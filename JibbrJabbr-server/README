@@ -1,0 +1,11 @@
+JibbrJabbr is an experiment in Java HTTP server concepts.
+
+Requires JDK 7 and you'll probably want Maven.
+
+Doesn't do a whole heck of a lot, yet.  Run the build,
+put target/jj-0.1-SNAPSHOT-all.jar in a directory
+somewhere, then run
+
+$JDK7_HOME/bin/java -jar jj-0.1-SNAPSHOT-all.jar
+
+in that directory.
