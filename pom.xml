@@ -8,6 +8,7 @@
 	<name>JibbrJabbr master</name>
 	<url>http://jibbrjabbr.com</url>
 	<properties>
+		<friendlyname>JibbrJabbr</friendlyname>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>

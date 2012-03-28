@@ -35,7 +35,4 @@
 			</resource>
 		</resources>
 	</build>
-	<properties>
-		<friendlyname>JibbrJabbr</friendlyname>
-	</properties>
 </project>

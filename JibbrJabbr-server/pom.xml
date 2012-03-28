@@ -12,17 +12,18 @@
 
 	<name>JibbrJabbr Server</name>
 	<description>An attempt at a simple Java web server. More or less an incubator for concepts and a reason to learn new Java stuff.</description>
-	
+
 	<properties>
 		<!-- the integration test project will probably care -->
 		<!-- hopefully there will be a better way -->
 		<distro.id>all</distro.id>
 		<distro.jarname>JibbrJabbr-${project.version}-${distro.id}.jar</distro.jarname>
 	</properties>
-	
+
 	<modules>
 		<module>JibbrJabbr-api</module>
 		<module>JibbrJabbr-kernel</module>
+		<module>JibbrJabbr-bootstrapper</module>
 		<module>JibbrJabbr</module>
 	</modules>
 
@@ -40,6 +41,11 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
+				<artifactId>JibbrJabbr-bootstrapper</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>JibbrJabbr</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -49,9 +55,11 @@
 				<version>4.10</version>
 			</dependency>
 			<dependency>
+				<!-- https://github.com/jhy/jsoup - not adding as a module since it will be released
+				eventually but we need the parser error fixes  -->
 				<groupId>org.jsoup</groupId>
 				<artifactId>jsoup</artifactId>
-				<version>1.6.1</version>
+				<version>1.6.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>io.netty</groupId>
@@ -96,7 +104,7 @@
 			<dependency>
 				<groupId>commons-daemon</groupId>
 				<artifactId>commons-daemon</artifactId>
-				<version>1.0.8</version>
+				<version>1.0.10</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -157,5 +165,5 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 </project>

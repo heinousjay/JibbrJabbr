@@ -21,6 +21,10 @@
 			<artifactId>JibbrJabbr-kernel</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>JibbrJabbr-bootstrapper</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>commons-daemon</groupId>
 			<artifactId>commons-daemon</artifactId>
 		</dependency>

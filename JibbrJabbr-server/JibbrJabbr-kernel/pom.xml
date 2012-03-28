@@ -14,6 +14,11 @@
 			<artifactId>JibbrJabbr-api</artifactId>
 		</dependency>
 		<dependency>
+		<!--  not ideal.  need to refactor this stuff into a utility -->
+			<groupId>${project.groupId}</groupId>
+			<artifactId>JibbrJabbr-bootstrapper</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 		</dependency>
