@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
 import jj.html.HTMLFragment;
+import jj.html.HTMLFragmentCache;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -75,9 +76,10 @@ public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
 	static {
 		Path jar = JJ.jarForClass(NettyRequestBridge.class);
 		try (FileSystem jarFS = FileSystems.newFileSystem(jar, null)) { 
-			index = new HTMLFragment(jarFS.getPath("jj", "assets", "index.html"));
-			error404 = new HTMLFragment(jarFS.getPath("jj", "errors", "404.html"));
-			error405 = new HTMLFragment(jarFS.getPath("jj", "errors", "405.html"));
+			HTMLFragmentCache cache = new HTMLFragmentCache();
+			index = cache.find(jarFS.getPath("jj", "assets", "index.html"));
+			error404 = cache.find(jarFS.getPath("jj", "errors", "404.html"));
+			error405 = cache.find(jarFS.getPath("jj", "errors", "405.html"));
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		} 
@@ -209,7 +211,9 @@ public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
 		@Override
 		public void run() {
 			logger.info("Servicing {} for {}", method, uri);
-
+			System.out.println();
+			System.out.println(System.getProperty("user.name"));
+			System.out.println();
 			if (GET != method) {
 				send405();
 			} else {

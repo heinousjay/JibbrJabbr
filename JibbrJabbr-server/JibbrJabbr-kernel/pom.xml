@@ -14,7 +14,9 @@
 			<artifactId>JibbrJabbr-api</artifactId>
 		</dependency>
 		<dependency>
-		<!--  not ideal.  need to refactor this stuff into a utility -->
+			<!-- not ideal. need to refactor the particulars into a utility 
+			     or just bite the bullet and duplicate the code, the bootstrapper
+			     is special anyway -->
 			<groupId>${project.groupId}</groupId>
 			<artifactId>JibbrJabbr-bootstrapper</artifactId>
 		</dependency>
@@ -36,7 +38,17 @@
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<artifactId>junit-dep</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

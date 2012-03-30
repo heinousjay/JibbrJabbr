@@ -10,10 +10,4 @@
   <name>JibbrJabbr Server Bootstrapping</name>
   <description>Various methods of getting JibbrJabbr started.</description>
   
-  <dependencies>
-  	<dependency>
-  		<groupId>${project.groupId}</groupId>
-  		<artifactId>JibbrJabbr-api</artifactId>
-  	</dependency>
-  </dependencies>
 </project>

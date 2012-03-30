@@ -15,23 +15,20 @@
  */
 package jj.html;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
-import org.jboss.netty.util.CharsetUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
+import org.jsoup.parser.ParseError;
 import org.jsoup.parser.Parser;
 import org.jsoup.parser.Tag;
 
 /**
  * <p>
- * Coordinates all activities relating to an HTML source file, which
- * can be a document or fragment thereof.
+ * Responsible for turning a string into a JSoup node of some type,
+ * maintaining information about it such as parsing errors
  * </p>
  * 
  * @author jason
@@ -39,29 +36,44 @@ import org.jsoup.parser.Tag;
  */
 public final class HTMLFragment {
 	
-	public static final Tag NODE_LIST_SENTINEL_TAG = Tag.valueOf("joj.sentinel.tag");
+	public static class HTMLError {
+		public String context;
+		public ParseError error;
+	}
 	
-	private final Path path;
-	private final AtomicReference<Element> element = new AtomicReference<>();
-
-	public HTMLFragment(final Path path) {
-		assert path != null;
-		assert Files.exists(path);
-		this.path = path;
+	public static final Tag NODE_LIST_SENTINEL_TAG = Tag.valueOf("jj.sentinel.tag");
+	
+	private static final Pattern DOC_DETECTOR =
+			Pattern.compile("(?si)^\\s*(?:<!doctype |<)html>.*");
+	
+	private final List<ParseError> parseErrors;
+	private final Element element;
+	
+	HTMLFragment(final String source) {
+		if (source == null || source.trim().isEmpty()) throw new IllegalArgumentException("");
 		
-		populate();
+		Parser parser = Parser.htmlParser();
+		Document parsed = parser.setTrackErrors(100).parseInput(source, "");
+		parseErrors = Collections.unmodifiableList(parser.getErrors());
+		
+		if (DOC_DETECTOR.matcher(source).matches()) {
+			element = parsed;
+		} else {
+			element = parsed.select("body").first();
+		}
+		contextualizeErrors(source);
 	}
 	
-	public Path path() {
-		return path;
-	}
-	
-	public void reload() {
-		populate();
-	}
-	
-	public void destroy() {
-		// nothing to do
+	private void contextualizeErrors(String source) {
+		
+		for (ParseError error : parseErrors) {
+			int position = error.getPosition();
+			int basePosition = Math.max(0, position - 25);
+			int endPosition = Math.min(source.length(), position + 15);
+			System.out.println(error.getErrorMessage());
+			System.out.println(source.substring(basePosition, endPosition).replace('\t', ' ').replace('\n',	' '));
+			System.out.println("                    ----^");
+		}
 	}
 	
 	/**
@@ -70,62 +82,22 @@ public final class HTMLFragment {
 	 * @return
 	 */
 	public Element element() {
-		Element core = element.get();
-		// always returns the clone, not the "canonical representation"
-		// since obviously we don't want that modified
-		return core == null ? null : core.clone();
+		return element == null ? null : element.clone();
 	}
 	
-	public static boolean isStandaloneElement(Element element) {
+	public List<ParseError> errors() {
+		return parseErrors;
+	}
+	
+	public static boolean isStandaloneElement(final Element element) {
 		return !isCompleteDocument(element) && !isNodeList(element);
 	}
 	
-	public static boolean isCompleteDocument(Element element) {
+	public static boolean isCompleteDocument(final Element element) {
 		return element instanceof Document;
 	}
 	
-	public static boolean isNodeList(Element element) {
+	public static boolean isNodeList(final Element element) {
 		return element.tag() == NODE_LIST_SENTINEL_TAG;
-	}
-	
-	private String getRawHTML() {
-		try {
-			return new String(Files.readAllBytes(path), CharsetUtil.UTF_8).trim();
-		} catch (IOException e) {
-			// TODO - gotta make this stuff somewhat nicer
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private void populate() {
-		Element old = element.get();
-		String raw = getRawHTML();
-		// does it start with a <!DOCTYPE HTML> or <html>? it's a document.  
-		// for now, who cares, just get it loading
-		Element parsed;
-		if (raw.startsWith("<!DOCTYPE") || raw.startsWith("<html>")) {
-			parsed = Parser.parse(raw, "");
-		} else {
-			List<Node> nodes = Parser.parseFragment(raw, null, "");
-			// if there is one node and it's an element, just use that
-			if (nodes.size() == 1 && nodes.get(0) instanceof Element) {
-				parsed = (Element)nodes.get(0);
-			} else {
-				parsed = new Element(NODE_LIST_SENTINEL_TAG, "");
-				for (Node node : nodes) {
-					parsed.appendChild(node);
-				}
-			}
-		}
-		
-		element.compareAndSet(old, parsed);
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("%s from %s",
-			HTMLFragment.class.getName(),
-			path
-		);
 	}
 }

@@ -15,27 +15,12 @@
  */
 package jj;
 
-import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.UserPrincipal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import jj.api.Version;
 
 /**
  * <p>
@@ -53,12 +38,6 @@ import jj.api.Version;
  * @author Jason Miller
  */
 public final class JJ {
-	
-	// these names get defined here and then copied in the
-	// classes that manage directory layouts
-	public static final String SYSTEM_BASE_PATH = "system";
-	public static final String LIB_PATH = "lib";
-	public static final String META_INF_PATH = "META-INF";
 	
 	private static final String JJ_KERNEL_CLASS = "jj.Kernel";
 	
@@ -136,7 +115,7 @@ public final class JJ {
 		return jarPath(uri(clazz));
 	}
 	
-	private static final Path myJarPath = jarForClass(JJ.class);
+	static final Path myJarPath = jarForClass(JJ.class);
 	private static boolean initialized = false;
 
 	public static void main(String[] args) 
@@ -167,6 +146,37 @@ public final class JJ {
 			throw new IllegalStateException("Main called under a daemon");
 		}
 	}
+	
+	private boolean processBootstrapArgs(String[] args) {
+		// we install regardless
+		if (!daemonStart && args.length == 1 && "install".equals(args[0])) {
+			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
+			System.out.println("⟾⟾");
+			System.out.println("⟾⟾ JibbrJabbr installed to: ");
+			System.out.println("⟾⟾ " + installer.basePath);
+			System.out.println("⟾⟾");
+			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
+			// we just stop here having performed the installation
+			return true;
+		}
+		
+		if (args.length == 1 && "env".equals(args[0])) {
+			System.out.println("ENVIRONMENT:");
+			for (String key : System.getenv().keySet()) {
+				System.out.printf("ENV[%s] = [%s]\n", key, System.getenv(key));
+			}
+			System.out.println("SYSTEM PROPERTIES:");
+			for (Object keyObj : System.getProperties().keySet()) {
+				String key = (String)keyObj;
+				System.out.printf("%s = [%s]\n", key, System.getProperty(key));
+			}
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private BootstrapInstaller installer;
 
 	public void init(String[] args) throws Exception {
 		if (initialized) {
@@ -174,24 +184,18 @@ public final class JJ {
 		}
 		initialized = true;
 		if (myJarPath != null) {
-			kernelClass = new BootstrapClassLoader().loadClass(JJ_KERNEL_CLASS);
 			
-			if (!daemonStart && args.length == 1 && "install".equals(args[0])) {
-				// we just stop here.  the class loader made the install
-				return;
-			}
+			installer = new BootstrapInstaller(myJarPath);
+			if (processBootstrapArgs(args) && !daemonStart) return;
+
+			kernelClass = new BootstrapClassLoader(installer.libPath).loadClass(JJ_KERNEL_CLASS);
 			
 		} else {
 			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
+			System.out.println("⟾⟾");
 			System.out.println("⟾⟾ WARNING - this operation is not fully implemented.");
 			System.out.println("⟾⟾ For best results, you should package this project");
 			System.out.println("⟾⟾ and run from the resulting jar.");
-			System.out.println("⟾⟾");
-			System.out.println("⟾⟾ export $JAVA_HOME=[JDK 7 home]");
-			System.out.println("⟾⟾");
-			System.out.println("⟾⟾ mvn clean install");
-			System.out.println("⟾⟾");
-			System.out.println("⟾⟾ $JAVA_HOME/bin/java -jar server/distro/target/" + Version.name + "-" + Version.version + "-all.jar");
 			System.out.println("⟾⟾");
 			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
 			
@@ -214,124 +218,6 @@ public final class JJ {
 		} catch (Exception e) {
 			System.err.println("Trouble shutting down");
 			e.printStackTrace();
-		}
-	}
-	
-	private static final class BasicSelfInstaller {
-		
-		private Path myLibPath;
-		
-		private void install() {
-			
-			try (FileSystem myJarFS = FileSystems.newFileSystem(myJarPath, null)) {
-				
-				// basic self installation
-				// - ensure the existence of the system directory and the system/lib
-				// - if necessary, copy the libs from inside the jar to the lib directory
-				//   for now, always do it. properly this would require version checks
-				//   maybe have Maven put the classpath entries in the manifest? that might work
-				//   since all the jars are named with versions
-				
-				// whoever owns the installation directory is going to own
-				// everything we make - if we are running as root on unix
-				// we need to do this or we can't read our dependencies later
-				UserPrincipal owner = Files.getOwner(myJarPath);
-				
-				myLibPath = Files.createDirectories(myJarPath.resolveSibling(SYSTEM_BASE_PATH).resolve(LIB_PATH));
-				Files.setOwner(myLibPath.getParent(), owner);
-				Files.setOwner(myLibPath, owner);
-				
-				try (DirectoryStream<Path> libDir = 
-					Files.newDirectoryStream(myJarFS.getPath(META_INF_PATH, LIB_PATH), "*.jar")) {
-					for (Path jarPath : libDir) {
-						Path jar = myLibPath.resolve(jarPath.getFileName().toString());
-						Files.copy(jarPath, jar, COPY_ATTRIBUTES, REPLACE_EXISTING);
-						Files.setOwner(jar, owner);
-					}
-				}
-			} catch (IOException ioe) {
-				throw new IllegalStateException("Could not open", ioe);
-			}
-		}
-		
-	}
-	
-	private static final class BootstrapClassLoader
-			extends ClassLoader{
-		
-		static {
-			// does this speed up the start-up? exciting...
-			registerAsParallelCapable();
-		}
-		
-		private final BasicSelfInstaller installer = new BasicSelfInstaller();
-	
-		private BootstrapClassLoader() {
-			// whatever loaded this class is the root of all classloaders in the system
-			super(JJ.class.getClassLoader());
-			
-			// this stuff does not belong here at all
-			installer.install();
-			
-		}
-	
-		private DirectoryStream<Path> libJarsStream() throws IOException {
-			return Files.newDirectoryStream(installer.myLibPath, "*.jar");
-		}
-		
-		@Override
-		protected Class<?> findClass(String name) throws ClassNotFoundException {
-			try (DirectoryStream<Path> libDir = libJarsStream()) {
-				for (Path jarPath : libDir) {
-					try (FileSystem myJarFS = FileSystems.newFileSystem(jarPath, null)) {
-						Path attempt = myJarFS.getPath("/" + name.replace('.', '/') + ".class");
-						if (Files.exists(attempt)) {
-							byte[] classBytes = Files.readAllBytes(attempt);
-							return defineClass(name, classBytes, 0, classBytes.length);
-						}
-					}
-				}
-				
-			} catch (IOException e) {
-				System.err.printf("Something went wrong reading a class [%s]\n", name);
-				e.printStackTrace();
-				throw new ClassNotFoundException(name, e);
-			}
-			System.err.printf("Couldn't find [%s]\n", name);
-			throw new ClassNotFoundException(name);
-		}
-		
-		@Override
-		protected URL findResource(String name) {
-			URL result = null;
-			try (DirectoryStream<Path> libJars = libJarsStream()) {
-				for (Path jarPath : libJars) {
-					try (FileSystem myJarFS = FileSystems.newFileSystem(jarPath, null)) {
-						Path attempt = myJarFS.getPath("/" + name);
-						if (Files.exists(attempt)) {
-							result = attempt.toUri().toURL();
-							break;
-						}
-					}
-				}
-			} catch (IOException e) {}
-			return result;
-		}
-		
-		@Override
-		protected Enumeration<URL> findResources(String name) throws IOException {
-			List<URL> result = new ArrayList<>();
-			try (DirectoryStream<Path> libJars = libJarsStream()) {
-				for (Path jarPath : libJars) {
-					try (FileSystem myJarFS = FileSystems.newFileSystem(jarPath, null)) {
-						Path attempt = myJarFS.getPath("/" + name);
-						if (Files.exists(attempt)) {
-							result.add(attempt.toUri().toURL());
-						}
-					}
-				}
-			}
-			return Collections.enumeration(result);
 		}
 	}
 }
