@@ -24,6 +24,7 @@ import static java.util.Calendar.SECOND;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -32,7 +33,7 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
+import org.slf4j.cal10n.LocLogger;
 
 /**
  * <p>
@@ -58,19 +59,20 @@ public class HttpThreadPoolExecutor
 		}
 		
 	}
+	private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
-	private final Logger logger;
+	private final LocLogger logger;
 	
 	private final AtomicInteger idSource = new AtomicInteger(1);
 	
 	private final ThreadGroup threadGroup = new ThreadGroup(HttpThreadPoolExecutor.class.getSimpleName());
 	
-	public HttpThreadPoolExecutor(final Logger logger, final KernelSettings kernelSettings) {
+	public HttpThreadPoolExecutor(final LocLogger logger, final KernelSettings kernelSettings) {
 		super(
 			logger,
-			kernelSettings.httpThreadCoreCount(),
-			kernelSettings.httpThreadMaxCount(),
-			kernelSettings.httpThreadTimeOut(), SECONDS,
+			kernelSettings.asynchronousThreadCoreCount(),
+			kernelSettings.asynchronousThreadMaxCount(),
+			kernelSettings.asynchronousThreadTimeOut(), SECONDS,
 			new LinkedBlockingQueue<Runnable>()
 		);
 		this.logger = logger;

@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.jcip.annotations.Immutable;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.ParseError;
@@ -34,12 +36,9 @@ import org.jsoup.parser.Tag;
  * @author jason
  *
  */
+@Immutable
 public final class HTMLFragment {
 	
-	public static class HTMLError {
-		public String context;
-		public ParseError error;
-	}
 	
 	public static final Tag NODE_LIST_SENTINEL_TAG = Tag.valueOf("jj.sentinel.tag");
 	
@@ -61,11 +60,13 @@ public final class HTMLFragment {
 		} else {
 			element = parsed.select("body").first();
 		}
-		contextualizeErrors(source);
+		//contextualizeErrors(source);
 	}
 	
+	/* *
+	 * Take the JSoup parser errors and make something human readable out of them
+	 * for now we don't much care, this was just a scratchpad
 	private void contextualizeErrors(String source) {
-		
 		for (ParseError error : parseErrors) {
 			int position = error.getPosition();
 			int basePosition = Math.max(0, position - 25);
@@ -75,6 +76,7 @@ public final class HTMLFragment {
 			System.out.println("                    ----^");
 		}
 	}
+	 */
 	
 	/**
 	 * If this returns NODE_LIST_SENTINEL_TAG as its Tag, then

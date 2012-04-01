@@ -49,10 +49,18 @@ public enum KernelMessages {
 	HttpServerResourcesReleasing,
 	HttpServerResourcesReleased,
 	
-	//NettyRequestBridge messages
+	// NettyRequestBridge messages
 	ServerErrorFallbackResponse,
 	
-	//KernelTaskMessages
+	// JJThreadPoolExecutor messages
+	JJTaskStarting,
+	JJThreadInitializing,
+	JJThreadStarting,
+	JJThreadExiting,
+	JJTaskEnded,
+	JJTaskEndedWithException,
+	
+	// KernelThreadPoolExecutor messages
 	KernelTaskRejected,
 	KernelTaskDone,
 	KernelThreadName

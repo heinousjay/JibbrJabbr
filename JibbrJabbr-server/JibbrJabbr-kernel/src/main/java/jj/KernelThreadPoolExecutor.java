@@ -67,25 +67,21 @@ public class KernelThreadPoolExecutor
 	
 	private final ThreadGroup threadGroup = new ThreadGroup(KernelThreadPoolExecutor.class.getSimpleName());
 	
-	private final Kernel.Controller controller;
-	
 	public KernelThreadPoolExecutor(
 		final LocLogger logger,
 		final MessageConveyor messageConveyor,
-		final KernelSettings mainSettings,
-		final Kernel.Controller controller
+		final KernelSettings mainSettings
 	) {
 		super(
 			logger,
-			mainSettings.kernelThreadCoreCount(), 
-			mainSettings.kernelThreadMaxCount(),
-			mainSettings.kernelThreadTimeOut(), SECONDS, 
+			mainSettings.synchronousThreadCoreCount(), 
+			mainSettings.synchronousThreadMaxCount(),
+			mainSettings.synchronousThreadTimeOut(), SECONDS, 
 			new LinkedBlockingQueue<Runnable>()
 		);
 		this.logger = logger;
 		this.messageConveyor = messageConveyor;
 		this.setRejectedExecutionHandler(this);
-		this.controller = controller;
 		logger.debug(ObjectInstantiated, KernelThreadPoolExecutor.class);
 	}
 	

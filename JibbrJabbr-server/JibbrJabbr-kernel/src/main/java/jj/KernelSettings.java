@@ -74,34 +74,34 @@ public class KernelSettings {
 		return port;
 	}
 	
-	private int kernelThreadCoreCount = 4;
-	public int kernelThreadCoreCount() {
-		return kernelThreadCoreCount;
+	private int synchronousThreadCoreCount = 4;
+	public int synchronousThreadCoreCount() {
+		return synchronousThreadCoreCount;
 	}
 	
-	private int kernelThreadMaxCount = 20;
-	public int kernelThreadMaxCount() {
-		return kernelThreadMaxCount;
+	private int synchronousThreadMaxCount = 20;
+	public int synchronousThreadMaxCount() {
+		return synchronousThreadMaxCount;
 	}
 	
-	private long kernelThreadTimeOut = 20L;
-	public long kernelThreadTimeOut() {
-		return kernelThreadTimeOut;
+	private long synchronousThreadTimeOut = 20L;
+	public long synchronousThreadTimeOut() {
+		return synchronousThreadTimeOut;
 	}
 	
-	private int httpThreadCoreCount = 4;
-	public int httpThreadCoreCount() {
-		return httpThreadCoreCount;
+	private int asynchronousThreadCoreCount = 4;
+	public int asynchronousThreadCoreCount() {
+		return asynchronousThreadCoreCount;
 	}
 	
-	private int httpThreadMaxCount = 4;
-	public int httpThreadMaxCount() {
-		return httpThreadMaxCount;
+	private int asynchronousThreadMaxCount = 4;
+	public int asynchronousThreadMaxCount() {
+		return asynchronousThreadMaxCount;
 	}
 	
-	private long httpThreadTimeOut = 20L;
-	public long httpThreadTimeOut() {
-		return httpThreadTimeOut;
+	private long asynchronousThreadTimeOut = 20L;
+	public long asynchronousThreadTimeOut() {
+		return asynchronousThreadTimeOut;
 	}
 	
 	private Mode mode = DEV;

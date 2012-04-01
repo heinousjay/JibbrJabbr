@@ -37,6 +37,10 @@
 			<artifactId>slf4j-ext</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>net.jcip</groupId>
+			<artifactId>jcip-annotations</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit-dep</artifactId>
 			<scope>test</scope>

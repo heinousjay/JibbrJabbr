@@ -3,11 +3,19 @@ package jj.html;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ConcurrentHashMap;
 
+import net.jcip.annotations.ThreadSafe;
+
+import org.jboss.netty.util.CharsetUtil;
+
+@ThreadSafe
 public class HTMLFragmentCache {
 
+	private final ConcurrentHashMap<Path, HTMLFragment> cache;
+	
 	public HTMLFragmentCache() {
-		
+		cache = new ConcurrentHashMap<>();
 	}
 	
 	/**
@@ -25,12 +33,21 @@ public class HTMLFragmentCache {
 	
 	public HTMLFragment find(Path location) {
 		if (location == null) throw new IllegalArgumentException("");
-		try {
-			String source = new String(Files.readAllBytes(location), "UTF8");
-			return new HTMLFragment(source);
-		} catch (IOException e) {
-			throw new IllegalArgumentException("", e);
+		if (!cache.containsKey(location)) {
+			HTMLFragment htmlFragment = constructFragment(location);
+			if (htmlFragment != null) {
+				cache.putIfAbsent(location, htmlFragment);
+			}
 		}
+		return cache.get(location);
 		
+	}
+	
+	private HTMLFragment constructFragment(Path location) {
+		try {
+			return new HTMLFragment(new String(Files.readAllBytes(location), CharsetUtil.UTF_8));
+		} catch (IOException e) {
+			return null;
+		}
 	}
 }

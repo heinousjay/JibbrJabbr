@@ -20,30 +20,30 @@ import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 
 /**
  * @author Jason Miller
  *
  */
 public class HttpThreadPoolExecutorTest {
+	
+	@Rule
+	public CoreResourcesRule resources = new CoreResourcesRule();
 
 	private HttpThreadPoolExecutor htpe;
-	private Logger logger;
 	
 	@Before
 	public void before() {
-		logger = new MockLogger();
-		KernelSettings kernelSettings = new KernelSettings(logger, new String[0]);
-		htpe = new HttpThreadPoolExecutor(logger, kernelSettings);
+		KernelSettings kernelSettings = new KernelSettings(resources.mockLogger(), new String[0]);
+		htpe = new HttpThreadPoolExecutor(resources.logger(), kernelSettings);
 	}
 	
 	@After
 	public void after() {
 		htpe.shutdownNow();
 		htpe = null;
-		logger = null;
 	}
 	
 	@Test
@@ -81,7 +81,7 @@ public class HttpThreadPoolExecutorTest {
 	@Test
 	public void testRejectedExecutionSilentlyFails() {
 		// this one is a little weird and i may change the behavior
-		int maxThreads = new KernelSettings(logger, new String[0]).httpThreadMaxCount();
+		int maxThreads = new KernelSettings(resources.logger(), new String[0]).asynchronousThreadMaxCount();
 		for (int i = 0; i < maxThreads; ++i) {
 			htpe.submit(new TestRunnable(false));
 		}

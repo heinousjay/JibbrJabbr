@@ -15,24 +15,23 @@
  */
 package jj;
 
-import java.util.TimeZone;
+import static jj.KernelMessages.*;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
+import org.slf4j.cal10n.LocLogger;
 
 abstract class JJThreadPoolExecutor 
 		extends ThreadPoolExecutor 
 		implements ThreadFactory {
 	
-	static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-	
-	private final Logger logger;
+	private final LocLogger logger;
 
 	JJThreadPoolExecutor(
-		final Logger logger,
+		final LocLogger logger,
 		final int corePoolSize,
 		final int maximumPoolSize,
 		final long keepAliveTime,
@@ -50,7 +49,7 @@ abstract class JJThreadPoolExecutor
 	
 	@Override
 	protected void beforeExecute(Thread t, Runnable r) {
-		logger.debug("Starting task [{}]", r.getClass());
+		logger.debug(JJTaskStarting, r.getClass());
 		super.beforeExecute(t, r);
 	}
 	
@@ -58,9 +57,9 @@ abstract class JJThreadPoolExecutor
 	protected void afterExecute(Runnable r, Throwable t) {
 		
 		if (t != null) {
-			logger.error("Task [{}] ended with exception", r, t);
+			logger.error(JJTaskEndedWithException, r, t);
 		} else {
-			logger.debug("Completed task [{}]", r.getClass());
+			logger.debug(JJTaskEnded, r.getClass());
 		}
 		super.afterExecute(r, t);
 	}
@@ -71,7 +70,7 @@ abstract class JJThreadPoolExecutor
 		String name = threadName();
 			
 		
-		logger.debug("Creating a thread [{}] from [{}]", name, Thread.currentThread().getName());
+		logger.debug(JJThreadInitializing, name, Thread.currentThread().getName());
 		
 		Thread thread = new Thread(
 			threadGroup(), 
@@ -79,9 +78,9 @@ abstract class JJThreadPoolExecutor
 				
 				@Override
 				public void run() {
-					logger.trace("Thread starting");
+					logger.trace(JJThreadStarting);
 					inner.run();
-					logger.trace("Thread exiting");
+					logger.trace(JJThreadExiting);
 				}
 			}, 
 			name

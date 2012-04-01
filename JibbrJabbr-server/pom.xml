@@ -117,6 +117,11 @@
 				<artifactId>hamcrest-library</artifactId>
 				<version>1.3.RC2</version>
 			</dependency>
+			<dependency>
+				<groupId>net.jcip</groupId>
+				<artifactId>jcip-annotations</artifactId>
+				<version>1.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<repositories>
@@ -140,6 +145,15 @@
 			</plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.4.0</version>
+			</plugin>
+		</plugins>
+	</reporting>
 	<!-- i think this goes here... -->
 	<profiles>
 		<profile>

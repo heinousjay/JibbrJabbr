@@ -124,7 +124,7 @@ public final class HttpServer {
 			new NioServerSocketChannelFactory(
 				bossExecutor,
 				httpExecutor,
-				kernelSettings.httpThreadMaxCount()
+				kernelSettings.asynchronousThreadMaxCount()
 			)
 		);
 		
