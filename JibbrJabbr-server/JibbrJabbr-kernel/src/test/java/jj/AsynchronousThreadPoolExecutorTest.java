@@ -27,17 +27,17 @@ import org.junit.Test;
  * @author Jason Miller
  *
  */
-public class HttpThreadPoolExecutorTest {
+public class AsynchronousThreadPoolExecutorTest {
 	
 	@Rule
 	public CoreResourcesRule resources = new CoreResourcesRule();
 
-	private HttpThreadPoolExecutor htpe;
+	private AsynchronousThreadPoolExecutor htpe;
 	
 	@Before
 	public void before() {
 		KernelSettings kernelSettings = new KernelSettings(resources.mockLogger(), new String[0]);
-		htpe = new HttpThreadPoolExecutor(resources.logger(), kernelSettings);
+		htpe = new AsynchronousThreadPoolExecutor(resources.logger(), kernelSettings, resources.messageConveyor());
 	}
 	
 	@After

@@ -105,8 +105,8 @@ public final class HttpServer {
 		final LocLogger logger, 
 		final NettyRequestBridge requestHandler,
 		final KernelSettings kernelSettings,
-		final KernelThreadPoolExecutor bossExecutor,
-		final HttpThreadPoolExecutor httpExecutor,
+		final SynchronousThreadPoolExecutor bossExecutor,
+		final AsynchronousThreadPoolExecutor httpExecutor,
 		final Kernel.Controller kernelSync
 	) {
 		assert logger != null;

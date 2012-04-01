@@ -98,7 +98,7 @@ public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
 	public NettyRequestBridge(
 		final MessageConveyor messageConveyor,
 		final LocLogger logger,
-		final KernelThreadPoolExecutor requestExecutor,
+		final SynchronousThreadPoolExecutor requestExecutor,
 		final Kernel.Controller controller
 	) throws Exception {
 

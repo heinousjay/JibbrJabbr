@@ -94,7 +94,7 @@ public class KernelSettings {
 		return asynchronousThreadCoreCount;
 	}
 	
-	private int asynchronousThreadMaxCount = 4;
+	private int asynchronousThreadMaxCount = 20;
 	public int asynchronousThreadMaxCount() {
 		return asynchronousThreadMaxCount;
 	}

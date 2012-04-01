@@ -370,7 +370,7 @@ public class FileWatchService {
 	 * @param executor
 	 * @param logger
 	 */
-	public FileWatchService(final KernelThreadPoolExecutor executor, final LocLogger logger) {
+	public FileWatchService(final SynchronousThreadPoolExecutor executor, final LocLogger logger) {
 		//
 		assert executor != null : "No executor provided";
 		assert logger != null : "No logger provided";

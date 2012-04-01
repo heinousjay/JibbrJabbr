@@ -30,7 +30,7 @@ public class FileWatchServiceTest {
 
 	MockLogger executorLogger = new MockLogger();
 	FileWatchService underTest;
-	KernelThreadPoolExecutor executor;
+	SynchronousThreadPoolExecutor executor;
 	//MockLogger fileWatchServiceLogger;
 	
 	@Before
@@ -38,7 +38,7 @@ public class FileWatchServiceTest {
 		// so much set-up
 		MessageConveyor messageConveyor = new MessageConveyor(Locale.US);
 		LocLogger logger = new LocLogger(executorLogger, messageConveyor);
-		executor = new KernelThreadPoolExecutor(
+		executor = new SynchronousThreadPoolExecutor(
 			logger,
 			messageConveyor,
 			new KernelSettings(logger, new String[0])

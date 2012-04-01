@@ -60,8 +60,13 @@ public enum KernelMessages {
 	JJTaskEnded,
 	JJTaskEndedWithException,
 	
-	// KernelThreadPoolExecutor messages
-	KernelTaskRejected,
-	KernelTaskDone,
-	KernelThreadName
+	// SynchronousThreadPoolExecutor messages
+	SynchronousTaskRejected,
+	SynchronousTaskDone,
+	SynchronousThreadName,
+	
+	// AsynchronousThreadPoolExecutor messages
+	AsynchronousTaskRejected,
+	AsynchronousTaskDone,
+	AsynchronousThreadName
 }

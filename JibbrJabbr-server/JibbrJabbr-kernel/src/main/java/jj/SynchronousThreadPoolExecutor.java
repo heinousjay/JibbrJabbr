@@ -15,16 +15,10 @@
  */
 package jj;
 
-import static java.util.Calendar.YEAR;
-import static java.util.Calendar.MONTH;
-import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.HOUR;
-import static java.util.Calendar.MINUTE;
-import static java.util.Calendar.SECOND;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.KernelMessages.*;
 
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,85 +29,93 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.cal10n.LocLogger;
 
+import ch.qos.cal10n.MessageConveyor;
+
 /**
  * <p>
- * Dedicated pool for decoding incoming HTTP requests
- * and handshaking WebSocket connections.  
+ * handles the synchronous tasks 
  * </p>
  * 
- * @author Jason Miller
+ * @author jason
  *
  */
-public class HttpThreadPoolExecutor 
-		extends JJThreadPoolExecutor 
+public class SynchronousThreadPoolExecutor 
+		extends JJThreadPoolExecutor
 		implements RejectedExecutionHandler {
 	
-	private final class HttpTask<V> extends FutureTask<V> {
+	private final class KernelTask<V> 
+		extends FutureTask<V> {
 
-		public HttpTask(Callable<V> callable) {
+		/**
+		 * @param callable
+		 */
+		public KernelTask(Callable<V> callable) {
 			super(callable);
 		}
 		
-		public HttpTask(Runnable runnable, V result) {
+		/**
+		 * 
+		 */
+		public KernelTask(Runnable runnable, V result) {
 			super(runnable, result);
 		}
 		
+		@Override
+		protected void done() {
+			logger.info(SynchronousTaskDone);
+		}
+		
 	}
-	private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-
+	
 	private final LocLogger logger;
+	
+	private final MessageConveyor messageConveyor;
 	
 	private final AtomicInteger idSource = new AtomicInteger(1);
 	
-	private final ThreadGroup threadGroup = new ThreadGroup(HttpThreadPoolExecutor.class.getSimpleName());
+	private final ThreadGroup threadGroup = new ThreadGroup(SynchronousThreadPoolExecutor.class.getSimpleName());
 	
-	public HttpThreadPoolExecutor(final LocLogger logger, final KernelSettings kernelSettings) {
+	public SynchronousThreadPoolExecutor(
+		final LocLogger logger,
+		final MessageConveyor messageConveyor,
+		final KernelSettings mainSettings
+	) {
 		super(
 			logger,
-			kernelSettings.asynchronousThreadCoreCount(),
-			kernelSettings.asynchronousThreadMaxCount(),
-			kernelSettings.asynchronousThreadTimeOut(), SECONDS,
+			mainSettings.synchronousThreadCoreCount(), 
+			mainSettings.synchronousThreadMaxCount(),
+			mainSettings.synchronousThreadTimeOut(), SECONDS, 
 			new LinkedBlockingQueue<Runnable>()
 		);
 		this.logger = logger;
+		this.messageConveyor = messageConveyor;
 		this.setRejectedExecutionHandler(this);
-		
-		logger.debug("Instantiating {}", HttpThreadPoolExecutor.class);
+		logger.debug(ObjectInstantiated, SynchronousThreadPoolExecutor.class);
 	}
-
+	
 	@Override
 	protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-		return new HttpTask<T>(callable);
+		return new KernelTask<T>(callable);
 	}
 	
-	@Override
-	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-		return new HttpTask<T>(runnable, value);
+	protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
+		return new KernelTask<T>(runnable, value);
 	};
-	
+
 	@Override
 	public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-		// can't happen with the current configuration
-		logger.warn("dropping connections");
+		logger.error(SynchronousTaskRejected);
 	}
-
-	@Override
+	
 	String threadName() {
-		Calendar now = Calendar.getInstance(UTC);
-		return String.format("HTTP thread %d (%d-%d-%d %d:%d:%dUTC)",
+		return messageConveyor.getMessage(SynchronousThreadName,
 			idSource.getAndIncrement(),
-			now.get(YEAR),
-			now.get(MONTH) + 1,
-			now.get(DAY_OF_MONTH),
-			now.get(HOUR),
-			now.get(MINUTE),
-			now.get(SECOND)
+			new Date()
 		);
 	}
-
-	@Override
+	
 	ThreadGroup threadGroup() {
 		return threadGroup;
 	}
-
+	
 }

@@ -263,8 +263,8 @@ public class Kernel {
 					 .addComponent(KernelSettings.class)
 					 .addComponent(HttpServer.class)
 					 .addComponent(NettyRequestBridge.class)
-					 .addComponent(KernelThreadPoolExecutor.class)
-					 .addComponent(HttpThreadPoolExecutor.class)
+					 .addComponent(SynchronousThreadPoolExecutor.class)
+					 .addComponent(AsynchronousThreadPoolExecutor.class)
 					 .addAdapter(new MessageConveyorProvidingAdapter())
 					 .as(NONE).addAdapter(new LocLoggerProvidingAdapter());
 
