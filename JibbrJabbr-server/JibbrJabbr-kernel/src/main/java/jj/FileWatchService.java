@@ -22,6 +22,8 @@ import net.jcip.annotations.ThreadSafe;
 
 import org.slf4j.cal10n.LocLogger;
 
+import ch.qos.cal10n.MessageConveyor;
+
 /**
  * <p>
  * Provides the file watching service for the JibbrJabbr system.  Register
@@ -370,10 +372,15 @@ public class FileWatchService {
 	 * @param executor
 	 * @param logger
 	 */
-	public FileWatchService(final SynchronousThreadPoolExecutor executor, final LocLogger logger) {
-		//
-		assert executor != null : "No executor provided";
+	public FileWatchService(
+		final SynchronousThreadPoolExecutor executor, 
+		final LocLogger logger,
+		final MessageConveyor messages
+	) {
+		// 
+		assert executor != null : "No synchronous executor provided";
 		assert logger != null : "No logger provided";
+		assert messages != null : "No messages provided";
 		
 		try {
 			this.keys = new ConcurrentHashMap<>();
@@ -382,6 +389,7 @@ public class FileWatchService {
 			this.logger = logger;
 			this.executor = executor;
 		} catch (IOException e) {
+			// TODO throw a smarter exception here
 			throw new IllegalStateException("", e);
 		}
 		

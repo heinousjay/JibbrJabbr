@@ -43,7 +43,7 @@ public class FileWatchServiceTest {
 			messageConveyor,
 			new KernelSettings(logger, new String[0])
 		);
-		underTest = new FileWatchService(executor, logger);
+		underTest = new FileWatchService(executor, logger, messageConveyor);
 	}
 	
 	@After
