@@ -31,14 +31,20 @@ import org.slf4j.cal10n.LocLoggerFactory;
 import ch.qos.cal10n.MessageConveyor;
 
 /**
- * Adapter to provide Class-specific Logger instances from an SLF4J
- * LoggerFactory.
+ * Adapter to provide Class-specific Logger instances.
+ * 
+ * Needs to get a lil more sophisticated - provide logger
+ * instances that actually log to a queue which a logging
+ * task picks up and dispatches.
+ * 
  * @author jason
  *
  */
 final class LocLoggerProvidingAdapter extends FactoryInjector<LocLogger> {
 
 	private static final String UNKNOWN_LOGGER_NAME = "jj.Unknown";
+	
+	
 	
 	@Override
 	public LocLogger getComponentInstance(PicoContainer container, Type into)

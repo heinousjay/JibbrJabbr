@@ -28,10 +28,9 @@ import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.concurrent.ExecutorService;
 
 import jj.html.HTMLFragment;
-import jj.html.HTMLFragmentCache;
+import jj.html.HTMLFragmentFinder;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -44,7 +43,6 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -66,30 +64,12 @@ import ch.qos.cal10n.MessageConveyor;
  *
  */
 public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
-
-	// still doesn't belong here but it's simpler to move out now
-	
-	private static final HTMLFragment index;
-	private static final HTMLFragment error404;
-	private static final HTMLFragment error405;
-	
-	static {
-		Path jar = JJ.jarForClass(NettyRequestBridge.class);
-		try (FileSystem jarFS = FileSystems.newFileSystem(jar, null)) { 
-			HTMLFragmentCache cache = new HTMLFragmentCache();
-			index = cache.find(jarFS.getPath("jj", "assets", "index.html"));
-			error404 = cache.find(jarFS.getPath("jj", "errors", "404.html"));
-			error405 = cache.find(jarFS.getPath("jj", "errors", "405.html"));
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		} 
-	}
 	
 	private final LocLogger logger;
-
-	private final ExecutorService requestExecutor;
 	
 	private final Kernel.Controller controller;
+	
+	private final HTMLFragmentFinder htmlFragmentFinder;
 
 	private final byte[] favicon;
 	
@@ -98,31 +78,24 @@ public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
 	public NettyRequestBridge(
 		final MessageConveyor messageConveyor,
 		final LocLogger logger,
-		final SynchronousThreadPoolExecutor requestExecutor,
-		final Kernel.Controller controller
+		final Kernel.Controller controller,
+		final HTMLFragmentFinder htmlFragmentFinder
 	) throws Exception {
 
-		assert messageConveyor != null;
-		assert logger != null;
-		assert requestExecutor != null;
-		assert controller != null;
+		assert messageConveyor != null : "messageConveyor is required";
+		assert logger != null : "logger is required";
+		assert controller != null : "controller is required";
+		assert htmlFragmentFinder != null : "htmlFragmentFinder is required";
 		
 		logger.debug(ObjectInstantiating, NettyRequestBridge.class);
 
 		this.logger = logger;
-		this.requestExecutor = requestExecutor;
 		this.controller = controller;
+		this.htmlFragmentFinder = htmlFragmentFinder;
 		
-		error503 = new DefaultHttpResponse(HTTP_1_1, SERVICE_UNAVAILABLE);
-		error503.setHeader(CONTENT_TYPE, "text/html; charset=" + CharsetUtil.UTF_8.name());
-		error503.setContent(
-			ChannelBuffers.wrappedBuffer(
-				messageConveyor.getMessage(ServerErrorFallbackResponse).getBytes(CharsetUtil.UTF_8)
-			)
-		);
-		// did this work?
-		logger.info(messageConveyor.getMessage(ServerErrorFallbackResponse));
-
+		error503 = makeFallback503(messageConveyor.getMessage(ServerErrorFallbackResponse));
+		
+		// totally the wrong place for this as well
 		try (InputStream indexStream = NettyRequestBridge.class.getResourceAsStream("assets/favicon.ico")) {
 			assert indexStream != null;
 			try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024)) {
@@ -135,8 +108,22 @@ public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
 			}
 		}
 	}
+	
+	@NonBlocking
+	private HttpResponse makeFallback503(String responseString) {
+		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, SERVICE_UNAVAILABLE);
+		response.setHeader(CONTENT_TYPE, "text/html; charset=" + CharsetUtil.UTF_8.name());
+		response.setContent(
+			ChannelBuffers.wrappedBuffer(
+				responseString.getBytes(CharsetUtil.UTF_8)
+			)
+		);
+		
+		return response;
+	}
 
 	@Override
+	@NonBlocking
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 
 		// if we're paused, return a 503 directly
@@ -158,25 +145,117 @@ public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
 						ctx.setAttachment(handshaker);
 					}
 				} else {
-					requestExecutor.execute(new HttpResponseTask(request, e.getChannel()));
+					handleHttp(ctx, e, request);
 				}
 			} else if (msg instanceof WebSocketFrame) {
 				handleWebSocketFrame(ctx, (WebSocketFrame) msg);
 			}
 		} else {
-			e.getChannel()
-				.write(error503)
-				.addListener(ChannelFutureListener.CLOSE);
+			write503(e.getChannel());
+		}
+	}
+	
+	private void write503(Channel channel) {
+		channel.write(error503)
+			.addListener(ChannelFutureListener.CLOSE);
+	}
+	
+	private static final HttpResponse RESPONSE_100_CONTINUE = new DefaultHttpResponse(HTTP_1_1, CONTINUE);
+	
+	@NonBlocking
+	private void handleHttp(final ChannelHandlerContext ctx, final MessageEvent e, final HttpRequest request) throws Exception {
+		// this totally does not belong here.
+		// need to set up a system of handlers
+		String path = null;
+		String uri = request.getUri();
+		final Channel responseChannel = e.getChannel();
+		HttpResponseStatus status = NOT_FOUND;
+		if (request.getMethod() != GET) {
+			path = "errors/405.html";
+			status = METHOD_NOT_ALLOWED;
+		} else {
+			if (is100ContinueExpected(request)) {
+				responseChannel.write(RESPONSE_100_CONTINUE);
+			} else if ("/favicon.ico".equals(uri)) {
+				writeResponse(responseChannel, request, OK, ChannelBuffers.wrappedBuffer(favicon), "image/vnd.microsoft.icon");
+			} else if ("/".equals(uri) || "/index".equals(uri)) {
+				path = "assets/index.html";
+				status = OK;
+			} else {
+				path = "errors/404.html";
+			}
+		}
+		
+		if (path != null) {
+			final HttpResponseStatus finalStatus = status;
+			try {
+				FileSystem jarFS = FileSystems.newFileSystem(JJ.jarForClass(NettyRequestBridge.class), null);
+				htmlFragmentFinder.find(jarFS.getPath("jj"), path, new SynchronousOperationCallback<HTMLFragment>() {
+					
+					@Override
+					public void complete(HTMLFragment htmlFragment) {
+						writeResponse(responseChannel, request, finalStatus, 
+							ChannelBuffers.copiedBuffer(
+								htmlFragment.element().html(), 
+								CharsetUtil.UTF_8
+							),
+							"text/html; charset=UTF-8"
+						);
+					}
+					
+					@Override
+					public void throwable(Throwable t) {
+						logger.error("NOT GOOD", t);
+						write503(responseChannel);
+					}
+				});
+			} catch (Exception ex) {
+				logger.error("NOT GOOD", ex);
+				
+			}
+		}
+	}
+	
+	@NonBlocking
+	private void writeResponse(
+		final Channel responseChannel,
+		final HttpRequest request,
+		final HttpResponseStatus status,
+		final ChannelBuffer content,
+		final String contentType
+	) {
+		// Decide whether to close the connection or not.
+		boolean keepAlive = isKeepAlive(request);
+
+		// Build the response object.
+		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
+		response.setContent(content);
+		response.setHeader(CONTENT_TYPE, contentType);
+
+		if (keepAlive) {
+			// Add 'Content-Length' header only for a keep-alive connection.
+			response.setHeader(CONTENT_LENGTH, content.readableBytes());
+		}
+
+		// Write the response.
+		ChannelFuture future = responseChannel.write(response);
+
+		// Close the non-keep-alive connection after the write operation is
+		// done.
+		if (!keepAlive) {
+			future.addListener(ChannelFutureListener.CLOSE);
 		}
 	}
 
 	private static final String WEBSOCKET_URI = "/websocket";
 
+	@NonBlocking
 	private String getWebSocketLocation(HttpRequest req) {
 		return "ws://" + req.getHeader(HttpHeaders.Names.HOST) + WEBSOCKET_URI;
 	}
 
-	// handle this in the I/O thread for now
+
+	@NonBlocking
 	private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
 		// Check for closing frame
 		if (frame instanceof CloseWebSocketFrame) {
@@ -191,89 +270,6 @@ public class NettyRequestBridge extends SimpleChannelUpstreamHandler {
 			String request = ((TextWebSocketFrame) frame).getText();
 			logger.debug("Channel {} received {}", ctx.getChannel().getId(), request);
 			ctx.getChannel().write(new TextWebSocketFrame(request.toUpperCase()));
-		}
-	}
-
-	private final class HttpResponseTask implements Runnable {
-
-		private final HttpRequest request;
-		private final String uri;
-		private final HttpMethod method;
-		private final Channel responseChannel;
-
-		HttpResponseTask(final HttpRequest request, final Channel responseChannel) {
-			this.request = request;
-			this.uri = request.getUri();
-			this.method = request.getMethod();
-			this.responseChannel = responseChannel;
-		}
-
-		@Override
-		public void run() {
-			logger.info("Servicing {} for {}", method, uri);
-			System.out.println();
-			System.out.println(System.getProperty("user.name"));
-			System.out.println();
-			if (GET != method) {
-				send405();
-			} else {
-				if (is100ContinueExpected(request)) {
-					send100Continue();
-				} if ("/favicon.ico".equals(uri)) {
-					sendFavicon();
-				} else if ("/".equals(uri) || "/index".equals(uri)) {
-					sendIndex();
-				} else {
-					send404();
-				}
-			}
-		}
-
-		private void send100Continue() { // no need to be fancy here
-			HttpResponse response = new DefaultHttpResponse(HTTP_1_1, CONTINUE);
-			responseChannel.write(response);
-		}
-
-		private void send404() {
-			writeResponse(NOT_FOUND, ChannelBuffers.copiedBuffer(error404.element().html(), CharsetUtil.UTF_8),
-				"text/html; charset=UTF-8");
-		}
-
-		private void send405() {
-			writeResponse(METHOD_NOT_ALLOWED, ChannelBuffers.copiedBuffer(error405.element().html(), CharsetUtil.UTF_8),
-				"text/html; charset=UTF-8");
-		}
-
-		private void sendFavicon() {
-			writeResponse(OK, ChannelBuffers.wrappedBuffer(favicon), "image/vnd.microsoft.icon");
-		}
-
-		private void sendIndex() {
-			writeResponse(OK, ChannelBuffers.copiedBuffer(index.element().html(), CharsetUtil.UTF_8), "text/html; charset=UTF-8");
-		}
-
-		private void writeResponse(HttpResponseStatus status, ChannelBuffer content, String contentType) {
-			// Decide whether to close the connection or not.
-			boolean keepAlive = isKeepAlive(request);
-
-			// Build the response object.
-			HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
-			response.setContent(content);
-			response.setHeader(CONTENT_TYPE, contentType);
-
-			if (keepAlive) {
-				// Add 'Content-Length' header only for a keep-alive connection.
-				response.setHeader(CONTENT_LENGTH, content.readableBytes());
-			}
-
-			// Write the response.
-			ChannelFuture future = responseChannel.write(response);
-
-			// Close the non-keep-alive connection after the write operation is
-			// done.
-			if (!keepAlive) {
-				future.addListener(ChannelFutureListener.CLOSE);
-			}
 		}
 	}
 

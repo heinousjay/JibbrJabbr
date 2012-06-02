@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.api;
+package jj.api.html;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.lang.annotation.ElementType.METHOD;
@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
 
 /**
  * <p>
- * Annotates a method be called with a {@link org.jsoup.select.Elements Elements}
+ * Annotates a method be called with a {@link Elements Elements}
  * collection that results from running the supplied selector against the active
- * document.
+ * document, or a 
  * </p>
  * 
  * <p>

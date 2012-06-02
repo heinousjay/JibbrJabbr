@@ -27,11 +27,8 @@ import org.slf4j.cal10n.LocLogger;
 abstract class JJThreadPoolExecutor 
 		extends ThreadPoolExecutor 
 		implements ThreadFactory {
-	
-	private final LocLogger logger;
 
 	JJThreadPoolExecutor(
-		final LocLogger logger,
 		final int corePoolSize,
 		final int maximumPoolSize,
 		final long keepAliveTime,
@@ -39,7 +36,6 @@ abstract class JJThreadPoolExecutor
 		final BlockingQueue<Runnable> workQueue
 	) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-		this.logger = logger;
 		this.setThreadFactory(this);
 	}
 	
@@ -49,7 +45,7 @@ abstract class JJThreadPoolExecutor
 	
 	@Override
 	protected void beforeExecute(Thread t, Runnable r) {
-		logger.debug(JJTaskStarting, r.getClass());
+		//logger.debug(JJTaskStarting, r.getClass());
 		super.beforeExecute(t, r);
 	}
 	
@@ -57,9 +53,9 @@ abstract class JJThreadPoolExecutor
 	protected void afterExecute(Runnable r, Throwable t) {
 		
 		if (t != null) {
-			logger.error(JJTaskEndedWithException, r, t);
+			//logger.error(JJTaskEndedWithException, r, t);
 		} else {
-			logger.debug(JJTaskEnded, r.getClass());
+			//logger.debug(JJTaskEnded, r.getClass());
 		}
 		super.afterExecute(r, t);
 	}
@@ -70,7 +66,7 @@ abstract class JJThreadPoolExecutor
 		String name = threadName();
 			
 		
-		logger.debug(JJThreadInitializing, name, Thread.currentThread().getName());
+		//logger.debug(JJThreadInitializing, name, Thread.currentThread().getName());
 		
 		Thread thread = new Thread(
 			threadGroup(), 
@@ -78,9 +74,9 @@ abstract class JJThreadPoolExecutor
 				
 				@Override
 				public void run() {
-					logger.trace(JJThreadStarting);
+					//logger.trace(JJThreadStarting);
 					inner.run();
-					logger.trace(JJThreadExiting);
+					//logger.trace(JJThreadExiting);
 				}
 			}, 
 			name

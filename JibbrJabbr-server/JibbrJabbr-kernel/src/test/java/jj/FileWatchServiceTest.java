@@ -30,7 +30,7 @@ public class FileWatchServiceTest {
 
 	MockLogger executorLogger = new MockLogger();
 	FileWatchService underTest;
-	SynchronousThreadPoolExecutor executor;
+	TestThreadPool testThreadPool;
 	//MockLogger fileWatchServiceLogger;
 	
 	@Before
@@ -38,20 +38,21 @@ public class FileWatchServiceTest {
 		// so much set-up
 		MessageConveyor messageConveyor = new MessageConveyor(Locale.US);
 		LocLogger logger = new LocLogger(executorLogger, messageConveyor);
-		executor = new SynchronousThreadPoolExecutor(
+		testThreadPool = new TestThreadPool();
+		underTest = new FileWatchService(
+			testThreadPool,
+			testThreadPool,
 			logger,
-			messageConveyor,
-			new KernelSettings(logger, new String[0])
+			messageConveyor
 		);
-		underTest = new FileWatchService(executor, logger, messageConveyor);
 	}
 	
 	@After
 	public void after() {
 		underTest.shutdown();
 		underTest = null;
-		executor.shutdown();
-		executor = null;
+		testThreadPool.shutdown();
+		testThreadPool = null;
 		
 		for (LogBundle lb : executorLogger.messages()) {
 			System.out.println(lb);
@@ -126,7 +127,7 @@ public class FileWatchServiceTest {
     }
 	
 	@Test
-	public void testBasicListening() throws Exception {
+	public void testBasicSynchronousListening() throws Exception {
 		Path baseDirectory = Files.createTempDirectory(getClass().getSimpleName());
 		final Path file = Files.createFile(baseDirectory.resolve("test.txt"));
 		final CyclicBarrier gate = new CyclicBarrier(2, new Runnable() {
@@ -180,6 +181,11 @@ public class FileWatchServiceTest {
 		} finally {
 			deleteTree(baseDirectory);
 		}
+	}
+	
+	@Test
+	public void testBasicAsynchronousListening() {
+		
 	}
 
 }

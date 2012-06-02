@@ -5,27 +5,27 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
-import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jboss.netty.util.CharsetUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 public class HTMLFragmentTest {
 
-	private static final String INDEX_HTML = "index.html";
+	private static final String CLAMWHORES_INDEX_HTML = "/com/clamwhores/index.html";
 	
 	HTMLFragment index;
-	Path clamwhoresBase;
+	Path clamwhoresIndex;
 	
 	@Before
-	public void before() throws URISyntaxException {
-		if (clamwhoresBase == null) {
-			Path clamwhoresIndex = Paths.get(getClass().getResource("/com/clamwhores/index.html").toURI());
-			clamwhoresBase = clamwhoresIndex.getParent();
+	public void before() throws Exception {
+		if (clamwhoresIndex == null) {
+			clamwhoresIndex = Paths.get(getClass().getResource(CLAMWHORES_INDEX_HTML).toURI());
 		}
-		index = new HTMLFragmentCache().find(clamwhoresBase, INDEX_HTML);
+		index = new HTMLFragment(new String(Files.readAllBytes(clamwhoresIndex), CharsetUtil.UTF_8));
 	}
 	
 	@Test

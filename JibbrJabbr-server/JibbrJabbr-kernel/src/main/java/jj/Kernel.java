@@ -22,6 +22,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import jj.api.Version;
+import jj.html.HTMLFragmentFinder;
 
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
@@ -261,6 +262,7 @@ public class Kernel {
 		coreContainer.addComponent(sync)
 					 .addComponent(args)
 					 .addComponent(KernelSettings.class)
+					 .addComponent(HTMLFragmentFinder.class)
 					 .addComponent(HttpServer.class)
 					 .addComponent(NettyRequestBridge.class)
 					 .addComponent(SynchronousThreadPoolExecutor.class)

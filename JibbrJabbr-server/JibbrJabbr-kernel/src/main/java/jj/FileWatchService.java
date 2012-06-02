@@ -13,7 +13,6 @@ import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -65,7 +64,9 @@ public class FileWatchService {
 	/**
 	 * <p>
 	 * Callback for receiving notifications that a file system
-	 * modification has been detected.
+	 * modification has been detected.  This callback will always be invoked in
+	 * the asynchronous pool and so should not directly do any work that will
+	 * result in potential thread blocking.
 	 * </p>
 	 * 
 	 * <p>
@@ -223,13 +224,13 @@ public class FileWatchService {
 		/**
 		 * dispatches the events as needed.
 		 * @param path
-		 * @param executor
+		 * @param synchExecutor
 		 */
 		int dispatch(final Path path, final Kind<Path> kind) {
 			int called = 0;
 			for (final FileWatchServiceCallback callback : directoryCallbacks.keySet()) {
 				++called;
-				executor.execute(new Runnable() {
+				asyncExecutor.execute(new Runnable() {
 					public void run() {
 						try {
 							if (kind == ENTRY_CREATE) {
@@ -252,7 +253,7 @@ public class FileWatchService {
 			if (callbacks != null) {
 				for (final FileWatchServiceCallback callback : callbacks.keySet()) {
 					++called;
-					executor.execute(new Runnable() {
+					asyncExecutor.execute(new Runnable() {
 						public void run() {
 							try {
 								if (kind == ENTRY_CREATE) {
@@ -363,22 +364,25 @@ public class FileWatchService {
 	private final FileSystem fileSystem;
 	private final WatchService watcher;
 	private final LocLogger logger;
-	private final Executor executor;
+	private final SynchThreadPool synchExecutor;
+	private final AsyncThreadPool asyncExecutor;
 	
 	private volatile boolean run = true;
 	
 	/**
 	 * Constructor that takes all dependencies
-	 * @param executor
+	 * @param synchExecutor
 	 * @param logger
 	 */
 	public FileWatchService(
-		final SynchronousThreadPoolExecutor executor, 
+		final SynchThreadPool synchExecutor,
+		final AsyncThreadPool asyncExecutor,
 		final LocLogger logger,
 		final MessageConveyor messages
 	) {
 		// 
-		assert executor != null : "No synchronous executor provided";
+		assert synchExecutor != null : "No synchronous executor provided";
+		assert asyncExecutor != null : "No asynchronous executor provided";
 		assert logger != null : "No logger provided";
 		assert messages != null : "No messages provided";
 		
@@ -387,13 +391,14 @@ public class FileWatchService {
 			this.fileSystem = FileSystems.getDefault();
 			this.watcher = this.fileSystem.newWatchService();
 			this.logger = logger;
-			this.executor = executor;
+			this.synchExecutor = synchExecutor;
+			this.asyncExecutor = asyncExecutor;
 		} catch (IOException e) {
 			// TODO throw a smarter exception here
 			throw new IllegalStateException("", e);
 		}
-		
-		executor.submit(serviceRunnable);
+		// very definitely a synchronous task
+		synchExecutor.submit(serviceRunnable);
 	}
 	
 	/**
@@ -408,46 +413,88 @@ public class FileWatchService {
 		return keys.get(watchKey);
 	}
 	
-	public boolean watch(final Path path, final FileWatchServiceCallback callback) {
+	/**
+	 * Synchronously register a path for watching.  This method interrogates the file system
+	 * and therefore should not be called from an asynchronous context.
+	 * @param path
+	 * @param callback
+	 * @return
+	 */
+	public boolean watch(final Path path, final FileWatchServiceCallback callback) throws IOException {
 		if (path == null) throw new IllegalArgumentException("");
 		if (callback == null) throw new IllegalArgumentException("");
 		if (path.getFileSystem() != fileSystem) throw new IllegalArgumentException("");
 		boolean success = false;
-		try {
-			// if it fails, that means the WatchKey was invalidated while
-			// adding the callback, and we need to try again.
-			while (!success) { 
-				// is this path a file? then we register the parent first
-				// then register the path
-				if (Files.isDirectory(path)) {
-					success = register(path).addCallback(callback);
-				} else {
-					success = register(path.getParent()).addCallback(callback, path);
-				}
+		// if it fails, that means the WatchKey was invalidated while
+		// adding the callback, and we need to try again.
+		while (!success) { 
+			// is this path a file? then we register the parent first
+			// then register the path
+			if (Files.isDirectory(path)) {
+				success = register(path).addCallback(callback);
+			} else {
+				success = register(path.getParent()).addCallback(callback, path);
 			}
-		} catch (Exception e) {
-			logger.warn("Error trying to watch a path", e);
 		}
 		return success;
 	}
 	
-	public void stopWatching(final Path path, final FileWatchServiceCallback callback) {
+	/**
+	 * Asynchronously register a path for watching, invoking the appropriate method on response when finished.
+	 * This method returns immediately without having completed registration and notifies the supplied response
+	 * callback upon completion
+	 * @param path
+	 * @param callback
+	 * @param response
+	 * @throws IllegalArgumentException immediately if any parameters are null
+	 */
+	public void watch(final Path path, final FileWatchServiceCallback callback, final SynchronousOperationCallback<Boolean> response) {
 		if (path == null) throw new IllegalArgumentException("");
 		if (callback == null) throw new IllegalArgumentException("");
-		try {
-			WatchKey key;
-			if (Files.isDirectory(path)) {
-				key = path.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-			} else {
-				key = path.getParent().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+		if (response == null) throw new IllegalArgumentException("");
+		synchExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					response.invokeComplete(asyncExecutor, Boolean.valueOf(watch(path, callback)));
+				} catch (final Throwable t) {
+					response.invokeThrowable(asyncExecutor, t);
+				}
 			}
-			WatchKeyCallbacks callbacks = keys.get(key);
-			if (callbacks != null) {
-				callbacks.removeCallback(callback, path);
-			}
-		} catch (Exception e) {
-			
+		});
+	}
+	
+	public void stopWatching(final Path path, final FileWatchServiceCallback callback) throws IOException {
+		if (path == null) throw new IllegalArgumentException("");
+		if (callback == null) throw new IllegalArgumentException("");
+
+		WatchKey key;
+		if (Files.isDirectory(path)) {
+			key = path.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+		} else {
+			key = path.getParent().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 		}
+		WatchKeyCallbacks callbacks = keys.get(key);
+		if (callbacks != null) {
+			callbacks.removeCallback(callback, path);
+		}
+	}
+	
+	public void stopWatching(final Path path, final FileWatchServiceCallback callback, final SynchronousOperationCallback<Void> response) {
+		if (path == null) throw new IllegalArgumentException("");
+		if (callback == null) throw new IllegalArgumentException("");
+		if (response == null) throw new IllegalArgumentException("");
+		synchExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					stopWatching(path, callback);
+					response.invokeComplete(asyncExecutor, null);
+				} catch (Throwable t) {
+					response.invokeThrowable(asyncExecutor, t);
+				}
+			}
+		});
 	}
 	
 	/**

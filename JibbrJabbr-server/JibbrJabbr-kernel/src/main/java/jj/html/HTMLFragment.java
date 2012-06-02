@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import jj.NonBlocking;
+
 import net.jcip.annotations.Immutable;
 
 import org.jsoup.nodes.Document;
@@ -48,8 +50,9 @@ public final class HTMLFragment {
 	private final List<ParseError> parseErrors;
 	private final Element element;
 	
+	@NonBlocking
 	HTMLFragment(final String source) {
-		if (source == null || source.trim().isEmpty()) throw new IllegalArgumentException("");
+		assert (source != null && !source.trim().isEmpty()) : "source is required";
 		
 		Parser parser = Parser.htmlParser();
 		Document parsed = parser.setTrackErrors(100).parseInput(source, "");
@@ -83,22 +86,37 @@ public final class HTMLFragment {
 	 * the child nodes are what counts.
 	 * @return
 	 */
+	@NonBlocking
 	public Element element() {
 		return element == null ? null : element.clone();
 	}
-	
+
+	@NonBlocking
 	public List<ParseError> errors() {
 		return parseErrors;
 	}
 	
+	@NonBlocking
+	public boolean isStandaloneElement() {
+		return isStandaloneElement(element);
+	}
+	
+	@NonBlocking
+	public boolean isCompleteDocument() {
+		return isCompleteDocument(element);
+	}
+
+	@NonBlocking
 	public static boolean isStandaloneElement(final Element element) {
 		return !isCompleteDocument(element) && !isNodeList(element);
 	}
-	
+
+	@NonBlocking
 	public static boolean isCompleteDocument(final Element element) {
 		return element instanceof Document;
 	}
-	
+
+	@NonBlocking
 	public static boolean isNodeList(final Element element) {
 		return element.tag() == NODE_LIST_SENTINEL_TAG;
 	}

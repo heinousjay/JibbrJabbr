@@ -16,9 +16,7 @@
 package jj;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.KernelMessages.AsynchronousTaskRejected;
-import static jj.KernelMessages.AsynchronousThreadName;
-import static jj.KernelMessages.ObjectInstantiated;
+import static jj.KernelMessages.*;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
@@ -26,25 +24,15 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.cal10n.LocLogger;
-
-import ch.qos.cal10n.MessageConveyor;
-
+import ch.qos.cal10n.IMessageConveyor;
 /**
  * <p>
  * Thread pool for handling asynchronous tasks.  This is largely an organizational concept.
- * Essentially no task that gets submitted into this pool is allowed to block.  I don't
- * think Java gives me a way to enforce that completely but one of the future tasks here
- * is to add a security manager that forbids manipulating files or the network if that is
- * possible to do on a per thread basis. If not, then classloader?  if not... well dammit.
- * </p>
- * 
- * <p>
- * Also have to verify netty works as I expect in this regard, or provide it a different
- * pool for network tasks.  
+ * Essentially no task that gets submitted into this pool is allowed to block.
  * </p>
  * 
  * <p>
@@ -56,8 +44,8 @@ import ch.qos.cal10n.MessageConveyor;
  *
  */
 public class AsynchronousThreadPoolExecutor 
-		extends JJThreadPoolExecutor 
-		implements RejectedExecutionHandler {
+		extends ThreadPoolExecutor 
+		implements AsyncThreadPool, RejectedExecutionHandler, ThreadFactory {
 	
 	private final class AsynchronousPoolTask<V> extends FutureTask<V> {
 
@@ -70,30 +58,26 @@ public class AsynchronousThreadPoolExecutor
 		}
 	}
 	
-	private final MessageConveyor messageConveyor;
-
-	private final LocLogger logger;
+	private final IMessageConveyor messageConveyor;
 	
 	private final AtomicInteger idSource = new AtomicInteger(1);
 	
 	private final ThreadGroup threadGroup = new ThreadGroup(AsynchronousThreadPoolExecutor.class.getSimpleName());
 	
 	public AsynchronousThreadPoolExecutor(
-		final LocLogger logger,
-		final KernelSettings kernelSettings,
-		final MessageConveyor messageConveyor) {
+		final IMessageConveyor messageConveyor,
+		final KernelSettings kernelSettings
+	) {
 		super(
-			logger,
 			kernelSettings.asynchronousThreadCoreCount(),
 			kernelSettings.asynchronousThreadMaxCount(),
 			kernelSettings.asynchronousThreadTimeOut(), SECONDS,
 			new LinkedBlockingQueue<Runnable>()
 		);
-		this.logger = logger;
 		this.messageConveyor = messageConveyor;
 		this.setRejectedExecutionHandler(this);
 		
-		logger.debug(ObjectInstantiated, AsynchronousThreadPoolExecutor.class);
+		//logger.debug(ObjectInstantiated, AsynchronousThreadPoolExecutor.class);
 	}
 
 	@Override
@@ -109,11 +93,10 @@ public class AsynchronousThreadPoolExecutor
 	@Override
 	public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 		// can't happen with the current configuration
-		logger.error(AsynchronousTaskRejected);
+		// need to log it
 	}
 
-	@Override
-	String threadName() {
+	private String threadName() {
 		return messageConveyor.getMessage(AsynchronousThreadName,
 			idSource.getAndIncrement(),
 			new Date()
@@ -121,8 +104,8 @@ public class AsynchronousThreadPoolExecutor
 	}
 
 	@Override
-	ThreadGroup threadGroup() {
-		return threadGroup;
+	public Thread newThread(Runnable runnable) {
+		return new Thread(threadGroup, runnable, threadName());
 	}
 
 }

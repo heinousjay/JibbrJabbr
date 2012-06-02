@@ -41,22 +41,22 @@ import ch.qos.cal10n.MessageConveyor;
  */
 public class SynchronousThreadPoolExecutor 
 		extends JJThreadPoolExecutor
-		implements RejectedExecutionHandler {
+		implements SynchThreadPool, RejectedExecutionHandler {
 	
-	private final class KernelTask<V> 
+	private final class SynchronousTask<V> 
 		extends FutureTask<V> {
 
 		/**
 		 * @param callable
 		 */
-		public KernelTask(Callable<V> callable) {
+		public SynchronousTask(Callable<V> callable) {
 			super(callable);
 		}
 		
 		/**
 		 * 
 		 */
-		public KernelTask(Runnable runnable, V result) {
+		public SynchronousTask(Runnable runnable, V result) {
 			super(runnable, result);
 		}
 		
@@ -81,7 +81,6 @@ public class SynchronousThreadPoolExecutor
 		final KernelSettings mainSettings
 	) {
 		super(
-			logger,
 			mainSettings.synchronousThreadCoreCount(), 
 			mainSettings.synchronousThreadMaxCount(),
 			mainSettings.synchronousThreadTimeOut(), SECONDS, 
@@ -95,11 +94,11 @@ public class SynchronousThreadPoolExecutor
 	
 	@Override
 	protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-		return new KernelTask<T>(callable);
+		return new SynchronousTask<T>(callable);
 	}
 	
 	protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
-		return new KernelTask<T>(runnable, value);
+		return new SynchronousTask<T>(runnable, value);
 	};
 
 	@Override

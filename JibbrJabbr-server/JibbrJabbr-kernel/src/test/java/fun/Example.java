@@ -6,10 +6,9 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import jj.api.Select;
+import jj.api.html.Element;
+import jj.api.html.Elements;
+import jj.api.html.Select;
 
 /**
  * Just sketching out the VERY VERY basic API for manipulating HTML.
@@ -48,6 +47,7 @@ public class Example {
 	
 	// defining this field will remove all comments from the output
 	// although i don't know yet how to do that
+	// this should also work per app, per directory, per template
 	final boolean removeComments = true;
 	
 	// figure out a simple looping mechanism

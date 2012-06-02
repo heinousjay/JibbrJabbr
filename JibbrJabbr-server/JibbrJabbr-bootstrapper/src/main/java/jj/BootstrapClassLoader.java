@@ -36,6 +36,9 @@ final class BootstrapClassLoader
 		// whatever loaded this class is the root of all classloaders in the system
 		super(BootstrapClassLoader.class.getClassLoader());
 		this.libPath = libPath;
+		// the kernel uses assertions to guarantee everything is constructed correctly
+		// and we want them enabled
+		setDefaultAssertionStatus(true);
 	}
 
 	private DirectoryStream<Path> libJarsStream() throws IOException {

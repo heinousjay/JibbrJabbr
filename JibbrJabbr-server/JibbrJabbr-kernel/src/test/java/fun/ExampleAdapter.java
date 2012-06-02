@@ -38,10 +38,10 @@ public class ExampleAdapter {
 		//  element sets you need and does the manipulations internally if
 		//  it comes to that)
 		logger.trace("Calling displayTime");
-		adapted.displayTime(element.select("#currentDate").first());
+		//adapted.displayTime(element.select("#currentDate").first());
 		
 		logger.trace("Calling cleanParagraphs");
-		adapted.cleanParagraphs(element.select("p"));
+		//adapted.cleanParagraphs(element.select("p"));
 		
 		return element;
 	}
