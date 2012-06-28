@@ -16,7 +16,11 @@
 package jj.api;
 
 /**
+ * Inject this interface if you need to publish events.
  * 
+ * The usage model should probably, what's the word... obvious.
+ * 
+ * @see Event
  * 
  * @author jason
  *

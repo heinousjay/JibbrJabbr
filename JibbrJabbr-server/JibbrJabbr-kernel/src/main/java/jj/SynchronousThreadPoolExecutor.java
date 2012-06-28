@@ -24,6 +24,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,8 +41,8 @@ import ch.qos.cal10n.MessageConveyor;
  *
  */
 public class SynchronousThreadPoolExecutor 
-		extends JJThreadPoolExecutor
-		implements SynchThreadPool, RejectedExecutionHandler {
+		extends ThreadPoolExecutor
+		implements SynchThreadPool, RejectedExecutionHandler, ThreadFactory {
 	
 	private final class SynchronousTask<V> 
 		extends FutureTask<V> {
@@ -89,8 +90,9 @@ public class SynchronousThreadPoolExecutor
 		this.logger = logger;
 		this.messageConveyor = messageConveyor;
 		this.setRejectedExecutionHandler(this);
-		logger.debug(ObjectInstantiated, SynchronousThreadPoolExecutor.class);
+		this.setThreadFactory(this);
 		
+		logger.debug(ObjectInstantiated, SynchronousThreadPoolExecutor.class);
 	}
 	
 	public void control(KernelControl control) {
@@ -121,8 +123,10 @@ public class SynchronousThreadPoolExecutor
 		);
 	}
 	
-	ThreadGroup threadGroup() {
-		return threadGroup;
+	@Override
+	public Thread newThread(final Runnable runnable) {
+		
+		return new Thread(threadGroup, runnable, threadName());
 	}
 	
 }

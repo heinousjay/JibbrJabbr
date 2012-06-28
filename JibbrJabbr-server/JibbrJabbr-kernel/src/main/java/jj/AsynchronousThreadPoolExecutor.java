@@ -77,7 +77,7 @@ public class AsynchronousThreadPoolExecutor
 		);
 		this.messageConveyor = messageConveyor;
 		this.setRejectedExecutionHandler(this);
-		
+		this.setThreadFactory(this);
 		//logger.debug(ObjectInstantiated, AsynchronousThreadPoolExecutor.class);
 		ems.register(this);
 	}

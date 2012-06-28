@@ -20,7 +20,6 @@ import static org.picocontainer.Characteristics.NONE;
 import static org.jboss.netty.util.ThreadNameDeterminer.CURRENT;
 
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 
 import jj.api.Version;
