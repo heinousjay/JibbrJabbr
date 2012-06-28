@@ -15,32 +15,18 @@
  */
 package jj;
 
+import jj.api.Event;
+
 /**
- * TODO needs a better name
- * 
- * <p>
- * Provides encapsulated command and control services for kernel systems
- * </p>
- * 
  * @author jason
  *
  */
-interface KernelController {
+@Event
+public class KernelException extends RuntimeException {
 
-	/**
-	 * waiting point for the initialization thread to
-	 * pause until all privileged operations are complete.
-	 * This is mainly to support binding to well-known ports
-	 * on Unix - this will probably have to change?
-	 */
-	void awaitPrivilegedOperationsComplete();
-	
 	/**
 	 * 
 	 */
-	void notifyPrivilegedOperationsComplete();
-	
-	void awaitHttpServerStart();
-	
-	void notifyHttpServerStarted();
+	private static final long serialVersionUID = -3110191078023953752L;
+
 }

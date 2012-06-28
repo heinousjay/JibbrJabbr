@@ -15,11 +15,9 @@
  */
 package jj;
 
+import static jj.KernelControl.*;
 import static org.picocontainer.Characteristics.NONE;
 import static org.jboss.netty.util.ThreadNameDeterminer.CURRENT;
-
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import jj.api.Version;
 import jj.html.HTMLFragmentFinder;
@@ -31,12 +29,32 @@ import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.behaviors.Caching;
 import org.picocontainer.injectors.ConstructorInjection;
+import org.picocontainer.lifecycle.NullLifecycleStrategy;
 import org.picocontainer.monitors.NullComponentMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Puts the server components together and manages their lifecycle.
+ * 
+ * container hierarchy should be something like
+ * 
+ * core
+ *  - thread pools
+ *  - event mediator
+ *  - settings
+ *  - messaging
+ *  - logging
+ *  - i/o container
+ *    - http/websocket/spdy? handler (netty)
+ *    - file watch service
+ *    - filesystem service
+ *  - application container - uses events to communicate with i/o container, no direct dependencies allowed!
+ *    - application loader
+ *    - individual application containers?
+ *      - responders
+ *      
+ * each layer uses the services of the layer(s) underneath
  * 
  * @author jason
  *
@@ -58,230 +76,81 @@ public class Kernel {
 	private final Logger logger = LoggerFactory.getLogger(Kernel.class);
 	
 	/**
-	 * Injected into kernel objects so they can be controlled in arbitrary
-	 * fashion by the kernel object.
-	 * 
-	 * This design is only vaguely testable, which is worrisome.
-	 * @author Jason Miller
-	 *
-	 */
-	final class Controller {
-
-		private final boolean daemon;
-		
-		private Controller(final boolean daemon) {
-			this.daemon = daemon;
-		}
-		
-		// synchronizing server start
-		// sequence is
-		// - start HttpServer initialization thread (Kernel)
-		// - awaitHttpSocketBound
-		// - bind socket (HttpServer)
-		// - awaitHttpServerStart
-		//   at this point, drop privileges in the outside daemon code
-		// - notifyHttpServerStarted
-		private final ReentrantLock serverStartGate = new ReentrantLock();
-		private final Condition socketBound = serverStartGate.newCondition();
-		private final Condition serverStarted = serverStartGate.newCondition();
-		private volatile boolean socketBoundFlag = false; 
-		private volatile boolean serverStartedFlag = false; 
-		private void awaitHttpSocketBound() {
-			if (daemon) {
-				serverStartGate.lock();
-				try {
-					while (!socketBoundFlag) {
-						logger.info("awaiting socket bound");
-						socketBound.awaitUninterruptibly();
-					}
-					logger.info("socket bound notification delivered");
-				} finally {
-					serverStartGate.unlock();
-				}
-			}
-		}
-		void awaitHttpServerStart() {
-			if (daemon) {
-				serverStartGate.lock();
-				try {
-					socketBoundFlag = true;
-					logger.info("notifying socket bound");
-					socketBound.signal();
-					while (!serverStartedFlag) {
-						logger.info("awaiting server start");
-						serverStarted.awaitUninterruptibly();
-					}
-					logger.info("server start notification delivered");
-				} finally {
-					serverStartGate.unlock();
-				}
-			}
-		}
-		private void notifyHttpServerStarted() {
-			if (daemon) {
-				serverStartGate.lock();
-				try {
-					serverStartedFlag = true;
-					logger.info("notifying server started");
-					serverStarted.signal();
-				} finally {
-					serverStartGate.unlock();
-				}
-			}
-		}
-		
-		private volatile boolean clearToServe = false;
-		public boolean clearToServe() {
-			return clearToServe;
-		}
-	}
-	
-	/**
-	 * Defines how the kernel manages its lifecycle, 
-	 * depending on how it was invoked
-	 * @author Jason Miller
-	 *
-	 */
-	private interface KernelLifecycleStrategy {
-		
-		void init();
-		void start();
-		void stop();
-		void dispose();
-	}
-	
-	/**
-	 * Kernel lifecycle when we are our own process
-	 * @author Jason Miller
-	 *
-	 */
-	private final class ProcessLifecycle
-			implements KernelLifecycleStrategy {
-		
-		@Override
-		public void init() {
-			logger.info("Process.init");
-			Runtime.getRuntime().addShutdownHook(new Thread() {
-				@Override
-				public void run() {
-					// this is to be split up later, when there is a way
-					// of externally controlling the kernel lifecycle.
-					// for now it can just stay in here
-					ProcessLifecycle.this.stop();
-					ProcessLifecycle.this.dispose();
-				}
-			});
-			coreContainer.start();
-			logger.info("Process.init complete");
-		}
-
-		@Override
-		public void start() {
-			sync.clearToServe = true;
-		}
-
-		@Override
-		public void stop() {
-			sync.clearToServe = false;
-		}
-
-		@Override
-		public void dispose() {
-			coreContainer.dispose();
-		}
-		
-	}
-	
-	private final class DaemonLifecycle
-			implements KernelLifecycleStrategy {
-		
-		@Override
-		public void init() {
-			logger.info("Daemon.init");
-			
-			new Thread("kernel initialization helper") {
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					// ugly mess of a thing, this is...
-					// gonna have to extract the lifecycle stuff,
-					// picocontainer keeps making me sad.
-					coreContainer.start();
-				}
-			}.start();
-			
-			sync.awaitHttpSocketBound();
-			logger.info("Daemon.init complete");
-		}
-
-		@Override
-		public void start() {
-			sync.notifyHttpServerStarted();
-			sync.clearToServe = true;
-		}
-
-		@Override
-		public void stop() {
-			sync.clearToServe = false;
-		}
-
-		@Override
-		public void dispose() {
-			coreContainer.dispose();
-		}
-		
-	}
-	
-	
-	private final Controller sync;
-	
-	private final KernelLifecycleStrategy lifecycle;
-	
-	/**
-	 * The core PicoContainer used to hold the most basic server
-	 * objects.
+	 * The core PicoContainer used to bootstrap the event mediator and
+	 * server executors
 	 */
 	private final MutablePicoContainer coreContainer =
 		new DefaultPicoContainer(
 			new Caching().wrap(new ConstructorInjection()),
-			new JJLifecycleStrategy(),
+			new NullLifecycleStrategy(),
 			null,
 			new NullComponentMonitor()
 		);
-
+	
+	/**
+	 * The PicoContainer used to talk to the outside world.  communicates with
+	 * the rest of the system entirely via events
+	 */
+	private final MutablePicoContainer ioContainer =
+		new DefaultPicoContainer(
+			new Caching().wrap(new ConstructorInjection()),
+			new JJLifecycleStrategy(coreContainer),
+			coreContainer,
+			new JJComponentMonitor()
+		);
+	
+	private final EventMediationService ems;
+	
 	public Kernel(String[] args, boolean daemon) {
-
+		
+		// move this into something else
 		logger.info("Welcome to {} {}", Version.name, Version.version);
-
-		sync = new Controller(daemon);
 		
-		lifecycle = daemon ? new DaemonLifecycle() : new ProcessLifecycle();
+		coreContainer.setName("Kernel Core");
 		
-		coreContainer.setName("Kernel");
+		coreContainer.addComponent(args)
+					.addComponent(KernelSettings.class)
+					.addComponent(EventMediationService.class)
+					.addComponent(SynchronousThreadPoolExecutor.class)
+					.addComponent(AsynchronousThreadPoolExecutor.class)
+					.addAdapter(new MessageConveyorProvidingAdapter())
+					.as(NONE).addAdapter(new LocLoggerProvidingAdapter());	 
+					 
+		coreContainer.addChildContainer(ioContainer);
 		
-		coreContainer.addComponent(sync)
-					 .addComponent(args)
-					 .addComponent(KernelSettings.class)
-					 .addComponent(HTMLFragmentFinder.class)
-					 .addComponent(HttpServer.class)
-					 .addComponent(NettyRequestBridge.class)
-					 .addComponent(SynchronousThreadPoolExecutor.class)
-					 .addComponent(AsynchronousThreadPoolExecutor.class)
-					 .addAdapter(new MessageConveyorProvidingAdapter())
-					 .as(NONE).addAdapter(new LocLoggerProvidingAdapter());
-
-		lifecycle.init();
+		ioContainer.setName("Kernel I/O");
+	
+		ioContainer.addComponent(HTMLFragmentFinder.class)
+				.addComponent(HttpRequestHandler.class)
+				.addComponent(HttpServer.class)
+				.addComponent(NettyRequestBridge.class);
+		
+		coreContainer.start();
+		
+		ems = coreContainer.getComponent(EventMediationService.class);
+		
+		if (!daemon) {
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				@Override
+				public void run() {
+					Kernel.this.stop();
+					Kernel.this.dispose();
+				}
+			});
+			
+			start();
+		}
 	}
 	
 	public void start() {
-		lifecycle.start();
+		ems.publish(Start);
 	}
 	
 	public void stop() {
-		lifecycle.stop();
+		ems.publish(Stop);
 	}
 	
 	public void dispose() {
-		lifecycle.dispose();
+		
 	}
 }

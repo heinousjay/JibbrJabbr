@@ -20,8 +20,8 @@ import static org.jboss.netty.channel.ChannelState.BOUND;
 import static jj.KernelMessages.*;
 
 import java.net.InetSocketAddress;
-
-import jj.api.Dispose;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelEvent;
@@ -43,7 +43,7 @@ import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.cal10n.LocLogger;
 
 public final class HttpServer {
-
+	
 	private final LocLogger logger;
 	
 	private final NettyRequestBridge requestHandler;
@@ -51,6 +51,8 @@ public final class HttpServer {
 	private final KernelSettings kernelSettings;
 	
 	private final ServerBootstrap bootstrap;
+	
+	private final CyclicBarrier startBarrier = new CyclicBarrier(2);
 	
 	/** All channels currently in use by the server */
 	private final ChannelGroup allChannels = 
@@ -106,8 +108,7 @@ public final class HttpServer {
 		final NettyRequestBridge requestHandler,
 		final KernelSettings kernelSettings,
 		final SynchThreadPool bossExecutor,
-		final AsyncThreadPool httpExecutor,
-		final Kernel.Controller kernelSync
+		final AsyncThreadPool httpExecutor
 	) {
 		assert logger != null;
 		assert requestHandler != null;
@@ -128,41 +129,65 @@ public final class HttpServer {
 			)
 		);
 		
-		bootstrap.setPipelineFactory(pipelineFactory);
-
-		bootstrap.setParentHandler(new ChannelUpstreamHandler() {
-			
-			@Override
-			public void handleUpstream(final ChannelHandlerContext ctx, final ChannelEvent e) throws Exception {
-				if (e instanceof UpstreamChannelStateEvent) {
-					UpstreamChannelStateEvent ucse = (UpstreamChannelStateEvent)e;
-					if (ucse.getState() == BOUND &&
-					    ucse.getValue() != null) {
-						allChannels.add(e.getChannel());
-						logger.info(ReachedStartSyncPoint);
-						kernelSync.awaitHttpServerStart();
-						logger.info(InterfaceBound, ((UpstreamChannelStateEvent)e).getValue());
-					}
-				}
-				ctx.sendUpstream(e);
-			}
-		});
+		bossExecutor.submit(initializer);
 		
-		int port = kernelSettings.port();
-		logger.debug(BindingPort, port);
-		bootstrap.bind(new InetSocketAddress(port));
+		
 	}
 	
 	
-	@Dispose
-	public void dispose() {
-		logger.info(HttpServerResourcesReleasing);
-		if (!allChannels.close().awaitUninterruptibly(kernelSettings.httpMaxShutdownTimeout(), SECONDS)) {
-			logger.warn(ConnectionsRemainPastTimeout, kernelSettings.httpMaxShutdownTimeout());
+	public void control(KernelControl control) {
+		
+		switch (control) {
+		case Start:
+			try {
+				startBarrier.await();
+			} catch (InterruptedException | BrokenBarrierException e) {
+				// publish the exception as an event.  BAM
+				e.printStackTrace();
+			}
+			break;
+			
+		case Stop:
+			logger.info(HttpServerResourcesReleasing);
+			if (!allChannels.close().awaitUninterruptibly(kernelSettings.httpMaxShutdownTimeout(), SECONDS)) {
+				logger.warn(ConnectionsRemainPastTimeout, kernelSettings.httpMaxShutdownTimeout());
+			}
+			// TODO kill this after moving the i/o threadpool out
+			bootstrap.releaseExternalResources();
+			logger.info(HttpServerResourcesReleased);
+			break;
 		}
-		// TODO kill this after moving the i/o threadpool out
-		bootstrap.releaseExternalResources();
-		logger.info(HttpServerResourcesReleased);
+		
 	}
 
+	private Runnable initializer = new Runnable() {
+		
+		@Override
+		public void run() {
+			bootstrap.setPipelineFactory(pipelineFactory);
+
+			bootstrap.setParentHandler(new ChannelUpstreamHandler() {
+				
+				@Override
+				public void handleUpstream(final ChannelHandlerContext ctx, final ChannelEvent e) throws Exception {
+					if (e instanceof UpstreamChannelStateEvent) {
+						UpstreamChannelStateEvent ucse = (UpstreamChannelStateEvent)e;
+						if (ucse.getState() == BOUND &&
+						    ucse.getValue() != null) {
+							allChannels.add(e.getChannel());
+							logger.info(ReachedStartSyncPoint);
+							startBarrier.await();
+							logger.info(InterfaceBound, ((UpstreamChannelStateEvent)e).getValue());
+						}
+					}
+					ctx.sendUpstream(e);
+				}
+			});
+			
+			int port = kernelSettings.port();
+			logger.debug(BindingPort, port);
+			bootstrap.bind(new InetSocketAddress(port));
+		}
+	};
+	
 }

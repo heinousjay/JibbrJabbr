@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import net.jcip.annotations.ThreadSafe;
 
-import jj.NonBlocking;
 import jj.SynchThreadPool;
+import jj.api.NonBlocking;
 
 /**
  * Simple backbone for non-blocking logging.  Dump messages on the queue and they

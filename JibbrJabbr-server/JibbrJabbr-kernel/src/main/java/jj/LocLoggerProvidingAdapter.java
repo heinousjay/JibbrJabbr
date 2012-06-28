@@ -59,7 +59,7 @@ final class LocLoggerProvidingAdapter extends FactoryInjector<LocLogger> {
 		if (into == null || 
 			into == ComponentAdapter.NOTHING.class) {
 			logger.warn(UsingUnknownLogger);
-			factory.getLocLogger(UNKNOWN_LOGGER_NAME);
+			return factory.getLocLogger(UNKNOWN_LOGGER_NAME);
 		}
 		
 		String loggerType = into.toString();

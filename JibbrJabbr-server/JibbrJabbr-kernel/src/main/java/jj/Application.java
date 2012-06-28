@@ -15,7 +15,17 @@
  */
 package jj;
 
+import java.io.Closeable;
+import java.net.URL;
+
+import jj.api.Blocking;
+import jj.api.NonBlocking;
+
+import net.jcip.annotations.ThreadSafe;
+
 /**
+ * Should this be immutable, with new instances created when things change?
+ * 
  * Represents some level of Application containment,
  * coordinating the set of resources that make it up
  * - picocontainer
@@ -37,6 +47,41 @@ package jj;
  * @author Jason Miller
  *
  */
-public class Application {
+@ThreadSafe
+public class Application implements Closeable {
 
+	protected final URL baseURL;
+	private volatile boolean closed = false;
+	private volatile boolean loaded = false;
+	
+	public Application(URL baseURL) throws Exception {
+		assert (baseURL != null) : "baseURL is required";
+		
+		this.baseURL = baseURL;
+		load();
+	}
+	
+	protected void load() throws Exception {
+		;
+	}
+	
+	@NonBlocking
+	public boolean loaded() {
+		return loaded;
+	}
+	
+	@Blocking
+	public boolean respond(String path) {
+		return true;
+	}
+
+	@Override
+	public void close() {
+		this.closed = true;
+	}
+	
+	public boolean closed() {
+		return closed;
+	}
+	
 }

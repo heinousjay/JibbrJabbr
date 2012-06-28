@@ -20,8 +20,8 @@ import java.util.Locale;
 
 import net.jcip.annotations.Immutable;
 
-import jj.Blocking;
-import jj.NonBlocking;
+import jj.api.Blocking;
+import jj.api.NonBlocking;
 
 /**
  * Custom implementation of the IMessageConveyor interface from cal10n,

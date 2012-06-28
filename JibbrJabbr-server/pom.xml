@@ -50,11 +50,9 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<!-- https://github.com/jhy/jsoup - not adding as a module since it will be released
-				eventually but we need the parser error fixes  -->
 				<groupId>org.jsoup</groupId>
 				<artifactId>jsoup</artifactId>
-				<version>1.6.2-SNAPSHOT</version>
+				<version>1.6.3</version>
 			</dependency>
 			<dependency>
 				<groupId>io.netty</groupId>
@@ -79,6 +77,11 @@
 			<dependency>
 				<groupId>org.ow2.asm</groupId>
 				<artifactId>asm</artifactId>
+				<version>4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm-util</artifactId>
 				<version>4.0</version>
 			</dependency>
 			<dependency>

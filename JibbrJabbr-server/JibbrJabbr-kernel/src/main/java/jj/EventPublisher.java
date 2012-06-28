@@ -13,30 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
-
-import jj.api.NonBlocking;
-
+package jj;
 
 /**
- * A takeoff on the cal10n project, tying things a little
- * more closely to the enumeration and not reloading bundles
- * behind the scenes.  Using JDK 1.6 facilities for loading
- * properties in different encodings.
+ * 
  * 
  * @author jason
  *
  */
-interface MessageConveyor<E extends Enum<E>> {
-
-	/**
-	 * Retrieve an appropriate message for the given key and optional parameters.  
-	 * Implementations of this method should not block
-	 * @param key
-	 * @param args
-	 * @return
-	 */
-	@NonBlocking
-	String getMessage(final E key, final Object... args);
+public interface EventPublisher {
+	
+	public void publish(Object event);
 
 }

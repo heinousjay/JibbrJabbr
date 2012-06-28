@@ -9,16 +9,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import jj.JJ;
-import jj.NettyRequestBridge;
 import jj.SynchronousOperationCallback;
 import jj.TestThreadPool;
 
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.util.CharsetUtil;
 import org.jsoup.nodes.Document;
 import org.junit.After;
 import org.junit.Before;

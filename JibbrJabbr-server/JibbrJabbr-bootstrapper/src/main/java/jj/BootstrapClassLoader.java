@@ -19,8 +19,13 @@ import java.util.List;
  * @author jason
  *
  */
-final class BootstrapClassLoader
+public final class BootstrapClassLoader
 		extends ClassLoader{
+	
+	public interface ClassEmitter {
+		public String name();
+		public byte[] emit();
+	}
 	
 	private static final String JAR_GLOB = "*.jar";
 	private static final String CLASS_FILE_FORMAT = "/%s.class";
@@ -32,6 +37,10 @@ final class BootstrapClassLoader
 	
 	private final Path libPath;
 
+	private DirectoryStream<Path> libJarsStream() throws IOException {
+		return Files.newDirectoryStream(libPath, JAR_GLOB);
+	}
+
 	BootstrapClassLoader(Path libPath) {
 		// whatever loaded this class is the root of all classloaders in the system
 		super(BootstrapClassLoader.class.getClassLoader());
@@ -40,9 +49,12 @@ final class BootstrapClassLoader
 		// and we want them enabled
 		setDefaultAssertionStatus(true);
 	}
-
-	private DirectoryStream<Path> libJarsStream() throws IOException {
-		return Files.newDirectoryStream(libPath, JAR_GLOB);
+	
+	public Class<?> loadClass(ClassEmitter emitter) {
+		byte[] bytes = emitter.emit();
+		Class<?> result = defineClass(emitter.name(), bytes, 0, bytes.length);
+		resolveClass(result);
+		return result;
 	}
 	
 	@Override

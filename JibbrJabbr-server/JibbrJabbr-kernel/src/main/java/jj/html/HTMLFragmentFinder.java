@@ -6,10 +6,10 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jj.AsyncThreadPool;
-import jj.Blocking;
-import jj.NonBlocking;
 import jj.SynchronousOperationCallback;
 import jj.SynchThreadPool;
+import jj.api.Blocking;
+import jj.api.NonBlocking;
 
 import net.jcip.annotations.ThreadSafe;
 

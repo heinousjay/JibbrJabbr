@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import jj.Blocking;
-import jj.NonBlocking;
+import jj.api.Blocking;
+import jj.api.NonBlocking;
 
 import net.jcip.annotations.Immutable;
 

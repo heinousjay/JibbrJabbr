@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import jj.NonBlocking;
+import jj.api.NonBlocking;
 
 import net.jcip.annotations.Immutable;
 

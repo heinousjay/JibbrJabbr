@@ -1,6 +1,7 @@
 package fun;
 
-import org.jsoup.nodes.Element;
+import jj.api.html.Element;
+
 import org.slf4j.Logger;
 
 // this should probably descend from a base class with
@@ -38,10 +39,10 @@ public class ExampleAdapter {
 		//  element sets you need and does the manipulations internally if
 		//  it comes to that)
 		logger.trace("Calling displayTime");
-		//adapted.displayTime(element.select("#currentDate").first());
+		adapted.displayTime(element.select("#currentDate").first());
 		
 		logger.trace("Calling cleanParagraphs");
-		//adapted.cleanParagraphs(element.select("p"));
+		adapted.cleanParagraphs(element.select("p"));
 		
 		return element;
 	}

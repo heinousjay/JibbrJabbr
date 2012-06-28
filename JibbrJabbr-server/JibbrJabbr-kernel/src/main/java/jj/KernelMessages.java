@@ -68,5 +68,8 @@ public enum KernelMessages {
 	// AsynchronousThreadPoolExecutor messages
 	AsynchronousTaskRejected,
 	AsynchronousTaskDone,
-	AsynchronousThreadName
+	AsynchronousThreadName,
+	
+	// EventMediationService messages
+	EventLoopThreadName
 }

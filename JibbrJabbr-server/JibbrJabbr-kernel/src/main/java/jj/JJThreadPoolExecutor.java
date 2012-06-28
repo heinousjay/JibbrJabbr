@@ -15,14 +15,10 @@
  */
 package jj;
 
-import static jj.KernelMessages.*;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.cal10n.LocLogger;
 
 abstract class JJThreadPoolExecutor 
 		extends ThreadPoolExecutor 
@@ -44,44 +40,8 @@ abstract class JJThreadPoolExecutor
 	abstract ThreadGroup threadGroup();
 	
 	@Override
-	protected void beforeExecute(Thread t, Runnable r) {
-		//logger.debug(JJTaskStarting, r.getClass());
-		super.beforeExecute(t, r);
-	}
-	
-	@Override
-	protected void afterExecute(Runnable r, Throwable t) {
+	public Thread newThread(final Runnable runnable) {
 		
-		if (t != null) {
-			//logger.error(JJTaskEndedWithException, r, t);
-		} else {
-			//logger.debug(JJTaskEnded, r.getClass());
-		}
-		super.afterExecute(r, t);
-	}
-	
-	@Override
-	public Thread newThread(final Runnable inner) {
-		
-		String name = threadName();
-			
-		
-		//logger.debug(JJThreadInitializing, name, Thread.currentThread().getName());
-		
-		Thread thread = new Thread(
-			threadGroup(), 
-			new Runnable() {
-				
-				@Override
-				public void run() {
-					//logger.trace(JJThreadStarting);
-					inner.run();
-					//logger.trace(JJThreadExiting);
-				}
-			}, 
-			name
-		);
-		
-		return thread;
+		return new Thread(threadGroup(), runnable, threadName());
 	}
 }

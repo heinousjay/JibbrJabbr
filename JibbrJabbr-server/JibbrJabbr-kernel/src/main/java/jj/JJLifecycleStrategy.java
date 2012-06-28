@@ -15,25 +15,13 @@
  */
 package jj;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import jj.api.Dispose;
-import jj.api.Shutdown;
-import jj.api.Startup;
-
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.LifecycleStrategy;
-import org.picocontainer.PicoLifecycleException;
+import org.picocontainer.PicoContainer;
 
 /**
  * <p>
- * Simple mapping from picocontainer lifecycle to JOJ lifecycle.
- * </p>
- * 
- * <p>
- * See {@link Startup}, {@link Shutdown}, and {@link Dispose}.
+ * every component has a lifecycle but it's managed elsewhere.
  * </p>
  * 
  * @author jason
@@ -41,21 +29,28 @@ import org.picocontainer.PicoLifecycleException;
  */
 class JJLifecycleStrategy implements LifecycleStrategy {
 
+	private final PicoContainer coreContainer;
+	
+	JJLifecycleStrategy(final PicoContainer coreContainer) {
+		this.coreContainer = coreContainer;
+	}
+	
 	@Override
 	public void start(Object component) {
-		invoke(component, Startup.class);
+		//invoke(component, Startup.class);
 	}
 
 	@Override
 	public void stop(Object component) {
-		invoke(component, Shutdown.class);
+		//invoke(component, Shutdown.class);
 	}
 
 	@Override
 	public void dispose(Object component) {
-		invoke(component, Dispose.class);
+		//invoke(component, Dispose.class);
+		coreContainer.getComponent(EventMediationService.class).unregister(component);
 	}
-	
+	/*
 	private void invoke(Object component, Class<? extends Annotation> annotation) {
 		for (Method method : component.getClass().getMethods()) {
 			if (method.isAnnotationPresent(annotation)) {
@@ -69,19 +64,11 @@ class JJLifecycleStrategy implements LifecycleStrategy {
 			}
 		}
 	}
+	*/
 
 	@Override
 	public boolean hasLifecycle(Class<?> type) {
-		boolean result = false;
-		for (Method method : type.getMethods()) {
-			if (method.isAnnotationPresent(Startup.class) ||
-				method.isAnnotationPresent(Shutdown.class) ||
-				method.isAnnotationPresent(Dispose.class)) {
-				result = true;
-				break;
-			}
-		}
-		return result;
+		return true;
 	}
 
 	@Override
