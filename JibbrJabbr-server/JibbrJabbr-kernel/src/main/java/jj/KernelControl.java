@@ -20,5 +20,6 @@ import jj.api.Event;
 @Event
 enum KernelControl {
 	Start,
-	Stop
+	Stop,
+	Dispose
 }

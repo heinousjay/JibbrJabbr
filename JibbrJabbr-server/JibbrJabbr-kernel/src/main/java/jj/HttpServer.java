@@ -23,6 +23,9 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import jj.api.Event;
+import jj.api.EventPublisher;
+
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandler;
@@ -44,6 +47,11 @@ import org.slf4j.cal10n.LocLogger;
 
 public final class HttpServer {
 	
+	@Event
+	enum State {
+		Bound
+	}
+	
 	private final LocLogger logger;
 	
 	private final NettyRequestBridge requestHandler;
@@ -51,6 +59,8 @@ public final class HttpServer {
 	private final KernelSettings kernelSettings;
 	
 	private final ServerBootstrap bootstrap;
+	
+	private final EventPublisher eventPublisher;
 	
 	private final CyclicBarrier startBarrier = new CyclicBarrier(2);
 	
@@ -108,16 +118,19 @@ public final class HttpServer {
 		final NettyRequestBridge requestHandler,
 		final KernelSettings kernelSettings,
 		final SynchThreadPool bossExecutor,
-		final AsyncThreadPool httpExecutor
+		final AsyncThreadPool httpExecutor,
+		final EventPublisher eventPublisher
 	) {
 		assert logger != null;
 		assert requestHandler != null;
 		assert kernelSettings != null;
 		assert bossExecutor != null;
+		assert eventPublisher != null;
 		
 		this.logger = logger;
 		this.requestHandler = requestHandler;
 		this.kernelSettings = kernelSettings;
+		this.eventPublisher = eventPublisher;
 		
 		logger.debug(ObjectInstantiating, HttpServer.class);
 		
@@ -130,8 +143,6 @@ public final class HttpServer {
 		);
 		
 		bossExecutor.submit(initializer);
-		
-		
 	}
 	
 	
@@ -152,12 +163,14 @@ public final class HttpServer {
 			if (!allChannels.close().awaitUninterruptibly(kernelSettings.httpMaxShutdownTimeout(), SECONDS)) {
 				logger.warn(ConnectionsRemainPastTimeout, kernelSettings.httpMaxShutdownTimeout());
 			}
-			// TODO kill this after moving the i/o threadpool out
-			bootstrap.releaseExternalResources();
+			
 			logger.info(HttpServerResourcesReleased);
 			break;
-		}
 		
+		case Dispose:
+			// ehh.  
+			break;
+		}
 	}
 
 	private Runnable initializer = new Runnable() {
@@ -176,6 +189,7 @@ public final class HttpServer {
 						    ucse.getValue() != null) {
 							allChannels.add(e.getChannel());
 							logger.info(ReachedStartSyncPoint);
+							eventPublisher.publish(State.Bound);
 							startBarrier.await();
 							logger.info(InterfaceBound, ((UpstreamChannelStateEvent)e).getValue());
 						}

@@ -90,6 +90,14 @@ public class SynchronousThreadPoolExecutor
 		this.messageConveyor = messageConveyor;
 		this.setRejectedExecutionHandler(this);
 		logger.debug(ObjectInstantiated, SynchronousThreadPoolExecutor.class);
+		
+	}
+	
+	public void control(KernelControl control) {
+		// hit them brakes baby
+		if (control == KernelControl.Dispose) {
+			this.shutdownNow();
+		}
 	}
 	
 	@Override

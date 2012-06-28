@@ -66,7 +66,8 @@ public class AsynchronousThreadPoolExecutor
 	
 	public AsynchronousThreadPoolExecutor(
 		final IMessageConveyor messageConveyor,
-		final KernelSettings kernelSettings
+		final KernelSettings kernelSettings,
+		final EventMediationService ems
 	) {
 		super(
 			kernelSettings.asynchronousThreadCoreCount(),
@@ -78,6 +79,14 @@ public class AsynchronousThreadPoolExecutor
 		this.setRejectedExecutionHandler(this);
 		
 		//logger.debug(ObjectInstantiated, AsynchronousThreadPoolExecutor.class);
+		ems.register(this);
+	}
+	
+	public void control(KernelControl control) {
+		// hit them brakes baby
+		if (control == KernelControl.Dispose) {
+			this.shutdownNow();
+		}
 	}
 
 	@Override

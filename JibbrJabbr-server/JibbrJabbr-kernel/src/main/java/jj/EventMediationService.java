@@ -33,6 +33,7 @@ import net.jcip.annotations.ThreadSafe;
 
 import jj.api.Blocking;
 import jj.api.Event;
+import jj.api.EventPublisher;
 import jj.api.NonBlocking;
 
 /**
@@ -83,6 +84,8 @@ public class EventMediationService implements EventPublisher {
 		this.messages = messages;
 		logger.info(ObjectInstantiated, EventMediationService.class);
 		synchPool.submit(eventLoop);
+		offerToLoop(this, true);
+		offerToLoop(synchPool, true);
 	}
 	
 	@NonBlocking
@@ -106,7 +109,7 @@ public class EventMediationService implements EventPublisher {
 	@NonBlocking
 	public void register(Object instance) {
 		assert (instance != null) : "cannot register a null for events";
-		offerToLoop(instance, true);
+		if (run) offerToLoop(instance, true);
 	}
 	
 	/**
@@ -116,7 +119,7 @@ public class EventMediationService implements EventPublisher {
 	@NonBlocking
 	public void unregister(Object instance) {
 		assert (instance != null) : "cannot unregister a null for events";
-		offerToLoop(instance, false);
+		if (run) offerToLoop(instance, false);
 	}
 	
 	/**
@@ -127,16 +130,19 @@ public class EventMediationService implements EventPublisher {
 	public void publish(Object event) {
 		assert (event != null) : "cannot publish a null event";
 		assert (event.getClass().getAnnotation(Event.class) != null) : "cannot publish an object that is not an event";
-		publishQueue.offer(event);
+		logger.trace("yay", event);
+		if (run) publishQueue.offer(event);
 	}
 	
 	/**
 	 * Shuts the service down.  After this method is called, the instance is useless and
 	 * should be discarded.
+	 * 
+	 * needs to be made pausable
 	 */
 	@NonBlocking
-	public void shutdown() {
-		run = false;
+	public void control(KernelControl control) {
+		run = (control == KernelControl.Start);
 	}
 	
 	// should be weak so things can be collected?
@@ -153,6 +159,7 @@ public class EventMediationService implements EventPublisher {
 		public void run() {
 			Thread.currentThread().setName(messages.getMessage(EventLoopThreadName));
 			try {
+
 				while (run) {
 					// get the event,
 					// do the registration stuff
@@ -213,8 +220,8 @@ public class EventMediationService implements EventPublisher {
 							}
 						}
 					}
-					
 				}
+				
 			} catch (InterruptedException ie) {
 				run = false;
 				Thread.currentThread().interrupt();

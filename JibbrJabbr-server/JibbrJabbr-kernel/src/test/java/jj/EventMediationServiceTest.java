@@ -133,8 +133,8 @@ public class EventMediationServiceTest {
 	
 	@After
 	public void after() {
-		ems.shutdown();
-		ttp.shutdown();
+		ems.publish(KernelControl.Dispose);
+		ttp.shutdownNow();
 	}
 
 	@Test

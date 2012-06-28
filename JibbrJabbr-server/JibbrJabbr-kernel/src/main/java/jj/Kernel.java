@@ -19,6 +19,10 @@ import static jj.KernelControl.*;
 import static org.picocontainer.Characteristics.NONE;
 import static org.jboss.netty.util.ThreadNameDeterminer.CURRENT;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+
 import jj.api.Version;
 import jj.html.HTMLFragmentFinder;
 
@@ -49,7 +53,7 @@ import org.slf4j.LoggerFactory;
  *    - http/websocket/spdy? handler (netty)
  *    - file watch service
  *    - filesystem service
- *  - application container - uses events to communicate with i/o container, no direct dependencies allowed!
+ *  - application master container - uses events to communicate with i/o container, no direct dependencies allowed!
  *    - application loader
  *    - individual application containers?
  *      - responders
@@ -101,6 +105,8 @@ public class Kernel {
 	
 	private final EventMediationService ems;
 	
+	private final CyclicBarrier httpServerBoundBarrier = new CyclicBarrier(2);
+	
 	public Kernel(String[] args, boolean daemon) {
 		
 		// move this into something else
@@ -128,6 +134,9 @@ public class Kernel {
 		coreContainer.start();
 		
 		ems = coreContainer.getComponent(EventMediationService.class);
+		ems.register(this);
+		
+		
 		
 		if (!daemon) {
 			Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -140,6 +149,24 @@ public class Kernel {
 			
 			start();
 		}
+		
+		try {
+			httpServerBoundBarrier.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			// no idea what to do here
+			e.printStackTrace();
+		}
+	}
+	
+	public void httpServerState(final HttpServer.State state) {
+		if (state == HttpServer.State.Bound) {
+			try {
+				httpServerBoundBarrier.await();
+			} catch (InterruptedException | BrokenBarrierException e) {
+				// no idea what to do here
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void start() {
@@ -151,6 +178,6 @@ public class Kernel {
 	}
 	
 	public void dispose() {
-		
+		ems.publish(Dispose);
 	}
 }
