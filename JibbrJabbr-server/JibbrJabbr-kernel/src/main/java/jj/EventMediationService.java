@@ -167,7 +167,9 @@ public class EventMediationService implements EventPublisher {
 					// publish the event
 					// OVER AND OVER FOREVER
 					// or until shutdown
-
+					
+					// should we wake up every now and again so the registration queue doesn't get out of hand?
+					// or combine the queues and wake up whenever there's something to do?
 					Object event = publishQueue.take();
 					
 					if (run) { // if we've been shut down, just ignore it all

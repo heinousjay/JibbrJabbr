@@ -5,6 +5,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.KernelMessages.LoopThreadName;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,10 +45,10 @@ public class FileWatchService {
 	/**
 	 * transfers the subscription requests into the event loop
 	 * 
-	 * is static so that instantiating the FileWatchSubscription causes subscription.  talk
+	 * is package friendly so that instantiating the FileWatchSubscription causes subscription.  talk
 	 * about a nice API
 	 */
-	static final LinkedTransferQueue<FileWatchSubscription> requestQueue = new LinkedTransferQueue<>();
+	final LinkedTransferQueue<FileWatchSubscription> requestQueue = new LinkedTransferQueue<>();
 	
 	private final HashMap<WatchKey, WeakHashMap<FileWatchSubscription, Boolean>> keys = new HashMap<>();
 	private final WatchService watcher = FileSystemService.fileSystem.newWatchService();
@@ -81,6 +82,8 @@ public class FileWatchService {
 		
 		// very definitely a synchronous task
 		synchExecutor.submit(serviceRunnable);
+		
+		FileWatchSubscription.fileWatchServiceRef = new WeakReference<FileWatchService>(this);
 	}
 	
 	/**

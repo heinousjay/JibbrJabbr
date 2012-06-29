@@ -61,7 +61,7 @@ public class EventMediationServiceTest {
 		}
 	}
 	
-	TestThreadPool ttp;
+	MockThreadPool ttp;
 	EventMediationService ems;
 	
 	AtomicInteger count;
@@ -122,7 +122,7 @@ public class EventMediationServiceTest {
 	public void before() {
 		MessageConveyor messageConveyor = new MessageConveyor(Locale.US);
 		LocLogger logger = new LocLogger(new MockLogger(), messageConveyor);
-		ttp = new TestThreadPool();
+		ttp = new MockThreadPool();
 		ems = new EventMediationService(ttp, logger, messageConveyor);
 		
 		count = new AtomicInteger(0);

@@ -16,6 +16,7 @@
 package jj.io;
 
 
+import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
 
@@ -47,9 +48,11 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public abstract class FileWatchSubscription {
 	
+	static WeakReference<FileWatchService> fileWatchServiceRef;
+	
 	protected final Path path;
 	
-	volatile boolean subscribe = true;
+	boolean subscribe = true;
 	
 	/**
 	 * Subscribe to notifications when changes occur to a particular path.
@@ -61,8 +64,9 @@ public abstract class FileWatchSubscription {
 	public FileWatchSubscription(Path path) {
 		assert path != null : "need at least one path";
 		this.path = path;
-		if (this.path.getFileSystem().equals(FileSystemService.fileSystem)) {
-			FileWatchService.requestQueue.offer(this);
+		FileWatchService fws = fileWatchServiceRef.get();
+		if (this.path.getFileSystem().equals(FileSystemService.fileSystem) && fws != null) {
+			fws.requestQueue.offer(this);
 		}
 	}
 	
@@ -73,7 +77,10 @@ public abstract class FileWatchSubscription {
 	@NonBlocking
 	public final void unsubscribe() {
 		subscribe = false;
-		FileWatchService.requestQueue.offer(this);
+		FileWatchService fws = fileWatchServiceRef.get();
+		if (fws != null) {
+			fws.requestQueue.offer(this);
+		}
 	}
 	
 	protected abstract void fileChanged(Path path, Kind<Path> operation);

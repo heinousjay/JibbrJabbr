@@ -31,10 +31,10 @@ import java.util.concurrent.TimeUnit;
  * @author jason
  *
  */
-public class TestThreadPool extends ThreadPoolExecutor implements
+public class MockThreadPool extends ThreadPoolExecutor implements
 		SynchThreadPool, AsyncThreadPool {
 
-	public TestThreadPool() {
+	public MockThreadPool() {
 		super(4, 4, 20, SECONDS, new LinkedBlockingQueue<Runnable>());
 	}
 	
@@ -45,7 +45,7 @@ public class TestThreadPool extends ThreadPoolExecutor implements
 	 * @param unit
 	 * @param workQueue
 	 */
-	public TestThreadPool(int corePoolSize, int maximumPoolSize,
+	public MockThreadPool(int corePoolSize, int maximumPoolSize,
 			long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
 		// TODO Auto-generated constructor stub

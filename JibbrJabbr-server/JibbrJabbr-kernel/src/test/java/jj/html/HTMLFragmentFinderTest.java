@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jj.SynchronousOperationCallback;
-import jj.TestThreadPool;
+import jj.MockThreadPool;
 
 import org.jsoup.nodes.Document;
 import org.junit.After;
@@ -25,11 +25,11 @@ public class HTMLFragmentFinderTest {
 	private static final String INDEX_HTML = "index.html";
 	HTMLFragmentFinder htmlFragmentFinder;
 	Path clamwhoresBase;
-	TestThreadPool testThreadPool;
+	MockThreadPool testThreadPool;
 	
 	@Before
 	public void before() throws Exception {
-		testThreadPool = new TestThreadPool();
+		testThreadPool = new MockThreadPool();
 		htmlFragmentFinder = new HTMLFragmentFinder(testThreadPool, testThreadPool);
 		if (clamwhoresBase == null) {
 			Path clamwhoresIndex = Paths.get(getClass().getResource("/com/clamwhores/index.html").toURI());

@@ -16,9 +16,11 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
 import jj.MockLogger;
-import jj.TestThreadPool;
 import jj.MockLogger.LogBundle;
+import jj.MockThreadPool;
+
 import jj.io.FileWatchService;
 import jj.io.FileWatchSubscription;
 
@@ -34,14 +36,14 @@ public class FileWatchServiceTest {
 
 	MockLogger executorLogger = new MockLogger();
 	FileWatchService underTest;
-	TestThreadPool testThreadPool;
+	MockThreadPool testThreadPool;
 	
 	@Before
 	public void before() throws Exception {
 		// so much set-up
 		MessageConveyor messageConveyor = new MessageConveyor(Locale.US);
 		LocLogger logger = new LocLogger(executorLogger, messageConveyor);
-		testThreadPool = new TestThreadPool();
+		testThreadPool = new MockThreadPool();
 		underTest = new FileWatchService(
 			testThreadPool,
 			testThreadPool,
