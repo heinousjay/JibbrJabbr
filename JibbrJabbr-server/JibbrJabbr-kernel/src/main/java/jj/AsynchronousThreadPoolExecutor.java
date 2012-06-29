@@ -43,7 +43,7 @@ import ch.qos.cal10n.IMessageConveyor;
  * @author Jason Miller
  *
  */
-public class AsynchronousThreadPoolExecutor 
+class AsynchronousThreadPoolExecutor 
 		extends ThreadPoolExecutor 
 		implements AsyncThreadPool, RejectedExecutionHandler, ThreadFactory {
 	
@@ -78,7 +78,6 @@ public class AsynchronousThreadPoolExecutor
 		this.messageConveyor = messageConveyor;
 		this.setRejectedExecutionHandler(this);
 		this.setThreadFactory(this);
-		//logger.debug(ObjectInstantiated, AsynchronousThreadPoolExecutor.class);
 		ems.register(this);
 	}
 	

@@ -40,7 +40,7 @@ import ch.qos.cal10n.MessageConveyor;
  * @author jason
  *
  */
-public class SynchronousThreadPoolExecutor 
+class SynchronousThreadPoolExecutor 
 		extends ThreadPoolExecutor
 		implements SynchThreadPool, RejectedExecutionHandler, ThreadFactory {
 	
