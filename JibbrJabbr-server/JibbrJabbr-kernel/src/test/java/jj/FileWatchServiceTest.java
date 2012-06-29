@@ -31,7 +31,6 @@ public class FileWatchServiceTest {
 	MockLogger executorLogger = new MockLogger();
 	FileWatchService underTest;
 	TestThreadPool testThreadPool;
-	//MockLogger fileWatchServiceLogger;
 	
 	@Before
 	public void before() throws Exception {
@@ -42,7 +41,8 @@ public class FileWatchServiceTest {
 		underTest = new FileWatchService(
 			testThreadPool,
 			testThreadPool,
-			logger
+			logger,
+			messageConveyor
 		);
 	}
 	

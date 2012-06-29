@@ -41,6 +41,8 @@ public enum KernelMessages {
 	UsingUnknownLogger,
 	ReturningLogger,
 	
+	LoopThreadName,
+	
 	// HttpServer messages
 	BindingPort,
 	InterfaceBound,
@@ -68,8 +70,5 @@ public enum KernelMessages {
 	// AsynchronousThreadPoolExecutor messages
 	AsynchronousTaskRejected,
 	AsynchronousTaskDone,
-	AsynchronousThreadName,
-	
-	// EventMediationService messages
-	EventLoopThreadName
+	AsynchronousThreadName
 }

@@ -2,6 +2,7 @@ package jj;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.KernelMessages.LoopThreadName;
 
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
@@ -22,6 +23,8 @@ import jj.api.NonBlocking;
 import net.jcip.annotations.ThreadSafe;
 
 import org.slf4j.cal10n.LocLogger;
+
+import ch.qos.cal10n.MessageConveyor;
 
 /**
  * <p>
@@ -69,6 +72,40 @@ public class FileWatchService {
 	 */
 	static final LinkedTransferQueue<FileWatchSubscription> requestQueue = new LinkedTransferQueue<>();
 	
+	private final HashMap<WatchKey, WeakHashMap<FileWatchSubscription, Boolean>> keys = new HashMap<>();
+	private final FileSystem fileSystem = FileSystems.getDefault();
+	private final WatchService watcher = this.fileSystem.newWatchService();
+	private final LocLogger logger;
+	private final MessageConveyor messages;
+	private final AsyncThreadPool asyncExecutor;
+	
+	private volatile boolean run = true;
+	
+	/**
+	 * Constructor that takes all dependencies
+	 * @param synchExecutor
+	 * @param logger
+	 */
+	@NonBlocking
+	public FileWatchService(
+		final SynchThreadPool synchExecutor,
+		final AsyncThreadPool asyncExecutor,
+		final LocLogger logger,
+		final MessageConveyor messages
+	) throws Exception {
+		// 
+		assert synchExecutor != null : "No synchronous executor provided";
+		assert asyncExecutor != null : "No asynchronous executor provided";
+		assert logger != null : "No logger provided";
+		assert messages != null : "No messages provided";
+		
+		this.logger = logger;
+		this.asyncExecutor = asyncExecutor;
+		this.messages = messages;
+		
+		// very definitely a synchronous task
+		synchExecutor.submit(serviceRunnable);
+	}
 	
 	/**
 	 * Handles the running tasks of the watch service, taking selected
@@ -91,6 +128,8 @@ public class FileWatchService {
 		@Override
 		@Blocking
 		public void run() {
+			String name = Thread.currentThread().getName();
+			Thread.currentThread().setName(messages.getMessage(LoopThreadName, FileWatchService.class.getSimpleName()));
 			try {
 				while (run) {
 					// wake up every now and again to register new watched files even if 
@@ -141,29 +180,30 @@ public class FileWatchService {
 							} else {
 								
 								for (WatchEvent<?> evnt : key.pollEvents()) {
-									final Kind<?> kind = evnt.kind();
-									if (kind == OVERFLOW) {
-										logger.info("FileWatchService OVERFLOW");
-										continue; // for now.  not sure what else to do
-									}
-									final WatchEvent<Path> event = cast(evnt);
 									final Path watchable = (Path)key.watchable();
-									final Path context = event.context();
-									final Path path = watchable.resolve(context);
-									
-									for (final FileWatchSubscription subscriber : subscribers.keySet()) {
-										// if the subscription is to the directory, all event are noted
-										// if the subscription is to a specific file only events for that file are noted
-										if (Files.isDirectory(subscriber.path) || path.equals(subscriber.path)) {
-											asyncExecutor.submit(new Runnable() {
-												@Override
-												public void run() {
-													subscriber.fileChanged(path, event.kind());
-												}
-											});
+									if (key.isValid()) {
+										final Kind<?> kind = evnt.kind();
+										if (kind == OVERFLOW) {
+											logger.info("FileWatchService OVERFLOW");
+											continue; // for now.  not sure what else to do
+										}
+										final WatchEvent<Path> event = cast(evnt);
+										final Path context = event.context();
+										final Path path = watchable.resolve(context);
+										
+										for (final FileWatchSubscription subscriber : subscribers.keySet()) {
+											// if the subscription is to the directory, all event are noted
+											// if the subscription is to a specific file only events for that file are noted
+											if (Files.isDirectory(subscriber.path) || path.equals(subscriber.path)) {
+												asyncExecutor.submit(new Runnable() {
+													@Override
+													public void run() {
+														subscriber.fileChanged(path, event.kind());
+													}
+												});
+											}
 										}
 									}
-									
 									// if our directory got deleted out from under us,
 									// bye bye
 									if (!Files.exists(watchable)) {
@@ -188,40 +228,10 @@ public class FileWatchService {
 				Thread.currentThread().interrupt();
 				cleanup();
 			}
-			
+			Thread.currentThread().setName(name);
 		}
 	};
 	
-	private final HashMap<WatchKey, WeakHashMap<FileWatchSubscription, Boolean>> keys = new HashMap<>();
-	private final FileSystem fileSystem = FileSystems.getDefault();
-	private final WatchService watcher = this.fileSystem.newWatchService();
-	private final LocLogger logger;
-	private final AsyncThreadPool asyncExecutor;
-	
-	private volatile boolean run = true;
-	
-	/**
-	 * Constructor that takes all dependencies
-	 * @param synchExecutor
-	 * @param logger
-	 */
-	@NonBlocking
-	public FileWatchService(
-		final SynchThreadPool synchExecutor,
-		final AsyncThreadPool asyncExecutor,
-		final LocLogger logger
-	) throws Exception {
-		// 
-		assert synchExecutor != null : "No synchronous executor provided";
-		assert asyncExecutor != null : "No asynchronous executor provided";
-		assert logger != null : "No logger provided";
-		
-		this.logger = logger;
-		this.asyncExecutor = asyncExecutor;
-
-		// very definitely a synchronous task
-		synchExecutor.submit(serviceRunnable);
-	}
 	
 	private void cleanup() {
 		try {

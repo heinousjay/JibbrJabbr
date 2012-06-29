@@ -157,7 +157,8 @@ public class EventMediationService implements EventPublisher {
 		@Blocking
 		@Override
 		public void run() {
-			Thread.currentThread().setName(messages.getMessage(EventLoopThreadName));
+			String name = Thread.currentThread().getName();
+			Thread.currentThread().setName(messages.getMessage(LoopThreadName, EventMediationService.class.getSimpleName()));
 			try {
 
 				while (run) {
@@ -226,6 +227,7 @@ public class EventMediationService implements EventPublisher {
 				run = false;
 				Thread.currentThread().interrupt();
 			}
+			Thread.currentThread().setName(name);
 		}
 	};
 }
