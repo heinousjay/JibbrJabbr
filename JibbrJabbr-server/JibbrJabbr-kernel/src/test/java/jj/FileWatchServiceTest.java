@@ -15,8 +15,8 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import jj.FileWatchService.FileWatchServiceCallback;
 import jj.MockLogger.LogBundle;
+import jj.FileWatchService.FileWatchSubscription;
 
 import org.jboss.netty.util.CharsetUtil;
 import org.junit.After;
@@ -34,7 +34,7 @@ public class FileWatchServiceTest {
 	//MockLogger fileWatchServiceLogger;
 	
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		// so much set-up
 		MessageConveyor messageConveyor = new MessageConveyor(Locale.US);
 		LocLogger logger = new LocLogger(executorLogger, messageConveyor);
@@ -42,14 +42,13 @@ public class FileWatchServiceTest {
 		underTest = new FileWatchService(
 			testThreadPool,
 			testThreadPool,
-			logger,
-			messageConveyor
+			logger
 		);
 	}
 	
 	@After
 	public void after() {
-		underTest.shutdown();
+		underTest.control(KernelControl.Dispose);
 		underTest = null;
 		testThreadPool.shutdown();
 		testThreadPool = null;
@@ -88,47 +87,22 @@ public class FileWatchServiceTest {
     
     @Test
     public void testNullArgumentsAreRejected() throws Exception {
-    	
-    	Path testPath = Files.createTempDirectory(getClass().getSimpleName());
-    	
+  
     	try {
-    		underTest.watch(null, null);
+    		new FileWatchSubscription(null) {
+    			@Override
+    			protected void fileChanged(Path path) {
+    				// doesn't matter
+    			}
+    		};
     		fail("should not accept nulls");
-    	} catch (IllegalArgumentException iae) {}
-    	
-    	try {
-    		underTest.watch(testPath, null);
-    		fail("should not accept nulls");
-    	} catch (IllegalArgumentException iae) {}
-    	
-    	try {
-    		underTest.watch(null, new FileWatchServiceCallback() {
-			});
-    		fail("should not accept nulls");
-    	} catch (IllegalArgumentException iae) {}
-    	
-    	try {
-    		underTest.stopWatching(null, null);
-    		fail("should not accept nulls");
-    	} catch (IllegalArgumentException iae) {}
-    	
-    	try {
-    		underTest.stopWatching(testPath, null);
-    		fail("should not accept nulls");
-    	} catch (IllegalArgumentException iae) {}
-    	
-    	try {
-    		underTest.stopWatching(null, new FileWatchServiceCallback() {
-			});
-    		fail("should not accept nulls");
-    	} catch (IllegalArgumentException iae) {}
-    	
-    	deleteTree(testPath);
+    	} catch (AssertionError err) {}
+
     }
 	
 	@Test
-	public void testBasicSynchronousListening() throws Exception {
-		Path baseDirectory = Files.createTempDirectory(getClass().getSimpleName());
+	public void testBasicListening() throws Exception {
+		final Path baseDirectory = Files.createTempDirectory(getClass().getSimpleName());
 		final Path file = Files.createFile(baseDirectory.resolve("test.txt"));
 		final CyclicBarrier gate = new CyclicBarrier(2, new Runnable() {
 			@Override
@@ -137,25 +111,28 @@ public class FileWatchServiceTest {
 			}
 		});
 		final AtomicBoolean testFailedInCallback = new AtomicBoolean(false);
-		final FileWatchServiceCallback testTxtCallback = new FileWatchServiceCallback() {
-			
-			@Override
-			public void modified(Path path) {
-				// should trip the gate
-				try {
-					gate.await();
-				} catch (InterruptedException | BrokenBarrierException e) {
-					testFailedInCallback.set(true);
-				}
-			}
-			
-		};
+
 		try {
-			underTest.watch(file, testTxtCallback);
-			underTest.watch(baseDirectory, new FileWatchServiceCallback() {
+			new FileWatchSubscription(file) {
 
 				@Override
-				public void created(Path path) {
+				protected void fileChanged(Path path) {
+					System.out.println(path);
+					try {
+						gate.await();
+					} catch (InterruptedException | BrokenBarrierException e) {
+						testFailedInCallback.set(true);
+					}
+				}
+				
+			};
+			
+			new FileWatchSubscription(baseDirectory) {
+
+				@Override
+				protected void fileChanged(Path path) {
+					System.out.println("watching " + baseDirectory);
+					System.out.println("received " + path);
 					try {
 						Files.write(
 							file, 
@@ -165,7 +142,10 @@ public class FileWatchServiceTest {
 						testFailedInCallback.set(true);
 					}
 				}
-			});
+			};
+			
+			Thread.sleep(1500);
+			
 			Files.createDirectory(baseDirectory.resolve("HI"));
 			try { 
 				// we need to wait a while because
@@ -182,10 +162,4 @@ public class FileWatchServiceTest {
 			deleteTree(baseDirectory);
 		}
 	}
-	
-	@Test
-	public void testBasicAsynchronousListening() {
-		
-	}
-
 }
