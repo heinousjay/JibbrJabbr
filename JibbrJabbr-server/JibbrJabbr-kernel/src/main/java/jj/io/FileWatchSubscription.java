@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.io;
 
 
 import java.nio.file.Path;
@@ -61,7 +61,9 @@ public abstract class FileWatchSubscription {
 	public FileWatchSubscription(Path path) {
 		assert path != null : "need at least one path";
 		this.path = path;
-		FileWatchService.requestQueue.offer(this);
+		if (this.path.getFileSystem().equals(FileSystemService.fileSystem)) {
+			FileWatchService.requestQueue.offer(this);
+		}
 	}
 	
 	/**

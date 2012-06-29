@@ -1,4 +1,4 @@
-package jj;
+package jj.io;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
@@ -16,7 +16,11 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import jj.MockLogger;
+import jj.TestThreadPool;
 import jj.MockLogger.LogBundle;
+import jj.io.FileWatchService;
+import jj.io.FileWatchSubscription;
 
 import org.jboss.netty.util.CharsetUtil;
 import org.junit.After;
@@ -48,9 +52,8 @@ public class FileWatchServiceTest {
 	
 	@After
 	public void after() {
-		underTest.control(KernelControl.Dispose);
 		underTest = null;
-		testThreadPool.shutdown();
+		testThreadPool.shutdownNow();
 		testThreadPool = null;
 		
 		for (LogBundle lb : executorLogger.messages()) {
@@ -132,7 +135,7 @@ public class FileWatchServiceTest {
 				@Override
 				protected void fileChanged(Path path, Kind<Path> kind) {
 					System.out.println("watching " + baseDirectory);
-					System.out.println("received " + path);
+					System.out.println("received " + path + " " + kind);
 					try {
 						Files.write(
 							file, 
