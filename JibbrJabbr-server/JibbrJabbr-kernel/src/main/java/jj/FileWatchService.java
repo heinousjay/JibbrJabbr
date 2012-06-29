@@ -14,10 +14,9 @@ import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.WeakHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 import jj.api.Blocking;
-import jj.api.Event;
 import jj.api.NonBlocking;
 
 import net.jcip.annotations.ThreadSafe;
@@ -68,55 +67,7 @@ public class FileWatchService {
 	 * is static so that instantiating the FileWatchSubscription causes subscription.  talk
 	 * about a nice API
 	 */
-	private static final LinkedTransferQueue<FileWatchSubscription> requestQueue = new LinkedTransferQueue<>();
-	
-	/**
-	 * use it like
-	 * <pre>
-	 * FileWatchSubscription fws = new FileWatchSubscription("/some/interesting.file") {
-	 *     protected void fileChanged(Path path) {
-	 *         // do something neat 
-	 *     }
-	 * };
-	 * 
-	 * ... later ...
-	 * 
-	 * fws.unsubscribe(); // and discard the instance here, it is now useless
-	 * </pre>
-	 * @author jason
-	 *
-	 */
-	@Event
-	abstract static class FileWatchSubscription {
-		
-		// probably do this via string. or URL.
-		protected final Path path;
-		
-		private volatile boolean subscribe = true;
-		
-		public FileWatchSubscription(Path path) {
-			assert path != null : "cannot watch a null path";
-			this.path = path;
-			requestQueue.offer(this);
-		}
-		
-		public final void unsubscribe() {
-			subscribe = false;
-			requestQueue.offer(this);
-		}
-		
-		protected abstract void fileChanged(Path path);
-		
-		@Override
-		public final boolean equals(Object other) {
-			return other == this;
-		}
-		
-		@Override
-		public final int hashCode() {
-			return System.identityHashCode(this);
-		}
-	}
+	static final LinkedTransferQueue<FileWatchSubscription> requestQueue = new LinkedTransferQueue<>();
 	
 	
 	/**
@@ -158,14 +109,14 @@ public class FileWatchService {
 								final WatchKey fwsKey = directory.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 								
 								if (fws.subscribe) {
-									HashSet<FileWatchSubscription> subscribers = keys.get(fwsKey);
+									WeakHashMap<FileWatchSubscription, Boolean> subscribers = keys.get(fwsKey);
 									if (subscribers == null) {
-										subscribers = new HashSet<>();
+										subscribers = new WeakHashMap<>();
 										keys.put(fwsKey, subscribers);
 									}
-									subscribers.add(fws);
+									subscribers.put(fws, Boolean.TRUE);
 								} else {
-									final HashSet<FileWatchSubscription> subscribers = keys.get(fwsKey);
+									final WeakHashMap<FileWatchSubscription, Boolean> subscribers = keys.get(fwsKey);
 									subscribers.remove(fws);
 									if (subscribers.isEmpty()) {
 										keys.remove(fwsKey);
@@ -183,7 +134,7 @@ public class FileWatchService {
 					
 					if (key != null) {
 						if (key.isValid()) {
-							final HashSet<FileWatchSubscription> subscribers = keys.get(key);
+							final WeakHashMap<FileWatchSubscription, Boolean> subscribers = keys.get(key);
 							if (subscribers == null) {
 								key.cancel();
 								logger.warn("A key with no callbacks was being watched.  Some resource was mishandled");
@@ -195,20 +146,19 @@ public class FileWatchService {
 										logger.info("FileWatchService OVERFLOW");
 										continue; // for now.  not sure what else to do
 									}
-									
 									final WatchEvent<Path> event = cast(evnt);
 									final Path watchable = (Path)key.watchable();
 									final Path context = event.context();
 									final Path path = watchable.resolve(context);
 									
-									for (final FileWatchSubscription subscriber : subscribers) {
+									for (final FileWatchSubscription subscriber : subscribers.keySet()) {
 										// if the subscription is to the directory, all event are noted
 										// if the subscription is to a specific file only events for that file are noted
 										if (Files.isDirectory(subscriber.path) || path.equals(subscriber.path)) {
 											asyncExecutor.submit(new Runnable() {
 												@Override
 												public void run() {
-													subscriber.fileChanged(path);
+													subscriber.fileChanged(path, event.kind());
 												}
 											});
 										}
@@ -221,13 +171,12 @@ public class FileWatchService {
 										keys.remove(key);
 									}
 								}
-								
 							}
 						}
 						
 						if (!key.reset()) {
-			                keys.remove(key);
-			            }
+							keys.remove(key);
+						}
 					}
 				}
 			} catch (final ClosedWatchServiceException closed) {
@@ -243,7 +192,7 @@ public class FileWatchService {
 		}
 	};
 	
-	private final HashMap<WatchKey, HashSet<FileWatchSubscription>> keys = new HashMap<>();
+	private final HashMap<WatchKey, WeakHashMap<FileWatchSubscription, Boolean>> keys = new HashMap<>();
 	private final FileSystem fileSystem = FileSystems.getDefault();
 	private final WatchService watcher = this.fileSystem.newWatchService();
 	private final LocLogger logger;

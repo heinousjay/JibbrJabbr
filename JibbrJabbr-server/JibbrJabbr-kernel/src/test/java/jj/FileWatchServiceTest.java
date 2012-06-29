@@ -8,6 +8,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.WatchEvent.Kind;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Locale;
 import java.util.concurrent.BrokenBarrierException;
@@ -16,7 +17,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jj.MockLogger.LogBundle;
-import jj.FileWatchService.FileWatchSubscription;
 
 import org.jboss.netty.util.CharsetUtil;
 import org.junit.After;
@@ -91,7 +91,7 @@ public class FileWatchServiceTest {
     	try {
     		new FileWatchSubscription(null) {
     			@Override
-    			protected void fileChanged(Path path) {
+    			protected void fileChanged(Path path, Kind<Path> kind) {
     				// doesn't matter
     			}
     		};
@@ -116,7 +116,7 @@ public class FileWatchServiceTest {
 			new FileWatchSubscription(file) {
 
 				@Override
-				protected void fileChanged(Path path) {
+				protected void fileChanged(Path path, Kind<Path> kind) {
 					System.out.println(path);
 					try {
 						gate.await();
@@ -130,7 +130,7 @@ public class FileWatchServiceTest {
 			new FileWatchSubscription(baseDirectory) {
 
 				@Override
-				protected void fileChanged(Path path) {
+				protected void fileChanged(Path path, Kind<Path> kind) {
 					System.out.println("watching " + baseDirectory);
 					System.out.println("received " + path);
 					try {
@@ -144,7 +144,7 @@ public class FileWatchServiceTest {
 				}
 			};
 			
-			Thread.sleep(1500);
+			Thread.sleep(1500); // need to give it a moment to wake up
 			
 			Files.createDirectory(baseDirectory.resolve("HI"));
 			try { 
