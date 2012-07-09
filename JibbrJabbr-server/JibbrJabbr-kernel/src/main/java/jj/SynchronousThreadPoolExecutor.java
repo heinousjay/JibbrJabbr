@@ -40,7 +40,7 @@ import ch.qos.cal10n.MessageConveyor;
  * @author jason
  *
  */
-class SynchronousThreadPoolExecutor 
+public class SynchronousThreadPoolExecutor 
 		extends ThreadPoolExecutor
 		implements SynchThreadPool, RejectedExecutionHandler, ThreadFactory {
 	
@@ -63,7 +63,7 @@ class SynchronousThreadPoolExecutor
 		
 		@Override
 		protected void done() {
-			logger.info(SynchronousTaskDone);
+			logger.trace(SynchronousTaskDone);
 		}
 		
 	}

@@ -16,6 +16,10 @@ import java.util.List;
  * Responsible for loading the kernel and its direct dependencies
  * The kernel will make its own set of classloaders to decide what
  * means what to applications.
+ * 
+ * Most of this should actually go into a different classloader inside the kernel
+ * project.  this should only really know how to find the startup class inside there
+ * 
  * @author jason
  *
  */

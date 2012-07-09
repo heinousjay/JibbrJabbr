@@ -13,14 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.generation;
+package jj.io;
 
 /**
- * Accepts a path to a .class file and outputs some set of 
- * class byte arrays suitable for classloading.
+ * 
+ * 
  * @author jason
  *
  */
-public class ClassTransformationService {
+public abstract class HttpRequestSubscription {
 
+	protected final String path;
+	
+	volatile boolean subscribe = true;
+	
+	public HttpRequestSubscription(final String path) {
+		this.path = path;
+	}
+	
+	public final void unsubscribe() {
+		subscribe = false;
+	}
+	
+	protected abstract void request();
+	
+	@Override
+	public final boolean equals(Object other) {
+		return other == this;
+	}
+	
+	@Override
+	public final int hashCode() {
+		return System.identityHashCode(this);
+	}
 }

@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import jj.AsyncThreadPool;
 import jj.SynchThreadPool;
-import jj.SynchronousOperationCallback;
 import jj.api.Blocking;
 import jj.api.NonBlocking;
 import net.jcip.annotations.ThreadSafe;

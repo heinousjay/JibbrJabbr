@@ -30,9 +30,10 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
+import java.net.URI;
+import java.net.URISyntaxException;
 
+import jj.api.EventPublisher;
 import jj.api.NonBlocking;
 import jj.html.HTMLFragment;
 import jj.html.HTMLFragmentFinder;
@@ -67,20 +68,21 @@ public class HttpRequestHandler {
 	
 	private static final HttpResponse RESPONSE_100_CONTINUE = new DefaultHttpResponse(HTTP_1_1, CONTINUE);
 	
-	private final HTMLFragmentFinder htmlFragmentFinder;
+	
+	private final EventPublisher eventPublisher;
 
 	private final byte[] favicon;
 	
 	private final HttpResponse error503;
 	
 	public HttpRequestHandler(
-		HTMLFragmentFinder htmlFragmentFinder,
-		MessageConveyor messageConveyor
+		MessageConveyor messageConveyor,
+		EventPublisher eventPublisher
 	) throws Exception {
 		
-		assert htmlFragmentFinder != null : "htmlFragmentFinder is required";
+		assert eventPublisher != null : "eventPublisher is required";
 		
-		this.htmlFragmentFinder = htmlFragmentFinder;
+		this.eventPublisher = eventPublisher;
 		
 		error503 = makeFallback503(messageConveyor.getMessage(ServerErrorFallbackResponse));
 		
@@ -111,15 +113,29 @@ public class HttpRequestHandler {
 		return response;
 	}
 	
+	private static URI INDEX;
+	private static URI ERROR_404;
+	private static URI ERROR_405;
+	
+	static {
+		try {
+			INDEX = HttpRequestHandler.class.getResource("/jj/builtin/assets/index.html").toURI();
+			ERROR_404 = HttpRequestHandler.class.getResource("/jj/builtin/errors/404.html").toURI();
+			ERROR_405 = HttpRequestHandler.class.getResource("/jj/builtin/errors/405.html").toURI();
+		} catch (URISyntaxException e) {
+			// can't happen
+		}
+	}
+	
 	@NonBlocking
 	public void handle(final ChannelHandlerContext ctx, final MessageEvent e, final HttpRequest request) throws Exception {
 		
-		String path = null;
+		URI resource = null;
 		String uri = request.getUri();
 		final Channel responseChannel = e.getChannel();
 		HttpResponseStatus status = NOT_FOUND;
 		if (request.getMethod() != GET) {
-			path = "builtin/errors/405.html";
+			resource = ERROR_405;
 			status = METHOD_NOT_ALLOWED;
 		} else {
 			if (is100ContinueExpected(request)) {
@@ -127,21 +143,21 @@ public class HttpRequestHandler {
 			} else if ("/favicon.ico".equals(uri)) {
 				writeResponse(responseChannel, request, OK, ChannelBuffers.wrappedBuffer(favicon), "image/vnd.microsoft.icon");
 			} else if ("/".equals(uri) || "/index".equals(uri)) {
-				path = "builtin/assets/index.html";
+				resource = INDEX;
 				status = OK;
 			} else {
-				path = "builtin/errors/404.html";
+				resource = ERROR_404;
 			}
 		}
 		
-		if (path != null) {
+		if (resource != null) {
 			final HttpResponseStatus finalStatus = status;
 			try {
-				final FileSystem jarFS = FileSystems.newFileSystem(JJ.jarForClass(HttpRequestHandler.class), null);
-				htmlFragmentFinder.find(jarFS.getPath("jj"), path, new SynchronousOperationCallback<HTMLFragment>() {
+				
+				new HTMLFragmentFinder(resource) {
 					
 					@Override
-					public void complete(HTMLFragment htmlFragment) {
+					protected void htmlFragment(HTMLFragment htmlFragment) {
 						writeResponse(responseChannel, request, finalStatus, 
 							ChannelBuffers.copiedBuffer(
 								htmlFragment.element().html(), 
@@ -150,16 +166,11 @@ public class HttpRequestHandler {
 							"text/html; charset=UTF-8"
 						);
 					}
-					
-					@Override
-					public void throwable(Throwable t) {
-						//logger.error("NOT GOOD", t);
-						write503(responseChannel);
-					}
-				});
-			} catch (Exception ex) {
-				//logger.error("NOT GOOD", ex);
+				};
 				
+			} catch (Exception ex) {
+				eventPublisher.publish(new KernelException(ex));
+				write503(responseChannel);
 			}
 		}
 	}

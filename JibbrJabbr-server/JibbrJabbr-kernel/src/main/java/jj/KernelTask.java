@@ -15,31 +15,42 @@
  */
 package jj;
 
-import java.nio.channels.CompletionHandler;
-import java.util.concurrent.FutureTask;
-
 /**
- * A two-part task to process some sort of potentially blocking
- * service, like file i/o.  Basic concept is the first task is the
- * i/o itself, second task is what to do with the result.
- * 
- * Probably needs to be not tied to the kernel pool, since there will
- * likely be a separate thread pool for non-HTTP I/O and a thread pool
- * for app tasks.
+ * a basic runnable that renames its thread for debugging purposes and
+ * provides interrupt handling and a cleanup method
  * 
  * @author Jason Miller
  *
  */
-public class KernelTask<T> extends FutureTask<T> {
+public abstract class KernelTask implements Runnable {
 	
-	public KernelTask(Runnable task, CompletionHandler<?, ?> completion) {
-		super(task, null);
-		
+	protected final String taskName;
+	
+	protected KernelTask(final String taskName) {
+		this.taskName = taskName;
 	}
 	
-	@Override
-	protected void done() {
-		// gah gah gah gah gah
+	public final void run() {
+		String originalName = Thread.currentThread().getName();
+		Thread.currentThread().setName(taskName);
+		try {
+			execute();
+		} catch (InterruptedException ie) {
+			Thread.currentThread().interrupt();
+		} catch (Exception e) {
+			e.printStackTrace(); // log as kernel exception
+		} finally {
+			try {
+				cleanup();
+			} catch (Exception e) {
+				// log this?
+			}
+			Thread.currentThread().setName(originalName);
+		}
 	}
+	
+	protected abstract void execute() throws Exception;
+	
+	protected void cleanup() {}
 }
 

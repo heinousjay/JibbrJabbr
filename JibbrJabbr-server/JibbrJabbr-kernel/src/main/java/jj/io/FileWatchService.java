@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2012 Jason Miller
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package jj.io;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -18,8 +33,10 @@ import java.util.WeakHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 
 import jj.AsyncThreadPool;
+import jj.KernelException;
 import jj.SynchThreadPool;
 import jj.api.Blocking;
+import jj.api.EventPublisher;
 import jj.api.NonBlocking;
 
 import net.jcip.annotations.ThreadSafe;
@@ -51,10 +68,11 @@ public class FileWatchService {
 	final LinkedTransferQueue<FileWatchSubscription> requestQueue = new LinkedTransferQueue<>();
 	
 	private final HashMap<WatchKey, WeakHashMap<FileWatchSubscription, Boolean>> keys = new HashMap<>();
-	private final WatchService watcher = FileSystemService.fileSystem.newWatchService();
+	private final WatchService watcher = FileSystemService.defaultFileSystem.newWatchService();
 	private final LocLogger logger;
 	private final MessageConveyor messages;
 	private final AsyncThreadPool asyncExecutor;
+	private final EventPublisher eventPublisher;
 	
 	private volatile boolean run = true;
 	
@@ -68,20 +86,23 @@ public class FileWatchService {
 		final SynchThreadPool synchExecutor,
 		final AsyncThreadPool asyncExecutor,
 		final LocLogger logger,
-		final MessageConveyor messages
+		final MessageConveyor messages,
+		final EventPublisher eventPublisher
 	) throws Exception {
 		// 
 		assert synchExecutor != null : "No synchronous executor provided";
 		assert asyncExecutor != null : "No asynchronous executor provided";
 		assert logger != null : "No logger provided";
 		assert messages != null : "No messages provided";
+		assert eventPublisher != null : "No eventPublisher provided";
 		
 		this.logger = logger;
 		this.asyncExecutor = asyncExecutor;
 		this.messages = messages;
+		this.eventPublisher = eventPublisher;
 		
 		// very definitely a synchronous task
-		synchExecutor.submit(serviceRunnable);
+		synchExecutor.submit(loop);
 		
 		FileWatchSubscription.fileWatchServiceRef = new WeakReference<FileWatchService>(this);
 	}
@@ -90,7 +111,7 @@ public class FileWatchService {
 	 * Handles the running tasks of the watch service, taking selected
 	 * keys from the service and dispatching interested callbacks
 	 */
-	private final Runnable serviceRunnable = new Runnable() {
+	private final Runnable loop = new Runnable() {
 
 		/**
 		 * Strange design decisions haunt the JDK, and so
@@ -142,8 +163,7 @@ public class FileWatchService {
 									}
 								}
 							} catch (final IOException io) {
-								// publish the exception
-								io.printStackTrace();
+								eventPublisher.publish(new KernelException(io));
 							}
 							// we check inside the loop because we're registering watchers up in here
 							if (Thread.interrupted()) throw new InterruptedException();

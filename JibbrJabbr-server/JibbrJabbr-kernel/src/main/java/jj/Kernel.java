@@ -17,17 +17,17 @@ package jj;
 
 import static jj.KernelControl.*;
 import static org.picocontainer.Characteristics.NONE;
-import static org.jboss.netty.util.ThreadNameDeterminer.CURRENT;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import jj.api.Version;
-import jj.html.HTMLFragmentFinder;
+import jj.html.HTMLFragmentCache;
+import jj.io.FileSystemService;
+import jj.io.FileWatchService;
 
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
-import org.jboss.netty.util.ThreadRenamingRunnable;
 import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.behaviors.Caching;
@@ -69,11 +69,8 @@ public class Kernel {
 		// determine the constraint level for JDK 7 on Mac.
 		System.setProperty("org.jboss.netty.channel.socket.nio.constraintLevel", "0");
 		
-		
 		// set netty to log to our logger
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-		// and tell netty to stop renaming our threads
-		ThreadRenamingRunnable.setThreadNameDeterminer(CURRENT);
 	}
 	
 	private final Logger logger = LoggerFactory.getLogger(Kernel.class);
@@ -125,10 +122,12 @@ public class Kernel {
 		
 		ioContainer.setName("Kernel I/O");
 	
-		ioContainer.addComponent(HTMLFragmentFinder.class)
+		ioContainer.addComponent(HTMLFragmentCache.class) // doesn't really belong here - should be a layer down
 				.addComponent(HttpRequestHandler.class)
 				.addComponent(HttpServer.class)
-				.addComponent(NettyRequestBridge.class);
+				.addComponent(NettyRequestBridge.class) // needs a good hard refactoring
+				.addComponent(FileWatchService.class)
+				.addComponent(FileSystemService.class);
 		
 		coreContainer.start();
 		
@@ -178,5 +177,10 @@ public class Kernel {
 	
 	public void dispose() {
 		ems.publish(Dispose);
+	}
+	
+	public void exception(KernelException e) {
+		// need something better of course
+		logger.error("OMG", e);
 	}
 }

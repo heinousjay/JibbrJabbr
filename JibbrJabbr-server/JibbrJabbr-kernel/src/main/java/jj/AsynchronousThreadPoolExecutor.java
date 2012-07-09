@@ -43,7 +43,7 @@ import ch.qos.cal10n.IMessageConveyor;
  * @author Jason Miller
  *
  */
-class AsynchronousThreadPoolExecutor 
+public class AsynchronousThreadPoolExecutor 
 		extends ThreadPoolExecutor 
 		implements AsyncThreadPool, RejectedExecutionHandler, ThreadFactory {
 	

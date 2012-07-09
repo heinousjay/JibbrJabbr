@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.generation;
+package jj;
 
 /**
- * Accepts a path to a .class file and outputs some set of 
- * class byte arrays suitable for classloading.
+ * Mainly used to ensure that there is an asynchronous appender
+ * in the logging configuration.
+ *
+ * maybe used to find separate configuration files?
+ * 
+ * If the kernel detects that logback is in use, then this class
+ * is instantiated reflectively.
+ * 
  * @author jason
  *
  */
-public class ClassTransformationService {
+class LogbackConfigurator {
 
+	LogbackConfigurator() {
+		// i don't remember how this works
+	}
+	
 }

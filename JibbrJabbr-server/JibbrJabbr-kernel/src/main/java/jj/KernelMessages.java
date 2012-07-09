@@ -36,6 +36,7 @@ public enum KernelMessages {
 	// general messages
 	ObjectInstantiating,
 	ObjectInstantiated,
+	ObjectDisposing,
 	
 	KernelInitialized,
 	UsingUnknownLogger,

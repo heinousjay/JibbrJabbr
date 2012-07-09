@@ -28,5 +28,9 @@ public class KernelException extends RuntimeException {
 	 * 
 	 */
 	private static final long serialVersionUID = -3110191078023953752L;
+	
+	public KernelException(Throwable cause) {
+		super("", cause);
+	}
 
 }

@@ -18,7 +18,7 @@ package jj;
 import jj.api.Event;
 
 @Event
-enum KernelControl {
+public enum KernelControl {
 	Start,
 	Stop,
 	Dispose

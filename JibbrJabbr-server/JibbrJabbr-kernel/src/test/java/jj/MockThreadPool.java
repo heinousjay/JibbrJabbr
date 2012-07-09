@@ -48,7 +48,6 @@ public class MockThreadPool extends ThreadPoolExecutor implements
 	public MockThreadPool(int corePoolSize, int maximumPoolSize,
 			long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-		// TODO Auto-generated constructor stub
 	}
 
 }

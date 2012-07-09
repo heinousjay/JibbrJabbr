@@ -37,7 +37,8 @@ import jj.api.EventPublisher;
 import jj.api.NonBlocking;
 
 /**
- * component with known event 
+ * maybe rework this so that internally one can instantiate a
+ * known event object which automatically publishes it?
  * 
  * @author jason
  *

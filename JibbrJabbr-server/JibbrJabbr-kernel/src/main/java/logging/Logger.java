@@ -16,10 +16,8 @@
 package logging;
 
 /**
- * Inspired by the slf4j LocLogger
- * 
- * provides that basic interface to the kernel systems but logs to a queue for
- * async dispatch
+ * Inspired by the slf4j LocLogger but without
+ * the string backups.  don't need em
  * 
  * @author jason
  *
@@ -29,6 +27,8 @@ public interface Logger {
 	void trace(Enum<?> key, Object... args);
 	void debug(Enum<?> key, Object... args);
 	void info(Enum<?> key, Object... args);
+	void warn(Enum<?> key, Throwable t);
 	void warn(Enum<?> key, Object... args);
+	void error(Enum<?> key, Throwable t);
 	void error(Enum<?> key, Object... args);
 }

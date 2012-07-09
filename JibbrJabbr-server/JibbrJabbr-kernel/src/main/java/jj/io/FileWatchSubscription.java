@@ -42,6 +42,9 @@ import net.jcip.annotations.ThreadSafe;
  * </pre>
  * </p>
  * 
+ * make a version that takes URIs?  or maybe it should only take URIs and convert its
+ * paths internally?
+ * 
  * @author jason
  *
  */
@@ -65,7 +68,7 @@ public abstract class FileWatchSubscription {
 		assert path != null : "need at least one path";
 		this.path = path;
 		FileWatchService fws = fileWatchServiceRef.get();
-		if (this.path.getFileSystem().equals(FileSystemService.fileSystem) && fws != null) {
+		if (this.path.getFileSystem().equals(FileSystemService.defaultFileSystem) && fws != null) {
 			fws.requestQueue.offer(this);
 		}
 	}

@@ -1,4 +1,6 @@
-package jj;
+package jj.resource;
+
+import jj.AsyncThreadPool;
 
 /**
  * <p>

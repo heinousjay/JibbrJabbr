@@ -2,181 +2,96 @@ package jj.html;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
-
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
-import jj.SynchronousOperationCallback;
+import jj.KernelControl;
+import jj.MockLogger;
 import jj.MockThreadPool;
+import jj.io.FileSystemService;
 
-import org.jsoup.nodes.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.cal10n.LocLogger;
+
+import ch.qos.cal10n.MessageConveyor;
 
 public class HTMLFragmentFinderTest {
 
-	private static final String FRAGMENT_HTML = "fragment.html";
-	private static final String INDEX_HTML = "index.html";
-	HTMLFragmentFinder htmlFragmentFinder;
-	Path clamwhoresBase;
+	HTMLFragmentCache htmlFragmentCache;
+	FileSystemService fileSystemService;
+	URI clamwhoresIndex;
 	MockThreadPool testThreadPool;
+	MessageConveyor messages = new MessageConveyor(Locale.US);
+	MockLogger mockLogger;
 	
+
+	
+	/**
+	 * @throws Exception 
+	 * 
+	 */
+	public HTMLFragmentFinderTest() throws Exception {
+		clamwhoresIndex = getClass().getResource("/com/clamwhores/index.html").toURI();
+	}
+
 	@Before
 	public void before() throws Exception {
+		mockLogger = new MockLogger();
 		testThreadPool = new MockThreadPool();
-		htmlFragmentFinder = new HTMLFragmentFinder(testThreadPool, testThreadPool);
-		if (clamwhoresBase == null) {
-			Path clamwhoresIndex = Paths.get(getClass().getResource("/com/clamwhores/index.html").toURI());
-			clamwhoresBase = clamwhoresIndex.getParent();
-		}
+		fileSystemService = new FileSystemService(testThreadPool, testThreadPool, new LocLogger(mockLogger, messages), messages);
+		htmlFragmentCache = new HTMLFragmentCache(testThreadPool, new LocLogger(mockLogger, messages), messages);
 	}
 	
 	@After
 	public void after() {
-		htmlFragmentFinder = null;
-		testThreadPool.shutdownNow();
+		htmlFragmentCache.control(KernelControl.Dispose);
+		fileSystemService.control(KernelControl.Dispose);
+		testThreadPool.shutdown();
 		testThreadPool = null;
 	}
 	
 	@Test
-	public void testFindArgumentErrors() {
-		Path nullPath = null;
-		String nullString = null;
-		SynchronousOperationCallback<HTMLFragment> nullCallback = null;
-		boolean failed = false;
-		try {
-			htmlFragmentFinder.find(nullPath, nullString);
-			failed = true;
-		} catch (AssertionError iae) {
-			assertThat(iae.getMessage(), containsString("base"));
-		}
-		if (failed) fail("should have thrown AssertionError");
+	public void testBasicFragmentRetrieval() throws Exception {
 		
-		try {
-			htmlFragmentFinder.find(clamwhoresBase, nullString);
-			failed = true;
-		} catch (AssertionError iae) {
-			assertThat(iae.getMessage(), containsString("url"));
-		}
-		if (failed) fail("should have thrown AssertionError");
-		
-		try {
-			htmlFragmentFinder.find(nullPath, INDEX_HTML);
-			failed = true;
-		} catch (AssertionError iae) {
-			assertThat(iae.getMessage(), containsString("base"));
-		}
-		if (failed) fail("should have thrown AssertionError");
-		
-		try {
-			htmlFragmentFinder.find(nullPath, nullString, nullCallback);
-			failed = true;
-		} catch (AssertionError iae) {
-			assertThat(iae.getMessage(), containsString("base"));
-		}
-		if (failed) fail("should have thrown AssertionError");
-		
-		try {
-			htmlFragmentFinder.find(clamwhoresBase, nullString, nullCallback);
-			failed = true;
-		} catch (AssertionError iae) {
-			assertThat(iae.getMessage(), containsString("url"));
-		}
-		if (failed) fail("should have thrown AssertionError");
-		
-		try {
-			htmlFragmentFinder.find(nullPath, INDEX_HTML, nullCallback);
-			failed = true;
-		} catch (AssertionError iae) {
-			assertThat(iae.getMessage(), containsString("base"));
-		}
-		if (failed) fail("should have thrown AssertionError");
-		
-		try {
-			htmlFragmentFinder.find(clamwhoresBase, INDEX_HTML, nullCallback);
-			failed = true;
-		} catch (AssertionError iae) {
-			assertThat(iae.getMessage(), containsString("callback"));
-		}
-		if (failed) fail("should have thrown AssertionError");
-	}
-	
-	@Test
-	public void testReturnsNullForUnknownResource() {
-		assertThat(htmlFragmentFinder.find(clamwhoresBase, "nonsense"), is(nullValue()));
-	}
-	
-	@Test
-	public void testFindsHTMLFragment() {
-		
-		HTMLFragment index = htmlFragmentFinder.find(clamwhoresBase, INDEX_HTML);
-		assertThat(index, is(notNullValue()));
-		assertThat(index.element(), is(instanceOf(Document.class)));
-		
-		HTMLFragment fragment = htmlFragmentFinder.find(clamwhoresBase, FRAGMENT_HTML);
-		assertThat(fragment, is(notNullValue()));
-		assertThat(fragment.element(), is(not(instanceOf(Document.class))));
-	}
-	
-	@Test 
-	public void testCachesHTMLFragments() {
-		HTMLFragment index1 = htmlFragmentFinder.find(clamwhoresBase, INDEX_HTML);
-		HTMLFragment index2 = htmlFragmentFinder.find(clamwhoresBase, INDEX_HTML);
-		HTMLFragment fragment1 = htmlFragmentFinder.find(clamwhoresBase, FRAGMENT_HTML);
-		HTMLFragment fragment2 = htmlFragmentFinder.find(clamwhoresBase, FRAGMENT_HTML);
-		assertThat(index1, is(sameInstance(index2)));
-		assertThat(fragment1, is(sameInstance(fragment2)));
-	}
-	
-	@Test
-	public void testFindsFragmentsAsynchronously() throws Exception {
-		
-		final int count = 20;
-		
-		final CountDownLatch latch = new CountDownLatch(count);
+		final CountDownLatch latch1 = new CountDownLatch(1);
+		final CountDownLatch latch2 = new CountDownLatch(1);
 		final AtomicBoolean failed = new AtomicBoolean(false);
+		final AtomicReference<HTMLFragment> fragment = new AtomicReference<>(null);
 		
-		try (FileSystem jarFS = FileSystems.newFileSystem(Paths.get(getClass().getResource("/clamwhores.jar").toURI()), null)) {
-			final Runnable runner = new Runnable() {
-				
-				@Override
-				public void run() {
-					htmlFragmentFinder.find(jarFS.getPath("jj"), "/com/clamwhores/index.html", new SynchronousOperationCallback<HTMLFragment>() {
-
-						@Override
-						public void complete(HTMLFragment htmlFragment) {
-							assertThat(htmlFragment, is(notNullValue()));
-							assertThat(htmlFragment.element(), is(instanceOf(Document.class)));
-							latch.countDown();
-						}
-						
-						@Override
-						public void throwable(Throwable t) {
-							t.printStackTrace();
-							latch.countDown();
-							failed.set(true);
-						}
-					});
+		new HTMLFragmentFinder(clamwhoresIndex) {
+			
+			@Override
+			protected void htmlFragment(HTMLFragment htmlFragment) {
+				if (htmlFragment == null) {
+					failed.set(true);
+				} else {
+					fragment.compareAndSet(null, htmlFragment);
 				}
-			};
-			
-			for (int i = 0; i < count; ++i) {
-				testThreadPool.submit(runner);
+				latch1.countDown();
 			}
+		};
+		
+		latch1.await(10, SECONDS);
+		
+		new HTMLFragmentFinder(clamwhoresIndex) {
 			
-			try {
-				latch.await(30, SECONDS);
-			} catch (Exception eaten) { failed.set(true); }
-			
-			if (failed.get()) {
-				fail("something didn't work");
+			@Override
+			protected void htmlFragment(HTMLFragment htmlFragment) {
+				if (htmlFragment != fragment.get()) {
+					failed.set(true);
+				} 
+				
+				latch2.countDown();
 			}
+		};
+		
+		if (!latch2.await(10, SECONDS) || !failed.get()) {
+			fail("something didn't work");
 		}
 	}
 }

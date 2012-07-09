@@ -21,6 +21,7 @@ import jj.MockLogger;
 import jj.MockLogger.LogBundle;
 import jj.MockThreadPool;
 
+import jj.api.EventPublisher;
 import jj.io.FileWatchService;
 import jj.io.FileWatchSubscription;
 
@@ -34,7 +35,7 @@ import ch.qos.cal10n.MessageConveyor;
 
 public class FileWatchServiceTest {
 
-	MockLogger executorLogger = new MockLogger();
+	MockLogger mockLogger = new MockLogger();
 	FileWatchService underTest;
 	MockThreadPool testThreadPool;
 	
@@ -42,13 +43,18 @@ public class FileWatchServiceTest {
 	public void before() throws Exception {
 		// so much set-up
 		MessageConveyor messageConveyor = new MessageConveyor(Locale.US);
-		LocLogger logger = new LocLogger(executorLogger, messageConveyor);
+		LocLogger logger = new LocLogger(mockLogger, messageConveyor);
 		testThreadPool = new MockThreadPool();
 		underTest = new FileWatchService(
 			testThreadPool,
 			testThreadPool,
 			logger,
-			messageConveyor
+			messageConveyor,
+			new EventPublisher() {
+				
+				@Override
+				public void publish(Object event) {}
+			}
 		);
 	}
 	
@@ -58,7 +64,7 @@ public class FileWatchServiceTest {
 		testThreadPool.shutdownNow();
 		testThreadPool = null;
 		
-		for (LogBundle lb : executorLogger.messages()) {
+		for (LogBundle lb : mockLogger.messages()) {
 			System.out.println(lb);
 		}
 	}

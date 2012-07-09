@@ -74,7 +74,7 @@ public class KernelSettings {
 		return port;
 	}
 	
-	private int synchronousThreadCoreCount = 4;
+	private int synchronousThreadCoreCount = 5;
 	public int synchronousThreadCoreCount() {
 		return synchronousThreadCoreCount;
 	}
