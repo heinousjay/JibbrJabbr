@@ -60,17 +60,6 @@ public abstract class FileBytesRetriever extends FileSystemService.UriToPath {
 		
 	}
 	
-	private void callFailed(final Throwable t) {
-		
-		asyncThreadPool.submit(new Runnable() {
-			
-			@Override
-			public void run() {
-				failed(t);
-			}
-		});
-	}
-	
 	/**
 	 * Called when the file is completely read.
 	 * 
@@ -80,9 +69,4 @@ public abstract class FileBytesRetriever extends FileSystemService.UriToPath {
 	 * @param bytes
 	 */
 	protected abstract void bytes(final ByteBuffer bytes);
-	
-	/**
-	 * Called if the operation failed.  Might just pass along the exception?
-	 */
-	protected abstract void failed(final Throwable t);
 }

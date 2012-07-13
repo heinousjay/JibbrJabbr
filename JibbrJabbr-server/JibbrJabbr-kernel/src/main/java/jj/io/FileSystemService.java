@@ -92,6 +92,22 @@ public class FileSystemService {
 			this.asyncThreadPool = instance.asyncThreadPool;
 		}
 		
+		/**
+		 * Called if the operation failed.  Optional operation
+		 */
+		protected void failed(final Throwable t) {}
+		
+		final void callFailed(final Throwable t) {
+			
+			asyncThreadPool.submit(new Runnable() {
+				
+				@Override
+				public void run() {
+					failed(t);
+				}
+			});
+		}
+		
 		abstract void execute();
 		
 		public final void cancel() {
