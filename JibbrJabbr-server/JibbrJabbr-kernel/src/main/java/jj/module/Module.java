@@ -23,6 +23,9 @@ package jj.module;
  */
 public interface Module {
 
-	
-	
+	/**
+	 * Indicates if this module is in service
+	 * @return
+	 */
+	boolean inService();
 }

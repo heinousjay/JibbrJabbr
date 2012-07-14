@@ -15,12 +15,59 @@
  */
 package jj.module;
 
+import java.net.URI;
+import java.util.List;
+
+import net.jcip.annotations.Immutable;
+
+import jj.KernelTask;
+import jj.io.DirectoryTreeRetriever;
+
 /**
  * <p>A module loaded from a jar file</p>
  * 
  * @author jason
  *
  */
-public class JarModule implements Module {
+@Immutable
+class JarModule implements Module {
+	
+	private volatile boolean inService;
+	
+	JarModule(final URI uri) {
+		
+		new DirectoryTreeRetriever(uri) {
 
+			@Override
+			protected void directoryTree(final List<URI> uris) {
+				inService = true;
+			}
+			
+			@Override
+			protected void failed(final Throwable t) {
+				// not sure what to do... save it?
+			}
+		};
+	}
+	
+	public boolean inService() {
+		return inService;
+	}
+	
+	private final class Worker extends KernelTask {
+
+		/**
+		 * @param taskName
+		 */
+		protected Worker(String taskName) {
+			super(taskName);
+		}
+
+		@Override
+		protected void execute() throws Exception {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 }

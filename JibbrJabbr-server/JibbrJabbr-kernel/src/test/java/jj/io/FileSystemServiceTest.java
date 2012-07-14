@@ -23,28 +23,23 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import jj.KernelControl;
-import jj.MockLogger;
-import jj.MockLogger.LogBundle;
-import jj.MockThreadPool;
+import jj.FileSystemServiceRule;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.cal10n.LocLogger;
-
-import ch.qos.cal10n.MessageConveyor;
 
 /**
  * @author jason
  *
  */
-public class FileSystemServiceTest {
+public class FileSystemServiceTest  {
+	
+	@Rule
+	public FileSystemServiceRule fssRule = new FileSystemServiceRule();
 	
 	final URI indexHtml;
 	final URI clamwhoresFS;
@@ -55,35 +50,6 @@ public class FileSystemServiceTest {
 		indexHtml = FileSystemServiceTest.class.getResource("/com/clamwhores/index.html").toURI();
 		clamwhoresFS = indexHtml.resolve(".");
 		clamwhoresJar = FileSystemServiceTest.class.getResource("/clamwhores.jar").toURI();
-	}
-	
-
-	FileSystemService fss;
-	MockThreadPool threadPool;
-	MessageConveyor messages = new MessageConveyor(Locale.US);
-	MockLogger mockLogger;
-	
-
-	@Before
-	public void before() {
-		mockLogger = new MockLogger();
-		threadPool = new MockThreadPool();
-		fss = new FileSystemService(threadPool, threadPool, new LocLogger(mockLogger, messages), messages);
-	}
-	
-	@After
-	public void after() throws Exception {
-		
-		fss.control(KernelControl.Dispose);
-		
-		threadPool.shutdown();
-		threadPool.awaitTermination(10, SECONDS);
-		
-		fss = null;
-		
-		for (LogBundle lb : mockLogger.messages()) {
-			System.out.println(lb);
-		}
 	}
 
 	@Test

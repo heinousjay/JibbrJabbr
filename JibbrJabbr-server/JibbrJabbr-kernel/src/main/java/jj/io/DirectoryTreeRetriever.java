@@ -33,7 +33,7 @@ import java.util.List;
  * Say that better!
  * 
  * if the path identifies a jar, return the entries inside the jar
- * if it identifies a file, return the entries of the parent directory
+ * if it identifies a file, return the entries of the parent directory?
  * if it identified a directory... BOOM SHAKALAKA
  * 
  * also say that better!

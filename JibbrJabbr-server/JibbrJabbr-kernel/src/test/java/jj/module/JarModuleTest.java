@@ -15,10 +15,39 @@
  */
 package jj.module;
 
+import static org.junit.Assert.assertTrue;
+
+import java.net.URI;
+
+import jj.FileSystemServiceRule;
+import jj.io.FileSystemServiceTest;
+
+import org.junit.Rule;
+import org.junit.Test;
+
 /**
  * @author jason
  *
  */
 public class JarModuleTest {
+	
+	@Rule
+	public FileSystemServiceRule fssRule = new FileSystemServiceRule();
+	
+	private final URI clamwhoresJar;
+	
+	
+	public JarModuleTest() throws Exception {
+		clamwhoresJar = FileSystemServiceTest.class.getResource("/clamwhores.jar").toURI();
+	}
 
+	
+	@Test
+	public void test() throws Exception {
+		final JarModule underTest = new JarModule(clamwhoresJar);
+		
+		Thread.sleep(2000);
+		
+		assertTrue("underTest.inService()", underTest.inService());
+	}
 }

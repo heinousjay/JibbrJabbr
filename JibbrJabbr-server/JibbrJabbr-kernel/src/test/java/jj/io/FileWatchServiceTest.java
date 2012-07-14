@@ -93,6 +93,7 @@ public class FileWatchServiceTest {
 			Files.walkFileTree(path, treeDeleter);
 		} catch (Exception e) {
 			System.err.println("Trouble deleting " + path);
+			e.printStackTrace();
 		}
     }
     
@@ -115,12 +116,7 @@ public class FileWatchServiceTest {
 	public void testBasicListening() throws Exception {
 		final Path baseDirectory = Files.createTempDirectory(getClass().getSimpleName());
 		final Path file = Files.createFile(baseDirectory.resolve("test.txt"));
-		final CyclicBarrier gate = new CyclicBarrier(2, new Runnable() {
-			@Override
-			public void run() {
-				System.out.println("testBasicListening gate tripped");
-			}
-		});
+		final CyclicBarrier gate = new CyclicBarrier(2);
 		final AtomicBoolean testFailedInCallback = new AtomicBoolean(false);
 
 		try {
@@ -142,8 +138,6 @@ public class FileWatchServiceTest {
 
 				@Override
 				protected void fileChanged(Path path, Kind<Path> kind) {
-					System.out.println("watching " + baseDirectory);
-					System.out.println("received " + path + " " + kind);
 					try {
 						Files.write(
 							file, 
@@ -155,7 +149,9 @@ public class FileWatchServiceTest {
 				}
 			};
 			
-			Thread.sleep(1500); // need to give it a moment to wake up
+			// need to give it a moment to wake up
+			// it's an implementation detail! leaking into the test!
+			Thread.sleep(1500); 
 			
 			Files.createDirectory(baseDirectory.resolve("HI"));
 			try { 
