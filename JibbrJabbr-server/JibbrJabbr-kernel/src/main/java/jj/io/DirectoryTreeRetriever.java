@@ -17,6 +17,8 @@ package jj.io;
 
 import java.net.URI;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -58,12 +60,26 @@ public abstract class DirectoryTreeRetriever extends FileSystemService.UriToPath
 	
 	@Override
 	void path(Path path) {
-		// if the path identifies a jar, return the entries inside the jar
-		// if it identifies a file, return the entries of the parent directory
-		// if it identified a directory... BOOM SHAKALAKA
+
+		List<URI> uris = new ArrayList<>();
 		try {
-			List<URI> uris = new ArrayList<>();
-			iteratePathAndAddToList(path, uris);
+			// if the path identifies a jar, return the entries inside the jar
+			if (path.toString().endsWith(".jar")) {
+				try (FileSystem jar = FileSystems.newFileSystem(path, null)) {
+					iteratePathAndAddToList(jar.getPath("/"), uris);
+				}
+			// if it identified a directory... BOOM SHAKALAKA
+			} else if (Files.isDirectory(path)) {
+				iteratePathAndAddToList(path, uris);
+			// otherwise use the parent
+			// potential change, just return the incoming path? need to verify it exists
+			} else {
+				iteratePathAndAddToList(path.getParent(), uris);
+				// if (Files.exists(path)) {
+				// uris.add(path.toUri());
+				// }
+			}
+		
 			callDirectoryTree(uris);
 		} catch (Exception e) {
 			callFailed(e);

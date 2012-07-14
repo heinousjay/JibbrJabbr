@@ -162,6 +162,63 @@ public class FileSystemServiceTest {
 	}
 	
 	@Test
+	public void testDirectoryTreeRetrieverJarSuccess() throws Exception {
+		
+
+		final HashSet<String> expectedURIsClamwhoresJar = new HashSet<>();
+
+		
+		expectedURIsClamwhoresJar.add("/com/");
+		expectedURIsClamwhoresJar.add("/com/clamwhores/");
+		expectedURIsClamwhoresJar.add("/com/clamwhores/clamwhores.com.png");
+		expectedURIsClamwhoresJar.add("/com/clamwhores/fragment.html");
+		expectedURIsClamwhoresJar.add("/com/clamwhores/index.html");
+		expectedURIsClamwhoresJar.add("/com/clamwhores/style.css");
+		
+		final CountDownLatch latch = new CountDownLatch(1);
+		final AtomicReference<String> failed = new AtomicReference<>(null);
+		
+		new DirectoryTreeRetriever(clamwhoresJar) {
+			
+			/* (non-Javadoc)
+			 * @see jj.io.DirectoryTreeRetriever#directoryTree(java.util.List)
+			 */
+			@Override
+			protected void directoryTree(List<URI> uris) {
+				// TODO Auto-generated method stub
+				for (URI uri : uris) {
+					String uriS = uri.toString();
+					String part = uriS.substring(uriS.indexOf('!') + 1);
+					if (!expectedURIsClamwhoresJar.remove(part)) {
+						failed.set("retrieved " + part + " from directory, not expected");
+					}
+				}
+				
+				if (!expectedURIsClamwhoresJar.isEmpty()) {
+					failed.set("expected to find addtional uris: " + expectedURIsClamwhoresJar);
+				}
+				latch.countDown();
+			}
+
+			@Override
+			protected void failed(Throwable t) {
+				t.printStackTrace();
+				failed.set(t.toString());
+				latch.countDown();
+			}
+			
+		};
+		
+		if (!latch.await(20, SECONDS)) {
+			fail("latch never tripped");
+		}
+		
+		if (failed.get() != null) {
+			fail(failed.get());
+		}
+	}
+	
+	@Test
 	public void testDirectoryTreeRetrieverDefaultFileSystemSuccess() throws Exception {
 		
 
@@ -177,6 +234,59 @@ public class FileSystemServiceTest {
 		final AtomicReference<String> failed = new AtomicReference<>(null);
 		
 		new DirectoryTreeRetriever(clamwhoresFS) {
+			
+			/* (non-Javadoc)
+			 * @see jj.io.DirectoryTreeRetriever#directoryTree(java.util.List)
+			 */
+			@Override
+			protected void directoryTree(List<URI> uris) {
+				// TODO Auto-generated method stub
+				for (URI uri : uris) {
+					if (!expectedURIsClamwhoresFS.remove(clamwhoresFS.relativize(uri).toString())) {
+						failed.set("retrieved " + clamwhoresFS.relativize(uri) + " from directory, not expected");
+					}
+				}
+				
+				if (!expectedURIsClamwhoresFS.isEmpty()) {
+					failed.set("expected to find addtional uris: " + expectedURIsClamwhoresFS);
+				}
+				latch.countDown();
+			}
+
+			@Override
+			protected void failed(Throwable t) {
+				t.printStackTrace();
+				failed.set(t.toString());
+				latch.countDown();
+			}
+			
+		};
+		
+		if (!latch.await(20, SECONDS)) {
+			fail("latch never tripped");
+		}
+		
+		if (failed.get() != null) {
+			fail(failed.get());
+		}
+	}
+	
+	@Test
+	public void testDirectoryTreeRetrieverDefaultFilePathSuccess() throws Exception {
+		
+
+		final HashSet<String> expectedURIsClamwhoresFS = new HashSet<>();
+
+		expectedURIsClamwhoresFS.add("clamwhores.com.png");
+		expectedURIsClamwhoresFS.add("fragment.html");
+		expectedURIsClamwhoresFS.add("index.html");
+		expectedURIsClamwhoresFS.add("style/");
+		expectedURIsClamwhoresFS.add("style/style.css");
+		
+		final CountDownLatch latch = new CountDownLatch(1);
+		final AtomicReference<String> failed = new AtomicReference<>(null);
+		
+		new DirectoryTreeRetriever(indexHtml) {
 			
 			/* (non-Javadoc)
 			 * @see jj.io.DirectoryTreeRetriever#directoryTree(java.util.List)
