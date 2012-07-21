@@ -40,6 +40,7 @@ import jj.api.NonBlocking;
  * maybe rework this so that internally one can instantiate a
  * known event object which automatically publishes it?
  * 
+ * this may not even be necessary
  * @author jason
  *
  */
@@ -84,7 +85,8 @@ public class EventMediationService implements EventPublisher {
 		this.logger = logger;
 		this.messages = messages;
 		logger.info(ObjectInstantiated, EventMediationService.class);
-		synchPool.submit(eventLoop);
+		synchPool.submit(new Worker());
+		// things that must be registered directly
 		offerToLoop(this, true);
 		offerToLoop(synchPool, true);
 	}
@@ -145,92 +147,89 @@ public class EventMediationService implements EventPublisher {
 	public void control(KernelControl control) {
 		run = (control == KernelControl.Start);
 	}
-	
-	// should be weak so things can be collected?
-	// need to investigate that.  for now count on
-	// cleanup notifications
-	// can only be accessed from inside the event loop
-	private final HashMap<Class<?>, HashMap<String, RegistrationBundle>> listeners = new HashMap<>(); 
+	 
 	
 	
-	private final Runnable eventLoop = new Runnable() {
+	private final class Worker extends KernelTask {
+		
+		// should be weak so things can be collected?
+		// need to investigate that.  for now count on
+		// cleanup notifications
+		// must only be accessed from inside the event loop
+		private final HashMap<Class<?>, HashMap<String, RegistrationBundle>> listeners = new HashMap<>();
+		
+		Worker() {
+			super(messages.getMessage(LoopThreadName, EventMediationService.class.getSimpleName()));
+		}
 		
 		@Blocking
 		@Override
-		public void run() {
-			String name = Thread.currentThread().getName();
-			Thread.currentThread().setName(messages.getMessage(LoopThreadName, EventMediationService.class.getSimpleName()));
-			try {
-
-				while (run) {
-					// get the event,
-					// do the registration stuff
-					// publish the event
-					// OVER AND OVER FOREVER
-					// or until shutdown
-					
-					// should we wake up every now and again so the registration queue doesn't get out of hand?
-					// or combine the queues and wake up whenever there's something to do?
-					Object event = publishQueue.take();
-					
-					if (run) { // if we've been shut down, just ignore it all
-						HashMap<String, RegistrationBundle> h;
-						RegistrationBundle i;
-						while ((i = registrationQueue.poll()) != null) {
+		public void execute() throws Exception {
+			while (run) {
+				// get the event,
+				// do the registration stuff
+				// publish the event
+				// OVER AND OVER FOREVER
+				// or until shutdown
+				
+				// should we wake up every now and again so the registration queue doesn't get out of hand?
+				// or combine the queues and wake up whenever there's something to do?
+				Object event = publishQueue.take();
+				
+				if (run) { // if we've been shut down, just ignore it all
+					HashMap<String, RegistrationBundle> h;
+					RegistrationBundle i;
+					while ((i = registrationQueue.poll()) != null) {
+						
+						if (i.add) {
 							
-							if (i.add) {
+							// going to be a service, of course
+							//EventMediationTransformer.makeClassBytes(i.eventType, i.instance.getClass(), i.m);
+							
+							// use ASM to convert the invocation into a non-reflective
+							// runnable that takes the event as a construction parameter
+							// and calls the method in its run method
+							
+							// use the instance class hashcode + '#' + method name as the key into a map of these tasks
+							
+							h = listeners.get(i.eventType);
+							if (h == null) {
+								h = new HashMap<>();
+								listeners.put(i.eventType, h);
+							}
+							h.put(i.key, i);
+						} else {
+							h = listeners.get(i.eventType);
+							if (h != null) {
 								
-								//EventMediationTransformer.makeClassBytes(i.eventType, i.instance.getClass(), i.m);
+								h.remove(i.key);
 								
-								// use ASM to convert the invocation into a non-reflective
-								// runnable that takes the event as a construction parameter
-								// and calls the method in its run method
-								
-								// use the instance class hashcode + '#' + method name as the key into a map of these tasks
-								
-								h = listeners.get(i.eventType);
-								if (h == null) {
-									h = new HashMap<>();
-									listeners.put(i.eventType, h);
-								}
-								h.put(i.key, i);
-							} else {
-								h = listeners.get(i.eventType);
-								if (h != null) {
-									
-									h.remove(i.key);
-									
-									if (h.isEmpty()) {
-										listeners.remove(i.eventType);
-									}
+								if (h.isEmpty()) {
+									listeners.remove(i.eventType);
 								}
 							}
-							
 						}
 						
-						h = listeners.get(event.getClass());
-						if (h != null) {
-							for (RegistrationBundle i2 : h.values()) {
-								try {
-									// instead of direct invocation, should be a runnable that
-									// gets put on the appropriate thread pool
-									i2.m.invoke(i2.instance, event);
-								// what do we do in exception cases?  egad
-								} catch (IllegalAccessException e) {
-									// can't happen.  if it does we've failed amazingly
-								} catch (InvocationTargetException e) {
-									e.getCause().printStackTrace();
-								}
+					}
+					
+					h = listeners.get(event.getClass());
+					if (h != null) {
+						for (RegistrationBundle i2 : h.values()) {
+							try {
+								// directly invoked.  event handlers must run quickly -
+								// generally speaking if a handler needs to do something
+								// interesting it needs to split its work off and schedule it
+								i2.m.invoke(i2.instance, event);
+							// what do we do in exception cases?  egad
+							} catch (IllegalAccessException e) {
+								// can't happen.  if it does we've failed amazingly
+							} catch (InvocationTargetException e) {
+								e.getCause().printStackTrace();
 							}
 						}
 					}
 				}
-				
-			} catch (InterruptedException ie) {
-				run = false;
-				Thread.currentThread().interrupt();
 			}
-			Thread.currentThread().setName(name);
 		}
 	};
 }
