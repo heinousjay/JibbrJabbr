@@ -47,7 +47,6 @@ public class FileWatchServiceTest {
 		testThreadPool = new MockThreadPool();
 		underTest = new FileWatchService(
 			testThreadPool,
-			testThreadPool,
 			logger,
 			messageConveyor,
 			new EventPublisher() {
@@ -124,7 +123,6 @@ public class FileWatchServiceTest {
 
 				@Override
 				protected void fileChanged(Path path, Kind<Path> kind) {
-					System.out.println(path);
 					try {
 						gate.await();
 					} catch (InterruptedException | BrokenBarrierException e) {

@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 
-import jj.AsyncThreadPool;
 import jj.KernelException;
 import jj.SynchThreadPool;
 import jj.api.Blocking;
@@ -71,38 +70,34 @@ public class FileWatchService {
 	private final WatchService watcher = FileSystemService.defaultFileSystem.newWatchService();
 	private final LocLogger logger;
 	private final MessageConveyor messages;
-	private final AsyncThreadPool asyncExecutor;
 	private final EventPublisher eventPublisher;
 	
 	private volatile boolean run = true;
 	
 	/**
 	 * Constructor that takes all dependencies
-	 * @param synchExecutor
+	 * @param synchThreadPool
 	 * @param logger
 	 */
 	@NonBlocking
 	public FileWatchService(
-		final SynchThreadPool synchExecutor,
-		final AsyncThreadPool asyncExecutor,
+		final SynchThreadPool synchThreadPool,
 		final LocLogger logger,
 		final MessageConveyor messages,
 		final EventPublisher eventPublisher
 	) throws Exception {
 		// 
-		assert synchExecutor != null : "No synchronous executor provided";
-		assert asyncExecutor != null : "No asynchronous executor provided";
+		assert synchThreadPool != null : "No synchronous executor provided";
 		assert logger != null : "No logger provided";
 		assert messages != null : "No messages provided";
 		assert eventPublisher != null : "No eventPublisher provided";
 		
 		this.logger = logger;
-		this.asyncExecutor = asyncExecutor;
 		this.messages = messages;
 		this.eventPublisher = eventPublisher;
 		
 		// very definitely a synchronous task
-		synchExecutor.submit(loop);
+		synchThreadPool.submit(loop);
 		
 		FileWatchSubscription.fileWatchServiceRef = new WeakReference<FileWatchService>(this);
 	}
@@ -193,12 +188,7 @@ public class FileWatchService {
 											// if the subscription is to the directory, all event are noted
 											// if the subscription is to a specific file only events for that file are noted
 											if (Files.isDirectory(subscriber.path) || path.equals(subscriber.path)) {
-												asyncExecutor.submit(new Runnable() {
-													@Override
-													public void run() {
-														subscriber.fileChanged(path, event.kind());
-													}
-												});
+												subscriber.fileChanged(path, event.kind());
 											}
 										}
 									}
