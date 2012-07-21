@@ -51,7 +51,7 @@ public final class HTMLFragment {
 	private final Element element;
 	
 	@NonBlocking
-	HTMLFragment(final String source) {
+	public HTMLFragment(final String source) {
 		assert (source != null && !source.trim().isEmpty()) : "source is required";
 		
 		Parser parser = Parser.htmlParser();
