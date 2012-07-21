@@ -15,19 +15,22 @@
  */
 package jj.io;
 
+import java.io.IOException;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * <p>
  * Reads a directory tree recursively starting at a given URI, returning a list of URIs of all
- * the files and directories from that starting URI, not including the starting URI.
+ * the files and directories from that starting URI, including the starting URI.
  * </p>
  * 
  * Say that better!
@@ -43,60 +46,68 @@ import java.util.List;
  */
 public abstract class DirectoryTreeRetriever extends FileSystemService.UriToPath {
 	
-	protected DirectoryTreeRetriever(URI uri) {
+	protected DirectoryTreeRetriever(final URI uri) {
 		super(uri);
 	}
 	
-	private void iteratePathAndAddToList(Path path, List<URI> uris) throws Exception {
-		try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
-			for (Path entry : ds) {
-				uris.add(entry.toUri());
-				if (Files.isDirectory(entry)) {
-					iteratePathAndAddToList(entry, uris);
-				}
-			}
+
+	private final List<URI> uris = new ArrayList<>();
+	
+	private final class Walker extends SimpleFileVisitor<Path> {
+		
+		@Override
+		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+			uris.add(dir.toUri());
+			return FileVisitResult.CONTINUE;
+		}
+		
+
+		@Override
+		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			uris.add(file.toUri());
+			return FileVisitResult.CONTINUE;
 		}
 	}
+
 	
 	@Override
-	void path(Path path) {
+	void path(final Path path) {
 
-		List<URI> uris = new ArrayList<>();
 		try {
 			// if the path identifies a jar, return the entries inside the jar
 			if (path.toString().endsWith(".jar")) {
 				try (FileSystem jar = FileSystems.newFileSystem(path, null)) {
-					iteratePathAndAddToList(jar.getPath("/"), uris);
+					Files.walkFileTree(jar.getPath("/"), new Walker());
 				}
 			// if it identified a directory... BOOM SHAKALAKA
 			} else if (Files.isDirectory(path)) {
-				iteratePathAndAddToList(path, uris);
+				Files.walkFileTree(path, new Walker());
 			// otherwise use the parent
 			// potential change, just return the incoming path? need to verify it exists
 			} else {
-				iteratePathAndAddToList(path.getParent(), uris);
+				Files.walkFileTree(path.getParent(), new Walker());
 				// if (Files.exists(path)) {
 				// uris.add(path.toUri());
 				// }
 			}
 		
-			callDirectoryTree(uris);
+			directoryTree(uris);
 		} catch (Exception e) {
-			callFailed(e);
+			failed(e);
+		} finally {
+			finished();
 		}
 	}
 	
-	private void callDirectoryTree(final List<URI> uris) {
-		
-		asyncThreadPool.submit(new Runnable() {
-			
-			@Override
-			public void run() {
-				directoryTree(uris);
-			}
-		});
-		
-	}
-	
+	/**
+	 * 
+	 * 
+	 * <p>
+	 * Do not perform any long running operations in this method as it runs on the
+	 * FileSystemService thread.
+	 * </p>
+	 * 
+	 * @param uris The List or URIs read from the directory.
+	 */ 
 	protected abstract void directoryTree(final List<URI> uris);
 }

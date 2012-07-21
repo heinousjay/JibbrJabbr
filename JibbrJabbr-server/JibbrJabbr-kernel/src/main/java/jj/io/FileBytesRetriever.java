@@ -42,31 +42,26 @@ public abstract class FileBytesRetriever extends FileSystemService.UriToPath {
 		try {
 			
 			// probably need a better method
-			callBytes(ByteBuffer.wrap(Files.readAllBytes(path)));
+			bytes(ByteBuffer.wrap(Files.readAllBytes(path)));
 		} catch (Exception e) {
-			callFailed(e);
+			failed(e);
+		} finally {
+			finished();
 		}
 	}
 	
-	private void callBytes(final ByteBuffer bytes) {
-		
-		asyncThreadPool.submit(new Runnable() {
-			
-			@Override
-			public void run() {
-				bytes(bytes);
-			}
-		});
-		
-	}
-	
 	/**
-	 * Called when the file is completely read.
+	 * <p>
+	 * Called when the file is completely read with a ByteBuffer representing
+	 * the contents.
+	 * </p>
 	 * 
-	 * Should probably also have a version that returns the channel
-	 * for transfers?  different class?
+	 * <p>
+	 * Do not perform any long running operations in this method as it runs on the
+	 * FileSystemService thread.
+	 * </p>
 	 * 
-	 * @param bytes
+	 * @param bytes the ByteBuffer with the contents found at the constructed URI
 	 */
 	protected abstract void bytes(final ByteBuffer bytes);
 }

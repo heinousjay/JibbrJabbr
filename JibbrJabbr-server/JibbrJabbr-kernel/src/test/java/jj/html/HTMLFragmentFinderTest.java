@@ -43,7 +43,7 @@ public class HTMLFragmentFinderTest {
 	public void before() throws Exception {
 		mockLogger = new MockLogger();
 		testThreadPool = new MockThreadPool();
-		fileSystemService = new FileSystemService(testThreadPool, testThreadPool, new LocLogger(mockLogger, messages), messages);
+		fileSystemService = new FileSystemService(testThreadPool, new LocLogger(mockLogger, messages), messages);
 		htmlFragmentCache = new HTMLFragmentCache(testThreadPool, new LocLogger(mockLogger, messages), messages);
 	}
 	

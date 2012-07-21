@@ -65,7 +65,7 @@ public class FileSystemServiceTest  {
 				if (path == null) {
 					failed.set(true);
 				}
-				
+				finished();
 				latch.countDown();
 			}
 		};
@@ -79,7 +79,7 @@ public class FileSystemServiceTest  {
 				if (path == null) {
 					failed.set(true);
 				} 
-				
+				finished();
 				latch.countDown();
 			}
 		};
@@ -133,7 +133,7 @@ public class FileSystemServiceTest  {
 
 		final HashSet<String> expectedURIsClamwhoresJar = new HashSet<>();
 
-		
+		expectedURIsClamwhoresJar.add("/");
 		expectedURIsClamwhoresJar.add("/com/");
 		expectedURIsClamwhoresJar.add("/com/clamwhores/");
 		expectedURIsClamwhoresJar.add("/com/clamwhores/clamwhores.com.png");
@@ -190,6 +190,8 @@ public class FileSystemServiceTest  {
 
 		final HashSet<String> expectedURIsClamwhoresFS = new HashSet<>();
 
+		// since we check with relativize, the starting slash is assumed
+		expectedURIsClamwhoresFS.add("");
 		expectedURIsClamwhoresFS.add("clamwhores.com.png");
 		expectedURIsClamwhoresFS.add("fragment.html");
 		expectedURIsClamwhoresFS.add("index.html");
@@ -243,6 +245,7 @@ public class FileSystemServiceTest  {
 
 		final HashSet<String> expectedURIsClamwhoresFS = new HashSet<>();
 
+		expectedURIsClamwhoresFS.add("");
 		expectedURIsClamwhoresFS.add("clamwhores.com.png");
 		expectedURIsClamwhoresFS.add("fragment.html");
 		expectedURIsClamwhoresFS.add("index.html");

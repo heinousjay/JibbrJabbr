@@ -15,25 +15,20 @@
  */
 package jj.io;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.KernelMessages.LoopThreadName;
 import static jj.KernelMessages.ObjectDisposing;
 import static jj.KernelMessages.ObjectInstantiated;
 
 import java.io.IOException;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jj.AsyncThreadPool;
 import jj.KernelControl;
 import jj.KernelTask;
 import jj.SynchThreadPool;
@@ -65,7 +60,7 @@ public class FileSystemService {
 	private static WeakReference<FileSystemService> fileSystemServiceRef = null;
 	
 	/**
-	 * Helper
+	 * Helper to get a hold of the FileSystemService instance
 	 * @return
 	 */
 	private static FileSystemService instance() {
@@ -79,17 +74,8 @@ public class FileSystemService {
 		
 		volatile boolean active = true;
 		
-		/**
-		 * The thread pool used to submit completion calls for FileSystemAPI calls
-		 * that need them.
-		 */
-		protected final AsyncThreadPool asyncThreadPool;
-		
 		FileSystemAPI() {
-			FileSystemService instance = instance();
-			assert instance != null : "FileSystemService must be running to use this object";
-			
-			this.asyncThreadPool = instance.asyncThreadPool;
+			assert instance() != null : "FileSystemService must be running to use this object";
 		}
 		
 		/**
@@ -97,22 +83,15 @@ public class FileSystemService {
 		 */
 		protected void failed(final Throwable t) {}
 		
-		final void callFailed(final Throwable t) {
-			
-			asyncThreadPool.submit(new Runnable() {
-				
-				@Override
-				public void run() {
-					failed(t);
-				}
-			});
-		}
-		
 		abstract void execute();
 		
+		/**
+		 * Attempts to stop processing this task.  In general this cannot be guaranteed to have any effect
+		 * since the processing is asynchronous, but if the service didn't get to it yet, then it will be
+		 * dropped on the floor
+		 */
 		public final void cancel() {
 			active = false;
-			offer();
 		}
 		
 		/**
@@ -126,11 +105,17 @@ public class FileSystemService {
 		}
 	}
 	
-	// works closely with the FileSystemService
-	// to maintain
+	/**
+	 * Base class for FileSystemService API command objects that need to
+	 * translate a URI into a path.
+	 * @author jason
+	 *
+	 */
 	static abstract class UriToPath extends FileSystemAPI {
 		
 		final URI uri;
+		
+		private volatile FileSystem openedFileSystem = null;
 		
 		UriToPath(final URI uri) {
 			this.uri = uri;
@@ -139,19 +124,68 @@ public class FileSystemService {
 		
 		abstract void path(Path path);
 		
-		@Override
-		final void execute() {
-			
-			Path path = null;
-			
-			if (fileSystemServiceRef != null) {
-				FileSystemService instance = fileSystemServiceRef.get();
-				if (instance != null) {
-					 path = instance.pathForURI(uri);
+		/**
+		 * Call this when the API command is finished working with the returned
+		 * path.
+		 */
+		void finished() {
+			if (openedFileSystem != null) {
+				try {
+					openedFileSystem.close();
+				} catch (IOException ioe) {
+					
+					// this should be logged!
 				}
 			}
 			
-			path(path);
+			openedFileSystem = null;
+		}
+		
+		@Blocking
+		private Path filePath(URI uri) {
+			try {
+				return defaultFileSystem.getPath(uri.getPath());
+			} catch (Exception e) {
+				return null;
+			}
+		}
+		
+		@Blocking
+		private Path pathInJar(URI uri) {
+			try {
+				Matcher m = JAR_URI_PARSER.matcher(uri.toString());
+				m.matches();
+				String jarPath = m.group(1);
+				String filePath = m.group(2);
+				
+				openedFileSystem = FileSystems.newFileSystem(filePath(URI.create(jarPath)), null);
+				
+				return openedFileSystem.getPath(filePath);
+				
+			} catch (Exception e) {
+				return null;
+			}
+		}
+		
+		@Blocking
+		private Path pathForURI(URI uri) {
+			assert (uri != null) : "no URI provided";
+			
+			// figure out the filesystem it's in
+			String scheme = uri.getScheme();
+			if ("file".equals(scheme)) {
+				return filePath(uri);
+			} else if ("jar".equals(scheme)) {
+				return pathInJar(uri);
+			}
+			
+			return null;
+		}
+		
+		@Override
+		final void execute() {
+			
+			path(pathForURI(uri));
 			
 		}
 	}
@@ -166,83 +200,27 @@ public class FileSystemService {
 	 */
 	private final LinkedTransferQueue<FileSystemAPI> requestQueue = new LinkedTransferQueue<>();
 	
-	private final HashMap<String, WeakReference<FileSystem>> fileSystems = new HashMap<>();
-	private final ReferenceQueue<FileSystem> fileSystemRefQueue = new ReferenceQueue<>();
-
 	private final LocLogger logger;
-	private final AsyncThreadPool asyncThreadPool;
 	
 	private volatile boolean run = true;
 	
 	public FileSystemService(
 		final SynchThreadPool synchThreadPool,
-		final AsyncThreadPool asyncThreadPool,
 		final LocLogger logger,
 		final MessageConveyor messages
 	) {
 		// 
 		assert synchThreadPool != null : "No synchronous thread pool provided";
-		assert asyncThreadPool != null : "No asynchronous thread pool provided";
 		assert logger != null : "No logger provided";
 		assert messages != null : "No messages provided";
 		
 		this.logger = logger;
-		this.asyncThreadPool = asyncThreadPool;
 		
 		synchThreadPool.submit(new Worker(messages.getMessage(LoopThreadName, FileSystemService.class.getSimpleName())));
 		
 		fileSystemServiceRef = new WeakReference<FileSystemService>(this);
 		
 		logger.trace(ObjectInstantiated, FileSystemService.class.getSimpleName());
-	}
-	
-	@Blocking
-	private Path filePath(URI uri) {
-		try {
-			return defaultFileSystem.getPath(uri.getPath());
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	@Blocking
-	private Path pathInJar(URI uri) {
-		try {
-			Matcher m = JAR_URI_PARSER.matcher(uri.toString());
-			m.matches();
-			String jarPath = m.group(1);
-			String filePath = m.group(2);
-			
-			WeakReference<FileSystem> ref = fileSystems.get(jarPath);
-			@SuppressWarnings("resource") // it's closed later!
-			// need to refactor this cause i don't think these are
-			// getting closed
-			FileSystem jarFileSystem = ref == null ? null : ref.get();
-			if (jarFileSystem == null) {
-				
-				jarFileSystem = FileSystems.newFileSystem(filePath(URI.create(jarPath)), null);
-				fileSystems.put(jarPath, new WeakReference<>(jarFileSystem, fileSystemRefQueue));
-			}
-			
-			return jarFileSystem.getPath(filePath);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	@Blocking
-	private Path pathForURI(URI uri) {
-		assert (uri != null) : "no URI provided";
-		
-		// figure out the filesystem it's in
-		String scheme = uri.getScheme();
-		if ("file".equals(scheme)) {
-			return filePath(uri);
-		} else if ("jar".equals(scheme)) {
-			return pathInJar(uri);
-		}
-		
-		return null;
 	}
 	
 	// should be an event listener!
@@ -259,23 +237,7 @@ public class FileSystemService {
 		@Override
 		protected void execute() throws Exception {
 			while (run) {
-				
-				FileSystemAPI fsa = requestQueue.poll(5, SECONDS);
-				
-				{
-					// clean the queue
-					Reference<? extends FileSystem> reference;
-					while ((reference = fileSystemRefQueue.poll()) != null) {
-						try {
-							reference.get().close();
-						} catch (Exception e) {
-							// blah - nothing.
-							// maybe record it?
-						}
-					}
-				}
-				
-				if (fsa != null) fsa.execute();
+				requestQueue.take().execute();
 			}
 		}
 		
@@ -286,18 +248,6 @@ public class FileSystemService {
 		protected void cleanup() {
 			
 			logger.trace(ObjectDisposing, FileSystemService.class.getSimpleName());
-			
-			for (WeakReference<FileSystem> reference : fileSystems.values()) {
-				FileSystem fs = reference.get();
-				if (fs != null) {
-					try {
-						logger.trace("shutting it down!");
-						fs.close();
-					} catch (IOException ioe) {
-						// log it?
-					}
-				}
-			}
 		}
 	};
 }

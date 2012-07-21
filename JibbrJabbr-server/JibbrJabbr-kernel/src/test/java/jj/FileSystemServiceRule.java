@@ -41,6 +41,12 @@ public class FileSystemServiceRule extends CoreResourcesRule {
 
 	
 	private FileSystemService fss;
+	
+	/**
+	 * probably belongs in the core... except we don't want to start it all the time.
+	 * 
+	 * gotta think this through.  maybe a gl
+	 */
 	private MockThreadPool threadPool;
 	
 	public FileSystemService fileSystemService() {
@@ -60,7 +66,7 @@ public class FileSystemServiceRule extends CoreResourcesRule {
 			public void evaluate() throws Throwable {
 				
 				threadPool = new MockThreadPool();
-				fss = new FileSystemService(threadPool, threadPool, logger(), messageConveyor());
+				fss = new FileSystemService(threadPool, logger(), messageConveyor());
 				
 				base.evaluate();
 				
