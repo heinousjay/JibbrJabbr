@@ -17,6 +17,7 @@ package jj.io;
 
 
 import java.lang.ref.WeakReference;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
 
@@ -68,7 +69,7 @@ public abstract class FileWatchSubscription {
 		assert path != null : "need at least one path";
 		this.path = path;
 		FileWatchService fws = fileWatchServiceRef.get();
-		if (this.path.getFileSystem().equals(FileSystemService.defaultFileSystem) && fws != null) {
+		if (this.path.getFileSystem().equals(FileSystems.getDefault()) && fws != null) {
 			fws.requestQueue.offer(this);
 		}
 	}

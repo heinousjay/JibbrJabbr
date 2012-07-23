@@ -144,7 +144,7 @@ public class FileSystemService {
 		@Blocking
 		private Path filePath(URI uri) {
 			try {
-				return defaultFileSystem.getPath(uri.getPath());
+				return FileSystems.getDefault().getPath(uri.getPath());
 			} catch (Exception e) {
 				return null;
 			}
@@ -189,11 +189,6 @@ public class FileSystemService {
 			
 		}
 	}
-
-	/**
-	 * Might as well hang onto it, right?
-	 */
-	static final FileSystem defaultFileSystem = FileSystems.getDefault();
 	
 	/**
 	 * The queue that feeds the event loop 

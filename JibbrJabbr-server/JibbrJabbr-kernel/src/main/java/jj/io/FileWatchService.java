@@ -22,6 +22,7 @@ import static jj.KernelMessages.LoopThreadName;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
@@ -67,7 +68,7 @@ public class FileWatchService {
 	final LinkedTransferQueue<FileWatchSubscription> requestQueue = new LinkedTransferQueue<>();
 	
 	private final HashMap<WatchKey, WeakHashMap<FileWatchSubscription, Boolean>> keys = new HashMap<>();
-	private final WatchService watcher = FileSystemService.defaultFileSystem.newWatchService();
+	private final WatchService watcher = FileSystems.getDefault().newWatchService();
 	private final LocLogger logger;
 	private final MessageConveyor messages;
 	private final EventPublisher eventPublisher;
