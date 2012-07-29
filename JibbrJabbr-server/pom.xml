@@ -25,6 +25,7 @@
 		<module>JibbrJabbr-kernel</module>
 		<module>JibbrJabbr-bootstrapper</module>
 		<module>JibbrJabbr</module>
+		<module>clamwhores.com</module>
 	</modules>
 
 	<dependencyManagement>
