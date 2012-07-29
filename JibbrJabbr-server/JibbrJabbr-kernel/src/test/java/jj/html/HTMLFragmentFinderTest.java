@@ -21,10 +21,12 @@ import org.slf4j.cal10n.LocLogger;
 import ch.qos.cal10n.MessageConveyor;
 
 public class HTMLFragmentFinderTest {
+	
+	private static final String INDEX_HTML = "/jj/html/index.html";
 
 	HTMLFragmentCache htmlFragmentCache;
 	FileSystemService fileSystemService;
-	URI clamwhoresIndex;
+	URI indexHTML;
 	MockThreadPool testThreadPool;
 	MessageConveyor messages = new MessageConveyor(Locale.US);
 	MockLogger mockLogger;
@@ -36,7 +38,7 @@ public class HTMLFragmentFinderTest {
 	 * 
 	 */
 	public HTMLFragmentFinderTest() throws Exception {
-		clamwhoresIndex = getClass().getResource("/com/clamwhores/index.html").toURI();
+		indexHTML = getClass().getResource(INDEX_HTML).toURI();
 	}
 
 	@Before
@@ -63,7 +65,7 @@ public class HTMLFragmentFinderTest {
 		final AtomicBoolean failed = new AtomicBoolean(false);
 		final AtomicReference<HTMLFragment> fragment = new AtomicReference<>(null);
 		
-		new HTMLFragmentFinder(clamwhoresIndex) {
+		new HTMLFragmentFinder(indexHTML) {
 			
 			@Override
 			protected void htmlFragment(HTMLFragment htmlFragment) {
@@ -78,7 +80,7 @@ public class HTMLFragmentFinderTest {
 		
 		latch1.await(10, SECONDS);
 		
-		new HTMLFragmentFinder(clamwhoresIndex) {
+		new HTMLFragmentFinder(indexHTML) {
 			
 			@Override
 			protected void htmlFragment(HTMLFragment htmlFragment) {

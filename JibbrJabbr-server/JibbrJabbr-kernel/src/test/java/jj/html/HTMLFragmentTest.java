@@ -15,17 +15,17 @@ import org.junit.Test;
 
 public class HTMLFragmentTest {
 
-	private static final String CLAMWHORES_INDEX_HTML = "/com/clamwhores/index.html";
+	private static final String INDEX_HTML = "/jj/html/index.html";
 	
 	HTMLFragment index;
-	Path clamwhoresIndex;
+	Path indexPath;
 	
 	@Before
 	public void before() throws Exception {
-		if (clamwhoresIndex == null) {
-			clamwhoresIndex = Paths.get(getClass().getResource(CLAMWHORES_INDEX_HTML).toURI());
+		if (indexPath == null) {
+			indexPath = Paths.get(getClass().getResource(INDEX_HTML).toURI());
 		}
-		index = new HTMLFragment(new String(Files.readAllBytes(clamwhoresIndex), CharsetUtil.UTF_8));
+		index = new HTMLFragment(new String(Files.readAllBytes(indexPath), CharsetUtil.UTF_8));
 	}
 	
 	@Test
