@@ -69,4 +69,6 @@ public final class Version {
 			throw new IllegalStateException("MY JAR IS BROKEN", e);
 		}
 	}
+	
+	private Version() {}
 }
