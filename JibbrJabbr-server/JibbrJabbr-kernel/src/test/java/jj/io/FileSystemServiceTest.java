@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
@@ -41,15 +42,16 @@ public class FileSystemServiceTest  {
 	@Rule
 	public FileSystemServiceRule fssRule = new FileSystemServiceRule();
 	
-	final URI indexHtml;
-	final URI clamwhoresFS;
-	final URI clamwhoresJar;
-	
+	final URI testFile;
+	final URI testDir;
+	final URI testJar;
+	final URI testJarFile;
 	
 	public FileSystemServiceTest() throws Exception {
-		indexHtml = FileSystemServiceTest.class.getResource("/com/clamwhores/index.html").toURI();
-		clamwhoresFS = indexHtml.resolve(".");
-		clamwhoresJar = FileSystemServiceTest.class.getResource("/clamwhores.jar").toURI();
+		testFile = FileSystemServiceTest.class.getResource("/jj/io/test/something.file").toURI();
+		testDir = testFile.resolve(".");
+		testJar = FileSystemServiceTest.class.getResource("/jj/io/jj_io_test.jar").toURI();
+		testJarFile = URI.create(String.format("jar:%s!/jj/io/test/something.file", testJar));
 	}
 
 	@Test
@@ -58,7 +60,7 @@ public class FileSystemServiceTest  {
 		final CountDownLatch latch = new CountDownLatch(2);
 		final AtomicBoolean failed = new AtomicBoolean(false);
 		
-		new FileSystemService.UriToPath(indexHtml) {
+		new FileSystemService.UriToPath(testFile) {
 			
 			@Override
 			void path(Path path) {
@@ -70,9 +72,8 @@ public class FileSystemServiceTest  {
 			}
 		};
 		
-		String uri = String.format("jar:%s!/com/clamwhores/index.html", clamwhoresJar);
 		
-		new FileSystemService.UriToPath(URI.create(uri)) {
+		new FileSystemService.UriToPath(testJarFile) {
 			
 			@Override
 			void path(Path path) {
@@ -96,15 +97,81 @@ public class FileSystemServiceTest  {
 	@Test
 	public void testFileBytesRetrieverSuccess() throws Exception {
 		
+		final byte[] fileBytes = "This file has something in it.".getBytes(StandardCharsets.UTF_8);
+		
 		final CountDownLatch latch = new CountDownLatch(1);
 		final AtomicBoolean failed = new AtomicBoolean(false);
 		
-		new FileBytesRetriever(indexHtml) {
+		new FileBytesRetriever(testFile) {
 			
 			@Override
 			protected void bytes(ByteBuffer bytes) {
+				// should be  
+				// in UTF-8 or ASCII or nearly everything really
 				if (bytes == null || bytes.limit() == 0) {
 					failed.set(true);
+				} else {
+					try {
+						for (byte b : fileBytes) {
+							if (bytes.get() != b) {
+								failed.set(true);
+							}
+						}
+					} catch (Exception e) {
+						failed.set(true);
+						e.printStackTrace();
+					}
+					
+				}
+				latch.countDown();
+			}
+			
+
+			@Override
+			protected void failed(Throwable t) {
+				t.printStackTrace();
+				failed.set(true);
+				latch.countDown();
+			}
+		};
+		
+		if (!latch.await(20, SECONDS)) {
+			fail("latch never tripped");
+		}
+		
+		if (failed.get()) {
+			fail("couldn't retrieve file bytes");
+		}
+	}
+	
+	@Test
+	public void testFileBytesJarRetrieverSuccess() throws Exception {
+		
+		final byte[] fileBytes = "This file has something in it.".getBytes(StandardCharsets.UTF_8);
+		
+		final CountDownLatch latch = new CountDownLatch(1);
+		final AtomicBoolean failed = new AtomicBoolean(false);
+		
+		new FileBytesRetriever(testJarFile) {
+			
+			@Override
+			protected void bytes(ByteBuffer bytes) {
+				// should be  
+				// in UTF-8 or ASCII or nearly everything really
+				if (bytes == null || bytes.limit() == 0) {
+					failed.set(true);
+				} else {
+					try {
+						for (byte b : fileBytes) {
+							if (bytes.get() != b) {
+								failed.set(true);
+							}
+						}
+					} catch (Exception e) {
+						failed.set(true);
+						e.printStackTrace();
+					}
+					
 				}
 				latch.countDown();
 			}
@@ -134,17 +201,20 @@ public class FileSystemServiceTest  {
 		final HashSet<String> expectedURIsClamwhoresJar = new HashSet<>();
 
 		expectedURIsClamwhoresJar.add("/");
-		expectedURIsClamwhoresJar.add("/com/");
-		expectedURIsClamwhoresJar.add("/com/clamwhores/");
-		expectedURIsClamwhoresJar.add("/com/clamwhores/clamwhores.com.png");
-		expectedURIsClamwhoresJar.add("/com/clamwhores/fragment.html");
-		expectedURIsClamwhoresJar.add("/com/clamwhores/index.html");
-		expectedURIsClamwhoresJar.add("/com/clamwhores/style.css");
+		expectedURIsClamwhoresJar.add("/jj/");
+		expectedURIsClamwhoresJar.add("/jj/io/");
+		expectedURIsClamwhoresJar.add("/jj/io/test/");
+		expectedURIsClamwhoresJar.add("/jj/io/test/nothing.file");
+		expectedURIsClamwhoresJar.add("/jj/io/test/something.file");
+		expectedURIsClamwhoresJar.add("/jj/io/test/level2/");
+		expectedURIsClamwhoresJar.add("/jj/io/test/level2/another.file");
+		expectedURIsClamwhoresJar.add("/META-INF/");
+		expectedURIsClamwhoresJar.add("/META-INF/MANIFEST.MF");
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 		final AtomicReference<String> failed = new AtomicReference<>(null);
 		
-		new DirectoryTreeRetriever(clamwhoresJar) {
+		new DirectoryTreeRetriever(testJar) {
 			
 			/* (non-Javadoc)
 			 * @see jj.io.DirectoryTreeRetriever#directoryTree(java.util.List)
@@ -192,16 +262,15 @@ public class FileSystemServiceTest  {
 
 		// since we check with relativize, the starting slash is assumed
 		expectedURIsClamwhoresFS.add("");
-		expectedURIsClamwhoresFS.add("clamwhores.com.png");
-		expectedURIsClamwhoresFS.add("fragment.html");
-		expectedURIsClamwhoresFS.add("index.html");
-		expectedURIsClamwhoresFS.add("style/");
-		expectedURIsClamwhoresFS.add("style/style.css");
+		expectedURIsClamwhoresFS.add("nothing.file");
+		expectedURIsClamwhoresFS.add("something.file");
+		expectedURIsClamwhoresFS.add("level2/");
+		expectedURIsClamwhoresFS.add("level2/another.file");
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 		final AtomicReference<String> failed = new AtomicReference<>(null);
 		
-		new DirectoryTreeRetriever(clamwhoresFS) {
+		new DirectoryTreeRetriever(testDir) {
 			
 			/* (non-Javadoc)
 			 * @see jj.io.DirectoryTreeRetriever#directoryTree(java.util.List)
@@ -210,8 +279,8 @@ public class FileSystemServiceTest  {
 			protected void directoryTree(List<URI> uris) {
 				// TODO Auto-generated method stub
 				for (URI uri : uris) {
-					if (!expectedURIsClamwhoresFS.remove(clamwhoresFS.relativize(uri).toString())) {
-						failed.set("retrieved " + clamwhoresFS.relativize(uri) + " from directory, not expected");
+					if (!expectedURIsClamwhoresFS.remove(testDir.relativize(uri).toString())) {
+						failed.set("retrieved " + testDir.relativize(uri) + " from directory, not expected");
 					}
 				}
 				
@@ -244,18 +313,16 @@ public class FileSystemServiceTest  {
 		
 
 		final HashSet<String> expectedURIsClamwhoresFS = new HashSet<>();
-
 		expectedURIsClamwhoresFS.add("");
-		expectedURIsClamwhoresFS.add("clamwhores.com.png");
-		expectedURIsClamwhoresFS.add("fragment.html");
-		expectedURIsClamwhoresFS.add("index.html");
-		expectedURIsClamwhoresFS.add("style/");
-		expectedURIsClamwhoresFS.add("style/style.css");
+		expectedURIsClamwhoresFS.add("nothing.file");
+		expectedURIsClamwhoresFS.add("something.file");
+		expectedURIsClamwhoresFS.add("level2/");
+		expectedURIsClamwhoresFS.add("level2/another.file");
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 		final AtomicReference<String> failed = new AtomicReference<>(null);
 		
-		new DirectoryTreeRetriever(indexHtml) {
+		new DirectoryTreeRetriever(testFile) {
 			
 			/* (non-Javadoc)
 			 * @see jj.io.DirectoryTreeRetriever#directoryTree(java.util.List)
@@ -264,8 +331,8 @@ public class FileSystemServiceTest  {
 			protected void directoryTree(List<URI> uris) {
 				// TODO Auto-generated method stub
 				for (URI uri : uris) {
-					if (!expectedURIsClamwhoresFS.remove(clamwhoresFS.relativize(uri).toString())) {
-						failed.set("retrieved " + clamwhoresFS.relativize(uri) + " from directory, not expected");
+					if (!expectedURIsClamwhoresFS.remove(testDir.relativize(uri).toString())) {
+						failed.set("retrieved " + testDir.relativize(uri) + " from directory, not expected");
 					}
 				}
 				

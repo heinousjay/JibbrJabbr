@@ -107,7 +107,7 @@ public class FileSystemService {
 	
 	/**
 	 * Base class for FileSystemService API command objects that need to
-	 * translate a URI into a path.
+	 * translate a URI into a path.  which might be all of them?
 	 * @author jason
 	 *
 	 */
@@ -232,7 +232,8 @@ public class FileSystemService {
 		@Override
 		protected void execute() throws Exception {
 			while (run) {
-				requestQueue.take().execute();
+				FileSystemAPI request = requestQueue.take();
+				if (request.active) request.execute();
 			}
 		}
 		
