@@ -21,8 +21,6 @@ import static jj.KernelMessages.ObjectInstantiating;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.nio.file.WatchEvent.Kind;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 
@@ -34,10 +32,12 @@ import jj.KernelControl;
 import jj.KernelTask;
 import jj.SynchThreadPool;
 import jj.io.FileBytesRetriever;
-import jj.io.FileWatchSubscription;
 
 /**
  * Almost certainly needs to be broken into an abstract cache and this
+ * 
+ * new plan - almost certainly is the wrong place for this and the module
+ * system will handle caching
  * 
  * @author jason
  *
@@ -118,23 +118,5 @@ public class HTMLFragmentCache {
 				}
 			}
 		}
-	}
-	
-	private final class FileWatchCacheUpdater extends FileWatchSubscription {
-
-		/**
-		 * @param path
-		 */
-		public FileWatchCacheUpdater(Path path) {
-			super(path);
-			
-		}
-
-		@Override
-		protected void fileChanged(Path path, Kind<Path> operation) {
-			// TODO Auto-generated method stub
-			
-		}
-		
 	}
 }

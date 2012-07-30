@@ -43,7 +43,7 @@ public abstract class KernelTask implements Runnable {
 			try {
 				cleanup();
 			} catch (Exception e) {
-				// log this?
+				// log this? of course
 			}
 			Thread.currentThread().setName(originalName);
 		}

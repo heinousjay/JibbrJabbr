@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.clamwhores.assets;
-
-import jj.api.html.Element;
-import jj.api.html.Select;
+package jj.module;
 
 /**
  * @author jason
  *
  */
-public class Index {
-
-	public void setProfileLink(@Select("a#profile-link") Element link) {
-		link.attr("href", "/profile/heinousjay").text("heinousjay");
-	}
+public enum ModulePath {
+	ASSETS
 }

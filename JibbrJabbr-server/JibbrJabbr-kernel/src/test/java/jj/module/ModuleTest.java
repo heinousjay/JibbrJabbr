@@ -15,12 +15,12 @@
  */
 package jj.module;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.net.URI;
 
 import jj.FileSystemServiceRule;
-import jj.io.FileSystemServiceTest;
+import jj.JJ;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import org.junit.Test;
  * @author jason
  *
  */
-public class JarModuleTest {
+public class ModuleTest {
 	
 	@Rule
 	public FileSystemServiceRule fssRule = new FileSystemServiceRule();
@@ -37,14 +37,17 @@ public class JarModuleTest {
 	private final URI clamwhoresJar;
 	
 	
-	public JarModuleTest() throws Exception {
-		clamwhoresJar = FileSystemServiceTest.class.getResource("/clamwhores.jar").toURI();
+	public ModuleTest() throws Exception {
+		
+		// this looks a little ugly but it works
+		// should get the name from the build maybe?  i don't know if it matters though
+		clamwhoresJar = JJ.uri(com.clamwhores.assets.Index.class).resolve("../../../../clamwhores.jar");
 	}
 
 	
 	@Test
 	public void test() throws Exception {
-		final JarModule underTest = new JarModule(clamwhoresJar);
+		final Module underTest = new Module(clamwhoresJar, fssRule.threadPool());
 		
 		Thread.sleep(2000);
 		

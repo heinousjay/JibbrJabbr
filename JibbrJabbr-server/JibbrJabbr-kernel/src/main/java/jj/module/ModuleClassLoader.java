@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.clamwhores.assets;
-
-import jj.api.html.Element;
-import jj.api.html.Select;
+package jj.module;
 
 /**
+ * Module class loading is a complicated subject.
+ * 
+ * At the basis, there are two types of modules - modules that work only with the API and
+ * modules that are meant to integrate into the kernel.  This distinction determines
+ * what the parent classloader of this classloader is.
+ * 
+ * API based modules can expose REST service APIs
+ * 
+ * Kernel modules can expose an API package that will be exposed to other kernel modules.
+ * 
+ * maybe.  this is all too much right now.
+ * 
  * @author jason
  *
  */
-public class Index {
+public class ModuleClassLoader extends ClassLoader {
 
-	public void setProfileLink(@Select("a#profile-link") Element link) {
-		link.attr("href", "/profile/heinousjay").text("heinousjay");
-	}
 }
