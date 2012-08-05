@@ -25,6 +25,9 @@ import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +42,11 @@ import org.slf4j.cal10n.LocLogger;
 import ch.qos.cal10n.MessageConveyor;
 
 /**
+ * <p>
+ * Coordinates system interactions with the local file system.  All interfaces identify
+ * files using URIs.  The JDK7 NIO file packages are used, so jars are handled uniformly.
+ * </p>
+ * 
  * @author jason
  *
  */
@@ -193,7 +201,7 @@ public class FileSystemService {
 	/**
 	 * The queue that feeds the event loop 
 	 */
-	private final LinkedTransferQueue<FileSystemAPI> requestQueue = new LinkedTransferQueue<>();
+	private final BlockingQueue<FileSystemAPI> requestQueue = new LinkedTransferQueue<>();
 	
 	private final LocLogger logger;
 	
@@ -218,9 +226,13 @@ public class FileSystemService {
 		logger.trace(ObjectInstantiated, FileSystemService.class.getSimpleName());
 	}
 	
-	// should be an event listener!
-	public void control(KernelControl control) {
+	private final ConcurrentMap<Thread, Boolean> threadSet = new ConcurrentHashMap<>();
+	
+	public void control(final KernelControl control) {
 		run = (control != KernelControl.Dispose);
+		for (final Thread thread : threadSet.keySet()) {
+			thread.interrupt();
+		}
 	}
 	
 	private final class Worker extends KernelTask {
@@ -231,9 +243,10 @@ public class FileSystemService {
 		
 		@Override
 		protected void execute() throws Exception {
+			threadSet.put(Thread.currentThread(), true);
 			while (run) {
 				FileSystemAPI request = requestQueue.take();
-				if (request.active) request.execute();
+				if (run && request.active) request.execute();
 			}
 		}
 		
@@ -242,7 +255,7 @@ public class FileSystemService {
 		 */
 		@Override
 		protected void cleanup() {
-			
+			threadSet.remove(Thread.currentThread());
 			logger.trace(ObjectDisposing, FileSystemService.class.getSimpleName());
 		}
 	};
