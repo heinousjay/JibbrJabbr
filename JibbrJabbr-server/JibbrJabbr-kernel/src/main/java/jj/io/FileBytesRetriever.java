@@ -27,7 +27,7 @@ import java.nio.file.Path;
  * @author jason
  *
  */
-public abstract class FileBytesRetriever extends FileSystemService.UriToPath {
+public abstract class FileBytesRetriever extends UriToPath {
 	
 	volatile boolean active = true;
 

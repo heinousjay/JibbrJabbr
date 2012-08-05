@@ -44,7 +44,7 @@ import java.util.List;
  * @author jason
  *
  */
-public abstract class DirectoryTreeRetriever extends FileSystemService.UriToPath {
+public abstract class DirectoryTreeRetriever extends UriToPath {
 	
 	protected DirectoryTreeRetriever(final URI uri) {
 		super(uri);

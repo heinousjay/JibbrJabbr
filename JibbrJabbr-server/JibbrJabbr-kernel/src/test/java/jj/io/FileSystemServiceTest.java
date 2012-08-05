@@ -60,7 +60,7 @@ public class FileSystemServiceTest  {
 		final CountDownLatch latch = new CountDownLatch(2);
 		final AtomicBoolean failed = new AtomicBoolean(false);
 		
-		new FileSystemService.UriToPath(testFile) {
+		new UriToPath(testFile) {
 			
 			@Override
 			void path(Path path) {
@@ -73,7 +73,7 @@ public class FileSystemServiceTest  {
 		};
 		
 		
-		new FileSystemService.UriToPath(testJarFile) {
+		new UriToPath(testJarFile) {
 			
 			@Override
 			void path(Path path) {

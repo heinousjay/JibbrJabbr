@@ -19,23 +19,15 @@ import static jj.KernelMessages.LoopThreadName;
 import static jj.KernelMessages.ObjectDisposing;
 import static jj.KernelMessages.ObjectInstantiated;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedTransferQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jj.KernelControl;
 import jj.KernelTask;
 import jj.SynchThreadPool;
-import jj.api.Blocking;
 
 import org.slf4j.cal10n.LocLogger;
 
@@ -51,13 +43,6 @@ import ch.qos.cal10n.MessageConveyor;
  *
  */
 public class FileSystemService {
-	
-	/**
-	 * separates a jar URI into a path to the jar and a path inside the jar
-	 * so that a file system instance can be determined
-	 * probably just need to split on the !
-	 */
-	private static final Pattern JAR_URI_PARSER = Pattern.compile("^jar:([^!]+)!(.+)$");
 	
 	/**
 	 * Slightly ugly technique - exposing the instance of the service so the API works,
@@ -87,7 +72,8 @@ public class FileSystemService {
 		}
 		
 		/**
-		 * Called if the operation failed.  Optional operation
+		 * Called if the operation failed.  Optional operation, but it's probably not something you
+		 * want to leave hanging unless you like mysterious stoppage.
 		 */
 		protected void failed(final Throwable t) {}
 		
@@ -110,91 +96,6 @@ public class FileSystemService {
 			if (instance != null) {
 				instance.requestQueue.offer(this);
 			}
-		}
-	}
-	
-	/**
-	 * Base class for FileSystemService API command objects that need to
-	 * translate a URI into a path.  which might be all of them?
-	 * @author jason
-	 *
-	 */
-	static abstract class UriToPath extends FileSystemAPI {
-		
-		final URI uri;
-		
-		private volatile FileSystem openedFileSystem = null;
-		
-		UriToPath(final URI uri) {
-			this.uri = uri;
-			offer();
-		}
-		
-		abstract void path(Path path);
-		
-		/**
-		 * Call this when the API command is finished working with the returned
-		 * path.
-		 */
-		void finished() {
-			if (openedFileSystem != null) {
-				try {
-					openedFileSystem.close();
-				} catch (IOException ioe) {
-					
-					// this should be logged!
-				}
-			}
-			
-			openedFileSystem = null;
-		}
-		
-		@Blocking
-		private Path filePath(URI uri) {
-			try {
-				return FileSystems.getDefault().getPath(uri.getPath());
-			} catch (Exception e) {
-				return null;
-			}
-		}
-		
-		@Blocking
-		private Path pathInJar(URI uri) {
-			try {
-				Matcher m = JAR_URI_PARSER.matcher(uri.toString());
-				m.matches();
-				String jarPath = m.group(1);
-				String filePath = m.group(2);
-				
-				openedFileSystem = FileSystems.newFileSystem(filePath(URI.create(jarPath)), null);
-				
-				return openedFileSystem.getPath(filePath);
-				
-			} catch (Exception e) {
-				return null;
-			}
-		}
-		
-		@Blocking
-		private Path pathForURI(URI uri) {
-			assert (uri != null) : "no URI provided";
-			
-			// figure out the filesystem it's in
-			String scheme = uri.getScheme();
-			if ("file".equals(scheme)) {
-				return filePath(uri);
-			} else if ("jar".equals(scheme)) {
-				return pathInJar(uri);
-			}
-			
-			return null;
-		}
-		
-		@Override
-		final void execute() {
-			
-			path(pathForURI(uri));
-			
 		}
 	}
 	
