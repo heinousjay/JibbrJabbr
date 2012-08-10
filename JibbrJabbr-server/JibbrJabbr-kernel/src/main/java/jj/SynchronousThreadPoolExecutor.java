@@ -20,6 +20,8 @@ import static jj.KernelMessages.*;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -64,6 +66,15 @@ public class SynchronousThreadPoolExecutor
 		@Override
 		protected void done() {
 			logger.trace(SynchronousTaskDone);
+			try {
+				get();
+			} catch (InterruptedException ie) {
+				// don't really care
+			} catch (CancellationException ce) {
+				// not sure this can happen
+			} catch (ExecutionException ee) {
+				ee.getCause().printStackTrace();
+			}
 		}
 		
 	}
