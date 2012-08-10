@@ -27,7 +27,8 @@ import jj.html.HTMLFragment;
  *
  */
 enum ResourceType {
-
+	
+	OCTET, // if we can't find another, that's the default
 	CLASS {
 		@Override
 		void processResource(Resource resource) {
@@ -46,6 +47,9 @@ enum ResourceType {
 				new HTMLFragment(resource.charset.decode(resource.bytes).toString());
 		}
 	},
+	PROPERTIES, // clearly it can be loaded as a properties file
+	XML, // dunno what we'll do with this crap honestly.  i hate XML
+	MANIFEST, // yeah, why not
 	PNG, // these two sit here for now
 	CSS; // need to make a default type... octet or whatever.  it does nothing with it
 	// just passes it along
@@ -63,7 +67,7 @@ enum ResourceType {
 		String uriS = uri.toString();
 		int i = uriS.lastIndexOf('.') + 1;
 		String ext = (i > 0 ? uriS.substring(i) : "").toLowerCase();
-		return byName.get(ext);
+		return byName.containsKey(ext) ? byName.get(ext) : OCTET;
 	}
 	
 	/**
