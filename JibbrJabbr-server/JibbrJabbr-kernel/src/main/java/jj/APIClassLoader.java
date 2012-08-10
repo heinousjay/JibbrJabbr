@@ -36,6 +36,7 @@ public class APIClassLoader extends URLClassLoader {
 	private static final URL[] urls;
 	
 	static {
+		registerAsParallelCapable();
 		try {
 			urls = new URL[]{JJ.jarPath(JJ.uri(jj.api.Version.class)).toUri().toURL()};
 		} catch (Exception e) {
