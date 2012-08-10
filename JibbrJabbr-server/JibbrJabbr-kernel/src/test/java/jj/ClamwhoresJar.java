@@ -13,35 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.module;
-
-import static org.junit.Assert.*;
+package jj;
 
 import java.net.URI;
 
-import jj.ClamwhoresJar;
-import jj.FileSystemServiceRule;
-import jj.JJ;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 /**
+ * Central place to get a hold of the clamwhores jar for testing
+ * 
  * @author jason
  *
  */
-public class ModuleTest {
-	
-	@Rule
-	public FileSystemServiceRule fssRule = new FileSystemServiceRule();
+public class ClamwhoresJar {
 
+	public static final URI uri;
 	
-	@Test
-	public void test() throws Exception {
-		final Module underTest = new Module(ClamwhoresJar.uri, fssRule.threadPool());
+	static {
 		
-		Thread.sleep(2000);
-		
-		
+		uri = JJ.uri(com.clamwhores.assets.Index.class).resolve("../../../../clamwhores.jar");
 	}
+	
 }
+
+
