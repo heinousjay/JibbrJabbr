@@ -32,7 +32,7 @@ import jj.html.HTMLFragment;
  */
 final class Resource {
 	
-	private static final Pattern PATH_MAKER = Pattern.compile("^(?:file:|jar:[^!]+!)(?:assets/)?(.*)$"); 
+	private static final Pattern PATH_MAKER = Pattern.compile("^(?:file:|jar:[^!]+!)(.*)$"); 
 	
 	Resource(final URI uri) {
 		
@@ -75,6 +75,6 @@ final class Resource {
 	
 	@Override
 	public String toString() {
-		return resourcePath;
+		return type + ": " +  resourcePath;
 	}
 }
