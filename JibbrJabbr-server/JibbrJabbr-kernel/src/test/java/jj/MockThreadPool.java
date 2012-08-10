@@ -49,5 +49,16 @@ public class MockThreadPool extends ThreadPoolExecutor implements
 			long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.util.concurrent.ThreadPoolExecutor#afterExecute(java.lang.Runnable, java.lang.Throwable)
+	 */
+	@Override
+	protected void afterExecute(Runnable r, Throwable t) {
+		if (t != null) {
+			System.err.println("Uncaught throwable in MockThreadPool");
+			t.printStackTrace();
+		}
+	}
 
 }
