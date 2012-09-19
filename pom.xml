@@ -9,6 +9,7 @@
 	<url>http://jibbrjabbr.com</url>
 	<properties>
 		<friendlyname>JibbrJabbr</friendlyname>
+		<jj.project.basedir>${project.basedir}</jj.project.basedir>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>

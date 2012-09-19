@@ -1,2 +1,11 @@
 ${friendlyname}
 ${version}
+${git.branch}
+${git.commit.user.name}
+${git.commit.user.email}
+${git.commit.id}
+${git.commit.id.describe}
+${git.commit.time}
+${git.build.user.name}
+${git.build.user.email}
+${git.build.time}
