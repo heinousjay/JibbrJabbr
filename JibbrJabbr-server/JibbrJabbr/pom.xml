@@ -14,10 +14,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>JibbrJabbr-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>JibbrJabbr-kernel</artifactId>
 		</dependency>
 		<dependency>

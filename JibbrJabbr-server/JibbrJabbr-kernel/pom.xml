@@ -10,87 +10,56 @@
 	<name>JibbrJabbr Kernel</name>
 	<dependencies>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>JibbrJabbr-api</artifactId>
+			<artifactId>netty</artifactId>
+			<groupId>io.netty</groupId>
 		</dependency>
 		<dependency>
-			<!-- not ideal. need to refactor the particulars into a utility 
-			     or just bite the bullet and duplicate the code, the bootstrapper
-			     is special anyway -->
-			<groupId>${project.groupId}</groupId>
-			<artifactId>JibbrJabbr-bootstrapper</artifactId>
+			<groupId>org.webbitserver</groupId>
+			<artifactId>webbit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mozilla</groupId>
+			<artifactId>rhino</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.picocontainer</groupId>
 			<artifactId>picocontainer</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-ext</artifactId>
+			<groupId>com.ning</groupId>
+			<artifactId>async-http-client-netty-provider</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.jcip</groupId>
-			<artifactId>jcip-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.asm</groupId>
-			<artifactId>asm</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.asm</groupId>
-			<artifactId>asm-util</artifactId>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock-junit4</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
-			<artifactId>junit-dep</artifactId>
-			<scope>test</scope>
+			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>clamwhores.com</artifactId>
-			<scope>test</scope>
+			<groupId>com.jibbrjabbr</groupId>
+			<artifactId>JibbrJabbr-bootstrapper</artifactId>
 		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>ch.qos.cal10n.plugins</groupId>
-				<artifactId>maven-cal10n-plugin</artifactId>
-				<version>0.7.4</version>
-				<executions>
-					<execution>
-						<id>verify-message-integrity</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>verify</goal>
-						</goals>
-						<configuration>
-							<enumTypes>
-								<!-- list every enum type you would like to see checked -->
-								<enumType>jj.KernelMessages</enumType>
-							</enumTypes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>

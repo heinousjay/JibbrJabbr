@@ -21,7 +21,6 @@
 		<dependencySet>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-					<include>${project.groupId}:JibbrJabbr-api</include>
 					<include>${project.groupId}:JibbrJabbr-bootstrapper</include>
 					<include>commons-daemon:commons-daemon</include>
 			</includes>
@@ -37,7 +36,6 @@
 		<dependencySet>
 			<outputDirectory>/META-INF/lib</outputDirectory>
 			<excludes>
-				<exclude>${project.groupId}:JibbrJabbr-api</exclude>
 				<exclude>${project.groupId}:JibbrJabbr-bootstrapper</exclude>
 				<exclude>commons-daemon:commons-daemon</exclude>
 			</excludes>

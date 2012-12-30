@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
  */
 public final class JJ {
 	
-	private static final String JJ_KERNEL_CLASS = "jj.Kernel";
+	private static final String JJ_MAIN_CLASS = "jj.Main";
 	
 	private static final String COMMONS_DAEMON_PROCESS_ID_KEY = "commons.daemon.process.id";
 
@@ -121,14 +121,27 @@ public final class JJ {
 	public static void main(String[] args) 
 		throws Exception {
 		try {
-			new JJ(true).init(args);
+			final JJ jj = new JJ(true).init(args);
+
+			jj.start();
+			
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				public void run() {
+					try {
+						jj.stop();
+					} catch (Exception e) {
+						// kablizzle
+						e.printStackTrace();
+					}
+				}
+			});
 		} catch (IllegalStateException ise) {
 			ise.printStackTrace();
 		}
 	}
 	
-	private Class<?> kernelClass;
-	private Object kernelInstance;
+	private Class<?> mainClass;
+	private Object mainInstance;
 	private boolean daemonStart = System.getProperty(COMMONS_DAEMON_PROCESS_ID_KEY) != null;
 	
 	public JJ() {
@@ -178,7 +191,7 @@ public final class JJ {
 	
 	private BootstrapInstaller installer;
 
-	public void init(String[] args) throws Exception {
+	public JJ init(String[] args) throws Exception {
 		if (initialized) {
 			throw new IllegalStateException("Already run once.");
 		}
@@ -186,9 +199,9 @@ public final class JJ {
 		if (myJarPath != null) {
 			
 			installer = new BootstrapInstaller(myJarPath);
-			if (processBootstrapArgs(args) && !daemonStart) return;
+			if (processBootstrapArgs(args) && !daemonStart) return this;
 
-			kernelClass = new BootstrapClassLoader(installer.libPath).loadClass(JJ_KERNEL_CLASS);
+			mainClass = new BootstrapClassLoader(installer.libPath).loadClass(JJ_MAIN_CLASS);
 			
 		} else {
 			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
@@ -199,22 +212,24 @@ public final class JJ {
 			System.out.println("⟾⟾");
 			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
 			
-			return;
+			return this;
 		}
-		kernelInstance = kernelClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
+		mainInstance = mainClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
+		
+		return this;
 	}
 
 	public void start() throws Exception {
-		kernelClass.getMethod("start").invoke(kernelInstance);
+		mainClass.getMethod("start").invoke(mainInstance);
 	}
 
 	public void stop() throws Exception {
-		kernelClass.getMethod("stop").invoke(kernelInstance);
+		mainClass.getMethod("stop").invoke(mainInstance);
 	}
 	
 	public void destroy() {
 		try {
-			kernelClass.getMethod("dispose").invoke(kernelInstance);
+			mainClass.getMethod("dispose").invoke(mainInstance);
 		} catch (Exception e) {
 			System.err.println("Trouble shutting down");
 			e.printStackTrace();
