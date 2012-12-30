@@ -25,6 +25,7 @@ public class Configuration {
 	
 	// exactly one arg must be a URI of the form http://domain:portIfNotStandard/
 	// we don't support more than that yet
+	// for now we'll default to localhost
 	private URI baseUri(final Set<String> args) {
 		URI result = null;
 		for (String arg : args) {
@@ -37,6 +38,8 @@ public class Configuration {
 		}
 		if (result != null) {
 			args.remove(result.toString());
+		} else {
+			result = URI.create("http://localhost:8080/");
 		}
 		
 		return result;
