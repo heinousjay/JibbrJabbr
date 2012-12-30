@@ -79,7 +79,7 @@ public final class BootstrapClassLoader
 			e.printStackTrace();
 			throw new ClassNotFoundException(name, e);
 		}
-		System.err.printf("Couldn't find [%s]\n", name);
+		
 		throw new ClassNotFoundException(name);
 	}
 	
