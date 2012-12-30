@@ -1,4 +1,4 @@
-package jj.request;
+package jj.document;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -11,8 +11,6 @@ import jj.IOThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.ScriptThread;
-import jj.document.DocumentFilter;
-import jj.document.DocumentRequest;
 import jj.script.ScriptBundle;
 import jj.webbit.JJHttpRequest;
 
@@ -83,7 +81,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	}
 	
 	public String baseName() {
-		return documentRequest.htmlResource().baseName();
+		return documentRequest.baseName();
 	}
 	
 	@Override
@@ -148,7 +146,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 						.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 						.header(
 							HttpHeaders.Names.CONTENT_TYPE, 
-							documentRequest.htmlResource().mime() + "; charset=UTF-8"
+							documentRequest.mime()
 						)
 						.content(bytes)
 						.end();

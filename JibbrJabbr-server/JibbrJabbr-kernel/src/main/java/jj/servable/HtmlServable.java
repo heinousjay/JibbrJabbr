@@ -6,11 +6,11 @@ import java.nio.file.Path;
 import jj.JJExecutors;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
-import jj.request.DocumentRequestProcessorImpl;
-import jj.request.RequestProcessor;
+import jj.document.DocumentRequestProcessorImpl;
 import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.RequestProcessor;
 
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
@@ -98,7 +98,7 @@ class HtmlServable extends Servable {
 			if (htmlResource != null) {
 				result = new DocumentRequestProcessorImpl(
 					executors,
-					new DocumentRequest(htmlResource, request, response, control),
+					new DocumentRequest(htmlResource, htmlResource.document(), request, response, control),
 					documentFilters
 				);
 			}

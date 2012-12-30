@@ -10,7 +10,8 @@ import java.math.BigDecimal;
 import jj.JJExecutors;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
-import jj.resource.HtmlResource;
+import jj.document.DocumentRequestProcessorImpl;
+import jj.resource.Resource;
 import jj.script.ScriptExecutorFactory;
 import jj.webbit.JJHttpRequest;
 
@@ -36,7 +37,7 @@ public class DocumentRequestProcessorImplTest {
 	@Mock ScriptExecutorFactory scriptExecutorFactory;
 	@Mock JJExecutors executors;
 
-	@Mock HtmlResource htmlResource;
+	@Mock Resource htmlResource;
 	
 	@Mock JJHttpRequest httpRequest;
 	StubHttpResponse httpResponse;
@@ -81,7 +82,7 @@ public class DocumentRequestProcessorImplTest {
 		when(executors.ioExecutor()).thenReturn(executor);
 		when(executors.scriptExecutorFor(baseName)).thenReturn(executor);
 
-		when(htmlResource.document()).thenReturn(document);
+		when(htmlResource.baseName()).thenReturn(baseName);
 		when(htmlResource.mime()).thenReturn(MIME);
 		
 		when(httpRequest.wallTime()).thenReturn(new BigDecimal(0));
@@ -89,7 +90,7 @@ public class DocumentRequestProcessorImplTest {
 		httpResponse = new StubHttpResponse();
 		httpControl = new StubHttpControl();
 		
-		documentRequest = new DocumentRequest(htmlResource, httpRequest, httpResponse, httpControl);
+		documentRequest = new DocumentRequest(htmlResource, document, httpRequest, httpResponse, httpControl);
 	}
 
 	@Test
@@ -139,7 +140,7 @@ public class DocumentRequestProcessorImplTest {
 		// then
 		assertThat(httpResponse.charset(), is(UTF_8));
 		assertThat(httpResponse.header(HttpHeaders.Names.CACHE_CONTROL), is (HttpHeaders.Values.NO_STORE));
-		assertThat(httpResponse.header(HttpHeaders.Names.CONTENT_TYPE), is(MIME + "; charset=UTF-8"));
+		assertThat(httpResponse.header(HttpHeaders.Names.CONTENT_TYPE), is(MIME));
 		assertThat(httpResponse.contentsString(), is(document.toString()));
 	}
 

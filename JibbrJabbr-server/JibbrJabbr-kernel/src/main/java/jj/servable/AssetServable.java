@@ -3,10 +3,10 @@ package jj.servable;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import jj.request.RequestProcessor;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.RequestProcessor;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;

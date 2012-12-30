@@ -50,9 +50,7 @@ public class InlineMessagesFilterTest {
 		document = Jsoup.parse("<a id=\"test\" data-i18n-href=\"goodbye\" data-i18n-title=\"title\" data-i18n=\"hi\">HI MESSAGE HERE</a><p data-i18n=\"hi\">HI MESSAGE HERE ALSO</p>");
 		given(documentRequest.document()).willReturn(document);
 		
-		given(documentRequest.htmlResource()).willReturn(htmlResource);
-		
-		given(htmlResource.baseName()).willReturn(baseName);
+		given(documentRequest.baseName()).willReturn(baseName);
 		
 		given(resourceFinder.findResource(PropertiesResource.class, baseName)).willReturn(propertiesResource);
 		

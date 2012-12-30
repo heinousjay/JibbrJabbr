@@ -2,8 +2,8 @@ package jj.script;
 
 import java.util.Map;
 
+import jj.document.DocumentRequestProcessor;
 import jj.jqmessage.JQueryMessage;
-import jj.request.DocumentRequestProcessor;
 import jj.rest.RestRequest;
 import jj.script.ContinuationState.Returns;
 import jj.webbit.JJHttpRequest;

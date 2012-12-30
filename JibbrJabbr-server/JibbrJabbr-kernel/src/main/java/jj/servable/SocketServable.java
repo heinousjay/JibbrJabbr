@@ -2,9 +2,9 @@ package jj.servable;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import jj.request.RequestProcessor;
 import jj.script.ScriptBundleFinder;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.RequestProcessor;
 
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;

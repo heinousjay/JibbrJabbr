@@ -6,7 +6,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 import java.io.IOException;
 
-import jj.request.DocumentRequestProcessor;
+import jj.document.DocumentRequestProcessor;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;

@@ -6,7 +6,6 @@ import jj.HttpControlThread;
 import jj.IOThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
-import jj.request.RequestProcessor;
 import jj.servable.Servable;
 
 import org.webbitserver.HttpControl;

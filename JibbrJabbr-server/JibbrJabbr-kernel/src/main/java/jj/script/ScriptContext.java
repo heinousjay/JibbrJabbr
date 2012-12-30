@@ -1,6 +1,6 @@
 package jj.script;
 
-import jj.request.DocumentRequestProcessor;
+import jj.document.DocumentRequestProcessor;
 import jj.webbit.JJWebSocketConnection;
 
 class ScriptContext {

@@ -6,8 +6,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
 import jj.IOThread;
-import jj.request.RequestProcessor;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.RequestProcessor;
 
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;

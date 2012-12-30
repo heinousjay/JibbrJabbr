@@ -1,7 +1,8 @@
-package jj.request;
+package jj.document;
 
 import jj.script.ScriptBundle;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.RequestProcessor;
 
 import org.jsoup.nodes.Document;
 

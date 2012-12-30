@@ -60,7 +60,6 @@ public class HtmlResource extends AbstractResource {
 	
 	@Override
 	public String mime() {
-		// NO CHOICE, UTF-8 or GTFO
 		return "text/html; charset=UTF-8";
 	}
 }

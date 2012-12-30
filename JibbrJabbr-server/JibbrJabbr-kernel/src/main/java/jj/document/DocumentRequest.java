@@ -1,6 +1,6 @@
 package jj.document;
 
-import jj.resource.HtmlResource;
+import jj.resource.Resource;
 import jj.webbit.JJHttpRequest;
 
 import org.jsoup.nodes.Document;
@@ -15,27 +15,34 @@ import org.webbitserver.HttpResponse;
  *
  */
 public class DocumentRequest {
-	private final HtmlResource htmlResource;
+	private final String baseName;
+	private final String mime;
 	private final Document document;
 	private final JJHttpRequest httpRequest;
 	private final HttpResponse httpResponse;
 	private final HttpControl httpControl;
 	
 	public DocumentRequest(
-		final HtmlResource htmlResource,
+		final Resource resource,
+		final Document document,
 		final JJHttpRequest httpRequest,
 		final HttpResponse httpResponse,
 		final HttpControl httpControl	
 	) {
-		this.htmlResource = htmlResource;
-		this.document = this.htmlResource.document().clone();
+		this.baseName = resource.baseName();
+		this.mime = resource.mime();
+		this.document = document.clone();
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
 		this.httpControl = httpControl;
 	}
 	
-	public HtmlResource htmlResource() {
-		return htmlResource;
+	public String mime() {
+		return mime;
+	}
+	
+	public String baseName() {
+		return baseName;
 	}
 	
 	public Document document() {

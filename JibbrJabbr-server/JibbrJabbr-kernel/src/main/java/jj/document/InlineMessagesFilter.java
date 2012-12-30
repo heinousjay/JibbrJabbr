@@ -51,7 +51,7 @@ public class InlineMessagesFilter implements DocumentFilter {
 	@Override
 	public void filter(final DocumentRequest documentRequest) {
 		
-		String baseName = documentRequest.htmlResource().baseName();
+		String baseName = documentRequest.baseName();
 		
 		PropertiesResource resource = 
 			executors.isIOThread() ?	
@@ -86,7 +86,7 @@ public class InlineMessagesFilter implements DocumentFilter {
 	public boolean needsIO(final DocumentRequest documentRequest) {
 		return resourceFinder.findResource(
 			PropertiesResource.class, 
-			documentRequest.htmlResource().baseName()
+			documentRequest.baseName()
 		) == null;
 	}
 

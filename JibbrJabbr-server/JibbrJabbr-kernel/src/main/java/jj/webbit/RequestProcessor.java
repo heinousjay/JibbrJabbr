@@ -1,5 +1,10 @@
-package jj.request;
+package jj.webbit;
 
+/**
+ * returned by a Servable if the request can be handled
+ * @author jason
+ *
+ */
 public interface RequestProcessor {
 	
 	/**

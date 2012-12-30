@@ -5,11 +5,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import jj.request.RequestProcessor;
 import jj.resource.ScriptResource;
 import jj.script.ScriptBundle;
 import jj.script.ScriptBundleFinder;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.RequestProcessor;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.webbitserver.HttpControl;
