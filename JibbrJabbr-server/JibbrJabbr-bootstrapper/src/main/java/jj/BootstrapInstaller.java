@@ -56,6 +56,7 @@ final class BootstrapInstaller {
 			// whoever owns the installation directory is going to own
 			// everything we make - if we are running as root on unix
 			// we need to do this or we can't read our dependencies later
+			// could (and should!) just make them readable to all
 			UserPrincipal owner = Files.getOwner(jarPath);
 			
 			Files.setOwner(libPath.getParent(), owner);
