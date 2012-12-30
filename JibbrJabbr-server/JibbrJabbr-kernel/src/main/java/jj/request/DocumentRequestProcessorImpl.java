@@ -13,7 +13,6 @@ import jj.JJRunnable;
 import jj.ScriptThread;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
-import jj.resource.HtmlResource;
 import jj.script.ScriptBundle;
 import jj.webbit.JJHttpRequest;
 
@@ -81,10 +80,6 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	
 	public Document document() {
 		return documentRequest.document();
-	}
-	
-	public HtmlResource htmlResource() {
-		return documentRequest.htmlResource();
 	}
 	
 	public String baseName() {
