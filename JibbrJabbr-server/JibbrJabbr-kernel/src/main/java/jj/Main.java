@@ -2,9 +2,6 @@ package jj;
 
 import static org.picocontainer.Characteristics.HIDE_IMPL;
 
-import java.net.URI;
-import java.nio.file.Paths;
-
 import jj.document.DocumentInitializer;
 import jj.hostapi.HostApiInitializer;
 import jj.resource.ResourceInitializer;
@@ -25,9 +22,6 @@ import com.ning.http.client.AsyncHttpClientConfig;
 
 public class Main {
 	
-	// for now, the address is hardcoded?  this is bad
-	
-	private static final URI LOCAL_WORLD = URI.create("http://localhost:8080/");
 
 	/**
 	 * debugging startup
@@ -53,13 +47,6 @@ public class Main {
 	public Main(String[] args, boolean daemonStart) throws Exception {
 		if (daemonStart) throw new IllegalStateException("This won't start correctly as a daemon anymore :(");
 		
-		// arg[0] must be our URI,
-		// arg[1] must be our path
-		
-		final SLF4JConfiguration slf4j = new SLF4JConfiguration();
-		
-		log.info("Welcome to JibbrJabbr");
-		
 		MutablePicoContainer container = 
 			new DefaultPicoContainer(
 				new Caching().wrap(new AdaptingBehavior()),
@@ -67,11 +54,8 @@ public class Main {
 				null,
 				new JJComponentMonitor()
 			)
-			// configuration - won't live long like this
-			.addComponent(LOCAL_WORLD)
-			.addComponent(Paths.get(args[0]).toRealPath())
-			
-			.addComponent(slf4j)
+			.addComponent(new Configuration(args))
+			.addComponent(new SLF4JConfiguration())
 			
 			.addComponent(JJServerLifecycle.class)
 			.addComponent(IOExecutor.class)
@@ -98,6 +82,7 @@ public class Main {
 		WebbitInitializer.initialize(container);
 		
 		serverLifecycle = container.getComponent(JJServerLifecycle.class);
+		log.info("Welcome to JibbrJabbr");
 	}
 	
 	public void start() throws Exception {

@@ -1,8 +1,7 @@
 package jj.servable;
 
 import java.io.IOException;
-import java.nio.file.Path;
-
+import jj.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 import jj.webbit.JJHttpRequest;
@@ -23,8 +22,8 @@ class AssetServable extends Servable {
 	
 	private final ResourceFinder resourceFinder;
 
-	AssetServable(final Path basePath, final ResourceFinder resourceFinder) {
-		super(basePath);
+	AssetServable(final Configuration configuration, final ResourceFinder resourceFinder) {
+		super(configuration);
 		this.resourceFinder = resourceFinder;
 	}
 	

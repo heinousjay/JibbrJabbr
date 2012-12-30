@@ -10,6 +10,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.Configuration;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +30,7 @@ public class ConcreteResourceFinderImplTest {
 
 	URI baseUri;
 	Path basePath;
+	@Mock Configuration configuration;
 	String baseName;
 	ResourceCache resourceCache;
 	ResourceCreator<?>[] resourceCreators;
@@ -36,12 +39,15 @@ public class ConcreteResourceFinderImplTest {
 	@Before
 	public void before() throws Exception {
 		baseUri = URI.create("http://localhost:8080/");
-		basePath = Paths.get(HtmlResourceCreatorTest.class.getResource("/index.html").toURI()).getParent();
+		basePath = Paths.get(ConcreteResourceFinderImplTest.class.getResource("/index.html").toURI()).getParent();
+		when(configuration.basePath()).thenReturn(basePath);
+		when(configuration.baseUri()).thenReturn(baseUri);
+		
 		baseName = "internal/no-worky";
 		resourceCache = new ResourceCache();
 		resourceCreators = new ResourceCreator<?>[] {
-			new HtmlResourceCreator(baseUri, basePath),
-			new ScriptResourceCreator(baseUri, basePath)
+			new HtmlResourceCreator(configuration),
+			new ScriptResourceCreator(configuration)
 		};
 	}
 	

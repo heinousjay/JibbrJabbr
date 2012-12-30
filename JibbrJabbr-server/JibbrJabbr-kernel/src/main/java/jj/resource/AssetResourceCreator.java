@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.Configuration;
 import jj.JJ;
 
 class AssetResourceCreator implements ResourceCreator<AssetResource> {
@@ -35,10 +36,10 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	
 	private final Logger log = LoggerFactory.getLogger(AssetResourceCreator.class);
 
-	private final URI uri;
+	private final URI baseUri;
 	
-	AssetResourceCreator(final URI uri) {
-		this.uri = uri;
+	AssetResourceCreator(final Configuration configuration) {
+		this.baseUri = configuration.baseUri();
 	}
 	
 	@Override
@@ -65,10 +66,10 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	@Override
 	public AssetResource create(String baseName, Object... args) throws IOException {
 		if (myJar == null) {
-			return new AssetResource(basePath, uri, baseName);
+			return new AssetResource(basePath, baseUri, baseName);
 		} else {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(myJar, null)) {
-				return new AssetResource(myJarFS.getPath("/jj/assets"), uri, baseName);
+				return new AssetResource(myJarFS.getPath("/jj/assets"), baseUri, baseName);
 			}
 		}
 		

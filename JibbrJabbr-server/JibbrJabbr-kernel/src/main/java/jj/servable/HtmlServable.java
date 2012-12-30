@@ -3,6 +3,7 @@ package jj.servable;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import jj.Configuration;
 import jj.JJExecutors;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
@@ -27,12 +28,12 @@ class HtmlServable extends Servable {
 	private final DocumentFilter[] documentFilters;
 	
 	HtmlServable(
-		final Path basePath,
+		final Configuration configuration,
 		final ResourceFinder resourceFinder, 
 		final JJExecutors executors,
 		final DocumentFilter[] documentFilters
 	) {
-		super(basePath);
+		super(configuration);
 		this.resourceFinder = resourceFinder;
 		this.executors = executors;
 		this.documentFilters = documentFilters;

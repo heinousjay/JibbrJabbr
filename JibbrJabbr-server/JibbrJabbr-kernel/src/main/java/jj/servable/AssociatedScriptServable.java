@@ -3,8 +3,7 @@ package jj.servable;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
-import java.nio.file.Path;
-
+import jj.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.ScriptBundle;
 import jj.script.ScriptBundleFinder;
@@ -29,8 +28,8 @@ class AssociatedScriptServable extends Servable {
 	
 	private final ScriptBundleFinder finder;
 
-	AssociatedScriptServable(final Path basePath, final ScriptBundleFinder finder) {
-		super(basePath);
+	AssociatedScriptServable(final Configuration configuration, final ScriptBundleFinder finder) {
+		super(configuration);
 		this.finder = finder;
 	}
 	

@@ -4,14 +4,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 
+import jj.Configuration;
+
 class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 
 	private final URI baseUri;
 	private final Path basePath;
 	
-	ScriptResourceCreator(final URI baseUri, final Path basePath) {
-		this.baseUri = baseUri;
-		this.basePath = basePath;
+	ScriptResourceCreator(final Configuration configuration) {
+		this.baseUri = configuration.baseUri();
+		this.basePath = configuration.basePath();
 	}
 	
 	@Override

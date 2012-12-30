@@ -2,12 +2,12 @@ package jj.webbit;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jj.Configuration;
 import jj.JJShutdown;
 import jj.JJStartup;
 
@@ -51,13 +51,14 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 	};
 
 	WebbitBootstrapper(
-		final URI uri, 
-		final Path basePath,
+		final Configuration configuration,
 		final LoggingHandler loggingHandler,
 		final JJEngineHttpHandler htmlEngineHttpHandler,
 		final NotFoundHttpHandler notFoundHandler
 	) throws InterruptedException, ExecutionException {
 
+		URI uri = configuration.baseUri();
+		
 		webServer = 
 				WebServers.createWebServer(
 					Executors.newSingleThreadExecutor(controlThreadFactory), 
@@ -67,7 +68,7 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 				.add(loggingHandler)
 				.add(htmlEngineHttpHandler)
 				// let the static file handler get stuff i'm not getting yet
-				.add(new StaticFileHandler(basePath.toFile(), Executors.newFixedThreadPool(4, sfhIOThreadFactory)))
+				.add(new StaticFileHandler(configuration.basePath().toFile(), Executors.newFixedThreadPool(4, sfhIOThreadFactory)))
 				// here would go an error handler
 				.add(notFoundHandler)
 				.uncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {

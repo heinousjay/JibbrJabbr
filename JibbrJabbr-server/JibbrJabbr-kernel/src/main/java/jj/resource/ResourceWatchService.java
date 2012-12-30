@@ -97,7 +97,7 @@ class ResourceWatchService implements JJShutdown {
 							resourceCache.remove(path.toUri());
 						} else if (kind == ENTRY_MODIFY) {
 							log.debug("reloading {}",path);
-							final Resource resource = resourceCache.get(path);
+							final Resource resource = resourceCache.get(path.toUri());
 							if (resource != null) {
 								// this thread is only to handle the
 								// WatchEvents

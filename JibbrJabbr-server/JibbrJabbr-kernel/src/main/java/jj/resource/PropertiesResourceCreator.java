@@ -4,14 +4,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 
+import jj.Configuration;
+
 class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
 
 	private final URI baseUri;
 	private final Path basePath;
 	
-	PropertiesResourceCreator(final URI baseUri, final Path basePath) {
-		this.baseUri = baseUri;
-		this.basePath = basePath;
+	PropertiesResourceCreator(final Configuration configuration) {
+		this.baseUri = configuration.baseUri();
+		this.basePath = configuration.basePath();
 	}
 	
 	@Override

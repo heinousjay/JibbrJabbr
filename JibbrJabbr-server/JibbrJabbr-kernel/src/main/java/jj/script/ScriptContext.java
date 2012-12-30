@@ -5,11 +5,12 @@ import jj.webbit.JJWebSocketConnection;
 
 class ScriptContext {
 	
+	// i think this "previous" crap is just going away...
 	final ScriptContext previous;
 	
-	final JJWebSocketConnection connection;
-	
 	final ScriptBundle scriptBundle;
+	
+	final JJWebSocketConnection connection;
 	
 	final DocumentRequestProcessor documentRequestProcessor;
 	

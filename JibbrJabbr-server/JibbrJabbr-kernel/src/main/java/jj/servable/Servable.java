@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
+import jj.Configuration;
 import jj.IOThread;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
@@ -32,8 +33,8 @@ public abstract class Servable implements Comparable<Servable> {
 	
 	protected final Path basePath;
 	
-	protected Servable(final Path basePath) {
-		this.basePath = basePath;
+	protected Servable(final Configuration configuration) {
+		this.basePath = configuration.basePath();
 	}
 	
 	/**

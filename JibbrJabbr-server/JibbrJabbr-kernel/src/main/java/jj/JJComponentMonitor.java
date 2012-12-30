@@ -72,6 +72,7 @@ final class JJComponentMonitor implements ComponentMonitor {
 			Exception cause) {
 		log.error("couldn't instantiate using {}", constructor);
 		log.error("", cause);
+		throw new AssertionError("could not build a server");
 	}
 
 	@Override

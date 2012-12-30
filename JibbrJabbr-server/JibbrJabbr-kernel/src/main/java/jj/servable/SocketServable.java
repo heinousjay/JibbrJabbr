@@ -2,6 +2,8 @@ package jj.servable;
 
 import java.io.IOException;
 import java.nio.file.Path;
+
+import jj.Configuration;
 import jj.script.ScriptBundleFinder;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
@@ -24,10 +26,11 @@ class SocketServable extends Servable {
 	private final WebSocketHandler webSocketHandler;
 	
 	SocketServable(
+		final Configuration configuration,
 		final ScriptBundleFinder scriptBundleFinder,
 		final WebSocketHandler webSocketHandler
 	) {
-		super(null);
+		super(configuration);
 		this.scriptBundleFinder = scriptBundleFinder;
 		this.webSocketHandler = webSocketHandler;
 	}

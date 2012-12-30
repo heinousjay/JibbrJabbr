@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
+import jj.Configuration;
 import jj.jqmessage.JQueryMessage;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
@@ -27,10 +28,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptHelperDocumentFilterTest {
 	
-	URI uri; 
 	String scriptUri;
 	String socketUri;
 	String webSocketUri;
+	@Mock Configuration configuration;
 	@Mock ScriptBundle scriptBundle;
 	@Mock CurrentScriptContext context;
 	@Mock ScriptResource scriptResource;
@@ -42,10 +43,12 @@ public class ScriptHelperDocumentFilterTest {
 	
 	@Before
 	public void before() {
-		uri = URI.create("http://localhost:8080/");
+		
+		when(configuration.baseUri()).thenReturn(URI.create("http://localhost:8080/"));
+		
 		scriptUri = "index/blahblahblah";
 		socketUri = "socketURI";
-		webSocketUri = uri.toString().replace("http", "ws") + socketUri;
+		webSocketUri = configuration.baseUri().toString().replace("http", "ws") + socketUri;
 		
 		when(scriptBundle.toUri()).thenReturn(scriptUri);
 		when(scriptBundle.toSocketUri()).thenReturn(socketUri);
@@ -60,7 +63,7 @@ public class ScriptHelperDocumentFilterTest {
 		when(documentRequest.document()).thenReturn(document);
 
 		
-		filter = new ScriptHelperDocumentFilter(uri, context);
+		filter = new ScriptHelperDocumentFilter(configuration, context);
 	}
 	
 	@Test
@@ -151,7 +154,7 @@ public class ScriptHelperDocumentFilterTest {
 		);
 		
 		given(httpRequest.getStartupJQueryMessages()).willReturn(messages);
-		filter = new ScriptHelperDocumentFilter(uri, context);
+		filter = new ScriptHelperDocumentFilter(configuration, context);
 		
 		// when 
 		filter.filter(documentRequest);

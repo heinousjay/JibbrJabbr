@@ -1,11 +1,35 @@
 jQuery(function($) {
 	
-	if (('WebSocket' in window) && ('localStorage' in window)) {
+	if (('WebSocket' in window) &&
+		('localStorage' in window) &&
+		('console' in window)) 
+	{
+		// our api goes here!
+		window.$j = {};
+		
 		
 		var me = $('#jj-connector-script');
 		
 		var debug = me.data('jj-debug') === true;
 		me.removeAttr('data-jj-debug');
+		
+		$j.debug = function(on) {
+			debug = on;
+		}
+		
+		var log = function(type) {
+			return function(message, force) {
+				if (debug || force) {
+					window.console[type](message);
+				}
+			}
+		}
+		var console = {
+			log: log('log'),
+			debug: log('debug'),
+			warn: log('warn', true),
+			error: log('error', true)
+		}
 		
 		var idSeq = 0;
 		var creationHoldingPen = {};
@@ -21,15 +45,15 @@ jQuery(function($) {
 		}
 		ws.onclose = function() {
 			connected = false;
-			if (debug) console.log('server closed the connection.  need a reconnect algorithm here');
+			console.debug('server closed the connection.  need a reconnect algorithm here');
 			$(window).trigger($.Event('socketclose'));
-			// need a reconnect
+			
 		}
 		ws.onerror = function(error) {
-			// try to send the error?
+			console.error(error);
 		}
 		ws.onmessage = function(msg) {
-			if (debug) console.log('received ' + msg.data);
+			console.debug('received ' + msg.data);
 			try {
 				processMessages(JSON.parse(msg.data));
 			} catch (e) {
@@ -144,7 +168,7 @@ jQuery(function($) {
 		function send(payload) {
 			if (connected) {
 				var message = JSON.stringify(payload);
-				if (debug) console.log('sending ' + message);
+				console.debug('sending ' + message);
 				ws.send(message);
 			}
 		}
@@ -178,7 +202,7 @@ jQuery(function($) {
 		me.removeAttr('data-jj-startup-messages');
 	
 	} else {
-		
+		alert("this isn't going to work for you.  sorry.");
 	}
 	
 });

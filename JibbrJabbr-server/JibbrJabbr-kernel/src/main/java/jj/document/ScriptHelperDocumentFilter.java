@@ -1,7 +1,6 @@
 package jj.document;
 
-import java.net.URI;
-
+import jj.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.CurrentScriptContext;
 import jj.script.ScriptBundle;
@@ -21,12 +20,12 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 	public static final String JQUERY_URI = "/jquery-1.8.3.min.js";
 	public static final String SOCKET_CONNECT_URI = "/socket-connect.js";
 
-	private final URI uri;
+	private final Configuration configuration;
 	private final CurrentScriptContext context;
 
-	public ScriptHelperDocumentFilter(final URI uri, final CurrentScriptContext context) {
+	public ScriptHelperDocumentFilter(final Configuration configuration, final CurrentScriptContext context) {
 		this.context = context;
-		this.uri = uri;
+		this.configuration = configuration;
 	}
 
 	private void addScript(Document document, ScriptBundle bundle, ScriptResource scriptResource) {
@@ -56,7 +55,7 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 		if (scriptBundle != null) {
 			addScript(documentRequest.document(), JQUERY_URI);
 			
-			String wsURI = uri.toString().replace("http", "ws") + scriptBundle.toSocketUri();
+			String wsURI = configuration.baseUri().toString().replace("http", "ws") + scriptBundle.toSocketUri();
 			
 			Element socketConnect = 
 				makeScriptTag(documentRequest.document(), SOCKET_CONNECT_URI)
@@ -66,6 +65,9 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 					"data-jj-startup-messages", 
 					context.httpRequest().getStartupJQueryMessages().toString()
 				);
+			if (configuration.debugClient()) {
+				socketConnect.attr("data-jj-debug", "true");
+			}
 			addScript(documentRequest.document(), socketConnect);
 			
 			if (scriptBundle.clientScriptResource() != null) {

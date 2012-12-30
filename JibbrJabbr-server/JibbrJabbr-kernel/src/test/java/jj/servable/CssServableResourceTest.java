@@ -3,10 +3,12 @@ package jj.servable;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.Configuration;
 import jj.servable.CssServable;
 import jj.webbit.JJHttpRequest;
 
@@ -21,10 +23,13 @@ public class CssServableResourceTest {
 	
 	Path basePath = Paths.get("/Users/jason/");
 	
+	@Mock Configuration configuration;
+	
 	@Mock JJHttpRequest request;
 	
 	@Before
 	public void before() {
+		when(configuration.basePath()).thenReturn(basePath);
 	}
 
 	@Test
@@ -36,7 +41,7 @@ public class CssServableResourceTest {
 			.willReturn("/not/a/path/to/servable.css");
 		
 		// when
-		CssServable cssServableResource = new CssServable(basePath);
+		CssServable cssServableResource = new CssServable(configuration);
 		
 		// then
 		assertThat(cssServableResource.isMatchingRequest(request), is(true));

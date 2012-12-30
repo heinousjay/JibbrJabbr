@@ -1,9 +1,9 @@
 package jj.servable;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.regex.Pattern;
 
+import jj.Configuration;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 
@@ -14,8 +14,8 @@ class CssServable extends Servable {
 	
 	private static final Pattern CSS_RESOURCE = Pattern.compile("^/(.+?)/([a-f0-9]{40}).css$");
 
-	CssServable(final Path basePath) {
-		super(basePath);
+	CssServable(final Configuration configuration) {
+		super(configuration);
 	}
 	
 	@Override
