@@ -2,7 +2,6 @@ package jj;
 
 import static org.picocontainer.Characteristics.HIDE_IMPL;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
 
@@ -51,7 +50,7 @@ public class Main {
 	
 	private final JJServerLifecycle serverLifecycle;
 	
-	public Main(String[] args, boolean daemonStart) throws IOException {
+	public Main(String[] args, boolean daemonStart) throws Exception {
 		if (daemonStart) throw new IllegalStateException("This won't start correctly as a daemon anymore :(");
 		
 		// arg[0] must be our URI,
@@ -66,7 +65,7 @@ public class Main {
 				new Caching().wrap(new AdaptingBehavior()),
 				new NullLifecycleStrategy(),
 				null,
-				new JibbrJabbrComponentMonitor()
+				new JJComponentMonitor()
 			)
 			// configuration - won't live long like this
 			.addComponent(LOCAL_WORLD)

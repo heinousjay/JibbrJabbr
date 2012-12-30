@@ -14,9 +14,9 @@ import org.picocontainer.injectors.ConstructorInjector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class JibbrJabbrComponentMonitor implements ComponentMonitor {
+final class JJComponentMonitor implements ComponentMonitor {
 	
-	private static final Logger log = LoggerFactory.getLogger(JibbrJabbrComponentMonitor.class);
+	private static final Logger log = LoggerFactory.getLogger(JJComponentMonitor.class);
 	
 	@Override
 	public Object noComponentFound(MutablePicoContainer container, Object componentKey) {
