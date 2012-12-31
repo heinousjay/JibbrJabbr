@@ -21,7 +21,7 @@ import jj.resource.ScriptResource;
  * @author jason
  *
  */
-public class ScriptBundleCreator {
+class ScriptBundleCreator {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptBundleCreator.class);
 	

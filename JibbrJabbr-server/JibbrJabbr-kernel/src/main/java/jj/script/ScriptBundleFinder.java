@@ -14,10 +14,6 @@ public class ScriptBundleFinder {
 		this.scriptBundles = scriptBundles;
 	}
 	
-	public ScriptBundle forBaseName(String baseName) {
-		return scriptBundles.get(baseName);
-	}
-	
 	public ScriptBundle forBaseNameAndKey(String combinedKey) {
 		ScriptBundle found = null;
 		Matcher matcher = KEY_SPLITTER.matcher(combinedKey);
