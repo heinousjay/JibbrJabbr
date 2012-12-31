@@ -12,7 +12,7 @@ var addMessage = (function() {
 			var newLine =
 				$('<div>', {
 					id : message.id
-				}).html('&lt;' + message.user + '&gt; ')
+				}).html('&lt;<span class="' + message.user.id + '">' + message.user.name + '</span>&gt; ')
 				.append($('<span>').addClass('chat-text').html(message.content));
 			$('#chatbox').append(newLine);
 			return newLine;
@@ -21,7 +21,7 @@ var addMessage = (function() {
 			var newLine = 
 				$('<div>', {
 					id : message.id
-				}).html('* ' + message.user + ' ')
+				}).html('* <span href="#" class="' + message.user.id + '">' + message.user.name + '</span> ')
 				.append($('<span>').addClass('chat-text').html(message.content));
 			$('#chatbox').append(newLine);
 			

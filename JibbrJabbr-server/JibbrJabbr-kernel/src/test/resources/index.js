@@ -16,23 +16,32 @@ $(function() {
 	// there might be stuff in there overflowing the bottom
 	$('#chatbox').scrollTo('max');
 	$('a.fancybox').each(fancyboxit);
+	$('#userInput').focus();
+	$('#users').on('mouseover', '.user', function(event) {
+		$('.' + this.id).parent().stop(true, true).animate({
+			backgroundColor: '#00BB22'
+		}, 400);
+	}).on('mouseout', '.user', function(event) {
+		$('.' + this.id).parent().stop(true, true).animate({
+			backgroundColor: 'transparent'
+		}, 250);
+	});
 });
 
 
 // there are some socket events exposed on the window
 $(window).bind('socketopen', function(event) {
-	console.log(event);
-
 	// right now there's nothing interesting passed along, you
 	// can just get the notification.  if more is needed we'll
 	// make more!
 });
 
 $(window).bind('socketclose', function(event) {
-	console.log(event);
+
 });
 
 (function($) {
+	// define a highlight plugin. yay
 	$.fn.highlight = function(color) {
 		return this.animate({
 			backgroundColor:color || '#00BB22'
@@ -45,34 +54,6 @@ $(window).bind('socketclose', function(event) {
 })(jQuery);
 
 
-// you can also define functions that you can call remotely
-// there's no special set up but there are some rules
-
-// 1 don't throw exceptions. exceptions don't go over the wire, 
-//   they just make things stop working, so don't write functions
-//   that throw exceptions
-
-// 2 a remote function has to be standalone, it will be invoked
-//   against the global context (i.e. window)
-
-// 3 it can only take arguments that can survive a trip over 
-//   a JSON transport,
-
-// 4 the function has to be declared all the way at the left
-//   margin or it won't be recognized, and it must be global
-//   or it won't be called correctly.
-
-// 5 if the function is going to return something, there needs
-//   to be a return statement on the last line of the function
-//   or the rpc system won't notice and will ignore it. also the
-//   return value must be able to survive a JSON transport.
-
-// 6 these functions cannot be invoked during the rendering phase
-//   on the server, only during event handling.
-
-// just define them in the client section like so, and
-// call them from the server-side event handlers.  they'll just
-// work
 
 var animateLoading = function(flag, element) {
 	
@@ -115,7 +96,34 @@ var fancyboxit = function() {
 	});
 }
 
+// you can also define functions that you can call remotely
+// there's no special set up but there are some rules
 
+// 1 don't throw exceptions. exceptions don't go over the wire, 
+//   they just make things stop working, so don't write functions
+//   that throw exceptions
+
+// 2 a remote function has to be standalone, it will be invoked
+//   against the global context (i.e. window)
+
+// 3 it can only take arguments that can survive a trip over 
+//   a JSON transport,
+
+// 4 the function has to be declared all the way at the left
+//   margin or it won't be recognized, and it must be global
+//   or it won't be called correctly.
+
+// 5 if the function is going to return something, there needs
+//   to be a return statement on the last line of the function
+//   or the rpc system won't notice and will ignore it. also the
+//   return value must be able to survive a JSON transport.
+
+// 6 these functions cannot be invoked during the rendering phase
+//   on the server, only during event handling.
+
+// just define them in the client section like so, and
+// call them from the server-side event handlers.  they'll just
+// work
 
 function showMessage(message) {
 	// addMessage is defined in index.shared.js so it can
@@ -132,7 +140,7 @@ function showMessage(message) {
 function userSignedOn(user) {
 	// makeUserId is also defined in index.shared.js
 	if ($('#' + user.id).length == 0) {
-		var div = $("<div>", {id: user.id}).html(user.name);
+		var div = $("<div>", {id: user.id, 'class': 'user'}).html(user.name);
 		$('#users').append(div);
 		div.highlight();
 	}
@@ -194,6 +202,11 @@ function changeTopic(topic) {
 		$('a.fancybox', $(this).html(topic).fadeIn(150)).each(fancyboxit);
 	});
 	$('#topic-holder div').highlight();
+}
+
+function lightsOut() {
+	$('#container').fadeOut(1500);
+	changeBackground('black', 2500);
 }
 
 // all of these functions are now available to call in event handlers

@@ -286,6 +286,12 @@ var command = (function() {
 			
 			return true;
 		},
+		'lights': function(params) {
+			if (params == "out") {
+				broadcast(lightsOut);
+				return true;
+			}
+		},
 		'title' : function(params) {
 			params = params.split(/\s+/);
 			var color = params[0];
@@ -315,7 +321,7 @@ var command = (function() {
 			// and send it out to everyone
 			broadcast(userChangedName.bind(null, user));
 			// and send an announcement!
-			var message = messages.add('/me is now known as ' + user.name, oldName, true);
+			var message = messages.add('/me is now known as ' + user.name, {id: user.id, name: oldName}, true);
 			broadcast(showMessage.bind(null, message));
 			// and return true, we always succeed
 			return true;
@@ -371,7 +377,7 @@ $(function() {
 	
 	print("prerendering the list of users");
 	users.forEach(function(user) {
-		$('#users').append($('<div>', {id: user.id}).html(user.name));
+		$('#users').append($('<div>', {id: user.id, 'class': 'user'}).html(user.name));
 	});
 	
 	// first we define a function that responds to events from the client
@@ -410,7 +416,7 @@ $(function() {
 				// clientStorage is an object that stores key-value pairs
 				// per-client.  it functions like localStorage in the
 				// browser - here we're reading the stored user name
-				var message = messages.add(content, clientStorage.user.name)
+				var message = messages.add(content, clientStorage.user)
 				
 				// broadcast is a built-in function that will apply its function argument on each
 				// connection to this script - every execution of an event occurs on behalf of
