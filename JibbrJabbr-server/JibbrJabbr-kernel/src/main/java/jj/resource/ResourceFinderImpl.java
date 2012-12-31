@@ -104,7 +104,6 @@ class ResourceFinderImpl implements ResourceFinder {
 			result = (T)resourceCache.get(pathUri);
 		} catch (NullPointerException | NoSuchFileException e) {
 			log.debug("couldn't find {} at {}", resourceClass.getSimpleName(), path);
-			log.debug("", e);
 		} catch (IOException ioe) {
 			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), path);
 			log.error("", ioe);
