@@ -24,7 +24,6 @@
 		<module>JibbrJabbr-kernel</module>
 		<module>JibbrJabbr-bootstrapper</module>
 		<module>JibbrJabbr</module>
-		<module>clamwhores.com</module>
 	</modules>
 
 	<dependencyManagement>
@@ -42,11 +41,6 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>JibbrJabbr</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>clamwhores.com</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
