@@ -33,8 +33,9 @@ public class WebSocketConnections {
 	@HttpControlThread
 	void addConnection(JJWebSocketConnection connection) {
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
-		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
-			perScript.get(connection.scriptBundle());
+		
+		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = perScript.get(connection.scriptBundle());
+		
 		if (connectionSet == null) {
 			connectionSet = new ConcurrentHashMap<>(16, 0.75F, 2);
 			perScript.put(connection.scriptBundle(), connectionSet);
@@ -58,9 +59,5 @@ public class WebSocketConnections {
 	public Set<JJWebSocketConnection> forScript(ScriptBundle scriptBundle) {
 		ConcurrentHashMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptBundle);		
 		return (connections != null) ? connections.keySet() : Collections.<JJWebSocketConnection>emptySet();
-	}
-	
-	public Set<JJWebSocketConnection> allConnections() {
-		return allConnections.keySet();
 	}
 }
