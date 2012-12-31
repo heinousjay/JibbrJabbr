@@ -1,4 +1,158 @@
+
+
 jQuery(function($) {
+	
+	// the following is taken from:
+	// https://github.com/joewalnes/reconnecting-websocket/
+	// 
+	// MIT License:
+	//
+	// Copyright (c) 2010-2012, Joe Walnes
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a copy
+	// of this software and associated documentation files (the "Software"), to deal
+	// in the Software without restriction, including without limitation the rights
+	// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	// copies of the Software, and to permit persons to whom the Software is
+	// furnished to do so, subject to the following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included in
+	// all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	// THE SOFTWARE.
+
+	function ReconnectingWebSocket(url, protocols) {
+
+	    // These can be altered by calling code.
+	    this.reconnectInterval = 1000;
+	    this.timeoutInterval = 2000;
+
+	    var self = this;
+	    var ws;
+	    var forcedClose = false;
+	    var timedOut = false;
+	    
+	    var messageBuffer = [];
+	    
+	    this.url = url;
+	    this.protocols = protocols;
+	    this.readyState = WebSocket.CONNECTING;
+	    this.URL = url; // Public API
+
+	    this.onopen = function(event) {
+	    };
+
+	    this.onclose = function(event) {
+	    };
+
+	    this.onmessage = function(event) {
+	    };
+
+	    this.onerror = function(event) {
+	    };
+
+	    function connect(reconnectAttempt) {
+	        ws = new WebSocket(url, protocols);
+	        if (debug) {
+	            console.debug('ReconnectingWebSocket', 'attempt-connect', url);
+	        }
+	        
+	        var localWs = ws;
+	        var timeout = setTimeout(function() {
+	            if (debug) {
+	                console.debug('ReconnectingWebSocket', 'connection-timeout', url);
+	            }
+	            timedOut = true;
+	            localWs.close();
+	            timedOut = false;
+	        }, self.timeoutInterval);
+	        
+	        ws.onopen = function(event) {
+	            clearTimeout(timeout);
+	            if (debug) {
+	                console.debug('ReconnectingWebSocket', 'onopen', url);
+	            }
+	            self.readyState = WebSocket.OPEN;
+	            reconnectAttempt = false;
+	            
+	            messageBuffer.forEach(ws.send);
+	            messageBuffer.length = 0;
+	            
+	            self.onopen(event);
+	        };
+	        
+	        ws.onclose = function(event) {
+	            clearTimeout(timeout);
+	            ws = null;
+	            if (forcedClose) {
+	                self.readyState = WebSocket.CLOSED;
+	                self.onclose(event);
+	            } else {
+	                self.readyState = WebSocket.CONNECTING;
+	                if (!reconnectAttempt && !timedOut) {
+	                    if (debug) {
+	                        console.debug('ReconnectingWebSocket', 'onclose', url);
+	                    }
+	                    self.onclose(event);
+	                }
+	                setTimeout(function() {
+	                    connect(true);
+	                }, self.reconnectInterval);
+	            }
+	        };
+	        ws.onmessage = function(event) {
+	            if (debug) {
+	                console.debug('ReconnectingWebSocket', 'onmessage', url, event.data);
+	            }
+	         self.onmessage(event);
+	        };
+	        ws.onerror = function(event) {
+	            if (debug) {
+	                console.debug('ReconnectingWebSocket', 'onerror', url, event);
+	            }
+	            self.onerror(event);
+	        };
+	    }
+	    connect(url);
+
+	    this.send = function(data) {
+	        if (ws) {
+	            if (debug) {
+	                console.debug('ReconnectingWebSocket', 'send', url, data);
+	            }
+	            return ws.send(data);
+	        } else {
+	            if (debug) {
+	                console.debug('ReconnectingWebSocket', 'buffer', url, data);
+	            }
+	            messageBuffer.push(data);
+	        }
+	    };
+
+	    this.close = function() {
+	        if (ws) {
+	            forcedClose = true;
+	            ws.close();
+	        }
+	    };
+
+	    /**
+	* Additional public API method to refresh the connection if still open (close, re-open).
+	* For example, if the app suspects bad data / missed heart beats, it can try to refresh.
+	*/
+	    this.refresh = function() {
+	        if (ws) {
+	            ws.close();
+	        }
+	    };
+	}
+	
 	
 	if (('WebSocket' in window) &&
 		('localStorage' in window) &&
@@ -10,25 +164,11 @@ jQuery(function($) {
 		
 		var me = $('#jj-connector-script');
 		
-		var debug = me.data('jj-debug') === true;
+		var debug = true; //me.data('jj-debug') === true;
 		me.removeAttr('data-jj-debug');
 		
 		$j.debug = function(on) {
 			debug = on;
-		}
-		
-		var log = function(type) {
-			return function(message, force) {
-				if (debug || force) {
-					window.console[type](message);
-				}
-			}
-		}
-		var console = {
-			log: log('log'),
-			debug: log('debug'),
-			warn: log('warn', true),
-			error: log('error', true)
 		}
 		
 		var idSeq = 0;
@@ -38,20 +178,27 @@ jQuery(function($) {
 		me.removeAttr('data-jj-socket-url');
 		
 		var connected = false;
-		var ws = new WebSocket(host);
+		
+		var messageBuffer = [];
+		var ws = new ReconnectingWebSocket(host);
 		ws.onopen = function() {
 			connected = true;
+			messageBuffer.forEach(ws.send);
+			messageBuffer.length = 0;
+			
 			$(window).trigger($.Event('socketopen'));
 		}
+		
 		ws.onclose = function() {
 			connected = false;
 			console.debug('server closed the connection.  need a reconnect algorithm here');
 			$(window).trigger($.Event('socketclose'));
-			
 		}
+		
 		ws.onerror = function(error) {
 			console.error(error);
 		}
+		
 		ws.onmessage = function(msg) {
 			console.debug('received ' + msg.data);
 			try {
@@ -61,6 +208,18 @@ jQuery(function($) {
 				console.warn(e);
 			}
 		}
+
+		function send(payload) {
+			var message = JSON.stringify(payload);
+			if (connected) {
+				console.debug('sending ' + message);
+				ws.send(message);
+			} else {
+				console.debug('buffering ' + message);
+				messageBuffer.push(message);
+			}
+		}
+		
 		
 		function processMessages(messages) {
 			messages.forEach(function(message) {
@@ -162,14 +321,6 @@ jQuery(function($) {
 						'value' : result
 					}
 				});
-			}
-		}
-		
-		function send(payload) {
-			if (connected) {
-				var message = JSON.stringify(payload);
-				console.debug('sending ' + message);
-				ws.send(message);
 			}
 		}
 		
