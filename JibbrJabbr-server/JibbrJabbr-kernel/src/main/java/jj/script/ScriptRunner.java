@@ -1,6 +1,5 @@
 package jj.script;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,9 +14,6 @@ import jj.ScriptThread;
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
 import jj.jqmessage.JQueryMessage;
-import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
 import jj.webbit.JJWebSocketConnection;
 
 /**
@@ -37,11 +33,7 @@ public class ScriptRunner {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptRunner.class);
 	
-	private final ScriptBundles scriptBundles;
-	
-	private final ScriptBundleCreator scriptBundleCreator;
-	
-	private final ResourceFinder resourceFinder;
+	private final ScriptBundleHelper scriptBundleHelper;
 	
 	private final ContinuationCoordinator continuationCoordinator;
 	
@@ -52,9 +44,7 @@ public class ScriptRunner {
 	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
 	
 	ScriptRunner(
-		final ScriptBundles scriptBundles,
-		final ScriptBundleCreator scriptBundleCreator,
-		final ResourceFinder resourceFinder,
+		final ScriptBundleHelper scriptBundleHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
 		final ScriptExecutorFactory scriptExecutorFactory,
@@ -64,9 +54,7 @@ public class ScriptRunner {
 		// this class has a lot of dependencies, but it does
 		// a very complicated job
 		
-		this.scriptBundles = scriptBundles;
-		this.scriptBundleCreator = scriptBundleCreator;
-		this.resourceFinder = resourceFinder;
+		this.scriptBundleHelper = scriptBundleHelper;
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
 		this.scriptExecutorFactory = scriptExecutorFactory;
@@ -79,41 +67,6 @@ public class ScriptRunner {
 			result.put(processor.type(), processor);
 		}
 		return Collections.unmodifiableMap(result);
-	}
-	
-	@ScriptThread
-	private ScriptBundle compile(
-		final String baseName,
-		final ScriptBundle previous,
-		final ScriptResource clientScriptResource,
-		final ScriptResource sharedScriptResource,
-		final ScriptResource serverScriptResource
-	) {
-		log.debug("compiling a new script bundle");
-		
-		ScriptBundle scriptBundle = scriptBundleCreator.createScriptBundle(
-			previous, 
-			clientScriptResource, 
-			sharedScriptResource, 
-			serverScriptResource,
-			baseName
-		);
-		
-		// sanity checking myself, there should NEVER be contention on a given
-		// baseName key, since right now only one thread is mutating this and
-		// future plans mean one thread per script so again - will never
-		// cross streams.  so throw a hard error if it is detected
-		if (previous != null) {
-			if (!scriptBundles.replace(baseName, previous, scriptBundle)) {
-				throw new AssertionError("multiple threads are attempting to execute a single script");
-			}
-		} else {
-			if (scriptBundles.putIfAbsent(baseName, scriptBundle) != null) {
-				throw new AssertionError("multiple threads are attempting to execute a single script");
-			}
-		}
-		
-		return scriptBundle;
 	}
 	
 	@ScriptThread
@@ -185,84 +138,43 @@ public class ScriptRunner {
 	
 	public void submit(final DocumentRequestProcessor documentRequestProcessor) {
 		
-		final ScriptBundle scriptBundle = scriptBundles.get(documentRequestProcessor.baseName());
-		try {
-			if (scriptBundle == null || scriptBundle.needsReplacing()) {
-			
-				makeScriptBundleAndExecute(documentRequestProcessor, scriptBundle);
-				
-			} else {
-				documentRequestProcessor.scriptBundle(scriptBundle);
-				submit(documentRequestProcessor.baseName(), new JJRunnable("document ready function execution") {
-					
-					@Override
-					protected void innerRun() throws Exception {
-						try {
-							context.initialize(
-								documentRequestProcessor
-							);
-							executeReadyFunction();
-						} finally {
-							context.end();
-						}
-					}
-				});
-			}
-
-			
-		} catch (IOException ioe) {
-			// TODO NO NO NO
-			throw new RuntimeException(ioe);
-		}
-		// not really going to be here
-		// documentRequestProcessor.respond();
-	}
-
-	private void makeScriptBundleAndExecute(
-		final DocumentRequestProcessor documentRequestProcessor,
-		final ScriptBundle scriptBundle)
-	throws IOException {
-		
 		final String baseName = documentRequestProcessor.baseName();
 		
-		final ScriptResource clientScriptResource = 
-			resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Client);
-		final ScriptResource sharedScriptResource =
-			resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Shared);
-		final ScriptResource serverScriptResource =
-			resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Server);
-		
-		// need to compile then execute
-		submit(baseName, new JJRunnable("document execution") {
+		submit(baseName, new JJRunnable("document ready function execution") {
 			
 			@Override
 			protected void innerRun() throws Exception {
-				if (serverScriptResource == null) {
-					context.initialize(documentRequestProcessor);
+				
+				ScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName);
+				if (scriptBundle == null) {
 					try {
+						context.initialize(documentRequestProcessor);
+						log.debug("no script to execute for this request, responding");
 						documentRequestProcessor.respond();
 					} finally {
 						context.end();
-					}
+					}	
 				} else {
-					documentRequestProcessor.scriptBundle(compile(
-						baseName,
-						scriptBundle,
-						clientScriptResource,
-						sharedScriptResource,
-						serverScriptResource
-					));
+					
+					documentRequestProcessor.scriptBundle(scriptBundle);
+					
 					try {
 						context.initialize(documentRequestProcessor);
-						initialExecution();
+						
+						if (scriptBundle.initialized()) {
+							executeReadyFunction();
+						} else {
+							initialExecution();
+						}
+						
 					} finally {
 						context.end();
-					}
+					}	
 				}
 			}
 		});
 	}
-	
+
 	private void resumeContinuation(
 		final JJWebSocketConnection connection,
 		final String pendingKey,

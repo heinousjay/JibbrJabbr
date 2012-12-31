@@ -1,15 +1,10 @@
 package jj.script;
 
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static org.hamcrest.CoreMatchers.*;
-
 import java.io.IOException;
 
 import jj.document.DocumentRequestProcessor;
-import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.JJHttpRequest.State;
 
@@ -34,14 +29,10 @@ public class ScriptRunnerTest {
 	Document document;
 	
 	@Mock ScriptBundle scriptBundle;
-	
-	ScriptBundles scriptBundles;
-	
-	@Mock ScriptBundleCreator scriptBundleCreator;
-	
+		
 	@Mock ScriptResource scriptResource;
 	
-	@Mock ResourceFinder resourceFinder;
+	@Mock ScriptBundleHelper scriptBundleHelper;
 	
 	@Mock ContinuationCoordinator continuationCoordinator;
 	
@@ -66,16 +57,7 @@ public class ScriptRunnerTest {
 	@Before
 	public void before() throws IOException {
 		
-		// no need to mock this one, it's just a HashMap
-		scriptBundles = new ScriptBundles();
-		
-		when(scriptBundleCreator.createScriptBundle(
-				null,
-				scriptResource,
-				scriptResource,
-				scriptResource,
-				baseName
-			)).thenReturn(scriptBundle);
+		when(scriptBundleHelper.scriptBundleFor(baseName)).thenReturn(scriptBundle);
 		
 		when(currentScriptContext.scriptBundle()).thenReturn(scriptBundle);
 		
@@ -85,9 +67,7 @@ public class ScriptRunnerTest {
 		when(continuationProcessor.type()).thenReturn(ContinuationType.AsyncHttpRequest);
 		
 		scriptRunner = new ScriptRunner(
-			scriptBundles,
-			scriptBundleCreator,
-			resourceFinder,
+			scriptBundleHelper,
 			continuationCoordinator,
 			currentScriptContext,
 			scriptExecutorFactory,
@@ -105,20 +85,28 @@ public class ScriptRunnerTest {
 		when(scriptBundle.getFunction(ScriptRunner.READY_FUNCTION_KEY)).thenReturn(readyFunction);
 	}
 	
-	//@Test
-	public void testInitialDocumentRequestWithNoContinuations() throws IOException {
+	@Test
+	public void testDocumentWithNoScript() throws Exception {
 		
 		// given
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Client)).willReturn(scriptResource);
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Shared)).willReturn(scriptResource);
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Server)).willReturn(scriptResource);
+		given(scriptBundleHelper.scriptBundleFor(baseName)).willReturn(null);
 		
 		// when
 		scriptRunner.submit(documentRequestProcessor);
 		executor.runUntilIdle();
 		
 		// then
-		assertThat(scriptBundles.get(baseName), is(scriptBundle));
+		verify(documentRequestProcessor).respond();
+	}
+	
+	@Test
+	public void testInitialDocumentRequestWithNoContinuations() throws IOException {
+		
+		// when
+		scriptRunner.submit(documentRequestProcessor);
+		executor.runUntilIdle();
+		
+		// then
 		verify(httpRequest).startingInitialExecution();
 		verify(httpRequest).startingReadyFunction();
 		verify(documentRequestProcessor).respond();
@@ -128,10 +116,6 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringInitialization() throws IOException {
 		
 		// given
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Client)).willReturn(scriptResource);
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Shared)).willReturn(scriptResource);
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Server)).willReturn(scriptResource);
-		
 		given(continuationCoordinator.execute(scriptBundle)).willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
@@ -142,7 +126,6 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		assertThat(scriptBundles.get(baseName), is(scriptBundle)); // verifies script compilation
 		verify(httpRequest).startingInitialExecution();
 		verify(continuationProcessor).process(continuationState);
 		
@@ -158,10 +141,6 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringReadyFunction() throws IOException {
 		
 		// given
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Client)).willReturn(scriptResource);
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Shared)).willReturn(scriptResource);
-		given(resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Server)).willReturn(scriptResource);
-		
 		given(continuationCoordinator.execute(scriptBundle, ScriptRunner.READY_FUNCTION_KEY))
 			.willReturn(continuationState);
 		
@@ -176,7 +155,6 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		assertThat(scriptBundles.get(baseName), is(scriptBundle)); // verifies script compilation
 		verify(httpRequest).startingInitialExecution();
 		verify(httpRequest).startingReadyFunction();
 		verify(continuationProcessor).process(continuationState);

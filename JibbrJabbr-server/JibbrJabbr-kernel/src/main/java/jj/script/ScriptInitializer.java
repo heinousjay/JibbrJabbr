@@ -13,6 +13,7 @@ public class ScriptInitializer {
 			.addComponent(CurrentScriptContext.class)
 			.addComponent(ScriptBundleCreator.class)
 			.addComponent(ScriptBundleFinder.class)
+			.addComponent(ScriptBundleHelper.class)
 			.addComponent(ScriptBundles.class)
 			.addComponent(ScriptRunner.class);
 	}
