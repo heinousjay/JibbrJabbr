@@ -47,7 +47,7 @@ public class SHA1Helper {
 	public static String keyFor(final String...strings) {
 		for (String string : strings) {
 			if (string != null) {
-				sha1.get().digest(string.getBytes(UTF_8));
+				sha1.get().update(string.getBytes(UTF_8));
 			}
 		}
 		return toHex(sha1.get().digest());
