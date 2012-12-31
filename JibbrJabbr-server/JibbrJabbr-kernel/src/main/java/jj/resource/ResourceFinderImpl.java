@@ -49,10 +49,13 @@ class ResourceFinderImpl implements ResourceFinder {
 		}
 		return Collections.unmodifiableMap(result);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Resource> T findResource(T resource) {
+		return resource == null ? null : (T)findResource(resource.getClass(), resource.baseName(), resource.creationArgs());
+	}
 
-	/**
-	 * tries to find the resource in the cache, and if it can't, returns null
-	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Resource> T findResource(
