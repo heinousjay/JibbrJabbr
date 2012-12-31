@@ -145,6 +145,8 @@ public class ScriptRunner {
 			@Override
 			protected void innerRun() throws Exception {
 				
+				log.debug("preparing to execute document request {}", baseName);
+				
 				ScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName);
 				if (scriptBundle == null) {
 					try {
@@ -209,7 +211,7 @@ public class ScriptRunner {
 		submit(connection.baseName(), new JJRunnable("host event on WebSocket connection") {
 			@Override
 			protected void innerRun() throws Exception {
-				log.debug("executing host event {}", hostEvent);
+				log.debug("executing host event {} for connection {}", hostEvent, connection);
 				context.initialize(connection);
 				try {
 					processContinuationState(
@@ -246,6 +248,8 @@ public class ScriptRunner {
 		final JJWebSocketConnection connection,
 		final JQueryMessage message
 	) {
+		log.debug("preparing to process an incoming message {} for connection {}", message, connection);
+		
 		switch (message.type()) {
 		case Result:
 			resumeContinuation(connection, message.result().id, message.result().value);
@@ -286,6 +290,8 @@ public class ScriptRunner {
 		if (!scriptExecutorFactory.isScriptThread()) {
 			throw new AssertionError("attempting to restart a continuation from the wrong thread");
 		}
+		
+		log.debug("restarting a continuation at {} with {}", pendingKey, result);
 		
 		if (context.connection() != null) {
 			resumeContinuation(pendingKey, result);
