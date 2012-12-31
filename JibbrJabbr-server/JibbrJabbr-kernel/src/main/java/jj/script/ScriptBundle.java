@@ -113,7 +113,7 @@ public class ScriptBundle {
 	}
 	
 	public String toString() {
-		return ScriptBundle.class.getSimpleName() + "{" + toUri() + "} ->";
+		return ScriptBundle.class.getSimpleName() + "{" + toUri() + "}";
 	}
 	
 	public String toUri() {
