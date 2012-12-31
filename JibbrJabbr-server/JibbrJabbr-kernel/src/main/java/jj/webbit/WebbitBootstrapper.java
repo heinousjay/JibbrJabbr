@@ -81,8 +81,7 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 	}
 	
 	public void start() throws Exception {
-		log.info("starting the web server");
-		webServer.start().get();
+		log.info("web server started at {}", webServer.start().get().getUri());
 	}
 	
 	public void stop() {
