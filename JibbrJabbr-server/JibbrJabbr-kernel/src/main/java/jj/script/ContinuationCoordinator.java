@@ -38,7 +38,7 @@ class ContinuationCoordinator {
 	 * @param scriptBundle
 	 * @return true if completed, false if continued
 	 */
-	public ContinuationState execute(ScriptBundle scriptBundle) {
+	ContinuationState execute(ScriptBundle scriptBundle) {
 		ScriptableObject.putConstProperty(scriptBundle.scope(), "scriptKey", scriptBundle.sha1());
 		try {
 			rhinoObjectCreator.context().executeScriptWithContinuations(
@@ -56,7 +56,8 @@ class ContinuationCoordinator {
 		} catch (OutOfMemoryError oom) {
 			throw oom;
 		} catch (Throwable e) {
-			log.error("unexpected problem during script execution", e);
+			log.error("unexpected problem during script execution {}", scriptBundle);
+			log.error("", e);
 		} finally {
 			Context.exit();
 		}
@@ -70,7 +71,7 @@ class ContinuationCoordinator {
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	public ContinuationState execute(ScriptBundle scriptBundle, String functionName, Object...args) {
+	ContinuationState execute(ScriptBundle scriptBundle, String functionName, Object...args) {
 		
 		Callable function = scriptBundle.getFunction(functionName);
 		if (function != null) {	
@@ -87,7 +88,8 @@ class ContinuationCoordinator {
 			} catch (OutOfMemoryError oom) {
 				throw oom;
 			} catch (Throwable e) {
-				log.error("unexpected problem during script execution", e);
+				log.error("unexpected problem during script execution {}", scriptBundle);
+				log.error("", e);
 			} finally {
 				Context.exit();
 			}
@@ -102,7 +104,7 @@ class ContinuationCoordinator {
 	 * @param result
 	 * @return
 	 */
-	public ContinuationState resumeContinuation(final String pendingKey, final ScriptBundle scriptBundle, final Object result) {
+	ContinuationState resumeContinuation(final String pendingKey, final ScriptBundle scriptBundle, final Object result) {
 		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
 		
 		try {
@@ -121,7 +123,8 @@ class ContinuationCoordinator {
 		} catch (OutOfMemoryError oom) {
 			throw oom;
 		} catch (Throwable e) {
-			log.error("unexpected problem during script execution", e);
+			log.error("unexpected problem during script execution {}", scriptBundle);
+			log.error("", e);
 		} finally {
 			Context.exit();
 		}

@@ -31,7 +31,7 @@ public class ScriptBundleFinder {
 			if (scriptBundle.sha1().equals(key)) {
 				found = scriptBundle;
 			} else {
-				scriptBundle = scriptBundle.previous();
+				found = null;
 			}
 		}
 		return found;

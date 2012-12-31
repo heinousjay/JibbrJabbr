@@ -55,6 +55,10 @@ public class CurrentScriptContext {
 		return currentContext.get().documentRequestProcessor.document();
 	}
 	
+	public void initialize(final ScriptBundle scriptBundle) {
+		currentContext.set(new ScriptContext(currentContext.get(), scriptBundle));
+	}
+	
 	public void initialize(final JJWebSocketConnection connection) {
 		currentContext.set(new ScriptContext(currentContext.get(), connection));
 	}

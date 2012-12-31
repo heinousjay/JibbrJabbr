@@ -76,7 +76,6 @@ class ScriptBundleHelper {
 		if (candidate != null) {
 			if (isObselete(candidate)) {
 				ScriptBundle next = creator.createScriptBundle(
-					candidate, 
 					clientScript(baseName), 
 					sharedScript(baseName), 
 					serverScript(baseName), 
@@ -102,7 +101,6 @@ class ScriptBundleHelper {
 		ScriptResource serverScript = serverScript(baseName);
 		
 		ScriptBundle newBundle = serverScript == null ? null : creator.createScriptBundle(
-			null,
 			clientScript(baseName),
 			sharedScript(baseName),
 			serverScript,

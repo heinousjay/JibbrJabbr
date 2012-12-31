@@ -500,7 +500,6 @@ clientDisconnected(function() {
 	delete clientStorage.skipFlag;
 });
 
-
 // other plans for future host objects 
 // - connection object with enter/exit context methods to allow client --> client messaging,
 //   to be passed along in the clientConnected/clientDisconnected events

@@ -11,8 +11,6 @@ import jj.SHA1Helper;
 import jj.resource.ScriptResource;
 
 public class ScriptBundle {
-
-	private final ScriptBundle previous;
 	
 	private final ScriptResource clientScriptResource;
 	
@@ -34,7 +32,6 @@ public class ScriptBundle {
 	private final HashMap<String, Callable> functions = new HashMap<>(); 
 	
 	ScriptBundle(
-		final ScriptBundle previous,
 		final ScriptResource clientScriptResource,
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource,
@@ -42,7 +39,6 @@ public class ScriptBundle {
 		final Script script,
 		final String baseName
 	) {
-		this.previous = previous;
 		this.clientScriptResource = clientScriptResource;
 		this.sharedScriptResource = sharedScriptResource;
 		this.serverScriptResource = serverScriptResource;
@@ -54,10 +50,6 @@ public class ScriptBundle {
 			serverScriptResource == null ? null : serverScriptResource.sha1()
 		);
 		this.baseName = baseName;
-	}
-	
-	public ScriptBundle previous() {
-		return previous;
 	}
 	
 	public ScriptResource clientScriptResource() {
@@ -121,7 +113,7 @@ public class ScriptBundle {
 	}
 	
 	public String toString() {
-		return ScriptBundle.class.getSimpleName() + "{" + toUri() + "} ->" + (previous == null ? "" : previous); 
+		return ScriptBundle.class.getSimpleName() + "{" + toUri() + "} ->";
 	}
 	
 	public String toUri() {

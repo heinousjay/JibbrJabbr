@@ -43,17 +43,18 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	public void onOpen(WebSocketConnection connection) {
 		
 		String uri = connection.httpRequest().uri().substring(1);
-		ScriptBundle actual = scriptBundleFinder.forSocketUri(uri);
-		ScriptBundle latest = scriptBundleFinder.forSocketUriBaseName(uri);
-		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, latest != actual);
+		ScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
+		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, scriptBundle == null);
 		if (jjcon.immediateClosure()) {
-			log.info("connection attempted to an old script, attempting reload");
-			connection.send("{\"command\":\"reload\"}");
+			if (scriptBundleFinder.forSocketUriBaseName(uri) != null) {
+				log.info("connection attempted to an old script, attempting reload");
+				connection.send("{\"command\":\"reload\"}");
+			}
 			connection.close();
 		} else {
-			log.debug("new connection to {}", latest);
+			log.debug("new connection to {}", scriptBundle);
 			log.debug("{}", jjcon);
-			jjcon.scriptBundle(latest);
+			jjcon.scriptBundle(scriptBundle);
 			connections.addConnection(jjcon);
 			executors.scriptRunner().submit(jjcon, HostEvent.clientConnected, connection);
 		}

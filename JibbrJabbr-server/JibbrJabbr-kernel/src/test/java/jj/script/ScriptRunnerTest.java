@@ -129,6 +129,9 @@ public class ScriptRunnerTest {
 		verify(httpRequest).startingInitialExecution();
 		verify(continuationProcessor).process(continuationState);
 		
+		// given
+		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
+		
 		// when
 		scriptRunner.restartAfterContinuation("", null);
 		
@@ -158,6 +161,9 @@ public class ScriptRunnerTest {
 		verify(httpRequest).startingInitialExecution();
 		verify(httpRequest).startingReadyFunction();
 		verify(continuationProcessor).process(continuationState);
+		
+		// given
+		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
 		
 		// when
 		scriptRunner.restartAfterContinuation("", null);

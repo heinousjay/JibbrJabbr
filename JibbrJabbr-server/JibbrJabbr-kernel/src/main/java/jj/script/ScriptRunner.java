@@ -282,7 +282,11 @@ public class ScriptRunner {
 	
 	/** you must be in a script thread and have restored the context to call this */
 	@ScriptThread
-	public void restartAfterContinuation(String pendingKey, Object result) {
+	void restartAfterContinuation(String pendingKey, Object result) {
+		if (!scriptExecutorFactory.isScriptThread()) {
+			throw new AssertionError("attempting to restart a continuation from the wrong thread");
+		}
+		
 		if (context.connection() != null) {
 			resumeContinuation(pendingKey, result);
 		} else {
