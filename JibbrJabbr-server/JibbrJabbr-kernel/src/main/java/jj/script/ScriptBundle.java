@@ -105,11 +105,11 @@ public class ScriptBundle {
 	
 	public boolean equals(Object other) {
 		return other instanceof ScriptBundle &&
-			((ScriptBundle)other).sha1().equals(sha1);
+			((ScriptBundle)other).toUri().equals(toUri());
 	}
 	
 	public int hashCode() {
-		return sha1.hashCode();
+		return toUri().hashCode();
 	}
 	
 	public String toString() {
