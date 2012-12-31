@@ -1,7 +1,10 @@
 package jj.hostapi;
 
 
+import java.util.Set;
+
 import jj.script.CurrentScriptContext;
+import jj.webbit.JJWebSocketConnection;
 import jj.webbit.WebSocketConnections;
 
 import org.mozilla.javascript.BaseFunction;
@@ -9,6 +12,8 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class PrepareConnectionIteratorFunction extends BaseFunction implements HostObject {
 	
@@ -17,6 +22,8 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 	static final String PROP_ITERATOR_NEEDS_FINISH = "//iteratorNeedsFinish";
 	
 	private static final long serialVersionUID = 1L;
+	
+	private final Logger log = LoggerFactory.getLogger(PrepareConnectionIteratorFunction.class);
 	
 	private final CurrentScriptContext context;
 	
@@ -61,10 +68,16 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 			throw new IllegalStateException("cannot broadcast during " + context.httpRequest().state());
 		}
 		
+		log.debug("preparing to broadcast for {}", context.scriptBundle());
+		
+		Set<JJWebSocketConnection> connectionSet = connections.forScript(context.scriptBundle());
+		
+		log.debug("connections are {}", connectionSet);
+		
 		ScriptableObject.putProperty(
 			context.scriptBundle().scope(),
 			PROP_CURRENT_ITERATOR,
-			connections.forScript(context.scriptBundle()).iterator()
+			connectionSet.iterator()
 		);
 		ScriptableObject.putProperty(
 			context.scriptBundle().scope(),

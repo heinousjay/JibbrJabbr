@@ -11,6 +11,8 @@ import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * the provider of the broadcast function, in concert with
@@ -22,6 +24,8 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 	private static final long serialVersionUID = 1L;
 	
 	private static final String NEXT_CONNECTION = "//nextConnection";
+	
+	private final Logger log = LoggerFactory.getLogger(NextConnectionFunction.class);
 	
 	private final CurrentScriptContext context;
 	
@@ -65,6 +69,7 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 		Object obj = context.scriptBundle().scope().get(PROP_CURRENT_ITERATOR, scope);
 		if (!(obj instanceof Iterator<?>)) {
 			// something really went wrong up in here
+			log.error("broadcast attempted but the current iterator does not exist for script bundle {}", context.scriptBundle());
 			throw new AssertionError("NextConnectionFunction called with no iterator.  something crossed up?");
 		}
 		
