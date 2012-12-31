@@ -163,17 +163,6 @@ function setUserId(userId) {
 	localStorage.userId = userId;
 }
 
-function changeBackground(newColor, duration) {
-	$('body').animate({
-		backgroundColor: newColor
-	}, duration);
-}
-
-function changeTitleColor(newColor, duration) {
-	$('#welcome').animate({
-		color: newColor
-	}, duration);
-}
 // returns the latest message this client has received,
 // used to bring them up to date on connect
 function latestMessageId() {
@@ -202,11 +191,6 @@ function changeTopic(topic) {
 		$('a.fancybox', $(this).html(topic).fadeIn(150)).each(fancyboxit);
 	});
 	$('#topic-holder div').highlight();
-}
-
-function lightsOut() {
-	$('#container').fadeOut(1500);
-	changeBackground('black', 2500);
 }
 
 // all of these functions are now available to call in event handlers

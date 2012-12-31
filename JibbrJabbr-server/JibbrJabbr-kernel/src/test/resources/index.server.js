@@ -79,55 +79,8 @@ var linkify = (function() {
 
 var smileys = {
 		
-	// still need to redo these
-	'ticklemidgets': {src:'http://www.yoursmiles.org/tsmile/sex/t15137.gif', width:48, height:48},
-	'footfetish': {src:'http://www.yoursmiles.org/tsmile/sex/t15115.gif', width:50, height:50},
-	'feelup': {src:'http://www.yoursmiles.org/tsmile/sex/t15117.gif', width:49, height:50},
-	'fakepussy': {src:'http://www.yoursmiles.org/tsmile/sex/t15118.gif', width:49, height:50},
-	'dirtysanchez': {src:'http://www.yoursmiles.org/tsmile/sex/t15120.gif', width:49, height:50},
-	'smurfing': {src:'http://www.yoursmiles.org/tsmile/sex/t15129.gif', width:49, height:50},
-	'vibratorbuddy': {src:'http://www.yoursmiles.org/tsmile/sex/t15130.gif', width:48, height:48},
-	'missionary': {src:'http://www.yoursmiles.org/tsmile/sex/t15120.gif', width:50, height:50},
-	'makeout': {src:'http://www.yoursmiles.org/tsmile/sex/t15135.gif', width:49, height:50},
-	'vampire': {src:'http://www.yoursmiles.org/tsmile/sex/t15138.gif', width:48, height:48},
-		
-	'whack': {src:'/smileys/whack.gif', width:24, height:24},
-	'jerk': {src:'/smileys/whack.gif', width:24, height:24},
-	'whackit': {src:'/smileys/whack.gif', width:24, height:24},
-	'jerkit': {src:'/smileys/whack.gif', width:24, height:24},
-	
-	'diddle': {src:'/smileys/diddle.gif', width:26, height:24},
-	'flipthebean': {src:'/smileys/diddle.gif', width:26, height:24},
-		
-	'hotkarl': {src:'/smileys/hotkarl.gif', width:33, height:24},
-		
-	'shocker': {src:'/smileys/shocker.gif', width:35, height:24},
-
-	'fuck': {src:'/smileys/fuck.gif', width:28, height:24},
-	'sex': {src:'/smileys/fuck.gif', width:28, height:24},
-	
-	'tittyfuck': {src:'/smileys/tittyfuck.gif', width:32, height:30},
-		
-	'goldenshower': {src:'/smileys/goldenshower.gif', width:34, height:30},
-		
-	'doggystyle': {src:'/smileys/doggystyle.gif', width:38, height:24},
-	
-	'fuckdog': {src:'/smileys/fuckdog.gif', width:35, height:24},
-	
-	'69': {src:'/smileys/69.gif', width:32, height:24},
-	
-	'cunnilingus': {src:'/smileys/cunnilingus.gif', width:32, height:24},
-	'eatpussy': {src:'/smileys/cunnilingus.gif', width:32, height:24},
-	
-	'ass2ass': {src:'/smileys/ass2ass.gif', width:50, height:24},
-	'asstoass': {src:'/smileys/ass2ass.gif', width:50, height:24},
-	
-	'fellatio': {src:'/smileys/fellatio.gif', width:25, height:30},
-	'blowjob': {src:'/smileys/fellatio.gif', width:25, height:30},
-	'suckdick': {src:'/smileys/fellatio.gif', width:25, height:30},
-	'bj': {src:'/smileys/fellatio.gif', width:25, height:30},
-	
-	'teabag': {src:'/smileys/teabag.gif', width:32, height:31}
+	// add smileys here in a format like
+	//'name': {src:'/path/to/image', width:48, height:48}
 }
 
 var smileyify = (function() {
@@ -150,32 +103,6 @@ var smileyify = (function() {
 		});
 	}
 })();
-
-
-
-//RestService can be called as a constructor or not,
-//takes a single parameter, a configuration object
-//parameter substitutions work in all parts of the final URL
-var lightService = new RestService({
-	// the base URL of the service.  can be bound as a parameter
-	// and pull from configuration? somehow.  that's a detail
-	// that hasn't been worked out
-	baseUrl: "http://192.168.1.12/api/jaystestname",
-	// this object defines the operations that will exist on the service
-	operations : {
-		// status just uses the default settings, so passing an empty
-		// object or true is enough to create the operation
-		status: true, 
-		flashAll: {
-			path: '/groups/0/action',
-			method: 'PUT',
-			params: {
-				alert: 'select'
-			},
-			ignoreResult: true
-		}
-	}
-});
 
 
 var messages = (function() {
@@ -282,36 +209,6 @@ var command = (function() {
 	var maxTopicLength = 100;
 	
 	var commands = {
-		'help' : function(params) {
-			
-			return true;
-		},
-		'lights': function(params) {
-			if (params == "out") {
-				broadcast(lightsOut);
-				return true;
-			}
-		},
-		'title' : function(params) {
-			params = params.split(/\s+/);
-			var color = params[0];
-			var duration = parseInt(params[1]);
-			if (color && !isNaN(duration)) {
-				broadcast(changeTitleColor.bind(null, color, duration));
-			}
-			// for now we always succeed
-			return true;
-		},
-		'bg' : function(params) {
-			params = params.split(/\s+/);
-			var color = params[0];
-			var duration = parseInt(params[1]);
-			if (color && !isNaN(duration)) {
-				broadcast(changeBackground.bind(null, color, duration));
-			}
-			// for now we always succeed
-			return true;
-		},
 		'nick' : function(params) {
 			var user = clientStorage.user;
 			var oldName = user.name;
