@@ -23,9 +23,9 @@ public class Configuration {
 		validate(args);
 	}
 	
-	// exactly one arg must be a URI of the form http://domain:portIfNotStandard/
+	// exactly one arg should be a URI of the form http://domain:portIfNotStandard/
 	// we don't support more than that yet
-	// for now we'll default to localhost
+	// for now we'll default to localhost:8080
 	private URI baseUri(final Set<String> args) {
 		URI result = null;
 		for (String arg : args) {
@@ -45,6 +45,8 @@ public class Configuration {
 		return result;
 	}
 	
+	// exactly one arg MUST be a path to the directory
+	// containing what we serve
 	private Path basePath(final Set<String> args) {
 		Path result = null;
 		for (String arg : args) {
