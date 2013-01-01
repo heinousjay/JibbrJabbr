@@ -20,18 +20,14 @@ import org.webbitserver.WebSocketHandler;
  *
  */
 class SocketServable extends Servable {
-
-	private final ScriptBundleFinder scriptBundleFinder;
 	
 	private final WebSocketHandler webSocketHandler;
 	
 	SocketServable(
 		final Configuration configuration,
-		final ScriptBundleFinder scriptBundleFinder,
 		final WebSocketHandler webSocketHandler
 	) {
 		super(configuration);
-		this.scriptBundleFinder = scriptBundleFinder;
 		this.webSocketHandler = webSocketHandler;
 	}
 	
