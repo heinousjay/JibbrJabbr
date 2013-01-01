@@ -9,6 +9,8 @@ import jj.script.ScriptRunner;
 public interface JJExecutors {
 
 	ScriptRunner scriptRunner();
+	
+	ScheduledExecutorService httpControlExecutor();
 
 	ExecutorService ioExecutor();
 

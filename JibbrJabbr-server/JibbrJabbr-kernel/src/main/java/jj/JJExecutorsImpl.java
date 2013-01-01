@@ -24,21 +24,28 @@ import jj.script.ScriptRunner;
 class JJExecutorsImpl implements JJExecutors {
 
 	private final ScriptRunner scriptRunner;
+	private final HttpControlExecutor httpControlExecutor;
 	private final IOExecutor ioExecutor;
 	private final ScriptExecutorFactory scriptExecutorFactory;
 	
 	public JJExecutorsImpl(
 		final ScriptRunner scriptRunner,
+		final HttpControlExecutor httpControlExecutor,
 		final IOExecutor ioExecutor,
 		final ScriptExecutorFactory scriptExecutorFactory
 	) {
 		this.scriptRunner = scriptRunner;
+		this.httpControlExecutor = httpControlExecutor;
 		this.ioExecutor = ioExecutor;
 		this.scriptExecutorFactory = scriptExecutorFactory;
 	}
 	
 	public ScriptRunner scriptRunner() {
 		return scriptRunner;
+	}
+	
+	public ScheduledExecutorService httpControlExecutor() {
+		return httpControlExecutor;
 	}
 	
 	public ExecutorService ioExecutor() {
