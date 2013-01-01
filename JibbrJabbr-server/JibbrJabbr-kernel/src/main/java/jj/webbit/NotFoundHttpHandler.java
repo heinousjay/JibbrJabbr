@@ -1,10 +1,10 @@
 package jj.webbit;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
@@ -34,11 +34,10 @@ class NotFoundHttpHandler implements HttpHandler {
 		if (notFound == null) { // the irony!
 			response.error(new IllegalStateException("internal assets are missing!"));
 		} else {
-			response.charset(UTF_8)
+			response.status(HttpResponseStatus.NOT_FOUND.getCode())
 				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 				.header(HttpHeaders.Names.CONTENT_TYPE, notFound.mime())
 				.content(notFound.bytes())
-				.status(404)
 				.end();
 		}
 	}
