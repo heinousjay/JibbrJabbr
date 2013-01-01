@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.Configuration;
+import jj.JJExecutors;
 import jj.JJShutdown;
 import jj.JJStartup;
 
@@ -31,15 +32,6 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 		}
 		return port;
 	}
-	
-	private static final ThreadFactory controlThreadFactory = new ThreadFactory() {
-		
-		@Override
-		public Thread newThread(final Runnable r) {
-			return new Thread(r, "Webbit HTTP control thread");
-		}
-	};
-
 	private static final AtomicInteger sfhIOThreadFactorySeq = new AtomicInteger();
 	private static final ThreadFactory sfhIOThreadFactory = new ThreadFactory() {
 		
@@ -52,6 +44,7 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 
 	WebbitBootstrapper(
 		final Configuration configuration,
+		final JJExecutors jjExecutors,
 		final LoggingHandler loggingHandler,
 		final JJEngineHttpHandler htmlEngineHttpHandler,
 		final NotFoundHttpHandler notFoundHandler
@@ -61,7 +54,7 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 		
 		webServer = 
 				WebServers.createWebServer(
-					Executors.newSingleThreadExecutor(controlThreadFactory), 
+					jjExecutors.httpControlExecutor(), 
 					new InetSocketAddress(port(uri)), 
 					uri
 				)
