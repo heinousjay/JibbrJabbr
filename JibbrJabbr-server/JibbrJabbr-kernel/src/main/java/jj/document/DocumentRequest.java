@@ -1,5 +1,6 @@
 package jj.document;
 
+import jj.Sequence;
 import jj.resource.Resource;
 import jj.webbit.JJHttpRequest;
 
@@ -15,12 +16,16 @@ import org.webbitserver.HttpResponse;
  *
  */
 public class DocumentRequest {
+	
+	private static final Sequence idSequence = new Sequence();
+	
 	private final String baseName;
 	private final String mime;
 	private final Document document;
 	private final JJHttpRequest httpRequest;
 	private final HttpResponse httpResponse;
 	private final HttpControl httpControl;
+	private final String id = "request " + idSequence.next();
 	
 	public DocumentRequest(
 		final Resource resource,
@@ -59,5 +64,13 @@ public class DocumentRequest {
 	
 	public HttpControl httpControl() {
 		return httpControl;
+	}
+	
+	public String id() {
+		return id;
+	}
+	
+	public String toString() {
+		return DocumentRequest.class.getSimpleName() + " for " + baseName + " (" + id + ")  on connection " + httpRequest;
 	}
 }
