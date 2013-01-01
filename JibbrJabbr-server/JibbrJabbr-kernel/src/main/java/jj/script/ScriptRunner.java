@@ -72,9 +72,11 @@ public class ScriptRunner {
 	@ScriptThread
 	private void initialExecution() {
 		log.debug("performing initial execution of a document request");
+		
 		context.httpRequest().startingInitialExecution();
 		final ContinuationState continuationState = 
 				continuationCoordinator.execute(context.scriptBundle());
+		
 		if (continuationState == null) {
 			context.scriptBundle().initialized(true);
 			log.debug("initial execution - completed, running ready function");
@@ -88,8 +90,10 @@ public class ScriptRunner {
 	@ScriptThread
 	private void resumeInitialExecution(String pendingKey, Object result) {
 		log.debug("resuming initial execution of a script bundle");
+		
 		final ContinuationState continuationState = 
 				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
+		
 		if (continuationState == null) {
 			context.scriptBundle().initialized(true);
 			log.debug("initial execution - completed, running ready function");
@@ -109,6 +113,7 @@ public class ScriptRunner {
 			throw new IllegalStateException("document script is defined with no ready function.  it won't work.");
 		}
 		log.debug("starting ready function execution");
+		
 		context.httpRequest().startingReadyFunction();
 		final ContinuationState continuationState = 
 				continuationCoordinator.execute(scriptBundle, READY_FUNCTION_KEY);
@@ -125,8 +130,10 @@ public class ScriptRunner {
 	@ScriptThread
 	private void resumeReadyFunction(String pendingKey, Object result) {
 		log.debug("resuming ready function execution of a script bundle");
+		
 		final ContinuationState continuationState = 
 				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
+		
 		if (continuationState == null) {
 			log.debug("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
@@ -272,24 +279,25 @@ public class ScriptRunner {
 	}
 	
 	/**
-	 * it feels like this needs to be elsewhere, or at least inverted somehow
+	 * 
 	 * @param continuationState
 	 */
 	private void processContinuationState(ContinuationState continuationState) {
 		if (continuationState != null) {
+			
 			ContinuationProcessor processor = continuationProcessors.get(continuationState.type());
-			if (processor != null) {
-				processor.process(continuationState);
-			}
+			
+			assert processor != null : "could not find a continuation processor of type " + continuationState.type();
+			
+			processor.process(continuationState);
 		}
 	}
 	
 	/** you must be in a script thread and have restored the context to call this */
 	@ScriptThread
 	void restartAfterContinuation(String pendingKey, Object result) {
-		if (!scriptExecutorFactory.isScriptThread()) {
-			throw new AssertionError("attempting to restart a continuation from the wrong thread");
-		}
+		
+		assert scriptExecutorFactory.isScriptThread() : "attempting to restart a continuation from the wrong thread";
 		
 		log.debug("restarting a continuation at {} with {}", pendingKey, result);
 		
