@@ -150,14 +150,27 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		if (el != null) {
 			if (context.document() != null) {
 				Element element = context.document().createElement(el);
+				String id = null;
 				if (args != null) {
 					for (Object key : args.keySet()) {
 						if (key != null && args.get(key) != null) {
 							element.attr(String.valueOf(key), String.valueOf(args.get(key)));
+							if ("id".equals(key)) {
+								id = String.valueOf(args.get(key));
+							}
 						}
 					}
 				}
-				return new DocumentSelection(html, element, context);
+				String newSelection;
+				if (id == null) {
+					// gotta do something like make up an ID and assign it as a data-jj-id?
+					// goddammit
+					log.warn("element created with no id.  didn't make up a selector for it, so event hookups will go badly");
+					newSelection = html;
+				} else {
+					newSelection = "#" + id;
+				}
+				return new DocumentSelection(newSelection, element, context);
 			}
 			
 			if (args.containsKey(ATTR_ID)) {
