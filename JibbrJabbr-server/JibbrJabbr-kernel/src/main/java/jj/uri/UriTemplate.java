@@ -310,8 +310,7 @@ public class UriTemplate {
 				 * The variable value contains a list of values
 				 */
 				else if (value instanceof Collection<?>) {
-					expanded = this.expandCollection(operator, varSpec,
-							(Collection) value);
+					expanded = this.expandCollection(operator, varSpec, (Collection) value);
 				}
 				
 				/*
@@ -326,8 +325,7 @@ public class UriTemplate {
 				else if (value == null) {
 					expanded = null;
 				} else if (expanded == null) {
-					expanded = this.expandStringValue(operator, varSpec,
-							value.toString(), VarSpec.VarFormat.SINGLE);
+					expanded = this.expandStringValue(operator, varSpec, value.toString(), VarSpec.VarFormat.SINGLE);
 				}
 				if (expanded != null) {
 					replacements.add(expanded);
