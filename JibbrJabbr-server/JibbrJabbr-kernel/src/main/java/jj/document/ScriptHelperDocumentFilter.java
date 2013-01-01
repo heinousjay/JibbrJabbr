@@ -55,7 +55,7 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 		if (scriptBundle != null) {
 			addScript(documentRequest.document(), JQUERY_URI);
 			
-			String wsURI = configuration.baseUri().toString().replace("http", "ws") + scriptBundle.toSocketUri();
+			String wsURI = "ws://" + documentRequest.httpRequest().host() + "/" + scriptBundle.toSocketUri();
 			
 			Element socketConnect = 
 				makeScriptTag(documentRequest.document(), SOCKET_CONNECT_URI)
@@ -63,7 +63,7 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 				.attr("data-jj-socket-url", wsURI)
 				.attr(
 					"data-jj-startup-messages", 
-					context.httpRequest().getStartupJQueryMessages().toString()
+					context.httpRequest().startupJQueryMessages().toString()
 				);
 			if (configuration.debugClient()) {
 				socketConnect.attr("data-jj-debug", "true");

@@ -9,6 +9,7 @@ import jj.DateFormatHelper;
 import jj.jqmessage.JQueryMessage;
 import jj.script.ScriptBundle;
 
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.webbitserver.HttpRequest;
 import org.webbitserver.wrapper.HttpRequestWrapper;
 
@@ -68,6 +69,10 @@ public class JJHttpRequest extends HttpRequestWrapper {
 	public State state() {
 		return (State)data(PROCESSING_STATE);
 	}
+	
+	public String host() {
+		return header(HttpHeaders.Names.HOST);
+	}
 
 	/**
 	 * adds a message intended to be processed a framework startup
@@ -85,7 +90,7 @@ public class JJHttpRequest extends HttpRequestWrapper {
 		messages.add(message);
 	}
 	
-	public List<JQueryMessage> getStartupJQueryMessages() {
+	public List<JQueryMessage> startupJQueryMessages() {
 		@SuppressWarnings("unchecked")
 		ArrayList<JQueryMessage> messages = (ArrayList<JQueryMessage>)data().remove(STARTUP_JQUERY_MESSAGES);
 		return messages == null ? Collections.<JQueryMessage>emptyList() : messages;
