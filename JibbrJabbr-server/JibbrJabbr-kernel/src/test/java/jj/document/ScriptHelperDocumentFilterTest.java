@@ -56,12 +56,12 @@ public class ScriptHelperDocumentFilterTest {
 		when(context.scriptBundle()).thenReturn(scriptBundle);
 		when(context.httpRequest()).thenReturn(httpRequest);
 		
-		when(httpRequest.getStartupJQueryMessages())
-			.thenReturn(Collections.<JQueryMessage>emptyList());
+		when(httpRequest.startupJQueryMessages()).thenReturn(Collections.<JQueryMessage>emptyList());
+		when(httpRequest.host()).thenReturn("localhost:8080");
 
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
 		when(documentRequest.document()).thenReturn(document);
-
+		when(documentRequest.httpRequest()).thenReturn(httpRequest);
 		
 		filter = new ScriptHelperDocumentFilter(configuration, context);
 	}
@@ -153,7 +153,7 @@ public class ScriptHelperDocumentFilterTest {
 			JQueryMessage.makeBind("#chatbox", "enter")
 		);
 		
-		given(httpRequest.getStartupJQueryMessages()).willReturn(messages);
+		given(httpRequest.startupJQueryMessages()).willReturn(messages);
 		filter = new ScriptHelperDocumentFilter(configuration, context);
 		
 		// when 
