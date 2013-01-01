@@ -48,7 +48,9 @@ class SocketServable extends Servable {
 
 	@Override
 	public boolean isMatchingRequest(final JJHttpRequest request) {
-		return scriptBundleFinder.forSocketUriBaseName(request.uri()) != null;
+		// we match on anything that ends with .socket.  when it gets connected,
+		// if we can't find the bundle, we force the reload
+		return request.uri().endsWith(".socket");
 	}
 
 	@Override
