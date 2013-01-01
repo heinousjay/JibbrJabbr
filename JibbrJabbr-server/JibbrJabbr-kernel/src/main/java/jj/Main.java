@@ -59,6 +59,7 @@ public class Main {
 			
 			.addComponent(JJServerLifecycle.class)
 			.addComponent(IOExecutor.class)
+			.addComponent(HttpControlExecutor.class)
 			
 			// a good place to break apart crafty circular dependencies
 			.as(HIDE_IMPL).addComponent(JJExecutors.class, JJExecutorsImpl.class)
