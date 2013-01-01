@@ -4,6 +4,7 @@ jQuery(function($) {
 	
 	// the following is taken from:
 	// https://github.com/joewalnes/reconnecting-websocket/
+	// and redone to suit my needs :D
 	// 
 	// MIT License:
 	//
@@ -90,7 +91,8 @@ jQuery(function($) {
 	        ws.onclose = function(event) {
 	            clearTimeout(timeout);
 	            ws = null;
-	            if (forcedClose) {
+	            // for now, let's not retry.  it's weird
+	            if (forcedClose || true) {
 	                self.readyState = WebSocket.CLOSED;
 	                self.onclose(event);
 	            } else {
@@ -142,10 +144,6 @@ jQuery(function($) {
 	        }
 	    };
 
-	    /**
-	* Additional public API method to refresh the connection if still open (close, re-open).
-	* For example, if the app suspects bad data / missed heart beats, it can try to refresh.
-	*/
 	    this.refresh = function() {
 	        if (ws) {
 	            ws.close();
@@ -161,7 +159,6 @@ jQuery(function($) {
 		// our api goes here!
 		window.$j = {};
 		
-		
 		var me = $('#jj-connector-script');
 		
 		var debug = true; //me.data('jj-debug') === true;
@@ -171,53 +168,66 @@ jQuery(function($) {
 			debug = on;
 		}
 		
+		// from a configuration
+		var heartbeatTimeout = 5000;
+		var heartbeatId;
+		
 		var idSeq = 0;
 		var creationHoldingPen = {};
 		
 		var host = me.data('jj-socket-url');
 		me.removeAttr('data-jj-socket-url');
 		
-		var connected = false;
-		
-		var messageBuffer = [];
+	
 		var ws = new ReconnectingWebSocket(host);
 		ws.onopen = function() {
-			connected = true;
-			messageBuffer.forEach(ws.send);
-			messageBuffer.length = 0;
 			
 			$(window).trigger($.Event('socketopen'));
+			heartbeatId = setTimeout(null, heartbeatTimeout);
 		}
 		
 		ws.onclose = function() {
-			connected = false;
-			console.debug('server closed the connection.  need a reconnect algorithm here');
 			$(window).trigger($.Event('socketclose'));
 		}
 		
 		ws.onerror = function(error) {
 			console.error(error);
 		}
-		
 		ws.onmessage = function(msg) {
-			console.debug('received ' + msg.data);
-			try {
-				processMessages(JSON.parse(msg.data));
-			} catch (e) {
-				console.warn('received messages that cannot be parsed');
-				console.warn(e);
+			if (!processRaw(msg)) {
+				try {
+					processMessages(JSON.parse(msg.data));
+				} catch (e) {
+					console.warn('received messages that cannot be parsed');
+					console.warn(e);
+				}
 			}
+		}
+		
+		var rawMessages = {
+			'jj-hi': function() {
+				if (debug) console.debug('server said hi');
+				ws.send('jj-yo');
+				return true;
+			},
+			'jj-yo': function() {
+				if (debug) console.debug('server said yo');
+				return true;
+			}
+			'jj-reload': function() {
+				if (debug) console.debug('server said reload');
+				window.location.href = window.location.href;
+				return true;
+			}
+		}
+		
+		function processRaw(message) {
+			return (message in rawMessages) && rawMessages[message]();
 		}
 
 		function send(payload) {
 			var message = JSON.stringify(payload);
-			if (connected) {
-				console.debug('sending ' + message);
-				ws.send(message);
-			} else {
-				console.debug('buffering ' + message);
-				messageBuffer.push(message);
-			}
+			ws.send(message);
 		}
 		
 		
@@ -236,17 +246,7 @@ jQuery(function($) {
 			});
 		}
 		
-		var commands = {
-			reload: function() {
-				// should perhaps present something nice?
-				window.location.href = window.location.href;
-			}
-		}
-		
 		var messageProcessors = {
-			'command': function(command) {
-				if (command in commands) commands[command]();
-			},
 			'bind': function(binding) {
 				var context = 'context' in binding ? $(binding.context) : $(document);
 				var eventName = binding.type;

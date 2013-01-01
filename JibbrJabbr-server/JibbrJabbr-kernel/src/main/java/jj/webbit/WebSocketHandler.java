@@ -46,10 +46,9 @@ class WebSocketHandler extends BaseWebSocketHandler {
 		ScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
 		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, scriptBundle == null);
 		if (jjcon.immediateClosure()) {
-			if (scriptBundleFinder.forSocketUriBaseName(uri) != null) {
-				log.info("connection attempted to an old script, attempting reload");
-				connection.send("{\"command\":\"reload\"}");
-			}
+			log.info("connection attempted to an old script, attempting reload");
+			// need some way of noticing we are being hammered here?
+			connection.send("jj-reload");
 			connection.close();
 		} else {
 			log.debug("new connection to {}", scriptBundle);
