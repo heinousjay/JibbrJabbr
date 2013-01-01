@@ -49,8 +49,8 @@ public final class BootstrapClassLoader
 		// whatever loaded this class is the root of all classloaders in the system
 		super(BootstrapClassLoader.class.getClassLoader());
 		this.libPath = libPath;
-		// the kernel uses assertions to guarantee everything is constructed correctly
-		// and we want them enabled
+		// the kernel uses assertions all over the place to ensure the state is
+		// what we expect it to be
 		setDefaultAssertionStatus(true);
 	}
 	
