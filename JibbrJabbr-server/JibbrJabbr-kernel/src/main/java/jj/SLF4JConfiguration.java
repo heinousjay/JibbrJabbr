@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.AsyncAppender;
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -40,6 +41,9 @@ class SLF4JConfiguration implements JJShutdown {
 		asyncAppender.start();
 		
 		logger.addAppender(asyncAppender);
+		
+		// shutting up the async http handler logging
+		((Logger)LoggerFactory.getLogger("com")).setLevel(Level.ERROR);
 	}
 
 	@Override
