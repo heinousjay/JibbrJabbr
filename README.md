@@ -18,3 +18,5 @@ and browse to
 
 [http://localhost:8080](http://localhost:8080)
 
+There is a partial chat sample living in JibbrJabbr-server/JibbrJabbr-kernel/src/test/resources/ you can use to explore.
+
