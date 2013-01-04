@@ -64,9 +64,6 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		if (context.connection() == null) {
-			throw new IllegalStateException("cannot broadcast during " + context.httpRequest().state());
-		}
 		
 		log.debug("preparing to broadcast for {}", context.scriptBundle());
 		
