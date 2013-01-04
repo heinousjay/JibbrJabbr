@@ -3,6 +3,12 @@ package jj;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The way to run a task
+ * 
+ * @author jason
+ *
+ */
 public abstract class JJRunnable implements Runnable {
 
 	private final Logger log = LoggerFactory.getLogger(JJRunnable.class);

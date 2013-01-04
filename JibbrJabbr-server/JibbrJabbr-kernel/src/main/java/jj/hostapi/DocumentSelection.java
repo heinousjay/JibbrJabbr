@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jj.jqmessage.JQueryMessage;
 import jj.script.CurrentScriptContext;
+import jj.script.EventNameHelper;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -50,9 +51,7 @@ public class DocumentSelection implements Selection {
 	public Selection bind(final String type, final Object data, final Callable function) {
 		// TODO handle the data. this will require some sort of context
 		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeBind(selector, type));
-		// ugly!
-		String eventId = type + "(" + selector + ")";
-		context.scriptBundle().addFunction(eventId, function);
+		context.scriptBundle().addFunction(EventNameHelper.makeEventName("", selector, type), function);
 		return this;
 	}
 	

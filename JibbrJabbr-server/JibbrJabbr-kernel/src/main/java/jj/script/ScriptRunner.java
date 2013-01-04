@@ -71,7 +71,7 @@ public class ScriptRunner {
 	
 	@ScriptThread
 	private void initialExecution() {
-		log.debug("performing initial execution of a document request");
+		log.trace("performing initial execution of a document request");
 		
 		context.httpRequest().startingInitialExecution();
 		final ContinuationState continuationState = 
@@ -79,27 +79,27 @@ public class ScriptRunner {
 		
 		if (continuationState == null) {
 			context.scriptBundle().initialized(true);
-			log.debug("initial execution - completed, running ready function");
+			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
-			log.debug("initial execution - continuation. storing execution state");
+			log.trace("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
 		}
 	}
 
 	@ScriptThread
 	private void resumeInitialExecution(String pendingKey, Object result) {
-		log.debug("resuming initial execution of a script bundle");
+		log.trace("resuming initial execution of a script bundle");
 		
 		final ContinuationState continuationState = 
 				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
 		
 		if (continuationState == null) {
 			context.scriptBundle().initialized(true);
-			log.debug("initial execution - completed, running ready function");
+			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
-			log.debug("initial execution - continuation. storing execution state");
+			log.trace("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
 		}
 	}
@@ -112,38 +112,40 @@ public class ScriptRunner {
 			// TODO smarter exception here!
 			throw new IllegalStateException("document script is defined with no ready function.  it won't work.");
 		}
-		log.debug("starting ready function execution");
+		log.trace("starting ready function execution");
 		
 		context.httpRequest().startingReadyFunction();
 		final ContinuationState continuationState = 
 				continuationCoordinator.execute(scriptBundle, READY_FUNCTION_KEY);
 		
 		if (continuationState == null) {
-			log.debug("ready function execution - completed, serving document");
+			log.trace("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
 		} else {
-			log.debug("ready function execution - continuation, storing execution state");
+			log.trace("ready function execution - continuation, storing execution state");
 			processContinuationState(continuationState);
 		}
 	}
 
 	@ScriptThread
 	private void resumeReadyFunction(String pendingKey, Object result) {
-		log.debug("resuming ready function execution of a script bundle");
+		log.trace("resuming ready function execution of a script bundle");
 		
 		final ContinuationState continuationState = 
 				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
 		
 		if (continuationState == null) {
-			log.debug("ready function execution - completed, serving document");
+			log.trace("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
 		} else {
-			log.debug("ready function execution - continuation, storing execution state");
+			log.trace("ready function execution - continuation, storing execution state");
 			processContinuationState(continuationState);
 		}
 	}
 	
 	public void submit(final DocumentRequestProcessor documentRequestProcessor) {
+		
+		assert (documentRequestProcessor != null) : "asked to process a null document request";
 		
 		final String baseName = documentRequestProcessor.baseName();
 		
@@ -152,13 +154,13 @@ public class ScriptRunner {
 			@Override
 			protected void innerRun() throws Exception {
 				
-				log.debug("preparing to execute document request {}", baseName);
+				log.trace("preparing to execute document request {}", baseName);
 				
 				ScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName);
 				if (scriptBundle == null) {
 					try {
 						context.initialize(documentRequestProcessor);
-						log.debug("no script to execute for this request, responding");
+						log.trace("no script to execute for this request, responding");
 						documentRequestProcessor.respond();
 					} finally {
 						context.end();
@@ -218,7 +220,7 @@ public class ScriptRunner {
 		submit(connection.baseName(), new JJRunnable("host event on WebSocket connection") {
 			@Override
 			protected void innerRun() throws Exception {
-				log.debug("executing host event {} for connection {}", hostEvent, connection);
+				log.trace("executing host event {} for connection {}", hostEvent, connection);
 				context.initialize(connection);
 				try {
 					processContinuationState(
@@ -233,17 +235,16 @@ public class ScriptRunner {
 	
 	private void processEvent(
 		final JJWebSocketConnection connection,
-		final String eventType,
-		final String selector
+		final String eventName,
+		final Object...args
 	) {
 		submit(connection.baseName(), new JJRunnable("client event on WebSocket connection") {
 			@Override
 			protected void innerRun() throws Exception {
 				context.initialize(connection);
 				try {
-					String functionName = eventType + "(" + selector + ")";
-					log.debug("executing script event {} for scriptBundle {}", functionName, connection.scriptBundle());
-					processContinuationState(continuationCoordinator.execute(connection.scriptBundle(), functionName));
+					log.trace("executing script event {} for scriptBundle {}", eventName, connection.scriptBundle());
+					processContinuationState(continuationCoordinator.execute(connection.scriptBundle(), eventName));
 				} finally {
 					context.end();
 				}
@@ -255,14 +256,14 @@ public class ScriptRunner {
 		final JJWebSocketConnection connection,
 		final JQueryMessage message
 	) {
-		log.debug("preparing to process an incoming message {} for connection {}", message, connection);
+		log.trace("preparing to process an incoming message {} for connection {}", message, connection);
 		
 		switch (message.type()) {
 		case Result:
 			resumeContinuation(connection, message.result().id, message.result().value);
 			break;
 		case Event:
-			processEvent(connection, message.event().type, message.event().selector);
+			processEvent(connection, EventNameHelper.makeEventName(message));
 			break;
 		default:
 			log.warn("received a message that makes no sense {}", message);
@@ -298,8 +299,9 @@ public class ScriptRunner {
 	void restartAfterContinuation(String pendingKey, Object result) {
 		
 		assert scriptExecutorFactory.isScriptThread() : "attempting to restart a continuation from the wrong thread";
+		assert context.scriptBundle() != null : "attempting to restart a continuation without a script context in place";
 		
-		log.debug("restarting a continuation at {} with {}", pendingKey, result);
+		log.trace("restarting a continuation at {} with {}", pendingKey, result);
 		
 		if (context.connection() != null) {
 			resumeContinuation(pendingKey, result);
