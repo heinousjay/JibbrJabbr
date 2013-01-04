@@ -74,25 +74,28 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	@HttpControlThread
 	public void onMessage(WebSocketConnection connection, String msg) throws Throwable {
 		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false);
-		log.debug("received message [{}] on {}]", msg, jjcon);
-		try {
-			JQueryMessage message = JQueryMessage.fromString(msg);
-			executors.scriptRunner().submit(jjcon, message);
-			
-		} catch (JQueryMessageException e) {
-			log.warn("{} connected to script {} spoke gibberish to me: {}", 
-				jjcon,
-				jjcon.scriptBundle(),
-				msg
-			);
-		}
+		log.trace("received message [{}] on {}]", msg, jjcon);
+		if ("jj-hi".equals(msg)) {
+			connection.send("jj-yo");
+		} else {
 		
+			try {
+				JQueryMessage message = JQueryMessage.fromString(msg);
+				executors.scriptRunner().submit(jjcon, message);
+				
+			} catch (JQueryMessageException e) {
+				log.warn("{} connected to script {} spoke gibberish to me: {}", 
+					jjcon,
+					jjcon.scriptBundle(),
+					msg
+				);
+			}
+		}
 	}
 
 	@Override
 	@HttpControlThread
-	public void onMessage(WebSocketConnection connection, byte[] msg)
-			throws Throwable {
+	public void onMessage(WebSocketConnection connection, byte[] msg) throws Throwable {
 		// at some point this is going to become interesting,
 		// thinking about streaming bytes in for uploads...
 		
@@ -100,9 +103,7 @@ class WebSocketHandler extends BaseWebSocketHandler {
 
 	@Override
 	@HttpControlThread
-	public void onPong(WebSocketConnection connection, byte[] msg)
-			throws Throwable {
-		// ping-pong will work into things soon enough, we'll need some
-		// sort of slow heartbeat
+	public void onPong(WebSocketConnection connection, byte[] msg) throws Throwable {
+		
 	}
 }

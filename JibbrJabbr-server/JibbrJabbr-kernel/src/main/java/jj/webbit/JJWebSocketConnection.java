@@ -8,7 +8,6 @@ import java.util.Map;
 import jj.DateFormatHelper;
 import jj.jqmessage.JQueryMessage;
 import jj.script.ScriptBundle;
-
 import org.webbitserver.WebSocketConnection;
 import org.webbitserver.wrapper.WebSocketConnectionWrapper;
 
@@ -21,12 +20,24 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	private static final String MESSAGES = "messages";
 	
 	private static final String CLIENT_STORAGE = "client storage";
+	
+	private static final String LAST_ACTIVITY = "last activity";
 
 	JJWebSocketConnection(final WebSocketConnection connection, final boolean immediateClosure) {
 		super(connection);
 		if (immediateClosure) {
-			data().put(IMMEDIATE_CLOSURE, Boolean.TRUE);
+			data(IMMEDIATE_CLOSURE, Boolean.TRUE);
+		} else {
+			markActivity();
 		}
+	}
+	
+	void markActivity() {
+		data(LAST_ACTIVITY, System.currentTimeMillis());
+	}
+	
+	long lastActivity() {
+		return (long)data(LAST_ACTIVITY);
 	}
 	
 	boolean immediateClosure() {

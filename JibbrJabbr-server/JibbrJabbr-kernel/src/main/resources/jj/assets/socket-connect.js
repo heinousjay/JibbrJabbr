@@ -5,6 +5,7 @@ jQuery(function($) {
 	// the following is taken from:
 	// https://github.com/joewalnes/reconnecting-websocket/
 	// and redone to suit my needs :D
+	// it's mainly here as a guidepost, in fact
 	// 
 	// MIT License:
 	//
@@ -168,9 +169,58 @@ jQuery(function($) {
 			debug = on;
 		}
 		
-		// from a configuration
-		var heartbeatTimeout = 5000;
-		var heartbeatId;
+		var heartbeat = (function() {
+			var PongReceived = 0,
+				WaitingForPong = 1,
+				ConnectionClosed = 2,
+				state,
+				ponged,
+				heartbeatTimeout = 30000,
+				heartbeatId;
+				
+			
+			var result = function() {
+
+				state = PongReceived;
+				ponged = true;
+				clearTimeout(heartbeatId);
+				heartbeatId = null;
+				
+				function doHeartbeat() {
+					switch(state) {
+					case PongReceived:
+						console.debug("ping");
+						ws.send('jj-hi');
+						state = WaitingForPong;
+						ponged = false;
+						heartbeatId = setTimeout(doHeartbeat, 500);
+						break;
+					case WaitingForPong:
+						if (ponged) {
+							console.debug("pong");
+							ponged = false;
+							state = PongReceived;
+							future = setTimeout(doHeartbeat, heartbeatTimeout);
+						} else {
+							console.debug("no pong from server.  uh oh");
+						}
+						break;
+					}
+				};
+				heartbeatId = setTimeout(doHeartbeat, heartbeatTimeout);
+			}
+			
+			result.pong = function() {
+				ponged = true;
+			}
+			
+			result.closed = function() {
+				state = ConnectionClosed;
+				clearTimeout(heartbeatId);
+			}
+			
+			return result;
+		})();
 		
 		var idSeq = 0;
 		var creationHoldingPen = {};
@@ -179,22 +229,28 @@ jQuery(function($) {
 		me.removeAttr('data-jj-socket-url');
 		
 	
-		var ws = new ReconnectingWebSocket(host);
+		var ws = new WebSocket(host);
 		ws.onopen = function() {
 			
+			console.debug("WebSocket open", host);
+			
+			heartbeat();
 			$(window).trigger($.Event('socketopen'));
-			heartbeatId = setTimeout(null, heartbeatTimeout);
 		}
 		
 		ws.onclose = function() {
+			
+			console.debug("WebSocket closed", host);
+			
+			heartbeat.closed();
 			$(window).trigger($.Event('socketclose'));
 		}
 		
 		ws.onerror = function(error) {
-			console.error(error);
+			console.error("WebSocket errored", error);
 		}
 		ws.onmessage = function(msg) {
-			if (!processRaw(msg)) {
+			if (!processRaw(msg.data)) {
 				try {
 					processMessages(JSON.parse(msg.data));
 				} catch (e) {
@@ -205,15 +261,17 @@ jQuery(function($) {
 		}
 		
 		var rawMessages = {
-			'jj-hi': function() {
-				if (debug) console.debug('server said hi');
-				ws.send('jj-yo');
+			// shutdown message
+			'jj-bye': function() {
+				if (debug) console.debug('server said bye');
 				return true;
 			},
+			// pong for the pinger
 			'jj-yo': function() {
-				if (debug) console.debug('server said yo');
+				heartbeat.pong();
 				return true;
-			}
+			},
+			// we are out of date and need to reload
 			'jj-reload': function() {
 				if (debug) console.debug('server said reload');
 				window.location.href = window.location.href;
@@ -222,7 +280,7 @@ jQuery(function($) {
 		}
 		
 		function processRaw(message) {
-			return (message in rawMessages) && rawMessages[message]();
+			return rawMessages[message] && rawMessages[message]();
 		}
 
 		function send(payload) {
@@ -256,7 +314,8 @@ jQuery(function($) {
 					eventName = proxy.as;
 					handler = proxy.handler;
 				}
-				// we pass our selector in as data
+				// we pass our selector and context in as data since these
+				// are the event keys
 				context.on(eventName + '.jj', binding.selector, binding.selector, handler);
 			},
 			'get': function(get) {
