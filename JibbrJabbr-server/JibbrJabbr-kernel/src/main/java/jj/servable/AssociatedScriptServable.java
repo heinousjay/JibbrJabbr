@@ -3,6 +3,8 @@ package jj.servable;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+
 import jj.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.ScriptBundle;
@@ -87,10 +89,13 @@ class AssociatedScriptServable extends Servable {
 			
 			@Override
 			public void process() {
-				response.charset(UTF_8)
+				
+				ByteBuffer buf = UTF_8.encode(scriptResource.script());
+				
+				response.header(HttpHeaders.Names.CONTENT_LENGTH, buf.remaining())
 					.header(HttpHeaders.Names.CACHE_CONTROL, "max-age=" + TWENTY_YEARS)
 					.header(HttpHeaders.Names.CONTENT_TYPE, "text/javascript; charset=UTF-8")
-					.content(scriptResource.script())
+					.content(buf)
 					.end();
 			}
 		};

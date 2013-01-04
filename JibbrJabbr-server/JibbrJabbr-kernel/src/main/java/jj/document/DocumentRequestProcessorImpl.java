@@ -141,7 +141,8 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 			public void innerRun() throws Exception {
 				final ByteBuffer bytes = UTF_8.encode(documentRequest.document().toString());
 				try {
-					documentRequest.httpResponse().charset(UTF_8)
+					documentRequest.httpResponse()
+						.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.remaining())
 						// clients shouldn't cache these responses at all
 						.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 						.header(

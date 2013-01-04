@@ -59,7 +59,7 @@ class AssetServable extends Servable {
 				try {
 					AssetResource asset = resourceFinder.findResource(AssetResource.class, baseName(request));
 					
-					response
+					response.header(HttpHeaders.Names.CONTENT_LENGTH, asset.bytes().length)
 						// once the URL rewriting works, then:
 						// HttpHeaders.Values.MAX_AGE + "=" + TWENTY_YEARS)
 						.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)

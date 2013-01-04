@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.webbitserver.WebServer;
 import org.webbitserver.WebServers;
 import org.webbitserver.handler.StaticFileHandler;
-import org.webbitserver.handler.logging.LoggingHandler;
 
 class WebbitBootstrapper implements JJStartup, JJShutdown {
 	
@@ -45,7 +44,7 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 	WebbitBootstrapper(
 		final Configuration configuration,
 		final JJExecutors jjExecutors,
-		final LoggingHandler loggingHandler,
+		final JJAccessLoggingHttpHandler loggingHandler,
 		final JJEngineHttpHandler htmlEngineHttpHandler,
 		final NotFoundHttpHandler notFoundHandler
 	) throws InterruptedException, ExecutionException {
