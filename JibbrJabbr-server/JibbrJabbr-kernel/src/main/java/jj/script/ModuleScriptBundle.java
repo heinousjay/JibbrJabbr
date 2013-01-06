@@ -23,7 +23,9 @@ import org.mozilla.javascript.Scriptable;
 /**
  * script bundle that represents the result of
  * a require() call inside the script host.
- * 
+ * these probably need to be keyed by the baseName +
+ * the path the module, i'm pretty sure i want
+ * independent instances per page-level script
  * @author jason
  *
  */
