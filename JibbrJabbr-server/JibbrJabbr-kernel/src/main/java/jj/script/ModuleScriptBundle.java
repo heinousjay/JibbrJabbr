@@ -32,31 +32,30 @@ import org.mozilla.javascript.Scriptable;
 class ModuleScriptBundle implements ScriptBundle {
 	
 	private final ScriptResource scriptResource;
-	private final Scriptable scope;
+	private final Scriptable local;
 	private final Script script;
+	private final Scriptable exports;
 	private final String baseName;
 	
-	/**
-	 * this isn't final but it must only be
-	 * set once, after which this is considered initialized
-	 */
-	private Scriptable exports = null;
+	private boolean initialized = false;
 	
 	ModuleScriptBundle(
 		final ScriptResource scriptResource,
-		final Scriptable scope,
+		final Scriptable local,
 		final Script script,
+		final Scriptable exports,
 		final String baseName
 	) {
 		this.scriptResource = scriptResource;
-		this.scope = scope;
+		this.local = local;
 		this.script = script;
+		this.exports = exports;
 		this.baseName = baseName;
 	}
 
 	@Override
 	public Scriptable scope() {
-		return scope;
+		return local;
 	}
 
 	@Override
@@ -76,13 +75,11 @@ class ModuleScriptBundle implements ScriptBundle {
 
 	@Override
 	public boolean initialized() {
-		return exports != null;
+		return initialized;
 	}
 
-	public void initialized(final Scriptable exports) {
-		if (this.exports == null) {
-			this.exports = exports;
-		}
+	public void initialized(final boolean initialized) {
+		this.initialized = initialized || this.initialized;
 	}
 	
 	public Scriptable exports() {
