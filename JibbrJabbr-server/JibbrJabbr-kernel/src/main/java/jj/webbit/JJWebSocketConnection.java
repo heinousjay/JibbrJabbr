@@ -8,6 +8,7 @@ import java.util.Map;
 import jj.DateFormatHelper;
 import jj.jqmessage.JQueryMessage;
 import jj.script.AssociatedScriptBundle;
+
 import org.webbitserver.WebSocketConnection;
 import org.webbitserver.wrapper.WebSocketConnectionWrapper;
 

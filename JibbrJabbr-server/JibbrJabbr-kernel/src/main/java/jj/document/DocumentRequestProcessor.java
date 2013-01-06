@@ -11,6 +11,7 @@ public interface DocumentRequestProcessor extends RequestProcessor {
 	JJHttpRequest httpRequest();
 	
 	AssociatedScriptBundle scriptBundle();
+	
 	void scriptBundle(AssociatedScriptBundle scriptBundle);
 
 	Document document();
