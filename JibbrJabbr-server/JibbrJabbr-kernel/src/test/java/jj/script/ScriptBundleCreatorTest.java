@@ -96,6 +96,9 @@ public class ScriptBundleCreatorTest {
 		assertThat(result, is(notNullValue()));
 		assertThat(result.exports(), is(notNullValue()));
 		
+		
+		// TODO put the remainder of this in the right test. but it's useful for now
+		
 		// when we execute that script - not strictly related to this test but it verifies we put the exports in the right
 		// place
 		Context cx = Context.enter();
@@ -108,9 +111,6 @@ public class ScriptBundleCreatorTest {
 		// then
 		Object hi = result.exports().get("hi", result.exports());
 		assertTrue(hi instanceof Callable);
-		
-		
-		// TODO put this in the right test. but it's useful for now
 		Callable hiFunc = (Callable)hi;
 		Object moduleId;
 		cx = Context.enter();
