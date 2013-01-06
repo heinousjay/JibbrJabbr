@@ -57,6 +57,8 @@ public class ContinuationState implements Serializable {
 			return restRequest().id();
 		case JQueryMessage:
 			return jQueryMessage().id();
+		case Require:
+			return null;
 		}
 		
 		throw new AssertionError("weird construction, can't happen");

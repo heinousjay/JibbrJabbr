@@ -10,7 +10,13 @@ import jj.IOThread;
 import jj.SHA1Helper;
 import jj.resource.ScriptResource;
 
-public class ScriptBundle {
+/**
+ * contains all of the information to execute a set of scripts
+ * associated with an HTML document.
+ * @author jason
+ *
+ */
+public class AssociatedScriptBundle {
 	
 	private final ScriptResource clientScriptResource;
 	
@@ -31,7 +37,7 @@ public class ScriptBundle {
 	/** the callable functions found in this script organized by some sort of externally meaningful name */
 	private final HashMap<String, Callable> functions = new HashMap<>(); 
 	
-	ScriptBundle(
+	AssociatedScriptBundle(
 		final ScriptResource clientScriptResource,
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource,
@@ -104,8 +110,8 @@ public class ScriptBundle {
 	}
 	
 	public boolean equals(Object other) {
-		return other instanceof ScriptBundle &&
-			((ScriptBundle)other).toUri().equals(toUri());
+		return other instanceof AssociatedScriptBundle &&
+			((AssociatedScriptBundle)other).toUri().equals(toUri());
 	}
 	
 	public int hashCode() {
@@ -113,7 +119,7 @@ public class ScriptBundle {
 	}
 	
 	public String toString() {
-		return ScriptBundle.class.getSimpleName() + "{" + toUri() + "}";
+		return AssociatedScriptBundle.class.getSimpleName() + "{" + toUri() + "}";
 	}
 	
 	public String toUri() {

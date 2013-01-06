@@ -31,7 +31,7 @@ public class ScriptRunnerTest {
 	
 	Document document;
 	
-	@Mock ScriptBundle scriptBundle;
+	@Mock AssociatedScriptBundle scriptBundle;
 		
 	@Mock ScriptResource scriptResource;
 	
@@ -219,7 +219,7 @@ public class ScriptRunnerTest {
 		givenAWebSocketMessage();
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		given(continuationCoordinator.execute(scriptBundle, HostEvent.clientConnected.toString(), connection)).willReturn(continuationState);
-		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
+		given(continuationCoordinator.resumeContinuation((String)any(), (AssociatedScriptBundle)any(), any()))
 			.willReturn(continuationState)
 			.willReturn(null);
 		
@@ -238,7 +238,7 @@ public class ScriptRunnerTest {
 		scriptRunner.restartAfterContinuation(null, null);
 		
 		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptBundle)any(), any());
+		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (AssociatedScriptBundle)any(), any());
 	}
 	
 	@Test
@@ -266,7 +266,7 @@ public class ScriptRunnerTest {
 		String eventName = EventNameHelper.makeEventName(jwm);
 		given(continuationState.type()).willReturn(ContinuationType.JQueryMessage);
 		given(continuationCoordinator.execute(scriptBundle, eventName)).willReturn(continuationState);
-		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
+		given(continuationCoordinator.resumeContinuation((String)any(), (AssociatedScriptBundle)any(), any()))
 			.willReturn(continuationState)
 			.willReturn(null);
 		
@@ -285,7 +285,7 @@ public class ScriptRunnerTest {
 		scriptRunner.restartAfterContinuation(null, null);
 		
 		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptBundle)any(), any());
+		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (AssociatedScriptBundle)any(), any());
 	}
 
 }

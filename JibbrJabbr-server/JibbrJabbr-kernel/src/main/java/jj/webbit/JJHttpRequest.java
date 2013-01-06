@@ -7,7 +7,7 @@ import java.util.List;
 
 import jj.DateFormatHelper;
 import jj.jqmessage.JQueryMessage;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.webbitserver.HttpRequest;
@@ -50,11 +50,11 @@ public class JJHttpRequest extends HttpRequestWrapper {
 		return BigDecimal.valueOf(System.nanoTime() - startTime, 6);
 	}
 	
-	public ScriptBundle scriptBundle() {
-		return (ScriptBundle)data(SCRIPT_BUNDLE);
+	public AssociatedScriptBundle scriptBundle() {
+		return (AssociatedScriptBundle)data(SCRIPT_BUNDLE);
 	}
 	
-	public void scriptBundle(ScriptBundle scriptBundle) {
+	public void scriptBundle(AssociatedScriptBundle scriptBundle) {
 		data(SCRIPT_BUNDLE, scriptBundle);
 	}
 	

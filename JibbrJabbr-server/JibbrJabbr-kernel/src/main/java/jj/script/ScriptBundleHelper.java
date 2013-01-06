@@ -55,7 +55,7 @@ class ScriptBundleHelper {
 	}
 	
 	
-	public boolean isObselete(final ScriptBundle scriptBundle) {
+	public boolean isObselete(final AssociatedScriptBundle scriptBundle) {
 		final String baseName = scriptBundle.baseName();
 		
 		// cache rules mean object equality works
@@ -71,11 +71,11 @@ class ScriptBundleHelper {
 	 * @return
 	 */
 	@ScriptThread
-	public ScriptBundle scriptBundleFor(final String baseName) {
-		ScriptBundle candidate = scriptBundles.get(baseName);
+	public AssociatedScriptBundle scriptBundleFor(final String baseName) {
+		AssociatedScriptBundle candidate = scriptBundles.get(baseName);
 		if (candidate != null) {
 			if (isObselete(candidate)) {
-				ScriptBundle next = creator.createScriptBundle(
+				AssociatedScriptBundle next = creator.createScriptBundle(
 					clientScript(baseName), 
 					sharedScript(baseName), 
 					serverScript(baseName), 
@@ -96,11 +96,11 @@ class ScriptBundleHelper {
 	}
 	
 	@ScriptThread
-	private ScriptBundle newScriptBundleFor(final String baseName) {
+	private AssociatedScriptBundle newScriptBundleFor(final String baseName) {
 		
 		ScriptResource serverScript = serverScript(baseName);
 		
-		ScriptBundle newBundle = serverScript == null ? null : creator.createScriptBundle(
+		AssociatedScriptBundle newBundle = serverScript == null ? null : creator.createScriptBundle(
 			clientScript(baseName),
 			sharedScript(baseName),
 			serverScript,

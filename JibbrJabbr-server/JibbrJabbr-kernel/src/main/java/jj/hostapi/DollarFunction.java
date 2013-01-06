@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import jj.SelectorFormatException;
 import jj.jqmessage.JQueryMessage;
 import jj.script.CurrentScriptContext;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptRunner;
 import jj.script.ContinuationState.Returns;
 
@@ -78,7 +78,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		ScriptBundle scriptBundle = context.scriptBundle();
+		AssociatedScriptBundle scriptBundle = context.scriptBundle();
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
 			scriptBundle.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);

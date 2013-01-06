@@ -7,7 +7,7 @@ import java.util.Map;
 
 import jj.DateFormatHelper;
 import jj.jqmessage.JQueryMessage;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 import org.webbitserver.WebSocketConnection;
 import org.webbitserver.wrapper.WebSocketConnectionWrapper;
 
@@ -44,7 +44,7 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 		return data().get(IMMEDIATE_CLOSURE) == Boolean.TRUE;
 	}
 	
-	void scriptBundle(ScriptBundle scriptBundle) {
+	void scriptBundle(AssociatedScriptBundle scriptBundle) {
 		data().put(SCRIPT_BUNDLE, scriptBundle);
 	}
 	
@@ -52,8 +52,8 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 		return scriptBundle().baseName();
 	}
 	
-	public ScriptBundle scriptBundle() {
-		return (ScriptBundle)data().get(SCRIPT_BUNDLE);
+	public AssociatedScriptBundle scriptBundle() {
+		return (AssociatedScriptBundle)data().get(SCRIPT_BUNDLE);
 	}
 	
 	public Map<String, Object> clientStorage() {

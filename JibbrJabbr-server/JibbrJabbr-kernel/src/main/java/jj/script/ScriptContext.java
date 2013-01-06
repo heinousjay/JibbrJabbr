@@ -7,7 +7,7 @@ class ScriptContext {
 	
 	final ScriptContext previous;
 	
-	final ScriptBundle scriptBundle;
+	final AssociatedScriptBundle scriptBundle;
 	
 	final JJWebSocketConnection connection;
 	
@@ -15,7 +15,7 @@ class ScriptContext {
 	
 	ScriptContext(
 		final ScriptContext previous,
-		final ScriptBundle scriptBundle
+		final AssociatedScriptBundle scriptBundle
 	) {
 		this.previous = previous;
 		this.scriptBundle = scriptBundle;

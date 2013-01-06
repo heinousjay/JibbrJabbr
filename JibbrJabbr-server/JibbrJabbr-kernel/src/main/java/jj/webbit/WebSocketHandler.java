@@ -5,7 +5,7 @@ import jj.JJExecutors;
 import jj.hostapi.HostEvent;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessageException;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
 
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	public void onOpen(WebSocketConnection connection) {
 		
 		String uri = connection.httpRequest().uri().substring(1);
-		ScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
+		AssociatedScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
 		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, scriptBundle == null);
 		if (jjcon.immediateClosure()) {
 			log.info("connection attempted to an old script, attempting reload");

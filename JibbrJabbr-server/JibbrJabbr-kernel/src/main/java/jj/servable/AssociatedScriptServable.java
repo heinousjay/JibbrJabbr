@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 
 import jj.Configuration;
 import jj.resource.ScriptResource;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
@@ -40,7 +40,7 @@ class AssociatedScriptServable extends Servable {
 		return Rank.Middle;
 	}
 	
-	private ScriptResource typeFromBundle(ScriptBundle bundle, String typeSpec) {
+	private ScriptResource typeFromBundle(AssociatedScriptBundle bundle, String typeSpec) {
 		ScriptResource result = null;
 		if ("".equals(typeSpec)) {
 			result = bundle.clientScriptResource();
@@ -62,7 +62,7 @@ class AssociatedScriptServable extends Servable {
 			String type = uri.substring(firstDot, lastDot);
 			String suffix = uri.substring(lastDot);
 			if (".js".equals(suffix)) {
-				ScriptBundle scriptBundle = finder.forBaseNameAndKey(key);
+				AssociatedScriptBundle scriptBundle = finder.forBaseNameAndKey(key);
 				if (scriptBundle != null) {
 					result = typeFromBundle(scriptBundle, type);
 				}

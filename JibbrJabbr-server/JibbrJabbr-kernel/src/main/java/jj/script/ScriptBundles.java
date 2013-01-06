@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author jason
  *
  */
-class ScriptBundles extends ConcurrentHashMap<String, ScriptBundle> {
+class ScriptBundles extends ConcurrentHashMap<String, AssociatedScriptBundle> {
 
 	private static final long serialVersionUID = 1L;
 	

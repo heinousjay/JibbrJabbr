@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import jj.HttpControlThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 
 /**
  * 
@@ -54,7 +54,7 @@ public class WebSocketConnections {
 	private final ConcurrentHashMap<JJWebSocketConnection, Boolean> allConnections =
 		new ConcurrentHashMap<>(16, 0.75F, 2);
 	
-	private final ConcurrentHashMap<ScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> perScript =
+	private final ConcurrentHashMap<AssociatedScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> perScript =
 		new ConcurrentHashMap<>();
 		
 	public WebSocketConnections(final JJExecutors executors) {
@@ -90,7 +90,7 @@ public class WebSocketConnections {
 		}
 	}
 	
-	public Set<JJWebSocketConnection> forScript(ScriptBundle scriptBundle) {
+	public Set<JJWebSocketConnection> forScript(AssociatedScriptBundle scriptBundle) {
 		ConcurrentHashMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptBundle);		
 		return (connections != null) ? connections.keySet() : Collections.<JJWebSocketConnection>emptySet();
 	}

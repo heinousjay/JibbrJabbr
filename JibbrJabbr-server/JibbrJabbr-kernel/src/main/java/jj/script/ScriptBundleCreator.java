@@ -32,7 +32,7 @@ class ScriptBundleCreator {
 	}
 	
 	@ScriptThread
-	ScriptBundle createScriptBundle(
+	AssociatedScriptBundle createScriptBundle(
 		final ScriptResource clientScriptResource,
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource,
@@ -49,7 +49,7 @@ class ScriptBundleCreator {
 		Script serverScript = 
 			compile(scope, clientStubs, clientScriptResource, sharedScriptResource, serverScriptResource);
 		
-		return new ScriptBundle(
+		return new AssociatedScriptBundle(
 			clientScriptResource,
 			sharedScriptResource,
 			serverScriptResource,

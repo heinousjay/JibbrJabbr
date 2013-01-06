@@ -11,7 +11,7 @@ import jj.IOThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.ScriptThread;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 import jj.webbit.JJHttpRequest;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -68,11 +68,11 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		return documentRequest.httpRequest();
 	}
 	
-	public ScriptBundle scriptBundle() {
+	public AssociatedScriptBundle scriptBundle() {
 		return documentRequest.httpRequest().scriptBundle();
 	}
 	
-	public void scriptBundle(ScriptBundle scriptBundle) {
+	public void scriptBundle(AssociatedScriptBundle scriptBundle) {
 		documentRequest.httpRequest().scriptBundle(scriptBundle);
 	}
 	

@@ -38,7 +38,7 @@ class ContinuationCoordinator {
 	 * @param scriptBundle
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(ScriptBundle scriptBundle) {
+	ContinuationState execute(AssociatedScriptBundle scriptBundle) {
 		ScriptableObject.putConstProperty(scriptBundle.scope(), "scriptKey", scriptBundle.sha1());
 		try {
 			rhinoObjectCreator.context().executeScriptWithContinuations(
@@ -71,7 +71,7 @@ class ContinuationCoordinator {
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(ScriptBundle scriptBundle, String functionName, Object...args) {
+	ContinuationState execute(AssociatedScriptBundle scriptBundle, String functionName, Object...args) {
 		
 		Callable function = scriptBundle.getFunction(functionName);
 		if (function != null) {	
@@ -104,7 +104,7 @@ class ContinuationCoordinator {
 	 * @param result
 	 * @return
 	 */
-	ContinuationState resumeContinuation(final String pendingKey, final ScriptBundle scriptBundle, final Object result) {
+	ContinuationState resumeContinuation(final String pendingKey, final AssociatedScriptBundle scriptBundle, final Object result) {
 		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
 		
 		try {

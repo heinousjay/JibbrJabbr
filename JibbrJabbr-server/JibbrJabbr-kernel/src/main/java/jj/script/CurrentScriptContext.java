@@ -31,7 +31,7 @@ public class CurrentScriptContext {
 	 */
 	private static final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
 	
-	public ScriptBundle scriptBundle() {
+	public AssociatedScriptBundle scriptBundle() {
 		return currentContext.get().scriptBundle;
 	}
 	
@@ -55,7 +55,7 @@ public class CurrentScriptContext {
 		return currentContext.get().documentRequestProcessor.document();
 	}
 	
-	public void initialize(final ScriptBundle scriptBundle) {
+	public void initialize(final AssociatedScriptBundle scriptBundle) {
 		currentContext.set(new ScriptContext(currentContext.get(), scriptBundle));
 	}
 	

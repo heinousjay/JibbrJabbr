@@ -3,7 +3,7 @@ package jj.document;
 import jj.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.CurrentScriptContext;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,7 +28,7 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 		this.configuration = configuration;
 	}
 
-	private void addScript(Document document, ScriptBundle bundle, ScriptResource scriptResource) {
+	private void addScript(Document document, AssociatedScriptBundle bundle, ScriptResource scriptResource) {
 		if (scriptResource != null) {
 			addScript(document, "/" + bundle.toUri() + scriptResource.type().suffix());
 		}
@@ -51,7 +51,7 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	@Override
 	public void filter(final DocumentRequest documentRequest) {
-		ScriptBundle scriptBundle = context.scriptBundle();
+		AssociatedScriptBundle scriptBundle = context.scriptBundle();
 		if (scriptBundle != null) {
 			addScript(documentRequest.document(), JQUERY_URI);
 			

@@ -1,6 +1,6 @@
 package jj.document;
 
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 
@@ -10,8 +10,8 @@ public interface DocumentRequestProcessor extends RequestProcessor {
 
 	JJHttpRequest httpRequest();
 	
-	ScriptBundle scriptBundle();
-	void scriptBundle(ScriptBundle scriptBundle);
+	AssociatedScriptBundle scriptBundle();
+	void scriptBundle(AssociatedScriptBundle scriptBundle);
 
 	Document document();
 	

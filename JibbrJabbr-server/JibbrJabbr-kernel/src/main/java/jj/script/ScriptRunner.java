@@ -106,7 +106,7 @@ public class ScriptRunner {
 	
 	@ScriptThread
 	private void executeReadyFunction() {
-		ScriptBundle scriptBundle = context.scriptBundle(); 
+		AssociatedScriptBundle scriptBundle = context.scriptBundle(); 
 		Callable ready = scriptBundle.getFunction(READY_FUNCTION_KEY);
 		if (ready == null) {
 			// TODO smarter exception here!
@@ -156,7 +156,7 @@ public class ScriptRunner {
 				
 				log.trace("preparing to execute document request {}", baseName);
 				
-				ScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName);
+				AssociatedScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName);
 				if (scriptBundle == null) {
 					try {
 						context.initialize(documentRequestProcessor);

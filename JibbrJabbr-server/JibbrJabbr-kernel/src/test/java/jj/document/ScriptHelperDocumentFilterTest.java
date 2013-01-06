@@ -14,7 +14,7 @@ import jj.jqmessage.JQueryMessage;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
 import jj.script.CurrentScriptContext;
-import jj.script.ScriptBundle;
+import jj.script.AssociatedScriptBundle;
 import jj.webbit.JJHttpRequest;
 
 import org.jsoup.Jsoup;
@@ -32,7 +32,7 @@ public class ScriptHelperDocumentFilterTest {
 	String socketUri;
 	String webSocketUri;
 	@Mock Configuration configuration;
-	@Mock ScriptBundle scriptBundle;
+	@Mock AssociatedScriptBundle scriptBundle;
 	@Mock CurrentScriptContext context;
 	@Mock ScriptResource scriptResource;
 	@Mock JJHttpRequest httpRequest;
