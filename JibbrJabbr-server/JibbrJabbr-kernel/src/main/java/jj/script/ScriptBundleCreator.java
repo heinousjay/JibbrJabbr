@@ -34,6 +34,16 @@ class ScriptBundleCreator {
 		this.rhinoObjectCreator = rhinoObjectCreator;
 	}
 	
+	/**
+	 * create a module script bundle named by the given moduleIdentifier and
+	 * associated solely to the associated script named by the given baseName
+	 * 
+	 * @param scriptResource the loaded script resource
+	 * @param moduleIdentifier the resolved module identifier
+	 * @param baseName the baseName of the associated script that is including
+	 * this module
+	 * @return
+	 */
 	@ScriptThread
 	ModuleScriptBundle createScriptBundle(
 		final ScriptResource scriptResource,
@@ -219,6 +229,7 @@ class ScriptBundleCreator {
 		Context context = rhinoObjectCreator.context();
 		
 		try {
+			log.debug("compiling module script");
 			return context.compileString(scriptResource.script(), scriptResource.path().toString(), 1, null);
 		} finally {
 			Context.exit();
