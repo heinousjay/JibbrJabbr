@@ -72,7 +72,13 @@ class ScriptBundleHelper {
 	 */
 	@ScriptThread
 	public AssociatedScriptBundle scriptBundleFor(final String baseName) {
-		AssociatedScriptBundle candidate = scriptBundles.get(baseName);
+		
+		ScriptBundle scriptBundle = scriptBundles.get(baseName);
+		AssociatedScriptBundle candidate = 
+			scriptBundle instanceof AssociatedScriptBundle ? 
+				(AssociatedScriptBundle)scriptBundle :
+				null;
+				
 		if (candidate != null) {
 			if (isObselete(candidate)) {
 				AssociatedScriptBundle next = creator.createScriptBundle(
@@ -81,11 +87,10 @@ class ScriptBundleHelper {
 					serverScript(baseName), 
 					baseName
 				);
+				
 				if (!scriptBundles.replace(baseName, candidate, next)) {
 					throw new AssertionError("multiple threads are attempting to manipulate a single script bundle");
 				}
-				
-				
 				
 				candidate = next;
 			}

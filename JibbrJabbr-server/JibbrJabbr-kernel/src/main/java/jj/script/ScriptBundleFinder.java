@@ -25,8 +25,8 @@ public class ScriptBundleFinder {
 	}
 	
 	private AssociatedScriptBundle forBaseNameAndKey(String baseName, String key) {
-		AssociatedScriptBundle found = null;
-		AssociatedScriptBundle scriptBundle = scriptBundles.get(baseName);
+		ScriptBundle found = null;
+		ScriptBundle scriptBundle = scriptBundles.get(baseName);
 		while (scriptBundle != null && found == null) {
 			if (scriptBundle.sha1().equals(key)) {
 				found = scriptBundle;
@@ -34,7 +34,7 @@ public class ScriptBundleFinder {
 				found = null;
 			}
 		}
-		return found;
+		return found instanceof AssociatedScriptBundle ? (AssociatedScriptBundle)found : null;
 	}
 
 	public AssociatedScriptBundle forSocketUri(String socketUri) {
@@ -48,13 +48,13 @@ public class ScriptBundleFinder {
 	}
 	
 	public AssociatedScriptBundle forSocketUriBaseName(String socketUri) {
-		AssociatedScriptBundle found = null;
+		ScriptBundle found = null;
 		Matcher matcher = SOCKET.matcher(socketUri);
 		if (matcher.matches()) {
 			String baseName = matcher.group(1);
 			found = scriptBundles.get(baseName);
 		}
-		return found;
+		return found instanceof AssociatedScriptBundle ? (AssociatedScriptBundle)found : null;
 	}
 	
 }
