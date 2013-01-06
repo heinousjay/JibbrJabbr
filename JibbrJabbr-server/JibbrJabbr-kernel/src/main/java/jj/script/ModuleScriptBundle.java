@@ -29,7 +29,11 @@ import org.mozilla.javascript.Scriptable;
  * @author jason
  *
  */
-class ModuleScriptBundle implements ScriptBundle {
+public class ModuleScriptBundle implements ScriptBundle {
+	
+	public static String makeKey(final String baseName, final String moduleIdentifier) {
+		return baseName + ":" + moduleIdentifier;
+	}
 	
 	private final ScriptResource scriptResource;
 	private final Scriptable local;

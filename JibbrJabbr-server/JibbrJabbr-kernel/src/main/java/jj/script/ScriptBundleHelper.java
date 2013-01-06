@@ -128,13 +128,9 @@ class ScriptBundleHelper {
 		return newBundle;
 	}
 	
-	private String makeKey(final String baseName, final String moduleIdentifier) {
-		return baseName + ":" + moduleIdentifier;
-	}
-	
 	@ScriptThread
 	public ModuleScriptBundle scriptBundleFor(final String baseName, final String moduleIdentifier) {
-		final String key = makeKey(baseName, moduleIdentifier);
+		final String key = ModuleScriptBundle.makeKey(baseName, moduleIdentifier);
 		
 		ScriptBundle scriptBundle = scriptBundles.get(key);
 		ModuleScriptBundle candidate = 
