@@ -148,6 +148,9 @@ class ScriptBundleCreator {
 		    
 		    // setting up the 'module' property as described in 
 		    // the commonjs module 1.1.1 specification
+		    // in the case of the top-level server script, the id
+		    // will be the baseName, which fortunately happens to be
+		    // exactly what is required
 		    Scriptable module = context.newObject(local);
 		    ScriptableObject.defineProperty(module, "id", moduleIdentifier, ScriptableObject.CONST);
 		    ScriptableObject.defineProperty(local, "module", module, ScriptableObject.CONST);
