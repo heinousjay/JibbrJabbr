@@ -46,7 +46,7 @@ public class CurrentScriptContext {
 	}
 	
 	public String baseName() {
-		return associatedScriptBundle().baseName();
+		return scriptBundle().baseName();
 	}
 	
 	public JJWebSocketConnection connection() {
@@ -208,6 +208,6 @@ public class CurrentScriptContext {
 		if (connection() != null) {
 			connection().end();
 		}
-		currentContext.set(currentContext.get().previous);
+		currentContext.set(currentContext.get().parent);
 	}
 }

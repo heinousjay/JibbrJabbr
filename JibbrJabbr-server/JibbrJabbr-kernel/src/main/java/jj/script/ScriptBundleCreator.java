@@ -37,13 +37,13 @@ class ScriptBundleCreator {
 	@ScriptThread
 	ModuleScriptBundle createScriptBundle(
 		final ScriptResource scriptResource,
-		final AssociatedScriptBundle parent,
+		final String moduleIdentifier,
 		final String baseName
 	) {
 		
 		log.debug("creating module script bundle");
 		
-		Scriptable local = createLocalScope();
+		Scriptable local = createLocalScope(moduleIdentifier);
 		Scriptable exports;
 		try {
 			exports = rhinoObjectCreator.context().newObject(local);
@@ -55,7 +55,7 @@ class ScriptBundleCreator {
 		Script script = compile(local, scriptResource);
 		
 		
-		return new ModuleScriptBundle(scriptResource, local, script, exports, baseName);
+		return new ModuleScriptBundle(scriptResource, local, script, exports, moduleIdentifier, baseName);
 	}
 	
 	@ScriptThread
@@ -72,7 +72,7 @@ class ScriptBundleCreator {
 		log.debug("creating associated script bundle");
 		
 		String clientStubs = extractStubs(clientScriptResource != null ? clientScriptResource.script() : "");
-		Scriptable scope = createLocalScope();
+		Scriptable scope = createLocalScope(baseName);
 		Script serverScript = 
 			compile(scope, clientStubs, clientScriptResource, sharedScriptResource, serverScriptResource);
 		
@@ -93,8 +93,6 @@ class ScriptBundleCreator {
 	
 	@ScriptThread
 	private String extractStubs(String clientScript) {
-		// keyed signature to whether this needs a return (ie continuation)
-		// this will be global and named better of course
 		StringBuilder stubs = new StringBuilder();
 		final String[] lines = COUNT_PATTERN.split(clientScript);
 		Matcher lastMatcher = null;
@@ -131,13 +129,18 @@ class ScriptBundleCreator {
 		return stubs.toString();
 	}
 	
-	@ScriptThread
-	private Scriptable createLocalScope() {
+	private Scriptable createLocalScope(final String moduleIdentifier) {
 		Context context = rhinoObjectCreator.context();
 		try { 
 			Scriptable local = context.newObject(rhinoObjectCreator.global());
 			local.setPrototype(rhinoObjectCreator.global());
 		    local.setParentScope(null);
+		    
+		    // setting up the 'module' property as described in 
+		    // the commonjs module 1.1.1 specification
+		    Scriptable module = context.newObject(local);
+		    ScriptableObject.defineProperty(module, "id", moduleIdentifier, ScriptableObject.CONST);
+		    ScriptableObject.defineProperty(local, "module", module, ScriptableObject.CONST);
 		    
 		    return local;
 		} finally {

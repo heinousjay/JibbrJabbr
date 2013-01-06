@@ -5,7 +5,7 @@ import jj.webbit.JJWebSocketConnection;
 
 class ScriptContext {
 	
-	final ScriptContext previous;
+	final ScriptContext parent;
 	
 	final AssociatedScriptBundle associatedScriptBundle;
 	
@@ -16,10 +16,10 @@ class ScriptContext {
 	final DocumentRequestProcessor documentRequestProcessor;
 	
 	ScriptContext(
-		final ScriptContext previous,
+		final ScriptContext parent,
 		final ModuleScriptBundle moduleScriptBundle
 	) {
-		this.previous = previous;
+		this.parent = parent;
 		this.moduleScriptBundle = moduleScriptBundle;
 
 		this.associatedScriptBundle = null;
@@ -28,10 +28,10 @@ class ScriptContext {
 	}
 	
 	ScriptContext(
-		final ScriptContext previous,
+		final ScriptContext parent,
 		final AssociatedScriptBundle associatedScriptBundle
 	) {
-		this.previous = previous;
+		this.parent = parent;
 		this.associatedScriptBundle = associatedScriptBundle;
 
 		this.connection = null;
@@ -40,10 +40,10 @@ class ScriptContext {
 	}
 	
 	ScriptContext( 
-		final ScriptContext previous,
+		final ScriptContext parent,
 		final JJWebSocketConnection connection
 	) {
-		this.previous = previous;
+		this.parent = parent;
 		this.connection = connection;
 		this.associatedScriptBundle = connection.associatedScriptBundle();
 		
@@ -52,10 +52,10 @@ class ScriptContext {
 	}
 	
 	ScriptContext( 
-		final ScriptContext previous,
+		final ScriptContext parent,
 		final DocumentRequestProcessor documentRequestProcessor
 	) {
-		this.previous = previous;
+		this.parent = parent;
 		this.documentRequestProcessor = documentRequestProcessor;
 		this.associatedScriptBundle = documentRequestProcessor.associatedScriptBundle();
 		

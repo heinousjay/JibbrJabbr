@@ -35,6 +35,7 @@ class ModuleScriptBundle implements ScriptBundle {
 	private final Scriptable local;
 	private final Script script;
 	private final Scriptable exports;
+	private final String moduleIdentifier;
 	private final String baseName;
 	
 	private boolean initialized = false;
@@ -44,12 +45,14 @@ class ModuleScriptBundle implements ScriptBundle {
 		final Scriptable local,
 		final Script script,
 		final Scriptable exports,
+		final String moduleIdentifier,
 		final String baseName
 	) {
 		this.scriptResource = scriptResource;
 		this.local = local;
 		this.script = script;
 		this.exports = exports;
+		this.moduleIdentifier = moduleIdentifier;
 		this.baseName = baseName;
 	}
 
@@ -68,6 +71,10 @@ class ModuleScriptBundle implements ScriptBundle {
 		return scriptResource.sha1();
 	}
 
+	public String moduleIdentifier() {
+		return moduleIdentifier;
+	}
+	
 	@Override
 	public String baseName() {
 		return baseName;

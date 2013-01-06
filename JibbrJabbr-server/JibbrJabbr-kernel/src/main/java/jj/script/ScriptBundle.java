@@ -30,8 +30,8 @@ public interface ScriptBundle {
 
 	String sha1();
 
-	String baseName();
-
 	boolean initialized();
+	
+	String baseName();
 
 }

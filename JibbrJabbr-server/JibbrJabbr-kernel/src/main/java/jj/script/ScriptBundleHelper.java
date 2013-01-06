@@ -42,6 +42,10 @@ class ScriptBundleHelper {
 		this.creator = creator;
 	}
 	
+	private ScriptResource moduleScript(final String moduleIdentifier) {
+		return finder.findResource(ScriptResource.class, moduleIdentifier, ScriptResourceType.Module);
+	}
+	
 	private ScriptResource clientScript(final String baseName) {
 		return finder.findResource(ScriptResource.class, baseName, ScriptResourceType.Client);
 	}
@@ -62,6 +66,11 @@ class ScriptBundleHelper {
 		return (scriptBundle.clientScriptResource() != clientScript(baseName)) ||
 			(scriptBundle.sharedScriptResource() != sharedScript(baseName)) ||
 			(scriptBundle.serverScriptResource() != serverScript(baseName));
+	}
+	
+	public boolean isObselete(final ModuleScriptBundle scriptBundle) {
+		return scriptBundle.scriptResource() != 
+			finder.findResource(scriptBundle.scriptResource());
 	}
 	
 	/**
@@ -113,6 +122,51 @@ class ScriptBundleHelper {
 		);
 		
 		if (newBundle != null && scriptBundles.putIfAbsent(baseName, newBundle) != null) {
+			throw new AssertionError("multiple threads are attempting to manipulate a single script bundle");
+		}
+		
+		return newBundle;
+	}
+	
+	private String makeKey(final String baseName, final String moduleIdentifier) {
+		return baseName + ":" + moduleIdentifier;
+	}
+	
+	@ScriptThread
+	public ModuleScriptBundle scriptBundleFor(final String baseName, final String moduleIdentifier) {
+		final String key = makeKey(baseName, moduleIdentifier);
+		
+		ScriptBundle scriptBundle = scriptBundles.get(key);
+		ModuleScriptBundle candidate = 
+			scriptBundle instanceof ModuleScriptBundle ? 
+				(ModuleScriptBundle)scriptBundle :
+				null;
+		
+		if (candidate != null && moduleScript(moduleIdentifier) != null) {
+			if (isObselete(candidate)) {
+				ModuleScriptBundle newBundle = creator.createScriptBundle(moduleScript(moduleIdentifier), moduleIdentifier, baseName);
+				
+				if (!scriptBundles.replace(key, candidate, newBundle)) {
+					throw new AssertionError("multiple threads are attempting to manipulate a single script bundle");
+				}
+				
+				candidate = newBundle;
+			}
+		} else {
+			candidate = newScriptBundleFor(key, baseName, moduleIdentifier);
+		}
+		
+		return candidate;
+	}
+	
+	@ScriptThread
+	private ModuleScriptBundle newScriptBundleFor(final String key, final String baseName, final String moduleIdentifier) {
+		
+		ScriptResource script = moduleScript(moduleIdentifier);
+		
+		ModuleScriptBundle newBundle = creator.createScriptBundle(script, moduleIdentifier, baseName);
+		
+		if (newBundle != null && scriptBundles.putIfAbsent(key, newBundle) != null) {
 			throw new AssertionError("multiple threads are attempting to manipulate a single script bundle");
 		}
 		

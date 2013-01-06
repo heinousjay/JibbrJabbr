@@ -1,6 +1,11 @@
 package jj.resource;
 
 public enum ScriptResourceType {
+	Module {
+		public String suffix() {
+			return ".js";
+		}
+	},
 	Client {
 		public String suffix() {
 			return ".js";
