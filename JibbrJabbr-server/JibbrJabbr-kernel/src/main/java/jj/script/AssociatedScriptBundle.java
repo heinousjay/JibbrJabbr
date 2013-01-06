@@ -105,7 +105,6 @@ public class AssociatedScriptBundle implements ScriptBundle {
 		return initialized;
 	}
 
-	@Override
 	public void initialized(boolean initialized) {
 		this.initialized = initialized || this.initialized;
 	}
