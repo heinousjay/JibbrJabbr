@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import jj.Configuration;
-import jj.script.ScriptBundleFinder;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 
