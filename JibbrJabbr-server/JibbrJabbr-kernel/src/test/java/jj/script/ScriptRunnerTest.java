@@ -132,6 +132,7 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringInitialization() {
 		
 		// given
+		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
 		given(continuationCoordinator.execute(associatedScriptBundle)).willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		givenADocumentRequest();
@@ -161,6 +162,7 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringReadyFunction() {
 		
 		// given
+		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
 		given(continuationCoordinator.execute(associatedScriptBundle, ScriptRunner.READY_FUNCTION_KEY))
 			.willReturn(continuationState);
 		
@@ -217,6 +219,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		givenAWebSocketMessage();
+		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		given(continuationCoordinator.execute(associatedScriptBundle, HostEvent.clientConnected.toString(), connection)).willReturn(continuationState);
 		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
@@ -262,6 +265,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		givenAWebSocketMessage();
+		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
 		JQueryMessage jwm = MessageMaker.makeEvent("jason", "miller");
 		String eventName = EventNameHelper.makeEventName(jwm);
 		given(continuationState.type()).willReturn(ContinuationType.JQueryMessage);
