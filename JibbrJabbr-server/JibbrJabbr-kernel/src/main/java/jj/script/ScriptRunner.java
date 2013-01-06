@@ -299,7 +299,7 @@ public class ScriptRunner {
 	void restartAfterContinuation(String pendingKey, Object result) {
 		
 		assert scriptExecutorFactory.isScriptThread() : "attempting to restart a continuation from the wrong thread";
-		assert context.associatedScriptBundle() != null : "attempting to restart a continuation without a script context in place";
+		assert context.scriptBundle() != null : "attempting to restart a continuation without a script context in place";
 		
 		log.trace("restarting a continuation at {} with {}", pendingKey, result);
 		
