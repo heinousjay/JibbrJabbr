@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +24,38 @@ import jj.resource.ScriptResource;
  */
 class ScriptBundleCreator {
 	
+	private static final String EXPORTS = "exports";
+	
 	private final Logger log = LoggerFactory.getLogger(ScriptBundleCreator.class);
 	
 	private final RhinoObjectCreator rhinoObjectCreator;
 
 	ScriptBundleCreator(final RhinoObjectCreator rhinoObjectCreator) {
 		this.rhinoObjectCreator = rhinoObjectCreator;
+	}
+	
+	@ScriptThread
+	ModuleScriptBundle createScriptBundle(
+		final ScriptResource scriptResource,
+		final AssociatedScriptBundle parent,
+		final String baseName
+	) {
+		
+		log.debug("creating module script bundle");
+		
+		Scriptable local = createLocalScope();
+		Scriptable exports;
+		try {
+			exports = rhinoObjectCreator.context().newObject(local);
+			ScriptableObject.defineProperty(local, EXPORTS, exports, ScriptableObject.CONST);
+		} finally {
+			Context.exit();
+		}
+		
+		Script script = compile(local, scriptResource);
+		
+		
+		return new ModuleScriptBundle(scriptResource, local, script, exports, baseName);
 	}
 	
 	@ScriptThread
@@ -42,7 +69,7 @@ class ScriptBundleCreator {
 			throw new IllegalArgumentException("null server script, nothing to do!");
 		}
 		
-		log.debug("creating script bundle");
+		log.debug("creating associated script bundle");
 		
 		String clientStubs = extractStubs(clientScriptResource != null ? clientScriptResource.script() : "");
 		Scriptable scope = createLocalScope();
@@ -175,6 +202,21 @@ class ScriptBundleCreator {
 	    		null
 	    	);
 		    
+		} finally {
+			Context.exit();
+		}
+	}
+	
+	@ScriptThread
+	private Script compile(
+		final Scriptable local,
+		final ScriptResource scriptResource
+	) {
+		
+		Context context = rhinoObjectCreator.context();
+		
+		try {
+			return context.compileString(scriptResource.script(), scriptResource.path().toString(), 1, null);
 		} finally {
 			Context.exit();
 		}
