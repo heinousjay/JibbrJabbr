@@ -31,6 +31,16 @@ public class CurrentScriptContext {
 	 */
 	private static final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
 	
+	public ScriptBundle scriptBundle() {
+		return moduleScriptBundle() != null ?
+			moduleScriptBundle() :
+			associatedScriptBundle();
+	}
+	
+	public ModuleScriptBundle moduleScriptBundle() {
+		return currentContext.get().moduleScriptBundle;
+	}
+	
 	public AssociatedScriptBundle associatedScriptBundle() {
 		return currentContext.get().associatedScriptBundle;
 	}
@@ -55,8 +65,12 @@ public class CurrentScriptContext {
 		return currentContext.get().documentRequestProcessor.document();
 	}
 	
-	public void initialize(final AssociatedScriptBundle scriptBundle) {
-		currentContext.set(new ScriptContext(currentContext.get(), scriptBundle));
+	public void initialize(final ModuleScriptBundle moduleScriptBundle) {
+		currentContext.set(new ScriptContext(currentContext.get(), moduleScriptBundle));
+	}
+	
+	public void initialize(final AssociatedScriptBundle associatedScriptBundle) {
+		currentContext.set(new ScriptContext(currentContext.get(), associatedScriptBundle));
 	}
 	
 	public void initialize(final JJWebSocketConnection connection) {
@@ -72,12 +86,9 @@ public class CurrentScriptContext {
 	}
 	
 	public void restore(ScriptContext scriptContext) {
-		if (currentContext.get() != null) {
-			throw new AssertionError("restoring a context on top of another context");
-		}
+		assert currentContext.get() == null : "cannot restore a context on top of another context";
 		currentContext.set(scriptContext);
 	}
-	
 	
 	private static final String PENDING_KEY = "pending continuation [%s]";
 

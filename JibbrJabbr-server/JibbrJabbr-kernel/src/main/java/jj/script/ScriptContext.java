@@ -9,9 +9,23 @@ class ScriptContext {
 	
 	final AssociatedScriptBundle associatedScriptBundle;
 	
+	final ModuleScriptBundle moduleScriptBundle;
+	
 	final JJWebSocketConnection connection;
 	
 	final DocumentRequestProcessor documentRequestProcessor;
+	
+	ScriptContext(
+		final ScriptContext previous,
+		final ModuleScriptBundle moduleScriptBundle
+	) {
+		this.previous = previous;
+		this.moduleScriptBundle = moduleScriptBundle;
+
+		this.associatedScriptBundle = null;
+		this.connection = null;
+		this.documentRequestProcessor = null;
+	}
 	
 	ScriptContext(
 		final ScriptContext previous,
@@ -22,6 +36,7 @@ class ScriptContext {
 
 		this.connection = null;
 		this.documentRequestProcessor = null;
+		this.moduleScriptBundle = null;
 	}
 	
 	ScriptContext( 
@@ -33,6 +48,7 @@ class ScriptContext {
 		this.associatedScriptBundle = connection.associatedScriptBundle();
 		
 		this.documentRequestProcessor = null;
+		this.moduleScriptBundle = null;
 	}
 	
 	ScriptContext( 
@@ -44,5 +60,6 @@ class ScriptContext {
 		this.associatedScriptBundle = documentRequestProcessor.associatedScriptBundle();
 		
 		this.connection = null;
+		this.moduleScriptBundle = null;
 	}
 }
