@@ -85,4 +85,8 @@ class ModuleScriptBundle implements ScriptBundle {
 	public Scriptable exports() {
 		return exports;
 	}
+	
+	public ScriptResource scriptResource() {
+		return scriptResource;
+	}
 }
