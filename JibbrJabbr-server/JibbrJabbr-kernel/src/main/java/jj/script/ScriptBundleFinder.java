@@ -14,6 +14,12 @@ public class ScriptBundleFinder {
 		this.scriptBundles = scriptBundles;
 	}
 	
+	public ModuleScriptBundle forBaseNameAndModuleIdenfier(final String baseName, final String moduleIdentifier) {
+		String key = ModuleScriptBundle.makeKey(baseName, moduleIdentifier);
+		ScriptBundle found = scriptBundles.get(key);
+		return found instanceof ModuleScriptBundle ? (ModuleScriptBundle)found : null;
+	}
+	
 	public AssociatedScriptBundle forBaseNameAndKey(String combinedKey) {
 		AssociatedScriptBundle found = null;
 		Matcher matcher = KEY_SPLITTER.matcher(combinedKey);
