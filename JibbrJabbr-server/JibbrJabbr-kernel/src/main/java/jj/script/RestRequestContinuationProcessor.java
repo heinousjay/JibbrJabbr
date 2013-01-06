@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJExecutors;
 import jj.JJRunnable;
-import jj.continuation.RestRequest;
+import jj.script.continuation.RestRequest;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;

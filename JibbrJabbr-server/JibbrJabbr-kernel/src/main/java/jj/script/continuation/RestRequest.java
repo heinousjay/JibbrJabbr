@@ -1,4 +1,4 @@
-package jj.continuation;
+package jj.script.continuation;
 
 import jj.Sequence;
 
