@@ -31,6 +31,10 @@ public class CurrentScriptContext {
 	 */
 	private static final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
 	
+	public ScriptContextType type() {
+		return currentContext.get().type;
+	}
+	
 	public ScriptBundle scriptBundle() {
 		return moduleScriptBundle() != null ?
 			moduleScriptBundle() :
