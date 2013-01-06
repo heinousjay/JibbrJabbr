@@ -24,8 +24,6 @@ import org.mozilla.javascript.Scriptable;
  */
 public interface ScriptBundle {
 
-	//boolean needsReplacing() throws IOException;
-
 	Scriptable scope();
 
 	Script script();
