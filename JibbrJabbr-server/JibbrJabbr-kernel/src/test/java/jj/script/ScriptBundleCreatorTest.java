@@ -86,7 +86,7 @@ public class ScriptBundleCreatorTest {
 		Path path = Paths.get(JJ.uri(ScriptBundleCreatorTest.class));
 		
 		// for now, this serves as a basic test of the module API
-		given(moduleScriptResource.script()).willReturn("exports.hi = function() { return module.id };");
+		given(moduleScriptResource.script()).willReturn("var id = module.id; exports.hi = function() { return id };");
 		given(moduleScriptResource.path()).willReturn(path);
 		
 		// when
@@ -96,11 +96,10 @@ public class ScriptBundleCreatorTest {
 		assertThat(result, is(notNullValue()));
 		assertThat(result.exports(), is(notNullValue()));
 		
-		
-		// TODO put the remainder of this in the right test. but it's useful for now
-		
-		// when we execute that script - not strictly related to this test but it verifies we put the exports in the right
-		// place
+		// when
+		// we execute the script - seemingly not related to this test
+		// but it verifies we put the exports and module objects in
+		// the right place, which is a responsibility of the creator
 		Context cx = Context.enter();
 		try {
 			result.script().exec(cx, result.scope());
@@ -115,7 +114,7 @@ public class ScriptBundleCreatorTest {
 		Object moduleId;
 		cx = Context.enter();
 		try {
-			moduleId = hiFunc.call(cx, result.scope(), global, new Object[0]);
+			moduleId = hiFunc.call(cx, global, global, new Object[0]);
 		} finally {
 			Context.exit();
 		}
