@@ -1,12 +1,10 @@
 package jj.script;
 
-import java.io.IOException;
 import java.util.HashMap;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
-import jj.IOThread;
 import jj.SHA1Helper;
 import jj.resource.ScriptResource;
 
@@ -72,14 +70,6 @@ public class AssociatedScriptBundle implements ScriptBundle {
 
 	public ScriptResource serverScriptResource() {
 		return serverScriptResource;
-	}
-
-	@Override
-	@IOThread
-	public boolean needsReplacing() throws IOException {
-		return (clientScriptResource != null && clientScriptResource.needsReplacing()) ||
-			   (sharedScriptResource != null && sharedScriptResource.needsReplacing()) ||
-			   (serverScriptResource != null && serverScriptResource.needsReplacing());
 	}
 
 	@Override

@@ -15,8 +15,6 @@
  */
 package jj.script;
 
-import java.io.IOException;
-
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
@@ -26,7 +24,7 @@ import org.mozilla.javascript.Scriptable;
  */
 public interface ScriptBundle {
 
-	boolean needsReplacing() throws IOException;
+	//boolean needsReplacing() throws IOException;
 
 	Scriptable scope();
 
