@@ -65,19 +65,19 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		log.debug("preparing to broadcast for {}", context.scriptBundle());
+		log.debug("preparing to broadcast for {}", context.associatedScriptBundle());
 		
-		Set<JJWebSocketConnection> connectionSet = connections.forScript(context.scriptBundle());
+		Set<JJWebSocketConnection> connectionSet = connections.forScript(context.associatedScriptBundle());
 		
 		log.debug("connections are {}", connectionSet);
 		
 		ScriptableObject.putProperty(
-			context.scriptBundle().scope(),
+			context.associatedScriptBundle().scope(),
 			PROP_CURRENT_ITERATOR,
 			connectionSet.iterator()
 		);
 		ScriptableObject.putProperty(
-			context.scriptBundle().scope(),
+			context.associatedScriptBundle().scope(),
 			PROP_ITERATOR_NEEDS_FINISH,
 			Boolean.FALSE
 		);

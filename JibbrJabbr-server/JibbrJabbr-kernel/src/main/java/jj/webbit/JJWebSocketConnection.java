@@ -14,7 +14,7 @@ import org.webbitserver.wrapper.WebSocketConnectionWrapper;
 
 public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	
-	private static final String SCRIPT_BUNDLE = "script bundle";
+	private static final String ASSOCIATED_SCRIPT_BUNDLE = "associated script bundle";
 	
 	private static final String IMMEDIATE_CLOSURE = "immediate closure";
 	
@@ -45,16 +45,16 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 		return data().get(IMMEDIATE_CLOSURE) == Boolean.TRUE;
 	}
 	
-	void scriptBundle(AssociatedScriptBundle scriptBundle) {
-		data().put(SCRIPT_BUNDLE, scriptBundle);
+	void scriptBundle(AssociatedScriptBundle associatedScriptBundle) {
+		data().put(ASSOCIATED_SCRIPT_BUNDLE, associatedScriptBundle);
 	}
 	
 	public String baseName() {
-		return scriptBundle().baseName();
+		return associatedScriptBundle().baseName();
 	}
 	
-	public AssociatedScriptBundle scriptBundle() {
-		return (AssociatedScriptBundle)data().get(SCRIPT_BUNDLE);
+	public AssociatedScriptBundle associatedScriptBundle() {
+		return (AssociatedScriptBundle)data().get(ASSOCIATED_SCRIPT_BUNDLE);
 	}
 	
 	public Map<String, Object> clientStorage() {

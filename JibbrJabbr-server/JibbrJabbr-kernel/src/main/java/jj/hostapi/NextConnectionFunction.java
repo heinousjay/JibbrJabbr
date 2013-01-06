@@ -66,16 +66,16 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		Object obj = context.scriptBundle().scope().get(PROP_CURRENT_ITERATOR, scope);
+		Object obj = context.associatedScriptBundle().scope().get(PROP_CURRENT_ITERATOR, scope);
 		if (!(obj instanceof Iterator<?>)) {
 			// something really went wrong up in here
-			log.error("broadcast attempted but the current iterator does not exist for script bundle {}", context.scriptBundle());
+			log.error("broadcast attempted but the current iterator does not exist for script bundle {}", context.associatedScriptBundle());
 			throw new AssertionError("NextConnectionFunction called with no iterator.  something crossed up?");
 		}
 		
 		@SuppressWarnings("unchecked")
 		Iterator<JJWebSocketConnection> iterator = (Iterator<JJWebSocketConnection>)obj;
-		Boolean needsFinish = (Boolean)context.scriptBundle().scope().get(PROP_ITERATOR_NEEDS_FINISH, scope);
+		Boolean needsFinish = (Boolean)context.associatedScriptBundle().scope().get(PROP_ITERATOR_NEEDS_FINISH, scope);
 		
 		if (needsFinish != null && needsFinish) {
 			context.end();
@@ -90,13 +90,13 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 		if (next != null) {
 			context.initialize(next);
 			ScriptableObject.putProperty(
-				context.scriptBundle().scope(),
+				context.associatedScriptBundle().scope(),
 				PROP_ITERATOR_NEEDS_FINISH,
 				Boolean.TRUE
 			);
 		} else {
-			context.scriptBundle().scope().delete(PROP_CURRENT_ITERATOR);
-			context.scriptBundle().scope().delete(PROP_ITERATOR_NEEDS_FINISH);
+			context.associatedScriptBundle().scope().delete(PROP_CURRENT_ITERATOR);
+			context.associatedScriptBundle().scope().delete(PROP_ITERATOR_NEEDS_FINISH);
 		}
 		
 		return next != null;

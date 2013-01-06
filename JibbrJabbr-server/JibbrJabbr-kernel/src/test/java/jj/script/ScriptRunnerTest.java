@@ -31,7 +31,7 @@ public class ScriptRunnerTest {
 	
 	Document document;
 	
-	@Mock AssociatedScriptBundle scriptBundle;
+	@Mock AssociatedScriptBundle associatedScriptBundle;
 		
 	@Mock ScriptResource scriptResource;
 	
@@ -64,9 +64,9 @@ public class ScriptRunnerTest {
 	@Before
 	public void before() {
 		
-		when(scriptBundleHelper.scriptBundleFor(baseName)).thenReturn(scriptBundle);
+		when(scriptBundleHelper.scriptBundleFor(baseName)).thenReturn(associatedScriptBundle);
 		
-		when(currentScriptContext.scriptBundle()).thenReturn(scriptBundle);
+		when(currentScriptContext.associatedScriptBundle()).thenReturn(associatedScriptBundle);
 		
 		executor = new DeterministicScheduler();
 		when(scriptExecutorFactory.executorFor(baseName)).thenReturn(executor);
@@ -88,7 +88,7 @@ public class ScriptRunnerTest {
 		when(documentRequestProcessor.document()).thenReturn(document);
 		
 		
-		when(scriptBundle.getFunction(ScriptRunner.READY_FUNCTION_KEY)).thenReturn(readyFunction);
+		when(associatedScriptBundle.getFunction(ScriptRunner.READY_FUNCTION_KEY)).thenReturn(readyFunction);
 	}
 	
 	private void givenADocumentRequest() {
@@ -132,7 +132,7 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringInitialization() {
 		
 		// given
-		given(continuationCoordinator.execute(scriptBundle)).willReturn(continuationState);
+		given(continuationCoordinator.execute(associatedScriptBundle)).willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		givenADocumentRequest();
 		
@@ -161,10 +161,10 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringReadyFunction() {
 		
 		// given
-		given(continuationCoordinator.execute(scriptBundle, ScriptRunner.READY_FUNCTION_KEY))
+		given(continuationCoordinator.execute(associatedScriptBundle, ScriptRunner.READY_FUNCTION_KEY))
 			.willReturn(continuationState);
 		
-		given(continuationCoordinator.execute(scriptBundle, ScriptRunner.READY_FUNCTION_KEY))
+		given(continuationCoordinator.execute(associatedScriptBundle, ScriptRunner.READY_FUNCTION_KEY))
 			.willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
@@ -193,7 +193,7 @@ public class ScriptRunnerTest {
 	private void givenAWebSocketMessage() {
 
 		given(connection.baseName()).willReturn(baseName);
-		given(connection.scriptBundle()).willReturn(scriptBundle);
+		given(connection.associatedScriptBundle()).willReturn(associatedScriptBundle);
 		given(currentScriptContext.connection()).willReturn(connection);
 		
 	}
@@ -209,7 +209,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(scriptBundle, HostEvent.clientConnected.toString(), connection);
+		verify(continuationCoordinator).execute(associatedScriptBundle, HostEvent.clientConnected.toString(), connection);
 	}
 	
 	@Test
@@ -218,7 +218,7 @@ public class ScriptRunnerTest {
 		// given
 		givenAWebSocketMessage();
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
-		given(continuationCoordinator.execute(scriptBundle, HostEvent.clientConnected.toString(), connection)).willReturn(continuationState);
+		given(continuationCoordinator.execute(associatedScriptBundle, HostEvent.clientConnected.toString(), connection)).willReturn(continuationState);
 		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
 			.willReturn(continuationState)
 			.willReturn(null);
@@ -228,7 +228,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(scriptBundle, HostEvent.clientConnected.toString(), connection);
+		verify(continuationCoordinator).execute(associatedScriptBundle, HostEvent.clientConnected.toString(), connection);
 		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
@@ -254,7 +254,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(scriptBundle, eventName);
+		verify(continuationCoordinator).execute(associatedScriptBundle, eventName);
 	}
 	
 	@Test
@@ -265,7 +265,7 @@ public class ScriptRunnerTest {
 		JQueryMessage jwm = MessageMaker.makeEvent("jason", "miller");
 		String eventName = EventNameHelper.makeEventName(jwm);
 		given(continuationState.type()).willReturn(ContinuationType.JQueryMessage);
-		given(continuationCoordinator.execute(scriptBundle, eventName)).willReturn(continuationState);
+		given(continuationCoordinator.execute(associatedScriptBundle, eventName)).willReturn(continuationState);
 		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
 			.willReturn(continuationState)
 			.willReturn(null);
@@ -275,7 +275,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(scriptBundle, eventName);
+		verify(continuationCoordinator).execute(associatedScriptBundle, eventName);
 		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);

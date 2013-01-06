@@ -86,7 +86,7 @@ class WebSocketHandler extends BaseWebSocketHandler {
 			} catch (JQueryMessageException e) {
 				log.warn("{} connected to script {} spoke gibberish to me: {}", 
 					jjcon,
-					jjcon.scriptBundle(),
+					jjcon.associatedScriptBundle(),
 					msg
 				);
 			}

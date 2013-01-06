@@ -51,7 +51,7 @@ public class DocumentSelection implements Selection {
 	public Selection bind(final String type, final Object data, final Callable function) {
 		// TODO handle the data. this will require some sort of context
 		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeBind(selector, type));
-		context.scriptBundle().addFunction(EventNameHelper.makeEventName("", selector, type), function);
+		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName("", selector, type), function);
 		return this;
 	}
 	

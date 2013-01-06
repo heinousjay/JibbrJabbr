@@ -7,7 +7,7 @@ class ScriptContext {
 	
 	final ScriptContext previous;
 	
-	final AssociatedScriptBundle scriptBundle;
+	final AssociatedScriptBundle associatedScriptBundle;
 	
 	final JJWebSocketConnection connection;
 	
@@ -15,15 +15,14 @@ class ScriptContext {
 	
 	ScriptContext(
 		final ScriptContext previous,
-		final AssociatedScriptBundle scriptBundle
+		final AssociatedScriptBundle associatedScriptBundle
 	) {
 		this.previous = previous;
-		this.scriptBundle = scriptBundle;
+		this.associatedScriptBundle = associatedScriptBundle;
 
 		this.connection = null;
 		this.documentRequestProcessor = null;
 	}
-		
 	
 	ScriptContext( 
 		final ScriptContext previous,
@@ -31,7 +30,7 @@ class ScriptContext {
 	) {
 		this.previous = previous;
 		this.connection = connection;
-		this.scriptBundle = connection.scriptBundle();
+		this.associatedScriptBundle = connection.associatedScriptBundle();
 		
 		this.documentRequestProcessor = null;
 	}
@@ -42,7 +41,7 @@ class ScriptContext {
 	) {
 		this.previous = previous;
 		this.documentRequestProcessor = documentRequestProcessor;
-		this.scriptBundle = documentRequestProcessor.scriptBundle();
+		this.associatedScriptBundle = documentRequestProcessor.associatedScriptBundle();
 		
 		this.connection = null;
 	}

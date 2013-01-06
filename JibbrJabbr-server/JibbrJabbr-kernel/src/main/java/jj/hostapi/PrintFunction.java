@@ -50,7 +50,7 @@ class PrintFunction extends BaseFunction implements HostObject {
 		Object printString = args[0];
 		if (printString == null) printString = "<null>";
 		if (printString == Undefined.instance) printString = "<undefined>";
-		LoggerFactory.getLogger(context.scriptBundle().baseName() + ".server.js").debug("{}", printString);
+		LoggerFactory.getLogger(context.associatedScriptBundle().baseName() + ".server.js").debug("{}", printString);
 		return Undefined.instance;
 	}
 	

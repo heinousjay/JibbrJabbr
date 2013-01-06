@@ -68,12 +68,12 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		return documentRequest.httpRequest();
 	}
 	
-	public AssociatedScriptBundle scriptBundle() {
-		return documentRequest.httpRequest().scriptBundle();
+	public AssociatedScriptBundle associatedScriptBundle() {
+		return documentRequest.httpRequest().associatedScriptBundle();
 	}
 	
 	public void scriptBundle(AssociatedScriptBundle scriptBundle) {
-		documentRequest.httpRequest().scriptBundle(scriptBundle);
+		documentRequest.httpRequest().associatedScriptBundle(scriptBundle);
 	}
 	
 	public Document document() {

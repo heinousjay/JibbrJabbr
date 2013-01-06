@@ -59,7 +59,7 @@ class PrintfFunction extends BaseFunction implements HostObject {
 				Arrays.asList(args).subList(1, args.length).toArray() :
 				EMPTY_ARGS;
 
-		LoggerFactory.getLogger(context.scriptBundle().toUri() + ".server.js").debug(
+		LoggerFactory.getLogger(context.associatedScriptBundle().toUri() + ".server.js").debug(
 			String.format(String.valueOf(formatString), toFormat)
 		);
 		return Undefined.instance;

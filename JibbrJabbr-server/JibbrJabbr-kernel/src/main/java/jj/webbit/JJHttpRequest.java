@@ -33,7 +33,7 @@ public class JJHttpRequest extends HttpRequestWrapper {
 	
 	private static final String PROCESSING_STATE = "processing state";
 	
-	private static final String SCRIPT_BUNDLE = "script bundle";
+	private static final String ASSOCIATED_SCRIPT_BUNDLE = "associated script bundle";
 	
 	private static final String START_TIME = "start time";
 	
@@ -50,12 +50,12 @@ public class JJHttpRequest extends HttpRequestWrapper {
 		return BigDecimal.valueOf(System.nanoTime() - startTime, 6);
 	}
 	
-	public AssociatedScriptBundle scriptBundle() {
-		return (AssociatedScriptBundle)data(SCRIPT_BUNDLE);
+	public AssociatedScriptBundle associatedScriptBundle() {
+		return (AssociatedScriptBundle)data(ASSOCIATED_SCRIPT_BUNDLE);
 	}
 	
-	public void scriptBundle(AssociatedScriptBundle scriptBundle) {
-		data(SCRIPT_BUNDLE, scriptBundle);
+	public void associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
+		data(ASSOCIATED_SCRIPT_BUNDLE, associatedScriptBundle);
 	}
 	
 	public void startingInitialExecution() {

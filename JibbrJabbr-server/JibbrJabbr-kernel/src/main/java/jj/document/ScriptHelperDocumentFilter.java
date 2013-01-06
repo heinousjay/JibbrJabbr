@@ -51,7 +51,7 @@ public class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	@Override
 	public void filter(final DocumentRequest documentRequest) {
-		AssociatedScriptBundle scriptBundle = context.scriptBundle();
+		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle();
 		if (scriptBundle != null) {
 			addScript(documentRequest.document(), JQUERY_URI);
 			

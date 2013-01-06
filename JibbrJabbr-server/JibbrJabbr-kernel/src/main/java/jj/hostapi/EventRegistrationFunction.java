@@ -72,7 +72,7 @@ class EventRegistrationFunction extends BaseFunction implements HostObject {
 			throw new IllegalArgumentException(String.format("%s takes only one argument of type function", functionName));
 		}
 		
-		context.scriptBundle().addFunction(functionName, (Callable)args[0]);
+		context.associatedScriptBundle().addFunction(functionName, (Callable)args[0]);
 		
 		// nothing worth returning here, chaining doesn't make sense
 		return Undefined.instance;

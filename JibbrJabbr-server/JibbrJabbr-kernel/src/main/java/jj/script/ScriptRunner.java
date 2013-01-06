@@ -75,10 +75,10 @@ public class ScriptRunner {
 		
 		context.httpRequest().startingInitialExecution();
 		final ContinuationState continuationState = 
-				continuationCoordinator.execute(context.scriptBundle());
+				continuationCoordinator.execute(context.associatedScriptBundle());
 		
 		if (continuationState == null) {
-			context.scriptBundle().initialized(true);
+			context.associatedScriptBundle().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
@@ -92,10 +92,10 @@ public class ScriptRunner {
 		log.trace("resuming initial execution of a script bundle");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
+				continuationCoordinator.resumeContinuation(pendingKey, context.associatedScriptBundle(), result);
 		
 		if (continuationState == null) {
-			context.scriptBundle().initialized(true);
+			context.associatedScriptBundle().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
@@ -106,7 +106,7 @@ public class ScriptRunner {
 	
 	@ScriptThread
 	private void executeReadyFunction() {
-		AssociatedScriptBundle scriptBundle = context.scriptBundle(); 
+		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle(); 
 		Callable ready = scriptBundle.getFunction(READY_FUNCTION_KEY);
 		if (ready == null) {
 			// TODO smarter exception here!
@@ -132,7 +132,7 @@ public class ScriptRunner {
 		log.trace("resuming ready function execution of a script bundle");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
+				continuationCoordinator.resumeContinuation(pendingKey, context.associatedScriptBundle(), result);
 		
 		if (continuationState == null) {
 			log.trace("ready function execution - completed, serving document");
@@ -210,7 +210,7 @@ public class ScriptRunner {
 		processContinuationState(
 			continuationCoordinator.resumeContinuation(
 				pendingKey,
-				context.scriptBundle(),
+				context.associatedScriptBundle(),
 				result
 			)
 		);
@@ -224,7 +224,7 @@ public class ScriptRunner {
 				context.initialize(connection);
 				try {
 					processContinuationState(
-						continuationCoordinator.execute(connection.scriptBundle(), hostEvent.toString(), args)
+						continuationCoordinator.execute(connection.associatedScriptBundle(), hostEvent.toString(), args)
 					);
 				} finally {
 					context.end();
@@ -243,8 +243,8 @@ public class ScriptRunner {
 			protected void innerRun() throws Exception {
 				context.initialize(connection);
 				try {
-					log.trace("executing script event {} for scriptBundle {}", eventName, connection.scriptBundle());
-					processContinuationState(continuationCoordinator.execute(connection.scriptBundle(), eventName));
+					log.trace("executing script event {} for scriptBundle {}", eventName, connection.associatedScriptBundle());
+					processContinuationState(continuationCoordinator.execute(connection.associatedScriptBundle(), eventName));
 				} finally {
 					context.end();
 				}
@@ -299,7 +299,7 @@ public class ScriptRunner {
 	void restartAfterContinuation(String pendingKey, Object result) {
 		
 		assert scriptExecutorFactory.isScriptThread() : "attempting to restart a continuation from the wrong thread";
-		assert context.scriptBundle() != null : "attempting to restart a continuation without a script context in place";
+		assert context.associatedScriptBundle() != null : "attempting to restart a continuation without a script context in place";
 		
 		log.trace("restarting a continuation at {} with {}", pendingKey, result);
 		

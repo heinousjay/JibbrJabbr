@@ -67,11 +67,11 @@ public class WebSocketConnections {
 		
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
 		
-		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = perScript.get(connection.scriptBundle());
+		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = perScript.get(connection.associatedScriptBundle());
 		
 		if (connectionSet == null) {
 			connectionSet = new ConcurrentHashMap<>(16, 0.75F, 2);
-			perScript.put(connection.scriptBundle(), connectionSet);
+			perScript.put(connection.associatedScriptBundle(), connectionSet);
 		}
 		connectionSet.putIfAbsent(connection, Boolean.TRUE);
 	}
@@ -81,11 +81,11 @@ public class WebSocketConnections {
 		allConnections.remove(connection);
 		
 		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
-			perScript.get(connection.scriptBundle());
+			perScript.get(connection.associatedScriptBundle());
 		if (connectionSet != null) {
 			connectionSet.remove(connection);
 			if (connectionSet.isEmpty()) {
-				perScript.remove(connection.scriptBundle());
+				perScript.remove(connection.associatedScriptBundle());
 			}
 		}
 	}

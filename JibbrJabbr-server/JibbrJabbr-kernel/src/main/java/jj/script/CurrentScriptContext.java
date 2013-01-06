@@ -31,12 +31,12 @@ public class CurrentScriptContext {
 	 */
 	private static final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
 	
-	public AssociatedScriptBundle scriptBundle() {
-		return currentContext.get().scriptBundle;
+	public AssociatedScriptBundle associatedScriptBundle() {
+		return currentContext.get().associatedScriptBundle;
 	}
 	
 	public String baseName() {
-		return scriptBundle().baseName();
+		return associatedScriptBundle().baseName();
 	}
 	
 	public JJWebSocketConnection connection() {

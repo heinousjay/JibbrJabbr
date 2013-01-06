@@ -32,7 +32,7 @@ public class ScriptHelperDocumentFilterTest {
 	String socketUri;
 	String webSocketUri;
 	@Mock Configuration configuration;
-	@Mock AssociatedScriptBundle scriptBundle;
+	@Mock AssociatedScriptBundle associatedScriptBundle;
 	@Mock CurrentScriptContext context;
 	@Mock ScriptResource scriptResource;
 	@Mock JJHttpRequest httpRequest;
@@ -50,10 +50,10 @@ public class ScriptHelperDocumentFilterTest {
 		socketUri = "socketURI";
 		webSocketUri = configuration.baseUri().toString().replace("http", "ws") + socketUri;
 		
-		when(scriptBundle.toUri()).thenReturn(scriptUri);
-		when(scriptBundle.toSocketUri()).thenReturn(socketUri);
+		when(associatedScriptBundle.toUri()).thenReturn(scriptUri);
+		when(associatedScriptBundle.toSocketUri()).thenReturn(socketUri);
 		
-		when(context.scriptBundle()).thenReturn(scriptBundle);
+		when(context.associatedScriptBundle()).thenReturn(associatedScriptBundle);
 		when(context.httpRequest()).thenReturn(httpRequest);
 		
 		when(httpRequest.startupJQueryMessages()).thenReturn(Collections.<JQueryMessage>emptyList());
@@ -70,8 +70,8 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientAndSharedScriptsAddedWhenPresent() {
 		
 		// given
-		given(scriptBundle.clientScriptResource()).willReturn(scriptResource);
-		given(scriptBundle.sharedScriptResource()).willReturn(scriptResource);
+		given(associatedScriptBundle.clientScriptResource()).willReturn(scriptResource);
+		given(associatedScriptBundle.sharedScriptResource()).willReturn(scriptResource);
 		given(scriptResource.type())
 			.willReturn(ScriptResourceType.Shared)
 			.willReturn(ScriptResourceType.Client);
@@ -92,7 +92,7 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientScriptIsAddedWhenPresentAndSharedScriptIsAbsent() {
 		
 		// given
-		given(scriptBundle.clientScriptResource()).willReturn(scriptResource);
+		given(associatedScriptBundle.clientScriptResource()).willReturn(scriptResource);
 		given(scriptResource.type()).willReturn(ScriptResourceType.Client);
 		
 		// when
@@ -111,7 +111,7 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientScriptIsAddedWhenAbsentAndSharedScriptIsPresent() {
 		
 		// given
-		given(scriptBundle.sharedScriptResource()).willReturn(scriptResource);
+		given(associatedScriptBundle.sharedScriptResource()).willReturn(scriptResource);
 		given(scriptResource.type()).willReturn(ScriptResourceType.Shared);
 		
 		//when

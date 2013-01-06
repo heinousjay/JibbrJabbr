@@ -78,7 +78,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		AssociatedScriptBundle scriptBundle = context.scriptBundle();
+		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle();
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
 			scriptBundle.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);
