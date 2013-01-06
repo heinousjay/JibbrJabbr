@@ -2,9 +2,9 @@ package jj.script;
 
 import java.util.Map;
 
+import jj.continuation.RestRequest;
 import jj.document.DocumentRequestProcessor;
 import jj.jqmessage.JQueryMessage;
-import jj.rest.RestRequest;
 import jj.script.ContinuationState.Returns;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.JJWebSocketConnection;

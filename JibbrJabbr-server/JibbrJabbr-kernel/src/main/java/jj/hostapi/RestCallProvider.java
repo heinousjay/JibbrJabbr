@@ -4,7 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 
-import jj.rest.RestRequest;
+import jj.continuation.RestRequest;
 import jj.script.CurrentScriptContext;
 import jj.script.ContinuationState.Returns;
 

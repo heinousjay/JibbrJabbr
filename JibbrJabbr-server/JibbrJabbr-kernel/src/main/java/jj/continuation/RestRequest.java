@@ -1,4 +1,4 @@
-package jj.rest;
+package jj.continuation;
 
 import jj.Sequence;
 

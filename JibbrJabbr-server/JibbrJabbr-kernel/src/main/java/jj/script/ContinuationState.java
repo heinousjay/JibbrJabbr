@@ -2,8 +2,8 @@ package jj.script;
 
 import java.io.Serializable;
 
+import jj.continuation.RestRequest;
 import jj.jqmessage.JQueryMessage;
-import jj.rest.RestRequest;
 
 public class ContinuationState implements Serializable {
 	
