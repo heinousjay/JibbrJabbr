@@ -5,7 +5,7 @@ package jj.script;
  * @author jason
  *
  */
-public class JQueryMessageContinuationProcessor implements ContinuationProcessor {
+class JQueryMessageContinuationProcessor implements ContinuationProcessor {
 	
 	private final CurrentScriptContext context;
 	

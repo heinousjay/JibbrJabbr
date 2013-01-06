@@ -13,7 +13,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 
-public class RestRequestContinuationProcessor implements ContinuationProcessor {
+class RestRequestContinuationProcessor implements ContinuationProcessor {
 	
 	private final Logger log = LoggerFactory.getLogger(RestRequestContinuationProcessor.class);
 

@@ -19,7 +19,7 @@ package jj.script;
  * @author jason
  *
  */
-public class RequireContinuationProcessor implements ContinuationProcessor {
+class RequireContinuationProcessor implements ContinuationProcessor {
 
 	@Override
 	public ContinuationType type() {
@@ -29,7 +29,7 @@ public class RequireContinuationProcessor implements ContinuationProcessor {
 	@Override
 	public void process(ContinuationState continuationState) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }
