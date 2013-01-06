@@ -21,17 +21,11 @@ package jj.script;
  */
 public class RequireContinuationProcessor implements ContinuationProcessor {
 
-	/* (non-Javadoc)
-	 * @see jj.script.ContinuationProcessor#type()
-	 */
 	@Override
 	public ContinuationType type() {
 		return ContinuationType.Require;
 	}
 
-	/* (non-Javadoc)
-	 * @see jj.script.ContinuationProcessor#process(jj.script.ContinuationState)
-	 */
 	@Override
 	public void process(ContinuationState continuationState) {
 		// TODO Auto-generated method stub
