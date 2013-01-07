@@ -38,10 +38,10 @@ public class ContinuationState implements Serializable {
 		this.returns = returns;
 	}
 	
-	public ContinuationState(final Require require, final Returns returns) {
+	public ContinuationState(final Require require) {
 		this.type = ContinuationType.Require;
 		this.message = require;
-		this.returns = returns;
+		this.returns = null;
 	}
 
 	private static final long serialVersionUID = 1L;

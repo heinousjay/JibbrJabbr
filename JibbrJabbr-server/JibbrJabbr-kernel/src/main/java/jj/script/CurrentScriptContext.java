@@ -180,8 +180,8 @@ public class CurrentScriptContext {
 		throw prepareContinuation(restRequest.id(), continuationState);
 	}
 	
-	public ContinuationPending prepareContinuation(Require require, Returns returns) {
-		ContinuationState continuationState = new ContinuationState(require, returns);
+	public ContinuationPending prepareContinuation(Require require) {
+		ContinuationState continuationState = new ContinuationState(require);
 		throw prepareContinuation(require.id(), continuationState);
 	}
 	
