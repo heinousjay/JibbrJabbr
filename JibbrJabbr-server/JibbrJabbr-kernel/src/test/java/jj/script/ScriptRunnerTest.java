@@ -1,6 +1,9 @@
 package jj.script;
 
+import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.*;
+
+import java.util.concurrent.Executors;
 
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
@@ -314,11 +317,51 @@ public class ScriptRunnerTest {
 		
 		// when
 		scriptRunner.submit(module);
+		executor.runNextPendingCommand();
+		
+		// then
+		verify(continuationCoordinator).execute(moduleScriptBundle);
+		
+		// given
+		given(currentScriptContext.type()).willReturn(ScriptContextType.HttpRequest);
+		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
+		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
+		given(httpRequest.state()).willReturn(State.Uninitialized);
+		
 		executor.runUntilIdle();
 		
-		verify(moduleScriptBundle, atLeastOnce()).initialized();
 		verify(moduleScriptBundle).initialized(true);
-		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), associatedScriptBundle, null);
+		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptBundle, null);
+	}
+	
+	@Test
+	public void testModuleScriptWithContinuation() {
+		
+		// given
+		RequiredModule module = givenAModuleRequire();
+		given(continuationCoordinator.execute(moduleScriptBundle)).willReturn(continuationState);
+		given(continuationState.type()).willReturn(ContinuationType.JQueryMessage);
+		
+		// when
+		scriptRunner.submit(module);
+		executor.runNextPendingCommand();
+		
+		// then
+		verify(continuationCoordinator).execute(moduleScriptBundle);
+		
+		// given
+		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
+		given(currentScriptContext.type()).willReturn(ScriptContextType.ModuleInitialization);
+		given(continuationCoordinator.execute(moduleScriptBundle)).willReturn(null);
+		
+		// when
+		scriptRunner.restartAfterContinuation("blah", null);
+		
+		// then
+		verify(continuationCoordinator).resumeContinuation("blah", moduleScriptBundle, null);
+		
+		
+		fail("this test isn't complete yet but i'm too tired to figure it out");
 	}
 
 }
