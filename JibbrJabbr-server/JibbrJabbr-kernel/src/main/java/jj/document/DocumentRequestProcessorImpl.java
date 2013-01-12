@@ -139,6 +139,10 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 			@Override
 			@HttpControlThread
 			public void innerRun() throws Exception {
+				// pretty printing is turned off because it inserts weird spaces
+				// into the output if there are text nodes next to element node
+				// and it gets REALLY ANNOYING
+				documentRequest.document().outputSettings().prettyPrint(false);
 				final ByteBuffer bytes = UTF_8.encode(documentRequest.document().toString());
 				try {
 					documentRequest.httpResponse()
