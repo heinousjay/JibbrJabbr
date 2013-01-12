@@ -52,6 +52,10 @@ public class CurrentScriptContext {
 		return scriptBundle().baseName();
 	}
 	
+	RequiredModule requiredModule() {
+		return currentContext.get().requiredModule;
+	}
+	
 	public JJWebSocketConnection connection() {
 		return currentContext.get().connection;
 	}
@@ -68,8 +72,8 @@ public class CurrentScriptContext {
 		return currentContext.get().documentRequestProcessor.document();
 	}
 	
-	public void initialize(final ModuleScriptBundle moduleScriptBundle) {
-		currentContext.set(new ScriptContext(currentContext.get(), moduleScriptBundle));
+	public void initialize(final ModuleScriptBundle moduleScriptBundle, final RequiredModule requiredModule) {
+		currentContext.set(new ScriptContext(currentContext.get(), moduleScriptBundle, requiredModule));
 	}
 	
 	public void initialize(final AssociatedScriptBundle associatedScriptBundle) {
@@ -188,13 +192,24 @@ public class CurrentScriptContext {
 		try {
 			ContinuationPending continuation = context.captureContinuation();
 			continuation.setApplicationState(continuationState);
-			if (connection() != null) {
-				addPendingContinuation(connection().data(), pendingId, continuation);
-			} else if (httpRequest() != null) {
+			
+			switch(type()) {
+			case HttpRequest:
 				addPendingContinuation(httpRequest().data(), pendingId, continuation);
-			} else {
+				break;
+			
+			case WebSocket:
+				addPendingContinuation(connection().data(), pendingId, continuation);
+				break;
+			
+			case ModuleInitialization:
+				addPendingContinuation(requiredModule().data(), pendingId, continuation);
+				break;
+				
+			default:
 				throw new AssertionError("attempting a continuation with nothing to coordinate resumption");
 			}
+			
 			return continuation;
 		} finally {
 			Context.exit();
@@ -202,13 +217,20 @@ public class CurrentScriptContext {
 	}
 	
 	public ContinuationPending pendingContinuation(String key) {
-		if (connection() != null) {
-			return pendingContinuation(connection().data(), key);
-		} else if (httpRequest() != null) {
-			return pendingContinuation(httpRequest().data(), key);
-		}
 		
-		throw new AssertionError("pending continuation requested when we don't have a connection");
+		switch(type()) {
+		case HttpRequest:
+			return pendingContinuation(httpRequest().data(), key);
+		
+		case WebSocket:
+			return pendingContinuation(connection().data(), key);
+		
+		case ModuleInitialization:
+			return pendingContinuation(requiredModule().data(), key);
+			
+		default:
+			throw new AssertionError("pending continuation request but it doesn't exist");
+		}
 	}
 	
 	public void end() {

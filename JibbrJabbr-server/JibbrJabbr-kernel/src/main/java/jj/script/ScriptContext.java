@@ -15,17 +15,21 @@ class ScriptContext {
 	
 	final ModuleScriptBundle moduleScriptBundle;
 	
+	final RequiredModule requiredModule;
+	
 	final JJWebSocketConnection connection;
 	
 	final DocumentRequestProcessor documentRequestProcessor;
 	
 	ScriptContext(
 		final ScriptContext parent,
-		final ModuleScriptBundle moduleScriptBundle
+		final ModuleScriptBundle moduleScriptBundle,
+		final RequiredModule requiredModule
 	) {
 		this.type = ModuleInitialization;
 		this.parent = parent;
 		this.moduleScriptBundle = moduleScriptBundle;
+		this.requiredModule = requiredModule;
 
 		this.associatedScriptBundle = null;
 		this.connection = null;
@@ -43,6 +47,7 @@ class ScriptContext {
 		this.connection = null;
 		this.documentRequestProcessor = null;
 		this.moduleScriptBundle = null;
+		this.requiredModule = null;
 	}
 	
 	ScriptContext( 
@@ -56,6 +61,7 @@ class ScriptContext {
 		
 		this.documentRequestProcessor = null;
 		this.moduleScriptBundle = null;
+		this.requiredModule = null;
 	}
 	
 	ScriptContext( 
@@ -69,5 +75,6 @@ class ScriptContext {
 		
 		this.connection = null;
 		this.moduleScriptBundle = null;
+		this.requiredModule = null;
 	}
 }

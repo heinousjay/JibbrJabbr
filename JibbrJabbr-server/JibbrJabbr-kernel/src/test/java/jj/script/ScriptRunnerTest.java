@@ -3,8 +3,6 @@ package jj.script;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.*;
 
-import java.util.concurrent.Executors;
-
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
 import jj.jqmessage.JQueryMessage;
@@ -66,6 +64,10 @@ public class ScriptRunnerTest {
 	
 	@Mock ContinuationProcessor continuationProcessor2;
 	
+	@Mock ContinuationProcessor continuationProcessor3;
+	
+	ScriptContext httpRequestContext;
+	
 	@Before
 	public void before() {
 		
@@ -78,13 +80,14 @@ public class ScriptRunnerTest {
 		
 		when(continuationProcessor1.type()).thenReturn(ContinuationType.AsyncHttpRequest);
 		when(continuationProcessor2.type()).thenReturn(ContinuationType.JQueryMessage);
+		when(continuationProcessor3.type()).thenReturn(ContinuationType.RequiredModule);
 		
 		scriptRunner = new ScriptRunner(
 			scriptBundleHelper,
 			continuationCoordinator,
 			currentScriptContext,
 			scriptExecutorFactory,
-			new ContinuationProcessor[] { continuationProcessor1, continuationProcessor2 }
+			new ContinuationProcessor[] { continuationProcessor1, continuationProcessor2, continuationProcessor3 }
 		);
 		
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
@@ -94,6 +97,8 @@ public class ScriptRunnerTest {
 		
 		
 		when(associatedScriptBundle.getFunction(ScriptRunner.READY_FUNCTION_KEY)).thenReturn(readyFunction);
+		
+		httpRequestContext = new ScriptContext(null, documentRequestProcessor);
 	}
 	
 	private void givenADocumentRequest() {
@@ -306,7 +311,9 @@ public class ScriptRunnerTest {
 		given(currentScriptContext.scriptBundle()).willReturn(moduleScriptBundle);
 		given(currentScriptContext.moduleScriptBundle()).willReturn(moduleScriptBundle);
 		given(scriptBundleHelper.scriptBundleFor(baseName, "module")).willReturn(moduleScriptBundle);
-		return new RequiredModule("module", currentScriptContext);
+		RequiredModule requiredModule = new RequiredModule("module", currentScriptContext);
+		given(currentScriptContext.requiredModule()).willReturn(requiredModule);
+		return requiredModule;
 	}
 	
 	@Test
@@ -328,13 +335,14 @@ public class ScriptRunnerTest {
 		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
 		given(httpRequest.state()).willReturn(State.Uninitialized);
 		
+		// when
 		executor.runUntilIdle();
 		
+		// then
 		verify(moduleScriptBundle).initialized(true);
 		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptBundle, null);
 	}
 	
-	@Test
 	public void testModuleScriptWithContinuation() {
 		
 		// given
@@ -356,12 +364,20 @@ public class ScriptRunnerTest {
 		
 		// when
 		scriptRunner.restartAfterContinuation("blah", null);
+		executor.runNextPendingCommand();
 		
 		// then
 		verify(continuationCoordinator).resumeContinuation("blah", moduleScriptBundle, null);
 		
+		// given
+		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
+		given(httpRequest.state()).willReturn(State.Uninitialized);
 		
-		fail("this test isn't complete yet but i'm too tired to figure it out");
+		// when
+		executor.runNextPendingCommand();
+		
+		// then
+		verify(moduleScriptBundle).initialized(true);
 	}
 
 }

@@ -15,6 +15,9 @@
  */
 package jj.script;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jj.Sequence;
 
 /**
@@ -32,6 +35,8 @@ public class RequiredModule {
 	private final ScriptContext parentContext;
 	
 	private final String pendingKey = pendingKeys.next();
+	
+	private final Map<String, Object> data = new HashMap<>();
 
 	public RequiredModule(final String identifier, final CurrentScriptContext context) {
 		this.identifier = identifier;
@@ -49,6 +54,10 @@ public class RequiredModule {
 	
 	String identifier() {
 		return identifier;
+	}
+	
+	Map<String, Object> data() {
+		return data;
 	}
 	
 	String pendingKey() {

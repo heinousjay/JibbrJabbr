@@ -196,7 +196,7 @@ public class ScriptRunner {
 		if (continuationState == null) {
 			context.moduleScriptBundle().initialized(true);
 			log.debug("initial execution - completed, resuming");
-			resumeModuleParent(requiredModule, context.moduleScriptBundle());
+			resumeModuleParent();
 		} else {
 			log.debug("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
@@ -204,7 +204,7 @@ public class ScriptRunner {
 	}
 
 	@ScriptThread
-	private void resumeModuleInitialExecution(String pendingKey, Object result) {
+	private void resumeModuleInitialExecution(final String pendingKey, final Object result) {
 		log.debug("resuming initial execution of a required module");
 		
 		final ContinuationState continuationState = 
@@ -213,14 +213,17 @@ public class ScriptRunner {
 		if (continuationState == null) {
 			context.scriptBundle().initialized(true);
 			log.debug("initial execution - completed, resuming");
-
+			resumeModuleParent();
 		} else {
 			log.debug("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
 		}
 	}
 	
-	private void resumeModuleParent(final RequiredModule requiredModule, final ModuleScriptBundle scriptBundle) {
+	private void resumeModuleParent() {
+		final RequiredModule requiredModule = context.requiredModule();
+		final ModuleScriptBundle scriptBundle = context.moduleScriptBundle();
+		
 		submit(scriptBundle.baseName(), new JJRunnable("module parent resumption") {
 			
 			@Override
@@ -246,7 +249,7 @@ public class ScriptRunner {
 			protected void innerRun() throws Exception {
 				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
 				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
-				context.initialize(scriptBundle);
+				context.initialize(scriptBundle, requiredModule);
 				try {
 					moduleInitialExecution(requiredModule);
 				} finally {
@@ -392,11 +395,7 @@ public class ScriptRunner {
 			break;
 			
 		case ModuleInitialization:
-			if (context.scriptBundle().initialized()) {
-				resumeContinuation(pendingKey, result);
-			} else {
-				resumeModuleInitialExecution(pendingKey, result);
-			}
+			resumeModuleInitialExecution(pendingKey, result);
 			break;
 			
 		case WebSocket:
