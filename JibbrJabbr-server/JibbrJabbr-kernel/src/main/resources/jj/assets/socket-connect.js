@@ -167,6 +167,7 @@ jQuery(function($) {
 		
 		$j.debug = function(on) {
 			debug = on;
+			return "debug is " + (on ? "on" : "off");
 		}
 		
 		var heartbeat = (function() {
@@ -285,6 +286,7 @@ jQuery(function($) {
 
 		function send(payload) {
 			var message = JSON.stringify(payload);
+			if (debug) console.debug(message);
 			ws.send(message);
 		}
 		
@@ -304,6 +306,12 @@ jQuery(function($) {
 			});
 		}
 		
+		var idify = function(el) {
+			var id = 'jj-' + (idSeq++);
+			el.attr('id', id);
+			return id;
+		};
+		
 		var messageProcessors = {
 			'bind': function(binding) {
 				var context = 'context' in binding ? $(binding.context) : $(document);
@@ -314,9 +322,12 @@ jQuery(function($) {
 					eventName = proxy.as;
 					handler = proxy.handler;
 				}
-				// we pass our selector and context in as data since these
-				// are the event keys
-				context.on(eventName + '.jj', binding.selector, binding.selector, handler);
+				var data = {
+					selector: binding.selector || '',
+					context: binding.context || ''
+				};
+				context.on(eventName + '.jj', binding.selector, data, handler);
+
 			},
 			'get': function(get) {
 				result(get.id, _$(get.selector)[get.type]());
@@ -329,11 +340,8 @@ jQuery(function($) {
 			},
 			'create': function(create) {
 				var el = $(create.html, create.args);
-				var selector = '#' + (el.attr('id') || (function() {
-					var id = 'jj-' + (idSeq++);
-					el.attr('id', id);
-					return id;
-				})());
+				var id = el.attr('id') || idify(el);
+				var selector = '#' + id;
 				creationHoldingPen[selector] = el;
 				result(create.id, selector);
 			},
@@ -386,13 +394,17 @@ jQuery(function($) {
 		// for now, this is fairly simple.  need to work out the messaging protocol
 		// the rest of the event data will also get packaged along
 		var sendEvent = function(event) {
-			send({
-				'event' : {
-					type: event.type,
-					selector: event.data,
-					which: event.which
-				}
-			});
+			var target = $(event.target);
+			var toSend = {
+					'event' : {
+						type: event.type,
+						selector: event.data.selector,
+						context: event.data.context,
+						which: event.which,
+						target: '#' + target.attr('id') || idify(target)
+					}
+				};
+			send(toSend);
 		}
 		
 		// specialized event handlers to handle common cases, throttle and debounce, and so on 

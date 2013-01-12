@@ -148,9 +148,9 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// given
 		List<JQueryMessage> messages = Arrays.asList(
-			JQueryMessage.makeBind("a.fancybox", "click"),
-			JQueryMessage.makeBind("a.fancyvideo", "click"),
-			JQueryMessage.makeBind("#chatbox", "enter")
+			JQueryMessage.makeBind("a.fancybox", "", "click"),
+			JQueryMessage.makeBind("a.fancyvideo", "", "click"),
+			JQueryMessage.makeBind("#chatbox", "", "enter")
 		);
 		
 		given(httpRequest.startupJQueryMessages()).willReturn(messages);

@@ -102,8 +102,9 @@ public class JQueryMessage {
 		return result;
 	}
 	
-	public static JQueryMessage makeBind(String selector, String type) {
+	public static JQueryMessage makeBind(String context, String selector, String type) {
 		JQueryMessage result = new JQueryMessage(Bind);
+		result.bind().context = context;
 		result.bind().selector = selector;
 		result.bind().type = type;
 		return result;

@@ -42,6 +42,12 @@ public class DocumentSelection implements Selection {
 	}
 	
 	// -- Events
+	public Selection on(final String type, final String selector, final Callable function) {
+		
+		
+		return this;
+	}
+	
 	@Override
 	public Selection bind(final String type, final Callable function) {
 		return bind(type, null, function);
@@ -49,9 +55,10 @@ public class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection bind(final String type, final Object data, final Callable function) {
-		// TODO handle the data. this will require some sort of context
-		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeBind(selector, type));
-		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName("", selector, type), function);
+		// TODO handle the data. this will require some sort of context... dunno how yet
+		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeBind(selector, "", type));
+		
+		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(selector, "", type), function);
 		return this;
 	}
 	
