@@ -298,10 +298,11 @@ public class ScriptRunnerTest {
 	
 	private RequiredModule givenAModuleRequire() {
 		given(moduleScriptBundle.initialized()).willReturn(false);
-		given(currentScriptContext.baseName()).willReturn("index");
+		given(moduleScriptBundle.baseName()).willReturn(baseName);
+		given(currentScriptContext.baseName()).willReturn(baseName);
 		given(currentScriptContext.scriptBundle()).willReturn(moduleScriptBundle);
 		given(currentScriptContext.moduleScriptBundle()).willReturn(moduleScriptBundle);
-		given(scriptBundleHelper.scriptBundleFor("index", "module")).willReturn(moduleScriptBundle);
+		given(scriptBundleHelper.scriptBundleFor(baseName, "module")).willReturn(moduleScriptBundle);
 		return new RequiredModule("module", currentScriptContext);
 	}
 	
@@ -317,6 +318,7 @@ public class ScriptRunnerTest {
 		
 		verify(moduleScriptBundle, atLeastOnce()).initialized();
 		verify(moduleScriptBundle).initialized(true);
+		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), associatedScriptBundle, null);
 	}
 
 }

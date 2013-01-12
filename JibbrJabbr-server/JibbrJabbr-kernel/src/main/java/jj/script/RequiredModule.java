@@ -27,13 +27,20 @@ public class RequiredModule {
 	
 	private final String identifier;
 	
+	private final String baseName;
+	
 	private final ScriptContext parentContext;
 	
 	private final String pendingKey = pendingKeys.next();
 
 	public RequiredModule(final String identifier, final CurrentScriptContext context) {
 		this.identifier = identifier;
+		this.baseName = context.baseName();
 		this.parentContext = context.save();
+	}
+	
+	String baseName() {
+		return baseName;
 	}
 	
 	ScriptContext parentContext() {

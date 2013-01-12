@@ -1,12 +1,5 @@
 
-var dehtml = (function() {
-	var amp = /&/g;
-	var quot = /"/g;
-	var lt = /</g;
-	return function(input) {
-		return input.replace(amp, '&amp;').replace(lt, '&lt;').replace(quot, '&quot;');
-	};
-})();
+var dehtml = require('./helpers').dehtml;
 
 var linkify = (function() {
 	var maxlength = 30;
@@ -16,13 +9,6 @@ var linkify = (function() {
     var pic = /(?:gif|jpg|jpeg|png)$/;
     var youtube = /(?:youtube.com\/watch\?v=|youtu.be\/)([\w\d-]+)/;
     var youtubeTime = /(?:t=(?:(\d+)m)?(?:([\d.]+)s))/;
-    
-    /*
-     * 
-     * <iframe width="560" height="315" 
-     * 	src="http://www.youtube.com/embed/J91ti_MpdHA" 
-     * frameborder="0" allowfullscreen></iframe>
-     */
     
     return function(input) {
         return input.replace(http, function(result, match, scheme) {

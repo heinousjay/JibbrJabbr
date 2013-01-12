@@ -7,6 +7,7 @@ import org.mozilla.javascript.Scriptable;
 
 import jj.SHA1Helper;
 import jj.resource.ScriptResource;
+import jj.resource.ScriptResourceType;
 
 /**
  * contains all of the information to execute a set of scripts associated with
@@ -90,6 +91,11 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	@Override
 	public String baseName() {
 		return baseName;
+	}
+	
+	@Override
+	public String scriptName() {
+		return baseName + ScriptResourceType.Server.suffix();
 	}
 
 	public Callable getFunction(String name) {

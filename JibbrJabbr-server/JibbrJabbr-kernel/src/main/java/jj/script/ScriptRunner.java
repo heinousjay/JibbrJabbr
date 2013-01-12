@@ -196,6 +196,7 @@ public class ScriptRunner {
 		if (continuationState == null) {
 			context.moduleScriptBundle().initialized(true);
 			log.debug("initial execution - completed, resuming");
+			resumeModuleParent(requiredModule, context.moduleScriptBundle());
 		} else {
 			log.debug("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
@@ -204,29 +205,46 @@ public class ScriptRunner {
 
 	@ScriptThread
 	private void resumeModuleInitialExecution(String pendingKey, Object result) {
-		log.trace("resuming initial execution of a required module");
+		log.debug("resuming initial execution of a required module");
 		
 		final ContinuationState continuationState = 
 				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
 		
 		if (continuationState == null) {
 			context.scriptBundle().initialized(true);
-			log.trace("initial execution - completed, resuming");
+			log.debug("initial execution - completed, resuming");
 
 		} else {
-			log.trace("initial execution - continuation. storing execution state");
+			log.debug("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
 		}
 	}
 	
-	public void submit(final RequiredModule requiredModule) {
-		final String baseName = context.baseName();
-		
-		submit(baseName, new JJRunnable("module script initialization for " + requiredModule.identifier()) {
+	private void resumeModuleParent(final RequiredModule requiredModule, final ModuleScriptBundle scriptBundle) {
+		submit(scriptBundle.baseName(), new JJRunnable("module parent resumption") {
 			
 			@Override
 			protected void innerRun() throws Exception {
-				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, requiredModule.identifier());
+				log.debug("resuming module parent with exports");
+				context.restore(requiredModule.parentContext());
+				try {
+					restartAfterContinuation(requiredModule.pendingKey(), scriptBundle.exports());
+				} finally {
+					context.end();
+				}
+			}
+		});
+	}
+	
+	public void submit(final RequiredModule requiredModule) {
+		final String baseName = requiredModule.baseName();
+		final String identifier = requiredModule.identifier();
+		
+		submit(baseName, new JJRunnable("module script initialization for " + identifier) {
+			
+			@Override
+			protected void innerRun() throws Exception {
+				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
 				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
 				context.initialize(scriptBundle);
 				try {
@@ -262,7 +280,7 @@ public class ScriptRunner {
 		processContinuationState(
 			continuationCoordinator.resumeContinuation(
 				pendingKey,
-				context.associatedScriptBundle(),
+				context.scriptBundle(),
 				result
 			)
 		);
@@ -347,7 +365,7 @@ public class ScriptRunner {
 	}
 	
 	/** 
-	 * you must be in a script thread and have restored the context to call this
+	 * you must be in a script thread before calling this method.
 	 */
 	@ScriptThread
 	void restartAfterContinuation(String pendingKey, Object result) {

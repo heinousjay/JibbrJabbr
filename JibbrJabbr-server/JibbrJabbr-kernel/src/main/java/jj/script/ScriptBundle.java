@@ -29,6 +29,8 @@ public interface ScriptBundle {
 	Script script();
 
 	String sha1();
+	
+	String scriptName();
 
 	boolean initialized();
 	

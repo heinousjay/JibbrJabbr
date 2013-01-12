@@ -16,6 +16,7 @@
 package jj.script;
 
 import jj.resource.ScriptResource;
+import jj.resource.ScriptResourceType;
 
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
@@ -82,6 +83,11 @@ public class ModuleScriptBundle implements ScriptBundle {
 	@Override
 	public String baseName() {
 		return baseName;
+	}
+	
+	@Override
+	public String scriptName() {
+		return moduleIdentifier + ScriptResourceType.Module.suffix();
 	}
 
 	@Override
