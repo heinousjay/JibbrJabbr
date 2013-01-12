@@ -3,8 +3,6 @@ package jj.script;
 import java.io.Serializable;
 
 import jj.jqmessage.JQueryMessage;
-import jj.script.continuation.Require;
-import jj.script.continuation.RestRequest;
 
 public class ContinuationState implements Serializable {
 	
@@ -38,8 +36,8 @@ public class ContinuationState implements Serializable {
 		this.returns = returns;
 	}
 	
-	public ContinuationState(final Require require) {
-		this.type = ContinuationType.Require;
+	public ContinuationState(final RequiredModule require) {
+		this.type = ContinuationType.RequiredModule;
 		this.message = require;
 		this.returns = null;
 	}
@@ -58,8 +56,8 @@ public class ContinuationState implements Serializable {
 		return type == ContinuationType.AsyncHttpRequest ? (RestRequest)message : null;
 	}
 	
-	public Require require() {
-		return type == ContinuationType.Require ? (Require)message : null;
+	public RequiredModule requiredModule() {
+		return type == ContinuationType.RequiredModule ? (RequiredModule)message : null;
 	}
 	
 	public String pendingKey() {
@@ -68,8 +66,8 @@ public class ContinuationState implements Serializable {
 			return restRequest().id();
 		case JQueryMessage:
 			return jQueryMessage().id();
-		case Require:
-			return require().id();
+		case RequiredModule:
+			return requiredModule().pendingKey();
 		}
 		
 		throw new AssertionError("weird construction, can't happen");

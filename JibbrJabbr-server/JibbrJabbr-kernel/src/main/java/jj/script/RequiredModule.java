@@ -15,21 +15,41 @@
  */
 package jj.script;
 
+import jj.Sequence;
+
 /**
  * @author jason
  *
  */
-class RequireContinuationProcessor implements ContinuationProcessor {
+public class RequiredModule {
+	
+	private static final Sequence pendingKeys = new Sequence();
+	
+	private final String identifier;
+	
+	private final ScriptContext parentContext;
+	
+	private final String pendingKey = pendingKeys.next();
 
-	@Override
-	public ContinuationType type() {
-		return ContinuationType.Require;
+	public RequiredModule(final String identifier, final CurrentScriptContext context) {
+		this.identifier = identifier;
+		this.parentContext = context.save();
 	}
-
-	@Override
-	public void process(ContinuationState continuationState) {
-		// TODO Auto-generated method stub
-		
+	
+	ScriptContext parentContext() {
+		return parentContext;
 	}
-
+	
+	String identifier() {
+		return identifier;
+	}
+	
+	String pendingKey() {
+		return pendingKey;
+	}
+	
+	@Override
+	public String toString() {
+		return "required module " + pendingKey;
+	}
 }

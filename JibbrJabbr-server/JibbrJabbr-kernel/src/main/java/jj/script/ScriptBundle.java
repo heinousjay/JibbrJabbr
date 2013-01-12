@@ -32,6 +32,8 @@ public interface ScriptBundle {
 
 	boolean initialized();
 	
+	void initialized(boolean initialized);
+	
 	String baseName();
 
 }

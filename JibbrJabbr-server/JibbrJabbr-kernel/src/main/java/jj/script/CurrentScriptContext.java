@@ -5,8 +5,6 @@ import java.util.Map;
 import jj.document.DocumentRequestProcessor;
 import jj.jqmessage.JQueryMessage;
 import jj.script.ContinuationState.Returns;
-import jj.script.continuation.Require;
-import jj.script.continuation.RestRequest;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.JJWebSocketConnection;
 
@@ -86,7 +84,7 @@ public class CurrentScriptContext {
 		currentContext.set(new ScriptContext(currentContext.get(), documentRequestProcessor));
 	}
 	
-	public ScriptContext save() {
+	ScriptContext save() {
 		return currentContext.get();
 	}
 	
@@ -180,9 +178,9 @@ public class CurrentScriptContext {
 		throw prepareContinuation(restRequest.id(), continuationState);
 	}
 	
-	public ContinuationPending prepareContinuation(Require require) {
+	public ContinuationPending prepareContinuation(RequiredModule require) {
 		ContinuationState continuationState = new ContinuationState(require);
-		throw prepareContinuation(require.id(), continuationState);
+		throw prepareContinuation(require.pendingKey(), continuationState);
 	}
 	
 	private ContinuationPending prepareContinuation(String pendingId, ContinuationState continuationState) {

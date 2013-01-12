@@ -9,6 +9,7 @@ public class ScriptInitializer {
 			.addComponent(ContinuationCoordinator.class)
 			.addComponent(JQueryMessageContinuationProcessor.class)
 			.addComponent(RestRequestContinuationProcessor.class)
+			.addComponent(RequiredModuleContinuationProcessor.class)
 			.addComponent(ScriptExecutorFactory.class)
 			.addComponent(CurrentScriptContext.class)
 			.addComponent(ScriptBundleCreator.class)

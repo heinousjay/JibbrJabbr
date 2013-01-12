@@ -70,7 +70,7 @@ public class ScriptRunner {
 	}
 	
 	@ScriptThread
-	private void initialExecution() {
+	private void httpRequestInitialExecution() {
 		log.trace("performing initial execution of a document request");
 		
 		context.httpRequest().startingInitialExecution();
@@ -88,14 +88,14 @@ public class ScriptRunner {
 	}
 
 	@ScriptThread
-	private void resumeInitialExecution(String pendingKey, Object result) {
+	private void resumeHttpRequestInitialExecution(String pendingKey, Object result) {
 		log.trace("resuming initial execution of a script bundle");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.associatedScriptBundle(), result);
+				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
 		
 		if (continuationState == null) {
-			context.associatedScriptBundle().initialized(true);
+			context.scriptBundle().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
@@ -175,12 +175,64 @@ public class ScriptRunner {
 						if (scriptBundle.initialized()) {
 							executeReadyFunction();
 						} else {
-							initialExecution();
+							httpRequestInitialExecution();
 						}
 						
 					} finally {
 						context.end();
 					}	
+				}
+			}
+		});
+	}
+	
+	@ScriptThread
+	private void moduleInitialExecution(final RequiredModule requiredModule) {
+		log.debug("performing initial execution of a required module");
+		
+		final ContinuationState continuationState = 
+				continuationCoordinator.execute(context.moduleScriptBundle());
+		
+		if (continuationState == null) {
+			context.moduleScriptBundle().initialized(true);
+			log.debug("initial execution - completed, resuming");
+		} else {
+			log.debug("initial execution - continuation. storing execution state");
+			processContinuationState(continuationState);
+		}
+	}
+
+	@ScriptThread
+	private void resumeModuleInitialExecution(String pendingKey, Object result) {
+		log.trace("resuming initial execution of a required module");
+		
+		final ContinuationState continuationState = 
+				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
+		
+		if (continuationState == null) {
+			context.scriptBundle().initialized(true);
+			log.trace("initial execution - completed, resuming");
+
+		} else {
+			log.trace("initial execution - continuation. storing execution state");
+			processContinuationState(continuationState);
+		}
+	}
+	
+	public void submit(final RequiredModule requiredModule) {
+		final String baseName = context.baseName();
+		
+		submit(baseName, new JJRunnable("module script initialization for " + requiredModule.identifier()) {
+			
+			@Override
+			protected void innerRun() throws Exception {
+				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, requiredModule.identifier());
+				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
+				context.initialize(scriptBundle);
+				try {
+					moduleInitialExecution(requiredModule);
+				} finally {
+					context.end();
 				}
 			}
 		});
@@ -294,7 +346,9 @@ public class ScriptRunner {
 		}
 	}
 	
-	/** you must be in a script thread and have restored the context to call this */
+	/** 
+	 * you must be in a script thread and have restored the context to call this
+	 */
 	@ScriptThread
 	void restartAfterContinuation(String pendingKey, Object result) {
 		
@@ -303,19 +357,34 @@ public class ScriptRunner {
 		
 		log.trace("restarting a continuation at {} with {}", pendingKey, result);
 		
-		if (context.connection() != null) {
-			resumeContinuation(pendingKey, result);
-		} else {
+		switch (context.type()) {
+		
+		case HttpRequest:
 			switch (context.httpRequest().state()) {
 			case InitialExecution:
-				resumeInitialExecution(pendingKey, result);
+				resumeHttpRequestInitialExecution(pendingKey, result);
 				break;
 			case ReadyFunctionExecution:
 				resumeReadyFunction(pendingKey, result);
 				break;
 			default:
 				resumeContinuation(pendingKey, result);
+				break;
 			}
+			break;
+			
+		case ModuleInitialization:
+			if (context.scriptBundle().initialized()) {
+				resumeContinuation(pendingKey, result);
+			} else {
+				resumeModuleInitialExecution(pendingKey, result);
+			}
+			break;
+			
+		case WebSocket:
+		case InternalExecution:
+			resumeContinuation(pendingKey, result);
+			break;
 		}
 	}
 }

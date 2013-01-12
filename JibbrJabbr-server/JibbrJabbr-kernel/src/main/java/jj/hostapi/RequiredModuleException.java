@@ -13,36 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.continuation;
-
-import jj.Sequence;
+package jj.hostapi;
 
 /**
  * @author jason
  *
  */
-public class Require {
-	
-	private static final Sequence ids = new Sequence();
-	
-	private final String moduleIdentifier;
-	
-	private final String id = ids.next();
+public class RequiredModuleException extends RuntimeException {
 
-	public Require(final String moduleIdentifier) {
-		this.moduleIdentifier = moduleIdentifier;
+	private static final long serialVersionUID = 5207653702478305981L;
+
+	private static String message(final String attemptedModuleIdentifier) {
+		return "could not require " + attemptedModuleIdentifier;
 	}
 	
-	public String moduleIdentifier() {
-		return moduleIdentifier;
+	public RequiredModuleException(final String attemptedModuleIdentifier) {
+		super(message(attemptedModuleIdentifier));
 	}
 	
-	public String id() {
-		return id;
-	}
-	
-	@Override
-	public String toString() {
-		return "require" + id;
+	public RequiredModuleException(final String attemptedModuleIdentifier, final Throwable cause) {
+		super(message(attemptedModuleIdentifier), cause);
 	}
 }

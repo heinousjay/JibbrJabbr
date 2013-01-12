@@ -32,6 +32,8 @@ public class ScriptRunnerTest {
 	Document document;
 	
 	@Mock AssociatedScriptBundle associatedScriptBundle;
+	
+	@Mock ModuleScriptBundle moduleScriptBundle;
 		
 	@Mock ScriptResource scriptResource;
 	
@@ -95,6 +97,7 @@ public class ScriptRunnerTest {
 
 		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
 		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
+		given(currentScriptContext.type()).willReturn(ScriptContextType.HttpRequest);
 	}
 	
 	@Test
@@ -197,6 +200,7 @@ public class ScriptRunnerTest {
 		given(connection.baseName()).willReturn(baseName);
 		given(connection.associatedScriptBundle()).willReturn(associatedScriptBundle);
 		given(currentScriptContext.connection()).willReturn(connection);
+		given(currentScriptContext.type()).willReturn(ScriptContextType.WebSocket);
 		
 	}
 	
@@ -290,6 +294,29 @@ public class ScriptRunnerTest {
 		
 		// then
 		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptBundle)any(), any());
+	}
+	
+	private RequiredModule givenAModuleRequire() {
+		given(moduleScriptBundle.initialized()).willReturn(false);
+		given(currentScriptContext.baseName()).willReturn("index");
+		given(currentScriptContext.scriptBundle()).willReturn(moduleScriptBundle);
+		given(currentScriptContext.moduleScriptBundle()).willReturn(moduleScriptBundle);
+		given(scriptBundleHelper.scriptBundleFor("index", "module")).willReturn(moduleScriptBundle);
+		return new RequiredModule("module", currentScriptContext);
+	}
+	
+	@Test
+	public void testModuleScriptWithNoContinuation() {
+		
+		// given
+		RequiredModule module = givenAModuleRequire();
+		
+		// when
+		scriptRunner.submit(module);
+		executor.runUntilIdle();
+		
+		verify(moduleScriptBundle, atLeastOnce()).initialized();
+		verify(moduleScriptBundle).initialized(true);
 	}
 
 }

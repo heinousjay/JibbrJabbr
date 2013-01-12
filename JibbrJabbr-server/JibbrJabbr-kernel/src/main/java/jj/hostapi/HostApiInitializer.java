@@ -27,6 +27,7 @@ public class HostApiInitializer {
 			.addComponent(NextConnectionFunction.class)
 			.addComponent(PrintFunction.class)
 			.addComponent(PrintfFunction.class)
+			.addComponent(RequireFunction.class)
 			.addComponent(ScriptJSON.class)
 			// the rhino object creator participates in some circular dependencies,
 			// so it needs the hidden implementation in order to allow construction

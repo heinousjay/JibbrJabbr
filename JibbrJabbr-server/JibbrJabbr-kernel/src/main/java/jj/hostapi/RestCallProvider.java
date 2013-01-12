@@ -5,8 +5,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 
 import jj.script.CurrentScriptContext;
+import jj.script.RestRequest;
 import jj.script.ContinuationState.Returns;
-import jj.script.continuation.RestRequest;
 
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
