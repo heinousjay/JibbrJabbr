@@ -28,4 +28,12 @@ public class MessageMaker {
 		result.event().type = type;
 		return result;
 	}
+	
+	public static JQueryMessage makeResult(final String id, final String value) {
+		JQueryMessage result = new JQueryMessage();
+		result.result(new Result());
+		result.result().id = id;
+		result.result().value = value;
+		return result;
+	}
 }

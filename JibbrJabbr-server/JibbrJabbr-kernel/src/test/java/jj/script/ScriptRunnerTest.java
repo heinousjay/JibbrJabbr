@@ -1,6 +1,5 @@
 package jj.script;
 
-import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.*;
 
 import jj.document.DocumentRequestProcessor;
@@ -304,6 +303,23 @@ public class ScriptRunnerTest {
 		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptBundle)any(), any());
 	}
 	
+	@Test
+	public void testWebSocketJQueryMessageResultWithNoContinuation() {
+		
+		// given
+		final String key = "0";
+		final String value = "value";
+		givenAWebSocketMessage();
+		JQueryMessage result = MessageMaker.makeResult(key, value);
+		
+		// when
+		scriptRunner.submit(connection, result);
+		executor.runUntilIdle();
+		
+		// then
+		verify(continuationCoordinator).resumeContinuation(key, null, value);
+	}
+	
 	private RequiredModule givenAModuleRequire() {
 		given(moduleScriptBundle.initialized()).willReturn(false);
 		given(moduleScriptBundle.baseName()).willReturn(baseName);
@@ -311,6 +327,7 @@ public class ScriptRunnerTest {
 		given(currentScriptContext.scriptBundle()).willReturn(moduleScriptBundle);
 		given(currentScriptContext.moduleScriptBundle()).willReturn(moduleScriptBundle);
 		given(scriptBundleHelper.scriptBundleFor(baseName, "module")).willReturn(moduleScriptBundle);
+		
 		RequiredModule requiredModule = new RequiredModule("module", currentScriptContext);
 		given(currentScriptContext.requiredModule()).willReturn(requiredModule);
 		return requiredModule;
@@ -343,6 +360,7 @@ public class ScriptRunnerTest {
 		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptBundle, null);
 	}
 	
+	@Test
 	public void testModuleScriptWithContinuation() {
 		
 		// given
@@ -375,9 +393,6 @@ public class ScriptRunnerTest {
 		
 		// when
 		executor.runNextPendingCommand();
-		
-		// then
-		verify(moduleScriptBundle).initialized(true);
 	}
 
 }
