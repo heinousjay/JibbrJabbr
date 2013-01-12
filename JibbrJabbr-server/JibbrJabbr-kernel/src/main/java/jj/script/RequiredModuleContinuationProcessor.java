@@ -55,7 +55,6 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private void loadScript(final RequiredModule requiredModule) {
 		
-		final ScriptContext saved = context.save();
 		final String baseName = context.baseName();
 		
 		executors.ioExecutor().submit(new JJRunnable("loading module " + requiredModule.identifier()) {
@@ -76,7 +75,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 				if (scriptResource != null) {
 					executors.scriptRunner().submit(requiredModule);
 				} else {
-					resumeContinuationAfterError(requiredModule, baseName, saved, new RequiredModuleException(requiredModule.identifier()));
+					resumeContinuationAfterError(requiredModule, baseName, new RequiredModuleException(requiredModule.identifier()));
 				}
 			}
 		});
@@ -85,7 +84,6 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	private void resumeContinuationAfterError(
 		final RequiredModule require,
 		final String baseName,
-		final ScriptContext saved,
 		final Object result
 	) {
 		
@@ -94,7 +92,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 			@Override
 			protected void innerRun() throws Exception {
 				
-				context.restore(saved);
+				context.restore(require.parentContext());
 				
 				try {
 					executors.scriptRunner().restartAfterContinuation(require.pendingKey(), result);
