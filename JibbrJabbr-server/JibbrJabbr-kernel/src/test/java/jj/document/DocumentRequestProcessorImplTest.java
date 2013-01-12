@@ -76,6 +76,7 @@ public class DocumentRequestProcessorImplTest {
 		filterCalls = 0;
 		
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
+		document.outputSettings().prettyPrint(false);
 		baseName = "baseName";
 		executor = new DeterministicScheduler();
 		
