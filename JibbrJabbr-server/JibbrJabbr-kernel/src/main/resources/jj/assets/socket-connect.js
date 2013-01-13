@@ -285,8 +285,8 @@ jQuery(function($) {
 		}
 
 		function send(payload) {
+			if (debug) console.debug("WebSocket", "send", payload);
 			var message = JSON.stringify(payload);
-			if (debug) console.debug(message);
 			ws.send(message);
 		}
 		
