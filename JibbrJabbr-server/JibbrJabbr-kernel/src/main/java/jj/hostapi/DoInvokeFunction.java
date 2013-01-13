@@ -2,6 +2,7 @@ package jj.hostapi;
 
 import jj.jqmessage.JQueryMessage;
 import jj.script.CurrentScriptContext;
+import jj.script.ScriptContextType;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -46,8 +47,8 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		if (context.connection() == null) {
-			throw new IllegalStateException("cannot invoke remote functions during " + context.httpRequest().state());
+		if (context.type() != ScriptContextType.WebSocket) {
+			throw new IllegalStateException("cannot invoke remote functions without a connecton");
 		}
 		throw context.prepareContinuation(
 			JQueryMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]))
