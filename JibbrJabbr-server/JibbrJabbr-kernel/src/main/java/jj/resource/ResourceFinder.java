@@ -2,6 +2,11 @@ package jj.resource;
 
 import jj.IOThread;
 
+/**
+ * Inject this to get resources from the filesystem
+ * @author jason
+ *
+ */
 public interface ResourceFinder {
 	
 	/**
@@ -28,7 +33,8 @@ public interface ResourceFinder {
 	/**
 	 * loads a resource matching the given resource spec, if necessary, and populates
 	 * the cache.  can only be called from an IO thread.  if the resource spec does
-	 * not identify a valid resource, this returns null
+	 * not identify a valid resource, this returns null. if a resource is returned from this method,
+	 * then it will be watched for changes and automatically updated
 	 * @param resourceClass
 	 * @param baseName
 	 * @param args

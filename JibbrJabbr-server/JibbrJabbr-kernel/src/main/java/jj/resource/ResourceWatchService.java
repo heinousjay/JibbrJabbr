@@ -52,7 +52,7 @@ class ResourceWatchService implements JJShutdown {
 		
 		final Path directory = resource.path().getParent();
 		if (directory.getFileSystem() == FileSystems.getDefault()) {
-			log.debug("registering for watch service: {}", resource);
+			log.trace("registering for watch service: {}", resource);
 			directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);
 		}
 	}
@@ -83,7 +83,7 @@ class ResourceWatchService implements JJShutdown {
 						
 						final Kind<?> kind = watchEvent.kind();
 						if (kind == OVERFLOW) {
-							log.info("FileWatchService OVERFLOW");
+							log.info("FileWatchService OVERFLOW - not sure what this means!");
 							continue; // for now. not sure what else to do
 						}
 						final WatchEvent<Path> event = cast(watchEvent);
@@ -93,10 +93,10 @@ class ResourceWatchService implements JJShutdown {
 						if (kind == ENTRY_DELETE) {
 							// it'll get reloaded if it gets recreated
 							// later and someone wants it
-							log.debug("removing {}", path);
+							log.info("removing {}", path);
 							resourceCache.remove(path.toUri());
 						} else if (kind == ENTRY_MODIFY) {
-							log.debug("reloading {}",path);
+							log.info("reloading {}",path);
 							final Resource resource = resourceCache.get(path.toUri());
 							if (resource != null) {
 								// this thread is only to handle the

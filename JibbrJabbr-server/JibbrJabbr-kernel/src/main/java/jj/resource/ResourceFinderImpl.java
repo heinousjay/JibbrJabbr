@@ -12,10 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.IOThread;
+import jj.JJExecutors;
 
 /**
  * coordinates access to the resource cache for the outside
- * world
+ * world.
  * @author jason
  *
  */
@@ -29,14 +30,18 @@ class ResourceFinderImpl implements ResourceFinder {
 	
 	private final ResourceWatchService resourceWatchService;
 	
+	private final JJExecutors executors;
+	
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
 		final ResourceCreator<?>[] resourceCreators,
-		final ResourceWatchService resourceWatchService
+		final ResourceWatchService resourceWatchService,
+		final JJExecutors executors
 	) {
 		this.resourceCache = resourceCache;
 		this.resourceCreators = makeResourceCreatorsMap(resourceCreators);
 		this.resourceWatchService = resourceWatchService;
+		this.executors = executors;
 	}
 	
 	// goddam, java generics get ugly sometimes
@@ -63,9 +68,9 @@ class ResourceFinderImpl implements ResourceFinder {
 		String baseName,
 		Object... args
 	) {
-		log.debug("checking in cache for {} at {}", resourceClass.getSimpleName(), baseName);
+		log.trace("checking in resource cache for {} at {}", resourceClass.getSimpleName(), baseName);
 		T result = (T)resourceCache.get(resourceCreators.get(resourceClass).toPath(baseName, args).toUri());
-		log.debug("result {}", result);
+		log.trace("result {}", result);
 		return result;
 	}
 
@@ -77,18 +82,20 @@ class ResourceFinderImpl implements ResourceFinder {
 		String baseName,
 		Object... args
 	) {
+		
+		assert executors.isIOThread() : "Can only call loadResource from an I/O thread";
+		
+		ResourceCreator<T> resourceCreator = (ResourceCreator<T>)resourceCreators.get(resourceClass);
+		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
+		
 		T result = null;
-		ResourceCreator<T> resourceCreator = 
-			(ResourceCreator<T>)resourceCreators.get(resourceClass);
-		if (resourceCreator == null) {
-			throw new AssertionError("need a ResourceCreator for " + resourceClass);
-		}
+		
 		Path path = resourceCreator.toPath(baseName, args);
 		URI pathUri = path.toUri();
 		try {
 			result = (T)resourceCache.get(pathUri);
 			if (result == null) {
-				log.debug("loading {} at {}", resourceClass.getSimpleName(), path);
+				log.trace("loading {} at {}", resourceClass.getSimpleName(), path);
 				Resource resource = resourceCreator.create(baseName, args);
 				if (resourceCache.putIfAbsent(pathUri, resource) == null) {
 					// if this was the first time we put this in the cache,
@@ -96,14 +103,14 @@ class ResourceFinderImpl implements ResourceFinder {
 					resourceWatchService.watch(resource);
 				}
 			} else if (result.needsReplacing()) {
-				log.debug("replacing {} at {}", resourceClass.getSimpleName(), path);
+				log.trace("replacing {} at {}", resourceClass.getSimpleName(), path);
 				if (!resourceCache.replace(pathUri, result, resourceCreator.create(baseName, args))){
 					log.warn("replacement failed, someone snuck in behind me? {} at {}", resourceClass.getSimpleName(), path);
 				}
 			}
 			result = (T)resourceCache.get(pathUri);
 		} catch (NullPointerException | NoSuchFileException e) {
-			log.debug("couldn't find {} at {}", resourceClass.getSimpleName(), path);
+			log.trace("couldn't find {} at {}", resourceClass.getSimpleName(), path);
 		} catch (IOException ioe) {
 			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), path);
 			log.error("", ioe);

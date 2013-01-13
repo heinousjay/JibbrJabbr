@@ -2,7 +2,7 @@ package jj.resource;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 
 import java.io.IOException;
@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.Configuration;
+import jj.JJExecutors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,8 @@ public class ConcreteResourceFinderImplTest {
 	ResourceCreator<?>[] resourceCreators;
 	@Mock ResourceWatchService resourceWatchService;
 	
+	@Mock JJExecutors executors;
+	
 	@Before
 	public void before() throws Exception {
 		baseUri = URI.create("http://localhost:8080/");
@@ -55,13 +58,19 @@ public class ConcreteResourceFinderImplTest {
 	public void test() throws IOException {
 		
 		// given 
-		ResourceFinderImpl toTest = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService);
+		ResourceFinderImpl toTest = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
 		
 		// when
 		HtmlResource result1 = toTest.findResource(HtmlResource.class, baseName);
+		
+		given(executors.isIOThread()).willReturn(true);
 		ScriptResource result2 = toTest.loadResource(ScriptResource.class, "index", ScriptResourceType.Server);
+		
+		given(executors.isIOThread()).willReturn(false);
 		ScriptResource result3 = toTest.findResource(ScriptResource.class, "index", ScriptResourceType.Server);
+		
 		// loading again with no changes should result in no changes
+		given(executors.isIOThread()).willReturn(true);
 		ScriptResource result4 = toTest.loadResource(ScriptResource.class, "index", ScriptResourceType.Server);
 		
 		// then

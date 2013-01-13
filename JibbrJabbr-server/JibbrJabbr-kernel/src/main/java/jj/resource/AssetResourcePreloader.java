@@ -27,7 +27,7 @@ class AssetResourcePreloader implements JJStartup {
 	@Override
 	public void start() throws Exception {
 		
-		log.debug("preloading internal assets");
+		log.info("preloading internal assets");
 
 		if (AssetResourceCreator.basePath != null) {
 			doWalk(AssetResourceCreator.basePath);
@@ -36,7 +36,6 @@ class AssetResourcePreloader implements JJStartup {
 				doWalk(myJarFS.getPath("/jj/assets"));
 			}
 		}
-		
 		
 		
 		log.debug("preload complete");

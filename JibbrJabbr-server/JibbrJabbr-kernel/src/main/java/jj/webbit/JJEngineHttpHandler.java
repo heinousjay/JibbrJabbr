@@ -3,7 +3,6 @@ package jj.webbit;
 import java.util.Arrays;
 
 import jj.HttpControlThread;
-import jj.IOThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.servable.Servable;
@@ -96,7 +95,6 @@ class JJEngineHttpHandler implements HttpHandler {
 		}
 	}
 	
-	@IOThread
 	private void nextHandler(final HttpControl control) {
 		if (executors.isIOThread()) {
 			control.execute(new JJRunnable("HtmlEngine passing control to next handler") {

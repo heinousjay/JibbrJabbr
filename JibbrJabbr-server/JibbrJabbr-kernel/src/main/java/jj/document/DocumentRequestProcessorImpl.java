@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.HttpControlThread;
-import jj.IOThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.ScriptThread;
@@ -40,9 +39,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	private final DocumentRequest documentRequest;
 	
 	private final DocumentFilter[] filters;
-	
 
-	@IOThread
 	public DocumentRequestProcessorImpl(
 		final JJExecutors executors,
 		final DocumentRequest documentRequest,
@@ -94,6 +91,8 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	 */
 	@ScriptThread
 	public void respond() {
+		assert executors.isScriptThread() : "must be called in a script thread";
+		
 		executeScriptFilters(makeFilterList(filters, false));
 		// the response gets written when this complete
 		FilterList ioFilters = makeFilterList(filters, true);
@@ -121,6 +120,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 			JJRunnable r = new JJRunnable(taskName) {
 				@Override
 				public void innerRun() throws Exception {
+					// not asserting IO thread here since this is only called from the next few lines
 					ioFilters.get(index).filter(documentRequest);
 					dispatchIONextFilter(ioFilters, currentIOFilter);
 				}
