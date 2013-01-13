@@ -118,6 +118,7 @@ class ScriptBundleCreator {
 				stubs.append("function ")
 					.append(lastMatcher.group(1))
 					.append("(){")
+					.append(hasReturn ? "return " : "")
 					.append("global['")
 					.append(hasReturn ? DoInvokeFunction.PROP_DO_INVOKE : DoCallFunction.PROP_DO_CALL)
 					.append("']('")
