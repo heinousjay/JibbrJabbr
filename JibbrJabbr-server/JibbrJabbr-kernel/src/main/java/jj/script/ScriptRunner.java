@@ -13,7 +13,6 @@ import jj.JJRunnable;
 import jj.ScriptThread;
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
-import jj.jqmessage.JQueryMessage;
 import jj.webbit.JJWebSocketConnection;
 
 /**
@@ -259,7 +258,7 @@ public class ScriptRunner {
 		});
 	}
 
-	private void resumeContinuation(
+	public void submitPendingResult(
 		final JJWebSocketConnection connection,
 		final String pendingKey,
 		final Object result
@@ -308,43 +307,6 @@ public class ScriptRunner {
 				}
 			}
 		});	
-	}
-	
-	private void processEvent(
-		final JJWebSocketConnection connection,
-		final String eventName,
-		final Object...args
-	) {
-		submit(connection.baseName(), new JJRunnable("client event on WebSocket connection") {
-			@Override
-			protected void innerRun() throws Exception {
-				context.initialize(connection);
-				try {
-					log.trace("executing script event {} for scriptBundle {}", eventName, connection.associatedScriptBundle());
-					processContinuationState(continuationCoordinator.execute(connection.associatedScriptBundle(), eventName));
-				} finally {
-					context.end();
-				}
-			}
-		});
-	}
-	
-	public void submit(
-		final JJWebSocketConnection connection,
-		final JQueryMessage message
-	) {
-		log.trace("preparing to process an incoming message {} for connection {}", message, connection);
-		
-		switch (message.type()) {
-		case Result:
-			resumeContinuation(connection, message.result().id, message.result().value);
-			break;
-		case Event:
-			processEvent(connection, EventNameHelper.makeEventName(message));
-			break;
-		default:
-			log.warn("received a message that makes no sense {}", message);
-		}
 	}
 	
 	/**

@@ -1,5 +1,9 @@
 package jj.webbit;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import jj.HttpControlThread;
 import jj.JJExecutors;
 import jj.hostapi.HostEvent;
@@ -28,14 +32,28 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	
 	private final WebSocketConnections connections;
 	
+	private final Map<JQueryMessage.Type, WebSocketMessageProcessor> messageProcessors;
+	
 	WebSocketHandler(
 		final ScriptBundleFinder scriptBundleFinder,
 		final JJExecutors executors,
-		final WebSocketConnections connections
+		final WebSocketConnections connections,
+		final WebSocketMessageProcessor[] messageProcessors
 	) {
 		this.scriptBundleFinder = scriptBundleFinder;
 		this.executors = executors;
 		this.connections = connections;
+		this.messageProcessors = makeMessageProcessors(messageProcessors);
+	}
+	
+	private 
+	Map<JQueryMessage.Type, WebSocketMessageProcessor> 
+	makeMessageProcessors(final WebSocketMessageProcessor[] messageProcessors) {
+		HashMap<JQueryMessage.Type, WebSocketMessageProcessor> result = new HashMap<>();
+		for (WebSocketMessageProcessor messageProcessor : messageProcessors) {
+			result.put(messageProcessor.type(), messageProcessor);
+		}
+		return Collections.unmodifiableMap(result);
 	}
 
 	@Override
@@ -48,6 +66,7 @@ class WebSocketHandler extends BaseWebSocketHandler {
 		if (jjcon.immediateClosure()) {
 			log.info("connection attempted to an old script, attempting reload");
 			// need some way of noticing we are being hammered here?
+			// i mean i guess we just close em as they come in
 			connection.send("jj-reload");
 			connection.close();
 		} else {
@@ -78,15 +97,20 @@ class WebSocketHandler extends BaseWebSocketHandler {
 		if ("jj-hi".equals(msg)) {
 			connection.send("jj-yo");
 		} else {
-		
+			boolean success = false;
+			
 			try {
 				JQueryMessage message = JQueryMessage.fromString(msg);
-				executors.scriptRunner().submit(jjcon, message);
 				
-			} catch (JQueryMessageException e) {
-				log.warn("{} connected to script {} spoke gibberish to me: {}", 
+				if (messageProcessors.containsKey(message.type())) {
+					messageProcessors.get(message.type()).handle(jjcon, message);
+					success = true;
+				}
+			} catch (JQueryMessageException e) {}
+			
+			if (!success) {
+				log.warn("{} spoke gibberish to me: {}", 
 					jjcon,
-					jjcon.associatedScriptBundle(),
 					msg
 				);
 			}

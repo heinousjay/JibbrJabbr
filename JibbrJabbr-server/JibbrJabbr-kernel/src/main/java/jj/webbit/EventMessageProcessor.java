@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.webbit;
 
-import jj.jqmessage.Event;
+import jj.JJExecutors;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;
+import jj.script.EventNameHelper;
 
 /**
  * @author jason
  *
  */
-public class EventNameHelper {
+class EventMessageProcessor implements WebSocketMessageProcessor {
 
-	private static final String FORMAT = "%s-%s(%s)";
+	private final JJExecutors executors;
 	
-	public static String makeEventName(JQueryMessage eventMessage) {
-		assert eventMessage != null && eventMessage.type() == Type.Event : "only event messages can be made into event names";
-		Event event = eventMessage.event();
-		return makeEventName(event.context, event.selector, event.type);
+	EventMessageProcessor(final JJExecutors executors) {
+		this.executors = executors;
 	}
 	
-	public static String makeEventName(String context, String selector, String type) {
-		if (context == null) context = "";
-		if (selector == null) selector = "";
-		if (type == null) type = "";
-		return String.format(FORMAT, context, selector, type);
+	@Override
+	public Type type() {
+		return Type.Event;
 	}
-	
+
+	@Override
+	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
+		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message));
+	}
+
 }

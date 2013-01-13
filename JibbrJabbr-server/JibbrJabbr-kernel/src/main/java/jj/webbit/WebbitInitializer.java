@@ -10,6 +10,8 @@ public class WebbitInitializer {
 				.addComponent(WebSocketHandler.class)
 				.addComponent(WebSocketConnections.class)
 				.addComponent(JJAccessLoggingHttpHandler.class)
-				.addComponent(NotFoundHttpHandler.class);
+				.addComponent(NotFoundHttpHandler.class)
+				.addComponent(EventMessageProcessor.class)
+				.addComponent(ResultMessageProcessor.class);
 	}
 }

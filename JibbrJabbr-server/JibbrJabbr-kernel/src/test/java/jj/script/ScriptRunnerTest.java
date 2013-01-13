@@ -4,8 +4,6 @@ import static org.mockito.BDDMockito.*;
 
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.MessageMaker;
 import jj.resource.ScriptResource;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.JJHttpRequest.State;
@@ -260,11 +258,10 @@ public class ScriptRunnerTest {
 		
 		// given
 		givenAWebSocketMessage();
-		JQueryMessage jwm = MessageMaker.makeEvent("jason", "miller");
-		String eventName = EventNameHelper.makeEventName(jwm);
+		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
 		
 		// when
-		scriptRunner.submit(connection, jwm);
+		scriptRunner.submit(connection, eventName);
 		executor.runUntilIdle();
 		
 		// then
@@ -277,16 +274,17 @@ public class ScriptRunnerTest {
 		// given
 		givenAWebSocketMessage();
 		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
-		JQueryMessage jwm = MessageMaker.makeEvent("jason", "miller");
-		String eventName = EventNameHelper.makeEventName(jwm);
+		
+		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
 		given(continuationState.type()).willReturn(ContinuationType.JQueryMessage);
 		given(continuationCoordinator.execute(associatedScriptBundle, eventName)).willReturn(continuationState);
+		
 		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
 			.willReturn(continuationState)
 			.willReturn(null);
 		
 		// when
-		scriptRunner.submit(connection, jwm);
+		scriptRunner.submit(connection, eventName);
 		executor.runUntilIdle();
 		
 		// then
@@ -310,10 +308,9 @@ public class ScriptRunnerTest {
 		final String key = "0";
 		final String value = "value";
 		givenAWebSocketMessage();
-		JQueryMessage result = MessageMaker.makeResult(key, value);
 		
 		// when
-		scriptRunner.submit(connection, result);
+		scriptRunner.submitPendingResult(connection, key, value);
 		executor.runUntilIdle();
 		
 		// then
