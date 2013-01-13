@@ -20,9 +20,14 @@ and browse to
 
 There is a partial chat sample living in JibbrJabbr-server/JibbrJabbr-kernel/src/test/resources/ you can use to explore.
 
-The capabilities of the system are currently very limited.  There is a notion of modules as defined in the commonjs modules spec,
+The capabilities of the system are currently very limited.  There 
+is a notion of modules as defined in the commonjs modules spec,
 so you can include a script using require('./whatever')
 
-There is a basic JQuery-like API for document manipulations.
+There is a basic jQuery-like API for document manipulations.
 
+DON'T DO ANYTHING SERIOUS WITH THIS.  It is far from production ready.
+It likely has massive security holes.  The API is barely specified,
+never mind implemented.  You'd be crazy to use this as anything but
+a toy.
 
