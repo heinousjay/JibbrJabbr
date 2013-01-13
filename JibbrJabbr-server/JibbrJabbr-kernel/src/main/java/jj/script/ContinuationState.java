@@ -30,10 +30,10 @@ public class ContinuationState implements Serializable {
 		this.returns = returns;
 	}
 	
-	public ContinuationState(final RestRequest request, final Returns returns) {
+	public ContinuationState(final RestRequest request) {
 		this.type = ContinuationType.AsyncHttpRequest;
 		this.message = request;
-		this.returns = returns;
+		this.returns = null;
 	}
 	
 	public ContinuationState(final RequiredModule require) {

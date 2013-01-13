@@ -6,9 +6,6 @@ import java.io.IOException;
 
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
-import jj.script.ContinuationState.Returns;
-
-
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -32,8 +29,6 @@ class RestCallProvider {
 	private final AsyncHttpClient httpClient;
 	
 	private final CurrentScriptContext context;
-	
-	private final Returns returnsJSON;
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -111,8 +106,8 @@ class RestCallProvider {
 			final Request request = requestBuilder.build();
 
 			if (!options.ignoreResult()) {
-				// TODO - handle the result in a way consistent with configuration
-				throw context.prepareContinuation(new RestRequest(request), returnsJSON);
+				// TODO - handle the result in a way consistent with configuration, gets set on the RestRequest
+				throw context.prepareContinuation(new RestRequest(request));
 			} else {
 				// just fire and forget!
 				try {
@@ -137,23 +132,10 @@ class RestCallProvider {
 	
 	RestCallProvider(
 		final AsyncHttpClient httpClient,
-		final CurrentScriptContext context,
-		final ScriptJSON scriptJSON
+		final CurrentScriptContext context
 	) {
 		this.httpClient = httpClient;
 		this.context = context;
-		returnsJSON = new Returns() {
-			
-			@Override
-			public Object transform(String value) {
-				return scriptJSON.parse(value);
-			}
-			
-			@Override
-			public String toString() {
-				return "JSON parsed js result";
-			}
-		};
 	}
 	
 	Function createRestCall(final RestCallOptions options) {

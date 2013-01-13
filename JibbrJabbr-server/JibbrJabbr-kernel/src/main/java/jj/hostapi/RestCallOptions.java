@@ -1,7 +1,7 @@
 package jj.hostapi;
 
-import static jj.hostapi.RestCallOptions.MIME.*;
-import static jj.hostapi.RestCallOptions.Method.*;
+import static jj.hostapi.MIME.*;
+import static jj.hostapi.Method.*;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -14,44 +14,6 @@ import org.mozilla.javascript.ScriptableObject;
  */
 class RestCallOptions {
 
-	enum Method {
-		GET {
-			@Override
-			MIME produces() {
-				return null;
-			}
-		},
-		POST {
-			@Override
-			MIME produces() {
-				return JSON;
-			}
-		},
-		PUT {
-			@Override
-			MIME produces() {
-				return JSON;
-			}
-		},
-		DELETE {
-			@Override
-			MIME produces() {
-				return null;
-			}
-		};
-		
-		abstract MIME produces();
-	}
-	
-	enum MIME {
-		JSON {
-			@Override
-			public String toString() {
-				return "application/json";
-			}
-		}
-	}
-	
 	private static final String PATH = "path";
 	private static final String METHOD = "method";
 	private static final String ACCEPT = "accept";

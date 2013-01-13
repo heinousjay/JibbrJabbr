@@ -1,7 +1,5 @@
 package jj.hostapi;
 
-import java.util.Map;
-
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.Callable;
 

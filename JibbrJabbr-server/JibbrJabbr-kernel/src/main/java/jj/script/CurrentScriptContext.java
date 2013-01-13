@@ -174,12 +174,8 @@ public class CurrentScriptContext {
 	}
 	
 	public ContinuationPending prepareContinuation(RestRequest restRequest) {
-		return prepareContinuation(restRequest, returnsString);
-	}
-	
-	public ContinuationPending prepareContinuation(RestRequest restRequest, Returns returns) {
-		ContinuationState continuationState = new ContinuationState(restRequest, returns);
-		throw prepareContinuation(restRequest.id(), continuationState);
+		ContinuationState continuationState = new ContinuationState(restRequest);
+		return prepareContinuation(restRequest.id(), continuationState);
 	}
 	
 	public ContinuationPending prepareContinuation(RequiredModule require) {

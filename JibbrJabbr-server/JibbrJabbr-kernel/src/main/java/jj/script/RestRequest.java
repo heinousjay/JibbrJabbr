@@ -1,6 +1,7 @@
 package jj.script;
 
 import jj.Sequence;
+import jj.hostapi.MIME;
 
 import com.ning.http.client.Request;
 
@@ -22,6 +23,11 @@ public class RestRequest {
 	
 	public String id() {
 		return id;
+	}
+	
+	public MIME produce() {
+		// for now, it's hardcoded
+		return MIME.JSON;
 	}
 	
 	public String toString() {

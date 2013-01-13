@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJExecutors;
 import jj.JJRunnable;
+import jj.hostapi.ScriptJSON;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
@@ -22,14 +23,18 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 	
 	private final JJExecutors executors;
 	
+	private final ScriptJSON json;
+	
 	RestRequestContinuationProcessor(
 		final CurrentScriptContext context,
 		final AsyncHttpClient httpClient,
-		final JJExecutors executors
+		final JJExecutors executors,
+		final ScriptJSON json
 	) {
 		this.context = context;
 		this.httpClient = httpClient;
 		this.executors = executors;
+		this.json = json;
 	}
 	
 	@Override
@@ -56,7 +61,7 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 								.scriptRunner()
 								.restartAfterContinuation(
 									restRequest.id(),
-									continuationState.produceReturn(body)
+									json.parse(body)
 								);
 							
 						} finally {
