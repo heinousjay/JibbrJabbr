@@ -16,6 +16,7 @@
 package jj.webbit;
 
 import jj.JJExecutors;
+import jj.hostapi.ScriptJSON;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;
 
@@ -27,8 +28,11 @@ class ResultMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
 	
-	public ResultMessageProcessor(final JJExecutors executors) {
+	private final ScriptJSON json;
+	
+	public ResultMessageProcessor(final JJExecutors executors, final ScriptJSON json) {
 		this.executors = executors;
+		this.json = json;
 	}
 	
 	@Override
@@ -38,7 +42,7 @@ class ResultMessageProcessor implements WebSocketMessageProcessor {
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
-		executors.scriptRunner().submitPendingResult(connection, message.result().id, message.result().value);
+		executors.scriptRunner().submitPendingResult(connection, message.result().id, json.parse(message.result().value));
 	}
 
 }

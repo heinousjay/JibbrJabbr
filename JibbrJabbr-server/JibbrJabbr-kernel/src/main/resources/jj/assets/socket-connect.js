@@ -251,6 +251,7 @@ jQuery(function($) {
 			console.error("WebSocket errored", error);
 		}
 		ws.onmessage = function(msg) {
+			if (debug) console.debug("WebSocket onmessage", msg);
 			if (!processRaw(msg.data)) {
 				try {
 					processMessages(JSON.parse(msg.data));
@@ -388,11 +389,10 @@ jQuery(function($) {
 		function result(id, result) {
 			// only send if we have an id
 			if (id) {
-				// clearly this can be cleaner although tags will help
 				send({
 					'result' : {
 						'id': id,
-						'value' : result
+						'value' : JSON.stringify(result)
 					}
 				});
 			}
