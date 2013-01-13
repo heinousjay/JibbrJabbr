@@ -8,6 +8,6 @@ public class DocumentInitializer {
 		
 		return container
 			.addComponent(ScriptHelperDocumentFilter.class)
-			.addComponent(InlineMessagesFilter.class);
+			.addComponent(InlineMessagesDocumentFilter.class);
 	}
 }

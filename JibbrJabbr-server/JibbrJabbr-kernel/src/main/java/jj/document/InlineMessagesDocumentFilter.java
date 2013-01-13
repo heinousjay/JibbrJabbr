@@ -34,13 +34,13 @@ import org.jsoup.select.Elements;
  * @author jason
  *
  */
-public class InlineMessagesFilter implements DocumentFilter {
+class InlineMessagesDocumentFilter implements DocumentFilter {
 	
 	private final ResourceFinder resourceFinder;
 	
 	private final JJExecutors executors;
 	
-	public InlineMessagesFilter(
+	public InlineMessagesDocumentFilter(
 		final ResourceFinder resourceFinder,
 		final JJExecutors executors
 	) {

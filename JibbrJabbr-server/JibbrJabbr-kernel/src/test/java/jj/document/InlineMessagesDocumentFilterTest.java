@@ -14,14 +14,13 @@ import jj.resource.PropertiesResource;
 import jj.resource.ResourceFinder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InlineMessagesFilterTest {
+public class InlineMessagesDocumentFilterTest {
 
 	String baseName;
 	@Mock ResourceFinder resourceFinder;
@@ -30,12 +29,13 @@ public class InlineMessagesFilterTest {
 	@Mock DocumentRequest documentRequest;
 	@Mock HtmlResource htmlResource;
 	Document document;
-	InlineMessagesFilter toTest;
+	InlineMessagesDocumentFilter toTest;
 	@Mock JJExecutors executors;
 	
-	@Before
-	public void before() throws IOException {
-		
+	@Test
+	public void test() throws IOException {
+
+		// given
 		baseName = "index";
 		
 		given(executors.isIOThread()).willReturn(false);
@@ -54,14 +54,8 @@ public class InlineMessagesFilterTest {
 		
 		given(resourceFinder.findResource(PropertiesResource.class, baseName)).willReturn(propertiesResource);
 		
-		toTest = new InlineMessagesFilter(resourceFinder, executors);
+		toTest = new InlineMessagesDocumentFilter(resourceFinder, executors);
 		
-	}
-	
-	@Test
-	public void test() {
-		
-		// given
 		
 		// when
 		toTest.filter(documentRequest);
