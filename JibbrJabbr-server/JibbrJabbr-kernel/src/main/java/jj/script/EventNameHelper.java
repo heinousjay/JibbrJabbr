@@ -20,6 +20,8 @@ import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;
 
 /**
+ * common functions for making a consistent event name
+ * 
  * @author jason
  *
  */
