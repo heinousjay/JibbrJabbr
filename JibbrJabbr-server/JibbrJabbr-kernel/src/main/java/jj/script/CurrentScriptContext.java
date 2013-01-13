@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maintains the current context for a thread
- * executing a script
+ * executing a script.  basically a multimode
+ * repository of information 
  * @author jason
  *
  */
@@ -154,7 +155,7 @@ public class CurrentScriptContext {
 	 * @return
 	 */
 	public ContinuationPending prepareContinuation(JQueryMessage jQueryMessage) {
-		return prepareContinuation(jQueryMessage, returnsString);
+		throw prepareContinuation(jQueryMessage, returnsString);
 	}
 	
 	/**
@@ -173,16 +174,33 @@ public class CurrentScriptContext {
 		throw prepareContinuation(jQueryMessage.resultId(), continuationState);
 	}
 	
+	/**
+	 * Prepares and throws a continuation for a rest request
+	 * @param restRequest
+	 * @return
+	 */
 	public ContinuationPending prepareContinuation(RestRequest restRequest) {
 		ContinuationState continuationState = new ContinuationState(restRequest);
-		return prepareContinuation(restRequest.id(), continuationState);
+		throw prepareContinuation(restRequest.id(), continuationState);
 	}
 	
+	/**
+	 * prepares and throws a continuation to require a new module
+	 * @param require
+	 * @return
+	 */
 	public ContinuationPending prepareContinuation(RequiredModule require) {
 		ContinuationState continuationState = new ContinuationState(require);
 		throw prepareContinuation(require.pendingKey(), continuationState);
 	}
 	
+	/**
+	 * captures a continuation from the rhino interpreter, and stores the information
+	 * necessary for resumption
+	 * @param pendingId 
+	 * @param continuationState
+	 * @return
+	 */
 	private ContinuationPending prepareContinuation(String pendingId, ContinuationState continuationState) {
 		Context context = Context.enter();
 		try {
@@ -207,6 +225,8 @@ public class CurrentScriptContext {
 			}
 			
 			return continuation;
+		} catch (Exception e) {
+			throw new AssertionError("could not capture a continuation", e);
 		} finally {
 			Context.exit();
 		}
