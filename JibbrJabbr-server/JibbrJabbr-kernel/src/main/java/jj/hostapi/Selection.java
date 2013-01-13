@@ -19,6 +19,10 @@ public interface Selection {
 	String selector();
 	
 	// -- Events
+	Selection on(final String type, final Callable function);
+	
+	Selection on(final String type, final String selector, final Callable function);
+	
 	/**
 	 * attaches an event handler to the named event on all matched elements
 	 * @param type

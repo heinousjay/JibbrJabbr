@@ -4,6 +4,8 @@ import java.util.Map;
 
 import jj.jqmessage.JQueryMessage;
 import jj.script.CurrentScriptContext;
+import jj.script.EventNameHelper;
+import jj.script.ScriptContextType;
 
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.Callable;
@@ -30,34 +32,45 @@ public class EventSelection implements Selection {
 	}
 	
 	@Override
-	public Selection bind(String type, boolean cancel) {
-		// TODO Auto-generated method stub
+	public Selection on(String type, Callable function) {
+		return on(type, "", function);
+	}
+	
+	@Override
+	public Selection on(String type, String selector, Callable function) {
+		if (context.type() != ScriptContextType.WebSocket) {
+			throw new IllegalStateException("cannot bind an event from this context");
+		}
+		context.connection().send(JQueryMessage.makeBind(this.selector, selector, type));
+		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return null;
+	}
+	
+	@Override
+	public Selection bind(String type, boolean cancel) {
+		return this;
 	}
 	@Override
 	public Selection bind(String type, Callable function) {
-		// TODO Auto-generated method stub
-		return null;
+		return on(type, function);
 	}
 	@Override
 	public Selection bind(String type, Object data, boolean cancel) {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 	@Override
 	public Selection bind(String type, Object data, Callable function) {
-		// TODO Auto-generated method stub
-		return null;
+		return on(type, function);
 	}
 
 	@Override
 	public Selection click(Callable function) {
-		return bind("click", function);
+		return on("click", function);
 	}
 	
 	@Override
 	public Selection enter(Callable function) {
-		return bind("enter", function);
+		return on("enter", function);
 	}
 
 	@Override

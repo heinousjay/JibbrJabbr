@@ -42,24 +42,26 @@ public class DocumentSelection implements Selection {
 	}
 	
 	// -- Events
+	@Override
+	public Selection on(final String type, final Callable function) {
+		return on(type, "", function);
+	}
+	
+	@Override
 	public Selection on(final String type, final String selector, final Callable function) {
-		
-		
+		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeBind(this.selector, selector, type));
+		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
 	}
 	
 	@Override
 	public Selection bind(final String type, final Callable function) {
-		return bind(type, null, function);
+		return on(type, function);
 	}
 	
 	@Override
 	public Selection bind(final String type, final Object data, final Callable function) {
-		// TODO handle the data. this will require some sort of context... dunno how yet
-		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeBind(selector, "", type));
-		
-		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(selector, "", type), function);
-		return this;
+		return on(type, function);
 	}
 	
 	@Override
