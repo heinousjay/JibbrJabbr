@@ -15,7 +15,7 @@ import org.jsoup.nodes.Element;
  * @author jason
  * 
  */
-public class ScriptHelperDocumentFilter implements DocumentFilter {
+class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	public static final String JQUERY_URI = "/jquery-1.8.3.min.js";
 	public static final String SOCKET_CONNECT_URI = "/socket-connect.js";
