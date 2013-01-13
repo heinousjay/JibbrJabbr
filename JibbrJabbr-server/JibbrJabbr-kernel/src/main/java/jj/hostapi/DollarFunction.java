@@ -9,8 +9,6 @@ import jj.jqmessage.JQueryMessage;
 import jj.script.CurrentScriptContext;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptRunner;
-import jj.script.ContinuationState.Returns;
-
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -180,19 +178,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				return new EventSelection(String.format("#%s", args.get(ATTR_ID)), context);
 			} else {
 				throw context.prepareContinuation(
-					JQueryMessage.makeCreate(html, args), 
-					new Returns() {
-						@Override
-						public Object transform(String value) {
-							return new EventSelection(value, context);
-						}
-						
-						@Override
-						public String toString() {
-							return "newly created element reference";
-						}
-					}
-				);
+					JQueryMessage.makeCreate(html, args));
 			}
 		}
 		

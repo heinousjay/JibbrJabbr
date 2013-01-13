@@ -1,7 +1,6 @@
 package jj.hostapi;
 
 import jj.jqmessage.JQueryMessage;
-import jj.script.ContinuationState.Returns;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 import jj.script.ScriptContextType;
@@ -19,15 +18,6 @@ public class EventSelection implements Selection {
 	private final String selector;
 	
 	private final CurrentScriptContext context;
-	
-	private static final Returns returnsBoolean = new Returns() {
-
-		@Override
-		public Object transform(String value) {
-			return "true".equals(value) ? Boolean.TRUE : Boolean.FALSE;
-		}
-		
-	};
 	
 	public EventSelection(final String selector, final CurrentScriptContext context) {
 		this.selector = selector;
@@ -128,7 +118,7 @@ public class EventSelection implements Selection {
 		if (context.type() != ScriptContextType.WebSocket) {
 			throw new IllegalStateException("cannot check for an attribute value from this context");
 		}
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasAttr", attributeKey), returnsBoolean);
+		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasAttr", attributeKey));
 	}
 
 	@Override
@@ -189,7 +179,7 @@ public class EventSelection implements Selection {
 		if (context.type() != ScriptContextType.WebSocket) {
 			throw new IllegalStateException("cannot check for a class from this context");
 		}
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasClass", className), returnsBoolean);
+		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasClass", className));
 	}
 
 	@Override

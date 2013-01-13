@@ -6,40 +6,23 @@ import jj.jqmessage.JQueryMessage;
 
 public class ContinuationState implements Serializable {
 	
-	/**
-	 * simple helper to produce a correctly typed result
-	 * post continuation.  you should define a toString
-	 * method that describes the return value for debugging
-	 * @author jason
-	 *
-	 */
-	public interface Returns {
-		
-		Object transform(String value);
-	}
-	
-	private final Returns returns;
-
 	private final Object message;
 	
 	private final ContinuationType type;
 	
-	public ContinuationState(final JQueryMessage jQueryMessage, final Returns returns) {
+	public ContinuationState(final JQueryMessage jQueryMessage) {
 		this.type = ContinuationType.JQueryMessage; 
 		this.message = jQueryMessage;
-		this.returns = returns;
 	}
 	
 	public ContinuationState(final RestRequest request) {
 		this.type = ContinuationType.AsyncHttpRequest;
 		this.message = request;
-		this.returns = null;
 	}
 	
 	public ContinuationState(final RequiredModule require) {
 		this.type = ContinuationType.RequiredModule;
 		this.message = require;
-		this.returns = null;
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -73,17 +56,11 @@ public class ContinuationState implements Serializable {
 		throw new AssertionError("weird construction, can't happen");
 	}
 	
-	public Object produceReturn(String value) {
-		return returns.transform(value);
-	}
-	
 	public String toString() {
 		return new StringBuilder("type: ")
 			.append(type())
 			.append(", message: ")
 			.append(message)
-			.append(", returns: ")
-			.append(returns)
 			.toString();
 	}
 }

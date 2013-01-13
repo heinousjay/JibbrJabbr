@@ -4,7 +4,6 @@ import java.util.Map;
 
 import jj.document.DocumentRequestProcessor;
 import jj.jqmessage.JQueryMessage;
-import jj.script.ContinuationState.Returns;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.JJWebSocketConnection;
 
@@ -131,17 +130,6 @@ public class CurrentScriptContext {
 		
 		return (ContinuationPending)data.remove(pendingKey);
 	}
-
-	
-	private static Returns returnsString = new Returns() {
-		public String transform(String value) {
-			return value;
-		}
-		
-		public String toString(){
-			return "String";
-		}
-	};
 	
 	/**
 	 * Prepares a continuation and throws it.  Returns the ContinuationPending
@@ -155,23 +143,8 @@ public class CurrentScriptContext {
 	 * @return
 	 */
 	public ContinuationPending prepareContinuation(JQueryMessage jQueryMessage) {
-		throw prepareContinuation(jQueryMessage, returnsString);
-	}
-	
-	/**
-	 * Prepares a continuation and throws it.  Returns the ContinuationPending
-	 * so that callers can write
-	 * <code>throw context.prepareContinuation(...)</code>
-	 * so the compiler stays happy, but this method never returns normally
-	 * 
-	 * @param jQueryMessage
-	 * @param returns
-	 * @return
-	 */
-	public ContinuationPending prepareContinuation(JQueryMessage jQueryMessage, Returns returns) {
-		
-		ContinuationState continuationState = new ContinuationState(jQueryMessage, returns);
-		throw prepareContinuation(jQueryMessage.resultId(), continuationState);
+		ContinuationState continuationState = new ContinuationState(jQueryMessage);
+		throw prepareContinuation(jQueryMessage.id(), continuationState);
 	}
 	
 	/**
