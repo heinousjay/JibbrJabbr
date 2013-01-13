@@ -21,6 +21,8 @@ import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;
 
 /**
+ * processes incoming result messages into usable objects and restarts the
+ * continuation
  * @author jason
  *
  */
