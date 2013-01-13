@@ -64,18 +64,27 @@ public class JQueryMessage {
 	}
 	
 	public static JQueryMessage makeGet(String selector, String type) {
+		return makeGet(selector, type, null);
+	}
+	
+	public static JQueryMessage makeGet(String selector, String type, String name) {
 		JQueryMessage result = new JQueryMessage(Get);
 		result.get().id = makeId();
 		result.get().selector = selector;
 		result.get().type = type;
-		
+		result.get().name = name;
 		return result;
 	}
 	
 	public static JQueryMessage makeSet(String selector, String type, String value) {
+		return makeSet(selector, type, null, value);
+	}
+	
+	public static JQueryMessage makeSet(String selector, String type, String name, String value) {
 		JQueryMessage result = new JQueryMessage(Set);
 		result.set().selector = selector;
 		result.set().type = type;
+		result.set().name = name;
 		result.set().value = value;
 		return result;
 	}
