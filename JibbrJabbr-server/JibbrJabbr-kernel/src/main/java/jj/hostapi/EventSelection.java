@@ -51,7 +51,7 @@ public class EventSelection implements Selection {
 		}
 		context.connection().send(JQueryMessage.makeBind(this.selector, selector, type));
 		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
-		return null;
+		return this;
 	}
 	
 	@Override
@@ -115,6 +115,13 @@ public class EventSelection implements Selection {
 		}
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "attr", attributeKey));
 	}
+	
+	public String prop(String propKey) {
+		if (context.type() != ScriptContextType.WebSocket) {
+			throw new IllegalStateException("cannot get an property value from this context");
+		}
+		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "prop", propKey));
+	}
 
 	@Override
 	public boolean hasAttr(String attributeKey) {
@@ -130,6 +137,14 @@ public class EventSelection implements Selection {
 			throw new IllegalStateException("cannot set an attribute from this context");
 		}
 		context.connection().send(JQueryMessage.makeSet(selector, "attr", attributeKey, attributeValue));
+		return this;
+	}
+
+	public Selection prop(String propKey, String propValue) {
+		if (context.type() != ScriptContextType.WebSocket) {
+			throw new IllegalStateException("cannot set an property from this context");
+		}
+		context.connection().send(JQueryMessage.makeSet(selector, "prop", propKey, propValue));
 		return this;
 	}
 
@@ -306,4 +321,8 @@ public class EventSelection implements Selection {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return EventSelection.class.getSimpleName() + ": " + selector;
+	}
 }
