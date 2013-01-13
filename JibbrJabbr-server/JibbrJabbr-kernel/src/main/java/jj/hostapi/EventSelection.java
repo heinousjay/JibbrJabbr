@@ -75,8 +75,7 @@ public class EventSelection implements Selection {
 
 	@Override
 	public Selection data(String key, String value) {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
@@ -87,20 +86,26 @@ public class EventSelection implements Selection {
 
 	@Override
 	public Selection text(String text) {
+		if (context.type() != ScriptContextType.WebSocket) {
+			throw new IllegalStateException("cannot retrieve text from this context");
+		}
 		context.connection().send(JQueryMessage.makeSet(selector, "text", text));
 		return this;
 	}
 
 	@Override
 	public Selection append(Selection selection) {
+		if (context.type() != ScriptContextType.WebSocket) {
+			throw new IllegalStateException("cannot append from this context");
+		}
 		context.connection().send(JQueryMessage.makeAppend(selector, selection.selector()));
 		return this;
 	}
 
 	@Override
 	public String attr(String attributeKey) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO make work
+		return "";
 	}
 
 	@Override
