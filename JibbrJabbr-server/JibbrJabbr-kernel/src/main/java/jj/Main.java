@@ -83,7 +83,7 @@ public class Main {
 		WebbitInitializer.initialize(container);
 		
 		serverLifecycle = container.getComponent(JJServerLifecycle.class);
-		log.info("Welcome to JibbrJabbr");
+		log.info("Welcome to {} version {} built on {}", Version.name, Version.version, Version.buildDate);
 	}
 	
 	public void start() throws Exception {
