@@ -2,12 +2,15 @@ package jj.jqmessage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Event extends Element {
+public class Event {
 
 	Event() {}
 	
 	@JsonProperty
 	public String context;
+	
+	@JsonProperty
+	public String selector;
 	
 	@JsonProperty
 	public String type;

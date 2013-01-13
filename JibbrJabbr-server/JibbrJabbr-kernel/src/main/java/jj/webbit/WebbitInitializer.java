@@ -12,6 +12,7 @@ public class WebbitInitializer {
 				.addComponent(JJAccessLoggingHttpHandler.class)
 				.addComponent(NotFoundHttpHandler.class)
 				.addComponent(EventMessageProcessor.class)
-				.addComponent(ResultMessageProcessor.class);
+				.addComponent(ResultMessageProcessor.class)
+				.addComponent(ElementMessageProcessor.class);
 	}
 }

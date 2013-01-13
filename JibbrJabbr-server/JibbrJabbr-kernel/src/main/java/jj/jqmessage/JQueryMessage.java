@@ -43,6 +43,8 @@ public class JQueryMessage {
 		Create,
 		/** client --> server event fired */
 		Event,
+		/** client --> server element result */
+		Element,
 		/** server --> client getter invocation, followed by result containing value */
 		Get,
 		/** server --> client general invocation, expecting no result! */
@@ -227,6 +229,17 @@ public class JQueryMessage {
 	void event(Event event) {
 		type = Event;
 		message = event;
+	}
+	
+	@JsonProperty
+	public Element element() {
+		return (Element)(type == Element ? message : null);
+	}
+	
+	@JsonProperty
+	void element(Element element) {
+		type = Element;
+		message = element;
 	}
 	
 	@JsonProperty

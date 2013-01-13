@@ -351,7 +351,7 @@ jQuery(function($) {
 				var id = el.attr('id') || idify(el);
 				var selector = '#' + id;
 				creationHoldingPen[selector] = el;
-				result(create.id, selector);
+				element(create.id, selector);
 			},
 			'append': function(append) {
 				_$(append.parent).append(_$(append.child));
@@ -384,6 +384,17 @@ jQuery(function($) {
 		function _$(selector) {
 			// use this to see if it's in the holding pen first
 			return creationHoldingPen[selector] || $(selector); 
+		}
+		
+		function element(id, selector) {
+			if (id) {
+				send({
+					'element' : {
+						'id' : id,
+						'selector' : selector
+					}
+				});
+			}
 		}
 		
 		function result(id, result) {
