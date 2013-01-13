@@ -190,7 +190,6 @@ public class DocumentSelection implements Selection {
 		return elements.text();
 	}
 
-	@Override
 	public boolean hasText() {
 		return elements.hasText();
 	}
@@ -200,12 +199,10 @@ public class DocumentSelection implements Selection {
 		return elements.html();
 	}
 
-	@Override
 	public String outerHtml() {
 		return elements.outerHtml();
 	}
 
-	@Override
 	public Selection tagName(String tagName) {
 		elements.tagName(tagName);
 		return this;

@@ -330,13 +330,20 @@ jQuery(function($) {
 
 			},
 			'get': function(get) {
-				result(get.id, _$(get.selector)[get.type]());
+				if ('name' in get) {
+					result(get.id, _$(get.selector)[get.type](get.name));
+				} else {
+					result(get.id, _$(get.selector)[get.type]());
+				}
 			},
 			'set': function(set) {
-				// TODO attr id setting is a special case! 
-				// may need to update the pen
-				// may become its own message actually
-				_$(set.selector)[set.type](set.value);
+				if ('name' in set) {
+					// TODO attr id setting is a special case! 
+					// because we may need to update the pen
+					_$(set.selector)[set.type](set.name, set.value);
+				} else {
+					_$(set.selector)[set.type](set.value);
+				}
 			},
 			'create': function(create) {
 				var el = $(create.html, create.args);

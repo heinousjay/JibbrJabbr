@@ -79,12 +79,6 @@ public interface Selection {
 	Selection data(final String key, final String value);
 	
 	/**
-	 * Returns the dataset of the first matched element, if any.
-	 * @return
-	 */
-	Map<String, String> dataset();
-	
-	/**
 	 * Set the text of the matched elements. Any existing contents (text or elements) will be cleared.
 	 * @param text
 	 * @return
@@ -187,12 +181,6 @@ public interface Selection {
 	 */
 	String text();
 
-    /**
-     Test if any matched element has any text content (that is not just whitespace).
-     @return true if any matched element has non-blank text content.
-     */
-	boolean hasText();
-
 	/**
 	 * Get the combined inner HTML of all matched elements.
 	 * @return string of all element's inner HTML.
@@ -200,23 +188,6 @@ public interface Selection {
 	 * @see #outerHtml()
 	 */
 	String html();
-
-	/**
-	 * Get the combined outer HTML of all matched elements.
-	 * @return string of all element's outer HTML.
-	 * @see #text()
-	 * @see #html()
-	 */
-	String outerHtml();
-
-	/**
-	 * Update the tag name of each matched element. For example, to change each {@code <i>} to a {@code <em>}, do
-	 * {@code doc.select("i").tagName("em");}
-	 * @param tagName the new tag name
-	 * @return this, for chaining
-	 * @see Element#tagName(String)
-	 */
-	Selection tagName(String tagName);
 
 	/**
 	 * Set the inner HTML of each matched element.
