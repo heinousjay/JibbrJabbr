@@ -290,14 +290,18 @@ public class ScriptRunner {
 	}
 	
 	public void submit(final JJWebSocketConnection connection, final HostEvent hostEvent, final Object...args) {
+		submit(connection, hostEvent.toString(), args);
+	}
+	
+	public void submit(final JJWebSocketConnection connection, final String event, final Object...args) {
 		submit(connection.baseName(), new JJRunnable("host event on WebSocket connection") {
 			@Override
 			protected void innerRun() throws Exception {
-				log.trace("executing host event {} for connection {}", hostEvent, connection);
+				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
 				try {
 					processContinuationState(
-						continuationCoordinator.execute(connection.associatedScriptBundle(), hostEvent.toString(), args)
+						continuationCoordinator.execute(connection.associatedScriptBundle(), event, args)
 					);
 				} finally {
 					context.end();
