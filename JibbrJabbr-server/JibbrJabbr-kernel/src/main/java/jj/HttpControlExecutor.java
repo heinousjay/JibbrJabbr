@@ -33,7 +33,9 @@ public class HttpControlExecutor extends ScheduledThreadPoolExecutor {
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
 
 	// just one.  maybe we can play with expanding this? but i doubt we
-	// need to.
+	// need to. and i believe i read somewhere that there is a handler in
+	// webbit that uses a hashmap to track connections on this thread, so
+	// it's clearly designed to only support 1
 	public static final int WORKER_COUNT = 1;
 	
 	private static final ThreadFactory threadFactory = new ThreadFactory() {
