@@ -15,9 +15,14 @@
  */
 package jj.webbit;
 
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.ScriptableObject;
+
 import jj.JJExecutors;
+import jj.hostapi.EventSelection;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;
+import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 
 /**
@@ -27,9 +32,11 @@ import jj.script.EventNameHelper;
 class EventMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
+	private final CurrentScriptContext context;
 	
-	EventMessageProcessor(final JJExecutors executors) {
+	EventMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
 		this.executors = executors;
+		this.context = context;
 	}
 	
 	@Override
@@ -39,7 +46,9 @@ class EventMessageProcessor implements WebSocketMessageProcessor {
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
-		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message));
+		NativeObject event = new NativeObject();
+		event.defineProperty("target", new EventSelection(message.event().target, context), ScriptableObject.CONST);
+		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message), event);
 	}
 
 }

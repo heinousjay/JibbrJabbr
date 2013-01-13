@@ -268,7 +268,8 @@ $(function() {
 	// style keeping everything scoped as tightly as possible makes sense.
 	// much like access in OOP, it's vastly simpler to loosen scope if needed 
 	// rather than tighten if desired
-	var chat = function() {
+	var chat = function(event) {
+		
 		// pretty standard jQuery style here, read the value of the 
 		// user input that triggered the event and trim it.
 		// you'd never know it by looking here, but that val() 
