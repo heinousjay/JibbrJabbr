@@ -374,7 +374,7 @@ jQuery(function($) {
 			'invoke': function(invoke) {
 				var toInvoke = window[invoke.name];
 				if (toInvoke) {
-					result(invoke.id, JSON.stringify(toInvoke.apply(window, JSON.parse(invoke.args))));
+					result(invoke.id, toInvoke.apply(window, JSON.parse(invoke.args)));
 				} else {
 					console.warn('asked to invoke a nonexistent function ' + invoke.name);
 				}
