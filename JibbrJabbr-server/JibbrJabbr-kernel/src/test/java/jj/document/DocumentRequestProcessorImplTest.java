@@ -110,9 +110,10 @@ public class DocumentRequestProcessorImplTest {
 			.willReturn(false)
 			.willReturn(false)
 			.willReturn(false)
-			.willReturn(true)
-			.willReturn(true)
+			.willReturn(false)
 			.willReturn(true);
+		
+		given(executors.isScriptThread()).willReturn(true);
 		
 		DocumentRequestProcessorImpl toTest = 
 			new DocumentRequestProcessorImpl(executors, documentRequest, filters);
@@ -133,6 +134,8 @@ public class DocumentRequestProcessorImplTest {
 		// given
 		DocumentRequestProcessorImpl toTest = 
 				new DocumentRequestProcessorImpl(executors, documentRequest, new DocumentFilter[0]);
+		
+		given(executors.isScriptThread()).willReturn(true);
 		
 		// when
 		toTest.respond();
