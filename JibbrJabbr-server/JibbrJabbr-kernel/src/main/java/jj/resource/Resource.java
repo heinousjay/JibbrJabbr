@@ -48,7 +48,9 @@ public interface Resource {
 
 	/**
 	 * uri to this resource, expressed as a path relative to
-	 * the absolute root that we serve
+	 * the absolute root that we serve, including the sha1 of
+	 * the resource in the path so as to uniquely identify
+	 * contents
 	 * @return
 	 */
 	String uri();
