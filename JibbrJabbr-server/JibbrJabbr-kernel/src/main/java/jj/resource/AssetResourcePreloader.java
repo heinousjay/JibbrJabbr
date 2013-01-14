@@ -12,6 +12,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.JJExecutors;
+import jj.JJRunnable;
 import jj.JJStartup;
 
 class AssetResourcePreloader implements JJStartup {
@@ -20,25 +22,36 @@ class AssetResourcePreloader implements JJStartup {
 	
 	private final ResourceFinder finder;
 	
-	AssetResourcePreloader(final ResourceFinder finder) {
+	private final JJExecutors executors;
+	
+	AssetResourcePreloader(final ResourceFinder finder, final JJExecutors executors) {
 		this.finder = finder;
+		this.executors = executors;
 	}
 
 	@Override
 	public void start() throws Exception {
 		
-		log.info("preloading internal assets");
+		executors.ioExecutor().submit(new JJRunnable("internal asset preloader") {
+			
+			@Override
+			protected void innerRun() throws Exception {
+				log.info("preloading internal assets");
 
-		if (AssetResourceCreator.basePath != null) {
-			doWalk(AssetResourceCreator.basePath);
-		} else if (AssetResourceCreator.myJar != null) {
-			try (FileSystem myJarFS = FileSystems.newFileSystem(AssetResourceCreator.myJar, null)) {
-				doWalk(myJarFS.getPath("/jj/assets"));
+				if (AssetResourceCreator.basePath != null) {
+					doWalk(AssetResourceCreator.basePath);
+				} else if (AssetResourceCreator.myJar != null) {
+					try (FileSystem myJarFS = FileSystems.newFileSystem(AssetResourceCreator.myJar, null)) {
+						doWalk(myJarFS.getPath("/jj/assets"));
+					}
+				}
+				
+				
+				log.debug("preload complete");
+				
 			}
-		}
+		});
 		
-		
-		log.debug("preload complete");
 	}
 	
 	private void doWalk(final Path path) throws Exception {
