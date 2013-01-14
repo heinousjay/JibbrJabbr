@@ -162,7 +162,7 @@ jQuery(function($) {
 		
 		var me = $('#jj-connector-script');
 		
-		var debug = true; //me.data('jj-debug') === true;
+		var debug = me.data('jj-debug') === true;
 		me.removeAttr('data-jj-debug');
 		
 		$j.debug = function(on) {
@@ -328,7 +328,6 @@ jQuery(function($) {
 					context: binding.context || ''
 				};
 				context.on(eventName + '.jj', binding.selector, data, handler);
-
 			},
 			'get': function(get) {
 				if ('name' in get) {
