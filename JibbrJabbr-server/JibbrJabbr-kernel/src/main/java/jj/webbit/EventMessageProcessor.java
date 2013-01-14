@@ -47,7 +47,9 @@ class EventMessageProcessor implements WebSocketMessageProcessor {
 	@Override
 	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
 		NativeObject event = new NativeObject();
-		event.defineProperty("target", new EventSelection(message.event().target, context), ScriptableObject.CONST);
+		// need to get a way to make the target into the context this for the handler
+		EventSelection target = new EventSelection(message.event().target, context);
+		event.defineProperty("target", target, ScriptableObject.CONST);
 		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message), event);
 	}
 
