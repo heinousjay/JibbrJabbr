@@ -27,12 +27,20 @@ public class DocumentRequest {
 	private final HttpControl httpControl;
 	private final String id = "request " + idSequence.next();
 	
+	// this is a little hacky but the idea is if the request needed IO, it's the first time
+	// through, so the ResourceUrlDocumentFilter will also need IO to warm up the cache
+	// with resources.  this may behave strangely in development if you do some file deletions
+	// and stuff... but the (eventual) REPL will eventually have a command to flush caches and
+	// force loading if things aren't getting picked up.
+	private final boolean neededIO;
+	
 	public DocumentRequest(
 		final Resource resource,
 		final Document document,
 		final JJHttpRequest httpRequest,
 		final HttpResponse httpResponse,
-		final HttpControl httpControl	
+		final HttpControl httpControl,
+		final boolean neededIO
 	) {
 		this.baseName = resource.baseName();
 		this.mime = resource.mime();
@@ -40,6 +48,7 @@ public class DocumentRequest {
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
 		this.httpControl = httpControl;
+		this.neededIO = neededIO;
 	}
 	
 	public String mime() {
@@ -68,6 +77,10 @@ public class DocumentRequest {
 	
 	public String id() {
 		return id;
+	}
+	
+	public boolean neededIO() {
+		return neededIO;
 	}
 	
 	public String toString() {

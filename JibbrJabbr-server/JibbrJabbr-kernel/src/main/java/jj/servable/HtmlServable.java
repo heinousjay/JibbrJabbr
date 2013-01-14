@@ -141,7 +141,7 @@ class HtmlServable extends Servable {
 				
 				result = new DocumentRequestProcessorImpl(
 					executors,
-					new DocumentRequest(htmlResource, htmlResource.document(), request, response, control),
+					new DocumentRequest(htmlResource, htmlResource.document(), request, response, control, executors.isIOThread()),
 					documentFilters
 				);
 			}

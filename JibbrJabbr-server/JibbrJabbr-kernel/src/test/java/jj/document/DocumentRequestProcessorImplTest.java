@@ -91,7 +91,7 @@ public class DocumentRequestProcessorImplTest {
 		httpResponse = new StubHttpResponse();
 		httpControl = new StubHttpControl();
 		
-		documentRequest = new DocumentRequest(htmlResource, document, httpRequest, httpResponse, httpControl);
+		documentRequest = new DocumentRequest(htmlResource, document, httpRequest, httpResponse, httpControl, false);
 	}
 
 	@Test
