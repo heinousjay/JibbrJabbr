@@ -39,6 +39,11 @@ class ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	ContinuationState execute(ScriptBundle scriptBundle) {
+		
+		assert (scriptBundle != null) : "cannot execute without a script bundle";
+		
+		log.trace("executing {}", scriptBundle);
+		
 		ScriptableObject.putConstProperty(scriptBundle.scope(), "scriptKey", scriptBundle.sha1());
 		try {
 			rhinoObjectCreator.context().executeScriptWithContinuations(
@@ -53,9 +58,7 @@ class ContinuationCoordinator {
 			for (ScriptStackElement sse : re.getScriptStack()) {
 				log.error("{}", sse);
 			}
-		} catch (OutOfMemoryError oom) {
-			throw oom;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error("unexpected problem during script execution {}", scriptBundle);
 			log.error("", e);
 		} finally {
@@ -73,8 +76,13 @@ class ContinuationCoordinator {
 	 */
 	ContinuationState execute(AssociatedScriptBundle scriptBundle, String functionName, Object...args) {
 		
+		assert (scriptBundle != null) : "cannot execute without a script bundle";
+		
 		Callable function = scriptBundle.getFunction(functionName);
-		if (function != null) {	
+		if (function != null) {
+			
+			log.trace("executing function {} in {}", functionName, scriptBundle);
+			
 			try {
 				rhinoObjectCreator.context().callFunctionWithContinuations(function, scriptBundle.scope(), args);
 			} catch (ContinuationPending continuation) {
@@ -85,15 +93,16 @@ class ContinuationCoordinator {
 				for (ScriptStackElement sse : re.getScriptStack()) {
 					log.error("{}", sse);
 				}
-			} catch (OutOfMemoryError oom) {
-				throw oom;
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error("unexpected problem during script execution {}", scriptBundle);
 				log.error("", e);
 			} finally {
 				Context.exit();
-			}
+			}	
+		} else {
+			log.warn("ignoring attempt to execute nonexistent function {} from {}", functionName, scriptBundle);
 		}
+		
 		return null;
 	}
 	
@@ -106,11 +115,11 @@ class ContinuationCoordinator {
 	 */
 	ContinuationState resumeContinuation(final String pendingKey, final ScriptBundle scriptBundle, final Object result) {
 		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
+		assert (continuation != null) : ("attempting to resume a non-existent continuation at " + pendingKey + " in " + scriptBundle);
+		
+		log.trace("resuming continuation in {} with key {} and result {}", scriptBundle, pendingKey, result);
 		
 		try {
-			if (continuation == null) {
-				throw new AssertionError("attempting to resume a non-existent continuation");
-			}
 			rhinoObjectCreator.context().resumeContinuation(continuation.getContinuation(), scriptBundle.scope(), result);
 		} catch (ContinuationPending nextContinuation) {
 			return extractContinuationState(nextContinuation);
@@ -120,9 +129,7 @@ class ContinuationCoordinator {
 			for (ScriptStackElement sse : re.getScriptStack()) {
 				log.error("{}", sse);
 			}
-		} catch (OutOfMemoryError oom) {
-			throw oom;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error("unexpected problem during script execution {}", scriptBundle);
 			log.error("", e);
 		} finally {
@@ -132,11 +139,11 @@ class ContinuationCoordinator {
 	}
 	
 	private ContinuationState extractContinuationState(final ContinuationPending continuation) {
+		
 		final ContinuationState continuationState = (ContinuationState)continuation.getApplicationState();
-		if (continuationState == null) {
-			throw new AssertionError("continuation captured with no state. no need for a continuation here!");
-		}
-		log.debug("script continuation occurred, {}", continuationState);
+		assert (continuationState != null) : "continuation captured with no state";
+
+		log.trace("script continuation captured, {}", continuationState);
 		return continuationState;
 	}
 }
