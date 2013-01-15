@@ -161,9 +161,6 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				}
 				String newSelection;
 				if (id == null) {
-					// gotta do something like make up an ID and assign it as a data-jj-id?
-					// goddammit
-					log.warn("element created with no id.  didn't make up a selector for it, so event hookups will go badly");
 					newSelection = html;
 				} else {
 					newSelection = "#" + id;
