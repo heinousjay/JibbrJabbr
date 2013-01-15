@@ -70,8 +70,8 @@ class WebSocketHandler extends BaseWebSocketHandler {
 			connection.send("jj-reload");
 			connection.close();
 		} else {
-			log.debug("new connection to {}", scriptBundle);
-			log.debug("{}", jjcon);
+			log.info("new connection to {}", scriptBundle);
+			log.trace("{}", jjcon);
 			jjcon.scriptBundle(scriptBundle);
 			connections.addConnection(jjcon);
 			executors.scriptRunner().submit(jjcon, HostEvent.clientConnected, connection);

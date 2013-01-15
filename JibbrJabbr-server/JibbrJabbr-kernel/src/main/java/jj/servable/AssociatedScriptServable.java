@@ -13,6 +13,8 @@ import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
 
@@ -22,6 +24,8 @@ import org.webbitserver.HttpResponse;
  *
  */
 class AssociatedScriptServable extends Servable {
+	
+	private final Logger log = LoggerFactory.getLogger(AssociatedScriptServable.class);
 	
 	/**
 	 * twenty years in seconds.  not including leap days. it's probably fine
@@ -97,6 +101,13 @@ class AssociatedScriptServable extends Servable {
 					.header(HttpHeaders.Names.CONTENT_TYPE, "text/javascript; charset=UTF-8")
 					.content(buf)
 					.end();
+
+				
+				log.info(
+					"request for [{}] completed in {} milliseconds (wall time)",
+					request.uri(),
+					request.wallTime()
+				);
 			}
 		};
 	}

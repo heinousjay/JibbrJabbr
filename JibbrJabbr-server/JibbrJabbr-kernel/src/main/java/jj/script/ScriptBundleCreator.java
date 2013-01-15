@@ -51,7 +51,8 @@ class ScriptBundleCreator {
 		final String baseName
 	) {
 		
-		log.debug("creating module script bundle");
+		log.info("creating module script bundle for {} associated to {}", moduleIdentifier, baseName);
+		log.trace("script is {}", scriptResource);
 		
 		Scriptable local = createLocalScope(moduleIdentifier);
 		Scriptable exports;
@@ -79,7 +80,10 @@ class ScriptBundleCreator {
 			throw new IllegalArgumentException("null server script, nothing to do!");
 		}
 		
-		log.debug("creating associated script bundle");
+		log.info("creating associated script bundle for {}", baseName);
+		log.trace("client script is {}", clientScriptResource);
+		log.trace("shared script is {}", sharedScriptResource);
+		log.trace("server script is {}", serverScriptResource);
 		
 		String clientStubs = extractStubs(clientScriptResource != null ? clientScriptResource.script() : "");
 		Scriptable scope = createLocalScope(baseName);
@@ -183,7 +187,7 @@ class ScriptBundleCreator {
 			
 			if (sharedScriptResource != null) {
 				try {
-					log.debug("evaluating shared script");
+					log.trace("evaluating shared script");
 					
 					context.evaluateString(
 						local, 
@@ -200,7 +204,8 @@ class ScriptBundleCreator {
 			
 			if (clientScriptResource != null) {
 				try {
-					log.debug("evaluating client stub");
+					log.trace("evaluating client stub");
+					log.trace("{}", clientStub);
 					
 					context.evaluateString(local, clientStub, "client stub for " + serverScriptResource.path(), 1, null);
 				} catch (Exception e) {
@@ -209,7 +214,7 @@ class ScriptBundleCreator {
 				}
 			}
 		    
-	    	log.debug("compiling server script");
+	    	log.trace("compiling server script");
 	    	return context.compileString(
 	    		serverScriptResource.script(),
 	    		serverScriptResource.path().toString(),
@@ -231,7 +236,7 @@ class ScriptBundleCreator {
 		Context context = rhinoObjectCreator.context();
 		
 		try {
-			log.debug("compiling module script");
+			log.trace("compiling module script");
 			return context.compileString(scriptResource.script(), scriptResource.path().toString(), 1, null);
 		} finally {
 			Context.exit();
