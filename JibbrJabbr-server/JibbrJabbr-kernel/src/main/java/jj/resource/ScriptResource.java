@@ -55,6 +55,6 @@ public class ScriptResource extends AbstractResource {
 
 	@Override
 	public String mime() {
-		return "text/javascript; charset=UTF-8";
+		return "application/javascript; charset=UTF-8";
 	}
 }
