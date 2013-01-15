@@ -60,7 +60,7 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 	
 	@Override
 	public String script() {
-		return "function broadcast(func){global['" + PREPARE_CONNECTION_ITERATOR + "']();while(global['" + NEXT_CONNECTION + "']())func();}";
+		return "function broadcast(func){global['" + PREPARE_CONNECTION_ITERATOR + "']();while(global['" + NEXT_CONNECTION + "']()) try { func(); } catch (e) {print('broadcast had an issue ' + e); } }";
 	}
 	
 	@Override
