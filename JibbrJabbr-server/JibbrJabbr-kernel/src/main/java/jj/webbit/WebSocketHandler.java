@@ -93,7 +93,7 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	@HttpControlThread
 	public void onMessage(WebSocketConnection connection, String msg) throws Throwable {
 		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false);
-		log.trace("received message [{}] on {}]", msg, jjcon);
+		log.trace("received message [{}] on {}", msg, jjcon);
 		if ("jj-hi".equals(msg)) {
 			connection.send("jj-yo");
 		} else {

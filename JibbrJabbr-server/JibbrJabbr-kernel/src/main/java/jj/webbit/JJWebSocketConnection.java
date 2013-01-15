@@ -9,6 +9,8 @@ import jj.DateFormatHelper;
 import jj.jqmessage.JQueryMessage;
 import jj.script.AssociatedScriptBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webbitserver.WebSocketConnection;
 import org.webbitserver.wrapper.WebSocketConnectionWrapper;
 
@@ -23,6 +25,8 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	private static final String CLIENT_STORAGE = "client storage";
 	
 	private static final String LAST_ACTIVITY = "last activity";
+	
+	private final Logger log = LoggerFactory.getLogger(JJWebSocketConnection.class);
 
 	JJWebSocketConnection(final WebSocketConnection connection, final boolean immediateClosure) {
 		super(connection);
@@ -69,6 +73,13 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	
 	public JJWebSocketConnection send(JQueryMessage message) {
 		messages().add(message);
+		return this;
+	}
+	
+	@Override
+	public JJWebSocketConnection send(String message) {
+		log.trace("sending [{}] on {}", message, this);
+		super.send(message);
 		return this;
 	}
 	
