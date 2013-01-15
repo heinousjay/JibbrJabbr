@@ -2,7 +2,6 @@ package jj.webbit;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,7 +46,7 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 		final JJAccessLoggingHttpHandler loggingHandler,
 		final JJEngineHttpHandler htmlEngineHttpHandler,
 		final NotFoundHttpHandler notFoundHandler
-	) throws InterruptedException, ExecutionException {
+	) {
 
 		URI uri = configuration.baseUri();
 		
