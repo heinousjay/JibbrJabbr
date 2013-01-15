@@ -24,6 +24,12 @@ public class EventSelection implements Selection {
 		this.context = context;
 	}
 	
+	private void verifyContext(final String actionDescription) {
+		if (context.type() != ScriptContextType.WebSocket) {
+			throw new IllegalStateException("cannot " + actionDescription + " from this context");
+		}
+	}
+	
 	@Override
 	public String selector() {
 		return selector;
@@ -36,9 +42,7 @@ public class EventSelection implements Selection {
 	
 	@Override
 	public Selection on(String type, String selector, Callable function) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot bind an event from this context");
-		}
+		verifyContext("bind an event");
 		context.connection().send(JQueryMessage.makeBind(this.selector, selector, type));
 		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
@@ -46,7 +50,7 @@ public class EventSelection implements Selection {
 	
 	@Override
 	public Selection bind(String type, boolean cancel) {
-		return this;
+		throw new UnsupportedOperationException("bind with autocancel is not yet implemented");
 	}
 	@Override
 	public Selection bind(String type, Callable function) {
@@ -54,7 +58,7 @@ public class EventSelection implements Selection {
 	}
 	@Override
 	public Selection bind(String type, Object data, boolean cancel) {
-		return this;
+		throw new UnsupportedOperationException("bind with autocancel is not yet implemented");
 	}
 	@Override
 	public Selection bind(String type, Object data, Callable function) {
@@ -73,242 +77,211 @@ public class EventSelection implements Selection {
 
 	@Override
 	public Selection data(String key, String value) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot set data from this context");
-		}
+		verifyContext("set data");
 		context.connection().send(JQueryMessage.makeSet(selector, "data", key, value));
 		return this;
 	}
 
 	@Override
 	public Selection text(String text) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot retrieve text from this context");
-		}
+		verifyContext("retrieve text");
 		context.connection().send(JQueryMessage.makeSet(selector, "text", text));
 		return this;
 	}
 
 	@Override
 	public Selection append(Selection selection) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot append from this context");
-		}
+		verifyContext("append");
 		context.connection().send(JQueryMessage.makeAppend(selector, selection.selector()));
 		return this;
 	}
 
 	@Override
 	public String attr(String attributeKey) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot get an attribute value from this context");
-		}
+		verifyContext("get an attribute value");
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "attr", attributeKey));
 	}
 	
 	public String prop(String propKey) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot get an property value from this context");
-		}
+		verifyContext("get an property value");
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "prop", propKey));
 	}
 
 	@Override
 	public boolean hasAttr(String attributeKey) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot check for an attribute value from this context");
-		}
+		verifyContext("check for an attribute");
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasAttr", attributeKey));
 	}
 
 	@Override
 	public Selection attr(String attributeKey, String attributeValue) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot set an attribute from this context");
-		}
+		verifyContext("set an attribute");
 		context.connection().send(JQueryMessage.makeSet(selector, "attr", attributeKey, attributeValue));
 		return this;
 	}
 
 	public Selection prop(String propKey, String propValue) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot set an property from this context");
-		}
+		verifyContext("set an property");
 		context.connection().send(JQueryMessage.makeSet(selector, "prop", propKey, propValue));
 		return this;
 	}
 
 	@Override
 	public Selection removeAttr(String attributeKey) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot remove an attribute from this context");
-		}
+		verifyContext("remove an attribute");
 		context.connection().send(JQueryMessage.makeSet(selector, "removeAttr", attributeKey));
 		return this;
 	}
 
 	@Override
 	public Selection addClass(String className) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot add a class from this context");
-		}
+		verifyContext("add a class");
 		context.connection().send(JQueryMessage.makeSet(selector, "addClass", className));
 		return this;
 	}
 
 	@Override
 	public Selection removeClass(String className) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot remove a class from this context");
-		}
+		verifyContext("remove a class");
 		context.connection().send(JQueryMessage.makeSet(selector, "removeClass", className));
 		return this;
 	}
 
 	@Override
 	public Selection toggleClass(String className) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot toggle a class from this context");
-		}
+		verifyContext("toggle a class");
 		context.connection().send(JQueryMessage.makeSet(selector, "toggleClass", className));
 		return this;
 	}
 
 	@Override
 	public boolean hasClass(String className) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot check for a class from this context");
-		}
+		verifyContext("check for a class");
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasClass", className));
 	}
 
 	@Override
 	public String val() {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot retrieve a value from this context");
-		}
+		verifyContext("retrieve a value");
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "val"));
 	}
 
 	@Override
 	public Selection val(String value) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot set a value from this context");
-		}
+		verifyContext("set a value");
 		context.connection().send(JQueryMessage.makeSet(selector, "val", value));
 		return this;
 	}
 
 	@Override
 	public String text() {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot retrieve text from this context");
-		}
+		verifyContext("retrieve text");
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "text"));
 	}
 
 	@Override
 	public String html() {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot retrieve html from this context");
-		}
+		verifyContext("retrieve html");
 		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "html"));
 	}
 
 	@Override
 	public Selection html(String html) {
+		verifyContext("set html");
 		context.connection().send(JQueryMessage.makeSet(selector, "html", html));
 		return this;
 	}
 
 	@Override
 	public Selection prepend(String html) {
-		// TODO Auto-generated method stub
-		return null;
+		verifyContext("prepend html");
+		context.connection().send(JQueryMessage.makeSet(selector, "prepend", html));
+		return this;
 	}
 
 	@Override
 	public Selection append(String html) {
-		// TODO Auto-generated method stub
-		return null;
+		verifyContext("append html");
+		context.connection().send(JQueryMessage.makeSet(selector, "append", html));
+		return this;
 	}
 
 	@Override
 	public Selection before(String html) {
-		// TODO Auto-generated method stub
-		return null;
+		verifyContext("set html before");
+		context.connection().send(JQueryMessage.makeSet(selector, "before", html));
+		return this;
 	}
 
 	@Override
 	public Selection after(String html) {
-		// TODO Auto-generated method stub
-		return null;
+		verifyContext("set html after");
+		context.connection().send(JQueryMessage.makeSet(selector, "after", html));
+		return this;
 	}
 
 	@Override
 	public Selection wrap(String html) {
-		// TODO Auto-generated method stub
-		return null;
+		verifyContext("wrap elements with html");
+		context.connection().send(JQueryMessage.makeSet(selector, "wrap", html));
+		return this;
 	}
 
 	@Override
 	public Selection unwrap() {
-		// TODO Auto-generated method stub
-		return null;
+		verifyContext("unwrap elements");
+		context.connection().send(JQueryMessage.makeSet(selector, "unwrap", ""));
+		return this;
 	}
 
 	@Override
 	public Selection empty() {
-		// TODO Auto-generated method stub
-		return null;
+		verifyContext("empty an element set");
+		context.connection().send(JQueryMessage.makeSet(selector, "empty", ""));
+		return this;
 	}
 
 	@Override
 	public Selection remove() {
+		verifyContext("remove elements");
 		context.connection().send(JQueryMessage.makeSet(selector, "remove", ""));
 		return this;
 	}
 
 	@Override
 	public Selection select(String query) {
-		// TODO Auto-generated method stub
-		return null;
+		// this i believe is exactly what jquery does!
+		return new EventSelection(selector + " " + query, context);
 	}
 
 	@Override
 	public Selection not(String query) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("not is not yet implemented");
 	}
 
 	@Override
 	public Selection eq(int index) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("eq is not yet implemented");
 	}
 
 	@Override
 	public boolean is(String query) {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("is is not yet implemented (and may never be!)");
 	}
 
 	@Override
 	public Selection parents() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("parents is not yet implemented");
 	}
 
 	@Override
 	public Element first() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("first is not yet implemented and probably will never be");
 	}
 
 	@Override
 	public Element last() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("first is not yet implemented and probably will never be");
 	}
 
 	@Override
