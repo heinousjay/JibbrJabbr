@@ -300,4 +300,9 @@ public class DocumentSelection implements Selection {
 	public Element last() {
 		return elements.last();
 	}
+
+	@Override
+	public String toString() {
+		return DocumentSelection.class.getSimpleName() + ": " + selector;
+	}
 }
