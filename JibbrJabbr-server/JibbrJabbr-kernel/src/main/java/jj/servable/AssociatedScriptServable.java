@@ -98,7 +98,7 @@ class AssociatedScriptServable extends Servable {
 				
 				response.header(HttpHeaders.Names.CONTENT_LENGTH, buf.remaining())
 					.header(HttpHeaders.Names.CACHE_CONTROL, "max-age=" + TWENTY_YEARS)
-					.header(HttpHeaders.Names.CONTENT_TYPE, "text/javascript; charset=UTF-8")
+					.header(HttpHeaders.Names.CONTENT_TYPE, scriptResource.mime())
 					.content(buf)
 					.end();
 
