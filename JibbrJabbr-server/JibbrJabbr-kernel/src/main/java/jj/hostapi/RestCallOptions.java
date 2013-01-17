@@ -4,11 +4,13 @@ import static jj.hostapi.MIME.*;
 import static jj.hostapi.Method.*;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 /**
  * takes a rhino map of properties and merges them against
- * defaults and exposes everything in a typed manner
+ * defaults and exposes everything in a typed manner.
+ *
  * @author jason
  *
  */
@@ -46,25 +48,25 @@ class RestCallOptions {
 
 	private String path(final Scriptable options) {
 		return options != null && ScriptableObject.hasProperty(options, PATH) ?
-			(String)Context.jsToJava(ScriptableObject.getProperty(options, PATH), String.class) :
+			toJavaString(options, PATH) :
 			DEFAULT_PATH;
 	}
 	
 	private Method method(final Scriptable options) {
 		return options != null && ScriptableObject.hasProperty(options, METHOD) ?
-			Method.valueOf((String)Context.jsToJava(ScriptableObject.getProperty(options, METHOD), String.class)) :
+			Method.valueOf(toJavaString(options, METHOD)) :
 			DEFAULT_METHOD;
 	}
 	
 	private MIME accept(final Scriptable options) {
 		return options != null && ScriptableObject.hasProperty(options, ACCEPT) ?
-			MIME.valueOf((String)Context.jsToJava(ScriptableObject.getProperty(options, ACCEPT), String.class)) :
+			MIME.valueOf(toJavaString(options, ACCEPT)) :
 			DEFAULT_ACCEPT;
 	}
 	
 	private MIME produce(final Scriptable options) {
 		return options != null && ScriptableObject.hasProperty(options, PRODUCE) ?
-			MIME.valueOf((String)Context.jsToJava(ScriptableObject.getProperty(options, PRODUCE), String.class)) :
+			MIME.valueOf(toJavaString(options, PRODUCE)) :
 			method(options).produces();
 	}
 	
@@ -85,8 +87,24 @@ class RestCallOptions {
 	
 	private boolean ignoreResult(final Scriptable options) {
 		return options != null && ScriptableObject.hasProperty(options, IGNORE_RESULT) ?
-			(Boolean)Context.jsToJava(ScriptableObject.getProperty(options, IGNORE_RESULT), Boolean.TYPE) :
+			toJavaBoolean(options, IGNORE_RESULT) :
 			DEFAULT_IGNORE_RESULT;
+	}
+	
+	private String toJavaString(final Scriptable options, final String key) {
+		try {
+			return (String)Context.jsToJava(ScriptableObject.getProperty(options, key), String.class);
+		} catch (EvaluatorException e) {
+			throw new IllegalArgumentException(key + " must be a string");
+		}
+	}
+	
+	private boolean toJavaBoolean(final Scriptable options, final String key) {
+		try {
+		return (boolean)Context.jsToJava(ScriptableObject.getProperty(options, key), Boolean.TYPE);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(key + " must be a boolean");
+		}
 	}
 	
 	String path() {

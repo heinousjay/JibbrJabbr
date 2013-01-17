@@ -15,13 +15,13 @@
  */
 package jj.hostapi;
 
-import static jj.hostapi.MIME.JSON;
+import static jj.hostapi.MIME.*;
 
 enum Method {
 	GET {
 		@Override
 		MIME produces() {
-			return null;
+			return UrlEncoded;
 		}
 	},
 	POST {
@@ -39,7 +39,7 @@ enum Method {
 	DELETE {
 		@Override
 		MIME produces() {
-			return null;
+			return UrlEncoded;
 		}
 	};
 	

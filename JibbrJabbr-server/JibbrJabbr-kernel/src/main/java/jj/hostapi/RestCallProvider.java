@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
+import jj.uri.UriTemplate;
+
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -48,9 +50,7 @@ class RestCallProvider {
 		@Override
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			
-			String baseUrl = baseUrl(thisObj);
 			
-			String url = baseUrl + options.path();
 			
 			Scriptable params = cx.newObject(scope);
 			
@@ -70,26 +70,45 @@ class RestCallProvider {
 			}
 			
 			String body = null;
+			StringBuilder url = new StringBuilder(baseUrl(thisObj));
 			
 			// we need to JSON serialize this.  yay
 			if (params.getIds().length > 0) {
-				// we need to pluck params out of there and sub them into the URL
+				UriTemplate path = new UriTemplate(options.path());
+				
+				for (Object idObj : params.getIds()) {
+					String id = String.valueOf(idObj);
+					String param = (String)Context.jsToJava(params.get(id, params), String.class);
+					path.set(id, param);
+				}
+				
+				url.append(path.expand());
+				
 				// delete all matches
 				// then if anything is left
-				// that's the body, assuming we produce JSON
-				if (params.getIds().length > 0) {
-					try {
-						body = objectMapper.writeValueAsString(params);
-					} catch (JsonProcessingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				// that get consumed according to what we produce
+				switch (options.produce()) {
+				case JSON:
+					if (params.getIds().length > 0) {
+						try {
+							body = objectMapper.writeValueAsString(params);
+						} catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							// BAD
+						}
 					}
+					break;
+				case UrlEncoded:
+					// ugh.
+					break;
 				}
+			} else {
+				url.append(options.path());
 			}
 			
-			
 			final RequestBuilder requestBuilder = new RequestBuilder(options.method().toString())
-				.setUrl(url)
+				.setUrl(url.toString())
 				.addHeader("Accept", options.accept().toString());
 			
 			if (body != null && !"".equals(body.trim())) {
@@ -104,6 +123,8 @@ class RestCallProvider {
 			
 			
 			final Request request = requestBuilder.build();
+			
+			log.debug("performing REST request {}", request);
 
 			if (!options.ignoreResult()) {
 				// TODO - handle the result in a way consistent with configuration, gets set on the RestRequest

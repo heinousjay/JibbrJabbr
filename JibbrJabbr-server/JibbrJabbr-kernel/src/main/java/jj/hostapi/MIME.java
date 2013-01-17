@@ -21,5 +21,8 @@ public enum MIME {
 		public String toString() {
 			return "application/json";
 		}
+	},
+	UrlEncoded {
+		
 	}
 }
