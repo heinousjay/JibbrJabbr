@@ -2,6 +2,8 @@ package jj;
 
 import java.util.Iterator;
 
+import org.jboss.netty.logging.InternalLoggerFactory;
+import org.jboss.netty.logging.Slf4JLoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.AsyncAppender;
@@ -42,8 +44,12 @@ class SLF4JConfiguration implements JJShutdown {
 		
 		logger.addAppender(asyncAppender);
 		
-		// shutting up the async http handler logging
+		// make sure netty logs to our log
+		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+		
+		// shutting up the logging in our dependencies by default
 		((Logger)LoggerFactory.getLogger("com")).setLevel(Level.ERROR);
+		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);
 	}
 
 	@Override
