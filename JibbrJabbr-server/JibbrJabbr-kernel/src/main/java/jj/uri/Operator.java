@@ -32,8 +32,6 @@ enum Operator {
 	CONTINUATION("&", "&",                true,  "=", Encoding.U),
 	FRAGMENT    ("#", DEFAULT_SEPARATOR,  false, "",  Encoding.UF);
 	
-	
-
 	private String operator;
 
 	private String separator;
@@ -73,84 +71,76 @@ enum Operator {
 		return this.separator;
 	}
 
-	   /**
-	    * 
-	    * 
-	    * @return
-	    */
-	   public Encoding getEncoding() {
-	      return encoding;
-	   }
-	   /**
-	    * 
-	    * 
-	    * @return
-	    */
-	   public boolean isNamed()
-	   {
-	      return named;
-	   }
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public Encoding getEncoding() {
+		return encoding;
+	}
 
-	   /**
-	    * 
-	    * 
-	    * @return
-	    */
-	   public String ifEmptyString()
-	   {
-	      return empty;
-	   }
-	   /**
-	    */
-	   public String getListSeparator()
-	   {
-	      return DEFAULT_SEPARATOR;
-	   }
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean isNamed() {
+		return named;
+	}
 
-	   /**
-	    * When the variable is a Collection, this flag determines if we use 
-	    * the VarSpec name to prefix values. For example:
-	    * 
-	    * {&list} return false
-	    * 
-	    * {&list*} will return true 
-	    * 
-	    * @return
-	    */
-	   public boolean useVarNameWhenExploded()
-	   {
-	      return named;
-	   }
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public String ifEmptyString() {
+		return empty;
+	}
 
-	   /**
-	    * 
-	    * 
-	    * @return
+	/**
 	    */
-	   public String getPrefix()
-	   {
-	      return operator;
-	   }
+	public String getListSeparator() {
+		return DEFAULT_SEPARATOR;
+	}
 
-	   /**
-	    * FIXME Comment this
-	    * 
-	    * @param opCode
-	    * @return
-	    */
-	   public static Operator fromOpCode(String opCode)
-	   {
-	      for (Operator op : Operator.values())
-	      {
-	         if (op.getOperator().equalsIgnoreCase(opCode))
-	         {
-	            return op;
-	         }
-	         else if (opCode.equalsIgnoreCase("!") || opCode.equalsIgnoreCase("="))
-	         {
-	            throw new ExpressionParseException(opCode + " is not a valid operator.");
-	         }
-	      }
-	      return null;
-	   }
+	/**
+	 * When the variable is a Collection, this flag determines if we use the
+	 * VarSpec name to prefix values. For example:
+	 * 
+	 * {&list} return false
+	 * 
+	 * {&list*} will return true
+	 * 
+	 * @return
+	 */
+	public boolean useVarNameWhenExploded() {
+		return named;
+	}
+
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public String getPrefix() {
+		return operator;
+	}
+
+	/**
+	 * FIXME Comment this
+	 * 
+	 * @param opCode
+	 * @return
+	 */
+	public static Operator fromOpCode(String opCode) {
+		for (Operator op : Operator.values()) {
+			if (op.getOperator().equalsIgnoreCase(opCode)) {
+				return op;
+			} else if (opCode.equalsIgnoreCase("!") || opCode.equalsIgnoreCase("=")) {
+				throw new ExpressionParseException(opCode + " is not a valid operator.");
+			}
+		}
+		return null;
+	}
 }
