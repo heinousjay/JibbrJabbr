@@ -26,7 +26,7 @@ public class ScriptJSON {
 	
 	public Object parse(final String input) {
 		// need to do some serious quote replacement
-		String escaped = input.replace("'", "\\'").replace("\\\"", "\\\\\"");
+		String escaped = input.trim().replace("'", "\\'").replace("\"", "\\\"");
 		Context context = rhinoObjectCreator.context();
 		try {
 			return context.evaluateString(
