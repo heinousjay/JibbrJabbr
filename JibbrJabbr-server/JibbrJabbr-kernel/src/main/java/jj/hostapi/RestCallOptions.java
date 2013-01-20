@@ -3,6 +3,8 @@ package jj.hostapi;
 import static jj.hostapi.MIME.*;
 import static jj.hostapi.Method.*;
 
+import java.util.Map;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
@@ -26,14 +28,14 @@ class RestCallOptions {
 	private static final String DEFAULT_PATH = "";
 	private static final Method DEFAULT_METHOD = GET;
 	private static final MIME DEFAULT_ACCEPT = JSON;
-	private static final Scriptable DEFAULT_PARAMS = null;
+	private static final Map<String, Object> DEFAULT_PARAMS = null;
 	private static final boolean DEFAULT_IGNORE_RESULT = false;
 	
 	private final String path;
 	private final Method method;
 	private final MIME accept;
 	private final MIME produce;
-	private final Scriptable params;
+	private final Map<String, Object> params;
 	private final boolean ignoreResult;
 	
 	RestCallOptions(final Scriptable options) {
@@ -70,16 +72,17 @@ class RestCallOptions {
 			method(options).produces();
 	}
 	
-	private Scriptable params(final Scriptable options) {
-		Scriptable result = DEFAULT_PARAMS;
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> params(final Scriptable options) {
+		Map<String, Object> result = DEFAULT_PARAMS;
 		if (options != null && ScriptableObject.hasProperty(options, PARAMS)) {
 			Object candidate = ScriptableObject.getProperty(options, PARAMS);
 			
-			if (candidate != null && !(candidate instanceof Scriptable)) {
+			if (candidate != null && !(candidate instanceof Map<?, ?>)) {
 				throw new IllegalArgumentException("params must be an object");
 			}
 			if (candidate != null) {
-				result = (Scriptable)candidate;
+				result = (Map<String, Object>)candidate;
 			}
 		}
 		return result;
@@ -123,7 +126,7 @@ class RestCallOptions {
 		return produce;
 	}
 	
-	Scriptable params() {
+	Map<String, Object> params() {
 		return params;
 	}
 	

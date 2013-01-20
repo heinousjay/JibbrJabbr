@@ -3,6 +3,8 @@ package jj.hostapi;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
@@ -50,57 +52,57 @@ class RestCallProvider {
 		@Override
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			
-			
-			
-			Scriptable params = cx.newObject(scope);
+			Map<String, Object> params = new HashMap<>();
 			
 			if (options.params() != null) {
-				for (Object idObj : options.params().getIds()) {
-					String id = (String)idObj;
-					params.put(id, params, options.params().get(id, options.params()));
+				for (String key : options.params().keySet()) {
+					params.put(key, options.params().get(key));
 				}
 			}
 			
-			if (args.length == 1 && args[0] instanceof Scriptable) {
-				Scriptable merge = (Scriptable)args[0];
-				for (Object idObj : merge.getIds()) {
-					String id = (String)idObj;
-					params.put(id, params, merge.get(id, merge));
+			if (args.length == 1 && args[0] instanceof Map) {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> merge = (Map<String, Object>)args[0];
+				for (String key : merge.keySet()) {
+					params.put(key, merge.get(key));
 				}
+			} else if (args.length != 0) {
+				throw new IllegalArgumentException("service functions take an object parameter or no parameters");
 			}
 			
 			String body = null;
 			StringBuilder url = new StringBuilder(baseUrl(thisObj));
 			
 			// we need to JSON serialize this.  yay
-			if (params.getIds().length > 0) {
+			if (!params.isEmpty()) {
 				UriTemplate path = new UriTemplate(options.path());
-				
-				for (Object idObj : params.getIds()) {
-					String id = String.valueOf(idObj);
-					String param = (String)Context.jsToJava(params.get(id, params), String.class);
-					path.set(id, param);
+				// one at a time, because we need to do string conversions here
+				for (String key : params.keySet()) {
+					String param = (String)Context.jsToJava(params.get(key), String.class);
+					path.set(key, param);
 				}
 				
 				url.append(path.expand());
 				
-				// delete all matches
+				for (String match : path.matches()) {
+					params.remove(match);
+				}
+				
 				// then if anything is left
-				// that get consumed according to what we produce
+				// that gets consumed according to what we produce
 				switch (options.produce()) {
 				case JSON:
-					if (params.getIds().length > 0) {
+					if (!params.isEmpty()) {
 						try {
 							body = objectMapper.writeValueAsString(params);
 						} catch (JsonProcessingException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							// BAD
+							throw new IllegalArgumentException("service call parameter couldn't be serialized", e);
 						}
 					}
 					break;
 				case UrlEncoded:
-					// ugh.
+					// if anything is left here, we ignore it? 
+					// or splat it onto the end of the url as parameters?
 					break;
 				}
 			} else {
