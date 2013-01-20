@@ -21,10 +21,12 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +67,7 @@ public class UriTemplate {
 	 */
 	public static UriTemplate fromTemplate(UriTemplate base) {
 		UriTemplate template = fromTemplate(base.getTemplate());
-		template.set(base.getValues());
+		template.set(base.values());
 		return template;
 	}
 	
@@ -116,6 +118,8 @@ public class UriTemplate {
 	private final StringBuilder templateBuffer;
 	
 	private final Map<String, Object> values = new HashMap<>();
+	
+	private final Set<String> matches = new HashSet<>();
 
 	/**
 	 * Create a new RFC6570UriTemplate.
@@ -189,8 +193,12 @@ public class UriTemplate {
 		return templateBuffer.toString();
 	}
 	
-	public Map<String, Object> getValues() {
+	public Map<String, Object> values() {
 		return values;
+	}
+	
+	public Set<String> matches() {
+		return matches;
 	}
 
 	public String expand() {
@@ -206,7 +214,8 @@ public class UriTemplate {
 		while (matcher.find()) {
 
 			String token = matcher.group();
-			String value = buildVarSpecs(token.substring(1, token.length() - 1));
+			token = token.substring(1, token.length() - 1);
+			String value = buildVarSpecs(token);
 			matcher.appendReplacement(buffer, value);
 			count++;
 		}

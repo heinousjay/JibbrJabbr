@@ -30,9 +30,9 @@ public class TestCreateUriTemplate
                                      .set("thingId","123öä|\\");
       
       
-      assertEquals(3, child.getValues().size());
-      Map<String, Object> childValues = child.getValues();
-      for(Entry<String, Object> e : base.getValues().entrySet())
+      assertEquals(3, child.values().size());
+      Map<String, Object> childValues = child.values();
+      for(Entry<String, Object> e : base.values().entrySet())
       {
          assertTrue(childValues.containsKey(e.getKey()));
          assertEquals(e.getValue(), childValues.get(e.getKey()));
@@ -54,7 +54,7 @@ public class TestCreateUriTemplate
                                         .set("version","v1")
                                         .set("thingId","12345");
       
-      assertEquals(3, template.getValues().size());
+      assertEquals(3, template.values().size());
       assertEquals("http://myhost{/version}{/myId}/things/{thingId}", template.getTemplate());
       assertEquals("http://myhost/v1/damnhandy/things/12345", template.expand());
    }

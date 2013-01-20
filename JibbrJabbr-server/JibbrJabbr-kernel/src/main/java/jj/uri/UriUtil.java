@@ -95,9 +95,7 @@ public final class UriUtil {
 	private static void add(BitSet destination, String toAdd) {
 
 		for (char character : toAdd.toCharArray()) {
-			if (character >= 127) {
-				throw new IllegalArgumentException("Bitset only works correct with one " + "byte");
-			}
+			assert (character < 128) : "Bitset only works correct with one " + "byte";
 			destination.set(character);
 		}
 	}
