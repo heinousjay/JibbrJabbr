@@ -50,6 +50,8 @@ class SLF4JConfiguration implements JJShutdown {
 		// shutting up the logging in our dependencies by default
 		((Logger)LoggerFactory.getLogger("com")).setLevel(Level.ERROR);
 		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);
+		
+		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.TRACE);
 	}
 
 	@Override
