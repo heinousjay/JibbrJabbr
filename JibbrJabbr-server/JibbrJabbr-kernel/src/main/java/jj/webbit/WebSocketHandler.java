@@ -122,7 +122,7 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	public void onMessage(WebSocketConnection connection, byte[] msg) throws Throwable {
 		// at some point this is going to become interesting,
 		// thinking about streaming bytes in for uploads...
-		
+		log.info("receiving bytes, length is {}", msg.length);
 	}
 
 	@Override

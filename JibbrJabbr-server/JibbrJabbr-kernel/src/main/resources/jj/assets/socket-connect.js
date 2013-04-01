@@ -166,7 +166,7 @@ jQuery(function($) {
 		me.removeAttr('data-jj-debug');
 		
 		$j.debug = function(on) {
-			debug = on;
+			debug = !!on;
 			return "debug is " + (on ? "on" : "off");
 		}
 		
@@ -261,6 +261,14 @@ jQuery(function($) {
 				}
 			}
 		}
+
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			ws.send(e.target.result);
+		}
+		$j.sendFile = function(file) {
+			reader.readAsArrayBuffer(file);
+		}
 		
 		var rawMessages = {
 			// shutdown message
@@ -288,6 +296,7 @@ jQuery(function($) {
 		function send(payload) {
 			if (debug) console.debug("WebSocket", "send", payload);
 			var message = JSON.stringify(payload);
+			if (ws)
 			ws.send(message);
 		}
 		
