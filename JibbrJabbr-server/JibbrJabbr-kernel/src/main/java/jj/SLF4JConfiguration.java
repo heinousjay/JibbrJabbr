@@ -27,22 +27,27 @@ class SLF4JConfiguration implements JJShutdown {
 	
 	private final AsyncAppender asyncAppender;
 	
-	SLF4JConfiguration() {
+	SLF4JConfiguration(boolean isTest) {
 		
-		asyncAppender = new AsyncAppender();
-		asyncAppender.setContext(context);
-		
-		Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
-		while (i.hasNext()) {
-			Appender<ILoggingEvent> appender = i.next();
-			logger.detachAppender(appender);
-			appender.setContext(context);
-			asyncAppender.addAppender(appender);
+		if (!isTest) {
+			
+			asyncAppender = new AsyncAppender();
+			asyncAppender.setContext(context);
+			
+			Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
+			while (i.hasNext()) {
+				Appender<ILoggingEvent> appender = i.next();
+				logger.detachAppender(appender);
+				appender.setContext(context);
+				asyncAppender.addAppender(appender);
+			}
+			
+			asyncAppender.start();
+			
+			logger.addAppender(asyncAppender);
+		} else {
+			asyncAppender = null;
 		}
-		
-		asyncAppender.start();
-		
-		logger.addAppender(asyncAppender);
 		
 		// make sure netty logs to our log
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
@@ -51,11 +56,11 @@ class SLF4JConfiguration implements JJShutdown {
 		((Logger)LoggerFactory.getLogger("com")).setLevel(Level.ERROR);
 		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);
 		
-		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.TRACE);
+		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.WARN : Level.TRACE);
 	}
 
 	@Override
 	public void stop() {
-		asyncAppender.stop();
+		if (asyncAppender != null) asyncAppender.stop();
 	}
 }

@@ -1,6 +1,4 @@
 
-var lightService = require('./helpers2').lightService;
-
 // commonjs module, so only what's assigned to exports is going to be exposed
 
 var amp = /&/g;
@@ -14,5 +12,3 @@ exports.dehtml = function(input) {
 exports.printModuleId = function() {
 	print('hi from ' + module.id);
 };
-
-print(JSON.stringify(lightService.status()));

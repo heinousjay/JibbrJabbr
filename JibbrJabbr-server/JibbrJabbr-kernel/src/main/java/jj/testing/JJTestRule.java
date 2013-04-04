@@ -16,12 +16,14 @@
 package jj.testing;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import jj.Startup;
 import jj.webbit.WebbitTestRunner;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -52,16 +54,13 @@ public class JJTestRule implements TestRule {
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				System.err.println("HI THERE!");
 				PicoContainer container = new Startup(new String[]{basePath}, true).container();
 				testRunner = container.getComponent(WebbitTestRunner.class);
 				try {
-					System.err.println("evaluating!");
 					base.evaluate();
 				} finally {
 					testRunner = null;
 				}
-				System.err.println("BYE THERE");
 			}
 		};
 	}
@@ -71,7 +70,6 @@ public class JJTestRule implements TestRule {
 	}
 	
 	public String getAndWait(final String uri, final long time, final TimeUnit unit) throws Exception {
-		System.err.println("basic request!");
 		final CountDownLatch latch = new CountDownLatch(1);
 		
 		final StubHttpRequest stubHttpRequest = 
@@ -83,7 +81,6 @@ public class JJTestRule implements TestRule {
 			
 			@Override
 			public StubHttpResponse end() {
-				System.err.println("end");
 				latch.countDown();
 				return super.end();
 			}
@@ -98,4 +95,7 @@ public class JJTestRule implements TestRule {
 		throw new TimedOutException(time, unit);
 	}
 	
+	public Future<Document> get(final String uri, final long time, final TimeUnit unit) throws Exception {
+		return null;
+	}
 }

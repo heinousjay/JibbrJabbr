@@ -53,7 +53,7 @@ public class Startup {
 				new JJComponentMonitor()
 			)
 			.addComponent(new Configuration(args))
-			.addComponent(new SLF4JConfiguration())
+			.addComponent(new SLF4JConfiguration(isTest))
 			
 			.addComponent(JJServerLifecycle.class)
 			.addComponent(IOExecutor.class)
