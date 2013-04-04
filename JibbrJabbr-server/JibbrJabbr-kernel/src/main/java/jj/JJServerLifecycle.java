@@ -18,14 +18,14 @@ class JJServerLifecycle {
 		this.shutdown = shutdown;
 	}
 	
-	void start() throws Exception {
+	public void start() throws Exception {
 		log.info("starting the server");
 		for (JJStartup start: startup) {
 			start.start();
 		}
 	}
 	
-	void stop() {
+	public void stop() {
 		log.info("stopping the server");
 		for (JJShutdown stop: shutdown) {
 			try {

@@ -1,28 +1,11 @@
 package jj;
 
-import static org.picocontainer.Characteristics.HIDE_IMPL;
-
-import jj.document.DocumentInitializer;
-import jj.hostapi.HostApiInitializer;
-import jj.resource.ResourceInitializer;
-import jj.script.ScriptInitializer;
-import jj.servable.ServableInitializer;
-import jj.webbit.WebbitInitializer;
-
-import org.picocontainer.DefaultPicoContainer;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.behaviors.AdaptingBehavior;
-import org.picocontainer.behaviors.Caching;
-import org.picocontainer.lifecycle.NullLifecycleStrategy;
+import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-
 public class Main {
 	
-
 	/**
 	 * debugging startup
 	 */
@@ -37,61 +20,30 @@ public class Main {
 				main.stop();
 			}
 		});
-
 	}
 	
 	private final Logger log = LoggerFactory.getLogger(Main.class);
 	
-	private final JJServerLifecycle serverLifecycle;
+	private final PicoContainer container;
 	
-	public Main(String[] args, boolean daemonStart) throws Exception {
+	private final JJServerLifecycle lifecycle;
+	
+	public Main(final String[] args, final boolean daemonStart) throws Exception {
 		if (daemonStart) throw new IllegalStateException("This won't start correctly as a daemon anymore :(");
 		
-		MutablePicoContainer container = 
-			new DefaultPicoContainer(
-				new Caching().wrap(new AdaptingBehavior()),
-				new NullLifecycleStrategy(),
-				null,
-				new JJComponentMonitor()
-			)
-			.addComponent(new Configuration(args))
-			.addComponent(new SLF4JConfiguration())
-			
-			.addComponent(JJServerLifecycle.class)
-			.addComponent(IOExecutor.class)
-			.addComponent(HttpControlExecutor.class)
-			
-			// a good place to break apart crafty circular dependencies
-			.as(HIDE_IMPL).addComponent(JJExecutors.class, JJExecutorsImpl.class)
-
-			// needs to be smarter configuration? i at least should be
-			// supplying the executor
-			.addComponent(new AsyncHttpClientConfig.Builder()
-				.setCompressionEnabled(true)
-				.setUserAgent("JibbrJabbr RestCall subsystem/Netty 3.5.11Final")
-				.setIOThreadMultiplier(1)
-				.setFollowRedirects(true)
-				.build()
-			)
-			.addComponent(AsyncHttpClient.class);
+		container = new Startup(args, false).container();
+		lifecycle = container.getComponent(JJServerLifecycle.class);
 		
-		ServableInitializer.initialize(container);
-		DocumentInitializer.initialize(container);
-		ScriptInitializer.initialize(container);
-		ResourceInitializer.initialize(container);
-		HostApiInitializer.initialize(container);
-		WebbitInitializer.initialize(container);
-		
-		serverLifecycle = container.getComponent(JJServerLifecycle.class);
+		//lifecycle();
 		log.info("Welcome to {} version {} built on {}", Version.name, Version.version, Version.buildDate);
 	}
 	
 	public void start() throws Exception {
-		serverLifecycle.start();
+		lifecycle.start();
 	}
 	
 	public void stop() {
-		serverLifecycle.stop();
+		lifecycle.stop();
 	}
 	
 	public void dispose() {
