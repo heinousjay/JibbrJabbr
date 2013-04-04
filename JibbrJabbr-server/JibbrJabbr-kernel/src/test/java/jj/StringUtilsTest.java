@@ -13,29 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.jqmessage;
+package jj;
+
+import static jj.StringUtils.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
- * Helper to create messages for other tests
- * 
  * @author jason
  *
  */
-public class MessageMaker {
+public class StringUtilsTest {
 
-	public static JQueryMessage makeEvent(final String selector, final String type) {
-		JQueryMessage result = new JQueryMessage();
-		result.event(new Event());
-		result.event().selector = selector;
-		result.event().type = type;
-		return result;
+	@Test
+	public void test() {
+		assertThat(isEmpty(null), is(true));
+		assertThat(isEmpty(""), is(true));
+		assertThat(isEmpty("hi"), is(false));
 	}
-	
-	public static JQueryMessage makeResult(final String id, final String value) {
-		JQueryMessage result = new JQueryMessage();
-		result.result(new Result());
-		result.result().id = id;
-		result.result().value = value;
-		return result;
-	}
+
 }

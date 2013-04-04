@@ -1,5 +1,6 @@
 package jj.jqmessage;
 
+import static jj.StringUtils.*;
 // lololololol java
 import static jj.jqmessage.JQueryMessage.Type.*;
 
@@ -107,6 +108,8 @@ public class JQueryMessage {
 	}
 	
 	public static JQueryMessage makeAppend(String parent, String child) {
+		assert !isEmpty(parent) : "append message requires parent";
+		assert !isEmpty(child) : "append message requires child";
 		JQueryMessage result = new JQueryMessage(Append);
 		result.append().parent = parent;
 		result.append().child = child;
@@ -114,6 +117,7 @@ public class JQueryMessage {
 	}
 	
 	public static JQueryMessage makeBind(String context, String selector, String type) {
+		assert !isEmpty(type) : "bind message requires type";
 		JQueryMessage result = new JQueryMessage(Bind);
 		result.bind().context = context;
 		result.bind().selector = selector;

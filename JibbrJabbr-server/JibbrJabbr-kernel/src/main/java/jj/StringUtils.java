@@ -13,29 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.jqmessage;
+package jj;
 
 /**
- * Helper to create messages for other tests
+ * Simple static utilities for safely handling strings that
+ * may be null.  based on commons lang but copied here to
+ * keep dependencies simple.  we bring in enough.
  * 
  * @author jason
  *
  */
-public class MessageMaker {
+public class StringUtils {
 
-	public static JQueryMessage makeEvent(final String selector, final String type) {
-		JQueryMessage result = new JQueryMessage();
-		result.event(new Event());
-		result.event().selector = selector;
-		result.event().type = type;
-		return result;
-	}
-	
-	public static JQueryMessage makeResult(final String id, final String value) {
-		JQueryMessage result = new JQueryMessage();
-		result.result(new Result());
-		result.result().id = id;
-		result.result().value = value;
-		return result;
+	public static boolean isEmpty(String in) {
+		return in == null || in.isEmpty();
 	}
 }
