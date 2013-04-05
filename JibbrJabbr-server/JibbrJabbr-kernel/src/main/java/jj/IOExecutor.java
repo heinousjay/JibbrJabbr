@@ -22,9 +22,9 @@ public class IOExecutor extends ThreadPoolExecutor {
 	
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
 
-	// watch service eats one of these threads,
-	// and four for dealing with loading
-	public static final int WORKER_COUNT = 5;
+	// watch service eats one thread
+	// plus half the processors
+	public static final int WORKER_COUNT = 1 + (int)(Runtime.getRuntime().availableProcessors() * 0.5);
 	
 	private static final ThreadFactory threadFactory = new ThreadFactory() {
 		

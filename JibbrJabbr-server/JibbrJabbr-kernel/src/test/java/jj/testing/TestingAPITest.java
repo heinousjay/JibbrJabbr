@@ -22,7 +22,6 @@ import java.nio.file.Paths;
 
 import jj.JJ;
 
-import org.jsoup.Jsoup;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -35,6 +34,7 @@ public class TestingAPITest {
 	static final String basePath;
 	
 	static {
+		// well it's ugly, but it's portable
 		basePath = Paths.get(JJ.uri(TestingAPITest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
 	}
 	
@@ -45,19 +45,16 @@ public class TestingAPITest {
 	public void runBasicTest() throws Exception {
 		
 		assertThat(
-			Jsoup.parse(jjTestRule.getAndWait("/index")).select("title").text(),
+			jjTestRule.getAndWait("/index").select("title").text(),
 			is("JAYCHAT!")
 		);
-		
 	}
 	
 	@Test
 	public void runAnotherTest() throws Exception {
 		
-		String doc = jjTestRule.getAndWait("/index");
-		
 		assertThat(
-			Jsoup.parse(doc).select("script[data-jj-socket-url]").attr("data-jj-socket-url"),
+			jjTestRule.getAndWait("/index").select("script[data-jj-socket-url]").attr("data-jj-socket-url"),
 			is(notNullValue())
 			//is("ws://localhost/index/092f1fef937fabedcc3b4cd608e827a9e2bbc2b3.socket")
 		);

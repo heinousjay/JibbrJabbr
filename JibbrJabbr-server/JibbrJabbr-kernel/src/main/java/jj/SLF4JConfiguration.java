@@ -52,6 +52,8 @@ class SLF4JConfiguration implements JJShutdown {
 		// make sure netty logs to our log
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
+		
+		logger.setLevel(Level.TRACE);
 		// shutting up the logging in our dependencies by default
 		((Logger)LoggerFactory.getLogger("com")).setLevel(Level.ERROR);
 		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);

@@ -16,13 +16,16 @@
 package jj.testing;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import jj.Startup;
 import jj.webbit.WebbitTestRunner;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -65,11 +68,18 @@ public class JJTestRule implements TestRule {
 		};
 	}
 	
-	public String getAndWait(final String uri) throws Exception {
-		return getAndWait(uri, 10, TimeUnit.SECONDS);
+	public Document getAndWait(final String uri) throws Exception {
+		return get(uri).get(10, TimeUnit.SECONDS);
 	}
 	
-	public String getAndWait(final String uri, final long time, final TimeUnit unit) throws Exception {
+	public Document getAndWait(final String uri, final long time, final TimeUnit unit) throws Exception {
+		return get(uri).get(time, unit);
+	}
+	
+	public Future<Document> get(final String uri) throws Exception {
+		
+		if (testRunner == null) throw new AssertionError("somehow this happened?");
+		
 		final CountDownLatch latch = new CountDownLatch(1);
 		
 		final StubHttpRequest stubHttpRequest = 
@@ -88,14 +98,37 @@ public class JJTestRule implements TestRule {
 		
 		testRunner.executeRequest(stubHttpRequest, stubHttpResponse);
 		
-		if (latch.await(time, unit)) {
-			return stubHttpResponse.contentsString();
-		}
-		
-		throw new TimedOutException(time, unit);
-	}
-	
-	public Future<Document> get(final String uri, final long time, final TimeUnit unit) throws Exception {
-		return null;
+		return new Future<Document>() {
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return false;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return false;
+			}
+
+			@Override
+			public boolean isDone() {
+				return latch.getCount() < 1;
+			}
+
+			@Override
+			public Document get() throws InterruptedException, ExecutionException {
+				latch.await();
+				return Jsoup.parse(stubHttpResponse.contentsString());
+			}
+
+			@Override
+			public Document get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+				if (latch.await(timeout, unit)) {
+					return Jsoup.parse(stubHttpResponse.contentsString());
+				}
+				throw new TimeoutException("timed out in " + timeout + " " + unit.toString().toLowerCase());
+			}
+			
+		};
 	}
 }

@@ -16,6 +16,7 @@
 package jj;
 
 import static org.picocontainer.Characteristics.HIDE_IMPL;
+import jj.client.ClientInitializer;
 import jj.document.DocumentInitializer;
 import jj.hostapi.HostApiInitializer;
 import jj.resource.ResourceInitializer;
@@ -23,14 +24,13 @@ import jj.script.ScriptInitializer;
 import jj.servable.ServableInitializer;
 import jj.webbit.WebbitInitializer;
 
+import org.jboss.netty.util.ThreadNameDeterminer;
+import org.jboss.netty.util.ThreadRenamingRunnable;
 import org.picocontainer.DefaultPicoContainer;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.behaviors.AdaptingBehavior;
 import org.picocontainer.behaviors.Caching;
 import org.picocontainer.lifecycle.NullLifecycleStrategy;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 
 /**
  * @author  jason
@@ -45,6 +45,9 @@ public class Startup {
 	 * 
 	 */
 	public Startup(final String[] args, final boolean isTest) {
+		
+		ThreadRenamingRunnable.setThreadNameDeterminer(ThreadNameDeterminer.CURRENT);
+		
 		container = 
 			new DefaultPicoContainer(
 				new Caching().wrap(new AdaptingBehavior()),
@@ -60,19 +63,9 @@ public class Startup {
 			.addComponent(HttpControlExecutor.class)
 			
 			// a good place to break apart crafty circular dependencies
-			.as(HIDE_IMPL).addComponent(JJExecutors.class, JJExecutorsImpl.class)
-
-			// needs to be smarter configuration? i at least should be
-			// supplying the executor
-			.addComponent(new AsyncHttpClientConfig.Builder()
-				.setCompressionEnabled(true)
-				.setUserAgent("JibbrJabbr RestCall subsystem/Netty 3.5.11Final")
-				.setIOThreadMultiplier(1)
-				.setFollowRedirects(true)
-				.build()
-			)
-			.addComponent(AsyncHttpClient.class);
+			.as(HIDE_IMPL).addComponent(JJExecutors.class, JJExecutorsImpl.class);
 		
+		ClientInitializer.initialize(container, isTest);
 		ServableInitializer.initialize(container);
 		DocumentInitializer.initialize(container);
 		ScriptInitializer.initialize(container);
