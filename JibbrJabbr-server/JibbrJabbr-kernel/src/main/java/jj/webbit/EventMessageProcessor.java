@@ -15,6 +15,9 @@
  */
 package jj.webbit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -29,11 +32,13 @@ import jj.script.EventNameHelper;
  * @author jason
  *
  */
+@Singleton
 class EventMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
 	private final CurrentScriptContext context;
 	
+	@Inject
 	EventMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
 		this.executors = executors;
 		this.context = context;

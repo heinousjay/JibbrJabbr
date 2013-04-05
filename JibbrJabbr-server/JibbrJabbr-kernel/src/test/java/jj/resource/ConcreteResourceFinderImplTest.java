@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import jj.Configuration;
 import jj.JJExecutors;
@@ -34,7 +36,7 @@ public class ConcreteResourceFinderImplTest {
 	@Mock Configuration configuration;
 	String baseName;
 	ResourceCache resourceCache;
-	ResourceCreator<?>[] resourceCreators;
+	Set<ResourceCreator<?>> resourceCreators;
 	@Mock ResourceWatchService resourceWatchService;
 	
 	@Mock JJExecutors executors;
@@ -48,10 +50,9 @@ public class ConcreteResourceFinderImplTest {
 		
 		baseName = "internal/no-worky";
 		resourceCache = new ResourceCache();
-		resourceCreators = new ResourceCreator<?>[] {
-			new HtmlResourceCreator(configuration),
-			new ScriptResourceCreator(configuration)
-		};
+		resourceCreators = new HashSet<>();
+		resourceCreators.add(new HtmlResourceCreator(configuration));
+		resourceCreators.add(new ScriptResourceCreator(configuration));
 	}
 	
 	@Test

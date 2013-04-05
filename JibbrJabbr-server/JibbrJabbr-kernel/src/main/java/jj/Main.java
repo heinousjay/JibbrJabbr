@@ -1,8 +1,10 @@
 package jj;
 
-import org.picocontainer.PicoContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Guice;
+import com.google.inject.Stage;
 
 public class Main {
 	
@@ -24,17 +26,13 @@ public class Main {
 	
 	private final Logger log = LoggerFactory.getLogger(Main.class);
 	
-	private final PicoContainer container;
-	
 	private final JJServerLifecycle lifecycle;
 	
 	public Main(final String[] args, final boolean daemonStart) throws Exception {
 		if (daemonStart) throw new IllegalStateException("This won't start correctly as a daemon anymore :(");
 		
-		container = new Startup(args, false).container();
-		lifecycle = container.getComponent(JJServerLifecycle.class);
+		lifecycle = Guice.createInjector(Stage.PRODUCTION, new CoreModule(args, false)).getInstance(JJServerLifecycle.class);
 		
-		//lifecycle();
 		log.info("Welcome to {} version {} built on {}", Version.name, Version.version, Version.buildDate);
 	}
 	

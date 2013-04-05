@@ -7,9 +7,13 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class ScriptExecutorFactory {
 	
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
@@ -49,6 +53,7 @@ public class ScriptExecutorFactory {
 		
 	private final ScheduledThreadPoolExecutor executor;
 		
+	@Inject
 	ScriptExecutorFactory() {
 		executor = new ScheduledThreadPoolExecutor(1, threadFactory, rejectedExecutionHandler);
 		executor.setMaximumPoolSize(1);

@@ -16,11 +16,11 @@ import org.mozilla.javascript.Undefined;
  * @author jason
  *
  */
-class EventRegistrationFunction extends BaseFunction implements HostObject {
+abstract class EventRegistrationFunction extends BaseFunction implements HostObject {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final String functionName;
+	private final HostEvent hostEvent;
 	
 	private final CurrentScriptContext context;
 	
@@ -31,14 +31,14 @@ class EventRegistrationFunction extends BaseFunction implements HostObject {
 	 * determines what we respond with from getFunctionName();
 	 * @param functionName
 	 */
-	EventRegistrationFunction(final String functionName, final CurrentScriptContext context) {
-		this.functionName = functionName;
+	protected EventRegistrationFunction(final HostEvent hostEvent, final CurrentScriptContext context) {
+		this.hostEvent = hostEvent;
 		this.context = context;
 	}
 	
 	@Override
 	public String name() {
-		return functionName;
+		return hostEvent.toString();
 	}
 	
 	@Override
@@ -63,16 +63,16 @@ class EventRegistrationFunction extends BaseFunction implements HostObject {
 	
 	@Override
 	public String getFunctionName() {
-		return functionName;
+		return hostEvent.toString();
 	}
 
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		if (args.length != 1 || !(args[0] instanceof Callable)) {
-			throw new IllegalArgumentException(String.format("%s takes only one argument of type function", functionName));
+			throw new IllegalArgumentException(String.format("%s takes only one argument of type function", hostEvent));
 		}
 		
-		context.associatedScriptBundle().addFunction(functionName, (Callable)args[0]);
+		context.associatedScriptBundle().addFunction(hostEvent.toString(), (Callable)args[0]);
 		
 		// nothing worth returning here, chaining doesn't make sense
 		return Undefined.instance;

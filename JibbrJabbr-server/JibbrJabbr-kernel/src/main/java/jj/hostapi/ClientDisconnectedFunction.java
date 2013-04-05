@@ -13,19 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.client;
+package jj.hostapi;
 
-import org.picocontainer.injectors.ProviderAdapter;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import com.ning.http.client.AsyncHttpClientConfig;
+import jj.script.CurrentScriptContext;
 
 /**
  * @author jason
  *
  */
-class ClientConfigurator extends ProviderAdapter {
+@Singleton
+public class ClientDisconnectedFunction extends EventRegistrationFunction {
 
-	public AsyncHttpClientConfig provide(final ClientExecutor executor) {
-		return null;
+	/**  */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @param functionName
+	 * @param context
+	 */
+	@Inject
+	protected ClientDisconnectedFunction(CurrentScriptContext context) {
+		super(HostEvent.clientDisconnected, context);
 	}
+
 }

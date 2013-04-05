@@ -7,6 +7,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * You should almost certainly not depend on this class.  depend on
  * {@link JJExecutors} instead. if there is something you need exposed,
@@ -14,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author jason
  *
  */
+@Singleton
 public class IOExecutor extends ThreadPoolExecutor {
 	
 	public boolean isIOThread() {
@@ -58,6 +62,7 @@ public class IOExecutor extends ThreadPoolExecutor {
 			}
 		};
 		
+	@Inject
 	public IOExecutor() {
 		super(
 			WORKER_COUNT, 

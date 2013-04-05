@@ -2,6 +2,9 @@ package jj.hostapi;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.Scriptable;
@@ -17,6 +20,7 @@ import org.mozilla.javascript.Scriptable;
  * @author jason
  *
  */
+@Singleton
 class ClientStorage implements HostObject {
 	
 	private Map<String,Object> data() {
@@ -25,6 +29,7 @@ class ClientStorage implements HostObject {
 	
 	private final CurrentScriptContext context;
 	
+	@Inject
 	ClientStorage(final CurrentScriptContext context) {
 		this.context = context;
 	}

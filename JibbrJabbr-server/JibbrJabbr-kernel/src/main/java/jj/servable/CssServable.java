@@ -3,6 +3,9 @@ package jj.servable;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
@@ -10,17 +13,14 @@ import jj.webbit.RequestProcessor;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
 
+@Singleton
 class CssServable extends Servable {
 	
 	private static final Pattern CSS_RESOURCE = Pattern.compile("^/(.+?)/([a-f0-9]{40}).css$");
-
+	
+	@Inject
 	CssServable(final Configuration configuration) {
 		super(configuration);
-	}
-	
-	@Override
-	protected Rank rank() {
-		return Rank.Middle;
 	}
 
 	@Override

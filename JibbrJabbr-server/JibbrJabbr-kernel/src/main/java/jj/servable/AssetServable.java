@@ -1,6 +1,10 @@
 package jj.servable;
 
 import java.io.IOException;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
@@ -13,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
 
+@Singleton
 class AssetServable extends Servable {
 	
 	private final Logger log = LoggerFactory.getLogger(AssetServable.class);
@@ -21,17 +26,11 @@ class AssetServable extends Servable {
 	private static final String TWENTY_YEARS = String.valueOf(60 * 60 * 24 * 365 * 20);
 	
 	private final ResourceFinder resourceFinder;
-
+	
+	@Inject
 	AssetServable(final Configuration configuration, final ResourceFinder resourceFinder) {
 		super(configuration);
 		this.resourceFinder = resourceFinder;
-	}
-	
-	@Override
-	protected Rank rank() {
-		// we happen after everyone else goes, to give
-		// a chance at overrides
-		return Rank.Last;
 	}
 	
 	private String baseName(JJHttpRequest httpRequest) {

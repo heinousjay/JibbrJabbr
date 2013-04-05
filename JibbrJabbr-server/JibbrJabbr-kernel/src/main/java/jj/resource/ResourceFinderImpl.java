@@ -7,6 +7,10 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +24,7 @@ import jj.JJExecutors;
  * @author jason
  *
  */
+@Singleton
 class ResourceFinderImpl implements ResourceFinder {
 	
 	private final Logger log = LoggerFactory.getLogger(ResourceFinderImpl.class);
@@ -32,9 +37,10 @@ class ResourceFinderImpl implements ResourceFinder {
 	
 	private final JJExecutors executors;
 	
+	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
-		final ResourceCreator<?>[] resourceCreators,
+		final Set<ResourceCreator<?>> resourceCreators,
 		final ResourceWatchService resourceWatchService,
 		final JJExecutors executors
 	) {
@@ -47,7 +53,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	// goddam, java generics get ugly sometimes
 	private 
 	Map<Class<?>, ResourceCreator<?>> 
-	makeResourceCreatorsMap(final ResourceCreator<?>[] resourceCreators) {
+	makeResourceCreatorsMap(final Set<ResourceCreator<?>> resourceCreators) {
 		Map<Class<?>, ResourceCreator<?>> result = new HashMap<>();
 		for (ResourceCreator<?> resourceCreator : resourceCreators) {
 			result.put(resourceCreator.type(), resourceCreator);

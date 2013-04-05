@@ -3,6 +3,10 @@ package jj.script;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 import org.slf4j.Logger;
@@ -26,6 +30,7 @@ import jj.webbit.JJWebSocketConnection;
  * @author jason
  *
  */
+@Singleton
 public class ScriptRunner {
 
 	public static final String READY_FUNCTION_KEY = "Document.ready";
@@ -42,12 +47,13 @@ public class ScriptRunner {
 	
 	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
 	
+	@Inject
 	ScriptRunner(
 		final ScriptBundleHelper scriptBundleHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
 		final ScriptExecutorFactory scriptExecutorFactory,
-		final ContinuationProcessor[] continuationProcessors
+		final Set<ContinuationProcessor> continuationProcessors
 	) {
 		
 		// this class has a lot of dependencies, but it does
@@ -60,7 +66,7 @@ public class ScriptRunner {
 		this.continuationProcessors = makeContinuationProcessors(continuationProcessors);
 	}
 	
-	private Map<ContinuationType, ContinuationProcessor> makeContinuationProcessors(final ContinuationProcessor[] continuationProcessors) {
+	private Map<ContinuationType, ContinuationProcessor> makeContinuationProcessors(final Set<ContinuationProcessor> continuationProcessors) {
 		Map<ContinuationType, ContinuationProcessor> result = new HashMap<>();
 		for (ContinuationProcessor processor : continuationProcessors) {
 			result.put(processor.type(), processor);

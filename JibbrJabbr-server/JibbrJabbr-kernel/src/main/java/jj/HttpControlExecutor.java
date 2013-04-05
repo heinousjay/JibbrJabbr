@@ -20,10 +20,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * @author jason
  *
  */
+@Singleton
 public class HttpControlExecutor extends ScheduledThreadPoolExecutor {
 	
 	public boolean isHttpControlThread() {
@@ -66,9 +70,7 @@ public class HttpControlExecutor extends ScheduledThreadPoolExecutor {
 			}
 		};
 		
-	/**
-	 * 
-	 */
+	@Inject
 	public HttpControlExecutor() {
 		super(WORKER_COUNT, threadFactory, rejectedExecutionHandler);
 		setMaximumPoolSize(1);

@@ -5,6 +5,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.AssociatedScriptBundle;
@@ -23,6 +26,7 @@ import org.webbitserver.HttpResponse;
  * @author jason
  *
  */
+@Singleton
 class AssociatedScriptServable extends Servable {
 	
 	private final Logger log = LoggerFactory.getLogger(AssociatedScriptServable.class);
@@ -34,14 +38,10 @@ class AssociatedScriptServable extends Servable {
 	
 	private final ScriptBundleFinder finder;
 
+	@Inject
 	AssociatedScriptServable(final Configuration configuration, final ScriptBundleFinder finder) {
 		super(configuration);
 		this.finder = finder;
-	}
-	
-	@Override
-	protected Rank rank() {
-		return Rank.Middle;
 	}
 	
 	private ScriptResource typeFromBundle(AssociatedScriptBundle bundle, String typeSpec) {

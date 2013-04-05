@@ -15,6 +15,9 @@
  */
 package jj.webbit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.JJExecutors;
 
 import org.webbitserver.HttpControl;
@@ -28,6 +31,7 @@ import org.webbitserver.stub.StubHttpControl;
  * @author jason
  *
  */
+@Singleton
 public class WebbitTestRunner {
 
 	private final JJExecutors jjExecutors;
@@ -36,6 +40,7 @@ public class WebbitTestRunner {
 	
 	private Exception testException = null;
 	
+	@Inject
 	WebbitTestRunner(
 		final JJExecutors jjExecutors,
 		final JJEngineHttpHandler htmlEngineHttpHandler

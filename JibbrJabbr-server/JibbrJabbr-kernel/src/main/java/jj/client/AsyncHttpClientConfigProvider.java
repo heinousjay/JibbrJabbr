@@ -13,27 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
+package jj.client;
 
-import javax.inject.Singleton;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import com.ning.http.client.AsyncHttpClientConfig;
 
 /**
  * @author jason
  *
  */
-@Singleton
-class ResourceUrlDocumentFilter implements DocumentFilter {
+class AsyncHttpClientConfigProvider implements Provider<AsyncHttpClientConfig> {
 
-	@Override
-	public boolean needsIO(DocumentRequest documentRequest) {
-		// TODO Auto-generated method stub
-		return false;
+	private final ClientExecutor executor;
+	
+	@Inject
+	AsyncHttpClientConfigProvider(final ClientExecutor executor) {
+		this.executor = executor;
 	}
-
+	
 	@Override
-	public void filter(DocumentRequest documentRequest) {
+	public AsyncHttpClientConfig get() {
 		// TODO Auto-generated method stub
-
+		return new AsyncHttpClientConfig.Builder()
+			.setCompressionEnabled(true)
+			.setUserAgent("JibbrJabbr RestCall subsystem/Netty 3.5.11Final")
+			.setIOThreadMultiplier(1)
+			.setFollowRedirects(true)
+			.setScheduledExecutorService(executor)
+			.setExecutorService(executor)
+			.build();
 	}
-
 }

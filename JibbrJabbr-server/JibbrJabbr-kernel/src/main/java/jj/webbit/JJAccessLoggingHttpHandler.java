@@ -18,6 +18,8 @@ package jj.webbit;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import javax.inject.Singleton;
+
 import jj.DateFormatHelper;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -39,6 +41,7 @@ import org.webbitserver.wrapper.HttpResponseWrapper;
  * @author jason
  *
  */
+@Singleton
 class JJAccessLoggingHttpHandler implements HttpHandler {
 	
 	private final Logger access = LoggerFactory.getLogger("access");

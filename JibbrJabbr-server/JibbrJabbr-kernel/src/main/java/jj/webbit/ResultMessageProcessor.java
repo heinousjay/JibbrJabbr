@@ -15,6 +15,9 @@
  */
 package jj.webbit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.JJExecutors;
 import jj.hostapi.ScriptJSON;
 import jj.jqmessage.JQueryMessage;
@@ -26,13 +29,15 @@ import jj.jqmessage.JQueryMessage.Type;
  * @author jason
  *
  */
+@Singleton
 class ResultMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
 	
 	private final ScriptJSON json;
 	
-	public ResultMessageProcessor(final JJExecutors executors, final ScriptJSON json) {
+	@Inject
+	ResultMessageProcessor(final JJExecutors executors, final ScriptJSON json) {
 		this.executors = executors;
 		this.json = json;
 	}

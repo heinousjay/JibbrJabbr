@@ -6,12 +6,16 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.HttpControlThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
+import jj.JJServerListener;
 import jj.script.AssociatedScriptBundle;
 
 /**
@@ -19,7 +23,8 @@ import jj.script.AssociatedScriptBundle;
  * @author jason
  *
  */
-public class WebSocketConnections {
+@Singleton
+public class WebSocketConnections implements JJServerListener {
 	
 	private final Logger log = LoggerFactory.getLogger(WebSocketConnections.class);
 	
@@ -57,8 +62,19 @@ public class WebSocketConnections {
 	private final ConcurrentHashMap<AssociatedScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> perScript =
 		new ConcurrentHashMap<>();
 		
+	private final JJExecutors executors;
+	
+	@Inject
 	public WebSocketConnections(final JJExecutors executors) {
+		this.executors = executors;
+	}
+	
+	public void start() {
 		executors.httpControlExecutor().scheduleAtFixedRate(new ActivityChecker(), 5, 5, SECONDS);
+	}
+	
+	public void stop() {
+		
 	}
 		
 		

@@ -2,6 +2,9 @@ package jj.script;
 
 import static org.mockito.BDDMockito.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
 import jj.resource.ScriptResource;
@@ -79,12 +82,17 @@ public class ScriptRunnerTest {
 		when(continuationProcessor2.type()).thenReturn(ContinuationType.JQueryMessage);
 		when(continuationProcessor3.type()).thenReturn(ContinuationType.RequiredModule);
 		
+		Set<ContinuationProcessor> continuationProcessors = new HashSet<>();
+		continuationProcessors.add(continuationProcessor1);
+		continuationProcessors.add(continuationProcessor2);
+		continuationProcessors.add(continuationProcessor3);
+		
 		scriptRunner = new ScriptRunner(
 			scriptBundleHelper,
 			continuationCoordinator,
 			currentScriptContext,
 			scriptExecutorFactory,
-			new ContinuationProcessor[] { continuationProcessor1, continuationProcessor2, continuationProcessor3 }
+			continuationProcessors
 		);
 		
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");

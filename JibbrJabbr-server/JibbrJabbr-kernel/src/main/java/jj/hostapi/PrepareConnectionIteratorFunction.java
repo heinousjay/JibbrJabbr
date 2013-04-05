@@ -3,6 +3,9 @@ package jj.hostapi;
 
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.script.CurrentScriptContext;
 import jj.webbit.JJWebSocketConnection;
 import jj.webbit.WebSocketConnections;
@@ -15,6 +18,7 @@ import org.mozilla.javascript.Undefined;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 class PrepareConnectionIteratorFunction extends BaseFunction implements HostObject {
 	
 	static final String PREPARE_CONNECTION_ITERATOR = "//prepareConnectionIteration";
@@ -29,6 +33,7 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 	
 	private final WebSocketConnections connections;
 	
+	@Inject
 	PrepareConnectionIteratorFunction(
 		final CurrentScriptContext context,
 		final WebSocketConnections connections

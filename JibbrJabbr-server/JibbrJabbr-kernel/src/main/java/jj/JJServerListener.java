@@ -6,7 +6,9 @@ package jj;
  * @author jason
  *
  */
-public interface JJStartup {
+public interface JJServerListener {
 
 	void start() throws Exception;
+	
+	void stop();
 }

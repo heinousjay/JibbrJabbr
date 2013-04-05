@@ -1,5 +1,8 @@
 package jj.document;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.CurrentScriptContext;
@@ -15,6 +18,7 @@ import org.jsoup.nodes.Element;
  * @author jason
  * 
  */
+@Singleton
 class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	public static final String JQUERY_URI = "/jquery-1.8.3.min.js";
@@ -23,6 +27,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 	private final Configuration configuration;
 	private final CurrentScriptContext context;
 
+	@Inject
 	public ScriptHelperDocumentFilter(final Configuration configuration, final CurrentScriptContext context) {
 		this.context = context;
 		this.configuration = configuration;

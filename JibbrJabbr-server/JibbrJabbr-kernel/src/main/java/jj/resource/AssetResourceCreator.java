@@ -6,12 +6,17 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.Configuration;
 import jj.JJ;
 
+@Singleton
 class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	
 	static final Path myJar = JJ.jarForClass(AssetResourceCreator.class);
@@ -38,6 +43,7 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 
 	private final URI baseUri;
 	
+	@Inject
 	AssetResourceCreator(final Configuration configuration) {
 		this.baseUri = configuration.baseUri();
 	}

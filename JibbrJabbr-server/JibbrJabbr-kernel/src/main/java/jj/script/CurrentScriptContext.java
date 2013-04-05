@@ -2,6 +2,8 @@ package jj.script;
 
 import java.util.Map;
 
+import javax.inject.Singleton;
+
 import jj.document.DocumentRequestProcessor;
 import jj.jqmessage.JQueryMessage;
 import jj.webbit.JJHttpRequest;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author jason
  *
  */
+@Singleton
 public class CurrentScriptContext {
 	
 	private final Logger log = LoggerFactory.getLogger(CurrentScriptContext.class);

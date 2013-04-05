@@ -106,6 +106,17 @@
 				<version>2.14.3</version>
 			</dependency>
 			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-multibindings</artifactId>
+				<version>3.0</version>
+			</dependency>
+			
+			<dependency>
 				<groupId>com.ning</groupId>
 				<artifactId>async-http-client-netty-provider</artifactId>
 				<version>1.8.0-SNAPSHOT</version>

@@ -1,5 +1,8 @@
 package jj.webbit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 
@@ -10,12 +13,14 @@ import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
 
+@Singleton
 class NotFoundHttpHandler implements HttpHandler {
 	
 	private static final String NOT_FOUND = "errors/404.html";
 	
 	private final ResourceFinder finder;
-
+	
+	@Inject
 	NotFoundHttpHandler(final ResourceFinder finder) {
 		this.finder = finder;
 	}

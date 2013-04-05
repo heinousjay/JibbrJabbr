@@ -13,23 +13,7 @@ import jj.webbit.RequestProcessor;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
 
-public abstract class Servable implements Comparable<Servable> {
-	
-	/**
-	 * Only one should be first and one should be last, which
-	 * is the HtmlServable and the AssetServable, respectively.
-	 * this isn't the most robust ordering mechanism but it
-	 * does the job as well as anything else
-	 * @author jason
-	 *
-	 */
-	protected enum Rank {
-		First,
-		NearFirst,
-		Middle,
-		NearLast,
-		Last;
-	}
+public abstract class Servable {
 	
 	protected final Path basePath;
 	
@@ -57,13 +41,6 @@ public abstract class Servable implements Comparable<Servable> {
 		return false;
 	}
 	
-	protected abstract Rank rank();
-	
-	@Override
-	public int compareTo(Servable o) {
-		return this.rank().compareTo(o.rank());
-	}
-
 	/**
 	 * Indicates if the incoming request can potentially be served by this servable.
 	 * this is more or less a first opportunity for trivial rejections (like extensions

@@ -2,6 +2,9 @@ package jj.script;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +16,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 
+@Singleton
 class RestRequestContinuationProcessor implements ContinuationProcessor {
 	
 	private final Logger log = LoggerFactory.getLogger(RestRequestContinuationProcessor.class);
@@ -25,6 +29,7 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 	
 	private final ScriptJSON json;
 	
+	@Inject
 	RestRequestContinuationProcessor(
 		final CurrentScriptContext context,
 		final AsyncHttpClient httpClient,

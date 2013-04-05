@@ -15,6 +15,9 @@
  */
 package jj.webbit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.JJExecutors;
 import jj.hostapi.EventSelection;
 import jj.jqmessage.JQueryMessage;
@@ -27,12 +30,14 @@ import jj.script.CurrentScriptContext;
  * @author jason
  *
  */
+@Singleton
 class ElementMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
 	
 	private final CurrentScriptContext context;
 	
+	@Inject
 	ElementMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
 		this.executors = executors;
 		this.context = context;

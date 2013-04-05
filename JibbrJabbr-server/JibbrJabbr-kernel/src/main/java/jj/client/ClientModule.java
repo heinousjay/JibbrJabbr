@@ -15,8 +15,9 @@
  */
 package jj.client;
 
-import org.picocontainer.MutablePicoContainer;
+import javax.inject.Singleton;
 
+import com.google.inject.AbstractModule;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 
@@ -24,24 +25,22 @@ import com.ning.http.client.AsyncHttpClientConfig;
  * @author jason
  *
  */
-public class ClientInitializer {
-
-public static MutablePicoContainer initialize(MutablePicoContainer container, boolean isTest) {
-		
-		ClientExecutor executor = new ClientExecutor();
+public class ClientModule extends AbstractModule {
 	
-		return container
-			// needs to be smarter configuration? i at least should be
-			// supplying the executor
-			.addComponent(new AsyncHttpClientConfig.Builder()
-				.setCompressionEnabled(true)
-				.setUserAgent("JibbrJabbr RestCall subsystem/Netty 3.5.11Final")
-				.setIOThreadMultiplier(1)
-				.setFollowRedirects(true)
-				.setScheduledExecutorService(executor)
-				.setExecutorService(executor)
-				.build())
-			.addComponent(AsyncHttpClient.class);
+	@Override
+	protected void configure() {
+	
+		bind(ClientExecutor.class);
+		bind(AsyncHttpClientConfig.class).toProvider(AsyncHttpClientConfigProvider.class);
 		
+		try {
+			bind(AsyncHttpClient.class)
+				.toConstructor(
+					AsyncHttpClient.class.getConstructor(AsyncHttpClientConfig.class)
+				)
+				.in(Singleton.class);
+		} catch (Exception e) {
+			throw new AssertionError("couldn't get the right constructor", e);
+		}
 	}
 }

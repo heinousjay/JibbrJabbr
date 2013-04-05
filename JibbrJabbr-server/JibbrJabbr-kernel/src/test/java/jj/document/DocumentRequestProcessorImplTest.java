@@ -6,6 +6,9 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import jj.JJExecutors;
 import jj.document.DocumentFilter;
@@ -98,14 +101,14 @@ public class DocumentRequestProcessorImplTest {
 	public void testIOFilterBehavior() {
 
 		// given
-		DocumentFilter[] filters = {
-			new TestDocumentFilter(true, 4),
-			new TestDocumentFilter(true, 5),
-			new TestDocumentFilter(false, 1),
-			new TestDocumentFilter(false, 2),
-			new TestDocumentFilter(true, 6),
-			new TestDocumentFilter(false, 3)
-		};
+		Set<DocumentFilter> filters = new LinkedHashSet<>();
+		filters.add(new TestDocumentFilter(true, 4));
+		filters.add(new TestDocumentFilter(true, 5));
+		filters.add(new TestDocumentFilter(false, 1));
+		filters.add(new TestDocumentFilter(false, 2));
+		filters.add(new TestDocumentFilter(true, 6));
+		filters.add(new TestDocumentFilter(false, 3));
+		
 		given(executors.isIOThread())
 			.willReturn(false)
 			.willReturn(false)
@@ -133,7 +136,7 @@ public class DocumentRequestProcessorImplTest {
 	public void testWritesDocumentCorrectly() {
 		// given
 		DocumentRequestProcessorImpl toTest = 
-				new DocumentRequestProcessorImpl(executors, documentRequest, new DocumentFilter[0]);
+				new DocumentRequestProcessorImpl(executors, documentRequest, Collections.<DocumentFilter>emptySet());
 		
 		given(executors.isScriptThread()).willReturn(true);
 		

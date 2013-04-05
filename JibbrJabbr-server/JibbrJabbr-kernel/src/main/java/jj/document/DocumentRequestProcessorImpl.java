@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.HttpControlThread;
@@ -38,19 +39,19 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	/** the document request */
 	private final DocumentRequest documentRequest;
 	
-	private final DocumentFilter[] filters;
+	private final Set<DocumentFilter> filters;
 
 	public DocumentRequestProcessorImpl(
 		final JJExecutors executors,
 		final DocumentRequest documentRequest,
-		final DocumentFilter[] filters
+		final Set<DocumentFilter> filters
 	) {
 		this.executors = executors;
 		this.documentRequest = documentRequest;
 		this.filters = filters;
 	}
 	
-	private FilterList makeFilterList(final DocumentFilter[] filters, final boolean io) {
+	private FilterList makeFilterList(final Set<DocumentFilter> filters, final boolean io) {
 		FilterList filterList = new FilterList();
 		for (DocumentFilter filter: filters) {
 			if (filter.needsIO(documentRequest) && io || 

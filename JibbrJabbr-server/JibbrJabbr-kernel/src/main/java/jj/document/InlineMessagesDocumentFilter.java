@@ -3,6 +3,9 @@ package jj.document;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.JJExecutors;
 import jj.resource.PropertiesResource;
 import jj.resource.ResourceFinder;
@@ -34,13 +37,15 @@ import org.jsoup.select.Elements;
  * @author jason
  *
  */
+@Singleton
 class InlineMessagesDocumentFilter implements DocumentFilter {
 	
 	private final ResourceFinder resourceFinder;
 	
 	private final JJExecutors executors;
 	
-	public InlineMessagesDocumentFilter(
+	@Inject
+	InlineMessagesDocumentFilter(
 		final ResourceFinder resourceFinder,
 		final JJExecutors executors
 	) {

@@ -2,6 +2,8 @@ package jj;
 
 import java.util.Iterator;
 
+import javax.inject.Singleton;
+
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,8 @@ import ch.qos.logback.core.Appender;
  * @author jason
  *
  */
-class SLF4JConfiguration implements JJShutdown {
+@Singleton
+class SLF4JConfiguration implements JJServerListener {
 
 	private final Logger logger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 	
@@ -59,6 +62,11 @@ class SLF4JConfiguration implements JJShutdown {
 		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);
 		
 		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.WARN : Level.TRACE);
+	}
+	
+	@Override
+	public void start() throws Exception {
+		// nothing to do here
 	}
 
 	@Override

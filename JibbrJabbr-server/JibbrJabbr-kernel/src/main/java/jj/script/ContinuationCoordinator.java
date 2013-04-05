@@ -1,5 +1,8 @@
 package jj.script;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
@@ -17,6 +20,7 @@ import jj.hostapi.RhinoObjectCreator;
  * @author jason
  *
  */
+@Singleton
 class ContinuationCoordinator {
 	
 	private final Logger log = LoggerFactory.getLogger(ContinuationCoordinator.class);
@@ -25,6 +29,7 @@ class ContinuationCoordinator {
 	
 	private final CurrentScriptContext currentScriptContext;
 	
+	@Inject
 	ContinuationCoordinator(
 		final RhinoObjectCreator rhinoObjectCreator,
 		final CurrentScriptContext currentScriptContext

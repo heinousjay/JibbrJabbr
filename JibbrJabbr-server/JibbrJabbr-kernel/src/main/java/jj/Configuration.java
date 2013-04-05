@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Singleton;
+
+@Singleton
 public class Configuration {
 	
 	private final URI baseUri;

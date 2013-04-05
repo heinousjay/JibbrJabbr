@@ -15,6 +15,9 @@
  */
 package jj.script;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.ScriptThread;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
@@ -26,12 +29,14 @@ import jj.resource.ScriptResourceType;
  * @author jason
  *
  */
+@Singleton
 class ScriptBundleHelper {
 	
 	private final ResourceFinder finder;
 	private final ScriptBundles scriptBundles;
 	private final ScriptBundleCreator creator;
 	
+	@Inject
 	ScriptBundleHelper(
 		final ResourceFinder finder,
 		final ScriptBundles scriptBundles,

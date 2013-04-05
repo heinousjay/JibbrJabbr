@@ -15,6 +15,9 @@
  */
 package jj.hostapi;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 import jj.resource.ResourceFinder;
 import jj.script.CurrentScriptContext;
@@ -31,6 +34,7 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
+@Singleton
 class RequireFunction extends BaseFunction implements HostObject, ContributesScript {
 
 	private static final long serialVersionUID = -3809338081179905958L;
@@ -42,6 +46,7 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 	private final ScriptBundleFinder scriptBundleFinder;
 	private final ResourceFinder resourceFinder;
 	
+	@Inject
 	RequireFunction(
 		final Configuration configuration,
 		final CurrentScriptContext context,

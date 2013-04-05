@@ -21,12 +21,16 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Configures an executor for the client subsystem
  * 
  * @author jason
  *
  */
+@Singleton
 class ClientExecutor extends ScheduledThreadPoolExecutor {
 	
 	// reaper the +
@@ -58,6 +62,7 @@ class ClientExecutor extends ScheduledThreadPoolExecutor {
 			}
 		};
 	
+	@Inject
 	ClientExecutor() {
 		super(
 			1, 

@@ -1,14 +1,19 @@
 package jj.script;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Kinda simple as these things go
  * @author jason
  *
  */
+@Singleton
 class JQueryMessageContinuationProcessor implements ContinuationProcessor {
 	
 	private final CurrentScriptContext context;
 	
+	@Inject
 	JQueryMessageContinuationProcessor(final CurrentScriptContext context) {
 		this.context = context;
 	}

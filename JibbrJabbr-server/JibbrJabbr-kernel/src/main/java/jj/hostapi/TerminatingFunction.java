@@ -13,27 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
+package jj.hostapi;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.script.CurrentScriptContext;
 
 /**
  * @author jason
  *
  */
 @Singleton
-class ResourceUrlDocumentFilter implements DocumentFilter {
+public class TerminatingFunction extends EventRegistrationFunction {
 
-	@Override
-	public boolean needsIO(DocumentRequest documentRequest) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	/**  */
+	private static final long serialVersionUID = 1L;
 
-	@Override
-	public void filter(DocumentRequest documentRequest) {
-		// TODO Auto-generated method stub
-
+	/**
+	 * @param functionName
+	 * @param context
+	 */
+	@Inject
+	protected TerminatingFunction(CurrentScriptContext context) {
+		super(HostEvent.terminating, context);
 	}
 
 }

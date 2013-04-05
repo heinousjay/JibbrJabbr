@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 
+@Singleton
 class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 
 	private final URI baseUri;
 	private final Path basePath;
 	
+	@Inject
 	ScriptResourceCreator(final Configuration configuration) {
 		this.baseUri = configuration.baseUri();
 		this.basePath = configuration.basePath();

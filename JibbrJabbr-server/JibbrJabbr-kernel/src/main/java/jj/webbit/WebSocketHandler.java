@@ -3,6 +3,10 @@ package jj.webbit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.HttpControlThread;
 import jj.JJExecutors;
@@ -22,6 +26,7 @@ import org.webbitserver.WebSocketConnection;
  * @author jason
  *
  */
+@Singleton
 class WebSocketHandler extends BaseWebSocketHandler {
 	
 	private Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
@@ -34,11 +39,12 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	
 	private final Map<JQueryMessage.Type, WebSocketMessageProcessor> messageProcessors;
 	
+	@Inject
 	WebSocketHandler(
 		final ScriptBundleFinder scriptBundleFinder,
 		final JJExecutors executors,
 		final WebSocketConnections connections,
-		final WebSocketMessageProcessor[] messageProcessors
+		final Set<WebSocketMessageProcessor> messageProcessors
 	) {
 		this.scriptBundleFinder = scriptBundleFinder;
 		this.executors = executors;
@@ -48,7 +54,7 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	
 	private 
 	Map<JQueryMessage.Type, WebSocketMessageProcessor> 
-	makeMessageProcessors(final WebSocketMessageProcessor[] messageProcessors) {
+	makeMessageProcessors(final Set<WebSocketMessageProcessor> messageProcessors) {
 		HashMap<JQueryMessage.Type, WebSocketMessageProcessor> result = new HashMap<>();
 		for (WebSocketMessageProcessor messageProcessor : messageProcessors) {
 			result.put(messageProcessor.type(), messageProcessor);

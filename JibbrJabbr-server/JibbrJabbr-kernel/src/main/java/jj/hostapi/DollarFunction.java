@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.SelectorFormatException;
 import jj.jqmessage.JQueryMessage;
 import jj.script.CurrentScriptContext;
@@ -22,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * @author jason
  *
  */
+@Singleton
 final class DollarFunction extends BaseFunction implements HostObject {
 	
 	private static Logger log = LoggerFactory.getLogger(DollarFunction.class);
@@ -34,6 +38,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	
 	private final CurrentScriptContext context;
 	
+	@Inject
 	public DollarFunction(final CurrentScriptContext context) {
 		this.context = context;
 	}

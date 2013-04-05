@@ -2,6 +2,9 @@ package jj.hostapi;
 
 import java.util.Arrays;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
@@ -10,6 +13,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 class PrintfFunction extends BaseFunction implements HostObject {
 	private static final long serialVersionUID = 1L;
 	
@@ -19,6 +23,7 @@ class PrintfFunction extends BaseFunction implements HostObject {
 	
 	private final CurrentScriptContext context;
 	
+	@Inject
 	public PrintfFunction(final CurrentScriptContext context) {
 		this.context = context;
 	}

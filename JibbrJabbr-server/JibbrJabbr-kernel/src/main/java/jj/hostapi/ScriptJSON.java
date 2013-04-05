@@ -1,6 +1,9 @@
 package jj.hostapi;
 
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.mozilla.javascript.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +17,14 @@ import org.slf4j.LoggerFactory;
  * @author jason
  *
  */
+@Singleton
 public class ScriptJSON {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptJSON.class);
 
 	private final RhinoObjectCreator rhinoObjectCreator;
 	
+	@Inject
 	public ScriptJSON(final RhinoObjectCreator rhinoObjectCreator) {
 		this.rhinoObjectCreator = rhinoObjectCreator;
 	}

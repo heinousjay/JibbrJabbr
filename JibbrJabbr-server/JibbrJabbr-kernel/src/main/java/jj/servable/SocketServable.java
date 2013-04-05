@@ -3,6 +3,9 @@ package jj.servable;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
@@ -18,21 +21,18 @@ import org.webbitserver.WebSocketHandler;
  * @author jason
  *
  */
+@Singleton
 class SocketServable extends Servable {
 	
 	private final WebSocketHandler webSocketHandler;
 	
+	@Inject
 	SocketServable(
 		final Configuration configuration,
 		final WebSocketHandler webSocketHandler
 	) {
 		super(configuration);
 		this.webSocketHandler = webSocketHandler;
-	}
-	
-	@Override
-	protected Rank rank() {
-		return Rank.Middle;
 	}
 	
 	@Override

@@ -1,5 +1,8 @@
 package jj.hostapi;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.jqmessage.JQueryMessage;
 import jj.script.CurrentScriptContext;
 
@@ -8,6 +11,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 
+@Singleton
 public class DoCallFunction extends BaseFunction implements HostObject {
 	private static final long serialVersionUID = 1L;
 	
@@ -15,6 +19,7 @@ public class DoCallFunction extends BaseFunction implements HostObject {
 	
 	private final CurrentScriptContext context;
 	
+	@Inject
 	public DoCallFunction(final CurrentScriptContext context) {
 		this.context = context;
 	}

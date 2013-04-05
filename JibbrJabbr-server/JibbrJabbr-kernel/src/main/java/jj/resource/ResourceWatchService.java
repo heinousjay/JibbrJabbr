@@ -10,21 +10,24 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.concurrent.ExecutorService;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.JJExecutors;
 import jj.JJRunnable;
-import jj.JJShutdown;
+import jj.JJServerListener;
 
 /**
  * watches for file changes on resources we've already loaded
  * @author jason
  *
  */
-class ResourceWatchService implements JJShutdown {
+@Singleton
+class ResourceWatchService implements JJServerListener {
 	
 	private final Logger log = LoggerFactory.getLogger(ResourceWatchService.class);
 	
@@ -34,8 +37,9 @@ class ResourceWatchService implements JJShutdown {
 	
 	private final ResourceFinder resourceFinder;
 	
-	private final ExecutorService ioExecutor;
+	private final JJExecutors executors;
 	
+	@Inject
 	ResourceWatchService(
 		final ResourceCache resourceCache,
 		final ResourceFinder resourceFinder,
@@ -43,9 +47,8 @@ class ResourceWatchService implements JJShutdown {
 	) throws IOException {
 		this.resourceCache = resourceCache;
 		this.resourceFinder = resourceFinder;
-		this.ioExecutor = executors.ioExecutor();
+		this.executors = executors;
 		watcher = FileSystems.getDefault().newWatchService();
-		ioExecutor.submit(loop);
 	}
 
 	void watch(Resource resource) throws IOException {
@@ -55,6 +58,10 @@ class ResourceWatchService implements JJShutdown {
 			log.trace("registering for watch service: {}", resource);
 			directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);
 		}
+	}
+	
+	public void start() {
+		executors.ioExecutor().submit(loop);
 	}
 	
 	public void stop() {
@@ -101,7 +108,7 @@ class ResourceWatchService implements JJShutdown {
 							if (resource != null) {
 								// this thread is only to handle the
 								// WatchEvents
-								ioExecutor.submit(new JJRunnable("ResourceWatchService reloader") {
+								executors.ioExecutor().submit(new JJRunnable("ResourceWatchService reloader") {
 
 									@Override
 									protected void innerRun() throws Exception {

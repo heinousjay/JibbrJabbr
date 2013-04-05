@@ -3,6 +3,10 @@ package jj.script;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class ScriptBundleFinder {
 	
 	private static final Pattern KEY_SPLITTER = Pattern.compile("^(.+?)/([a-f0-9]{40})$");
@@ -10,6 +14,7 @@ public class ScriptBundleFinder {
 	
 	private final ScriptBundles scriptBundles;
 	
+	@Inject
 	ScriptBundleFinder(final ScriptBundles scriptBundles) {
 		this.scriptBundles = scriptBundles;
 	}

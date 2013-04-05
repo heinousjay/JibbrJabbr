@@ -1,33 +1,37 @@
 package jj;
 
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class JJServerLifecycle {
+@Singleton
+public class JJServerLifecycle {
 
 	private final Logger log = LoggerFactory.getLogger(JJServerLifecycle.class);
 	
-	private final JJStartup[] startup;
-	private final JJShutdown[] shutdown;
+	private final Set<JJServerListener> listeners;
 	
+	@Inject
 	JJServerLifecycle(
-		final JJStartup[] startup,
-		final JJShutdown[] shutdown
+		final Set<JJServerListener> listeners
 	) {
-		this.startup = startup;
-		this.shutdown = shutdown;
+		this.listeners = listeners;
 	}
 	
 	public void start() throws Exception {
 		log.info("starting the server");
-		for (JJStartup start: startup) {
+		for (JJServerListener start: listeners) {
 			start.start();
 		}
 	}
 	
 	public void stop() {
 		log.info("stopping the server");
-		for (JJShutdown stop: shutdown) {
+		for (JJServerListener stop: listeners) {
 			try {
 				stop.stop();
 			} catch (Throwable t) {

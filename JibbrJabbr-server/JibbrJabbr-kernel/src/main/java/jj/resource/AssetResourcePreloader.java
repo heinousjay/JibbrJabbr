@@ -9,14 +9,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.JJExecutors;
 import jj.JJRunnable;
-import jj.JJStartup;
+import jj.JJServerListener;
 
-class AssetResourcePreloader implements JJStartup {
+@Singleton
+class AssetResourcePreloader implements JJServerListener {
 	
 	private final Logger log = LoggerFactory.getLogger(AssetResourcePreloader.class);
 	
@@ -24,6 +28,7 @@ class AssetResourcePreloader implements JJStartup {
 	
 	private final JJExecutors executors;
 	
+	@Inject
 	AssetResourcePreloader(final ResourceFinder finder, final JJExecutors executors) {
 		this.finder = finder;
 		this.executors = executors;
@@ -83,5 +88,10 @@ class AssetResourcePreloader implements JJStartup {
 				return FileVisitResult.CONTINUE;
 			}
 		});
+	}
+
+	@Override
+	public void stop() {
+		//nothing to do
 	}
 }

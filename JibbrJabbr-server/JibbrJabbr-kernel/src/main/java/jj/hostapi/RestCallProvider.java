@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
 import jj.uri.UriTemplate;
@@ -153,6 +155,7 @@ class RestCallProvider {
 		}
 	}
 	
+	@Inject
 	RestCallProvider(
 		final AsyncHttpClient httpClient,
 		final CurrentScriptContext context

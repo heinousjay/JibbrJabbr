@@ -1,6 +1,9 @@
 package jj.webbit;
 
-import java.util.Arrays;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.HttpControlThread;
 import jj.JJExecutors;
@@ -17,19 +20,20 @@ import org.webbitserver.HttpResponse;
  * @author jason
  *
  */
+@Singleton
 class JJEngineHttpHandler implements HttpHandler {
 	
 	private final JJExecutors executors;
 	
-	private final Servable[] resourceTypes;
+	private final Set<Servable> resourceTypes;
 	
+	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
-		final Servable[] resourceTypes
+		final Set<Servable> resourceTypes
 	) {
 		this.executors = executors;
 		this.resourceTypes = resourceTypes;
-		Arrays.sort(this.resourceTypes);
 	}
 	
 	private Servable findMatchingServable(final JJHttpRequest request) {

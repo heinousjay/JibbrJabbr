@@ -4,6 +4,9 @@ import static jj.hostapi.PrepareConnectionIteratorFunction.*;
 
 import java.util.Iterator;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.script.CurrentScriptContext;
 import jj.webbit.JJWebSocketConnection;
 
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author jason
  *
  */
+@Singleton
 class NextConnectionFunction extends BaseFunction implements HostObject, ContributesScript {
 	private static final long serialVersionUID = 1L;
 	
@@ -29,6 +33,7 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 	
 	private final CurrentScriptContext context;
 	
+	@Inject
 	NextConnectionFunction(final CurrentScriptContext context) {
 		this.context = context;
 	}

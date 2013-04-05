@@ -2,6 +2,10 @@ package jj.servable;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.Configuration;
 import jj.JJExecutors;
@@ -18,6 +22,7 @@ import jj.webbit.RequestProcessor;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
 
+@Singleton
 class HtmlServable extends Servable {
 	
 	public static final String SLASH = "/";
@@ -27,23 +32,19 @@ class HtmlServable extends Servable {
 	
 	private final ResourceFinder resourceFinder;
 	private final JJExecutors executors;
-	private final DocumentFilter[] documentFilters;
+	private final Set<DocumentFilter> documentFilters;
 	
+	@Inject
 	HtmlServable(
 		final Configuration configuration,
 		final ResourceFinder resourceFinder, 
 		final JJExecutors executors,
-		final DocumentFilter[] documentFilters
+		final Set<DocumentFilter> documentFilters
 	) {
 		super(configuration);
 		this.resourceFinder = resourceFinder;
 		this.executors = executors;
 		this.documentFilters = documentFilters;
-	}
-	
-	@Override
-	protected Rank rank() {
-		return Rank.First;
 	}
 	
 	@Override

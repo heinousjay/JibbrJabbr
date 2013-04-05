@@ -15,6 +15,9 @@
  */
 package jj.script;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.hostapi.RequiredModuleException;
@@ -26,6 +29,7 @@ import jj.resource.ScriptResourceType;
  * @author jason
  *
  */
+@Singleton
 class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final CurrentScriptContext context;
@@ -36,6 +40,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final ScriptBundleFinder scriptFinder;
 	
+	@Inject
 	RequiredModuleContinuationProcessor(
 		final CurrentScriptContext context,
 		final JJExecutors executors,

@@ -3,6 +3,9 @@ package jj;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.script.ScriptExecutorFactory;
 import jj.script.ScriptRunner;
 
@@ -21,6 +24,7 @@ import jj.script.ScriptRunner;
  * @author jason
  *
  */
+@Singleton
 class JJExecutorsImpl implements JJExecutors {
 
 	private final ScriptRunner scriptRunner;
@@ -28,6 +32,7 @@ class JJExecutorsImpl implements JJExecutors {
 	private final IOExecutor ioExecutor;
 	private final ScriptExecutorFactory scriptExecutorFactory;
 	
+	@Inject
 	public JJExecutorsImpl(
 		final ScriptRunner scriptRunner,
 		final HttpControlExecutor httpControlExecutor,

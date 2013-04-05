@@ -1,11 +1,17 @@
 package jj.hostapi;
 
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class RhinoObjectCreatorImpl implements RhinoObjectCreator {
 	
 	private static Context contextInner() {
@@ -21,7 +27,8 @@ public class RhinoObjectCreatorImpl implements RhinoObjectCreator {
 	
 	private final Logger log = LoggerFactory.getLogger(RhinoObjectCreatorImpl.class);
 	
-	RhinoObjectCreatorImpl(final HostObject[] hostObjects) {
+	@Inject
+	RhinoObjectCreatorImpl(final Set<HostObject> hostObjects) {
 		Context context = contextInner();
 		try {
 			global = initializeGlobalScope(context, hostObjects);
@@ -38,7 +45,7 @@ public class RhinoObjectCreatorImpl implements RhinoObjectCreator {
 		return global;
 	}
 	
-	private ScriptableObject initializeGlobalScope(final Context context, final HostObject[] hostObjects) {
+	private ScriptableObject initializeGlobalScope(final Context context, final Set<HostObject> hostObjects) {
 		final ScriptableObject global = context.initStandardObjects(null, true);
 		// make sure all the Rhino objects are available
 		context.evaluateString(global , "RegExp; getClass; java; Packages; JavaAdapter;", "lazyLoad", 0, null);

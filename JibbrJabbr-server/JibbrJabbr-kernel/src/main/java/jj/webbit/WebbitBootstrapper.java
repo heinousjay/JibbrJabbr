@@ -6,10 +6,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.Configuration;
 import jj.JJExecutors;
-import jj.JJShutdown;
-import jj.JJStartup;
+import jj.JJServerListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +19,8 @@ import org.webbitserver.WebServer;
 import org.webbitserver.WebServers;
 import org.webbitserver.handler.StaticFileHandler;
 
-class WebbitBootstrapper implements JJStartup, JJShutdown {
+@Singleton
+class WebbitBootstrapper implements JJServerListener {
 	
 	private final Logger log = LoggerFactory.getLogger(WebbitBootstrapper.class);
 	
@@ -40,6 +43,7 @@ class WebbitBootstrapper implements JJStartup, JJShutdown {
 		}
 	};
 
+	@Inject
 	WebbitBootstrapper(
 		final Configuration configuration,
 		final JJExecutors jjExecutors,

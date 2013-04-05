@@ -21,7 +21,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import jj.Startup;
+import jj.CoreModule;
+import jj.JJServerLifecycle;
 import jj.webbit.WebbitTestRunner;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -30,9 +31,11 @@ import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.picocontainer.PicoContainer;
 import org.webbitserver.stub.StubHttpRequest;
 import org.webbitserver.stub.StubHttpResponse;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * A test rule that supplies a context for performing
@@ -57,12 +60,18 @@ public class JJTestRule implements TestRule {
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				PicoContainer container = new Startup(new String[]{basePath}, true).container();
-				testRunner = container.getComponent(WebbitTestRunner.class);
+				
+				Injector injector = Guice.createInjector(new CoreModule(new String[]{basePath}, true));
+				
+				testRunner = injector.getInstance(WebbitTestRunner.class);
+				
+				
 				try {
+					injector.getInstance(JJServerLifecycle.class).start();
 					base.evaluate();
 				} finally {
 					testRunner = null;
+					injector.getInstance(JJServerLifecycle.class).stop();
 				}
 			}
 		};

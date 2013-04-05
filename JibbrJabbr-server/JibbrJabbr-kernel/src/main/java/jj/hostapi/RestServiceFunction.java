@@ -1,6 +1,9 @@
 package jj.hostapi;
 
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -14,6 +17,7 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
+@Singleton
 class RestServiceFunction extends BaseFunction implements HostObject {
 	
 	private static final long serialVersionUID = 1L;
@@ -23,6 +27,7 @@ class RestServiceFunction extends BaseFunction implements HostObject {
 	
 	private final RestCallProvider restCallProvider;
 	
+	@Inject
 	RestServiceFunction(final RestCallProvider restCallProvider) {
 		this.restCallProvider = restCallProvider;
 	}

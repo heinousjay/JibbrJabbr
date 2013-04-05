@@ -3,6 +3,9 @@ package jj.script;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
@@ -22,6 +25,7 @@ import jj.resource.ScriptResource;
  * @author jason
  *
  */
+@Singleton
 class ScriptBundleCreator {
 	
 	private static final String EXPORTS = "exports";
@@ -29,7 +33,8 @@ class ScriptBundleCreator {
 	private final Logger log = LoggerFactory.getLogger(ScriptBundleCreator.class);
 	
 	private final RhinoObjectCreator rhinoObjectCreator;
-
+	
+	@Inject
 	ScriptBundleCreator(final RhinoObjectCreator rhinoObjectCreator) {
 		this.rhinoObjectCreator = rhinoObjectCreator;
 	}
