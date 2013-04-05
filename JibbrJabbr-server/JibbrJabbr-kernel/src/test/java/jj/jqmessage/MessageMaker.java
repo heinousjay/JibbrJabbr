@@ -38,4 +38,12 @@ public class MessageMaker {
 		result.result().value = value;
 		return result;
 	}
+	
+	public static JQueryMessage makeElement(final String id, final String selector) {
+		JQueryMessage result = new JQueryMessage();
+		result.element(new Element());
+		result.element().id = id;
+		result.element().selector = selector;
+		return result;
+	}
 }
