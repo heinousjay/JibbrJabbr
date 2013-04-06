@@ -17,18 +17,22 @@ package jj.webbit;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.DateFormatHelper;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
+import org.webbitserver.helpers.DateHelper;
 import org.webbitserver.wrapper.HttpResponseWrapper;
 
 /**
@@ -44,42 +48,56 @@ import org.webbitserver.wrapper.HttpResponseWrapper;
 @Singleton
 class JJAccessLoggingHttpHandler implements HttpHandler {
 	
-	private final Logger access = LoggerFactory.getLogger("access");
+	private static final String RESPONSE_HEADERS = "Response Headers";
+	
+	private final Logger access;
+	
+	@Inject
+	JJAccessLoggingHttpHandler(final Logger access) {
+		this.access = access;
+	}
 
 	@Override
-	public void handleHttpRequest(final HttpRequest request, final HttpResponse response, final HttpControl control) throws Exception {
+	public void handleHttpRequest(
+		final HttpRequest request,
+		final HttpResponse response,
+		final HttpControl control
+	) throws Exception {
 		
+		request.data(RESPONSE_HEADERS, new HashMap<String, String>());
 		
-	 HttpResponseWrapper responseWrapper = new HttpResponseWrapper(response) {
-
+		HttpResponseWrapper responseWrapper = new HttpResponseWrapper(response) {
+		 
 		 	@Override
 		 	public HttpResponseWrapper header(String name, String value) {
-		 		if (HttpHeaders.Names.CONTENT_LENGTH.equals(name)) {
-		 			request.data(HttpHeaders.Names.CONTENT_LENGTH, value);
-		 		}
+		 		makeHeader(request, name, value);
 		 		return super.header(name, value);
 		 	}
 		 
 		 	@Override
 		 	public HttpResponseWrapper header(String name, long value) {
-		 		if (HttpHeaders.Names.CONTENT_LENGTH.equals(name)) {
-		 			request.data(HttpHeaders.Names.CONTENT_LENGTH, value);
-		 		}
+		 		makeHeader(request, name, String.valueOf(value));
+		 		return super.header(name, value);
+		 	}
+		 	
+		 	@Override
+		 	public HttpResponseWrapper header(String name, Date value) {
+		 		makeHeader(request, name, DateHelper.rfc1123Format(value));
 		 		return super.header(name, value);
 		 	}
 		 
-            @Override
-            public HttpResponseWrapper end() {
-                log(request, response);
-                return super.end();
-            }
-
-            @Override
-            public HttpResponseWrapper error(Throwable error) {
-            	log(request, response);
-                return super.error(error);
-            }
-        };
+			@Override
+			public HttpResponseWrapper end() {
+				log(request, response);
+				return super.end();
+			}
+			
+			@Override
+			public HttpResponseWrapper error(Throwable error) {
+				log(request, response);
+				return super.error(error);
+			}
+		};
 		control.nextHandler(request, responseWrapper);
 	}
 	
@@ -91,9 +109,21 @@ class JJAccessLoggingHttpHandler implements HttpHandler {
 			request.method(),
 			request.uri(),
 			response.status(),
-			request.data(HttpHeaders.Names.CONTENT_LENGTH),
+			header(request, HttpHeaders.Names.CONTENT_LENGTH),
 			extractReferer(request),
 			request.header(HttpHeaders.Names.USER_AGENT));
+		
+		if (access.isTraceEnabled()) {
+			access.trace("Request Headers");
+			for (Entry<String, String> header : request.allHeaders()) {
+				access.trace(header.getKey() + " : " + header.getValue());
+			}
+			
+			access.trace("Response Headers");
+			for (Entry<String, String> header : rh(request).entrySet()) {
+				access.trace(header.getKey() + " : " + header.getValue());
+			}
+		}
 	}
 	
 	private String extractIP(final SocketAddress remoteAddress) {
@@ -106,6 +136,19 @@ class JJAccessLoggingHttpHandler implements HttpHandler {
 		return request.hasHeader(HttpHeaders.Names.REFERER) ?
 			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :
 			"-";	
+	}
+
+	@SuppressWarnings("unchecked")
+	private HashMap<String, String> rh(final HttpRequest request) {
+		return ((HashMap<String, String>)request.data(RESPONSE_HEADERS));
+	}
+	
+	private String header(final HttpRequest request, final String name) {
+		return rh(request).get(name);
+	}
+	
+	private void makeHeader(final HttpRequest request, final String name, final String value) {
+		rh(request).put(name, value);
 	}
 
 }

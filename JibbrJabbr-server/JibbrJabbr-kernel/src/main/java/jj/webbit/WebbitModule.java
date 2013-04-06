@@ -1,5 +1,8 @@
 package jj.webbit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jj.JJServerListener;
 
 import com.google.inject.AbstractModule;
@@ -28,6 +31,7 @@ public class WebbitModule extends AbstractModule {
 		
 		bind(JJEngineHttpHandler.class);
 		bind(org.webbitserver.WebSocketHandler.class).to(WebSocketHandler.class);
+		bind(Logger.class).toInstance(LoggerFactory.getLogger("access"));
 		bind(JJAccessLoggingHttpHandler.class);
 		bind(NotFoundHttpHandler.class);
 		
