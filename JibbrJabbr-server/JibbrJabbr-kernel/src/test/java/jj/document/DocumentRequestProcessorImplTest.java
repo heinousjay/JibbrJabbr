@@ -1,5 +1,7 @@
 package jj.document;
 
+
+import static jj.MockJJExecutors.ThreadType.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -10,7 +12,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import jj.JJExecutors;
+import jj.MockJJExecutors;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
@@ -38,7 +40,7 @@ public class DocumentRequestProcessorImplTest {
 
 	DeterministicScheduler executor;
 	@Mock ScriptExecutorFactory scriptExecutorFactory;
-	@Mock JJExecutors executors;
+	MockJJExecutors executors;
 
 	@Mock Resource htmlResource;
 	
@@ -68,7 +70,6 @@ public class DocumentRequestProcessorImplTest {
 		@Override
 		public void filter(DocumentRequest documentRequest) {
 			assertThat(++filterCalls, is(sequence));
-			assertTrue("not correctly sequencing calls or switching to IO thread", io == executors.isIOThread());
 		}
 	}
 	
@@ -81,11 +82,10 @@ public class DocumentRequestProcessorImplTest {
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
 		document.outputSettings().prettyPrint(false);
 		baseName = "baseName";
-		executor = new DeterministicScheduler();
-		
-		when(executors.ioExecutor()).thenReturn(executor);
-		when(executors.scriptExecutorFor(baseName)).thenReturn(executor);
 
+		executor = new DeterministicScheduler();
+		executors = new MockJJExecutors(executor);
+		
 		when(htmlResource.baseName()).thenReturn(baseName);
 		when(htmlResource.mime()).thenReturn(MIME);
 		
@@ -109,14 +109,8 @@ public class DocumentRequestProcessorImplTest {
 		filters.add(new TestDocumentFilter(true, 6));
 		filters.add(new TestDocumentFilter(false, 3));
 		
-		given(executors.isIOThread())
-			.willReturn(false)
-			.willReturn(false)
-			.willReturn(false)
-			.willReturn(false)
-			.willReturn(true);
-		
-		given(executors.isScriptThread()).willReturn(true);
+		executors.addThreadTypes(ScriptThread, 4);
+		executors.addThreadTypes(IOThread, 2);
 		
 		DocumentRequestProcessorImpl toTest = 
 			new DocumentRequestProcessorImpl(executors, documentRequest, filters);
@@ -127,9 +121,7 @@ public class DocumentRequestProcessorImplTest {
 		
 		// then
 		assertThat(filterCalls, is(6));
-		
-		// + assertions in TestDocumentFilter
-		
+		// TODO can make this smarter later
 	}
 	
 	@Test
@@ -138,7 +130,7 @@ public class DocumentRequestProcessorImplTest {
 		DocumentRequestProcessorImpl toTest = 
 				new DocumentRequestProcessorImpl(executors, documentRequest, Collections.<DocumentFilter>emptySet());
 		
-		given(executors.isScriptThread()).willReturn(true);
+		executors.isScriptThread = true;
 		
 		// when
 		toTest.respond();

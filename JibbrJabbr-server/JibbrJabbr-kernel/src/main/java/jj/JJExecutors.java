@@ -23,5 +23,7 @@ public interface JJExecutors {
 	boolean isIOThread();
 
 	int ioPoolSize();
+	
+	Runnable prepareTask(JJRunnable task);
 
 }

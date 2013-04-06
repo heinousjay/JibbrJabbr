@@ -15,25 +15,12 @@
  */
 package jj.testing;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import jj.CoreModule;
 import jj.JJServerLifecycle;
-import jj.webbit.WebbitTestRunner;
-
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.webbitserver.stub.StubHttpRequest;
-import org.webbitserver.stub.StubHttpResponse;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -48,7 +35,7 @@ public class JJTestRule implements TestRule {
 	
 	private final String basePath;
 	
-	private WebbitTestRunner testRunner;
+	private Injector injector;
 	
 	public JJTestRule(final String basePath) {
 		this.basePath = basePath;
@@ -61,83 +48,31 @@ public class JJTestRule implements TestRule {
 			@Override
 			public void evaluate() throws Throwable {
 				
-				Injector injector = Guice.createInjector(new CoreModule(new String[]{basePath}, true));
-				
-				testRunner = injector.getInstance(WebbitTestRunner.class);
-				
+				injector = Guice.createInjector(new TestModule(basePath));
 				
 				try {
 					injector.getInstance(JJServerLifecycle.class).start();
 					base.evaluate();
 				} finally {
-					testRunner = null;
 					injector.getInstance(JJServerLifecycle.class).stop();
+					injector = null;
 				}
 			}
 		};
 	}
 	
-	public Document getAndWait(final String uri) throws Exception {
-		return get(uri).get(10, TimeUnit.SECONDS);
+	public void doSocketConnection(final Document document) throws Exception {
+		get(document.select("script[data-jj-socket-url]").attr("data-jj-socket-url"));
 	}
 	
-	public Document getAndWait(final String uri, final long time, final TimeUnit unit) throws Exception {
-		return get(uri).get(time, unit);
-	}
-	
-	public Future<Document> get(final String uri) throws Exception {
+	public TestClient get(final String uri) throws Exception {
 		
-		if (testRunner == null) throw new AssertionError("somehow this happened?");
+		TestRunner runner = injector.getInstance(TestRunner.class);
 		
-		final CountDownLatch latch = new CountDownLatch(1);
-		
-		final StubHttpRequest stubHttpRequest = 
-			new StubHttpRequest(uri)
+		runner.request().uri(uri)
 			.timestamp(System.nanoTime())
 			.header(HttpHeaders.Names.HOST, "localhost");
 		
-		final StubHttpResponse stubHttpResponse = new StubHttpResponse() {
-			
-			@Override
-			public StubHttpResponse end() {
-				latch.countDown();
-				return super.end();
-			}
-		};
-		
-		testRunner.executeRequest(stubHttpRequest, stubHttpResponse);
-		
-		return new Future<Document>() {
-
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return false;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				return latch.getCount() < 1;
-			}
-
-			@Override
-			public Document get() throws InterruptedException, ExecutionException {
-				latch.await();
-				return Jsoup.parse(stubHttpResponse.contentsString());
-			}
-
-			@Override
-			public Document get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-				if (latch.await(timeout, unit)) {
-					return Jsoup.parse(stubHttpResponse.contentsString());
-				}
-				throw new TimeoutException("timed out in " + timeout + " " + unit.toString().toLowerCase());
-			}
-			
-		};
+		return runner.run();
 	}
 }

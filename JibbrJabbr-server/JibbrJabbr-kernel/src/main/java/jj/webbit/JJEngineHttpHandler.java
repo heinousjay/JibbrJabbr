@@ -10,6 +10,8 @@ import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.servable.Servable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
@@ -21,7 +23,9 @@ import org.webbitserver.HttpResponse;
  *
  */
 @Singleton
-class JJEngineHttpHandler implements HttpHandler {
+public class JJEngineHttpHandler implements HttpHandler {
+	
+	private final Logger log = LoggerFactory.getLogger(JJEngineHttpHandler.class);
 	
 	private final JJExecutors executors;
 	
@@ -63,10 +67,15 @@ class JJEngineHttpHandler implements HttpHandler {
 		final Servable servable = findMatchingServable(jjrequest);
 		
 		if (servable != null) {
-			JJRunnable r = new JJRunnable("JJEngine webbit->core processing") {
+			Runnable r = executors.prepareTask(new JJRunnable() {
 				
 				@Override
-				public void innerRun() throws Exception {
+				public String name() {
+					return "JJEngine webbit->core processing";
+				}
+
+				@Override
+				public void run() throws Exception {
 					try {
 						RequestProcessor requestProcessor = 
 							servable.makeRequestProcessor(
@@ -82,11 +91,12 @@ class JJEngineHttpHandler implements HttpHandler {
 						}
 						
 					} catch (Exception e) {
+						log.error("Request processing failed", e);
 						nextHandler(control);
 						throw e;
 					}
 				}
-			};
+			});
 			
 			if (servable.needsIO(jjrequest)) {
 				executors.ioExecutor().execute(r);
@@ -101,15 +111,20 @@ class JJEngineHttpHandler implements HttpHandler {
 	
 	private void nextHandler(final HttpControl control) {
 		if (executors.isIOThread()) {
-			control.execute(new JJRunnable("HtmlEngine passing control to next handler") {
-	
+			control.execute(executors.prepareTask(new JJRunnable() {
+
+				@Override
+				public String name() {
+					return "HtmlEngine passing control to next handler";
+				}
+
 				@Override
 				@HttpControlThread
-				protected void innerRun() throws Exception {
+				public void run() throws Exception {
 					control.nextHandler();
 				}
 				
-			});
+			}));
 		} else {
 			control.nextHandler();
 		}

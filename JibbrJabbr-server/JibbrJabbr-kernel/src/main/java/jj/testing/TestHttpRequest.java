@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.testing;
 
-import java.io.IOException;
-
-import jj.JJServerListener;
+import org.webbitserver.stub.StubHttpRequest;
 
 /**
  * @author jason
  *
  */
-interface ResourceWatchService extends JJServerListener {
+class TestHttpRequest extends StubHttpRequest {
 
-	void watch(Resource resource) throws IOException;
-
+	
+	@Override
+	public String toString() {
+		
+		return uri();
+	}
 }

@@ -46,10 +46,11 @@ public class CoreModule extends AbstractModule {
 		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
 		
 		bind(Configuration.class).toInstance(new Configuration(args));
-		serverListeners.addBinding().toInstance(new SLF4JConfiguration(isTest));
+		serverListeners.addBinding().toInstance(new LogConfigurator(isTest));
 		bind(JJServerLifecycle.class);
 		bind(IOExecutor.class);
 		bind(HttpControlExecutor.class);
+		bind(TaskCreator.class);
 		
 		// a good place to break apart crafty circular dependencies
 		bind(JJExecutors.class).to(JJExecutorsImpl.class);
@@ -57,7 +58,7 @@ public class CoreModule extends AbstractModule {
 		install(new ClientModule());
 		install(new DocumentModule());
 		install(new HostApiModule());
-		install(new ResourceModule());
+		install(new ResourceModule(isTest));
 		install(new ScriptModule());
 		install(new ServableModule());
 		install(new WebbitModule(isTest));

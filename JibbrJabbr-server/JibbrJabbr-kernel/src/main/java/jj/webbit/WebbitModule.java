@@ -21,9 +21,7 @@ public class WebbitModule extends AbstractModule {
 		
 		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
 		
-		if (isTest) {
-			bind(WebbitTestRunner.class);
-		} else {
+		if (!isTest) {
 			serverListeners.addBinding().to(WebbitBootstrapper.class);
 		}
 		

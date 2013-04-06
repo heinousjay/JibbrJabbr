@@ -13,18 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.testing;
 
-import java.io.IOException;
+import jj.CoreModule;
 
-import jj.JJServerListener;
+import com.google.inject.AbstractModule;
 
 /**
  * @author jason
  *
  */
-interface ResourceWatchService extends JJServerListener {
+class TestModule extends AbstractModule {
+	
+	private final String basePath;
+	
+	TestModule(final String basePath) {
+		this.basePath = basePath;
+	}
 
-	void watch(Resource resource) throws IOException;
-
+	@Override
+	protected void configure() {
+		
+		install(new CoreModule(new String[]{basePath}, true));
+		
+		bind(TestHttpControl.class);
+		bind(TestHttpRequest.class);
+		bind(TestHttpResponse.class);
+		bind(TestRunner.class);
+	}
 }

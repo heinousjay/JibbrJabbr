@@ -62,28 +62,35 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		
 		final String baseName = context.baseName();
 		
-		executors.ioExecutor().submit(new JJRunnable("loading module " + requiredModule.identifier()) {
-			
-			@Override
-			protected void innerRun() throws Exception {
-				ScriptResource scriptResource = 
-					finder.loadResource(ScriptResource.class, requiredModule.identifier(), ScriptResourceType.Module);
-				
-				// at this point do we need to check if we got scooped? inside
-				// the script thread makes more sense really, if we check here
-				// then we are potentially contending for the stores but if we
-				// check inside a script thread then strict ordering will happen,
-				// so submit needs to check if it's doing useless work at the
-				// beginning and just restart and then we just wasted a little i/o
-				// time, no biggy
-				
-				if (scriptResource != null) {
-					executors.scriptRunner().submit(requiredModule);
-				} else {
-					resumeContinuationAfterError(requiredModule, baseName, new RequiredModuleException(requiredModule.identifier()));
+		executors.ioExecutor().submit(
+			executors.prepareTask(new JJRunnable() {
+
+				@Override
+				public String name() {
+					return "loading module " + requiredModule.identifier();
 				}
-			}
-		});
+			
+				@Override
+				public void run() throws Exception {
+					ScriptResource scriptResource = 
+						finder.loadResource(ScriptResource.class, requiredModule.identifier(), ScriptResourceType.Module);
+					
+					// at this point do we need to check if we got scooped? inside
+					// the script thread makes more sense really, if we check here
+					// then we are potentially contending for the stores but if we
+					// check inside a script thread then strict ordering will happen,
+					// so submit needs to check if it's doing useless work at the
+					// beginning and just restart and then we just wasted a little i/o
+					// time, no biggy
+					
+					if (scriptResource != null) {
+						executors.scriptRunner().submit(requiredModule);
+					} else {
+						resumeContinuationAfterError(requiredModule, baseName, new RequiredModuleException(requiredModule.identifier()));
+					}
+				}
+			})
+		);
 	}
 	
 	private void resumeContinuationAfterError(
@@ -92,20 +99,27 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		final Object result
 	) {
 		
-		executors.scriptExecutorFor(baseName).submit(new JJRunnable("required module " + require.identifier() + " error") {
-			
-			@Override
-			protected void innerRun() throws Exception {
-				
-				context.restore(require.parentContext());
-				
-				try {
-					executors.scriptRunner().restartAfterContinuation(require.pendingKey(), result);
-				} finally {
-					context.end();
+		executors.scriptExecutorFor(baseName).submit(
+			executors.prepareTask(new JJRunnable() {
+
+				@Override
+				public String name() {
+					return "required module " + require.identifier() + " error";
 				}
-			}
-		});
+			
+				@Override
+				public void run() throws Exception {
+					
+					context.restore(require.parentContext());
+					
+					try {
+						executors.scriptRunner().restartAfterContinuation(require.pendingKey(), result);
+					} finally {
+						context.end();
+					}
+				}
+			})
+		);
 	}
 
 	@Override

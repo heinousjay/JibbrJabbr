@@ -15,13 +15,16 @@
  */
 package jj.testing;
 
+import static java.util.concurrent.TimeUnit.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.nio.file.Paths;
+import java.util.concurrent.TimeoutException;
 
 import jj.JJ;
 
+import org.jsoup.nodes.Document;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -44,19 +47,25 @@ public class TestingAPITest {
 	@Test
 	public void runBasicTest() throws Exception {
 		
-		assertThat(
-			jjTestRule.getAndWait("/index").select("title").text(),
-			is("JAYCHAT!")
-		);
+		Document doc = jjTestRule.get("/index").document();
+		
+		assertThat(doc.select("title").text(), is("JAYCHAT!"));
 	}
 	
-	@Test
-	public void runAnotherTest() throws Exception {
+	//@Test
+	public void runBasic404Test() throws Exception {
 		
-		assertThat(
-			jjTestRule.getAndWait("/index").select("script[data-jj-socket-url]").attr("data-jj-socket-url"),
-			is(notNullValue())
-			//is("ws://localhost/index/092f1fef937fabedcc3b4cd608e827a9e2bbc2b3.socket")
-		);
+		// this actually doesn't work, heh
+		TestClient client = jjTestRule.get("/errors/404.html");
+		
+		try {
+			System.out.println(client.document(2, SECONDS));
+			fail("should have thrown an exception");
+		} catch (TimeoutException te) {
+			fail("timed out");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

@@ -117,15 +117,21 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		if (index >= ioFilters.size()) {
 			writeResponse();
 		} else {
-			String taskName = String.format("DocumentFilter%s", (executors.isIOThread() ? " w/IO" : ""));
-			JJRunnable r = new JJRunnable(taskName) {
+			final String taskName = String.format("DocumentFilter %s", (executors.isIOThread() ? " w/IO" : ""));
+			Runnable r = executors.prepareTask(new JJRunnable() {
+				
 				@Override
-				public void innerRun() throws Exception {
+				public String name() {
+					return taskName;
+				}
+				
+				@Override
+				public void run() throws Exception {
 					// not asserting IO thread here since this is only called from the next few lines
 					ioFilters.get(index).filter(documentRequest);
 					dispatchIONextFilter(ioFilters, currentIOFilter);
 				}
-			};
+			});
 			if (executors.isIOThread()) {
 				r.run();
 			} else {
@@ -135,11 +141,16 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	}
 
 	private void writeResponse() {
-		documentRequest.httpControl().execute(new JJRunnable("Writing HTTP response") {
+		documentRequest.httpControl().execute(executors.prepareTask(new JJRunnable() {
+			
+			@Override
+			public String name() {
+				return "Writing HTTP response";
+			}
 			
 			@Override
 			@HttpControlThread
-			public void innerRun() throws Exception {
+			public void run() throws Exception {
 				// pretty printing is turned off because it inserts weird spaces
 				// into the output if there are text nodes next to element node
 				// and it gets REALLY ANNOYING
@@ -168,6 +179,6 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 					documentRequest.httpRequest().wallTime()
 				);
 			}
-		});
+		}));
 	}
 }

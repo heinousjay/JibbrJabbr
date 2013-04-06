@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
+package jj.resource;
 
-import java.util.concurrent.TimeUnit;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public class TimedOutException extends RuntimeException {
+public class AssetResourcePreloaderTest {
 
-	private static final long serialVersionUID = 1L;
-	
-	TimedOutException(final long time, final TimeUnit unit) {
-		super("timed out after " + time + " " + unit.toString().toLowerCase());
+	@Test
+	public void test() {
+		// TODO
 	}
 
 }

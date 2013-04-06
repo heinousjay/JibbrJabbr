@@ -16,7 +16,7 @@
 package jj.script;
 
 import static org.mockito.BDDMockito.*;
-import jj.JJExecutors;
+import jj.MockJJExecutors;
 import jj.hostapi.RequiredModuleException;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
@@ -45,7 +45,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	DeterministicScheduler executor;
 	
-	@Mock JJExecutors executors;
+	MockJJExecutors executors;
 	
 	@Mock ResourceFinder finder;
 	
@@ -67,12 +67,9 @@ public class RequiredModuleContinuationProcessorTest {
 	public void before() {
 		
 		executor = new DeterministicScheduler();
+		executors = new MockJJExecutors(executor);
 		
 		given(context.baseName()).willReturn(baseName);
-		
-		given(executors.ioExecutor()).willReturn(executor);
-		given(executors.scriptExecutorFor(baseName)).willReturn(executor);
-		given(executors.scriptRunner()).willReturn(scriptRunner);
 		
 		processor = new RequiredModuleContinuationProcessor(context, executors, finder, scriptFinder);
 		
@@ -92,7 +89,7 @@ public class RequiredModuleContinuationProcessorTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(scriptRunner).submit(requiredModule);
+		verify(executors.scriptRunner).submit(requiredModule);
 	}
 	
 	@Test
@@ -103,7 +100,7 @@ public class RequiredModuleContinuationProcessorTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(scriptRunner).restartAfterContinuation(anyString(), any(RequiredModuleException.class));
+		verify(executors.scriptRunner).restartAfterContinuation(anyString(), any(RequiredModuleException.class));
 	}
 	
 	@Test
@@ -122,7 +119,7 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// then
-		verify(scriptRunner).restartAfterContinuation(anyString(), any(Scriptable.class));
+		verify(executors.scriptRunner).restartAfterContinuation(anyString(), any(Scriptable.class));
 	}
 	
 	@Test
@@ -138,7 +135,7 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// then
-		verify(scriptRunner).submit(requiredModule);
+		verify(executors.scriptRunner).submit(requiredModule);
 	}
 
 }

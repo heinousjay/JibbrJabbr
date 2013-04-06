@@ -37,10 +37,15 @@ class AssetResourcePreloader implements JJServerListener {
 	@Override
 	public void start() throws Exception {
 		
-		executors.ioExecutor().submit(new JJRunnable("internal asset preloader") {
+		executors.ioExecutor().submit(executors.prepareTask(new JJRunnable() {
+
+			@Override
+			public String name() {
+				return "internal asset preloader";
+			}
 			
 			@Override
-			protected void innerRun() throws Exception {
+			public void run() throws Exception {
 				log.info("preloading internal assets");
 
 				if (AssetResourceCreator.basePath != null) {
@@ -55,7 +60,7 @@ class AssetResourcePreloader implements JJServerListener {
 				log.debug("preload complete");
 				
 			}
-		});
+		}));
 		
 	}
 	

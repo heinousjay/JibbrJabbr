@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.testing;
 
-import java.io.IOException;
-
-import jj.JJServerListener;
+import org.webbitserver.WebSocketHandler;
+import org.webbitserver.stub.StubConnection;
 
 /**
  * @author jason
  *
  */
-interface ResourceWatchService extends JJServerListener {
+class TestHandlerConnection extends StubConnection {
 
-	void watch(Resource resource) throws IOException;
-
+	TestHandlerConnection(WebSocketHandler handler) {
+		System.out.println("ha");
+	}
 }

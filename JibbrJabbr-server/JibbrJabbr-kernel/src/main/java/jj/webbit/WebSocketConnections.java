@@ -28,20 +28,17 @@ public class WebSocketConnections implements JJServerListener {
 	
 	private final Logger log = LoggerFactory.getLogger(WebSocketConnections.class);
 	
-	private final class ActivityChecker extends JJRunnable {
+	private final class ActivityChecker implements JJRunnable {
 
-		/**
-		 * @param taskName
-		 */
-		public ActivityChecker() {
-			super("WebSocket connection activity checker");
+		public String name() {
+			return"WebSocket connection activity checker";
 		}
 
 		/* (non-Javadoc)
 		 * @see jj.JJRunnable#innerRun()
 		 */
 		@Override
-		protected void innerRun() throws Exception {
+		public void run() throws Exception {
 			
 			for (JJWebSocketConnection connection : allConnections.keySet()) {
 				if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
@@ -59,7 +56,9 @@ public class WebSocketConnections implements JJServerListener {
 	private final ConcurrentHashMap<JJWebSocketConnection, Boolean> allConnections =
 		new ConcurrentHashMap<>(16, 0.75F, 2);
 	
-	private final ConcurrentHashMap<AssociatedScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> perScript =
+	private final 
+	ConcurrentHashMap<AssociatedScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> 
+	perScript =
 		new ConcurrentHashMap<>();
 		
 	private final JJExecutors executors;
@@ -70,7 +69,7 @@ public class WebSocketConnections implements JJServerListener {
 	}
 	
 	public void start() {
-		executors.httpControlExecutor().scheduleAtFixedRate(new ActivityChecker(), 5, 5, SECONDS);
+		executors.httpControlExecutor().scheduleAtFixedRate(executors.prepareTask(new ActivityChecker()), 5, 5, SECONDS);
 	}
 	
 	public void stop() {
@@ -83,7 +82,8 @@ public class WebSocketConnections implements JJServerListener {
 		
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
 		
-		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = perScript.get(connection.associatedScriptBundle());
+		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
+			perScript.get(connection.associatedScriptBundle());
 		
 		if (connectionSet == null) {
 			connectionSet = new ConcurrentHashMap<>(16, 0.75F, 2);

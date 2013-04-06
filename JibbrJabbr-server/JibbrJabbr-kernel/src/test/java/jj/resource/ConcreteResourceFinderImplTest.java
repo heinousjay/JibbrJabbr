@@ -37,7 +37,7 @@ public class ConcreteResourceFinderImplTest {
 	String baseName;
 	ResourceCache resourceCache;
 	Set<ResourceCreator<?>> resourceCreators;
-	@Mock ResourceWatchService resourceWatchService;
+	@Mock ResourceWatchServiceImpl resourceWatchService;
 	
 	@Mock JJExecutors executors;
 	

@@ -13,18 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj;
 
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import jj.JJServerListener;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author jason
  *
  */
-interface ResourceWatchService extends JJServerListener {
+@Singleton
+public class TaskCreator {
+	
+	private final Logger log = LoggerFactory.getLogger(TaskCreator.class);
 
-	void watch(Resource resource) throws IOException;
-
+	@Inject
+	TaskCreator() {}
+	
+	public Runnable prepareTask(final JJRunnable task) {
+		
+		return new Runnable() {
+			
+			@Override
+			public final void run() {
+				try {
+					task.run();
+				} catch (OutOfMemoryError rethrow) {
+					throw rethrow;
+				} catch (Throwable t) {
+					log.error("Problem running a task {}", task.name());
+					log.error("", t);
+				}
+			}
+		};
+		
+	}
 }

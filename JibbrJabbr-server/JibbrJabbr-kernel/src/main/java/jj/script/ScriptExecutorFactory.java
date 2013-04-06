@@ -54,7 +54,8 @@ public class ScriptExecutorFactory {
 	private final ScheduledThreadPoolExecutor executor;
 		
 	@Inject
-	ScriptExecutorFactory() {
+	ScriptExecutorFactory(
+	) {
 		executor = new ScheduledThreadPoolExecutor(1, threadFactory, rejectedExecutionHandler);
 		executor.setMaximumPoolSize(1);
 		executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);

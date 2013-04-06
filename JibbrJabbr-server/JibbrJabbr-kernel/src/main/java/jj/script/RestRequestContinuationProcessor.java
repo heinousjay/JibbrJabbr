@@ -54,13 +54,18 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 		try {
 			final ListenableFuture<Response> response = httpClient.executeRequest(restRequest.request());
 			response.addListener(
-				new JJRunnable("REST response with id " + restRequest.id()) {
+				executors.prepareTask(new JJRunnable() {
+
+					@Override
+					public String name() {
+						return "REST response with id " + restRequest.id();
+					}
 					
 					@Override
-					protected void innerRun() throws Exception {
+					public void run() throws Exception {
 						context.restore(scriptContext);
 						try {
-
+							// TODO obviously this isn't right yet
 							String body = response.get().getResponseBody();
 							executors
 								.scriptRunner()
@@ -69,11 +74,14 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 									json.parse(body)
 								);
 							
+						} catch (Exception e) {
+							log.error("trouble executing {}", restRequest);
+							throw e;
 						} finally {
 							context.end();
 						}
 					}
-				}, executors.scriptExecutorFor(context.baseName()));
+				}), executors.scriptExecutorFor(context.baseName()));
 			
 		} catch (IOException e) {
 			log.error("trouble executing {}", restRequest);

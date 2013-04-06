@@ -27,6 +27,7 @@ import jj.script.ScriptRunner;
 @Singleton
 class JJExecutorsImpl implements JJExecutors {
 
+	private final TaskCreator taskCreator;
 	private final ScriptRunner scriptRunner;
 	private final HttpControlExecutor httpControlExecutor;
 	private final IOExecutor ioExecutor;
@@ -34,11 +35,13 @@ class JJExecutorsImpl implements JJExecutors {
 	
 	@Inject
 	public JJExecutorsImpl(
+		final TaskCreator taskCreator,
 		final ScriptRunner scriptRunner,
 		final HttpControlExecutor httpControlExecutor,
 		final IOExecutor ioExecutor,
 		final ScriptExecutorFactory scriptExecutorFactory
 	) {
+		this.taskCreator = taskCreator;
 		this.scriptRunner = scriptRunner;
 		this.httpControlExecutor = httpControlExecutor;
 		this.ioExecutor = ioExecutor;
@@ -77,5 +80,10 @@ class JJExecutorsImpl implements JJExecutors {
 	
 	public int ioPoolSize() {
 		return ioExecutor.getMaximumPoolSize();
+	}
+	
+	public Runnable prepareTask(final JJRunnable task) {
+		return taskCreator.prepareTask(task);
+		
 	}
 }

@@ -22,7 +22,7 @@ import ch.qos.logback.core.Appender;
  *
  */
 @Singleton
-class SLF4JConfiguration implements JJServerListener {
+class LogConfigurator implements JJServerListener {
 
 	private final Logger logger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 	
@@ -30,7 +30,7 @@ class SLF4JConfiguration implements JJServerListener {
 	
 	private final AsyncAppender asyncAppender;
 	
-	SLF4JConfiguration(boolean isTest) {
+	LogConfigurator(boolean isTest) {
 		
 		if (!isTest) {
 			
@@ -54,7 +54,6 @@ class SLF4JConfiguration implements JJServerListener {
 		
 		// make sure netty logs to our log
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-		
 		
 		logger.setLevel(Level.TRACE);
 		// shutting up the logging in our dependencies by default

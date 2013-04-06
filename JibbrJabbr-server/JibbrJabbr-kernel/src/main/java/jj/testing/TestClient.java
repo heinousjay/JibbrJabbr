@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.testing;
 
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import jj.JJServerListener;
+import org.jsoup.nodes.Document;
 
 /**
  * @author jason
  *
  */
-interface ResourceWatchService extends JJServerListener {
-
-	void watch(Resource resource) throws IOException;
-
+public interface TestClient {
+	
+	
+	Document document() throws Exception;
+	
+	Document document(long timeout, TimeUnit unit) throws Exception;
 }

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.ScriptThread;
+import jj.TaskCreator;
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
 import jj.webbit.JJWebSocketConnection;
@@ -43,6 +44,8 @@ public class ScriptRunner {
 	
 	private final CurrentScriptContext context;
 	
+	private final TaskCreator taskCreator;
+	
 	private final ScriptExecutorFactory scriptExecutorFactory;
 	
 	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
@@ -52,6 +55,7 @@ public class ScriptRunner {
 		final ScriptBundleHelper scriptBundleHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
+		final TaskCreator taskCreator,
 		final ScriptExecutorFactory scriptExecutorFactory,
 		final Set<ContinuationProcessor> continuationProcessors
 	) {
@@ -62,6 +66,7 @@ public class ScriptRunner {
 		this.scriptBundleHelper = scriptBundleHelper;
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
+		this.taskCreator = taskCreator;
 		this.scriptExecutorFactory = scriptExecutorFactory;
 		this.continuationProcessors = makeContinuationProcessors(continuationProcessors);
 	}
@@ -154,10 +159,15 @@ public class ScriptRunner {
 		
 		final String baseName = documentRequestProcessor.baseName();
 		
-		submit(baseName, new JJRunnable("document ready function execution") {
-			
+		submit(baseName, new JJRunnable() {
+
 			@Override
-			protected void innerRun() throws Exception {
+			public String name() {
+				return "document ready function execution";
+			}
+
+			@Override
+			public void run() throws Exception {
 				
 				log.trace("preparing to execute document request {}", baseName);
 				
@@ -229,10 +239,15 @@ public class ScriptRunner {
 		final RequiredModule requiredModule = context.requiredModule();
 		final ModuleScriptBundle scriptBundle = context.moduleScriptBundle();
 		
-		submit(scriptBundle.baseName(), new JJRunnable("module parent resumption") {
-			
+		submit(scriptBundle.baseName(), new JJRunnable() {
+
 			@Override
-			protected void innerRun() throws Exception {
+			public String name() {
+				return "module parent resumption";
+			}
+
+			@Override
+			public void run() throws Exception {
 				log.debug("resuming module parent with exports");
 				context.restore(requiredModule.parentContext());
 				try {
@@ -248,10 +263,15 @@ public class ScriptRunner {
 		final String baseName = requiredModule.baseName();
 		final String identifier = requiredModule.identifier();
 		
-		submit(baseName, new JJRunnable("module script initialization for " + identifier) {
+		submit(baseName, new JJRunnable() {
 			
 			@Override
-			protected void innerRun() throws Exception {
+			public String name() {
+				return "module script initialization for " + identifier;
+			}
+
+			@Override
+			public void run() throws Exception {
 				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
 				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
 				context.initialize(scriptBundle, requiredModule);
@@ -269,10 +289,15 @@ public class ScriptRunner {
 		final String pendingKey,
 		final Object result
 	) {
-		submit(connection.baseName(), new JJRunnable("resuming continuation on " + connection) {
+		submit(connection.baseName(), new JJRunnable() {
 			
 			@Override
-			protected void innerRun() throws Exception {
+			public String name() {
+				return "resuming continuation on " + connection;
+			}
+
+			@Override
+			public void run() throws Exception {
 				context.initialize(connection);
 				try {
 					resumeContinuation(pendingKey, result);
@@ -299,9 +324,15 @@ public class ScriptRunner {
 	}
 	
 	public void submit(final JJWebSocketConnection connection, final String event, final Object...args) {
-		submit(connection.baseName(), new JJRunnable("host event on WebSocket connection") {
+		submit(connection.baseName(), new JJRunnable() {
+
 			@Override
-			protected void innerRun() throws Exception {
+			public String name() {
+				return "host event on WebSocket connection";
+			}
+
+			@Override
+			public void run() throws Exception {
 				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
 				try {
@@ -320,8 +351,9 @@ public class ScriptRunner {
 	 * @param baseName
 	 * @param runnable
 	 */
-	private void submit(final String baseName, final Runnable runnable) {
-		scriptExecutorFactory.executorFor(baseName).submit(runnable);
+	private void submit(final String baseName, final JJRunnable runnable) {
+		
+		scriptExecutorFactory.executorFor(baseName).submit(taskCreator.prepareTask(runnable));
 	}
 	
 	/**

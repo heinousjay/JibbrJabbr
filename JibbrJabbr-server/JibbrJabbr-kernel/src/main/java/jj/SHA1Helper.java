@@ -6,8 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /** 
- * simple thread-safe way to get a pool of resources.  saw this somewhere on github,
- * very good way to handle certain situations.
+ * 
  * @author jason
  *
  */
