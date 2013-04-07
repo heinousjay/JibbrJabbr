@@ -15,32 +15,39 @@
  */
 package jj.testing;
 
-import org.junit.runner.Description;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import jj.CoreModule;
-import jj.JJModule;
+import org.junit.runner.Description;
+import org.slf4j.Logger;
+
+import jj.JJServerListener;
+import jj.logging.TestRunnerLogger;
 
 /**
  * @author jason
  *
  */
-class TestModule extends JJModule {
+@Singleton
+public class TestListener implements JJServerListener {
 	
-	private final String basePath;
+	private final Logger testRunnerLogger;
 	private final Description description;
 	
-	TestModule(final String basePath, final Description description) {
-		this.basePath = basePath;
+	@Inject
+	TestListener(final @TestRunnerLogger Logger testRunnerLogger, final Description description) {
+		this.testRunnerLogger = testRunnerLogger;
 		this.description = description;
 	}
 
 	@Override
-	protected void configure() {
-		
-		addServerListenerBinding().to(TestListener.class);
-		
-		bind(Description.class).toInstance(description);
-		
-		install(new CoreModule(new String[]{basePath}, true));
+	public void start() throws Exception {
+		testRunnerLogger.info("{} - test start", description);
 	}
+
+	@Override
+	public void stop() {
+		testRunnerLogger.info("{} - test end", description);
+	}
+
 }

@@ -19,6 +19,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.nio.file.Paths;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import jj.JJ;
 
@@ -56,7 +61,6 @@ public class TestingAPITest {
 	@Test
 	public void runNotFoundTest() throws Exception {
 		
-		// this actually doesn't work, heh
 		TestClient client = app.get("/non-existent");
 		assertThat(client.status(), is(404));
 		
@@ -72,6 +76,10 @@ public class TestingAPITest {
 		TestClient index6 = app.get("/files");
 		TestClient index7 = app.get("/index");
 		TestClient index8 = app.get("/files");
+		TestClient index9 = app.get("/index");
+		TestClient index10 = app.get("/files");
+		TestClient index11 = app.get("/index");
+		TestClient index12 = app.get("/files");
 		
 		assertThat(index1.status(), is(200));
 		assertThat(index1.contentsString(), is(notNullValue()));
@@ -104,5 +112,67 @@ public class TestingAPITest {
 		assertThat(index8.status(), is(200));
 		assertThat(index8.contentsString(), is(notNullValue()));
 		assertThat(index8.document().select("title").text(), is("files test"));
+		
+		assertThat(index9.status(), is(200));
+		assertThat(index9.contentsString(), is(notNullValue()));
+		assertThat(index9.document().select("title").text(), is("JAYCHAT!"));
+		
+		assertThat(index10.status(), is(200));
+		assertThat(index10.contentsString(), is(notNullValue()));
+		assertThat(index10.document().select("title").text(), is("files test"));
+		
+		assertThat(index11.status(), is(200));
+		assertThat(index11.contentsString(), is(notNullValue()));
+		assertThat(index11.document().select("title").text(), is("JAYCHAT!"));
+		
+		assertThat(index12.status(), is(200));
+		assertThat(index12.contentsString(), is(notNullValue()));
+		assertThat(index12.document().select("title").text(), is("files test"));
+	}
+	
+	//@Test
+	public void areYouKiddingMe() throws Throwable {
+		final long startingTotalMemory = Runtime.getRuntime().totalMemory();
+		final long startingMaxMemory = Runtime.getRuntime().maxMemory();
+		final long startingFreeMemory = Runtime.getRuntime().freeMemory();
+		final int totalClients = 4800;
+		final int totalThreads = 12;
+		final ExecutorService e = Executors.newFixedThreadPool(totalThreads);
+		final long start = System.currentTimeMillis();
+		
+		final Callable<Void> c = new Callable<Void>() {
+			
+			public Void call() throws Exception {
+				getLotsOfClients();
+				return null;
+			};
+		};
+		
+		@SuppressWarnings("unchecked")
+		Future<Void>[] f = (Future<Void>[]) new Future<?>[totalClients];
+		for (int i = 0; i < totalClients; ++i) {
+			f[i] = e.submit(c);
+		}
+		
+		try {
+			for (int i = 0; i < totalClients; ++i) {
+				f[i].get();
+			}
+		} catch (ExecutionException er) {
+			throw er.getCause();
+		} finally {
+			e.shutdownNow();
+		}
+		
+		
+		System.out.println("loaded " + (totalClients * 8) + " pages in " + (System.currentTimeMillis() - start) + " milliseconds.");
+		System.out.println("starting free " + startingFreeMemory + " total " + startingTotalMemory + " max " + startingMaxMemory);
+		System.out.println("now free " + Runtime.getRuntime().freeMemory() + " total " + Runtime.getRuntime().totalMemory() + " max " + Runtime.getRuntime().maxMemory());
+		Runtime.getRuntime().gc();
+	}
+	
+	//@Test
+	public void areYouKiddingMePart2() throws Throwable {
+		areYouKiddingMe();
 	}
 }

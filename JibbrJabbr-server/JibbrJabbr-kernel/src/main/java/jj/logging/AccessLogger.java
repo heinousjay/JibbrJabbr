@@ -21,10 +21,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.google.inject.BindingAnnotation;
+
 /**
  * @author jason
  *
  */
+@BindingAnnotation
 @Documented
 @Target({ElementType.METHOD,ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

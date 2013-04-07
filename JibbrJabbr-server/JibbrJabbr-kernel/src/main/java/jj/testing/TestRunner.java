@@ -22,9 +22,8 @@ import javax.inject.Inject;
 
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.ExecutionTrace;
+import jj.logging.TestRunnerLogger;
 import jj.webbit.JJEngineHttpHandler;
 
 /**
@@ -33,7 +32,7 @@ import jj.webbit.JJEngineHttpHandler;
  */
 class TestRunner {
 	
-	static final Logger log = LoggerFactory.getLogger(TestRunner.class);
+	private final Logger testRunnerLog;
 	
 	private final class TestClientImpl implements TestClient {
 		
@@ -45,79 +44,79 @@ class TestRunner {
 		
 		@Override
 		public int status() throws Exception {
-			log.trace("status() on {}", response.id());
+			testRunnerLog.trace("status() on {}", response.id());
 			response.get();
 			return response.status();
 		};
 		
 		@Override
 		public int status(final long timeout, final TimeUnit unit) throws Exception {
-			log.trace("status({}, {}) on {}", timeout, unit, response.id());
+			testRunnerLog.trace("status({}, {}) on {}", timeout, unit, response.id());
 			response.get(timeout, unit);
 			return response.status();
 		};
 		
 		@Override
 		public Throwable error() throws Exception {
-			log.trace("error() on {}", response.id());
+			testRunnerLog.trace("error() on {}", response.id());
 			response.get();
 			return response.error();
 		}
 		
 		@Override
 		public Throwable error(final long timeout, final TimeUnit unit) throws Exception {
-			log.trace("error({}, {}) on {}", timeout, unit, response.id());
+			testRunnerLog.trace("error({}, {}) on {}", timeout, unit, response.id());
 			response.get(timeout, unit);
 			return response.error();
 		}
 		
 		@Override
 		public Map<String, String> headers() throws Exception {
-			log.trace("headers() on {}", response.id());
+			testRunnerLog.trace("headers() on {}", response.id());
 			response.get();
 			return response.headers();
 		}
 		
 		@Override
 		public Map<String, String> headers(final long timeout, final TimeUnit unit) throws Exception {
-			log.trace("headers({}, {}) on {}", timeout, unit, response.id());
+			testRunnerLog.trace("headers({}, {}) on {}", timeout, unit, response.id());
 			response.get(timeout, unit);
 			return response.headers();
 		}
 		
 		@Override
 		public String contentsString() throws Exception {
-			log.trace("contentsString() on {}", response.id());
+			testRunnerLog.trace("contentsString() on {}", response.id());
 			response.get();
 			return response.contentsString();
 		}
 
 		@Override
 		public String contentsString(final long timeout, final TimeUnit unit) throws Exception {
-			log.trace("contentsString({}, {}) on {}", timeout, unit, response.id());
+			testRunnerLog.trace("contentsString({}, {}) on {}", timeout, unit, response.id());
 			response.get(timeout, unit);
 			return response.contentsString();
 		}
 
 		@Override
 		public Document document() throws Exception {
-			log.trace("document() on {}", response.id());
+			testRunnerLog.trace("document() on {}", response.id());
 			response.get();
 			return response.document();
 		}
 
 		@Override
 		public Document document(final long timeout, final TimeUnit unit) throws Exception {
-			log.trace("document({}, {}) on {}", timeout, unit, response.id());
+			testRunnerLog.trace("document({}, {}) on {}", timeout, unit, response.id());
 			response.get(timeout, unit);
 			return response.document();
 		}
 		
 		@Override
 		public void dumpObjects() {
-			log.trace("{}", control);
-			log.trace("{}", control.request());
-			log.trace("{}", response);
+			testRunnerLog.trace("{}", control);
+			testRunnerLog.trace("{}", control.request());
+			testRunnerLog.trace("{}", response);
 		}
 	}
 	
@@ -129,11 +128,13 @@ class TestRunner {
 	TestRunner(
 		final TestHttpControl control,
 		final JJEngineHttpHandler handler,
-		final ExecutionTrace trace
+		final ExecutionTrace trace,
+		final @TestRunnerLogger Logger testRunnerLog
 	) {
 		this.control = control;
 		this.handler = handler;
 		this.trace = trace;
+		this.testRunnerLog = testRunnerLog;
 	}
 
 	TestHttpRequest request() {

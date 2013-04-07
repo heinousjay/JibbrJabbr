@@ -15,35 +15,22 @@
  */
 package jj.logging;
 
-import jj.JJModule;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Provides;
+import com.google.inject.BindingAnnotation;
 
 /**
  * @author jason
  *
  */
-public class LoggingModule extends JJModule {
-	
-	public static final String ACCESS_LOGGER = "access";
-	public static final String TEST_RUNNER_LOGGER = "test runner";
-
-	@Override
-	protected void configure() {
-		
-	}
-	
-	@Provides @AccessLogger
-	public Logger provideAccessLogger() {
-		return LoggerFactory.getLogger(ACCESS_LOGGER);
-	}
-	
-	@Provides @TestRunnerLogger
-	public Logger provideTestRunnerLogger() {
-		return LoggerFactory.getLogger(TEST_RUNNER_LOGGER);
-	}
+@BindingAnnotation
+@Documented
+@Target({ElementType.METHOD,ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TestRunnerLogger {
 
 }

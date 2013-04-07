@@ -30,10 +30,12 @@ import javax.inject.Inject;
 
 import jj.ExecutionTrace;
 import jj.JJExecutors;
+import jj.logging.TestRunnerLogger;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
 import org.webbitserver.helpers.DateHelper;
 import org.webbitserver.stub.StubHttpResponse;
 
@@ -53,13 +55,17 @@ class TestHttpResponse extends StubHttpResponse {
 	
 	private final ExecutionTrace trace;
 	
+	private final Logger testRunnerLogger;
+	
 	@Inject
 	TestHttpResponse(
 		final JJExecutors executors,
-		final ExecutionTrace trace
+		final ExecutionTrace trace,
+		final @TestRunnerLogger Logger testRunnerLogger
 	) {
 		this.executors = executors;
 		this.trace = trace;
+		this.testRunnerLogger = testRunnerLogger;
 	}
 	
 	void id(int id) {
@@ -74,14 +80,14 @@ class TestHttpResponse extends StubHttpResponse {
 	
 	@Override
 	public TestHttpResponse end() {
-		TestRunner.log.info("end called on {}", this);
+		testRunnerLogger.info("end called on {}", this);
 		super.end();
 		processResponse();
 		return this;
 	}
 	@Override
 	public TestHttpResponse error(Throwable t) {
-		TestRunner.log.info("error called on {}", this);
+		testRunnerLogger.info("error called on {}", this);
 		super.error(t);
 		processResponse();
 		return this;

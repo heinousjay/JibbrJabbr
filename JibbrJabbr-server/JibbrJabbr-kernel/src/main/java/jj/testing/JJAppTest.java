@@ -48,16 +48,14 @@ public class JJAppTest implements TestRule {
 			@Override
 			public void evaluate() throws Throwable {
 				
-				injector = Guice.createInjector(new TestModule(basePath));
+				injector = Guice.createInjector(new TestModule(basePath, description));
 				
 				try {
-					TestRunner.log.info("{} - test start", description);
 					injector.getInstance(JJServerLifecycle.class).start();
 					base.evaluate();
 				} finally {
 					injector.getInstance(JJServerLifecycle.class).stop();
 					injector = null;
-					TestRunner.log.info("{} - test end", description);
 				}
 			}
 		};
