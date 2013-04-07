@@ -1,5 +1,7 @@
 package jj;
 
+import static jj.logging.LoggingModule.*;
+
 import java.util.Iterator;
 
 import javax.inject.Singleton;
@@ -56,13 +58,13 @@ class LogConfigurator implements JJServerListener {
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
 		logger.setLevel(Level.OFF);
-		// shutting up the logging in our dependencies by default
+		// shutting up the logging in our dependencies by default, except errors
 		((Logger)LoggerFactory.getLogger("com")).setLevel(Level.ERROR);
 		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);
 		
 		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.OFF : Level.OFF);
 		((Logger)LoggerFactory.getLogger("jj.testing.TestRunner")).setLevel(Level.OFF);
-		((Logger)LoggerFactory.getLogger("access")).setLevel(Level.OFF);
+		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.OFF);
 		((Logger)LoggerFactory.getLogger("execution trace")).setLevel(Level.TRACE);
 		
 	}

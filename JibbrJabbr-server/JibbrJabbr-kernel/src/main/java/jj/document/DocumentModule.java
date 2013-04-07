@@ -1,11 +1,12 @@
 package jj.document;
 
-import com.google.inject.AbstractModule;
+import jj.JJModule;
+
 import com.google.inject.multibindings.Multibinder;
 
 
 
-public class DocumentModule extends AbstractModule {
+public class DocumentModule extends JJModule {
 
 	@Override
 	protected void configure() {

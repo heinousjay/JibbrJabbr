@@ -1,6 +1,7 @@
 package jj.hostapi;
 
-import com.google.inject.AbstractModule;
+import jj.JJModule;
+
 import com.google.inject.multibindings.Multibinder;
 
 /**
@@ -8,7 +9,7 @@ import com.google.inject.multibindings.Multibinder;
  * @author jason
  *
  */
-public class HostApiModule extends AbstractModule {
+public class HostApiModule extends JJModule {
 
 	@Override
 	protected void configure() {

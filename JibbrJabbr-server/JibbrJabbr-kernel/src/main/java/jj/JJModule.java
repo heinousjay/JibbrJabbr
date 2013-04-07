@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.logging;
+package jj;
 
-import jj.JJModule;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Provides;
+import com.google.inject.AbstractModule;
+import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.Multibinder;
 
 /**
  * @author jason
  *
  */
-public class LoggingModule extends JJModule {
+public abstract class JJModule extends AbstractModule {
 	
-	public static final String ACCESS_LOGGER = "access";
+	private Multibinder<JJServerListener> serverListeners;
 
-	@Override
-	protected void configure() {
-		
-	}
-	
-	@Provides @AccessLogger
-	public Logger provideAccessLogger() {
-		return LoggerFactory.getLogger(ACCESS_LOGGER);
+	protected LinkedBindingBuilder<JJServerListener> addServerListenerBinding() {
+		if (serverListeners == null) {
+			serverListeners =  Multibinder.newSetBinder(binder(), JJServerListener.class);
+		}
+		return serverListeners.addBinding();
 	}
 
 }

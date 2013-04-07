@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.JJServerListener;
+
 /**
  * Configures an executor for the client subsystem
  * 
@@ -31,7 +33,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class ClientExecutor extends ScheduledThreadPoolExecutor {
+class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerListener {
 	
 	// reaper the +
 	// half the processors
@@ -71,5 +73,15 @@ class ClientExecutor extends ScheduledThreadPoolExecutor {
 		);
 		this.setCorePoolSize(WORKER_COUNT);
 		this.setMaximumPoolSize(WORKER_COUNT);
+	}
+
+	@Override
+	public void start() throws Exception {
+		// nothing
+	}
+
+	@Override
+	public void stop() {
+		shutdownNow();
 	}
 }

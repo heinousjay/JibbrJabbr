@@ -1,9 +1,10 @@
 package jj.servable;
 
-import com.google.inject.AbstractModule;
+import jj.JJModule;
+
 import com.google.inject.multibindings.Multibinder;
 
-public class ServableModule extends AbstractModule {
+public class ServableModule extends JJModule {
 
 	@Override
 	protected void configure() {

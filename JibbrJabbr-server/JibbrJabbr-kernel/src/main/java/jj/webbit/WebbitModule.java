@@ -1,8 +1,5 @@
 package jj.webbit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.JJServerListener;
 
 import com.google.inject.AbstractModule;

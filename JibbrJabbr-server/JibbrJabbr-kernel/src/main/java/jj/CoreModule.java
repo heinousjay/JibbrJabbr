@@ -24,14 +24,11 @@ import jj.script.ScriptModule;
 import jj.servable.ServableModule;
 import jj.webbit.WebbitModule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-
 /**
  * @author jason
  *
  */
-public class CoreModule extends AbstractModule {
+public class CoreModule extends JJModule {
 	
 	private final String [] args;
 	private final boolean isTest;
@@ -44,10 +41,9 @@ public class CoreModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		
-		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
-		serverListeners.addBinding().to(LogConfigurator.class);
-		serverListeners.addBinding().to(IOExecutor.class);
-		serverListeners.addBinding().to(HttpControlExecutor.class);
+		addServerListenerBinding().to(LogConfigurator.class);
+		addServerListenerBinding().to(IOExecutor.class);
+		addServerListenerBinding().to(HttpControlExecutor.class);
 		
 		// this gets instantiated before anything might write to a log
 		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
