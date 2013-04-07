@@ -37,7 +37,7 @@ import org.webbitserver.stub.StubHttpResponse;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JJAccessLoggingHttpHandlerTest {
+public class JJExecutiveHttpHandlerTest {
 	
 	private static final InetSocketAddress REMOTE_ADDRESS = new InetSocketAddress(80);
 	private static final String URI = "/slick!";
@@ -52,7 +52,7 @@ public class JJAccessLoggingHttpHandlerTest {
 	public void test() throws Exception {
 		
 		// given
-		JJAccessLoggingHttpHandler h = new JJAccessLoggingHttpHandler(logger);
+		JJExecutiveHttpHandler h = new JJExecutiveHttpHandler(logger);
 		willReturn(true).given(logger).isTraceEnabled();
 		
 		StubHttpRequest request = new StubHttpRequest();

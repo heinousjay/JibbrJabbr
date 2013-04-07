@@ -15,6 +15,12 @@
  */
 package jj.testing;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.webbitserver.helpers.DateHelper;
 import org.webbitserver.stub.StubHttpRequest;
 
 /**
@@ -22,11 +28,45 @@ import org.webbitserver.stub.StubHttpRequest;
  *
  */
 class TestHttpRequest extends StubHttpRequest {
-
 	
+	private final Map<String, String> headers = new HashMap<>();
+	
+	public Map<String, String> headers() {
+		return Collections.unmodifiableMap(headers);
+	}
+	
+	@Override 
+	public String header(String name) {
+		return headers.get(name);
+	}
+
+	@Override
+	public StubHttpRequest header(String name, String value) {
+		if (value == null) {
+			headers.remove(name);
+		} else {
+			headers.put(name, value);
+		}
+		return this;
+	}
+
+	public StubHttpRequest header(String name, long value) {
+		return header(name, String.valueOf(value));
+	}
+
+	public StubHttpRequest header(String name, Date value) {
+		return header(name, DateHelper.rfc1123Format(value));
+	}
+
 	@Override
 	public String toString() {
-		
-		return uri();
+		return new StringBuilder(TestHttpRequest.class.getSimpleName())
+			.append("[").append(id()).append("] {")
+			.append("method=").append(method())
+			.append(", uri=").append(uri())
+			.append(", headers=").append(headers())
+			.append(", body=").append(body())
+			.append("}")
+			.toString();
 	}
 }

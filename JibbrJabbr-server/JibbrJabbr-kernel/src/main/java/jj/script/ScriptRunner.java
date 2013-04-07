@@ -189,6 +189,9 @@ public class ScriptRunner {
 						
 						if (scriptBundle.initialized()) {
 							executeReadyFunction();
+						} else if (scriptBundle.initializing()) {
+							// just run us again
+							submit(baseName, this);
 						} else {
 							httpRequestInitialExecution();
 						}

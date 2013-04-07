@@ -44,6 +44,7 @@ public class ModuleScriptBundle implements ScriptBundle {
 	private final String baseName;
 	
 	private boolean initialized = false;
+	private boolean initializing = false;
 	
 	ModuleScriptBundle(
 		final ScriptResource scriptResource,
@@ -95,8 +96,22 @@ public class ModuleScriptBundle implements ScriptBundle {
 		return initialized;
 	}
 
-	public void initialized(final boolean initialized) {
+	@Override
+	public void initialized(boolean initialized) {
 		this.initialized = initialized || this.initialized;
+		if (this.initialized) initializing = false;
+	}
+	
+	@Override
+	public boolean initializing() {
+		return initializing;
+	}
+	
+	@Override
+	public void initializing(boolean initializing) {
+		if (!this.initialized) {
+			this.initializing = initializing || this.initializing;
+		}
 	}
 	
 	public Scriptable exports() {
@@ -105,5 +120,17 @@ public class ModuleScriptBundle implements ScriptBundle {
 	
 	public ScriptResource scriptResource() {
 		return scriptResource;
+	}
+	
+	public String toString() {
+		return new StringBuilder(ModuleScriptBundle.class.getName())
+			.append("[")
+			.append(baseName).append("/").append(scriptName())
+			.append("@").append(sha1())
+			.append("] {")
+			.append("initialized=").append(initialized)
+			.append(", initializing=").append(initializing)
+			.append("}")
+			.toString();
 	}
 }

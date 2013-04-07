@@ -21,6 +21,8 @@ public interface JJExecutors {
 	boolean isScriptThread();
 
 	boolean isIOThread();
+	
+	boolean isHttpControlThread();
 
 	int ioPoolSize();
 	

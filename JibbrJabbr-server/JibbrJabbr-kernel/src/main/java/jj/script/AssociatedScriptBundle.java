@@ -33,6 +33,8 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	private final String baseName;
 
 	private boolean initialized;
+	
+	private boolean initializing;
 
 	/**
 	 * the callable functions found in this script organized by some sort of
@@ -111,8 +113,22 @@ public class AssociatedScriptBundle implements ScriptBundle {
 		return initialized;
 	}
 
+	@Override
 	public void initialized(boolean initialized) {
 		this.initialized = initialized || this.initialized;
+		if (this.initialized) initializing = false;
+	}
+	
+	@Override
+	public boolean initializing() {
+		return initializing;
+	}
+	
+	@Override
+	public void initializing(boolean initializing) {
+		if (!this.initialized) {
+			this.initializing = initializing || this.initializing;
+		}
 	}
 
 	public boolean equals(Object other) {
@@ -124,15 +140,23 @@ public class AssociatedScriptBundle implements ScriptBundle {
 		return toUri().hashCode();
 	}
 
-	public String toString() {
-		return AssociatedScriptBundle.class.getSimpleName() + "{" + toUri() + "}";
-	}
-
 	public String toUri() {
 		return baseName + "/" + sha1;
 	}
 
 	public String toSocketUri() {
 		return toUri() + ".socket";
+	}
+	
+	public String toString() {
+		return new StringBuilder(AssociatedScriptBundle.class.getName())
+			.append("[")
+			.append(baseName).append("/").append(scriptName())
+			.append("@").append(sha1())
+			.append("] {")
+			.append("initialized=").append(initialized)
+			.append(", initializing=").append(initializing)
+			.append("}")
+			.toString();
 	}
 }

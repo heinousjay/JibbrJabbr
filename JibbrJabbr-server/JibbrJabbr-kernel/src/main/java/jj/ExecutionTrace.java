@@ -13,33 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
-
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
+package jj;
 
 /**
  * @author jason
  *
  */
-public interface ScriptBundle {
-
-	Scriptable scope();
-
-	Script script();
-
-	String sha1();
+public class ExecutionTrace {
 	
-	String scriptName();
+	final static class State {
+		
+		private State() {}
+	}
+	
+	private static final ThreadLocal<State> state = new ThreadLocal<ExecutionTrace.State>() {};
+	
+	static final void initiateState() {
+		assert state.get() == null;
+		state.set(new State());
+	}
 
-	boolean initialized();
+	public static void addEvent(final String event) {
+		
+	}
 	
-	void initialized(boolean initialized);
-	
-	boolean initializing();
-	
-	void initializing(boolean initializing);
-	
-	String baseName();
-
+	public static void addEvent(final String event, final Throwable throwable) {
+		
+	}
 }

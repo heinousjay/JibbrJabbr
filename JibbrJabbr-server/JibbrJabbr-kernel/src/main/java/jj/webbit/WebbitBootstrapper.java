@@ -47,7 +47,7 @@ class WebbitBootstrapper implements JJServerListener {
 	WebbitBootstrapper(
 		final Configuration configuration,
 		final JJExecutors jjExecutors,
-		final JJAccessLoggingHttpHandler loggingHandler,
+		final JJExecutiveHttpHandler executiveHandler,
 		final JJEngineHttpHandler htmlEngineHttpHandler,
 		final NotFoundHttpHandler notFoundHandler
 	) {
@@ -60,7 +60,7 @@ class WebbitBootstrapper implements JJServerListener {
 					new InetSocketAddress(port(uri)), 
 					uri
 				)
-				.add(loggingHandler)
+				.add(executiveHandler)
 				.add(htmlEngineHttpHandler)
 				// let the static file handler get stuff i'm not getting yet
 				.add(new StaticFileHandler(configuration.basePath().toFile(), Executors.newFixedThreadPool(4, sfhIOThreadFactory)))

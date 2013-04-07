@@ -18,7 +18,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-public class IOExecutor extends ThreadPoolExecutor {
+public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 	
 	public boolean isIOThread() {
 		return flag.get() != null;
@@ -73,5 +73,15 @@ public class IOExecutor extends ThreadPoolExecutor {
 			threadFactory,
 			rejectedExecutionHandler
 		);
+	}
+
+	@Override
+	public void start() throws Exception {
+		// nothing to do
+	}
+
+	@Override
+	public void stop() {
+		shutdownNow();
 	}
 }

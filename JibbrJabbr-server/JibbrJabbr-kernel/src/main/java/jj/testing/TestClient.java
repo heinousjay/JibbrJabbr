@@ -15,6 +15,7 @@
  */
 package jj.testing;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.nodes.Document;
@@ -25,8 +26,20 @@ import org.jsoup.nodes.Document;
  */
 public interface TestClient {
 	
+	int status() throws Exception;
+	int status(final long timeout, final TimeUnit unit) throws Exception;
+	
+	Throwable error() throws Exception;
+	Throwable error(final long timeout, final TimeUnit unit) throws Exception;
+	
+	Map<String, String> headers() throws Exception;
+	Map<String, String> headers(final long timeout, final TimeUnit unit) throws Exception;
+	
+	String contentsString() throws Exception;
+	String contentsString(final long timeout, final TimeUnit unit) throws Exception;
 	
 	Document document() throws Exception;
-	
 	Document document(long timeout, TimeUnit unit) throws Exception;
+	
+	void dumpObjects();
 }

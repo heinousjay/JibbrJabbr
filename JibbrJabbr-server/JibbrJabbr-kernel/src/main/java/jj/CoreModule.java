@@ -44,11 +44,12 @@ public class CoreModule extends AbstractModule {
 	protected void configure() {
 		
 		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
+		serverListeners.addBinding().toInstance(new LogConfigurator(isTest));
+		serverListeners.addBinding().to(IOExecutor.class);
+		serverListeners.addBinding().to(HttpControlExecutor.class);
 		
 		bind(Configuration.class).toInstance(new Configuration(args));
-		serverListeners.addBinding().toInstance(new LogConfigurator(isTest));
 		bind(JJServerLifecycle.class);
-		bind(IOExecutor.class);
 		bind(HttpControlExecutor.class);
 		bind(TaskCreator.class);
 		

@@ -31,13 +31,13 @@ import com.google.inject.Injector;
  * @author jason
  *
  */
-public class JJTestRule implements TestRule {
+public class JJAppTest implements TestRule {
 	
 	private final String basePath;
 	
 	private Injector injector;
 	
-	public JJTestRule(final String basePath) {
+	public JJAppTest(final String basePath) {
 		this.basePath = basePath;
 	}
 
@@ -51,11 +51,13 @@ public class JJTestRule implements TestRule {
 				injector = Guice.createInjector(new TestModule(basePath));
 				
 				try {
+					TestRunner.log.info("{} - test start", description);
 					injector.getInstance(JJServerLifecycle.class).start();
 					base.evaluate();
 				} finally {
 					injector.getInstance(JJServerLifecycle.class).stop();
 					injector = null;
+					TestRunner.log.info("{} - test end", description);
 				}
 			}
 		};

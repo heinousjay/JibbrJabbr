@@ -15,16 +15,13 @@
  */
 package jj.testing;
 
-import static java.util.concurrent.TimeUnit.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.nio.file.Paths;
-import java.util.concurrent.TimeoutException;
 
 import jj.JJ;
 
-import org.jsoup.nodes.Document;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -42,30 +39,70 @@ public class TestingAPITest {
 	}
 	
 	@Rule
-	public JJTestRule jjTestRule = new JJTestRule(basePath);
+	public JJAppTest app = new JJAppTest(basePath);
 	
 	@Test
 	public void runBasicTest() throws Exception {
 		
-		Document doc = jjTestRule.get("/index").document();
+		TestClient index = app.get("/index");
+		index.dumpObjects();
+		assertThat(index.status(), is(200));
+		index.dumpObjects();
+		assertThat(index.contentsString(), is(notNullValue()));
 		
-		assertThat(doc.select("title").text(), is("JAYCHAT!"));
+		assertThat(index.document().select("title").text(), is("JAYCHAT!"));
 	}
 	
-	//@Test
-	public void runBasic404Test() throws Exception {
+	@Test
+	public void runNotFoundTest() throws Exception {
 		
 		// this actually doesn't work, heh
-		TestClient client = jjTestRule.get("/errors/404.html");
+		TestClient client = app.get("/non-existent");
+		assertThat(client.status(), is(404));
 		
-		try {
-			System.out.println(client.document(2, SECONDS));
-			fail("should have thrown an exception");
-		} catch (TimeoutException te) {
-			fail("timed out");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	}
+	
+	@Test
+	public void getLotsOfClients() throws Exception {
+		TestClient index1 = app.get("/index");
+		TestClient index2 = app.get("/files");
+		TestClient index3 = app.get("/index");
+		TestClient index4 = app.get("/files");
+		TestClient index5 = app.get("/index");
+		TestClient index6 = app.get("/files");
+		TestClient index7 = app.get("/index");
+		TestClient index8 = app.get("/files");
 		
+		assertThat(index1.status(), is(200));
+		assertThat(index1.contentsString(), is(notNullValue()));
+		assertThat(index1.document().select("title").text(), is("JAYCHAT!"));
+		
+		assertThat(index2.status(), is(200));
+		assertThat(index2.contentsString(), is(notNullValue()));
+		assertThat(index2.document().select("title").text(), is("files test"));
+		
+		assertThat(index3.status(), is(200));
+		assertThat(index3.contentsString(), is(notNullValue()));
+		assertThat(index3.document().select("title").text(), is("JAYCHAT!"));
+		
+		assertThat(index4.status(), is(200));
+		assertThat(index4.contentsString(), is(notNullValue()));
+		assertThat(index4.document().select("title").text(), is("files test"));
+		
+		assertThat(index5.status(), is(200));
+		assertThat(index5.contentsString(), is(notNullValue()));
+		assertThat(index5.document().select("title").text(), is("JAYCHAT!"));
+		
+		assertThat(index6.status(), is(200));
+		assertThat(index6.contentsString(), is(notNullValue()));
+		assertThat(index6.document().select("title").text(), is("files test"));
+		
+		assertThat(index7.status(), is(200));
+		assertThat(index7.contentsString(), is(notNullValue()));
+		assertThat(index7.document().select("title").text(), is("JAYCHAT!"));
+		
+		assertThat(index8.status(), is(200));
+		assertThat(index8.contentsString(), is(notNullValue()));
+		assertThat(index8.document().select("title").text(), is("files test"));
 	}
 }

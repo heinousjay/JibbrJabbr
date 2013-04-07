@@ -14,7 +14,7 @@ import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
 
 @Singleton
-class NotFoundHttpHandler implements HttpHandler {
+public class NotFoundHttpHandler implements HttpHandler {
 	
 	private static final String NOT_FOUND = "errors/404.html";
 	

@@ -60,6 +60,7 @@ public class JJHttpRequest extends HttpRequestWrapper {
 	
 	public void startingInitialExecution() {
 		data(PROCESSING_STATE, State.InitialExecution);
+		associatedScriptBundle().initializing(true);
 	}
 	
 	public void startingReadyFunction() {

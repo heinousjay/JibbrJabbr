@@ -78,6 +78,10 @@ class JJExecutorsImpl implements JJExecutors {
 		return ioExecutor.isIOThread();
 	}
 	
+	public boolean isHttpControlThread() {
+		return httpControlExecutor.isHttpControlThread();
+	}
+	
 	public int ioPoolSize() {
 		return ioExecutor.getMaximumPoolSize();
 	}

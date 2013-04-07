@@ -46,7 +46,7 @@ class AssetResourcePreloader implements JJServerListener {
 			
 			@Override
 			public void run() throws Exception {
-				log.info("preloading internal assets");
+				log.debug("preloading internal assets");
 
 				if (AssetResourceCreator.basePath != null) {
 					doWalk(AssetResourceCreator.basePath);

@@ -10,8 +10,6 @@ import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.servable.Servable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
@@ -24,8 +22,6 @@ import org.webbitserver.HttpResponse;
  */
 @Singleton
 public class JJEngineHttpHandler implements HttpHandler {
-	
-	private final Logger log = LoggerFactory.getLogger(JJEngineHttpHandler.class);
 	
 	private final JJExecutors executors;
 	
@@ -87,13 +83,11 @@ public class JJEngineHttpHandler implements HttpHandler {
 						if (requestProcessor != null) {
 							requestProcessor.process();
 						} else {
-							nextHandler(control);
+							nextHandler(control, response);
 						}
 						
-					} catch (Exception e) {
-						log.error("Request processing failed", e);
-						nextHandler(control);
-						throw e;
+					} catch (Throwable e) {
+						response.error(e);
 					}
 				}
 			});
@@ -105,28 +99,33 @@ public class JJEngineHttpHandler implements HttpHandler {
 			}
 			
 		} else {
-			nextHandler(control);
+			nextHandler(control, response);
 		}
 	}
 	
-	private void nextHandler(final HttpControl control) {
-		if (executors.isIOThread()) {
-			control.execute(executors.prepareTask(new JJRunnable() {
+	private void nextHandler(final HttpControl control, final HttpResponse response) {
+		Runnable r = executors.prepareTask(new JJRunnable() {
 
-				@Override
-				public String name() {
-					return "HtmlEngine passing control to next handler";
-				}
+			@Override
+			public String name() {
+				return "HtmlEngine passing control to next handler";
+			}
 
-				@Override
-				@HttpControlThread
-				public void run() throws Exception {
+			@Override
+			@HttpControlThread
+			public void run() throws Exception {
+				try {
 					control.nextHandler();
+				} catch (Throwable t) {
+					response.error(t);
 				}
-				
-			}));
+			}
+			
+		});
+		if (executors.isIOThread()) {
+			executors.httpControlExecutor().execute(r);
 		} else {
-			control.nextHandler();
+			r.run();
 		}
 	}
 	

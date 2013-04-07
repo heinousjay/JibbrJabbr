@@ -28,7 +28,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-public class HttpControlExecutor extends ScheduledThreadPoolExecutor {
+public class HttpControlExecutor extends ScheduledThreadPoolExecutor implements JJServerListener {
 	
 	public boolean isHttpControlThread() {
 		return flag.get() != null;
@@ -65,8 +65,10 @@ public class HttpControlExecutor extends ScheduledThreadPoolExecutor {
 			
 			@Override
 			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-				// well.. whatever.  we're about to die bb yeah
-				System.err.println("ran out of room for an http task.  OOM error coming shortly!");
+				System.err.println("ran out of room for an http control task.  OOM error coming shortly!");
+				System.err.println(Runtime.getRuntime().maxMemory());
+				System.err.println(Runtime.getRuntime().totalMemory());
+				System.err.println(Runtime.getRuntime().freeMemory());
 			}
 		};
 		
@@ -76,6 +78,16 @@ public class HttpControlExecutor extends ScheduledThreadPoolExecutor {
 		setMaximumPoolSize(1);
 		setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 		setRemoveOnCancelPolicy(true);
+	}
+
+	@Override
+	public void start() throws Exception {
+		// nothing to do
+	}
+
+	@Override
+	public void stop() {
+		shutdownNow();
 	}
 
 }

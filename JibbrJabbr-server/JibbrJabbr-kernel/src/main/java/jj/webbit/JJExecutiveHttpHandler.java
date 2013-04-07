@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.DateFormatHelper;
+import jj.ExecutionTrace;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
@@ -46,14 +47,14 @@ import org.webbitserver.wrapper.HttpResponseWrapper;
  *
  */
 @Singleton
-class JJAccessLoggingHttpHandler implements HttpHandler {
+class JJExecutiveHttpHandler implements HttpHandler {
 	
 	private static final String RESPONSE_HEADERS = "Response Headers";
 	
 	private final Logger access;
 	
 	@Inject
-	JJAccessLoggingHttpHandler(final Logger access) {
+	JJExecutiveHttpHandler(final Logger access) {
 		this.access = access;
 	}
 
@@ -98,6 +99,7 @@ class JJAccessLoggingHttpHandler implements HttpHandler {
 				return super.error(error);
 			}
 		};
+		
 		control.nextHandler(request, responseWrapper);
 	}
 	

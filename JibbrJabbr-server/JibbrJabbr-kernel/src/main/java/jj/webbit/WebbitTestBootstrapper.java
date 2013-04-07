@@ -13,33 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
-
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
+package jj.webbit;
 
 /**
  * @author jason
  *
  */
-public interface ScriptBundle {
-
-	Scriptable scope();
-
-	Script script();
-
-	String sha1();
-	
-	String scriptName();
-
-	boolean initialized();
-	
-	void initialized(boolean initialized);
-	
-	boolean initializing();
-	
-	void initializing(boolean initializing);
-	
-	String baseName();
+public class WebbitTestBootstrapper {
 
 }

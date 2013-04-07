@@ -141,7 +141,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	}
 
 	private void writeResponse() {
-		documentRequest.httpControl().execute(executors.prepareTask(new JJRunnable() {
+		executors.httpControlExecutor().execute(executors.prepareTask(new JJRunnable() {
 			
 			@Override
 			public String name() {

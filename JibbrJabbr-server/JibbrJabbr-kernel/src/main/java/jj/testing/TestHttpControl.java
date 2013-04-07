@@ -16,14 +16,12 @@
 package jj.testing;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
 import jj.JJExecutors;
 
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
 import org.webbitserver.WebSocketConnection;
 import org.webbitserver.WebSocketHandler;
 import org.webbitserver.stub.StubHttpControl;
@@ -33,13 +31,19 @@ import org.webbitserver.stub.StubHttpControl;
  *
  */
 class TestHttpControl extends StubHttpControl {
+	
+	private static final AtomicInteger IDS = new AtomicInteger();
 
 	private final JJExecutors executor;
+	
+	private final int id = IDS.incrementAndGet();
 	
 	@Inject
 	TestHttpControl(final JJExecutors executor, final TestHttpRequest request, final TestHttpResponse response) {
 		super(request, response);
 		this.executor = executor;
+		request.id(id);
+		response.id(id);
 	}
 	
 	@Override
@@ -52,8 +56,9 @@ class TestHttpControl extends StubHttpControl {
 		return executor.httpControlExecutor();
 	}
 	
-	public void nextHandler(HttpRequest request, HttpResponse response, HttpControl control) {
-		throw new AssertionError(request + " not found");
+	@Override
+	public void execute(Runnable command) {
+		handlerExecutor().execute(command);
 	}
 	
 	@Override
@@ -64,5 +69,12 @@ class TestHttpControl extends StubHttpControl {
 	@Override
 	public TestHttpResponse response() {
 		return (TestHttpResponse)super.response();
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder(TestHttpControl.class.getSimpleName())
+			.append("[").append(id).append("]")
+			.toString();
 	}
 }

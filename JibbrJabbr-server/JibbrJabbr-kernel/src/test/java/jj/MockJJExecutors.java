@@ -148,6 +148,13 @@ public class MockJJExecutors implements JJExecutors {
 		return isIOThread || (!threadTypeDeque.isEmpty() && threadTypeDeque.removeFirst() == IOThread);
 	}
 	
+	public boolean isHttpControlThread = false;
+
+	@Override
+	public boolean isHttpControlThread() {
+		return isHttpControlThread || (!threadTypeDeque.isEmpty() && threadTypeDeque.removeFirst() == HttpControlThread);
+	}
+	
 	public int ioPoolSize = 1;
 
 	@Override
