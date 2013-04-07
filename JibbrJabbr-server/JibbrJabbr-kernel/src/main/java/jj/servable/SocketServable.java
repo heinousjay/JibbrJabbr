@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.Configuration;
+import jj.ExecutionTrace;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 
@@ -55,6 +56,8 @@ class SocketServable extends Servable {
 		final HttpControl control
 	) throws IOException {
 		
+		ExecutionTrace.addEvent("socket connection incoming");
+		
 		// 
 		return new RequestProcessor() {
 			
@@ -63,6 +66,10 @@ class SocketServable extends Servable {
 				// this is the appropriate place to integrate socket.io's transport mechanisms
 				// if it becomes worthwhile to support downbrowser crap
 				control.upgradeToWebSocketConnection(webSocketHandler);
+				
+				// the request is considered over at this point, we are connection
+				ExecutionTrace.addEvent("socket connection made");
+				ExecutionTrace.end(request.originalRequest());
 			}
 		};
 	}

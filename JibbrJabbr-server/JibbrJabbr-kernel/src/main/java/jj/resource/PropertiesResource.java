@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.PropertyResourceBundle;
 
-public class PropertiesResource extends AbstractResource {
+public class PropertiesResource extends AbstractFileResource {
 
 	private static final String DOT_PROPERTIES = ".properties";
 	

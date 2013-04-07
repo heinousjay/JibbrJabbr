@@ -2,10 +2,6 @@ package jj.webbit;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -17,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webbitserver.WebServer;
 import org.webbitserver.WebServers;
-import org.webbitserver.handler.StaticFileHandler;
 
 @Singleton
 class WebbitBootstrapper implements JJServerListener {
@@ -33,15 +28,6 @@ class WebbitBootstrapper implements JJServerListener {
 		}
 		return port;
 	}
-	private static final AtomicInteger sfhIOThreadFactorySeq = new AtomicInteger();
-	private static final ThreadFactory sfhIOThreadFactory = new ThreadFactory() {
-		
-		
-		@Override
-		public Thread newThread(final Runnable r) {
-			return new Thread(r, "Webbit StaticFileHandler I/O thread " + sfhIOThreadFactorySeq.incrementAndGet());
-		}
-	};
 
 	@Inject
 	WebbitBootstrapper(
@@ -62,9 +48,6 @@ class WebbitBootstrapper implements JJServerListener {
 				)
 				.add(executiveHandler)
 				.add(htmlEngineHttpHandler)
-				// let the static file handler get stuff i'm not getting yet
-				.add(new StaticFileHandler(configuration.basePath().toFile(), Executors.newFixedThreadPool(4, sfhIOThreadFactory)))
-				// here would go an error handler
 				.add(notFoundHandler)
 				.uncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 					

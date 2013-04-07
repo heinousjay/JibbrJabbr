@@ -33,10 +33,6 @@ class AssetServable extends Servable {
 		this.resourceFinder = resourceFinder;
 	}
 	
-	private String baseName(JJHttpRequest httpRequest) {
-		return httpRequest.uri().substring(1);
-	}
-
 	@Override
 	public boolean isMatchingRequest(JJHttpRequest httpRequest) {		
 		return resourceFinder.findResource(AssetResource.class, baseName(httpRequest)) != null;

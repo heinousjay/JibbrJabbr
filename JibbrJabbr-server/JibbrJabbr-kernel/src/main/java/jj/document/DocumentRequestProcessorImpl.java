@@ -118,12 +118,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 			writeResponse();
 		} else {
 			final String taskName = String.format("DocumentFilter %s", (executors.isIOThread() ? " w/IO" : ""));
-			Runnable r = executors.prepareTask(new JJRunnable() {
-				
-				@Override
-				public String name() {
-					return taskName;
-				}
+			Runnable r = executors.prepareTask(new JJRunnable(taskName) {
 				
 				@Override
 				public void run() throws Exception {
@@ -141,12 +136,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	}
 
 	private void writeResponse() {
-		executors.httpControlExecutor().execute(executors.prepareTask(new JJRunnable() {
-			
-			@Override
-			public String name() {
-				return "Writing HTTP response";
-			}
+		executors.httpControlExecutor().execute(executors.prepareTask(new JJRunnable("Writing HTTP response") {
 			
 			@Override
 			@HttpControlThread

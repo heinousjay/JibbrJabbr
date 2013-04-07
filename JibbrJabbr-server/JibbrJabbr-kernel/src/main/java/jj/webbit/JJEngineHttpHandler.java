@@ -1,6 +1,9 @@
 package jj.webbit;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,27 +30,30 @@ public class JJEngineHttpHandler implements HttpHandler {
 	
 	private final Set<Servable> resourceTypes;
 	
+	private final JJHttpRequestCreator creator;
+	
 	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
+		final JJHttpRequestCreator creator,
 		final Set<Servable> resourceTypes
 	) {
 		this.executors = executors;
+		this.creator = creator;
 		this.resourceTypes = resourceTypes;
 	}
 	
-	private Servable findMatchingServable(final JJHttpRequest request) {
+	private Servable[] findMatchingServables(final JJHttpRequest request) {
 		
-		Servable result = null;
+		List<Servable> result = new ArrayList<>();
 		
 		for (final Servable type : resourceTypes) {
 			if (type.isMatchingRequest(request)) {
-				result = type;
-				break;
+				result.add(type);
 			}
 		}
 		
-		return result;
+		return result.toArray(new Servable[result.size()]);
 	}
 
 	@Override
@@ -57,60 +63,62 @@ public class JJEngineHttpHandler implements HttpHandler {
 		final HttpResponse response,
 		final HttpControl control
 	) throws Exception {
-		final JJHttpRequest jjrequest = new JJHttpRequest(request);
+		final JJHttpRequest jjrequest = creator.createJJHttpRequest(request);
 		
 		// figure out if there's something for us to do
-		final Servable servable = findMatchingServable(jjrequest);
+		final Servable[] servables = findMatchingServables(jjrequest);
 		
-		if (servable != null) {
-			Runnable r = executors.prepareTask(new JJRunnable() {
-				
-				@Override
-				public String name() {
-					return "JJEngine webbit->core processing";
-				}
-
-				@Override
-				public void run() throws Exception {
-					try {
-						RequestProcessor requestProcessor = 
-							servable.makeRequestProcessor(
-								jjrequest,
-								response,
-								control
-							);
-						
-						if (requestProcessor != null) {
-							requestProcessor.process();
-						} else {
-							nextHandler(control, response);
-						}
-						
-					} catch (Throwable e) {
-						response.error(e);
-					}
-				}
-			});
-			
-			if (servable.needsIO(jjrequest)) {
-				executors.ioExecutor().execute(r);
-			} else {
-				r.run();
-			}
+		if (servables.length > 0) {
+			dispatchNextServable(jjrequest, response, control, servables, new AtomicInteger());
 			
 		} else {
 			nextHandler(control, response);
 		}
 	}
 	
-	private void nextHandler(final HttpControl control, final HttpResponse response) {
-		Runnable r = executors.prepareTask(new JJRunnable() {
-
+	private void dispatchNextServable(
+		final JJHttpRequest request,
+		final HttpResponse response,
+		final HttpControl control,
+		final Servable[] servables,
+		final AtomicInteger count
+	) {
+		Runnable r = executors.prepareTask(new JJRunnable("JJEngine webbit->core processing") {
+			
 			@Override
-			public String name() {
-				return "HtmlEngine passing control to next handler";
+			public void run() throws Exception {
+				try {
+					RequestProcessor requestProcessor = 
+						servables[count.getAndIncrement()].makeRequestProcessor(
+							request,
+							response,
+							control
+						);
+					
+					if (requestProcessor != null) {
+						requestProcessor.process();
+					} else if (count.get() < servables.length) {
+						dispatchNextServable(request, response, control, servables, count);
+					} else {
+						nextHandler(control, response);
+					}
+					
+				} catch (Throwable e) {
+					response.error(e);
+				}
 			}
-
+		});
+		
+		if (servables[0].needsIO(request)) {
+			executors.ioExecutor().execute(r);
+		} else {
+			executors.httpControlExecutor().execute(r);
+		}
+	}
+	
+	private void nextHandler(final HttpControl control, final HttpResponse response) {
+		Runnable r = executors.prepareTask(new JJRunnable("HtmlEngine passing control to next handler") {
+			
 			@Override
 			@HttpControlThread
 			public void run() throws Exception {
@@ -122,10 +130,10 @@ public class JJEngineHttpHandler implements HttpHandler {
 			}
 			
 		});
-		if (executors.isIOThread()) {
-			executors.httpControlExecutor().execute(r);
-		} else {
+		if (executors.isHttpControlThread()) {
 			r.run();
+		} else {
+			executors.httpControlExecutor().execute(r);
 		}
 	}
 	

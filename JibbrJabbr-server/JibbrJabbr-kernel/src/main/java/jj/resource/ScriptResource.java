@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 import jj.IOThread;
 
-public class ScriptResource extends AbstractResource {
+public class ScriptResource extends AbstractFileResource {
 	
 	private final ScriptResourceType type;
 	private final String uri;

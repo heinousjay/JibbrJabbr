@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 @Singleton
 public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 	
-	public boolean isIOThread() {
+	public static boolean isIOThread() {
 		return flag.get() != null;
 	}
 	

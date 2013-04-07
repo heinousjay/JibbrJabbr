@@ -58,4 +58,13 @@ public abstract class Servable {
 		final HttpResponse response,
 		final HttpControl control
 	) throws IOException;
+
+	/**
+	 * helper to extract the baseName from the request
+	 * @param httpRequest
+	 * @return
+	 */
+	protected String baseName(JJHttpRequest httpRequest) {
+		return httpRequest.uri().substring(1);
+	}
 }

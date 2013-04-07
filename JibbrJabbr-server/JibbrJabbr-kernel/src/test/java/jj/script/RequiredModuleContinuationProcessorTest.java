@@ -22,7 +22,6 @@ import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
 
-import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,8 +41,6 @@ public class RequiredModuleContinuationProcessorTest {
 	String module = "module";
 	
 	@Mock CurrentScriptContext context;
-	
-	DeterministicScheduler executor;
 	
 	MockJJExecutors executors;
 	
@@ -66,8 +63,7 @@ public class RequiredModuleContinuationProcessorTest {
 	@Before
 	public void before() {
 		
-		executor = new DeterministicScheduler();
-		executors = new MockJJExecutors(executor);
+		executors = new MockJJExecutors();
 		
 		given(context.baseName()).willReturn(baseName);
 		
@@ -86,7 +82,7 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		// when
 		processor.process(continuationState);
-		executor.runUntilIdle();
+		executors.executor.runUntilIdle();
 		
 		// then
 		verify(executors.scriptRunner).submit(requiredModule);
@@ -97,7 +93,7 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		// when
 		processor.process(continuationState);
-		executor.runUntilIdle();
+		executors.executor.runUntilIdle();
 		
 		// then
 		verify(executors.scriptRunner).restartAfterContinuation(anyString(), any(RequiredModuleException.class));

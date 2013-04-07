@@ -159,12 +159,7 @@ public class ScriptRunner {
 		
 		final String baseName = documentRequestProcessor.baseName();
 		
-		submit(baseName, new JJRunnable() {
-
-			@Override
-			public String name() {
-				return "document ready function execution";
-			}
+		submit(baseName, new JJRunnable("document ready function execution") {
 
 			@Override
 			public void run() throws Exception {
@@ -242,12 +237,7 @@ public class ScriptRunner {
 		final RequiredModule requiredModule = context.requiredModule();
 		final ModuleScriptBundle scriptBundle = context.moduleScriptBundle();
 		
-		submit(scriptBundle.baseName(), new JJRunnable() {
-
-			@Override
-			public String name() {
-				return "module parent resumption";
-			}
+		submit(scriptBundle.baseName(), new JJRunnable("module parent resumption") {
 
 			@Override
 			public void run() throws Exception {
@@ -266,13 +256,8 @@ public class ScriptRunner {
 		final String baseName = requiredModule.baseName();
 		final String identifier = requiredModule.identifier();
 		
-		submit(baseName, new JJRunnable() {
+		submit(baseName, new JJRunnable("module script initialization for " + identifier) {
 			
-			@Override
-			public String name() {
-				return "module script initialization for " + identifier;
-			}
-
 			@Override
 			public void run() throws Exception {
 				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
@@ -292,13 +277,8 @@ public class ScriptRunner {
 		final String pendingKey,
 		final Object result
 	) {
-		submit(connection.baseName(), new JJRunnable() {
+		submit(connection.baseName(), new JJRunnable("resuming continuation on " + connection) {
 			
-			@Override
-			public String name() {
-				return "resuming continuation on " + connection;
-			}
-
 			@Override
 			public void run() throws Exception {
 				context.initialize(connection);
@@ -327,12 +307,7 @@ public class ScriptRunner {
 	}
 	
 	public void submit(final JJWebSocketConnection connection, final String event, final Object...args) {
-		submit(connection.baseName(), new JJRunnable() {
-
-			@Override
-			public String name() {
-				return "host event on WebSocket connection";
-			}
+		submit(connection.baseName(), new JJRunnable("host event on WebSocket connection") {
 
 			@Override
 			public void run() throws Exception {

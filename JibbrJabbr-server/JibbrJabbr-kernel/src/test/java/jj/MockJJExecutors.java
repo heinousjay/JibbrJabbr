@@ -47,11 +47,11 @@ public class MockJJExecutors implements JJExecutors {
 		IOThread;
 	}
 	
-	private ScriptExecutorFactory scriptExecutorFactory = mock(ScriptExecutorFactory.class);
-	private DeterministicScheduler executor;
+	public final ScriptExecutorFactory scriptExecutorFactory = mock(ScriptExecutorFactory.class);
+	public final ScriptRunner scriptRunner = mock(ScriptRunner.class);
+	public final DeterministicScheduler executor = new DeterministicScheduler();
 	
-	public MockJJExecutors(final DeterministicScheduler executor) {
-		this.executor = executor;
+	public MockJJExecutors() {
 		prepScriptExecutorFactory();
 	}
 	
@@ -66,7 +66,6 @@ public class MockJJExecutors implements JJExecutors {
 		});
 	}
 
-	public ScriptRunner scriptRunner = mock(ScriptRunner.class);
 	
 	@Override
 	public ScriptRunner scriptRunner() {

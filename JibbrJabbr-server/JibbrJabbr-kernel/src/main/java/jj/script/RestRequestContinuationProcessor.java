@@ -54,12 +54,7 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 		try {
 			final ListenableFuture<Response> response = httpClient.executeRequest(restRequest.request());
 			response.addListener(
-				executors.prepareTask(new JJRunnable() {
-
-					@Override
-					public String name() {
-						return "REST response with id " + restRequest.id();
-					}
+				executors.prepareTask(new JJRunnable("REST response with id [" + restRequest.id() + "]") {
 					
 					@Override
 					public void run() throws Exception {

@@ -39,6 +39,7 @@ public class ResourceModule extends AbstractModule {
 		resourceCreators.addBinding().to(AssetResourceCreator.class);
 		resourceCreators.addBinding().to(HtmlResourceCreator.class);
 		resourceCreators.addBinding().to(ScriptResourceCreator.class);
+		resourceCreators.addBinding().to(StaticResourceCreator.class);
 		resourceCreators.addBinding().to(PropertiesResourceCreator.class);
 		
 		// these guys love each other but it's easier to manage the implementation

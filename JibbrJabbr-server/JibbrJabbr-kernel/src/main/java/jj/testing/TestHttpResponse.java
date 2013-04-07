@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
+import jj.ExecutionTrace;
 import jj.JJExecutors;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -47,6 +48,8 @@ class TestHttpResponse extends StubHttpResponse {
 	private int id = 0;
 	
 	private final JJExecutors executors;
+	
+	private TestHttpRequest request;
 	
 	@Inject
 	TestHttpResponse(final JJExecutors executors) {
@@ -68,8 +71,6 @@ class TestHttpResponse extends StubHttpResponse {
 		TestRunner.log.info("end called on {}", this);
 		super.end();
 		processResponse();
-		latch.countDown();
-		assert executors.isHttpControlThread();
 		return this;
 	}
 	@Override
@@ -77,8 +78,6 @@ class TestHttpResponse extends StubHttpResponse {
 		TestRunner.log.info("error called on {}", this);
 		super.error(t);
 		processResponse();
-		latch.countDown();
-		assert executors.isHttpControlThread();
 		return this;
 	}
 	
@@ -128,6 +127,10 @@ class TestHttpResponse extends StubHttpResponse {
 				new AssertionError("document was not null").printStackTrace();
 			}
 		}
+		
+		ExecutionTrace.end(request);
+		latch.countDown();
+		assert executors.isHttpControlThread();
 	}
 	
 	public void get() throws Exception {
@@ -155,5 +158,12 @@ class TestHttpResponse extends StubHttpResponse {
 			.append(", contents=").append(contents().length)
 			.append("}")
 			.toString();
+	}
+
+	/**
+	 * @param request
+	 */
+	public void setRequest(final TestHttpRequest request) {
+		this.request = request;
 	}
 }

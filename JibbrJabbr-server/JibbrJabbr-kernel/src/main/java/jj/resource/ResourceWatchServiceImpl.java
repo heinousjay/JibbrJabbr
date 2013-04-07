@@ -76,11 +76,11 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 		return (WatchEvent<Path>)event;
 	}
 		
-	private final JJRunnable loop = new JJRunnable() {
+	private final JJRunnable loop = new JJRunnable(ResourceWatchService.class.getSimpleName() + " loop") {
 
 		@Override
-		public String name() {
-			return "ResourceWatchService loop";
+		protected boolean ignoreInExecutionTrace() {
+			return true;
 		}
 		
 		@Override
@@ -113,22 +113,24 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 							if (resource != null) {
 								// this thread is only to handle the
 								// WatchEvents
-								executors.ioExecutor().submit(executors.prepareTask(new JJRunnable() {
-
-									@Override
-									public String name() {
-										return "ResourceWatchService reloader";
-									}
-
-									@Override
-									public void run() throws Exception {
-										resourceFinder.loadResource(
-											resource.getClass(),
-											resource.baseName(),
-											resource.creationArgs()
-										);
-									}
-								}));
+								executors.ioExecutor().submit(executors.prepareTask(
+									new JJRunnable(ResourceWatchService.class.getSimpleName() + "reloader") {
+									
+										@Override
+										protected boolean ignoreInExecutionTrace() {
+											return true;
+										}
+	
+										@Override
+										public void run() throws Exception {
+											resourceFinder.loadResource(
+												resource.getClass(),
+												resource.baseName(),
+												resource.creationArgs()
+											);
+										}
+									})
+								);
 							}
 						}
 						

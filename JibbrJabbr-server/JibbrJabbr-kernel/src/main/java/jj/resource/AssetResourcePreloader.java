@@ -37,11 +37,11 @@ class AssetResourcePreloader implements JJServerListener {
 	@Override
 	public void start() throws Exception {
 		
-		executors.ioExecutor().submit(executors.prepareTask(new JJRunnable() {
+		executors.ioExecutor().submit(executors.prepareTask(new JJRunnable("internal asset preloader") {
 
 			@Override
-			public String name() {
-				return "internal asset preloader";
+			protected boolean ignoreInExecutionTrace() {
+				return true;
 			}
 			
 			@Override

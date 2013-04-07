@@ -22,7 +22,6 @@ import static org.mockito.BDDMockito.*;
 import jj.MockJJExecutors;
 import jj.hostapi.ScriptJSON;
 
-import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +46,6 @@ public class RestRequestContinuationProcessorTest {
 	@Mock CurrentScriptContext context;
 	@Mock AsyncHttpClient client;
 	@Mock ListenableFuture<Response> future;
-	DeterministicScheduler executor;
 	MockJJExecutors executors;
 	@Mock ScriptJSON json;
 	@Mock ContinuationState continuationState;
@@ -57,15 +55,14 @@ public class RestRequestContinuationProcessorTest {
 	
 	@Before
 	public void before() throws Exception {
-		executor = new DeterministicScheduler();
-		executors = new MockJJExecutors(executor);
+		executors = new MockJJExecutors();
 		
 		RestRequest restRequest = new RestRequest(null);
 		given(continuationState.restRequest()).willReturn(restRequest);
 		
 		given(client.executeRequest(null)).willReturn(future);
 		
-		given(future.addListener(BDDMockito.any(Runnable.class), eq(executor))).will(new Answer<ListenableFuture<Response> >() {
+		given(future.addListener(BDDMockito.any(Runnable.class), eq(executors.executor))).will(new Answer<ListenableFuture<Response> >() {
 
 			@Override
 			public ListenableFuture<Response>  answer(InvocationOnMock invocation) throws Throwable {
@@ -87,7 +84,7 @@ public class RestRequestContinuationProcessorTest {
 		
 		//then
 		assertThat(runnable, is(notNullValue()));
-		verify(future).addListener(BDDMockito.any(Runnable.class), eq(executor));
+		verify(future).addListener(BDDMockito.any(Runnable.class), eq(executors.executor));
 		
 		//given
 		given(future.get()).willReturn(response);

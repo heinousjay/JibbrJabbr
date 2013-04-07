@@ -18,7 +18,7 @@ import org.jsoup.parser.Parser;
  * @author jason
  *
  */
-public class HtmlResource extends AbstractResource {
+public class HtmlResource extends AbstractFileResource {
 
 	private final String uri;
 	private final String absoluteUri;

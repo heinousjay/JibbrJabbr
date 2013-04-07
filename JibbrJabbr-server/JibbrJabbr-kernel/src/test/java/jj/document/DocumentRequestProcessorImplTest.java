@@ -21,7 +21,6 @@ import jj.script.ScriptExecutorFactory;
 import jj.webbit.JJHttpRequest;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
@@ -38,7 +37,6 @@ public class DocumentRequestProcessorImplTest {
 	Document document;
 	String baseName;
 
-	DeterministicScheduler executor;
 	@Mock ScriptExecutorFactory scriptExecutorFactory;
 	MockJJExecutors executors;
 
@@ -83,8 +81,7 @@ public class DocumentRequestProcessorImplTest {
 		document.outputSettings().prettyPrint(false);
 		baseName = "baseName";
 
-		executor = new DeterministicScheduler();
-		executors = new MockJJExecutors(executor);
+		executors = new MockJJExecutors();
 		
 		when(htmlResource.baseName()).thenReturn(baseName);
 		when(htmlResource.mime()).thenReturn(MIME);
@@ -117,7 +114,7 @@ public class DocumentRequestProcessorImplTest {
 		
 		// when
 		toTest.respond();
-		executor.runUntilIdle();
+		executors.executor.runUntilIdle();
 		
 		// then
 		assertThat(filterCalls, is(6));
@@ -134,7 +131,7 @@ public class DocumentRequestProcessorImplTest {
 		
 		// when
 		toTest.respond();
-		executor.runUntilIdle();
+		executors.executor.runUntilIdle();
 		
 		// then
 		assertThat(httpResponse.charset(), is(UTF_8));

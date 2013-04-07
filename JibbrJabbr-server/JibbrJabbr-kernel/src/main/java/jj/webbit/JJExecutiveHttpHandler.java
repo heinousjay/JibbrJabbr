@@ -64,7 +64,6 @@ class JJExecutiveHttpHandler implements HttpHandler {
 		final HttpResponse response,
 		final HttpControl control
 	) throws Exception {
-		
 		request.data(RESPONSE_HEADERS, new HashMap<String, String>());
 		
 		HttpResponseWrapper responseWrapper = new HttpResponseWrapper(response) {
@@ -90,17 +89,27 @@ class JJExecutiveHttpHandler implements HttpHandler {
 			@Override
 			public HttpResponseWrapper end() {
 				log(request, response);
-				return super.end();
+				super.end();
+				ExecutionTrace.end(request);
+				return this;
 			}
 			
 			@Override
 			public HttpResponseWrapper error(Throwable error) {
 				log(request, response);
-				return super.error(error);
+				super.error(error);
+				ExecutionTrace.end(request);
+				return this;
 			}
 		};
-		
-		control.nextHandler(request, responseWrapper);
+		try {
+			access.error("{}", request);
+			ExecutionTrace.start(request, response);
+			control.nextHandler(request, responseWrapper);
+		} catch (Throwable t) {
+			access.error("{}", request);
+			access.error("{}", t);
+		}
 	}
 	
 	private void log(final HttpRequest request, final HttpResponse response) {
@@ -137,7 +146,7 @@ class JJExecutiveHttpHandler implements HttpHandler {
 		
 		return request.hasHeader(HttpHeaders.Names.REFERER) ?
 			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :
-			"-";	
+			"-";
 	}
 
 	@SuppressWarnings("unchecked")

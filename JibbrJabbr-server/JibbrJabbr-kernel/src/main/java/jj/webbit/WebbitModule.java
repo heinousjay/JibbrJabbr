@@ -32,6 +32,7 @@ public class WebbitModule extends AbstractModule {
 		bind(Logger.class).toInstance(LoggerFactory.getLogger("access"));
 		bind(JJExecutiveHttpHandler.class);
 		bind(NotFoundHttpHandler.class);
+		bind(JJHttpRequestCreator.class);
 		
 		Multibinder<WebSocketMessageProcessor> messageProcessors = Multibinder.newSetBinder(binder(), WebSocketMessageProcessor.class);
 		

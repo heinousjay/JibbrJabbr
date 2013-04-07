@@ -28,15 +28,17 @@ public class WebSocketConnections implements JJServerListener {
 	
 	private final Logger log = LoggerFactory.getLogger(WebSocketConnections.class);
 	
-	private final class ActivityChecker implements JJRunnable {
-
-		public String name() {
-			return"WebSocket connection activity checker";
+	private final class ActivityChecker extends JJRunnable {
+		
+		private ActivityChecker() {
+			 super("WebSocket connection activity checker");
+		}
+		
+		@Override
+		protected boolean ignoreInExecutionTrace() {
+			return true;
 		}
 
-		/* (non-Javadoc)
-		 * @see jj.JJRunnable#innerRun()
-		 */
 		@Override
 		public void run() throws Exception {
 			

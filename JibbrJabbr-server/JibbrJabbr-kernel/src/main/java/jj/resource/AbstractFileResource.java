@@ -11,7 +11,7 @@ import jj.SHA1Helper;
 // needs to be public or mockito can't mock this, so the constructor
 // is package protected to prevent outside things from deriving from
 // this.  for now at least
-public abstract class AbstractResource implements Resource {
+public abstract class AbstractFileResource implements Resource {
 
 	private static final Object[] EMPTY_ARGS = {};
 	
@@ -24,7 +24,7 @@ public abstract class AbstractResource implements Resource {
 	private final String toString;
 
 	@IOThread
-	AbstractResource(
+	AbstractFileResource(
 		final String baseName,
 		final Path path
 	) throws IOException {
@@ -66,5 +66,10 @@ public abstract class AbstractResource implements Resource {
 	@Override
 	public final String toString() {
 		return toString;
+	}
+	
+	@Override
+	public boolean cache() {
+		return true;
 	}
 }

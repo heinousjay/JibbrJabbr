@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 @Singleton
 public class HttpControlExecutor extends ScheduledThreadPoolExecutor implements JJServerListener {
 	
-	public boolean isHttpControlThread() {
+	public static boolean isHttpControlThread() {
 		return flag.get() != null;
 	}
 	

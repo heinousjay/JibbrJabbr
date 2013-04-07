@@ -34,7 +34,7 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 			} 
 			
 		} catch (Exception e) {
-			// if this happens, you've altered the jar
+			throw new AssertionError("couldn't locate internal assets, altering the jar?");
 		}
 		basePath = attempt;
 	}

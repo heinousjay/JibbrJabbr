@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.ExecutionTrace;
 import jj.webbit.JJEngineHttpHandler;
 
 /**
@@ -140,6 +141,7 @@ class TestRunner {
 		control.execute(new Runnable() {
 			public void run() {
 				try {
+					ExecutionTrace.start(control.request(), control.response());
 					handler.handleHttpRequest(control.request(), control.response(), control);
 				} catch (Throwable t) {
 					control.response().error(t);

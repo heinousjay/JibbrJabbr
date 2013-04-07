@@ -35,11 +35,17 @@ public class TaskCreator {
 	
 	public Runnable prepareTask(final JJRunnable task) {
 		
+		final ExecutionTrace.State state = task.ignoreInExecutionTrace() ? null : ExecutionTrace.save();
+		
 		return new Runnable() {
 			
 			@Override
 			public final void run() {
 				try {
+					if (!task.ignoreInExecutionTrace()) {
+						ExecutionTrace.restore(state);
+						ExecutionTrace.addEvent(task.name());
+					}
 					task.run();
 				} catch (OutOfMemoryError rethrow) {
 					throw rethrow;

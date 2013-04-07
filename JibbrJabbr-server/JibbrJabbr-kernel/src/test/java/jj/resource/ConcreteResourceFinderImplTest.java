@@ -6,20 +6,14 @@ import static org.mockito.BDDMockito.*;
 
 
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.Configuration;
 import jj.JJExecutors;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * this test is fairly concrete and not so much "unit" but
@@ -28,13 +22,8 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author jason
  *
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ConcreteResourceFinderImplTest {
+public class ConcreteResourceFinderImplTest extends ResourceBase {
 
-	URI baseUri;
-	Path basePath;
-	@Mock Configuration configuration;
-	String baseName;
 	ResourceCache resourceCache;
 	Set<ResourceCreator<?>> resourceCreators;
 	@Mock ResourceWatchServiceImpl resourceWatchService;
@@ -43,16 +32,15 @@ public class ConcreteResourceFinderImplTest {
 	
 	@Before
 	public void before() throws Exception {
-		baseUri = URI.create("http://localhost:8080/");
-		basePath = Paths.get(ConcreteResourceFinderImplTest.class.getResource("/index.html").toURI()).getParent();
-		when(configuration.basePath()).thenReturn(basePath);
-		when(configuration.baseUri()).thenReturn(baseUri);
 		
-		baseName = "internal/no-worky";
 		resourceCache = new ResourceCache();
+		
 		resourceCreators = new HashSet<>();
 		resourceCreators.add(new HtmlResourceCreator(configuration));
 		resourceCreators.add(new ScriptResourceCreator(configuration));
+		resourceCreators.add(new StaticResourceCreator(configuration));
+		
+		
 	}
 	
 	@Test
@@ -62,7 +50,7 @@ public class ConcreteResourceFinderImplTest {
 		ResourceFinderImpl toTest = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
 		
 		// when
-		HtmlResource result1 = toTest.findResource(HtmlResource.class, baseName);
+		HtmlResource result1 = toTest.findResource(HtmlResource.class, "internal/no-worky");
 		
 		given(executors.isIOThread()).willReturn(true);
 		ScriptResource result2 = toTest.loadResource(ScriptResource.class, "index", ScriptResourceType.Server);
@@ -81,8 +69,20 @@ public class ConcreteResourceFinderImplTest {
 		assertThat(result4, is(notNullValue()));
 		assertThat(result2, is(result3));
 		assertThat(result3, is(result4));
+		
+		verify(resourceWatchService, never()).watch(result1);
 		// watch service should only have been asked to watch this once, the first time it was created
-		verify(resourceWatchService).watch((Resource)anyObject());
+		verify(resourceWatchService).watch(result2);
+
+		// given
+		given(executors.isIOThread()).willReturn(true);
+	}
+	
+	@Test
+	public void staticResources() throws IOException {
+		
+		//given
+		ResourceFinderImpl toTest = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
 	}
 
 }

@@ -63,12 +63,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		final String baseName = context.baseName();
 		
 		executors.ioExecutor().submit(
-			executors.prepareTask(new JJRunnable() {
-
-				@Override
-				public String name() {
-					return "loading module " + requiredModule.identifier();
-				}
+			executors.prepareTask(new JJRunnable("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
 			
 				@Override
 				public void run() throws Exception {
@@ -100,12 +95,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	) {
 		
 		executors.scriptExecutorFor(baseName).submit(
-			executors.prepareTask(new JJRunnable() {
-
-				@Override
-				public String name() {
-					return "required module " + require.identifier() + " error";
-				}
+			executors.prepareTask(new JJRunnable("required module " + require.identifier() + " error result in [" + baseName + "]") {
 			
 				@Override
 				public void run() throws Exception {

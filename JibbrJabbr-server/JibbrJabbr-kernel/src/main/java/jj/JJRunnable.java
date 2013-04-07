@@ -6,10 +6,21 @@ package jj;
  * @author jason
  *
  */
-public interface JJRunnable {
+public abstract class JJRunnable {
 	
-	String name();
+	private final String name;
+	protected JJRunnable(final String name) {
+		this.name = name;
+	}
+	
+	protected boolean ignoreInExecutionTrace() {
+		return false;
+	}
+	
+	public final String name() {
+		return name;
+	}
 
-	void run() throws Exception;
+	public abstract void run() throws Exception;
 
 }

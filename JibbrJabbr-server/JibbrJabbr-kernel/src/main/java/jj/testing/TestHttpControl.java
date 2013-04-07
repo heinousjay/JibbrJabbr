@@ -41,6 +41,7 @@ class TestHttpControl extends StubHttpControl {
 	@Inject
 	TestHttpControl(final JJExecutors executor, final TestHttpRequest request, final TestHttpResponse response) {
 		super(request, response);
+		response.setRequest(request);
 		this.executor = executor;
 		request.id(id);
 		response.id(id);

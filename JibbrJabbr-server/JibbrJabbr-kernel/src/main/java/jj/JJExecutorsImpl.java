@@ -75,11 +75,11 @@ class JJExecutorsImpl implements JJExecutors {
 	}
 
 	public boolean isIOThread() {
-		return ioExecutor.isIOThread();
+		return IOExecutor.isIOThread();
 	}
 	
 	public boolean isHttpControlThread() {
-		return httpControlExecutor.isHttpControlThread();
+		return HttpControlExecutor.isHttpControlThread();
 	}
 	
 	public int ioPoolSize() {

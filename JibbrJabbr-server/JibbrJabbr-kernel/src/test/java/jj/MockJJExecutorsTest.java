@@ -19,7 +19,6 @@ import static jj.MockJJExecutors.ThreadType.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.junit.Test;
 
 /**
@@ -31,7 +30,7 @@ public class MockJJExecutorsTest {
 	
 	@Test
 	public void testThreadTypeReplies() {
-		MockJJExecutors e = new MockJJExecutors(new DeterministicScheduler());
+		MockJJExecutors e = new MockJJExecutors();
 		e.addThreadTypes(ScriptThread, 2);
 		e.addThreadTypes(IOThread, 2);
 		
@@ -74,7 +73,7 @@ public class MockJJExecutorsTest {
 	
 	@Test
 	public void testThreadTypesSequence() {
-		MockJJExecutors e = new MockJJExecutors(new DeterministicScheduler());
+		MockJJExecutors e = new MockJJExecutors();
 		
 		e.scriptExecutorFor("");
 		e.ioExecutor();
