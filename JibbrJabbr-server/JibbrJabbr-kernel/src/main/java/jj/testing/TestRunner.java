@@ -123,14 +123,17 @@ class TestRunner {
 	
 	private final TestHttpControl control;
 	private final JJEngineHttpHandler handler;
+	private final ExecutionTrace trace;
 	
 	@Inject
 	TestRunner(
 		final TestHttpControl control,
-		final JJEngineHttpHandler handler
+		final JJEngineHttpHandler handler,
+		final ExecutionTrace trace
 	) {
 		this.control = control;
 		this.handler = handler;
+		this.trace = trace;
 	}
 
 	TestHttpRequest request() {
@@ -141,7 +144,7 @@ class TestRunner {
 		control.execute(new Runnable() {
 			public void run() {
 				try {
-					ExecutionTrace.start(control.request(), control.response());
+					trace.start(control.request(), control.response());
 					handler.handleHttpRequest(control.request(), control.response(), control);
 				} catch (Throwable t) {
 					control.response().error(t);

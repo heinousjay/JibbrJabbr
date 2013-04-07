@@ -15,6 +15,8 @@
  */
 package jj;
 
+import static org.mockito.Mockito.mock;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class MockTaskCreator extends TaskCreator {
+	
+	public MockTaskCreator() {
+		super(mock(ExecutionTraceImpl.class));
+	}
 	
 	private final Logger log = LoggerFactory.getLogger(MockTaskCreator.class);
 

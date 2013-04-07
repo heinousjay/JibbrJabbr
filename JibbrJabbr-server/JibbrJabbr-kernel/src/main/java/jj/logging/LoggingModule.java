@@ -13,30 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.logging;
 
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.WebSocketConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
 /**
  * @author jason
  *
  */
-public interface ExecutionTrace {
+public class LoggingModule extends AbstractModule {
 
-	void addEvent(String event);
+	@Override
+	protected void configure() {
+		// nothing to provide?  i guess not
 
-	void addEvent(String event, Throwable throwable);
-
-	/**
-	 * @param request
-	 * @param response
-	 */
-	void start(HttpRequest request, HttpResponse response);
-
-	void end(HttpRequest request);
-
-	void start(WebSocketConnection connection);
+	}
+	
+	@Provides @AccessLogger
+	public Logger providerLogger() {
+		return LoggerFactory.getLogger("access");
+	}
 
 }

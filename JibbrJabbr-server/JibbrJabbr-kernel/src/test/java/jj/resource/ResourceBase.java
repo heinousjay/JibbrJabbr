@@ -68,7 +68,6 @@ public abstract class ResourceBase {
 		assertThat(resource1.lastModified(), is(Files.getLastModifiedTime(path)));
 		assertThat(resource1.path(), is(path));
 		assertThat(resource1.sha1(), is(SHA1Helper.keyFor(bytes)));
-		assertThat(resource1.absoluteUri(), is(baseUri + baseName));
 		assertThat(resource1.cache(), is(cached));
 		assertThat(resource1.needsReplacing(), is(false));
 		

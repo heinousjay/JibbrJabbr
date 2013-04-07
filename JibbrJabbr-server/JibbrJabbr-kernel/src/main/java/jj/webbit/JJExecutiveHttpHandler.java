@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import jj.DateFormatHelper;
 import jj.ExecutionTrace;
+import jj.logging.AccessLogger;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
@@ -53,9 +54,12 @@ class JJExecutiveHttpHandler implements HttpHandler {
 	
 	private final Logger access;
 	
+	private final ExecutionTrace trace;
+	
 	@Inject
-	JJExecutiveHttpHandler(final Logger access) {
+	JJExecutiveHttpHandler(final @AccessLogger Logger access, final ExecutionTrace trace) {
 		this.access = access;
+		this.trace = trace;
 	}
 
 	@Override
@@ -90,7 +94,7 @@ class JJExecutiveHttpHandler implements HttpHandler {
 			public HttpResponseWrapper end() {
 				log(request, response);
 				super.end();
-				ExecutionTrace.end(request);
+				trace.end(request);
 				return this;
 			}
 			
@@ -98,13 +102,13 @@ class JJExecutiveHttpHandler implements HttpHandler {
 			public HttpResponseWrapper error(Throwable error) {
 				log(request, response);
 				super.error(error);
-				ExecutionTrace.end(request);
+				trace.end(request);
 				return this;
 			}
 		};
 		try {
 			access.error("{}", request);
-			ExecutionTrace.start(request, response);
+			trace.start(request, response);
 			control.nextHandler(request, responseWrapper);
 		} catch (Throwable t) {
 			access.error("{}", request);

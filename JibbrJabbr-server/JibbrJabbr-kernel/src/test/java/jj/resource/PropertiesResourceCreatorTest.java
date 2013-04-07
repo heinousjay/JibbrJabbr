@@ -13,30 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.resource;
 
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.WebSocketConnection;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.*;
+
+import java.nio.file.Files;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public interface ExecutionTrace {
+public class PropertiesResourceCreatorTest extends ResourceBase {
 
-	void addEvent(String event);
+	@Test
+	public void test() throws Exception {
+		doTest("index");
+	}
+	
+	private void doTest(final String baseName) throws Exception {
 
-	void addEvent(String event, Throwable throwable);
-
-	/**
-	 * @param request
-	 * @param response
-	 */
-	void start(HttpRequest request, HttpResponse response);
-
-	void end(HttpRequest request);
-
-	void start(WebSocketConnection connection);
+		PropertiesResource resource1 = testFileResource(baseName, new PropertiesResourceCreator(configuration));
+		assertThat(resource1, is(notNullValue()));
+		assertThat(resource1.bytes, is(Files.readAllBytes(resource1.path)));
+	}
 
 }

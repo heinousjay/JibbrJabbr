@@ -30,12 +30,18 @@ public class TaskCreator {
 	
 	private final Logger log = LoggerFactory.getLogger(TaskCreator.class);
 
+	private final ExecutionTraceImpl trace;
+	
 	@Inject
-	TaskCreator() {}
+	TaskCreator(
+		final ExecutionTraceImpl trace
+	) {
+		this.trace = trace;
+	}
 	
 	public Runnable prepareTask(final JJRunnable task) {
 		
-		final ExecutionTrace.State state = task.ignoreInExecutionTrace() ? null : ExecutionTrace.save();
+		final ExecutionTraceImpl.State state = task.ignoreInExecutionTrace() ? null : trace.save();
 		
 		return new Runnable() {
 			
@@ -43,8 +49,8 @@ public class TaskCreator {
 			public final void run() {
 				try {
 					if (!task.ignoreInExecutionTrace()) {
-						ExecutionTrace.restore(state);
-						ExecutionTrace.addEvent(task.name());
+						trace.restore(state);
+						trace.addEvent(task.name());
 					}
 					task.run();
 				} catch (OutOfMemoryError rethrow) {

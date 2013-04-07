@@ -51,9 +51,15 @@ class TestHttpResponse extends StubHttpResponse {
 	
 	private TestHttpRequest request;
 	
+	private final ExecutionTrace trace;
+	
 	@Inject
-	TestHttpResponse(final JJExecutors executors) {
+	TestHttpResponse(
+		final JJExecutors executors,
+		final ExecutionTrace trace
+	) {
 		this.executors = executors;
+		this.trace = trace;
 	}
 	
 	void id(int id) {
@@ -128,7 +134,7 @@ class TestHttpResponse extends StubHttpResponse {
 			}
 		}
 		
-		ExecutionTrace.end(request);
+		trace.end(request);
 		latch.countDown();
 		assert executors.isHttpControlThread();
 	}

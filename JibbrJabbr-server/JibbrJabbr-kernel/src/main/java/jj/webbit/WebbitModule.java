@@ -27,12 +27,9 @@ public class WebbitModule extends AbstractModule {
 		
 		serverListeners.addBinding().to(WebSocketConnections.class);
 		
-		bind(JJEngineHttpHandler.class);
 		bind(org.webbitserver.WebSocketHandler.class).to(WebSocketHandler.class);
-		bind(Logger.class).toInstance(LoggerFactory.getLogger("access"));
-		bind(JJExecutiveHttpHandler.class);
-		bind(NotFoundHttpHandler.class);
-		bind(JJHttpRequestCreator.class);
+		
+		
 		
 		Multibinder<WebSocketMessageProcessor> messageProcessors = Multibinder.newSetBinder(binder(), WebSocketMessageProcessor.class);
 		

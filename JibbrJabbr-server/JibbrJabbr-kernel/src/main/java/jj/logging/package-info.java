@@ -13,30 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
-
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.WebSocketConnection;
-
 /**
  * @author jason
  *
  */
-public interface ExecutionTrace {
-
-	void addEvent(String event);
-
-	void addEvent(String event, Throwable throwable);
-
-	/**
-	 * @param request
-	 * @param response
-	 */
-	void start(HttpRequest request, HttpResponse response);
-
-	void end(HttpRequest request);
-
-	void start(WebSocketConnection connection);
-
-}
+package jj.logging;

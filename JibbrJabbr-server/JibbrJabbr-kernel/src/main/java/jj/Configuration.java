@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
@@ -17,6 +18,7 @@ public class Configuration {
 	private final URI baseUri;
 	private final Path basePath;
 	
+	@Inject
 	Configuration(final String[] args) {
 		
 		Set<String> argSet = new HashSet<>(Arrays.asList(args));

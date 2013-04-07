@@ -10,8 +10,17 @@ import jj.SHA1Helper;
 
 // needs to be public or mockito can't mock this, so the constructor
 // is package protected to prevent outside things from deriving from
-// this.  for now at least
+// this.  for now at least.
+/**
+ * re
+ * @author jason
+ *
+ */
 public abstract class AbstractFileResource implements Resource {
+	
+	// for now, a hard line in the sand.  webbit doesn't much like large files,
+	// so even this number might be optimistic
+	private static final long MAX_FILE_SIZE = 1000000;
 
 	private static final Object[] EMPTY_ARGS = {};
 	
@@ -28,6 +37,11 @@ public abstract class AbstractFileResource implements Resource {
 		final String baseName,
 		final Path path
 	) throws IOException {
+		
+		if (Files.size(path) > MAX_FILE_SIZE) {
+			throw new IOException(AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_FILE_SIZE + " bytes");
+		}
+		
 		this.baseName = baseName;
 		this.path = path;
 		this.lastModified = Files.getLastModifiedTime(this.path);

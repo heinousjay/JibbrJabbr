@@ -20,6 +20,7 @@ import static org.mockito.BDDMockito.*;
 import java.net.InetSocketAddress;
 
 import jj.DateFormatHelper;
+import jj.ExecutionTrace;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
@@ -47,12 +48,13 @@ public class JJExecutiveHttpHandlerTest {
 	private static final String USER_AGENT = "reticules";
 	
 	@Mock Logger logger;
+	@Mock ExecutionTrace trace;
 
 	@Test
 	public void test() throws Exception {
 		
 		// given
-		JJExecutiveHttpHandler h = new JJExecutiveHttpHandler(logger);
+		JJExecutiveHttpHandler h = new JJExecutiveHttpHandler(logger, trace);
 		willReturn(true).given(logger).isTraceEnabled();
 		
 		StubHttpRequest request = new StubHttpRequest();

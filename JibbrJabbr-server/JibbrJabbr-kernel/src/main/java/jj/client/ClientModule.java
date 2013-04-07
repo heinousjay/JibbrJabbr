@@ -30,7 +30,6 @@ public class ClientModule extends AbstractModule {
 	@Override
 	protected void configure() {
 	
-		bind(ClientExecutor.class);
 		bind(AsyncHttpClientConfig.class).toProvider(AsyncHttpClientConfigProvider.class);
 		
 		try {

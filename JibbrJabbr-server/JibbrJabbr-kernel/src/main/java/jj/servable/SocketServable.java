@@ -27,13 +27,17 @@ class SocketServable extends Servable {
 	
 	private final WebSocketHandler webSocketHandler;
 	
+	private final ExecutionTrace trace;
+	
 	@Inject
 	SocketServable(
 		final Configuration configuration,
-		final WebSocketHandler webSocketHandler
+		final WebSocketHandler webSocketHandler,
+		final ExecutionTrace trace
 	) {
 		super(configuration);
 		this.webSocketHandler = webSocketHandler;
+		this.trace = trace;
 	}
 	
 	@Override
@@ -56,7 +60,7 @@ class SocketServable extends Servable {
 		final HttpControl control
 	) throws IOException {
 		
-		ExecutionTrace.addEvent("socket connection incoming");
+		trace.addEvent("socket connection incoming");
 		
 		// 
 		return new RequestProcessor() {
@@ -68,8 +72,8 @@ class SocketServable extends Servable {
 				control.upgradeToWebSocketConnection(webSocketHandler);
 				
 				// the request is considered over at this point, we are connection
-				ExecutionTrace.addEvent("socket connection made");
-				ExecutionTrace.end(request.originalRequest());
+				trace.addEvent("socket connection made");
+				trace.end(request.originalRequest());
 			}
 		};
 	}

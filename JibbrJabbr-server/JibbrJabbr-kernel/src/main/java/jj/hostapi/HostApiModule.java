@@ -14,8 +14,8 @@ public class HostApiModule extends AbstractModule {
 	protected void configure() {
 		
 		bind(RhinoObjectCreator.class).to(RhinoObjectCreatorImpl.class);
-		bind(ScriptJSON.class);
-		bind(RestCallProvider.class);
+		//bind(ScriptJSON.class);
+		//bind(RestCallProvider.class);
 		
 		Multibinder<HostObject> hostObjects = Multibinder.newSetBinder(binder(), HostObject.class);
 		hostObjects.addBinding().to(ClientStorage.class);

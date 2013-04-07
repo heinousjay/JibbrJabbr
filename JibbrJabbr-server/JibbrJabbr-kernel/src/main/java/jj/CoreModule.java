@@ -18,6 +18,7 @@ package jj;
 import jj.client.ClientModule;
 import jj.document.DocumentModule;
 import jj.hostapi.HostApiModule;
+import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.servable.ServableModule;
@@ -44,14 +45,20 @@ public class CoreModule extends AbstractModule {
 	protected void configure() {
 		
 		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
-		serverListeners.addBinding().toInstance(new LogConfigurator(isTest));
+		serverListeners.addBinding().to(LogConfigurator.class);
 		serverListeners.addBinding().to(IOExecutor.class);
 		serverListeners.addBinding().to(HttpControlExecutor.class);
 		
-		bind(Configuration.class).toInstance(new Configuration(args));
-		bind(JJServerLifecycle.class);
-		bind(HttpControlExecutor.class);
-		bind(TaskCreator.class);
+		// this gets instantiated before anything might write to a log
+		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
+		
+		// you want the command line args?  HAVE AT EM
+		bind(String[].class).toInstance(args);
+		
+		// for now.  this will have different installations in different
+		// environments, i'd think.  if you replace this binding you'll also
+		// have to  do something with TaskCreator
+		bind(ExecutionTrace.class).to(ExecutionTraceImpl.class);
 		
 		// a good place to break apart crafty circular dependencies
 		bind(JJExecutors.class).to(JJExecutorsImpl.class);
@@ -59,6 +66,7 @@ public class CoreModule extends AbstractModule {
 		install(new ClientModule());
 		install(new DocumentModule());
 		install(new HostApiModule());
+		install(new LoggingModule());
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
 		install(new ServableModule());

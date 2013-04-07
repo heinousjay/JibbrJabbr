@@ -13,30 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.logging;
 
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.WebSocketConnection;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author jason
  *
  */
-public interface ExecutionTrace {
-
-	void addEvent(String event);
-
-	void addEvent(String event, Throwable throwable);
-
-	/**
-	 * @param request
-	 * @param response
-	 */
-	void start(HttpRequest request, HttpResponse response);
-
-	void end(HttpRequest request);
-
-	void start(WebSocketConnection connection);
+@Documented
+@Target({ElementType.METHOD,ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AccessLogger {
 
 }
