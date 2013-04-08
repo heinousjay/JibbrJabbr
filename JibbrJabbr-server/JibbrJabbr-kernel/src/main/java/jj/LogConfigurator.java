@@ -63,8 +63,8 @@ class LogConfigurator implements JJServerListener {
 		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);
 		
 		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.WARN : Level.INFO);
-		((Logger)LoggerFactory.getLogger("jj.testing.TestRunner")).setLevel(Level.OFF);
-		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.OFF);
+		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.OFF);
+		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.TRACE);
 		((Logger)LoggerFactory.getLogger("execution trace")).setLevel(Level.TRACE);
 		
 	}
