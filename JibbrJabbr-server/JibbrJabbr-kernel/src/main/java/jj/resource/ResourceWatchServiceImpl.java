@@ -114,7 +114,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 								// this thread is only to handle the
 								// WatchEvents
 								executors.ioExecutor().submit(executors.prepareTask(
-									new JJRunnable(ResourceWatchService.class.getSimpleName() + "reloader") {
+									new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader") {
 									
 										@Override
 										protected boolean ignoreInExecutionTrace() {
