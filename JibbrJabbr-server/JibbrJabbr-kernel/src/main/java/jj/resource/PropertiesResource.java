@@ -35,8 +35,8 @@ public class PropertiesResource extends AbstractFileResource {
 		String relative = basePath.relativize(path).toString();
 		relative = relative.substring(0, relative.lastIndexOf(DOT_PROPERTIES));
 		
-		absoluteUri = baseUri.toString() + relative + "/" + sha1 + DOT_PROPERTIES;
-		uri = baseUri.getPath() + relative + "/" + sha1 + DOT_PROPERTIES;
+		absoluteUri = baseUri.toString() + sha1 + "/" + relative + DOT_PROPERTIES;
+		uri = baseUri.getPath() + sha1 + "/" + relative + DOT_PROPERTIES;
 		
 		properties =
 			new PropertyResourceBundle(new StringReader(UTF_8.decode(ByteBuffer.wrap(bytes)).toString()));

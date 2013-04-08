@@ -17,11 +17,7 @@ package jj;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.grapher.GrapherModule;
@@ -36,35 +32,25 @@ public class Grapher {
 		graphGood("main.dot", Guice.createInjector(new CoreModule(args, false)));
 	}
 
-	public final static void graphGood(String filename, Injector inj) {
+	public final static void graphGood(String filename, Injector inj) throws Exception {
 		File file = new File(filename).getAbsoluteFile();
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			PrintWriter out = new PrintWriter(baos);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintWriter out = new PrintWriter(baos);
 
-			Injector injector =
-				Guice.createInjector(new GrapherModule(), new GraphvizModule());
-			GraphvizRenderer renderer =
-				injector.getInstance(GraphvizRenderer.class);
-			renderer.setOut(out).setRankdir("TB");
+		Injector injector =
+			Guice.createInjector(new GrapherModule(), new GraphvizModule());
+		GraphvizRenderer renderer =
+			injector.getInstance(GraphvizRenderer.class);
+		renderer.setOut(out).setRankdir("TB");
 
-			injector.getInstance(InjectorGrapher.class).of(inj).graph();
+		injector.getInstance(InjectorGrapher.class).of(inj).graph();
 
-			out = new PrintWriter(file, "UTF-8");
-			String s = baos.toString("UTF-8");
-			s = fixGrapherBug(s);
-			s = hideClassPaths(s);
-			s = s.replaceAll(" margin=(\\S+), ", " margin=\"$1\", ");
-			out.write(s);
-			out.close();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		out = new PrintWriter(file, "UTF-8");
+		String s = baos.toString("UTF-8");
+		s = fixGrapherBugs(s);
+		s = hideClassPaths(s);
+		out.write(s);
+		out.close();
 
 		System.out.println("wrote to " + file);
 	}
@@ -75,8 +61,9 @@ public class Grapher {
 		return s;
 	}
 
-	public static String fixGrapherBug(String s) {
+	public static String fixGrapherBugs(String s) {
 		s = s.replaceAll("style=invis", "style=solid");
+		s = s.replaceAll(" margin=(\\S+), ", " margin=\"$1\", ");
 		return s;
 	}
 }

@@ -29,7 +29,7 @@ class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 	@Override
 	public Path toPath(String baseName, Object... args) {
 		if (args.length != 1 || !(args[0] instanceof ScriptResourceType)) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("expected ScriptResourceType but got " + (args.length > 0 ? args[0] : " null"));
 		}
 		ScriptResourceType type = (ScriptResourceType)args[0];
 		return basePath.resolve(baseName + type.suffix());

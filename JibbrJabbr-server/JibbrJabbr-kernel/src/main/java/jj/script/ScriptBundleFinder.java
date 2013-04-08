@@ -9,8 +9,8 @@ import javax.inject.Singleton;
 @Singleton
 public class ScriptBundleFinder {
 	
-	private static final Pattern KEY_SPLITTER = Pattern.compile("^(.+?)/([a-f0-9]{40})$");
-	private static final Pattern SOCKET = Pattern.compile("^/?(.+?)/([a-f0-9]{40}).socket$");
+	private static final Pattern KEY_SPLITTER = Pattern.compile("^([a-f0-9]{40})/(.+)$");
+	private static final Pattern SOCKET = Pattern.compile("^/?([a-f0-9]{40})/(.+?).socket$");
 	
 	private final ScriptBundles scriptBundles;
 	
@@ -29,7 +29,7 @@ public class ScriptBundleFinder {
 		AssociatedScriptBundle found = null;
 		Matcher matcher = KEY_SPLITTER.matcher(combinedKey);
 		if (matcher.matches()) {
-			found = forBaseNameAndKey(matcher.group(1), matcher.group(2));
+			found = forBaseNameAndKey(matcher.group(2), matcher.group(1));
 		}
 		
 		return found;
@@ -52,7 +52,7 @@ public class ScriptBundleFinder {
 		AssociatedScriptBundle found = null;
 		Matcher matcher = SOCKET.matcher(socketUri);
 		if (matcher.matches()) {
-			found = forBaseNameAndKey(matcher.group(1), matcher.group(2));
+			found = forBaseNameAndKey(matcher.group(2), matcher.group(1));
 		}
 		
 		return found;

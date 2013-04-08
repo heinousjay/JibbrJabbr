@@ -16,13 +16,13 @@ public class AssetResource extends AbstractFileResource {
 	
 	AssetResource(final Path basePath, final URI baseUri, final String baseName) throws IOException {
 		super(baseName, basePath.resolve(baseName));
-		absoluteUri = baseUri.toString() + baseName;
+		absoluteUri = baseUri.toString() + uri();
 		mime = MimeTypes.get(baseName);
 	}
 
 	@Override
 	public String uri() {
-		return "/" + baseName;
+		return "/" + sha1 + "/" + baseName;
 	}
 
 	@Override

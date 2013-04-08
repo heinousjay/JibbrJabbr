@@ -36,12 +36,12 @@ public class StaticResource extends AbstractFileResource {
 	StaticResource(final URI baseUri, final Path basePath, final String baseName) throws IOException {
 		super(baseName, basePath.resolve(baseName));
 		mime = MimeTypes.get(baseName);
-		absoluteUri = baseUri.toString() + baseName;
+		absoluteUri = baseUri.toString() + uri();
 	}
 
 	@Override
 	public String uri() {
-		return "/" + baseName;
+		return "/" + sha1 + "/" + baseName;
 	}
 
 	@Override

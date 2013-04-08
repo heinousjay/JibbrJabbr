@@ -141,7 +141,7 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	}
 
 	public String toUri() {
-		return baseName + "/" + sha1;
+		return sha1 + "/" + baseName;
 	}
 
 	public String toSocketUri() {

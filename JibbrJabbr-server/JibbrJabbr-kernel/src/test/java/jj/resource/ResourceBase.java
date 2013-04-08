@@ -51,17 +51,26 @@ public abstract class ResourceBase {
 		given(configuration.baseUri()).willReturn(baseUri);
 	}
 	
-	protected <T extends Resource> T testFileResource(final String baseName, final ResourceCreator<T> toTest) throws Exception {
-		return testFileResource(baseName, toTest, true);
+	protected <T extends Resource> T testFileResource(
+		final String baseName,
+		final ResourceCreator<T> toTest,
+		Object...args
+	) throws Exception {
+		return testFileResource(baseName, toTest, true, args);
 	}
 		
 
-	protected <T extends Resource> T testFileResource(final String baseName, final ResourceCreator<T> toTest, final boolean cached) throws Exception {
-		final Path path = toTest.toPath(baseName);
+	protected <T extends Resource> T testFileResource(
+		final String baseName,
+		final ResourceCreator<T> toTest,
+		final boolean cached,
+		Object...args
+	) throws Exception {
+		final Path path = toTest.toPath(baseName, args);
 		
 		assertTrue(baseName + " does not exist", Files.exists(path));
 		
-		T resource1 = toTest.create(baseName);
+		T resource1 = toTest.create(baseName, args);
 		final byte[] bytes = Files.readAllBytes(path);
 		assertThat(resource1, is(notNullValue()));
 		assertThat(resource1.baseName(), is(baseName));

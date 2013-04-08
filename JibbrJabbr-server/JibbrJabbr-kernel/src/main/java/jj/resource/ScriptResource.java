@@ -26,7 +26,7 @@ public class ScriptResource extends AbstractFileResource {
 		super(baseName, path);
 		this.type = type;
 		// our URI has our sha1 in it to allow for far-future caching
-		uri = baseName + "/" + sha1 + type.suffix();
+		uri = sha1 + "/" + baseName + type.suffix();
 		absoluteUri = baseUri.toString() + uri;
 		script = UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
 	}
