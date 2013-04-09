@@ -44,7 +44,8 @@ public class ResourceModule extends JJModule {
 		
 		
 		// these guys love each other but it's easier to manage the implementation
-		// in two classes so i don't feel this is a big burden
+		// in two classes so i don't feel this is a big burden.  there may be a 
+		// better design lurking.
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
 		
 		if (!isTest) {

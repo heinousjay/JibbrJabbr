@@ -30,6 +30,7 @@ public class LoggingModule extends JJModule {
 	
 	public static final String ACCESS_LOGGER = "access";
 	public static final String TEST_RUNNER_LOGGER = "test runner";
+	public static final String EXECUTION_TRACE_LOGGER = "execution trace";
 
 	@Override
 	protected void configure() {
@@ -44,6 +45,11 @@ public class LoggingModule extends JJModule {
 	@Provides @TestRunnerLogger
 	public Logger provideTestRunnerLogger() {
 		return LoggerFactory.getLogger(TEST_RUNNER_LOGGER);
+	}
+	
+	@Provides @ExecutionTraceLogger
+	public Logger provideExecutionTraceLogger() {
+		return LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER);
 	}
 
 }

@@ -23,6 +23,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Stage;
 
 /**
  * A test rule that supplies a context for performing
@@ -48,7 +49,9 @@ public class JJAppTest implements TestRule {
 			@Override
 			public void evaluate() throws Throwable {
 				
-				injector = Guice.createInjector(new TestModule(basePath, description));
+				// we use production to eagerly instantiate the graph, since the next line will do
+				// that anyway
+				injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(basePath, description));
 				
 				try {
 					injector.getInstance(JJServerLifecycle.class).start();

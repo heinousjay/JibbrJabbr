@@ -57,15 +57,16 @@ class LogConfigurator implements JJServerListener {
 		// make sure netty logs to our log
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
-		logger.setLevel(Level.OFF);
-		// shutting up the logging in our dependencies by default, except errors
-		((Logger)LoggerFactory.getLogger("com")).setLevel(Level.ERROR);
-		((Logger)LoggerFactory.getLogger("org")).setLevel(Level.ERROR);
+		logger.setLevel(Level.OFF); // start from clean
 		
-		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.WARN : Level.INFO);
+		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.ERROR : Level.ERROR);
+		// logs events specifically related to running inside a JJAppTest
 		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.OFF);
-		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.TRACE);
-		((Logger)LoggerFactory.getLogger("execution trace")).setLevel(Level.TRACE);
+		// the http access log
+		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.OFF);
+		// execution trace logging.  lots of info about the path of execution for interactions
+		// with the system
+		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.TRACE);
 		
 	}
 	

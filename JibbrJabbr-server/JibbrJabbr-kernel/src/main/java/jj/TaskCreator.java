@@ -15,9 +15,6 @@
  */
 package jj;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -28,36 +25,37 @@ import javax.inject.Singleton;
 @Singleton
 public class TaskCreator {
 	
-	private final Logger log = LoggerFactory.getLogger(TaskCreator.class);
+	private static final ThreadLocal<JJRunnable> current = new ThreadLocal<JJRunnable>() {};
 
-	private final ExecutionTraceImpl trace;
+	private final ExecutionTrace trace;
 	
 	@Inject
 	TaskCreator(
-		final ExecutionTraceImpl trace
+		final ExecutionTrace trace
 	) {
 		this.trace = trace;
 	}
 	
 	public Runnable prepareTask(final JJRunnable task) {
 		
-		final ExecutionTraceImpl.State state = task.ignoreInExecutionTrace() ? null : trace.save();
+		final boolean traceLog = !task.ignoreInExecutionTrace(); 
+		if (traceLog) trace.preparingTask(current.get(), task);
 		
 		return new Runnable() {
 			
 			@Override
 			public final void run() {
 				try {
-					if (!task.ignoreInExecutionTrace()) {
-						trace.restore(state);
-						trace.addEvent(task.name());
-					}
+					current.set(task);
+					if (traceLog) trace.startingTask(task);
 					task.run();
+					if (traceLog) trace.taskCompletedSuccessfully(task);
 				} catch (OutOfMemoryError rethrow) {
 					throw rethrow;
 				} catch (Throwable t) {
-					log.error("Problem running a task {}", task.name());
-					log.error("", t);
+					if (traceLog) trace.taskCompletedWithError(task, t);
+				} finally {
+					current.set(null);
 				}
 			}
 		};

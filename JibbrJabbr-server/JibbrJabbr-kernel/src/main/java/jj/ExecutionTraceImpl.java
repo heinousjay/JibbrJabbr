@@ -15,11 +15,14 @@
  */
 package jj;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.logging.ExecutionTraceLogger;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
 import org.webbitserver.WebSocketConnection;
@@ -28,146 +31,142 @@ import org.webbitserver.WebSocketConnection;
  * @author jason
  *
  */
+@Singleton
 class ExecutionTraceImpl implements ExecutionTrace {
 	
-	private static final Logger log = LoggerFactory.getLogger("execution trace");
-	
-	private final static class Event {
-		private final long at = System.currentTimeMillis();
-		private final String description;
-		private final Throwable throwable;
-		
-		private Event(final String description) {
-			this(description, null);
-		}
-		
-		private Event(final String description, final Throwable throwable) {
-			this.description = description;
-			this.throwable = throwable;
-		}
-		
-		@Override
-		public String toString() {
-			return new StringBuilder(description.length() + 30)
-				.append("event at ")
-				.append(DateFormatHelper.basicFormat(at))
-				.append(" - ")
-				.append(description)
-				.append(throwable == null ? "" : " with throwable ")
-				.append(throwable == null ? "" : throwable.getMessage())
-				.toString();
-		}
+	private static final class State {
+		private JJRunnable prepared;
+		private JJRunnable current;
 	}
 	
-	private static final Sequence IDS = new Sequence();
+	private final ThreadLocal<State> current = new ThreadLocal<State>();
+	private final ConcurrentHashMap<JJRunnable, State> currentTracker = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<JJRunnable, State> preparedTracker = new ConcurrentHashMap<>();
 	
-	final static class State {
-		
-		private State() {}
-		
-		private final String id = IDS.next();
-		private final long start = System.currentTimeMillis();
-		private HttpRequest httpRequest;
-		private HttpResponse httpResponse;
-		private final List<Event> events = new ArrayList<>();
-		
-		private void outputEvents(final StringBuilder s) {
-			s.append("Events:\n");
-			for (Event event : events) {
-				s.append("  - ").append(event).append("\n");
-			}
-		}
-		
-		@Override
-		public String toString() {
-			StringBuilder s = new StringBuilder(384)
-				.append("Execution trace [").append(id).append("]")
-				.append("http request started at ")
-				.append(DateFormatHelper.basicFormat(start)).append("\n")
-				.append(httpRequest).append("\n")
-				.append(httpResponse).append("\n");
-			outputEvents(s);
-			return s.toString();
-		}
-	}
+	private final Logger log;
 	
-	private static final ThreadLocal<State> state = new ThreadLocal<ExecutionTraceImpl.State>() {};
-	
-	private void initializeState() {
-		//assert state.get() == null : state.get();
-		//state.set(new State());
-	}
-	
-	State save() {
-		return null;
-//		State s = state.get();
-//		if (s != null) {
-//			log.info("saving {} on {}", s.id, Thread.currentThread().getName());
-//			state.set(null);
-//		} else {
-//			log.info("asked to save but nothing here on {}", Thread.currentThread().getName());
-//			log.info("", new Exception());
-//		}
-//		return s;
-	}
-	
-	void restore(final State s) {
-//		if (s != null) {
-//			log.info("restoring {} on {}", s.id, Thread.currentThread().getName());
-//			assert state.get() == null : state.get();
-//			state.set(s);
-//		} else {
-//			log.info("asked to restore but nothing here on {}", Thread.currentThread().getName());
-//			log.info("", new Exception());
-//		}
+	@Inject
+	ExecutionTraceImpl(final @ExecutionTraceLogger Logger log) {
+		this.log = log;
 	}
 
 	@Override
-	public void addEvent(final String event) {
-//		State s = state.get();
-//		assert s != null;
-//		s.events.add(new Event(event));
-	}
-	
-	@Override
-	public void addEvent(final String event, final Throwable throwable) {
-//		State s = state.get();
-//		assert s != null;
-//		s.events.add(new Event(event, throwable));
+	public void preparingTask(JJRunnable oldTask, JJRunnable newTask) {
+		State state;
+		if (oldTask != null) {
+			log.trace("task [{}] is preparing [{}]", oldTask, newTask);
+			state = currentTracker.get(oldTask);
+			
+			assert state != null : "preparing a JJRunnable from a JJRunnable but no state is in place";
+			assert state.prepared == null : "preparing a JJRunnable but one is already prepared";
+			assert state.current == oldTask : "state data is all screwed up";
+			
+		} else {
+			log.trace("thread [{}] is preparing [{}]", Thread.currentThread().getName(), newTask);
+			
+			assert !currentTracker.containsKey(newTask) : "preparing a JJRunnable from outside but there is already state";
+			
+			state = new State();
+			
+		}
+		state.prepared = newTask;
+		boolean wasAbleToStore = (preparedTracker.putIfAbsent(newTask, state) == null);
+		
+		assert wasAbleToStore : "task [" + newTask + "] had previous prepared state";
 	}
 
-	/**
-	 * @param request
-	 * @param response
-	 */
 	@Override
-	public void start(final HttpRequest request, final HttpResponse response) {
-//		initializeState();
-//		State s = state.get();
-//		log.info("starting {} on {}", s.id, Thread.currentThread().getName());
-//		log.trace("request - {}", request);
-//		s.httpRequest = request;
-//		s.httpResponse = response;
+	public void startingTask(JJRunnable task) {
+		
+		log.trace("starting task [{}]", task);
+		State state = preparedTracker.get(task);
+		
+		assert state != null && state.prepared == task : "starting a task [" + task + "] that wasn't prepared";
+		
+		JJRunnable oldTask = state.current;
+		if (oldTask != null) {
+			boolean removed = currentTracker.remove(oldTask, state);
+			
+			assert removed : "old task [" + task + "] mapping in current tracker was not correct";
+		}
+
+		boolean removed = preparedTracker.remove(task, state);
+		
+		assert removed : "old task [" + task + "] mapping in prepared tracker was not correct";
+		
+		state.current = task;
+		state.prepared = null;
+		
+		currentTracker.putIfAbsent(task, state);
+		assert current.get() == null : "state is already stored in current";
+		current.set(state);
 	}
-	
+
 	@Override
-	public void end(final HttpRequest request) {
-//		State s = state.get();
-//		assert s != null;
-//		state.set(null);
-//		log.info("ending {} on {}", s.id, Thread.currentThread().getName());
-//		log.trace("request - {}", request);
-//		assert s.httpRequest == request;
-//		log.info("{}", s);
+	public void taskCompletedSuccessfully(JJRunnable task) {
+		log.trace("successful completion of task [{}]", task);
+		
+		current.set(null);
+		
+		State state = currentTracker.get(task);
+		assert state != null : "task ended and no state.  que?";
+		if (state.prepared == null) {
+			boolean removed = currentTracker.remove(task, state);
+			assert removed : "something is really whacky here";
+			log.trace("end processing");
+		}
+		
 	}
-	
+
+	@Override
+	public void taskCompletedWithError(JJRunnable task, Throwable error) {
+		
+		log.error("task [{}] completed with error:", task);
+		log.error("", error);
+		
+		current.set(null);
+		
+		State state = currentTracker.get(task);
+		assert state != null : "task ended and no state.  que?";
+		if (state.prepared == null) {
+			boolean removed = currentTracker.remove(task, state);
+			assert removed : "something is really whacky here";
+			log.trace("end processing");
+		}
+		
+	}
+
+	@Override
+	public void start(HttpRequest request, HttpResponse response) {
+		log.trace("Request started {}", request);
+		
+		
+	}
+
+	@Override
+	public void end(HttpRequest request) {
+		log.trace("Request ended {}", request);
+	}
+
 	@Override
 	public void start(WebSocketConnection connection) {
-//		initializeState();
-//		State s = state.get();
-//		log.info("starting {} on {}", s.id, Thread.currentThread().getName());
-//		log.trace("connection - {}", connection);
-//		s.httpRequest = request;
-//		s.httpResponse = response;
+		log.trace("websocket connection started {}", connection);
+	}
+	
+	@Override
+	public void end(WebSocketConnection connection) {
+		log.trace("websocket connection ended {}", connection);
+	}
+	
+	@Override
+	public void message(WebSocketConnection connection, String message) {
+		log.trace("message from websocket connection {}", connection);
+		log.trace(message);
+	}
+	
+	@Override
+	public void send(WebSocketConnection connection, String message) {
+		log.trace("sending on websocket connection {}", connection);
+		log.trace(message);
 	}
 }

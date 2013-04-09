@@ -68,66 +68,30 @@ public class TestingAPITest {
 	
 	@Test
 	public void getLotsOfClients() throws Exception {
-		TestClient index1 = app.get("/index");
-		TestClient index2 = app.get("/files");
-		TestClient index3 = app.get("/index");
-		TestClient index4 = app.get("/files");
-		TestClient index5 = app.get("/index");
-		TestClient index6 = app.get("/files");
-		TestClient index7 = app.get("/index");
-		TestClient index8 = app.get("/files");
-		TestClient index9 = app.get("/index");
-		TestClient index10 = app.get("/files");
-		TestClient index11 = app.get("/index");
-		TestClient index12 = app.get("/files");
+		getLotsOfClients(3);
+	}
+	
+	private boolean getLotsOfClients(final int number) throws Exception {
 		
-		assertThat(index1.status(), is(200));
-		assertThat(index1.contentsString(), is(notNullValue()));
-		assertThat(index1.document().select("title").text(), is("JAYCHAT!"));
+		TestClient[] clients = new TestClient[number * 2];
+		int count = 0;
+		for (int i = 0; i < number; ++i) {
+			clients[count++] = app.get("/index");
+			clients[count++] = app.get("/files");
+		}
 		
-		assertThat(index2.status(), is(200));
-		assertThat(index2.contentsString(), is(notNullValue()));
-		assertThat(index2.document().select("title").text(), is("files test"));
+		count = 0;
+		for (int i = 0; i < number; ++i) {
+			assertThat(clients[count].status(), is(200));
+			assertThat(clients[count].contentsString(), is(notNullValue()));
+			assertThat(clients[count++].document().select("title").text(), is("JAYCHAT!"));
+			
+			assertThat(clients[count].status(), is(200));
+			assertThat(clients[count].contentsString(), is(notNullValue()));
+			assertThat(clients[count++].document().select("title").text(), is("files test"));
+		}
 		
-		assertThat(index3.status(), is(200));
-		assertThat(index3.contentsString(), is(notNullValue()));
-		assertThat(index3.document().select("title").text(), is("JAYCHAT!"));
-		
-		assertThat(index4.status(), is(200));
-		assertThat(index4.contentsString(), is(notNullValue()));
-		assertThat(index4.document().select("title").text(), is("files test"));
-		
-		assertThat(index5.status(), is(200));
-		assertThat(index5.contentsString(), is(notNullValue()));
-		assertThat(index5.document().select("title").text(), is("JAYCHAT!"));
-		
-		assertThat(index6.status(), is(200));
-		assertThat(index6.contentsString(), is(notNullValue()));
-		assertThat(index6.document().select("title").text(), is("files test"));
-		
-		assertThat(index7.status(), is(200));
-		assertThat(index7.contentsString(), is(notNullValue()));
-		assertThat(index7.document().select("title").text(), is("JAYCHAT!"));
-		
-		assertThat(index8.status(), is(200));
-		assertThat(index8.contentsString(), is(notNullValue()));
-		assertThat(index8.document().select("title").text(), is("files test"));
-		
-		assertThat(index9.status(), is(200));
-		assertThat(index9.contentsString(), is(notNullValue()));
-		assertThat(index9.document().select("title").text(), is("JAYCHAT!"));
-		
-		assertThat(index10.status(), is(200));
-		assertThat(index10.contentsString(), is(notNullValue()));
-		assertThat(index10.document().select("title").text(), is("files test"));
-		
-		assertThat(index11.status(), is(200));
-		assertThat(index11.contentsString(), is(notNullValue()));
-		assertThat(index11.document().select("title").text(), is("JAYCHAT!"));
-		
-		assertThat(index12.status(), is(200));
-		assertThat(index12.contentsString(), is(notNullValue()));
-		assertThat(index12.document().select("title").text(), is("files test"));
+		return true;
 	}
 	
 	//@Test
@@ -140,23 +104,23 @@ public class TestingAPITest {
 		final ExecutorService e = Executors.newFixedThreadPool(totalThreads);
 		final long start = System.currentTimeMillis();
 		
-		final Callable<Void> c = new Callable<Void>() {
+		final Callable<Boolean> c = new Callable<Boolean>() {
 			
-			public Void call() throws Exception {
-				getLotsOfClients();
-				return null;
+			public Boolean call() throws Exception {
+				return getLotsOfClients(6);
 			};
 		};
 		
 		@SuppressWarnings("unchecked")
-		Future<Void>[] f = (Future<Void>[]) new Future<?>[totalClients];
+		Future<Boolean>[] f = (Future<Boolean>[]) new Future<?>[totalClients];
 		for (int i = 0; i < totalClients; ++i) {
 			f[i] = e.submit(c);
 		}
 		
+		boolean success = true;
 		try {
 			for (int i = 0; i < totalClients; ++i) {
-				f[i].get();
+				success = f[i].get() && success;
 			}
 		} catch (ExecutionException er) {
 			throw er.getCause();
@@ -164,15 +128,24 @@ public class TestingAPITest {
 			e.shutdownNow();
 		}
 		
+		if (!success) throw new AssertionError("NOT SUCCESS, somehow");
 		
-		System.out.println("loaded " + (totalClients * 8) + " pages in " + (System.currentTimeMillis() - start) + " milliseconds.");
-		System.out.println("starting free " + startingFreeMemory + " total " + startingTotalMemory + " max " + startingMaxMemory);
-		System.out.println("now free " + Runtime.getRuntime().freeMemory() + " total " + Runtime.getRuntime().totalMemory() + " max " + Runtime.getRuntime().maxMemory());
+		
+		System.out.println("loaded " + (totalClients * 12) + " pages in " + (System.currentTimeMillis() - start) + " milliseconds.");
+		System.out.println("free\t" + startingFreeMemory + "\ttotal\t" + startingTotalMemory + "\tmax\t" + startingMaxMemory + " at start");
+		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory());
 		Runtime.getRuntime().gc();
+		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory());
 	}
 	
 	//@Test
 	public void areYouKiddingMePart2() throws Throwable {
+		areYouKiddingMe();
+		System.out.println();
+		System.out.println("the numbers mean something starting here");
+		System.out.println();
+		areYouKiddingMe();
+		areYouKiddingMe();
 		areYouKiddingMe();
 	}
 }

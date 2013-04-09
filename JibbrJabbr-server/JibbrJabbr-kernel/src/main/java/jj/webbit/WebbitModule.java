@@ -24,7 +24,7 @@ public class WebbitModule extends AbstractModule {
 		
 		serverListeners.addBinding().to(WebSocketConnections.class);
 		
-		bind(org.webbitserver.WebSocketHandler.class).to(WebSocketHandler.class);
+		bind(org.webbitserver.WebSocketHandler.class).to(JJWebSocketHandler.class);
 		
 		
 		

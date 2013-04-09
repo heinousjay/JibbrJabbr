@@ -37,7 +37,7 @@ public class MockTaskCreator extends TaskCreator {
 		return new Runnable() {
 			@Override
 			public void run() {
-				log.info("Beginning execution of {}", task.name());
+				log.info("Beginning execution of {}", task);
 				try {
 					task.run();
 				} catch (Exception e) {
@@ -47,7 +47,7 @@ public class MockTaskCreator extends TaskCreator {
 					log.error("Throwable executing a task", t);
 					throw t;
 				} finally {
-					log.info("Ending execution of {}", task.name());
+					log.info("Ending execution of {}", task);
 				}
 			}
 		};

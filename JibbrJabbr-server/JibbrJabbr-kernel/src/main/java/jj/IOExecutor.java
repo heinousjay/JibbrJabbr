@@ -58,7 +58,7 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 			@Override
 			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 				// well.. whatever.  we're about to die bb yeah
-				System.err.println("ran out of room for an i/o task.  OOM error coming shortly!");
+				System.err.println("I/O executor is rejecting tasks. this would be surprising.");
 			}
 		};
 		

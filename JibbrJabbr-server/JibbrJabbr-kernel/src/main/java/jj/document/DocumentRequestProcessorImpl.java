@@ -117,7 +117,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		if (index >= ioFilters.size()) {
 			writeResponse();
 		} else {
-			final String taskName = String.format("DocumentFilter %s", (executors.isIOThread() ? " w/IO" : ""));
+			final String taskName = String.format("DocumentFilter%s", (executors.isIOThread() ? "  w/IO" : ""));
 			Runnable r = executors.prepareTask(new JJRunnable(taskName) {
 				
 				@Override

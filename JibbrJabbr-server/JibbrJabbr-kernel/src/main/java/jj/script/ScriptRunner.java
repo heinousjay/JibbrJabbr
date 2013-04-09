@@ -256,7 +256,7 @@ public class ScriptRunner {
 		final String baseName = requiredModule.baseName();
 		final String identifier = requiredModule.identifier();
 		
-		submit(baseName, new JJRunnable("module script initialization for " + identifier) {
+		submit(baseName, new JJRunnable("module script initialization for [" + identifier + "]") {
 			
 			@Override
 			public void run() throws Exception {
@@ -277,7 +277,7 @@ public class ScriptRunner {
 		final String pendingKey,
 		final Object result
 	) {
-		submit(connection.baseName(), new JJRunnable("resuming continuation on " + connection) {
+		submit(connection.baseName(), new JJRunnable("resuming continuation on [" + connection + "]") {
 			
 			@Override
 			public void run() throws Exception {

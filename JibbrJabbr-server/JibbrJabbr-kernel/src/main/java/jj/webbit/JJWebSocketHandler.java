@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.ExecutionTrace;
 import jj.HttpControlThread;
 import jj.JJExecutors;
 import jj.hostapi.HostEvent;
@@ -27,9 +28,9 @@ import org.webbitserver.WebSocketConnection;
  *
  */
 @Singleton
-class WebSocketHandler extends BaseWebSocketHandler {
+class JJWebSocketHandler extends BaseWebSocketHandler {
 	
-	private Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
+	private Logger log = LoggerFactory.getLogger(JJWebSocketHandler.class);
 	
 	private final ScriptBundleFinder scriptBundleFinder;
 	
@@ -37,18 +38,22 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	
 	private final WebSocketConnections connections;
 	
+	private final ExecutionTrace trace;
+	
 	private final Map<JQueryMessage.Type, WebSocketMessageProcessor> messageProcessors;
 	
 	@Inject
-	WebSocketHandler(
+	JJWebSocketHandler(
 		final ScriptBundleFinder scriptBundleFinder,
 		final JJExecutors executors,
 		final WebSocketConnections connections,
+		final ExecutionTrace trace,
 		final Set<WebSocketMessageProcessor> messageProcessors
 	) {
 		this.scriptBundleFinder = scriptBundleFinder;
 		this.executors = executors;
 		this.connections = connections;
+		this.trace = trace;
 		this.messageProcessors = makeMessageProcessors(messageProcessors);
 	}
 	
@@ -65,10 +70,10 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	@Override
 	@HttpControlThread
 	public void onOpen(WebSocketConnection connection) {
-		
+		trace.start(connection);
 		String uri = connection.httpRequest().uri().substring(1);
 		AssociatedScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
-		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, scriptBundle == null);
+		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, scriptBundle == null, trace);
 		if (jjcon.immediateClosure()) {
 			log.info("connection attempted to an old script, attempting reload");
 			// need some way of noticing we are being hammered here?
@@ -87,7 +92,8 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	@Override
 	@HttpControlThread
 	public void onClose(WebSocketConnection connection) {
-		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false);
+		trace.end(connection);
+		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false, trace);
 		// don't do anything reload command
 		if (!jjcon.immediateClosure()) {
 			executors.scriptRunner().submit(jjcon, HostEvent.clientDisconnected, connection);
@@ -98,11 +104,12 @@ class WebSocketHandler extends BaseWebSocketHandler {
 	@Override
 	@HttpControlThread
 	public void onMessage(WebSocketConnection connection, String msg) throws Throwable {
-		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false);
-		log.trace("received message [{}] on {}", msg, jjcon);
+		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false, trace);
+
 		if ("jj-hi".equals(msg)) {
 			connection.send("jj-yo");
 		} else {
+			trace.message(connection, msg);
 			boolean success = false;
 			
 			try {

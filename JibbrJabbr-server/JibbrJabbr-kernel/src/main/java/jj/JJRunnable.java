@@ -16,11 +16,12 @@ public abstract class JJRunnable {
 	protected boolean ignoreInExecutionTrace() {
 		return false;
 	}
-	
-	public final String name() {
-		return name;
-	}
 
 	public abstract void run() throws Exception;
+	
+	@Override
+	public final String toString() {
+		return name;
+	}
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import jj.DateFormatHelper;
+import jj.ExecutionTrace;
 import jj.jqmessage.JQueryMessage;
 import jj.script.AssociatedScriptBundle;
 
@@ -27,9 +28,12 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	private static final String LAST_ACTIVITY = "last activity";
 	
 	private final Logger log = LoggerFactory.getLogger(JJWebSocketConnection.class);
+	
+	private final ExecutionTrace trace;
 
-	JJWebSocketConnection(final WebSocketConnection connection, final boolean immediateClosure) {
+	JJWebSocketConnection(final WebSocketConnection connection, final boolean immediateClosure, final ExecutionTrace trace) {
 		super(connection);
+		this.trace = trace;
 		if (immediateClosure) {
 			data(IMMEDIATE_CLOSURE, Boolean.TRUE);
 		} else {
@@ -85,7 +89,9 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	
 	public void end() {
 		if (!messages().isEmpty()) {
-			send(serialize());
+			String message = serialize();
+			trace.send(this, message);
+			send(message);
 		}
 	}
 	
@@ -127,10 +133,8 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	@Override
 	public String toString() {
 		return "connection[" +
-			httpRequest().remoteAddress() +
+			httpRequest().uri() +
 			"] started at " +
-			DateFormatHelper.basicFormat(httpRequest().timestamp()) +
-			" with data " +
-			data();
+			DateFormatHelper.basicFormat(httpRequest().timestamp());
 	}
 }

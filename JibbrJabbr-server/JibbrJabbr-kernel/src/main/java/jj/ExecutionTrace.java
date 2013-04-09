@@ -24,11 +24,15 @@ import org.webbitserver.WebSocketConnection;
  *
  */
 public interface ExecutionTrace {
-
-	void addEvent(String event);
-
-	void addEvent(String event, Throwable throwable);
-
+	
+	void preparingTask(JJRunnable oldTask, JJRunnable newTask);
+	
+	void startingTask(JJRunnable task);
+	
+	void taskCompletedSuccessfully(JJRunnable task);
+	
+	void taskCompletedWithError(JJRunnable task, Throwable error);
+	
 	/**
 	 * @param request
 	 * @param response
@@ -38,5 +42,10 @@ public interface ExecutionTrace {
 	void end(HttpRequest request);
 
 	void start(WebSocketConnection connection);
+	
+	void end(WebSocketConnection connection);
 
+	void message(WebSocketConnection connection, String message);
+	
+	void send(WebSocketConnection connection, String message);
 }
