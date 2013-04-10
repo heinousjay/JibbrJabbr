@@ -15,7 +15,11 @@
  */
 package jj.testing;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import jj.JJServerLifecycle;
+import jj.StringUtils;
+
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
@@ -41,7 +45,7 @@ public class JJAppTest implements TestRule {
 	public JJAppTest(final String basePath) {
 		this.basePath = basePath;
 	}
-
+	
 	@Override
 	public Statement apply(final Statement base, final Description description) {
 		
@@ -50,7 +54,12 @@ public class JJAppTest implements TestRule {
 			public void evaluate() throws Throwable {
 				
 				// we use production to eagerly instantiate the graph, since the next line will do
-				// that anyway
+				// that anyway.  might be adding the concept of modules back, simple rules to start -
+				// some derivative of Module in your base package (first directory in the jar that has
+				// classes, and that's about it.  you can inject anything public.  the classloader will
+				// treat jj. just like java. in that it will be off limits?  is this smart? it's
+				// probably better to start restrictive and loosen if needed.  ModuleListener interface
+				// to get a call on start-up
 				injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(basePath, description));
 				
 				try {
@@ -64,12 +73,16 @@ public class JJAppTest implements TestRule {
 		};
 	}
 	
-	public void doSocketConnection(final Document document) throws Exception {
-		get(document.select("script[data-jj-socket-url]").attr("data-jj-socket-url"));
+	public TestClient doSocketConnection(final Document document) throws Exception {
+		String url = document.select("script[data-jj-socket-url]").attr("data-jj-socket-url");
+		assertThat("document doesn't have socket script", StringUtils.isEmpty(url), is(false));
+		TestClient client = get(url);
+		client.dumpObjects();
+		return client;
 	}
 	
 	public TestClient get(final String uri) throws Exception {
-		
+		assertThat("supply a uri pls", uri, is(notNullValue()));
 		TestRunner runner = injector.getInstance(TestRunner.class);
 		
 		runner.request().uri(uri)

@@ -1,4 +1,4 @@
-package jj.script;
+package jj;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
@@ -9,6 +9,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import jj.ScriptExecutorFactory;
 
 import org.junit.Before;
 import org.junit.Test;

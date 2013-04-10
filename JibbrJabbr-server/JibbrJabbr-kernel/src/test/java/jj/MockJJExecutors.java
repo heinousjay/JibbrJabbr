@@ -30,7 +30,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import jj.script.ScriptExecutorFactory;
 import jj.script.ScriptRunner;
 
 /**

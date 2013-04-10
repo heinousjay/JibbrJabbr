@@ -171,4 +171,9 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 			}
 		}));
 	}
+	
+	@Override
+	public String toString() {
+		return httpRequest().uri();
+	}
 }

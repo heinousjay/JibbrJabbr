@@ -6,7 +6,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.ScriptExecutorFactory;
 import jj.script.ScriptRunner;
 
 /**

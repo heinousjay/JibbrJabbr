@@ -13,11 +13,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jj.MockJJExecutors;
+import jj.ScriptExecutorFactory;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
 import jj.resource.Resource;
-import jj.script.ScriptExecutorFactory;
 import jj.webbit.JJHttpRequest;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;

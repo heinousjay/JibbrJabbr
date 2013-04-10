@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJExecutors;
 import jj.JJRunnable;
+import jj.ScriptExecutorFactory;
 import jj.ScriptThread;
 import jj.TaskCreator;
 import jj.document.DocumentRequestProcessor;
@@ -159,7 +160,7 @@ public class ScriptRunner {
 		
 		final String baseName = documentRequestProcessor.baseName();
 		
-		submit(baseName, new JJRunnable("document ready function execution") {
+		submit(baseName, new JJRunnable("document request [" + documentRequestProcessor + "]") {
 
 			@Override
 			public void run() throws Exception {

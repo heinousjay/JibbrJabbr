@@ -41,12 +41,13 @@ public class CoreModule extends JJModule {
 	@Override
 	protected void configure() {
 		
+		// this gets instantiated before anything might write to a log
+		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
+		
 		addServerListenerBinding().to(LogConfigurator.class);
 		addServerListenerBinding().to(IOExecutor.class);
 		addServerListenerBinding().to(HttpControlExecutor.class);
-		
-		// this gets instantiated before anything might write to a log
-		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
+		addServerListenerBinding().to(ScriptExecutorFactory.class);
 		
 		// you want the command line args?  HAVE AT EM
 		bind(String[].class).toInstance(args);
@@ -56,9 +57,11 @@ public class CoreModule extends JJModule {
 		// have to  do something with TaskCreator
 		bind(ExecutionTrace.class).to(ExecutionTraceImpl.class);
 		
-		// a good place to break apart crafty circular dependencies
+		// a good place to break apart crafty circular dependencies.  this is
+		// the most popular object in the system.  for good reason.
 		bind(JJExecutors.class).to(JJExecutorsImpl.class);
 		
+		// and install our little pieces
 		install(new ClientModule());
 		install(new DocumentModule());
 		install(new HostApiModule());

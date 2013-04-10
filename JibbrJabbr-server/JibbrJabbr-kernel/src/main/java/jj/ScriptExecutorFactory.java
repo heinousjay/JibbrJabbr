@@ -1,4 +1,4 @@
-package jj.script;
+package jj;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
@@ -10,11 +10,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class ScriptExecutorFactory {
+public class ScriptExecutorFactory implements JJServerListener {
 	
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
 	
@@ -74,6 +75,16 @@ public class ScriptExecutorFactory {
 	
 	public boolean isScriptThread() {
 		return flag.get() != null;
+	}
+
+	@Override
+	public void start() throws Exception {
+		// nothing to do, nothing to do
+	}
+
+	@Override
+	public void stop() {
+		executor.shutdownNow();
 	}
 
 }

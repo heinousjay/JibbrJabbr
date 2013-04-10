@@ -94,12 +94,12 @@ public class TestingAPITest {
 		return true;
 	}
 	
-	//@Test
+	@Test
 	public void areYouKiddingMe() throws Throwable {
 		final long startingTotalMemory = Runtime.getRuntime().totalMemory();
 		final long startingMaxMemory = Runtime.getRuntime().maxMemory();
 		final long startingFreeMemory = Runtime.getRuntime().freeMemory();
-		final int totalClients = 4800;
+		final int totalClients = 480;
 		final int totalThreads = 12;
 		final ExecutorService e = Executors.newFixedThreadPool(totalThreads);
 		final long start = System.currentTimeMillis();

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.MockTaskCreator;
+import jj.ScriptExecutorFactory;
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
 import jj.resource.ScriptResource;

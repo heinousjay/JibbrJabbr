@@ -37,6 +37,16 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	private static final class State {
 		private JJRunnable prepared;
 		private JJRunnable current;
+		private HttpRequest request;
+		
+		@Override
+		public String toString() {
+			return new StringBuilder()
+				.append("prepared=").append(prepared)
+				.append(",current=").append(current)
+				.append(",request=").append(request)
+				.toString();
+		}
 	}
 	
 	private final ThreadLocal<State> current = new ThreadLocal<State>();
@@ -49,7 +59,7 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	ExecutionTraceImpl(final @ExecutionTraceLogger Logger log) {
 		this.log = log;
 	}
-
+	
 	@Override
 	public void preparingTask(JJRunnable oldTask, JJRunnable newTask) {
 		State state;
@@ -64,17 +74,16 @@ class ExecutionTraceImpl implements ExecutionTrace {
 		} else {
 			log.trace("thread [{}] is preparing [{}]", Thread.currentThread().getName(), newTask);
 			
-			assert !currentTracker.containsKey(newTask) : "preparing a JJRunnable from outside but there is already state";
+			assert !currentTracker.containsKey(newTask) : "preparing a JJRunnable from outside but there is already a current task";
 			
 			state = new State();
-			
 		}
 		state.prepared = newTask;
 		boolean wasAbleToStore = (preparedTracker.putIfAbsent(newTask, state) == null);
 		
 		assert wasAbleToStore : "task [" + newTask + "] had previous prepared state";
 	}
-
+	
 	@Override
 	public void startingTask(JJRunnable task) {
 		
@@ -101,7 +110,7 @@ class ExecutionTraceImpl implements ExecutionTrace {
 		assert current.get() == null : "state is already stored in current";
 		current.set(state);
 	}
-
+	
 	@Override
 	public void taskCompletedSuccessfully(JJRunnable task) {
 		log.trace("successful completion of task [{}]", task);
@@ -115,9 +124,8 @@ class ExecutionTraceImpl implements ExecutionTrace {
 			assert removed : "something is really whacky here";
 			log.trace("end processing");
 		}
-		
 	}
-
+	
 	@Override
 	public void taskCompletedWithError(JJRunnable task, Throwable error) {
 		
@@ -133,16 +141,20 @@ class ExecutionTraceImpl implements ExecutionTrace {
 			assert removed : "something is really whacky here";
 			log.trace("end processing");
 		}
-		
 	}
-
+	
 	@Override
 	public void start(HttpRequest request, HttpResponse response) {
 		log.trace("Request started {}", request);
+		State state = current.get();
+		assert state == null : "somehow there is state left from some previous request " + state;
 		
 		
+		//state = new State();
+		//state.request = request;
+		//current.set(state);
 	}
-
+	
 	@Override
 	public void end(HttpRequest request) {
 		log.trace("Request ended {}", request);
