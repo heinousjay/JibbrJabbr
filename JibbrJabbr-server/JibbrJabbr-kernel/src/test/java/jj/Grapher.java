@@ -29,7 +29,7 @@ public class Grapher {
 
 	public static void main(String[] args) throws Exception {
 
-		graphGood("main.dot", Guice.createInjector(new CoreModule(args, false)));
+		graphGood("target/main.dot", Guice.createInjector(new CoreModule(args, false)));
 	}
 
 	public final static void graphGood(String filename, Injector inj) throws Exception {
@@ -48,7 +48,7 @@ public class Grapher {
 		out = new PrintWriter(file, "UTF-8");
 		String s = baos.toString("UTF-8");
 		s = fixGrapherBugs(s);
-		s = hideClassPaths(s);
+		//s = hideClassPaths(s);
 		out.write(s);
 		out.close();
 
