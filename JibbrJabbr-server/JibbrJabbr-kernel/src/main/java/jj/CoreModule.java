@@ -41,10 +41,8 @@ public class CoreModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		// this gets instantiated before anything might write to a log
-		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
+		install(new LoggingModule(isTest));
 		
-		addServerListenerBinding().to(LogConfigurator.class);
 		addServerListenerBinding().to(IOExecutor.class);
 		addServerListenerBinding().to(HttpControlExecutor.class);
 		addServerListenerBinding().to(ScriptExecutorFactory.class);
@@ -65,7 +63,6 @@ public class CoreModule extends JJModule {
 		install(new ClientModule());
 		install(new DocumentModule());
 		install(new HostApiModule());
-		install(new LoggingModule());
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
 		install(new ServableModule());

@@ -31,9 +31,19 @@ public class LoggingModule extends JJModule {
 	public static final String ACCESS_LOGGER = "access";
 	public static final String TEST_RUNNER_LOGGER = "test runner";
 	public static final String EXECUTION_TRACE_LOGGER = "execution trace";
+	
+	private final boolean isTest;
+	
+	public LoggingModule(final boolean isTest) {
+		this.isTest = isTest;
+	}
 
 	@Override
 	protected void configure() {
+		
+		// this gets instantiated before anything might write to a log
+		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
+		addServerListenerBinding().to(LogConfigurator.class);
 		
 	}
 	

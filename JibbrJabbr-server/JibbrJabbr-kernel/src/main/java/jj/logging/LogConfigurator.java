@@ -1,10 +1,12 @@
-package jj;
+package jj.logging;
 
 import static jj.logging.LoggingModule.*;
 
 import java.util.Iterator;
 
 import javax.inject.Singleton;
+
+import jj.JJServerListener;
 
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
@@ -66,7 +68,7 @@ class LogConfigurator implements JJServerListener {
 		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.OFF);
 		// execution trace logging.  lots of info about the path of execution for interactions
 		// with the system
-		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.TRACE);
+		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.OFF);
 		
 	}
 	
