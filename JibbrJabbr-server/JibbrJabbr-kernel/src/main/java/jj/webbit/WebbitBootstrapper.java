@@ -53,7 +53,7 @@ class WebbitBootstrapper implements JJServerListener {
 					
 					@Override
 					public void uncaughtException(Thread t, Throwable e) {
-						log.error("caught an exception at the bootstrap", e);
+						log.error("caught an exception at the bootstrap!", e);
 					}
 				});
 	}

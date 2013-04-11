@@ -21,7 +21,7 @@ public class ScriptExecutorFactoryImplTest {
 	
 	@Before
 	public void before() {
-		scriptExecutorFactory = new ScriptExecutorFactory();
+		scriptExecutorFactory = new ScriptExecutorFactory(new MockTaskCreator());
 	}
 	
 	@Test

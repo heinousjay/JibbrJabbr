@@ -2,6 +2,7 @@ package jj;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -62,8 +63,12 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 			}
 		};
 		
+	private final TaskCreator creator;
+		
 	@Inject
-	public IOExecutor() {
+	public IOExecutor(
+		final TaskCreator creator
+	) {
 		super(
 			WORKER_COUNT, 
 			WORKER_COUNT,
@@ -73,6 +78,12 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 			threadFactory,
 			rejectedExecutionHandler
 		);
+		this.creator = creator;
+	}
+	
+	@Override
+	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
+		return creator.newTaskFor(runnable, value);
 	}
 
 	@Override

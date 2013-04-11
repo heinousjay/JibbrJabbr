@@ -17,6 +17,7 @@ package jj.client;
 
 import javax.inject.Singleton;
 
+import jj.ClientExecutor;
 import jj.JJModule;
 
 import com.ning.http.client.AsyncHttpClient;
@@ -30,8 +31,6 @@ public class ClientModule extends JJModule {
 	
 	@Override
 	protected void configure() {
-		
-		addServerListenerBinding().to(ClientExecutor.class);
 	
 		bind(AsyncHttpClientConfig.class).toProvider(AsyncHttpClientConfigProvider.class);
 		

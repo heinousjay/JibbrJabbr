@@ -29,10 +29,10 @@ public class Grapher {
 
 	public static void main(String[] args) throws Exception {
 
-		graphGood("target/main.dot", Guice.createInjector(new CoreModule(args, false)));
+		graph("target/main.dot", Guice.createInjector(new CoreModule(args, false)));
 	}
 
-	public final static void graphGood(String filename, Injector inj) throws Exception {
+	public final static void graph(String filename, Injector inj) throws Exception {
 		File file = new File(filename).getAbsoluteFile();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintWriter out = new PrintWriter(baos);
@@ -48,17 +48,10 @@ public class Grapher {
 		out = new PrintWriter(file, "UTF-8");
 		String s = baos.toString("UTF-8");
 		s = fixGrapherBugs(s);
-		//s = hideClassPaths(s);
 		out.write(s);
 		out.close();
 
 		System.out.println("wrote to " + file);
-	}
-
-	public static String hideClassPaths(String s) {
-		s = s.replaceAll("\\w[a-z\\d_\\.]+\\.([A-Z][A-Za-z\\d_]*)", "");
-		s = s.replaceAll("value=[\\w-]+", "random");
-		return s;
 	}
 
 	public static String fixGrapherBugs(String s) {

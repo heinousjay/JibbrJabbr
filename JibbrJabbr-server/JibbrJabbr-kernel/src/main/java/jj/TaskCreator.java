@@ -15,6 +15,14 @@
  */
 package jj;
 
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.RunnableScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -58,7 +66,82 @@ public class TaskCreator {
 					current.set(null);
 				}
 			}
+			
+			@Override
+			public String toString() {
+				return task.toString();
+			}
 		};
+	}
+	
+	public <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
 		
+		return new FutureTask<T>(runnable, value) {
+			@Override
+			public void run() {
+				try {
+					System.err.println("starting task [" + runnable + "]");
+					runnable.run();
+				} finally {
+					System.err.println("ending task [" + runnable + "]");
+				}
+			}
+		};
+	}
+	
+	public <V> RunnableScheduledFuture<V> prepareTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
+		return new RunnableScheduledFuture<V>() {
+
+			@Override
+			public void run() {
+				try {
+					System.err.println("starting task [" + runnable + "]");
+					task.run();
+				} finally {
+					System.err.println("ending task [" + runnable + "]");
+				}
+			}
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return task.cancel(mayInterruptIfRunning);
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return task.isCancelled();
+			}
+
+			@Override
+			public boolean isDone() {
+				return task.isDone();
+			}
+
+			@Override
+			public V get() throws InterruptedException, ExecutionException {
+				return task.get();
+			}
+
+			@Override
+			public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+				return task.get(timeout, unit);
+			}
+
+			@Override
+			public long getDelay(TimeUnit unit) {
+				return task.getDelay(unit);
+			}
+
+			@Override
+			public int compareTo(Delayed o) {
+				return task.compareTo(o);
+			}
+
+			@Override
+			public boolean isPeriodic() {
+				return task.isPeriodic();
+			}
+			
+		};
 	}
 }

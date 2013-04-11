@@ -41,11 +41,13 @@ public class CoreModule extends JJModule {
 	@Override
 	protected void configure() {
 		
+		// we need the logging module to configure our async logger before we do anything that might log
 		install(new LoggingModule(isTest));
 		
 		addServerListenerBinding().to(IOExecutor.class);
 		addServerListenerBinding().to(HttpControlExecutor.class);
 		addServerListenerBinding().to(ScriptExecutorFactory.class);
+		addServerListenerBinding().to(ClientExecutor.class);
 		
 		// you want the command line args?  HAVE AT EM
 		bind(String[].class).toInstance(args);

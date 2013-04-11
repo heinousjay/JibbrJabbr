@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.client;
+package jj;
 
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -24,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerListener;
 
 /**
  * Configures an executor for the client subsystem
@@ -33,9 +33,15 @@ import jj.JJServerListener;
  *
  */
 @Singleton
-class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerListener {
+public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerListener {
 	
-	// reaper the +
+	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
+	
+	public static boolean isClientThread() {
+		return (Boolean.TRUE == flag.get());
+	}
+	
+	// reaper +
 	// half the processors
 	public static final int WORKER_COUNT = 1 + (int)(Runtime.getRuntime().availableProcessors() * 0.5);
 	
@@ -46,10 +52,16 @@ class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerList
 		@Override
 		public Thread newThread(final Runnable r) {
 			final String name = String.format(
-				"JibbrJabbr Client I/O Handler %d", 
+				"JibbrJabbr Http Client I/O Handler %d", 
 				id.incrementAndGet()
 			);
-			Thread thread = new Thread(r, name);
+			Thread thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					flag.set(Boolean.TRUE);
+					r.run();
+				}
+			}, name);
 			thread.setDaemon(true);
 			return thread;
 		}
@@ -64,8 +76,12 @@ class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerList
 			}
 		};
 	
+	private final TaskCreator creator;
+		
 	@Inject
-	ClientExecutor() {
+	ClientExecutor(
+		final TaskCreator creator
+	) {
 		super(
 			1, 
 			threadFactory,
@@ -73,6 +89,12 @@ class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerList
 		);
 		this.setCorePoolSize(WORKER_COUNT);
 		this.setMaximumPoolSize(WORKER_COUNT);
+		this.creator = creator;
+	}
+	
+	@Override
+	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
+		return creator.newTaskFor(runnable, value);
 	}
 
 	@Override

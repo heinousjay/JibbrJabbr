@@ -17,6 +17,8 @@ package jj;
 
 import static org.mockito.Mockito.mock;
 
+import java.util.concurrent.RunnableScheduledFuture;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,5 +53,10 @@ public class MockTaskCreator extends TaskCreator {
 				}
 			}
 		};
+	}
+	
+	@Override
+	public <V> RunnableScheduledFuture<V> prepareTask(Runnable runnable, RunnableScheduledFuture<V> task) {
+		return task;
 	}
 }

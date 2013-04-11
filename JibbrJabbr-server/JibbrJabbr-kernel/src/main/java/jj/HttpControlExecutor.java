@@ -16,6 +16,7 @@
 package jj;
 
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -72,12 +73,22 @@ public class HttpControlExecutor extends ScheduledThreadPoolExecutor implements 
 			}
 		};
 		
+	private final TaskCreator creator;
+		
 	@Inject
-	public HttpControlExecutor() {
+	public HttpControlExecutor(
+		final TaskCreator creator
+	) {
 		super(WORKER_COUNT, threadFactory, rejectedExecutionHandler);
 		setMaximumPoolSize(1);
 		setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 		setRemoveOnCancelPolicy(true);
+		this.creator = creator;
+	}
+	
+	@Override
+	protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable, RunnableScheduledFuture<V> task) {
+		return creator.prepareTask(runnable, task);
 	}
 
 	@Override

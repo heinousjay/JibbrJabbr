@@ -1,6 +1,7 @@
 package jj;
 
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
@@ -56,11 +57,20 @@ public class ScriptExecutorFactory implements JJServerListener {
 		
 	@Inject
 	ScriptExecutorFactory(
+		final TaskCreator creator
 	) {
-		executor = new ScheduledThreadPoolExecutor(1, threadFactory, rejectedExecutionHandler);
-		executor.setMaximumPoolSize(1);
-		executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-		executor.setRemoveOnCancelPolicy(true);
+		executor = new ScheduledThreadPoolExecutor(1, threadFactory, rejectedExecutionHandler) {
+			
+			{
+				setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+				setRemoveOnCancelPolicy(true);
+			}
+			
+			@Override
+			protected <V> RunnableScheduledFuture<V> decorateTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
+				return creator.prepareTask(runnable, task);
+			}
+		};
 	}
 	
 	public ScheduledExecutorService executorFor(String baseName) {
