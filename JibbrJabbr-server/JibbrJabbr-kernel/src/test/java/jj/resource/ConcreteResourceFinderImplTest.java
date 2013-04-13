@@ -82,7 +82,32 @@ public class ConcreteResourceFinderImplTest extends ResourceBase {
 	public void staticResources() throws IOException {
 		
 		//given
+		given(executors.isIOThread()).willReturn(true);
 		ResourceFinderImpl toTest = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
+		
+		
+		// when
+		StaticResource resource1 = toTest.findResource(StaticResource.class, "index.html");
+		
+		// then
+		assertThat(resource1, is(nullValue()));
+		
+		// when
+		StaticResource resource2 = toTest.loadResource(StaticResource.class, "index.html");
+		
+		// then
+		assertThat(resource2, is(notNullValue()));
+		// doesn't get cached
+		assertThat(toTest.findResource(StaticResource.class, "index.html"), is(nullValue()));
+		
+		// when
+		StaticResource resource3 = toTest.loadResource(StaticResource.class, "index.html");
+		
+		// then
+		assertThat(resource3, is(notNullValue()));
+		assertThat(resource2, is(not(sameInstance(resource3))));
+		assertThat(resource2.bytes(), is(resource3.bytes()));
+		
 	}
 
 }
