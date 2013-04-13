@@ -17,7 +17,6 @@ package jj.client;
 
 import javax.inject.Singleton;
 
-import jj.ClientExecutor;
 import jj.JJModule;
 
 import com.ning.http.client.AsyncHttpClient;
