@@ -31,3 +31,4 @@ It likely has massive security holes.  The API is barely specified,
 never mind implemented.  You'd be crazy to use this as anything but
 a toy.
 
+If you try running the tests and you're getting weird errors, make sure you've enabled assertions.
