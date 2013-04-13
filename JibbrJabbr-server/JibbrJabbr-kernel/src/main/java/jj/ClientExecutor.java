@@ -16,7 +16,6 @@
 package jj;
 
 import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
