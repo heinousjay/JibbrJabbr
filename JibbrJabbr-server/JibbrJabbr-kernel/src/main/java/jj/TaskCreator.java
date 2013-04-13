@@ -74,7 +74,11 @@ public class TaskCreator {
 		};
 	}
 	
-	public <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
+	<T> RunnableFuture<T> newIOTask(final Runnable runnable, final T value) {
+		return newTaskFor(runnable, value);
+	}
+	
+	private <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
 		
 		return new FutureTask<T>(runnable, value) {
 			@Override
@@ -89,7 +93,19 @@ public class TaskCreator {
 		};
 	}
 	
-	public <V> RunnableScheduledFuture<V> prepareTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
+	<V> RunnableScheduledFuture<V> newClientTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
+		return prepareTask(runnable, task);
+	}
+	
+	<V> RunnableScheduledFuture<V> newHttpTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
+		return prepareTask(runnable, task);
+	}
+	
+	<V> RunnableScheduledFuture<V> newScriptTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
+		return prepareTask(runnable, task);
+	}
+	
+	private <V> RunnableScheduledFuture<V> prepareTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
 		return new RunnableScheduledFuture<V>() {
 
 			@Override

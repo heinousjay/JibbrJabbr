@@ -68,7 +68,7 @@ public class ScriptExecutorFactory implements JJServerListener {
 			
 			@Override
 			protected <V> RunnableScheduledFuture<V> decorateTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
-				return creator.prepareTask(runnable, task);
+				return creator.newScriptTask(runnable, task);
 			}
 		};
 	}

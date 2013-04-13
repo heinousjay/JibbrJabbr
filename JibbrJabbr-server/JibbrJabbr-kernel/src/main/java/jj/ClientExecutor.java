@@ -17,6 +17,7 @@ package jj;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -93,8 +94,8 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 	}
 	
 	@Override
-	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-		return creator.newTaskFor(runnable, value);
+	protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable, RunnableScheduledFuture<V> task) {
+		return creator.newClientTask(runnable, task);
 	}
 
 	@Override

@@ -83,7 +83,7 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 	
 	@Override
 	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-		return creator.newTaskFor(runnable, value);
+		return creator.newIOTask(runnable, value);
 	}
 
 	@Override

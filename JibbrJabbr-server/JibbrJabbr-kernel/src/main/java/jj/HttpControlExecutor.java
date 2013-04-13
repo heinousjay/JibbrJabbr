@@ -88,7 +88,7 @@ public class HttpControlExecutor extends ScheduledThreadPoolExecutor implements 
 	
 	@Override
 	protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable, RunnableScheduledFuture<V> task) {
-		return creator.prepareTask(runnable, task);
+		return creator.newHttpTask(runnable, task);
 	}
 
 	@Override

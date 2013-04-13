@@ -17,6 +17,8 @@ package jj;
 
 import static org.mockito.Mockito.mock;
 
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.RunnableScheduledFuture;
 
 import org.slf4j.Logger;
@@ -56,7 +58,22 @@ public class MockTaskCreator extends TaskCreator {
 	}
 	
 	@Override
-	public <V> RunnableScheduledFuture<V> prepareTask(Runnable runnable, RunnableScheduledFuture<V> task) {
+	<T> RunnableFuture<T> newIOTask(Runnable runnable, T value) {
+		return new FutureTask<T>(runnable, value);
+	}
+	
+	@Override
+	<V> RunnableScheduledFuture<V> newClientTask(Runnable runnable, RunnableScheduledFuture<V> task) {
+		return task;
+	}
+	
+	@Override
+	<V> RunnableScheduledFuture<V> newHttpTask(Runnable runnable, RunnableScheduledFuture<V> task) {
+		return task;
+	}
+	
+	@Override
+	<V> RunnableScheduledFuture<V> newScriptTask(Runnable runnable, RunnableScheduledFuture<V> task) {
 		return task;
 	}
 }
