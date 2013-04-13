@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document;
  * @author jason
  *
  */
-public interface TestClient {
+public interface TestHttpClient {
 	
 	int status() throws Exception;
 	int status(final long timeout, final TimeUnit unit) throws Exception;

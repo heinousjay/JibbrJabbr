@@ -84,10 +84,8 @@ public class TaskCreator {
 			@Override
 			public void run() {
 				try {
-					System.err.println("starting task [" + runnable + "]");
 					runnable.run();
 				} finally {
-					System.err.println("ending task [" + runnable + "]");
 				}
 			}
 		};
@@ -111,10 +109,8 @@ public class TaskCreator {
 			@Override
 			public void run() {
 				try {
-					System.err.println("starting task [" + runnable + "]");
 					task.run();
 				} finally {
-					System.err.println("ending task [" + runnable + "]");
 				}
 			}
 

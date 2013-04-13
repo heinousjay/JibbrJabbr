@@ -49,7 +49,7 @@ public class TestingAPITest {
 	@Test
 	public void runBasicTest() throws Exception {
 		
-		TestClient index = app.get("/index");
+		TestHttpClient index = app.get("/index");
 		index.dumpObjects();
 		assertThat(index.status(), is(200));
 		index.dumpObjects();
@@ -61,7 +61,7 @@ public class TestingAPITest {
 	@Test
 	public void runNotFoundTest() throws Exception {
 		
-		TestClient client = app.get("/non-existent");
+		TestHttpClient client = app.get("/non-existent");
 		assertThat(client.status(), is(404));
 		
 	}
@@ -73,7 +73,7 @@ public class TestingAPITest {
 	
 	private boolean getLotsOfClients(final int number) throws Exception {
 		
-		TestClient[] clients = new TestClient[number * 2];
+		TestHttpClient[] clients = new TestHttpClient[number * 2];
 		int count = 0;
 		for (int i = 0; i < number; ++i) {
 			clients[count++] = app.get("/index");
@@ -99,7 +99,7 @@ public class TestingAPITest {
 		final long startingTotalMemory = Runtime.getRuntime().totalMemory();
 		final long startingMaxMemory = Runtime.getRuntime().maxMemory();
 		final long startingFreeMemory = Runtime.getRuntime().freeMemory();
-		final int totalClients = 480;
+		final int totalClients = 4800;
 		final int totalThreads = 12;
 		final ExecutorService e = Executors.newFixedThreadPool(totalThreads);
 		final long start = System.currentTimeMillis();
@@ -138,7 +138,7 @@ public class TestingAPITest {
 		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory());
 	}
 	
-	//@Test
+	@Test
 	public void areYouKiddingMePart2() throws Throwable {
 		areYouKiddingMe();
 		System.out.println();

@@ -73,15 +73,15 @@ public class JJAppTest implements TestRule {
 		};
 	}
 	
-	public TestClient doSocketConnection(final Document document) throws Exception {
+	public TestHttpClient doSocketConnection(final Document document) throws Exception {
 		String url = document.select("script[data-jj-socket-url]").attr("data-jj-socket-url");
 		assertThat("document doesn't have socket script", StringUtils.isEmpty(url), is(false));
-		TestClient client = get(url);
+		TestHttpClient client = get(url);
 		client.dumpObjects();
 		return client;
 	}
 	
-	public TestClient get(final String uri) throws Exception {
+	public TestHttpClient get(final String uri) throws Exception {
 		assertThat("supply a uri pls", uri, is(notNullValue()));
 		TestRunner runner = injector.getInstance(TestRunner.class);
 		

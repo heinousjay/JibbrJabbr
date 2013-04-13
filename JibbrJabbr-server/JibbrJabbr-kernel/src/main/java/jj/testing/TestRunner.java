@@ -34,67 +34,79 @@ class TestRunner {
 	
 	private final Logger testRunnerLog;
 	
-	private final class TestClientImpl implements TestClient {
+	private final class TestHttpClientImpl implements TestHttpClient {
 		
 		private final TestHttpResponse response;
 		
-		private TestClientImpl(final TestHttpResponse response) {
+		private TestHttpClientImpl(final TestHttpResponse response) {
 			this.response = response;
+		}
+		
+		private void getResponse() throws Exception {
+			if (response.get()) {
+				
+			}
+		}
+		
+		private void getResponse(final long timeout, final TimeUnit unit) throws Exception {
+			if (response.get(timeout, unit)) {
+				
+			}
 		}
 		
 		@Override
 		public int status() throws Exception {
 			testRunnerLog.trace("status() on {}", response.id());
-			response.get();
+			getResponse();
 			return response.status();
 		};
 		
 		@Override
 		public int status(final long timeout, final TimeUnit unit) throws Exception {
 			testRunnerLog.trace("status({}, {}) on {}", timeout, unit, response.id());
-			response.get(timeout, unit);
+			getResponse(timeout, unit);
 			return response.status();
 		};
 		
 		@Override
 		public Throwable error() throws Exception {
 			testRunnerLog.trace("error() on {}", response.id());
-			response.get();
+			getResponse();
 			return response.error();
 		}
 		
 		@Override
 		public Throwable error(final long timeout, final TimeUnit unit) throws Exception {
 			testRunnerLog.trace("error({}, {}) on {}", timeout, unit, response.id());
-			response.get(timeout, unit);
+			getResponse(timeout, unit);
 			return response.error();
 		}
 		
 		@Override
 		public Map<String, String> headers() throws Exception {
 			testRunnerLog.trace("headers() on {}", response.id());
-			response.get();
+			getResponse();
 			return response.headers();
 		}
 		
 		@Override
 		public Map<String, String> headers(final long timeout, final TimeUnit unit) throws Exception {
 			testRunnerLog.trace("headers({}, {}) on {}", timeout, unit, response.id());
-			response.get(timeout, unit);
+			getResponse(timeout, unit);
 			return response.headers();
 		}
 		
 		@Override
 		public String contentsString() throws Exception {
 			testRunnerLog.trace("contentsString() on {}", response.id());
-			response.get();
+			getResponse();
 			return response.contentsString();
 		}
 
 		@Override
 		public String contentsString(final long timeout, final TimeUnit unit) throws Exception {
 			testRunnerLog.trace("contentsString({}, {}) on {}", timeout, unit, response.id());
-			response.get(timeout, unit);
+			getResponse(timeout, unit);
 			return response.contentsString();
 		}
 
@@ -141,7 +153,7 @@ class TestRunner {
 		return control.request();
 	}
 	
-	TestClient run() {
+	TestHttpClient run() {
 		control.execute(new Runnable() {
 			public void run() {
 				try {
@@ -152,7 +164,7 @@ class TestRunner {
 				}
 			}
 		});
-		return new TestClientImpl(control.response());
+		return new TestHttpClientImpl(control.response());
 	}
 	
 	

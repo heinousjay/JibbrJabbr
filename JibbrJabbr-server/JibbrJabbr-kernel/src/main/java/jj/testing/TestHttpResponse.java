@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -31,6 +32,7 @@ import javax.inject.Inject;
 import jj.ExecutionTrace;
 import jj.JJExecutors;
 import jj.logging.TestRunnerLogger;
+import jj.resource.MimeTypes;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
@@ -56,6 +58,8 @@ class TestHttpResponse extends StubHttpResponse {
 	private final ExecutionTrace trace;
 	
 	private final Logger testRunnerLogger;
+	
+	private final AtomicBoolean gotOnce = new AtomicBoolean(true);
 	
 	@Inject
 	TestHttpResponse(
@@ -134,7 +138,7 @@ class TestHttpResponse extends StubHttpResponse {
 	
 	private void processResponse() {
 
-		if ("text/html; charset=UTF-8".equalsIgnoreCase(header(HttpHeaders.Names.CONTENT_TYPE))) {
+		if (MimeTypes.get("html").equalsIgnoreCase(header(HttpHeaders.Names.CONTENT_TYPE))) {
 			if (!document.compareAndSet(null, Jsoup.parse(contentsString()))) {
 				new AssertionError("document was not null").printStackTrace();
 			}
@@ -145,17 +149,24 @@ class TestHttpResponse extends StubHttpResponse {
 		assert executors.isHttpControlThread();
 	}
 	
-	public void get() throws Exception {
+	/**
+	 * waits until the server has responded, returning true to the first call to this
+	 * method or the timeout version and false to every subsequent call
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean get() throws Exception {
 
-		get(2, SECONDS);
+		return get(2, SECONDS);
 	}
 
-	public void get(long timeout, TimeUnit unit) throws Exception {
+	public boolean get(long timeout, TimeUnit unit) throws Exception {
 		if (!isDone()) {
 			if (!latch.await(timeout, unit)) {
 				throw new TimeoutException("timed out in " + timeout + " " + unit.toString().toLowerCase());
 			}
 		}
+		return gotOnce.getAndSet(false);
 	}
 	
 	@Override
