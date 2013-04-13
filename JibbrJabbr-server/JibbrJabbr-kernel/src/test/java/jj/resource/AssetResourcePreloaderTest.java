@@ -15,19 +15,47 @@
  */
 package jj.resource;
 
-import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.*;
+import jj.MockJJExecutors;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AssetResourcePreloaderTest {
+	
+	MockJJExecutors executors;
+	@Mock ResourceFinder finder;
+	
+	@Before
+	public void before() {
+		executors = new MockJJExecutors();
+	}
 
 	@Test
-	public void test() {
-		// TODO
+	public void test() throws Exception {
+		
+		//given
+		AssetResourcePreloader toTest = new AssetResourcePreloader(finder, executors);
+		
+		//when
+		toTest.start();
+		executors.executor.runUntilIdle();
+		
+		// this test also functions as an asset inventory,
+		verify(finder).loadResource(AssetResource.class, "errors/404.html");
+		verify(finder).loadResource(AssetResource.class, "favicon.ico");
+		verify(finder).loadResource(AssetResource.class, "jquery-1.8.3.min.js");
+		verify(finder).loadResource(AssetResource.class, "socket-connect.js");
+		// which is why we verify no more interactions
+		verifyNoMoreInteractions(finder);
 	}
 
 }
