@@ -36,39 +36,37 @@ class LogConfigurator implements JJServerListener {
 	
 	LogConfigurator(boolean isTest) {
 		
-		if (!isTest) {
-			
-			asyncAppender = new AsyncAppender();
-			asyncAppender.setContext(context);
-			
-			Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
-			while (i.hasNext()) {
-				Appender<ILoggingEvent> appender = i.next();
-				logger.detachAppender(appender);
-				appender.setContext(context);
-				asyncAppender.addAppender(appender);
-			}
-			
-			asyncAppender.start();
-			
-			logger.addAppender(asyncAppender);
-		} else {
-			asyncAppender = null;
+		asyncAppender = new AsyncAppender();
+		asyncAppender.setContext(context);
+		
+		Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
+		while (i.hasNext()) {
+			Appender<ILoggingEvent> appender = i.next();
+			logger.detachAppender(appender);
+			appender.setContext(context);
+			asyncAppender.addAppender(appender);
 		}
+		
+		asyncAppender.start();
+		
+		logger.addAppender(asyncAppender);
 		
 		// make sure netty logs to our log
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
 		logger.setLevel(Level.OFF); // start from clean
 		
-		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.ERROR : Level.ERROR);
+		((Logger)LoggerFactory.getLogger("jj")).setLevel(isTest ? Level.INFO : Level.TRACE);
+		
 		// logs events specifically related to running inside a JJAppTest
 		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.OFF);
+		
 		// the http access log
 		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.OFF);
+		
 		// execution trace logging.  lots of info about the path of execution for interactions
 		// with the system
-		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.OFF);
+		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.INFO);
 		
 	}
 	
