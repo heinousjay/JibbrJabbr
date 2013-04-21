@@ -17,18 +17,65 @@ package jj.hostapi;
 
 import static org.junit.Assert.*;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import jj.JJ;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.EvaluatorException;
 
 /**
  * @author jason
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class RestServiceFunctionTest {
 
+	@Mock RestCallProvider restCallProvider;
+	
+	protected final String scriptName() {
+		return getClass().getSimpleName() + ".js";
+	}
+	
+	protected final String script() throws Exception {
+		Path me = Paths.get(JJ.uri(getClass()));
+		return new String(Files.readAllBytes(me.resolveSibling(scriptName())), StandardCharsets.UTF_8);
+	}
+	
+	protected final RhinoObjectCreator makeHost(final HostObject...hostObjects) {
+		Set<HostObject> result = new HashSet<>();
+		Collections.addAll(result,  hostObjects);
+		return new RhinoObjectCreatorImpl(result);
+	}
+	
+	protected final void basicExecution(final RhinoObjectCreator host) throws Exception {
+		try {
+			host.context().evaluateString(host.global(), script(), scriptName(), 1, null);
+		} catch (EvaluatorException ee) {
+			fail(ee.getMessage());
+		}
+	}
+	
 	@Test
-	public void test() {
+	public void test() throws Exception {
 		
-		RestServiceFunction restServiceFunction;
+		// given
+		RestServiceFunction restServiceFunction = new RestServiceFunction(restCallProvider);
+		
+		RhinoObjectCreator host = makeHost(restServiceFunction);
+		
+		// when
+		basicExecution(host);
+		
 	}
 
 }

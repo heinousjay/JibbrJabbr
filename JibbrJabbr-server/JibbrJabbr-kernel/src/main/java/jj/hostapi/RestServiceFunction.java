@@ -82,7 +82,7 @@ class RestServiceFunction extends BaseFunction implements HostObject {
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		// we always construct a new object
 		if (args.length != 1 || !(args[0] instanceof Scriptable)) {
-			throw new IllegalArgumentException("");
+			throw new IllegalArgumentException("RestService must be created with a configuration object");
 		}
 		Scriptable configuration = (Scriptable)args[0];
 		Scriptable instance = super.createObject(cx, scope);
