@@ -1,1 +1,4 @@
-new RestService();
+new RestService({
+	baseUrl: '',
+	operations: {}
+});
