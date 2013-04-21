@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
@@ -14,13 +15,32 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class RhinoObjectCreatorImpl implements RhinoObjectCreator {
 	
-	private static Context contextInner() {
-		Context context = Context.enter();
-		// always in interpreter mode for continuation support
-		context.setOptimizationLevel(-1);
-		// this should be configurable? maybe not
-		context.setLanguageVersion(Context.VERSION_1_8);
-		return context;
+	private static final class JJContext extends Context {
+		JJContext(final ContextFactory factory) {
+			super(factory);
+		}
+	}
+	
+	private static final class JJContextFactory extends ContextFactory {
+		
+		@Override
+		protected Context makeContext() {
+			Context context = new JJContext(this);
+			// always in interpreter mode for continuation support
+			context.setOptimizationLevel(-1);
+			// this should be configurable? maybe not
+			context.setLanguageVersion(Context.VERSION_1_8);
+			return context;
+		}
+		
+		@Override
+		protected boolean hasFeature(Context cx, int featureIndex) {
+			return (featureIndex == Context.FEATURE_ENHANCED_JAVA_ACCESS) || super.hasFeature(cx, featureIndex);
+		}
+	}
+	
+	static {
+		ContextFactory.initGlobal(new JJContextFactory());
 	}
 	
 	private final ScriptableObject global;
@@ -29,7 +49,7 @@ public class RhinoObjectCreatorImpl implements RhinoObjectCreator {
 	
 	@Inject
 	RhinoObjectCreatorImpl(final Set<HostObject> hostObjects) {
-		Context context = contextInner();
+		Context context = Context.enter();
 		try {
 			global = initializeGlobalScope(context, hostObjects);
 		} finally {
@@ -38,7 +58,7 @@ public class RhinoObjectCreatorImpl implements RhinoObjectCreator {
 	}
 
 	public Context context() {
-		return contextInner();
+		return Context.enter();
 	}
 
 	public ScriptableObject global() {

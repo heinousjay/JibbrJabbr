@@ -29,18 +29,18 @@ function inspectObject(theObject, depth, indent) {
 ﻿  }
 ﻿  
 ﻿  if (theObject === null) {
-﻿  ﻿  project.log(indent + "null");
+﻿  ﻿  java.lang.System.out.println(indent + "null");
 ﻿  ﻿  return;
 ﻿  }
 ﻿  if (typeof theObject === "undefined") {
-﻿  ﻿  project.log(indent + "undefined");
+﻿  ﻿  java.lang.System.out.println(indent + "undefined");
 ﻿  ﻿  return;
 ﻿  }
 ﻿  
 ﻿  if (theObject.getClass) {
-﻿  ﻿  project.log(indent + theObject.getClass() + " =>");
+﻿  ﻿  java.lang.System.out.println(indent + theObject.getClass() + " =>");
 ﻿  } else {
-﻿  ﻿  project.log(indent + getConstructorNameFor(theObject) + " =>");
+﻿  ﻿  java.lang.System.out.println(indent + getConstructorNameFor(theObject) + " =>");
 ﻿  }
 ﻿  
 ﻿  indent += "  ";
@@ -62,7 +62,7 @@ function inspectObject(theObject, depth, indent) {
 ﻿  ﻿  ﻿  output += typeOfW;
 ﻿  ﻿  }
 
-﻿  ﻿  project.log(output);
+﻿  ﻿  java.lang.System.out.println(output);
 ﻿  ﻿  
 ﻿  ﻿  if (typeOfW === "object" && depth) {
 ﻿  ﻿  ﻿  inspectObject(theObject[w], depth, indent + "  ");

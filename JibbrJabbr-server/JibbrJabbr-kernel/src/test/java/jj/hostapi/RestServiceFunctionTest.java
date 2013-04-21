@@ -15,7 +15,7 @@
  */
 package jj.hostapi;
 
-import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.*;
 
 
 
@@ -43,6 +43,8 @@ public class RestServiceFunctionTest extends AbstractHostApiTest {
 		
 		// when
 		basicExecution(host);
+		
+		verify(restCallProvider).createRestCall(any(RestCallOptions.class));
 		
 	}
 

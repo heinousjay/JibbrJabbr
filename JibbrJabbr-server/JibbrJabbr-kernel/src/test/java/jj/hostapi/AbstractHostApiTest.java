@@ -15,7 +15,7 @@
  */
 package jj.hostapi;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,13 +27,74 @@ import java.util.Set;
 
 import jj.JJ;
 
+import org.mozilla.javascript.BaseFunction;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.Scriptable;
 
 /**
+ * provides basic utilities for building a test against an
+ * API provider
+ * 
  * @author jason
  *
  */
 abstract class AbstractHostApiTest {
+	
+	private static final String RHINO_UNIT = "rhinoUnitUtil.js";
+	
+	private final String rhinoUnit() throws Exception {
+		Path me = Paths.get(JJ.uri(AbstractHostApiTest.class));
+		return script(me.resolveSibling(RHINO_UNIT));
+	}
+	
+	private final class RhinoUnitHostObject extends BaseFunction implements HostObject, ContributesScript {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public String script() {
+			try {
+				return rhinoUnit();
+			} catch (Exception e) {
+				throw new AssertionError("tests are not in order!", e);
+			}
+		}
+		
+		@Override
+		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+			throw new AssertionError("not a callable function, just a hack");
+		}
+
+		@Override
+		public String name() {
+			return RHINO_UNIT;
+		}
+
+		@Override
+		public boolean constant() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean readonly() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean permanent() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean dontenum() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+	}
 
 	protected final String scriptName() {
 		return getClass().getSimpleName() + ".js";
@@ -48,10 +109,11 @@ abstract class AbstractHostApiTest {
 		return new String(Files.readAllBytes(scriptPath), StandardCharsets.UTF_8);
 	}
 
-	protected final RhinoObjectCreator makeHost(final HostObject...hostObjects) {
-		Set<HostObject> result = new HashSet<>();
-		Collections.addAll(result,  hostObjects);
-		return new RhinoObjectCreatorImpl(result);
+	protected final RhinoObjectCreator makeHost(final HostObject...hostObjects) throws Exception {
+		Set<HostObject> hostObjectSet = new HashSet<>();
+		Collections.addAll(hostObjectSet,  hostObjects);
+		hostObjectSet.add(new RhinoUnitHostObject());
+		return new RhinoObjectCreatorImpl(hostObjectSet);
 	}
 
 	protected final void basicExecution(final RhinoObjectCreator host) throws Exception {
