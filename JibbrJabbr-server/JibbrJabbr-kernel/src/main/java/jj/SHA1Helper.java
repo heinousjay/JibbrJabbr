@@ -19,8 +19,7 @@ public class SHA1Helper {
 			try {
 				return MessageDigest.getInstance("SHA-1");
 			} catch (NoSuchAlgorithmException e) {
-				// can't happen
-				return null;
+				throw new AssertionError("couldn't make a MessageDigest", e);
 			}
 		}
 	};
