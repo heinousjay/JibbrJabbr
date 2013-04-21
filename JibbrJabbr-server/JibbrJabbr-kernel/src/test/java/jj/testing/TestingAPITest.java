@@ -94,7 +94,7 @@ public class TestingAPITest {
 		return true;
 	}
 	
-	@Test
+	//@Test
 	public void areYouKiddingMe() throws Throwable {
 		final long startingTotalMemory = Runtime.getRuntime().totalMemory();
 		final long startingMaxMemory = Runtime.getRuntime().maxMemory();
@@ -138,7 +138,7 @@ public class TestingAPITest {
 		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory());
 	}
 	
-	@Test
+	//@Test
 	public void areYouKiddingMePart2() throws Throwable {
 		areYouKiddingMe();
 		System.out.println();
