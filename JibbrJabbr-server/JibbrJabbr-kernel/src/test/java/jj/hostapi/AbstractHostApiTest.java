@@ -45,7 +45,7 @@ abstract class AbstractHostApiTest {
 	
 	private final String rhinoUnit() throws Exception {
 		Path me = Paths.get(JJ.uri(AbstractHostApiTest.class));
-		return script(me.resolveSibling(RHINO_UNIT));
+		return readPath(me.resolveSibling(RHINO_UNIT));
 	}
 	
 	private final class RhinoUnitHostObject extends BaseFunction implements HostObject, ContributesScript {
@@ -102,10 +102,10 @@ abstract class AbstractHostApiTest {
 
 	protected final String script() throws Exception {
 		Path me = Paths.get(JJ.uri(getClass()));
-		return script(me.resolveSibling(scriptName()));
+		return readPath(me.resolveSibling(scriptName()));
 	}
 
-	protected final String script(final Path scriptPath) throws Exception {
+	protected final String readPath(final Path scriptPath) throws Exception {
 		return new String(Files.readAllBytes(scriptPath), StandardCharsets.UTF_8);
 	}
 
