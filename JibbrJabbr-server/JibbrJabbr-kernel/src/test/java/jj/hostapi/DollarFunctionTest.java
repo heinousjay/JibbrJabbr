@@ -15,7 +15,6 @@
  */
 package jj.hostapi;
 
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 
 import java.nio.file.Path;
