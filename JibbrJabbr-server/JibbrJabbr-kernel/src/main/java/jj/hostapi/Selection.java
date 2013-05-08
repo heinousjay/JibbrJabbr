@@ -8,7 +8,7 @@ import org.mozilla.javascript.Callable;
  * @author jason
  *
  */
-public interface Selection {
+interface Selection {
 	
 	/**
 	 * The selector that created this selection

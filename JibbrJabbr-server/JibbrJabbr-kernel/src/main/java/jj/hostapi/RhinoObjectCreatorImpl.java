@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class RhinoObjectCreatorImpl implements RhinoObjectCreator {
+class RhinoObjectCreatorImpl implements RhinoObjectCreator {
 	
 	private static final class JJContext extends Context {
 		JJContext(final ContextFactory factory) {

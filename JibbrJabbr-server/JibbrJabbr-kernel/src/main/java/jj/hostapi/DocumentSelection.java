@@ -17,7 +17,7 @@ import org.mozilla.javascript.Callable;
  * @author jason
  *
  */
-public class DocumentSelection implements Selection {
+class DocumentSelection implements Selection {
 	
 	
 	private final Elements elements;

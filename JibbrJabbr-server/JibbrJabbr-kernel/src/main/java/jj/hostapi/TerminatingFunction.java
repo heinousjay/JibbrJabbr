@@ -25,7 +25,7 @@ import jj.script.CurrentScriptContext;
  *
  */
 @Singleton
-public class TerminatingFunction extends EventRegistrationFunction {
+class TerminatingFunction extends EventRegistrationFunction {
 
 	/**  */
 	private static final long serialVersionUID = 1L;

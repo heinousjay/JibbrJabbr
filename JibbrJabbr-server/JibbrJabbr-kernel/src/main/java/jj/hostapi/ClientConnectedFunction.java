@@ -25,7 +25,7 @@ import jj.script.CurrentScriptContext;
  *
  */
 @Singleton
-public class ClientConnectedFunction extends EventRegistrationFunction {
+class ClientConnectedFunction extends EventRegistrationFunction {
 
 	/**  */
 	private static final long serialVersionUID = 1L;
