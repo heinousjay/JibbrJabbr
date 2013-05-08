@@ -52,5 +52,7 @@ public class DollarFunctionTest extends AbstractHostApiTest {
 		RhinoObjectCreator host = makeHost(new DollarFunction(context));
 		basicExecution(host);
 	}
+	
+	private void finish_this_test() {}
 
 }

@@ -123,5 +123,4 @@ abstract class AbstractHostApiTest {
 			fail(ee.getMessage());
 		}
 	}
-
 }
