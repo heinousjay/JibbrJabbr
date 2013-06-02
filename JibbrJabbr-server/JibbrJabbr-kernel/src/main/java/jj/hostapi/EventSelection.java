@@ -36,6 +36,27 @@ public class EventSelection implements Selection {
 	}
 	
 	@Override
+	public Selection hide() {
+		verifyContext("hide a selection");
+		context.connection().send(JQueryMessage.makeSet(this.selector, "hide", null));
+		return this;
+	}
+
+	@Override
+	public Selection hide(final String duration) {
+		verifyContext("hide a selection");
+		context.connection().send(JQueryMessage.makeSet(this.selector, "hide", duration));
+		return this;
+	}
+
+	@Override
+	public Selection show() {
+		verifyContext("show a selection");
+		context.connection().send(JQueryMessage.makeSet(this.selector, "show", null));
+		return this;
+	}
+	
+	@Override
 	public Selection on(String type, Callable function) {
 		return on(type, "", function);
 	}
@@ -45,6 +66,18 @@ public class EventSelection implements Selection {
 		verifyContext("bind an event");
 		context.connection().send(JQueryMessage.makeBind(this.selector, selector, type));
 		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
+		return this;
+	}
+	
+	public Selection off(String type, Callable function) {
+		return off(type, "", function);
+	}
+	
+	public Selection off(String type, String selector, Callable function) {
+		verifyContext("unbind an event");
+		if (context.associatedScriptBundle().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type), function)) {
+			context.connection().send(JQueryMessage.makeUnbind(this.selector, selector, type));
+		}
 		return this;
 	}
 	
@@ -73,6 +106,11 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection enter(Callable function) {
 		return on("enter", function);
+	}
+	
+	public String data(String key) {
+		verifyContext("get data");
+		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "data", key));
 	}
 
 	@Override

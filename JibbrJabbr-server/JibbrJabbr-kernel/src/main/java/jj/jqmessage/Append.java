@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * <p>
  * Message from server to client to append an element
  * set identified by the selector passed in child to the
- * element set identifed by the selector passed in parent.
+ * element set identified by the selector passed in parent.
  * </p>
  * <p>
  * No response expected.

@@ -68,6 +68,8 @@ interface Selection {
 	 */
 	Selection enter(Callable function);
 
+	String data(String key);
+	
 	/**
 	 * Sets the given data value under the given data key to all matched elements
 	 * @param key
@@ -332,5 +334,15 @@ interface Selection {
 	 @return The last matched element, or <code>null</code> if contents is empty.
 	 */
 	Element last();
+	
+	/**
+	 * hides the selected element
+	 * @return
+	 */
+	Selection hide();
+	
+	Selection hide(String duration);
+	
+	Selection show();
 
 }

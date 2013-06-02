@@ -41,6 +41,21 @@ class DocumentSelection implements Selection {
 		return selector;
 	}
 	
+	@Override
+	public Selection hide() {
+		throw new AbstractMethodError();
+	}
+
+	@Override
+	public Selection hide(final String duration) {
+		throw new AbstractMethodError();
+	}
+
+	@Override
+	public Selection show() {
+		throw new AbstractMethodError();
+	}
+	
 	// -- Events
 	@Override
 	public Selection on(final String type, final Callable function) {

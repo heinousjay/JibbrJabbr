@@ -322,21 +322,34 @@ jQuery(function($) {
 			return id;
 		};
 		
+		function determineEventConfig(binding) {
+			var context = 'context' in binding ? $(binding.context) : $(document);
+			var eventName = binding.type;
+			var handler = sendEvent;
+			var proxy = eventProxies[eventName];
+			if (proxy) {
+				eventName = proxy.as;
+				handler = proxy.handler;
+			}
+			return {
+				context: context,
+				name: eventName + '.jj',
+				handler: handler
+			};
+		}
+		
 		var messageProcessors = {
 			'bind': function(binding) {
-				var context = 'context' in binding ? $(binding.context) : $(document);
-				var eventName = binding.type;
-				var handler = sendEvent;
-				var proxy = eventProxies[eventName];
-				if (proxy) {
-					eventName = proxy.as;
-					handler = proxy.handler;
-				}
 				var data = {
 					selector: binding.selector || '',
 					context: binding.context || ''
 				};
-				context.on(eventName + '.jj', binding.selector, data, handler);
+				var eventConfig = determineEventConfig(binding);
+				eventConfig.context.on(eventConfig.name, binding.selector, data, eventConfig.handler);
+			},
+			'unbind': function(unbinding) {
+				var eventConfig = determineEventConfig(unbinding);
+				eventConfig.context.off(eventConfig.name, unbinding.selector, eventConfig.handler);
 			},
 			'get': function(get) {
 				if ('name' in get) {
@@ -427,7 +440,7 @@ jQuery(function($) {
 						selector: event.data.selector,
 						context: event.data.context,
 						which: event.which,
-						target: '#' + target.attr('id') || idify(target)
+						target: '#' + (target.attr('id') || idify(target))
 					}
 				};
 			send(toSend);

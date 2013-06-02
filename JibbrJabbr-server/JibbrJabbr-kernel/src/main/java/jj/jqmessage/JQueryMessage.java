@@ -57,7 +57,9 @@ public class JQueryMessage {
 		/** server --> client setter invocation */
 		Set,
 		/** server --> client request to store information on the client */
-		Store;
+		Store,
+		/** server --> client event unbinding request */
+		Unbind;
 	}
 	
 	private static Sequence ids = new Sequence();
@@ -168,6 +170,17 @@ public class JQueryMessage {
 		return result;
 	}
 	
+
+	
+	public static JQueryMessage makeUnbind(String context, String selector, String type) {
+		assert !isEmpty(type) : "unbind message requires type";
+		JQueryMessage result = new JQueryMessage(Unbind);
+		result.unbind().context = context;
+		result.unbind().selector = selector;
+		result.unbind().type = type;
+		return result;
+	}
+	
 	JQueryMessage() {}
 	
 	JQueryMessage(final Type type) {
@@ -198,6 +211,9 @@ public class JQueryMessage {
 			break;
 		case Store:
 			message = new Store();
+			break;
+		case Unbind:
+			message = new Unbind();
 			break;
 		default:
 			throw new AssertionError("can't create a JQueryMessage of type " + type);
@@ -295,6 +311,11 @@ public class JQueryMessage {
 	@JsonProperty
 	public Invoke call() {
 		return (Invoke)(type == Call ? message : null);
+	}
+	
+	@JsonProperty
+	public Unbind unbind() {
+		return (Unbind)(type == Unbind ? message : null);
 	}
 	
 	public String toString() {

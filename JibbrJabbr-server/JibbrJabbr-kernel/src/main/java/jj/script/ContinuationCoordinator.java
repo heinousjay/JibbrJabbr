@@ -38,6 +38,24 @@ class ContinuationCoordinator {
 		this.currentScriptContext = currentScriptContext;
 	}
 	
+	private void log(final RhinoException re) {
+		if (log.isErrorEnabled()) {
+			StringBuilder sb = new StringBuilder("trouble executing a script")
+				.append(re.sourceName())
+				.append("\n============== BEGIN SCRIPT TRACE ==============\n")
+				.append(re.getMessage());
+			for (ScriptStackElement sse : re.getScriptStack()) {
+				sb.append('\n').append(sse);
+			}
+			sb.append("\n==============  END SCRIPT TRACE  ==============\n");
+			log.error("{}", sb);
+		}
+	}
+	
+	private void log(final Exception e, final ScriptBundle scriptBundle) {
+		log.error("unexpected problem during script execution {}", scriptBundle);
+		log.error("", e);
+	} 
 	/**
 	 * initial execution of a script
 	 * @param scriptBundle
@@ -58,14 +76,9 @@ class ContinuationCoordinator {
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
 		} catch (RhinoException re) {
-			log.error("trouble executing a script {}", re.sourceName());
-			log.error("{}", re.getMessage());
-			for (ScriptStackElement sse : re.getScriptStack()) {
-				log.error("{}", sse);
-			}
+			log(re);
 		} catch (Exception e) {
-			log.error("unexpected problem during script execution {}", scriptBundle);
-			log.error("", e);
+			log(e, scriptBundle);
 		} finally {
 			Context.exit();
 		}
@@ -93,14 +106,9 @@ class ContinuationCoordinator {
 			} catch (ContinuationPending continuation) {
 				return extractContinuationState(continuation);
 			} catch (RhinoException re) {
-				log.error("trouble executing a script {}", re.sourceName());
-				log.error("{}", re.getMessage());
-				for (ScriptStackElement sse : re.getScriptStack()) {
-					log.error("{}", sse);
-				}
+				log(re);
 			} catch (Exception e) {
-				log.error("unexpected problem during script execution {}", scriptBundle);
-				log.error("", e);
+				log(e, scriptBundle);
 			} finally {
 				Context.exit();
 			}	
@@ -129,14 +137,9 @@ class ContinuationCoordinator {
 		} catch (ContinuationPending nextContinuation) {
 			return extractContinuationState(nextContinuation);
 		} catch (RhinoException re) {
-			log.error("trouble executing a script {}", re.sourceName());
-			log.error("{}", re.getMessage());
-			for (ScriptStackElement sse : re.getScriptStack()) {
-				log.error("{}", sse);
-			}
+			log(re);
 		} catch (Exception e) {
-			log.error("unexpected problem during script execution {}", scriptBundle);
-			log.error("", e);
+			log(e, scriptBundle);
 		} finally {
 			Context.exit();
 		}
