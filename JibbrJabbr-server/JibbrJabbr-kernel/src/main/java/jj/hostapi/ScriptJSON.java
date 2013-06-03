@@ -29,9 +29,13 @@ public class ScriptJSON {
 		this.rhinoObjectCreator = rhinoObjectCreator;
 	}
 	
+	private String emptyOrInput(final String input) {
+		return input == null ? "" : input;
+	}
+	
 	public Object parse(final String input) {
 		// need to do some serious quote replacement
-		String escaped = input.trim().replace("'", "\\'").replace("\"", "\\\"");
+		String escaped = emptyOrInput(input).trim().replace("'", "\\'").replace("\"", "\\\"");
 		Context context = rhinoObjectCreator.context();
 		try {
 			return context.evaluateString(
