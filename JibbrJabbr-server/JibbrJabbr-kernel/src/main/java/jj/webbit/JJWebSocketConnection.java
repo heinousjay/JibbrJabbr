@@ -42,11 +42,11 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	}
 	
 	void markActivity() {
-		data(LAST_ACTIVITY, System.currentTimeMillis());
+		data().put(LAST_ACTIVITY, System.currentTimeMillis());
 	}
 	
 	long lastActivity() {
-		return (long)data(LAST_ACTIVITY);
+		return (long)data().get(LAST_ACTIVITY);
 	}
 	
 	boolean immediateClosure() {
@@ -82,7 +82,8 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	
 	@Override
 	public JJWebSocketConnection send(String message) {
-		log.trace("sending [{}] on {}", message, this);
+		markActivity();
+		log.trace("sending {} on {}", message, this);
 		super.send(message);
 		return this;
 	}

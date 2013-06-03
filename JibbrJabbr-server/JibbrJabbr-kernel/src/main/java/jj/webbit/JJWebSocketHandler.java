@@ -105,7 +105,7 @@ class JJWebSocketHandler extends BaseWebSocketHandler {
 	@HttpControlThread
 	public void onMessage(WebSocketConnection connection, String msg) throws Throwable {
 		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false, trace);
-
+		jjcon.markActivity();
 		if ("jj-hi".equals(msg)) {
 			connection.send("jj-yo");
 		} else {

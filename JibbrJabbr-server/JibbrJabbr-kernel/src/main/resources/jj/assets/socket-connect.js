@@ -201,7 +201,7 @@ jQuery(function($) {
 							console.debug("pong");
 							ponged = false;
 							state = PongReceived;
-							future = setTimeout(doHeartbeat, heartbeatTimeout);
+							heartbeatId = setTimeout(doHeartbeat, heartbeatTimeout);
 						} else {
 							console.debug("no pong from server.  uh oh");
 						}
