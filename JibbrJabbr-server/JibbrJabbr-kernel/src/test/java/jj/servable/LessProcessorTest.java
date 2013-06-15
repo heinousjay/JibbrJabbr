@@ -58,7 +58,7 @@ public class LessProcessorTest {
 	public void testBasicProcessing() throws IOException {
 		
 		String output = underTest.process("test.less");
-		
+		// System.out.println(output);
 		// we don't so much care that less does what less does
 		// as we care that it worked.
 		assertThat(output, is(testCss));

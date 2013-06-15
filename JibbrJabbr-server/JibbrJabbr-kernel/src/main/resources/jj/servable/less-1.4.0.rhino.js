@@ -3973,6 +3973,7 @@ tree.debugInfo = function(env, ctx) {
                 result = tree.debugInfo.asComment(ctx);
                 break;
             case 'mediaquery':
+            case 'mediaQuery': // as per instructions!
                 result = tree.debugInfo.asMediaQuery(ctx);
                 break;
             case 'all':
@@ -4008,7 +4009,6 @@ tree.jsify = function (obj) {
 };
 
 })(require('./tree'));
-var name;
 
 function loadStyleSheet(sheet, callback, reload, remaining) {
     var endOfPath = Math.max(name().lastIndexOf('/'), name().lastIndexOf('\\')),
@@ -4038,7 +4038,7 @@ function print(arg) {
 	java.lang.System.out.println(arg);
 }
 
-function runLess(baseName, compress) {
+function runLess(baseName) {
 	name(baseName);
 	var input = readFile(baseName);
 	if (!input) {
@@ -4048,12 +4048,14 @@ function runLess(baseName, compress) {
 
 	var result;
     try {
-        var parser = new less.Parser();
+    	var options = lessOptions();
+    	options.filename = baseName;
+        var parser = new less.Parser(options);
         parser.parse(input, function (e, root) {
             if (e) {
                 error(e, baseName);
             } else {
-                result = root.toCSS({compress: compress || false});
+                result = root.toCSS({compress: options.compress || false});
             }
         });
     }

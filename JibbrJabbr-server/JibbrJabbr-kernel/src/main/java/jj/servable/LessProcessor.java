@@ -88,7 +88,19 @@ class LessProcessor {
 			}
 			return name.get();
 		}
+	}
+	
+	private class LessOptionsFunction extends BaseFunction {
 		
+		private static final long serialVersionUID = -1L;
+		
+		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+			
+			Scriptable object = cx.newObject(scope);
+			//object.put("dumpLineNumbers", object, "all");
+			//object.put("compress", object, true);
+			return object;
+		}
 	}
 
 	private final ScriptableObject global;
@@ -126,6 +138,7 @@ class LessProcessor {
 			ScriptableObject global = context.initStandardObjects(null, true);
 			global.defineProperty("readFile", new ReadFileFunction(configuration.basePath()), ScriptableObject.EMPTY);
 			global.defineProperty("name", new NameFunction(), ScriptableObject.EMPTY);
+			global.defineProperty("lessOptions", new LessOptionsFunction(), ScriptableObject.EMPTY);
 			context.evaluateString(global, lessScript(), SCRIPT_NAME, 1, null);
 			global.sealObject();
 			return global;
