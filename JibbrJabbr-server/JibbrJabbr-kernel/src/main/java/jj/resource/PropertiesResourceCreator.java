@@ -1,7 +1,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -12,12 +11,10 @@ import jj.configuration.Configuration;
 @Singleton
 class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
 
-	private final URI baseUri;
 	private final Path basePath;
 	
 	@Inject
 	PropertiesResourceCreator(final Configuration configuration) {
-		this.baseUri = configuration.baseUri();
 		this.basePath = configuration.basePath();
 	}
 	
@@ -26,9 +23,6 @@ class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
 		return PropertiesResource.class;
 	}
 
-	/**
-	 * the args can 
-	 */
 	@Override
 	public Path toPath(String baseName, Object... args) {
 		return basePath.resolve(baseName + ".properties");
@@ -36,7 +30,7 @@ class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
 
 	@Override
 	public PropertiesResource create(String baseName, Object... args) throws IOException {
-		return new PropertiesResource(baseUri, basePath, baseName);
+		return new PropertiesResource(basePath, baseName);
 	}
 
 }

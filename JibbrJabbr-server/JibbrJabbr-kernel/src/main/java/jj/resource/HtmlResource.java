@@ -3,7 +3,6 @@ package jj.resource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
@@ -21,7 +20,6 @@ import org.jsoup.parser.Parser;
 public class HtmlResource extends AbstractFileResource {
 
 	private final String uri;
-	private final String absoluteUri;
 	private final Document document;
 	
 	/**
@@ -31,27 +29,18 @@ public class HtmlResource extends AbstractFileResource {
 	 */
 	@IOThread
 	HtmlResource(
-		final URI absoluteUri,
+		final String baseName,
 		final Path path
 	) throws IOException {
-		super(extractBaseName(absoluteUri.toString()), path);
-		this.uri = absoluteUri.getPath();
-		this.absoluteUri = absoluteUri.toString();
+		super(baseName, path);
+		this.uri = baseName;
 		String html = UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
-		this.document = Parser.htmlParser().parseInput(html, this.absoluteUri);
-	}
-	
-	private static String extractBaseName(final String absoluteUri) {
-		return absoluteUri.substring(absoluteUri.indexOf('/', absoluteUri.indexOf("//") + 2) + 1);
+		this.document = Parser.htmlParser().parseInput(html, baseName);
 	}
 	
 	@Override
 	public String uri() {
 		return uri;
-	}
-	
-	public String absoluteUri() {
-		return absoluteUri;
 	}
 	
 	public Document document() {

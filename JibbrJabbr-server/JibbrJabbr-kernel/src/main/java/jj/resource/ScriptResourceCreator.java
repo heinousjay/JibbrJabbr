@@ -1,7 +1,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -12,12 +11,10 @@ import jj.configuration.Configuration;
 @Singleton
 class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 
-	private final URI baseUri;
 	private final Path basePath;
 	
 	@Inject
 	ScriptResourceCreator(final Configuration configuration) {
-		this.baseUri = configuration.baseUri();
 		this.basePath = configuration.basePath();
 	}
 	
@@ -42,7 +39,7 @@ class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 		}
 		Path path = toPath(baseName, args);
 		ScriptResourceType type = (ScriptResourceType)args[0];
-		return new ScriptResource(type, path, baseName, baseUri);
+		return new ScriptResource(type, path, baseName);
 	}
 
 }

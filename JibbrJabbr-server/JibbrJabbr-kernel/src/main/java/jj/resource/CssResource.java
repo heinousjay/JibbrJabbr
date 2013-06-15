@@ -11,13 +11,6 @@ public class CssResource extends AbstractFileResource {
 
 	@Override
 	public String uri() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String absoluteUri() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

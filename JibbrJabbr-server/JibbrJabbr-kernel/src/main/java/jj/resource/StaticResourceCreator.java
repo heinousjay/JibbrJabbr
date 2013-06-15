@@ -16,7 +16,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -31,12 +30,10 @@ import jj.configuration.Configuration;
 @Singleton
 class StaticResourceCreator implements ResourceCreator<StaticResource> {
 
-	private final URI baseUri;
 	private final Path basePath;
 
 	@Inject
 	StaticResourceCreator(final Configuration configuration) {
-		this.baseUri = configuration.baseUri();
 		this.basePath = configuration.basePath();
 	}
 	
@@ -52,7 +49,7 @@ class StaticResourceCreator implements ResourceCreator<StaticResource> {
 
 	@Override
 	public StaticResource create(String baseName, Object... args) throws IOException {
-		StaticResource s = new StaticResource(baseUri, basePath, baseName);
+		StaticResource s = new StaticResource(basePath, baseName);
 		return s;
 	}
 

@@ -46,7 +46,6 @@ public class StaticResourceCreatorTest extends ResourceBase {
 		assertThat(resource1, is(notNullValue()));
 		assertThat(resource1.mime(), is(MimeTypes.get(baseName)));
 		assertThat(resource1.bytes(), is(Files.readAllBytes(resource1.path())));
-		assertThat(resource1.absoluteUri(), is(baseUri + "/" + resource1.sha1() + "/" + resource1.baseName()));
 	}
 	
 	@Test

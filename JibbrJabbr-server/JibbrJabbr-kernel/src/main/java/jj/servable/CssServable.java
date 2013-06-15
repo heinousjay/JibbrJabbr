@@ -1,7 +1,6 @@
 package jj.servable;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,7 +15,7 @@ import org.webbitserver.HttpResponse;
 @Singleton
 class CssServable extends Servable {
 	
-	private static final Pattern CSS_RESOURCE = Pattern.compile(".css$");
+	private static final String CSS = ".css";
 	
 	@Inject
 	CssServable(final Configuration configuration) {
@@ -26,7 +25,7 @@ class CssServable extends Servable {
 	@Override
 	public boolean isMatchingRequest(final JJHttpRequest request) {
 		// match everything that ends in .css
-		return CSS_RESOURCE.matcher(request.uri()).matches();
+		return request.uri().endsWith(CSS);
 	}
 
 	@Override

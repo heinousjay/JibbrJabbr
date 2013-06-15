@@ -16,7 +16,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 
 /**
@@ -26,27 +25,20 @@ import java.nio.file.Path;
 public class StaticResource extends AbstractFileResource {
 
 	private final String mime;
-	private final String absoluteUri;
 	
 	/**
 	 * @param baseName
 	 * @param path
 	 * @throws IOException
 	 */
-	StaticResource(final URI baseUri, final Path basePath, final String baseName) throws IOException {
+	StaticResource(final Path basePath, final String baseName) throws IOException {
 		super(baseName, basePath.resolve(baseName));
 		mime = MimeTypes.get(baseName);
-		absoluteUri = baseUri.toString() + uri();
 	}
 
 	@Override
 	public String uri() {
 		return "/" + sha1 + "/" + baseName;
-	}
-
-	@Override
-	public String absoluteUri() {
-		return absoluteUri;
 	}
 
 	@Override

@@ -15,9 +15,6 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 /**
@@ -34,8 +31,7 @@ public class ScriptResourceCreatorTest extends ResourceBase {
 	}
 	
 	private void doTest(final String baseName, final ScriptResourceType type) throws Exception {
-		ScriptResource sr = testFileResource(baseName, new ScriptResourceCreator(configuration), type);
-		assertThat(sr.absoluteUri(), is(baseUri + sr.sha1() + "/" + baseName + type.suffix()));
+		testFileResource(baseName, new ScriptResourceCreator(configuration), type);
 	}
 
 }

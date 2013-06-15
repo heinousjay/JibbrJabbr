@@ -50,22 +50,27 @@ public abstract class AbstractFileResource implements Resource {
 		toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
 	}
 	
-	public String baseName() {
-		return baseName;
-	}
-	
+	@Override
 	public Object[] creationArgs() {
 		return EMPTY_ARGS;
 	}
+	
+	@Override
+	public String baseName() {
+		return baseName;
+	}
 
+	@Override
 	public String sha1() {
 		return sha1;
 	}
 
+	@Override
 	public Path path() {
 		return path;
 	}
 
+	@Override
 	public FileTime lastModified() {
 		return lastModified;
 	}

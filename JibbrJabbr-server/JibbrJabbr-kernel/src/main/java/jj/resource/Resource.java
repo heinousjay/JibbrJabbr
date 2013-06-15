@@ -56,12 +56,6 @@ public interface Resource {
 	String uri();
 	
 	/**
-	 * absolute uri using our canonical domain
-	 * @return
-	 */
-	String absoluteUri();
-	
-	/**
 	 * sha1 of the file bytes
 	 * @return
 	 */

@@ -12,6 +12,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * The central point of configuration for the system
+ * @author jason
+ *
+ */
 @Singleton
 public class Configuration {
 	

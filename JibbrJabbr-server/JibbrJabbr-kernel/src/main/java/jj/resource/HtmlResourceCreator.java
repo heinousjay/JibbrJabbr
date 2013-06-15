@@ -1,7 +1,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -12,13 +11,10 @@ import jj.configuration.Configuration;
 @Singleton
 class HtmlResourceCreator implements ResourceCreator<HtmlResource>{
 	
-	private final URI baseUri;
-	
 	private final Path basePath;
 	
 	@Inject
 	HtmlResourceCreator(final Configuration configuration) {
-		this.baseUri = configuration.baseUri();
 		this.basePath = configuration.basePath();
 	}
 
@@ -34,6 +30,6 @@ class HtmlResourceCreator implements ResourceCreator<HtmlResource>{
 	
 	@Override
 	public HtmlResource create(final String baseName, final Object...args) throws IOException {
-		return new HtmlResource(baseUri.resolve(baseName), toPath(baseName));
+		return new HtmlResource(baseName, toPath(baseName));
 	}
 }

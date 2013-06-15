@@ -7,14 +7,12 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.JJ;
-import jj.configuration.Configuration;
 
 @Singleton
 class AssetResourceCreator implements ResourceCreator<AssetResource> {
@@ -40,13 +38,6 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	}
 	
 	private final Logger log = LoggerFactory.getLogger(AssetResourceCreator.class);
-
-	private final URI baseUri;
-	
-	@Inject
-	AssetResourceCreator(final Configuration configuration) {
-		this.baseUri = configuration.baseUri();
-	}
 	
 	@Override
 	public Class<AssetResource> type() {
@@ -72,10 +63,10 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	@Override
 	public AssetResource create(String baseName, Object... args) throws IOException {
 		if (myJar == null) {
-			return new AssetResource(basePath, baseUri, baseName);
+			return new AssetResource(basePath, baseName);
 		} else {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(myJar, null)) {
-				return new AssetResource(myJarFS.getPath("/jj/assets"), baseUri, baseName);
+				return new AssetResource(myJarFS.getPath("/jj/assets"), baseName);
 			}
 		}
 		
