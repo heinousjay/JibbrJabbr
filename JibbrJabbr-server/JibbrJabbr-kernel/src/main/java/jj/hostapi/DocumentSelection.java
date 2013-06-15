@@ -43,17 +43,26 @@ class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection hide() {
-		throw new AbstractMethodError();
+		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeSet(this.selector, "hide", null));
+		return this;
 	}
 
 	@Override
 	public Selection hide(final String duration) {
-		throw new AbstractMethodError();
+		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeSet(this.selector, "hide", duration));
+		return this;
 	}
 
 	@Override
 	public Selection show() {
-		throw new AbstractMethodError();
+		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeSet(this.selector, "show", null));
+		return this;
+	}
+
+	@Override
+	public Selection show(final String duration) {
+		context.httpRequest().addStartupJQueryMessage(JQueryMessage.makeSet(this.selector, "show", duration));
+		return this;
 	}
 	
 	// -- Events
@@ -314,6 +323,11 @@ class DocumentSelection implements Selection {
 	@Override
 	public Element last() {
 		return elements.last();
+	}
+	
+	@Override
+	public Selection clone() {
+		return new DocumentSelection(selector, elements.clone(), context);
 	}
 
 	@Override

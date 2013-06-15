@@ -345,10 +345,12 @@ jQuery(function($) {
 					context: binding.context || ''
 				};
 				var eventConfig = determineEventConfig(binding);
+				if (debug) console.log("binding", eventConfig, binding);
 				eventConfig.context.on(eventConfig.name, binding.selector, data, eventConfig.handler);
 			},
 			'unbind': function(unbinding) {
 				var eventConfig = determineEventConfig(unbinding);
+				if (debug) console.log("unbinding", eventConfig, unbinding);
 				eventConfig.context.off(eventConfig.name, unbinding.selector, eventConfig.handler);
 			},
 			'get': function(get) {

@@ -22,9 +22,6 @@ class AssetServable extends Servable {
 	
 	private final Logger log = LoggerFactory.getLogger(AssetServable.class);
 	
-	@SuppressWarnings("unused")
-	private static final String TWENTY_YEARS = String.valueOf(60 * 60 * 24 * 365 * 20);
-	
 	private final ResourceFinder resourceFinder;
 	
 	@Inject

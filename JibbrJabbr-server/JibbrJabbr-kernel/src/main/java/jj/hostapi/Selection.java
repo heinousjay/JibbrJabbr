@@ -344,5 +344,9 @@ interface Selection {
 	Selection hide(String duration);
 	
 	Selection show();
+	
+	Selection show(String duration);
+	
+	Selection clone();
 
 }

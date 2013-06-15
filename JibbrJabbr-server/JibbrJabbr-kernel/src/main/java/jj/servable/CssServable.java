@@ -16,7 +16,7 @@ import org.webbitserver.HttpResponse;
 @Singleton
 class CssServable extends Servable {
 	
-	private static final Pattern CSS_RESOURCE = Pattern.compile("^/(.+?)/([a-f0-9]{40}).css$");
+	private static final Pattern CSS_RESOURCE = Pattern.compile(".css$");
 	
 	@Inject
 	CssServable(final Configuration configuration) {
@@ -25,13 +25,7 @@ class CssServable extends Servable {
 
 	@Override
 	public boolean isMatchingRequest(final JJHttpRequest request) {
-		// we only serve stuff that looks like 
-		//  baseName/sha1.css.  I say looks like
-		// because it's not a real baseName, but it
-		// is the path to the file.  this is CSS that
-		// got pre-processed by a filter to be long-term
-		// cacheable, and potentially was processed by
-		// less
+		// match everything that ends in .css
 		return CSS_RESOURCE.matcher(request.uri()).matches();
 	}
 
@@ -41,6 +35,10 @@ class CssServable extends Servable {
 		HttpResponse response,
 		HttpControl control
 	) throws IOException {
+		
+		// if this is a plain URL (no sha key) then find the latest matching css
+		// and issue a redirect to that URL
+		
 		
 		return null;
 	}

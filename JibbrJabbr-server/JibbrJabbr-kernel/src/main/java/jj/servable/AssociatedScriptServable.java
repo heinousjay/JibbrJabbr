@@ -31,11 +31,6 @@ class AssociatedScriptServable extends Servable {
 	
 	private final Logger log = LoggerFactory.getLogger(AssociatedScriptServable.class);
 	
-	/**
-	 * twenty years in seconds.  not including leap days. it's probably fine
-	 */
-	private static final String TWENTY_YEARS = String.valueOf(60 * 60 * 24 * 365 * 20);
-	
 	private final ScriptBundleFinder finder;
 
 	@Inject

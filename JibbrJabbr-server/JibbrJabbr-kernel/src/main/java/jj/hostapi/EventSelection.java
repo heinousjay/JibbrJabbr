@@ -55,6 +55,13 @@ public class EventSelection implements Selection {
 		context.connection().send(JQueryMessage.makeSet(this.selector, "show", null));
 		return this;
 	}
+
+	@Override
+	public Selection show(final String duration) {
+		verifyContext("show a selection");
+		context.connection().send(JQueryMessage.makeSet(this.selector, "show", duration));
+		return this;
+	}
 	
 	@Override
 	public Selection on(String type, Callable function) {
@@ -320,6 +327,11 @@ public class EventSelection implements Selection {
 	@Override
 	public Element last() {
 		throw new UnsupportedOperationException("first is not yet implemented and probably will never be");
+	}
+	
+	@Override
+	public Selection clone() {
+		return new EventSelection(selector, context);
 	}
 
 	@Override

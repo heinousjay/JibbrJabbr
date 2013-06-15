@@ -15,6 +15,9 @@
  */
 package jj;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
+
 import jj.client.ClientModule;
 import jj.document.DocumentModule;
 import jj.hostapi.HostApiModule;
@@ -29,6 +32,30 @@ import jj.webbit.WebbitModule;
  *
  */
 public class CoreModule extends JJModule {
+	
+	private static final class JJContext extends Context {
+		JJContext(final ContextFactory factory) {
+			super(factory);
+		}
+	}
+	
+	private static final class JJContextFactory extends ContextFactory {
+		
+		@Override
+		protected Context makeContext() {
+			Context context = new JJContext(this);
+			return context;
+		}
+		
+		@Override
+		protected boolean hasFeature(Context cx, int featureIndex) {
+			return (featureIndex == Context.FEATURE_ENHANCED_JAVA_ACCESS) || super.hasFeature(cx, featureIndex);
+		}
+	}
+	
+	static {
+		ContextFactory.initGlobal(new JJContextFactory());
+	}
 	
 	private final String [] args;
 	private final boolean isTest;

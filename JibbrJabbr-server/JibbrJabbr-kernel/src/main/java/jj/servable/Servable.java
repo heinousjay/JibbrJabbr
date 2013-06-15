@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 import jj.Configuration;
 import jj.IOThread;
@@ -14,6 +15,11 @@ import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
 
 public abstract class Servable {
+	
+	/**
+	 * twenty years in seconds.  not including leap days. it's probably fine
+	 */
+	protected static final String TWENTY_YEARS = String.valueOf(60 * 60 * 24 * 365 * 20);
 	
 	protected final Path basePath;
 	
