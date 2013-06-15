@@ -6,8 +6,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
-import jj.Configuration;
 import jj.IOThread;
+import jj.configuration.Configuration;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 

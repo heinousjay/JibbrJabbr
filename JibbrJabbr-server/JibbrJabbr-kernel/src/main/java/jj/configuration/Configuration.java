@@ -1,4 +1,4 @@
-package jj;
+package jj.configuration;
 
 import java.net.URI;
 import java.nio.file.Files;

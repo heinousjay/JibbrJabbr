@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.Configuration;
+import jj.configuration.Configuration;
 import jj.servable.CssServable;
 import jj.webbit.JJHttpRequest;
 

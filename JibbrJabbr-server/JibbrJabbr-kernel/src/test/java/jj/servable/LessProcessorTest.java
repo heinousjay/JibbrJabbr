@@ -25,8 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.Configuration;
 import jj.JJ;
+import jj.configuration.Configuration;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -3,7 +3,7 @@ package jj.document;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Configuration;
+import jj.configuration.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.CurrentScriptContext;
 import jj.script.AssociatedScriptBundle;

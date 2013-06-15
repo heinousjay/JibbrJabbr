@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.configuration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -21,6 +21,8 @@ import static org.junit.Assert.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import jj.configuration.Configuration;
 
 import org.junit.Before;
 import org.junit.Test;

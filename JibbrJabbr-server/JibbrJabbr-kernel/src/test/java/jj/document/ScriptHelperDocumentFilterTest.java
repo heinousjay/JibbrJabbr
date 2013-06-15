@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-import jj.Configuration;
+import jj.configuration.Configuration;
 import jj.jqmessage.JQueryMessage;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;

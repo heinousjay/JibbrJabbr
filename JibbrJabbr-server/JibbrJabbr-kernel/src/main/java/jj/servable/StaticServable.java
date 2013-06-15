@@ -20,9 +20,9 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Configuration;
 import jj.JJExecutors;
 import jj.JJRunnable;
+import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
 import jj.webbit.JJHttpRequest;

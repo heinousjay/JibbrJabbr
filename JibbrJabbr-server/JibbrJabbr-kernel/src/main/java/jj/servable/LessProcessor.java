@@ -28,7 +28,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.Configuration;
+import jj.configuration.Configuration;
 
 /**
  * accepts a path that represents a less source file,

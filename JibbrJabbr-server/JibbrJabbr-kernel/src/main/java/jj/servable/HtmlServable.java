@@ -7,8 +7,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Configuration;
 import jj.JJExecutors;
+import jj.configuration.Configuration;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;

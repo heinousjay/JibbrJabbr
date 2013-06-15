@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Configuration;
+import jj.configuration.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;

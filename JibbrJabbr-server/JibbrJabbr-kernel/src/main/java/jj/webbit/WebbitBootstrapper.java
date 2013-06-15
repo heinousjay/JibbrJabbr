@@ -5,9 +5,9 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Configuration;
 import jj.JJExecutors;
 import jj.JJServerListener;
+import jj.configuration.Configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

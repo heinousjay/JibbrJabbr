@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Configuration;
+import jj.configuration.Configuration;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 
