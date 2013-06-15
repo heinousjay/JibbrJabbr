@@ -33,6 +33,10 @@ import jj.webbit.WebbitModule;
  */
 public class CoreModule extends JJModule {
 	
+	// this stuff lives here because we need to set up the context factory
+	// before anything actually creates a context, otherwise we won't
+	// get the "enhanced java access" which means exceptions will just
+	// break on through the scripts
 	private static final class JJContext extends Context {
 		JJContext(final ContextFactory factory) {
 			super(factory);
