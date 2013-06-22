@@ -91,11 +91,12 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 				WatchKey watchKey = watcher.take();
 				if (watchKey.isValid()) {
 					final Path directory = (Path)watchKey.watchable();
+					
 					for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
 						
 						final Kind<?> kind = watchEvent.kind();
 						if (kind == OVERFLOW) {
-							log.info("FileWatchService OVERFLOW - not sure what this means!");
+							log.warn("FileWatchService OVERFLOW - not sure what this means!");
 							continue; // for now. not sure what else to do
 						}
 						final WatchEvent<Path> event = cast(watchEvent);
@@ -107,14 +108,14 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 							// later and someone wants it
 							log.info("removing {}", path);
 							resourceCache.remove(path.toUri());
+						
 						} else if (kind == ENTRY_MODIFY) {
-							log.info("reloading {}",path);
 							final Resource resource = resourceCache.get(path.toUri());
 							if (resource != null) {
 								// this thread is only to handle the
 								// WatchEvents
 								executors.ioExecutor().submit(executors.prepareTask(
-									new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader") {
+									new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
 									
 										@Override
 										protected boolean ignoreInExecutionTrace() {
@@ -123,6 +124,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 	
 										@Override
 										public void run() throws Exception {
+											log.info("reloading {}",path);
 											resourceFinder.loadResource(
 												resource.getClass(),
 												resource.baseName(),
@@ -133,12 +135,13 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 								);
 							}
 						}
-						
-						if (!Files.exists(directory)) {
-							watchKey.cancel();
-						}
+					}
+					
+					if (!Files.exists(directory)) {
+						watchKey.cancel();
 					}
 				}
+				
 				watchKey.reset();
 			}
 		}

@@ -100,7 +100,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		URI pathUri = path.toUri();
 		Resource uncachedResource = null;
 		try {
-			result = (T)resourceCache.get(pathUri);
+			result = resourceClass.cast(resourceCache.get(pathUri));
 			if (result == null) {
 				log.trace("loading {} at {}", resourceClass.getSimpleName(), path);
 				Resource resource = resourceCreator.create(baseName, args);
@@ -116,16 +116,22 @@ class ResourceFinderImpl implements ResourceFinder {
 			} else if (result.needsReplacing()) {
 				log.trace("replacing {} at {}", resourceClass.getSimpleName(), path);
 				if (!resourceCache.replace(pathUri, result, resourceCreator.create(baseName, args))){
-					log.warn("replacement failed, someone snuck in behind me? {} at {}", resourceClass.getSimpleName(), path);
+					log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceClass.getSimpleName(), path);
 				}
 			}
-			result = (T)(uncachedResource != null ? uncachedResource : resourceCache.get(pathUri));
+			result = resourceClass.cast(uncachedResource != null ? uncachedResource : resourceCache.get(pathUri));
+		
 		} catch (NullPointerException | NoSuchFileException e) {
 			log.trace("couldn't find {} at {}", resourceClass.getSimpleName(), path);
+		
+		} catch (ClassCastException cce) {
+			log.info("resource at {} was expected to be of type {} but was {}", pathUri, resourceClass, resourceCache.get(pathUri).getClass());
+			
 		} catch (IOException ioe) {
 			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), path);
 			log.error("", ioe);
 		}
+		
 		return result;
 	}
 }
