@@ -92,7 +92,7 @@ class AssociatedScriptServable extends Servable {
 				ByteBuffer buf = UTF_8.encode(scriptResource.script());
 				
 				response.header(HttpHeaders.Names.CONTENT_LENGTH, buf.remaining())
-					.header(HttpHeaders.Names.CACHE_CONTROL, "max-age=" + TWENTY_YEARS)
+					.header(HttpHeaders.Names.CACHE_CONTROL, TWENTY_YEARS)
 					.header(HttpHeaders.Names.CONTENT_TYPE, scriptResource.mime())
 					.content(buf)
 					.end();

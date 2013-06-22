@@ -4,6 +4,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
+import jj.resource.AssetResource;
+import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.script.CurrentScriptContext;
 import jj.script.AssociatedScriptBundle;
@@ -21,16 +23,22 @@ import org.jsoup.nodes.Element;
 @Singleton
 class ScriptHelperDocumentFilter implements DocumentFilter {
 
-	public static final String JQUERY_URI = "/jquery-1.8.3.min.js";
-	public static final String SOCKET_CONNECT_URI = "/socket-connect.js";
+	public static final String JQUERY_JS = "jquery-1.8.3.min.js";
+	public static final String JJ_JS = "jj.js";
 
 	private final Configuration configuration;
 	private final CurrentScriptContext context;
+	private final ResourceFinder resourceFinder;
 
 	@Inject
-	public ScriptHelperDocumentFilter(final Configuration configuration, final CurrentScriptContext context) {
+	public ScriptHelperDocumentFilter(
+		final Configuration configuration, 
+		final CurrentScriptContext context,
+		final ResourceFinder resourceFinder
+	) {
 		this.context = context;
 		this.configuration = configuration;
+		this.resourceFinder = resourceFinder;
 	}
 
 	private void addScript(Document document, AssociatedScriptBundle bundle, ScriptResource scriptResource) {
@@ -58,12 +66,13 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 	public void filter(final DocumentRequest documentRequest) {
 		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle();
 		if (scriptBundle != null) {
-			addScript(documentRequest.document(), JQUERY_URI);
+			
+			addScript(documentRequest.document(), resourceFinder.findResource(AssetResource.class, JQUERY_JS).uri());
 			
 			String wsURI = "ws://" + documentRequest.httpRequest().host() + "/" + scriptBundle.toSocketUri();
 			
 			Element socketConnect = 
-				makeScriptTag(documentRequest.document(), SOCKET_CONNECT_URI)
+				makeScriptTag(documentRequest.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())
 				.attr("id", "jj-connector-script")
 				.attr("data-jj-socket-url", wsURI)
 				.attr(

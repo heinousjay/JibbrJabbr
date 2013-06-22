@@ -11,6 +11,8 @@ import java.util.Collections;
 
 import jj.configuration.Configuration;
 import jj.jqmessage.JQueryMessage;
+import jj.resource.AssetResource;
+import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
 import jj.script.CurrentScriptContext;
@@ -28,6 +30,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptHelperDocumentFilterTest {
 	
+	static final String JQUERY_SHA = "aeb0805239eb1c1158894f8d25b4272ee6e67e44";
+	static final String JQUERY_URI = "/" + JQUERY_SHA + "/" + ScriptHelperDocumentFilter.JQUERY_JS;
+	static final String JJ_SHA = "be03b9352e1e254cae9a58cff2b20e0c8d513e47";
+	static final String JJ_URI = "/" + JJ_SHA + "/" + ScriptHelperDocumentFilter.JJ_JS;
+	
 	String scriptUri;
 	String socketUri;
 	String webSocketUri;
@@ -36,6 +43,9 @@ public class ScriptHelperDocumentFilterTest {
 	@Mock CurrentScriptContext context;
 	@Mock ScriptResource scriptResource;
 	@Mock JJHttpRequest httpRequest;
+	@Mock ResourceFinder resourceFinder;
+	@Mock AssetResource jqueryJs;
+	@Mock AssetResource jjJs;
 	Document document;
 	@Mock DocumentRequest documentRequest;
 
@@ -63,7 +73,18 @@ public class ScriptHelperDocumentFilterTest {
 		when(documentRequest.document()).thenReturn(document);
 		when(documentRequest.httpRequest()).thenReturn(httpRequest);
 		
-		filter = new ScriptHelperDocumentFilter(configuration, context);
+		when(resourceFinder.findResource(AssetResource.class, ScriptHelperDocumentFilter.JQUERY_JS))
+			.thenReturn(jqueryJs);
+		when(resourceFinder.findResource(AssetResource.class, ScriptHelperDocumentFilter.JJ_JS))
+			.thenReturn(jjJs);
+		
+		when(jqueryJs.sha1()).thenReturn(JQUERY_SHA);
+		when(jqueryJs.uri()).thenReturn(JQUERY_URI);
+		
+		when(jjJs.sha1()).thenReturn(JJ_SHA);
+		when(jjJs.uri()).thenReturn(JJ_URI);
+		
+		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
 	}
 	
 	@Test
@@ -81,9 +102,9 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// then
 		assertThat(document.select("script[type=text/javascript]").size(), is(4));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.JQUERY_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
+		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
 		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(1));
 		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(1));
 	}
@@ -100,9 +121,9 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// then
 		assertThat(document.select("script[type=text/javascript]").size(), is(3));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.JQUERY_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
+		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
 		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(1));
 		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(0));
 	}
@@ -119,9 +140,9 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// then
 		assertThat(document.select("script[type=text/javascript]").size(), is(3));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.JQUERY_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
+		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
 		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(0));
 		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(1));
 	}
@@ -136,9 +157,9 @@ public class ScriptHelperDocumentFilterTest {
 		
 		//then
 		assertThat(document.select("script[type=text/javascript]").size(), is(2));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.JQUERY_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptHelperDocumentFilter.SOCKET_CONNECT_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
+		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
+		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
 		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(0));
 		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(0));
 	}
@@ -154,7 +175,7 @@ public class ScriptHelperDocumentFilterTest {
 		);
 		
 		given(httpRequest.startupJQueryMessages()).willReturn(messages);
-		filter = new ScriptHelperDocumentFilter(configuration, context);
+		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
 		
 		// when 
 		filter.filter(documentRequest);

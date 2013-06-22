@@ -53,7 +53,7 @@ public class AssetResourcePreloaderTest {
 		verify(finder).loadResource(AssetResource.class, "errors/404.html");
 		verify(finder).loadResource(AssetResource.class, "favicon.ico");
 		verify(finder).loadResource(AssetResource.class, "jquery-1.8.3.min.js");
-		verify(finder).loadResource(AssetResource.class, "socket-connect.js");
+		verify(finder).loadResource(AssetResource.class, "jj.js");
 		// which is why we verify no more interactions
 		verifyNoMoreInteractions(finder);
 	}

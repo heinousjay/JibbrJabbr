@@ -4,21 +4,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 import jj.IOThread;
 import jj.configuration.Configuration;
 import jj.webbit.JJHttpRequest;
 import jj.webbit.RequestProcessor;
 
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.webbitserver.HttpControl;
 import org.webbitserver.HttpResponse;
 
 public abstract class Servable {
 	
 	/**
-	 * twenty years in seconds.  not including leap days. it's probably fine
+	 * twenty years in seconds for cache control
 	 */
-	protected static final String TWENTY_YEARS = String.valueOf(60 * 60 * 24 * 365 * 20);
+	protected static final String TWENTY_YEARS = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365 * 20);
 	
 	protected final Path basePath;
 	
@@ -64,6 +66,8 @@ public abstract class Servable {
 		final HttpControl control
 	) throws IOException;
 
+	
+	
 	/**
 	 * helper to extract the baseName from the request
 	 * @param httpRequest

@@ -31,6 +31,8 @@ public class JJHttpRequest extends HttpRequestWrapper {
 		};
 	}
 	
+	private static final String HEADER_X_HOST = "x-host"; 
+	
 	private static final String PROCESSING_STATE = "processing state";
 	
 	private static final String ASSOCIATED_SCRIPT_BUNDLE = "associated script bundle";
@@ -72,7 +74,13 @@ public class JJHttpRequest extends HttpRequestWrapper {
 	}
 	
 	public String host() {
-		return header(HttpHeaders.Names.HOST);
+		String xHost = header(HEADER_X_HOST);
+		String host = header(HttpHeaders.Names.HOST);
+		return xHost == null ? host : xHost;
+	}
+	
+	public boolean secure() {
+		return false;
 	}
 
 	/**
