@@ -56,6 +56,14 @@ public class TestingAPITest {
 		assertThat(index.contentsString(), is(notNullValue()));
 		
 		assertThat(index.document().select("title").text(), is("JAYCHAT!"));
+		
+		TestHttpClient files = app.get("/files");
+		files.dumpObjects();
+		assertThat(files.status(), is(200));
+		files.dumpObjects();
+		assertThat(files.contentsString(), is(notNullValue()));
+		
+		assertThat(files.document().select("title").text(), is("files test"));
 	}
 	
 	@Test
@@ -77,7 +85,7 @@ public class TestingAPITest {
 		int count = 0;
 		for (int i = 0; i < number; ++i) {
 			clients[count++] = app.get("/index");
-			clients[count++] = app.get("/files");
+			clients[count++] = app.get("/index");
 		}
 		
 		count = 0;
@@ -88,7 +96,7 @@ public class TestingAPITest {
 			
 			assertThat(clients[count].status(), is(200));
 			assertThat(clients[count].contentsString(), is(notNullValue()));
-			assertThat(clients[count++].document().select("title").text(), is("files test"));
+			assertThat(clients[count++].document().select("title").text(), is("JAYCHAT!"));
 		}
 		
 		return true;
@@ -133,9 +141,9 @@ public class TestingAPITest {
 		
 		System.out.println("loaded " + (totalClients * 12) + " pages in " + (System.currentTimeMillis() - start) + " milliseconds.");
 		System.out.println("free\t" + startingFreeMemory + "\ttotal\t" + startingTotalMemory + "\tmax\t" + startingMaxMemory + " at start");
-		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory());
+		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory() + " at finish");
 		Runtime.getRuntime().gc();
-		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory());
+		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory() + " after GC");
 	}
 	
 	//@Test

@@ -23,7 +23,7 @@ import org.jsoup.nodes.Element;
 @Singleton
 class ScriptHelperDocumentFilter implements DocumentFilter {
 
-	public static final String JQUERY_JS = "jquery-1.8.3.min.js";
+	public static final String JQUERY_JS = "jquery-2.0.2.min.js";
 	public static final String JJ_JS = "jj.js";
 
 	private final Configuration configuration;
@@ -67,11 +67,13 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle();
 		if (scriptBundle != null) {
 			
+			// internal version of jquery
 			addScript(documentRequest.document(), resourceFinder.findResource(AssetResource.class, JQUERY_JS).uri());
 			
+			// jj script
 			String wsURI = "ws://" + documentRequest.httpRequest().host() + "/" + scriptBundle.toSocketUri();
 			
-			Element socketConnect = 
+			Element jjScript = 
 				makeScriptTag(documentRequest.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())
 				.attr("id", "jj-connector-script")
 				.attr("data-jj-socket-url", wsURI)
@@ -80,14 +82,11 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 					context.httpRequest().startupJQueryMessages().toString()
 				);
 			if (configuration.debugClient()) {
-				socketConnect.attr("data-jj-debug", "true");
+				jjScript.attr("data-jj-debug", "true");
 			}
-			addScript(documentRequest.document(), socketConnect);
+			addScript(documentRequest.document(), jjScript);
 			
-			if (scriptBundle.clientScriptResource() != null) {
-	
-			}
-	
+			// associated scripts
 			addScript(documentRequest.document(), scriptBundle, scriptBundle.sharedScriptResource());
 			addScript(documentRequest.document(), scriptBundle, scriptBundle.clientScriptResource());
 		}
