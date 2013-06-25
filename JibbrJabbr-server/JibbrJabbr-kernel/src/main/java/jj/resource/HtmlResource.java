@@ -5,11 +5,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.util.HashSet;
 
 import jj.IOThread;
 
+import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 import org.jsoup.parser.Parser;
+import org.jsoup.select.NodeTraversor;
+import org.jsoup.select.NodeVisitor;
 
 /**
  * An immutable collection of information about an
@@ -21,6 +26,24 @@ public class HtmlResource extends AbstractFileResource {
 
 	private final String uri;
 	private final Document document;
+	
+	private static final class CommentNodeFinder implements NodeVisitor {
+
+		private final HashSet<Comment> comments = new HashSet<>();
+		
+		@Override
+		public void head(Node node, int depth) {
+			if (node instanceof Comment) {
+				comments.add((Comment)node);
+			}
+		}
+
+		@Override
+		public void tail(Node node, int depth) {
+			// nothing to do
+		}
+		
+	}
 	
 	/**
 	 * @param absoluteUri The server absolute URI to this resource
@@ -36,6 +59,11 @@ public class HtmlResource extends AbstractFileResource {
 		this.uri = baseName;
 		String html = UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
 		this.document = Parser.htmlParser().parseInput(html, baseName);
+		CommentNodeFinder commentNodeFinder = new CommentNodeFinder();
+		new NodeTraversor(commentNodeFinder).traverse(document);
+		for (Comment comment : commentNodeFinder.comments) {
+			comment.remove();
+		}
 	}
 	
 	@Override

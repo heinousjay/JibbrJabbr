@@ -262,12 +262,15 @@ jQuery(function($) {
 			}
 		}
 
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			ws.send(e.target.result);
-		}
+		var reader;
 		$j.sendFile = function(file) {
-			reader.readAsArrayBuffer(file);
+			(reader || (function() {
+				reader = new FileReader();
+				reader.onload = function(e) {
+					ws.send(e.target.result);
+				}
+				return reader;
+			})()).readAsArrayBuffer(file);
 		}
 		
 		var rawMessages = {

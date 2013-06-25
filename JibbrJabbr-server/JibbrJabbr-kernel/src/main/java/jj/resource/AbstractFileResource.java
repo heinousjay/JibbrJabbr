@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
+import java.util.Date;
 
 import jj.IOThread;
 import jj.SHA1Helper;
@@ -73,6 +74,11 @@ public abstract class AbstractFileResource implements Resource {
 	@Override
 	public FileTime lastModified() {
 		return lastModified;
+	}
+	
+	@Override
+	public Date lastModifiedDate() {
+		return new Date(lastModified.toMillis());
 	}
 	
 	@IOThread

@@ -1,10 +1,12 @@
 package jj.servable;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.DateFormatHelper;
 import jj.configuration.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
@@ -52,7 +54,8 @@ class AssetServable extends Servable {
 		final HttpResponse response, 
 		final HttpControl control
 	) throws IOException {
-		// this one works inline, since assets are preloaded
+		
+		// this one works inline, since assets are always preloaded
 		return new RequestProcessor() {
 			
 			@Override
@@ -66,19 +69,50 @@ class AssetServable extends Servable {
 					
 					log.debug("unqualified request for asset {}, redirecting", asset);
 					
-					response.status(HttpResponseStatus.SEE_OTHER.getCode())
+					response.status(HttpResponseStatus.TEMPORARY_REDIRECT.getCode())
 						.header(HttpHeaders.Names.LOCATION, newURL)
 						.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 						.end();
 					
 				} else {
-				
-					response.status(HttpResponseStatus.OK.getCode())
-						.header(HttpHeaders.Names.CACHE_CONTROL, TWENTY_YEARS)
-						.header(HttpHeaders.Names.CONTENT_LENGTH, asset.bytes().length)
-						.header(HttpHeaders.Names.CONTENT_TYPE, asset.mime())
-						.content(asset.bytes())
-						.end();
+					
+					boolean notModified = false;
+					
+					if (request.hasHeader(HttpHeaders.Names.IF_MODIFIED_SINCE)) {
+						Date ifModifiedDate = DateFormatHelper.headerDate(request.header(HttpHeaders.Names.IF_MODIFIED_SINCE));
+						// might be incorrectly formatted? always possible, i guess
+						if (ifModifiedDate != null && 
+							!ifModifiedDate.before(asset.lastModifiedDate())) {
+							
+							response.status(HttpResponseStatus.NOT_MODIFIED.getCode())
+								.header(HttpHeaders.Names.CACHE_CONTROL, TWENTY_YEARS)
+								.header(HttpHeaders.Names.ETAG, asset.sha1())
+								.header(HttpHeaders.Names.LAST_MODIFIED, asset.lastModifiedDate())
+								.end();
+							notModified = true;
+						}
+					} else if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
+						asset.sha1().equals(request.header(HttpHeaders.Names.ETAG))) {
+						
+						response.status(HttpResponseStatus.NOT_MODIFIED.getCode())
+							.header(HttpHeaders.Names.CACHE_CONTROL, TWENTY_YEARS)
+							.header(HttpHeaders.Names.ETAG, asset.sha1())
+							.header(HttpHeaders.Names.LAST_MODIFIED, asset.lastModifiedDate())
+							.end();
+						notModified = true;
+					}
+					
+					if (!notModified) {
+						
+						response.status(HttpResponseStatus.OK.getCode())
+							.header(HttpHeaders.Names.CACHE_CONTROL, TWENTY_YEARS)
+							.header(HttpHeaders.Names.ETAG, asset.sha1())
+							.header(HttpHeaders.Names.LAST_MODIFIED, asset.lastModifiedDate())
+							.header(HttpHeaders.Names.CONTENT_LENGTH, asset.bytes().length)
+							.header(HttpHeaders.Names.CONTENT_TYPE, asset.mime())
+							.content(asset.bytes())
+							.end();
+					}
 				}
 				
 				log.info(

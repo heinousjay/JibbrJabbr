@@ -144,7 +144,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 				// pretty printing is turned off because it inserts weird spaces
 				// into the output if there are text nodes next to element node
 				// and it gets REALLY ANNOYING
-				documentRequest.document().outputSettings().prettyPrint(false);
+				documentRequest.document().outputSettings().prettyPrint(false).indentAmount(0);
 				final ByteBuffer bytes = UTF_8.encode(documentRequest.document().toString());
 				try {
 					documentRequest.httpResponse()

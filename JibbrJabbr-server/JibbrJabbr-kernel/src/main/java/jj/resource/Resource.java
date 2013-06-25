@@ -3,6 +3,7 @@ package jj.resource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
+import java.util.Date;
 
 import jj.IOThread;
 
@@ -45,6 +46,13 @@ public interface Resource {
 	 * @return
 	 */
 	FileTime lastModified();
+	
+	/**
+	 * time this resource was last modified as
+	 * a java.util.Date
+	 * @return
+	 */
+	Date lastModifiedDate();
 
 	/**
 	 * uri to this resource, expressed as a path relative to
