@@ -26,11 +26,11 @@ import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.JJHttpResponse;
 import jj.webbit.RequestProcessor;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.webbitserver.HttpControl;
-import org.webbitserver.HttpResponse;
 
 /**
  * @author jason
@@ -76,7 +76,7 @@ public class StaticServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request,
-		final HttpResponse response,
+		final JJHttpResponse response,
 		final HttpControl control
 	) throws IOException {
 		

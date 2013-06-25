@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.webbitserver.HttpRequest;
+import org.webbitserver.HttpResponse;
 
 /**
  * The things we do for testing
@@ -26,15 +27,23 @@ import org.webbitserver.HttpRequest;
  *
  */
 @Singleton
-class JJHttpRequestCreator {
+class JJHttpObjectsCreator {
 
 	@Inject
-	JJHttpRequestCreator() {}
+	JJHttpObjectsCreator() {}
 	
-	JJHttpRequest createJJHttpRequest(HttpRequest request) {
+	JJHttpRequest createJJHttpRequest(final HttpRequest request) {
 		if (request instanceof JJHttpRequest) {
 			return (JJHttpRequest)request;
 		}
 		return new JJHttpRequest(request);
+	}
+	
+	JJHttpResponse createJJHttpResponse(final JJHttpRequest request, final HttpResponse response) {
+		if (response instanceof JJHttpResponse) {
+			return (JJHttpResponse)response;
+		}
+		
+		return new JJHttpResponse(request, response);
 	}
 }

@@ -7,10 +7,10 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.JJHttpResponse;
 import jj.webbit.RequestProcessor;
 
 import org.webbitserver.HttpControl;
-import org.webbitserver.HttpResponse;
 
 @Singleton
 class CssServable extends Servable {
@@ -31,7 +31,7 @@ class CssServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		JJHttpRequest request,
-		HttpResponse response,
+		JJHttpResponse response,
 		HttpControl control
 	) throws IOException {
 		

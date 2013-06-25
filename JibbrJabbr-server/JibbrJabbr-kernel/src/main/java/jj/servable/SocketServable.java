@@ -8,10 +8,10 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.JJHttpResponse;
 import jj.webbit.RequestProcessor;
 
 import org.webbitserver.HttpControl;
-import org.webbitserver.HttpResponse;
 import org.webbitserver.WebSocketHandler;
 
 /**
@@ -51,7 +51,7 @@ class SocketServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request, 
-		final HttpResponse response, 
+		final JJHttpResponse response, 
 		final HttpControl control
 	) throws IOException {
 		

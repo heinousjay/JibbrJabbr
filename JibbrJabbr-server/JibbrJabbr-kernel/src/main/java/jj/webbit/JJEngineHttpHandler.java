@@ -30,12 +30,12 @@ public class JJEngineHttpHandler implements HttpHandler {
 	
 	private final Set<Servable> resourceTypes;
 	
-	private final JJHttpRequestCreator creator;
+	private final JJHttpObjectsCreator creator;
 	
 	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
-		final JJHttpRequestCreator creator,
+		final JJHttpObjectsCreator creator,
 		final Set<Servable> resourceTypes
 	) {
 		this.executors = executors;
@@ -64,12 +64,12 @@ public class JJEngineHttpHandler implements HttpHandler {
 		final HttpControl control
 	) throws Exception {
 		final JJHttpRequest jjrequest = creator.createJJHttpRequest(request);
-		
+		final JJHttpResponse jjresponse = creator.createJJHttpResponse(jjrequest, response);
 		// figure out if there's something for us to do
 		final Servable[] servables = findMatchingServables(jjrequest);
 		
 		if (servables.length > 0) {
-			dispatchNextServable(jjrequest, response, control, servables, new AtomicInteger());
+			dispatchNextServable(jjrequest, jjresponse, control, servables, new AtomicInteger());
 			
 		} else {
 			nextHandler(control, response);
@@ -78,7 +78,7 @@ public class JJEngineHttpHandler implements HttpHandler {
 	
 	private void dispatchNextServable(
 		final JJHttpRequest request,
-		final HttpResponse response,
+		final JJHttpResponse response,
 		final HttpControl control,
 		final Servable[] servables,
 		final AtomicInteger count

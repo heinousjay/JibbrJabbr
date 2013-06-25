@@ -17,10 +17,10 @@ import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
 import jj.webbit.JJHttpRequest;
+import jj.webbit.JJHttpResponse;
 import jj.webbit.RequestProcessor;
 
 import org.webbitserver.HttpControl;
-import org.webbitserver.HttpResponse;
 
 @Singleton
 class HtmlServable extends Servable {
@@ -120,7 +120,7 @@ class HtmlServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request,
-		final HttpResponse response,
+		final JJHttpResponse response,
 		final HttpControl control
 	) throws IOException {
 		

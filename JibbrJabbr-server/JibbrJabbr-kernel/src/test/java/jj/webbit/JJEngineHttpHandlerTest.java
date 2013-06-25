@@ -43,7 +43,7 @@ public class JJEngineHttpHandlerTest {
 	@Mock Servable servable1;
 	@Mock Servable servable2;
 	@Mock Servable servable3;
-	@Mock JJHttpRequestCreator creator;
+	@Mock JJHttpObjectsCreator creator;
 	@Mock HttpRequest request1;
 	@Mock HttpRequest request2;
 	@Mock HttpRequest request3;
@@ -53,6 +53,7 @@ public class JJEngineHttpHandlerTest {
 	@Mock JJHttpRequest httpRequest3;
 	@Mock JJHttpRequest httpRequest4;
 	@Mock HttpResponse response;
+	@Mock JJHttpResponse httpResponse;
 	@Mock HttpControl control;
 	@Mock RequestProcessor requestProcessor1;
 	@Mock RequestProcessor requestProcessor2;
@@ -69,25 +70,30 @@ public class JJEngineHttpHandlerTest {
 		given(creator.createJJHttpRequest(request3)).willReturn(httpRequest3);
 		given(creator.createJJHttpRequest(request4)).willReturn(httpRequest4);
 		
+		given(creator.createJJHttpResponse(httpRequest1, response)).willReturn(httpResponse);
+		given(creator.createJJHttpResponse(httpRequest2, response)).willReturn(httpResponse);
+		given(creator.createJJHttpResponse(httpRequest3, response)).willReturn(httpResponse);
+		given(creator.createJJHttpResponse(httpRequest4, response)).willReturn(httpResponse);
+		
 		given(servable1.isMatchingRequest(httpRequest1)).willReturn(true);
 		given(servable1.isMatchingRequest(httpRequest2)).willReturn(false);
 		given(servable1.isMatchingRequest(httpRequest3)).willReturn(false);
 		given(servable1.isMatchingRequest(httpRequest4)).willReturn(false);
-		given(servable1.makeRequestProcessor(httpRequest1, response, control)).willReturn(requestProcessor1);
+		given(servable1.makeRequestProcessor(httpRequest1, httpResponse, control)).willReturn(requestProcessor1);
 		
 		given(servable2.isMatchingRequest(httpRequest1)).willReturn(false);
 		given(servable2.isMatchingRequest(httpRequest2)).willReturn(true);
 		given(servable2.isMatchingRequest(httpRequest3)).willReturn(false);
 		given(servable2.isMatchingRequest(httpRequest4)).willReturn(true);
-		given(servable2.makeRequestProcessor(httpRequest2, response, control)).willReturn(requestProcessor2);
-		given(servable2.makeRequestProcessor(httpRequest4, response, control)).willReturn(null);
+		given(servable2.makeRequestProcessor(httpRequest2, httpResponse, control)).willReturn(requestProcessor2);
+		given(servable2.makeRequestProcessor(httpRequest4, httpResponse, control)).willReturn(null);
 		
 		given(servable3.isMatchingRequest(httpRequest1)).willReturn(false);
 		given(servable3.isMatchingRequest(httpRequest2)).willReturn(false);
 		given(servable3.isMatchingRequest(httpRequest3)).willReturn(true);
 		given(servable3.isMatchingRequest(httpRequest4)).willReturn(true);
-		given(servable3.makeRequestProcessor(httpRequest3, response, control)).willReturn(requestProcessor3);
-		given(servable3.makeRequestProcessor(httpRequest4, response, control)).willReturn(requestProcessor3);
+		given(servable3.makeRequestProcessor(httpRequest3, httpResponse, control)).willReturn(requestProcessor3);
+		given(servable3.makeRequestProcessor(httpRequest4, httpResponse, control)).willReturn(requestProcessor3);
 		
 		resourceTypes = new LinkedHashSet<>();
 		resourceTypes.add(servable1);
