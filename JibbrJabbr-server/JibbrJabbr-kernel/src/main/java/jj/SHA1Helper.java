@@ -39,13 +39,10 @@ public class SHA1Helper {
 	}
 	
 	public static String keyFor(final ByteBuffer bytes) {
-		if (bytes.hasArray()) {
-			return toHex(sha1.get().digest(bytes.array()));
-		} else {
-			byte[] copy = new byte[bytes.limit()];
-			bytes.get(copy);
-			return toHex(sha1.get().digest(copy));
-		}
+		bytes.rewind();
+		sha1.get().update(bytes);
+		bytes.rewind();
+		return toHex(sha1.get().digest());
 	}
 	
 	/**
