@@ -2,6 +2,7 @@ package jj;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -35,6 +36,16 @@ public class SHA1Helper {
 	
 	public static String keyFor(final byte[] bytes) {
 		return toHex(sha1.get().digest(bytes));
+	}
+	
+	public static String keyFor(final ByteBuffer bytes) {
+		if (bytes.hasArray()) {
+			return toHex(sha1.get().digest(bytes.array()));
+		} else {
+			byte[] copy = new byte[bytes.limit()];
+			bytes.get(copy);
+			return toHex(sha1.get().digest(copy));
+		}
 	}
 	
 	/**

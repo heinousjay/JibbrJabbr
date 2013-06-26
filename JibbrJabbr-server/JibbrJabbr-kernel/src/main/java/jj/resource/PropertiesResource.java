@@ -5,7 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.PropertyResourceBundle;
 
@@ -35,7 +34,7 @@ public class PropertiesResource extends AbstractFileResource {
 		uri = sha1 + "/" + baseName;
 		
 		properties =
-			new PropertyResourceBundle(new StringReader(UTF_8.decode(ByteBuffer.wrap(bytes)).toString()));
+			new PropertyResourceBundle(new StringReader(UTF_8.decode(byteBuffer).toString()));
 	}
 	
 	public PropertyResourceBundle properties() {

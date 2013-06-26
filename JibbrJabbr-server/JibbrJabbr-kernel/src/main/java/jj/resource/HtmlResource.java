@@ -3,7 +3,6 @@ package jj.resource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.HashSet;
 
@@ -57,7 +56,7 @@ public class HtmlResource extends AbstractFileResource {
 	) throws IOException {
 		super(baseName, path);
 		this.uri = baseName;
-		String html = UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
+		String html = UTF_8.decode(byteBuffer).toString();
 		this.document = Parser.htmlParser().parseInput(html, baseName);
 		CommentNodeFinder commentNodeFinder = new CommentNodeFinder();
 		new NodeTraversor(commentNodeFinder).traverse(document);

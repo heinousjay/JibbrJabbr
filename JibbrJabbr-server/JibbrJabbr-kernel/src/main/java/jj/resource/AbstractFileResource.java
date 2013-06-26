@@ -1,6 +1,7 @@
 package jj.resource;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
@@ -29,7 +30,7 @@ public abstract class AbstractFileResource implements Resource {
 	protected final String sha1;
 	protected final Path path;
 	protected final FileTime lastModified;
-	protected final byte[] bytes;
+	protected final ByteBuffer byteBuffer;
 	
 	private final String toString;
 
@@ -46,9 +47,13 @@ public abstract class AbstractFileResource implements Resource {
 		this.baseName = baseName;
 		this.path = path;
 		this.lastModified = Files.getLastModifiedTime(this.path);
-		bytes = Files.readAllBytes(path);
-		sha1 = SHA1Helper.keyFor(bytes);
+		byteBuffer = readAllBytes(path);
+		sha1 = SHA1Helper.keyFor(byteBuffer);
 		toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+	}
+	
+	private ByteBuffer readAllBytes(final Path path) throws IOException {
+		return ByteBuffer.wrap(Files.readAllBytes(path));
 	}
 	
 	@Override

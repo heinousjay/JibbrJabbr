@@ -42,7 +42,7 @@ public class NotFoundHttpHandler implements HttpHandler {
 			response.status(HttpResponseStatus.NOT_FOUND.getCode())
 				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 				.header(HttpHeaders.Names.CONTENT_TYPE, notFound.mime())
-				.header(HttpHeaders.Names.CONTENT_LENGTH, notFound.bytes().length)
+				.header(HttpHeaders.Names.CONTENT_LENGTH, notFound.bytes().limit())
 				.content(notFound.bytes())
 				.end();
 		}

@@ -16,6 +16,7 @@
 package jj.resource;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
 /**
@@ -52,8 +53,8 @@ public class StaticResource extends AbstractFileResource {
 	}
 	
 	// this is bad!
-	public byte[] bytes() {
-		return bytes;
+	public ByteBuffer bytes() {
+		return byteBuffer;
 	}
 
 }

@@ -38,7 +38,7 @@ public class PropertiesResourceCreatorTest extends ResourceBase {
 
 		PropertiesResource resource1 = testFileResource(baseName, new PropertiesResourceCreator(configuration));
 		assertThat(resource1, is(notNullValue()));
-		assertThat(resource1.bytes, is(Files.readAllBytes(resource1.path)));
+		assertThat(resource1.byteBuffer.limit(), is(Files.readAllBytes(resource1.path).length));
 	}
 
 }

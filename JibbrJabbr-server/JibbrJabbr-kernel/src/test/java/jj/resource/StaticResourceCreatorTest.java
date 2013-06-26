@@ -45,7 +45,7 @@ public class StaticResourceCreatorTest extends ResourceBase {
 		StaticResource resource1 = testFileResource(baseName, new StaticResourceCreator(configuration), false, new Object[0]);
 		assertThat(resource1, is(notNullValue()));
 		assertThat(resource1.mime(), is(MimeTypes.get(baseName)));
-		assertThat(resource1.bytes(), is(Files.readAllBytes(resource1.path())));
+		assertThat(resource1.bytes().limit(), is(Files.readAllBytes(resource1.path()).length));
 	}
 	
 	@Test

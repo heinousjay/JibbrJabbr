@@ -15,6 +15,7 @@
  */
 package jj.webbit;
 
+import java.nio.ByteBuffer;
 import java.util.Date;
 
 import jj.resource.Resource;
@@ -79,6 +80,11 @@ public class JJHttpResponse extends HttpResponseWrapper {
 		return this;
 	}
 	
+	public JJHttpResponse content(final ByteBuffer bytes) {
+		super.content(bytes);
+		return this;
+	}
+	
 	public JJHttpResponse end() {
 		super.end();
 		return this;
@@ -127,12 +133,12 @@ public class JJHttpResponse extends HttpResponseWrapper {
 	 * @param resource
 	 * @return
 	 */
-	public JJHttpResponse sendCachedResource(final Resource resource, byte[] bytes) {
+	public JJHttpResponse sendCachedResource(final Resource resource, ByteBuffer bytes) {
 		return status(HttpResponseStatus.OK)
 			.header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
 			.header(HttpHeaders.Names.LAST_MODIFIED, resource.lastModifiedDate())
-			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
+			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.limit())
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.content(bytes)
 			.end();
