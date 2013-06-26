@@ -15,6 +15,8 @@
  */
 package jj.webbit;
 
+import java.util.Date;
+
 import jj.resource.Resource;
 
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -50,6 +52,38 @@ public class JJHttpResponse extends HttpResponseWrapper {
 		return this;
 	}
 	
+	public JJHttpResponse header(final String name, final String value) {
+		super.header(name, value);
+		return this;
+	}
+	
+	public JJHttpResponse headerIfNotSet(final String name, final String value) {
+		if (!containsHeader(name)) {
+			super.header(name, value);
+		}
+		return this;
+	}
+	
+	public JJHttpResponse header(final String name, final Date date) {
+		super.header(name, date);
+		return this;
+	}
+	
+	public JJHttpResponse header(final String name, final long value) {
+		super.header(name, value);
+		return this;
+	}
+	
+	public JJHttpResponse content(final byte[] bytes) {
+		super.content(bytes);
+		return this;
+	}
+	
+	public JJHttpResponse end() {
+		super.end();
+		return this;
+	}
+	
 	/**
 	 * Sends a 304 Not Modified for the given resource and ends the response,
 	 * allowing the result to be cached for one year
@@ -57,13 +91,11 @@ public class JJHttpResponse extends HttpResponseWrapper {
 	 * @return
 	 */
 	public JJHttpResponse sendNotModified(final Resource resource) {
-		status(HttpResponseStatus.NOT_MODIFIED)
+		return status(HttpResponseStatus.NOT_MODIFIED)
 			.header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
 			.header(HttpHeaders.Names.LAST_MODIFIED, resource.lastModifiedDate())
 			.end();
-		
-		return this;
 	}
 	
 	private String makeAbsoluteURL(final Resource resource) {
@@ -83,12 +115,10 @@ public class JJHttpResponse extends HttpResponseWrapper {
 	 */
 	public JJHttpResponse sendTemporaryRedirect(final Resource resource) {
 		
-		status(HttpResponseStatus.TEMPORARY_REDIRECT)
+		return status(HttpResponseStatus.TEMPORARY_REDIRECT)
 			.header(HttpHeaders.Names.LOCATION, makeAbsoluteURL(resource))
 			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 			.end();
-		
-		return this;
 	}
 	
 	/**
@@ -98,7 +128,7 @@ public class JJHttpResponse extends HttpResponseWrapper {
 	 * @return
 	 */
 	public JJHttpResponse sendCachedResource(final Resource resource, byte[] bytes) {
-		status(HttpResponseStatus.OK)
+		return status(HttpResponseStatus.OK)
 			.header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
 			.header(HttpHeaders.Names.LAST_MODIFIED, resource.lastModifiedDate())
@@ -106,26 +136,26 @@ public class JJHttpResponse extends HttpResponseWrapper {
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.content(bytes)
 			.end();
-		
-		return this;
 	}
 	
 	/**
-	 * Responds with the given resource and bytes as a 200 OK, not allowing the result to
-	 * be cached at all
+	 * Responds with the given resource and bytes as a 200 OK, not setting any
+	 * validation headers and turning caching off if no cache control headers have
+	 * previously been set on the response.  this is the appropriate responding
+	 * method for dynamically generated responses (not including simple statically
+	 * compiled dynamic resources, like less->css)
 	 * 
 	 * @param resource
 	 * @param bytes
 	 * @return
 	 */
 	public JJHttpResponse sendUncachedResource(final Resource resource, byte[] bytes) {
-		status(HttpResponseStatus.OK)
-			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE)
+		
+		return status(HttpResponseStatus.OK)
+			.headerIfNotSet(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE)
 			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.content(bytes)
 			.end();
-		
-		return this;
 	}
 }

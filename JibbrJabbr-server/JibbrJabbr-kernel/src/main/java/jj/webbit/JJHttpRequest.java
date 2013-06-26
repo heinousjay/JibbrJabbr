@@ -1,6 +1,7 @@
 package jj.webbit;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,18 +21,20 @@ public class JJHttpRequest extends HttpRequestWrapper {
 		InitialExecution {
 			@Override
 			public String toString() {
-				return "initial execution";
+				return "Initial execution";
 			}
 		},
 		ReadyFunctionExecution {
 			@Override
 			public String toString() {
-				return "ready function execution";
+				return "Ready function execution";
 			}
 		};
 	}
 	
-	private static final String HEADER_X_HOST = "x-host"; 
+	private static final String HEADER_X_HOST = "x-host";
+	
+	private static final String HEADER_X_SECURE = "x-secure";
 	
 	private static final String PROCESSING_STATE = "processing state";
 	
@@ -56,17 +59,20 @@ public class JJHttpRequest extends HttpRequestWrapper {
 		return (AssociatedScriptBundle)data(ASSOCIATED_SCRIPT_BUNDLE);
 	}
 	
-	public void associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
+	public JJHttpRequest associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
 		data(ASSOCIATED_SCRIPT_BUNDLE, associatedScriptBundle);
+		return this;
 	}
 	
-	public void startingInitialExecution() {
+	public JJHttpRequest startingInitialExecution() {
 		data(PROCESSING_STATE, State.InitialExecution);
 		associatedScriptBundle().initializing(true);
+		return this;
 	}
 	
-	public void startingReadyFunction() {
+	public JJHttpRequest startingReadyFunction() {
 		data(PROCESSING_STATE, State.ReadyFunctionExecution);
+		return this;
 	}
 	
 	public State state() {
@@ -80,7 +86,18 @@ public class JJHttpRequest extends HttpRequestWrapper {
 	}
 	
 	public boolean secure() {
-		return false;
+		return "true".equals(header(HEADER_X_SECURE));
+	}
+	
+	public URI absoluteUri() {
+		return URI.create(
+			new StringBuilder("http")
+				.append(secure() ? "s" : "")
+				.append("://")
+				.append(host())
+				.append(uri())
+				.toString()
+		);
 	}
 
 	/**
@@ -89,7 +106,7 @@ public class JJHttpRequest extends HttpRequestWrapper {
 	 * some other case may come up
 	 * @param message
 	 */
-	public void addStartupJQueryMessage(final JQueryMessage message) {
+	public JJHttpRequest addStartupJQueryMessage(final JQueryMessage message) {
 		@SuppressWarnings("unchecked")
 		ArrayList<JQueryMessage> messages = (ArrayList<JQueryMessage>)data().get(STARTUP_JQUERY_MESSAGES);
 		if (messages == null) {
@@ -97,6 +114,7 @@ public class JJHttpRequest extends HttpRequestWrapper {
 			data().put(STARTUP_JQUERY_MESSAGES, messages);
 		}
 		messages.add(message);
+		return this;
 	}
 	
 	public List<JQueryMessage> startupJQueryMessages() {
