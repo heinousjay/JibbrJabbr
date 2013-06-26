@@ -90,10 +90,17 @@ class ScriptBundleCreator {
 		log.trace("shared script is {}", sharedScriptResource);
 		log.trace("server script is {}", serverScriptResource);
 		
-		String clientStubs = extractStubs(clientScriptResource != null ? clientScriptResource.script() : "");
+		String clientStubs = extractClientStubs(clientScriptResource.script());
+		
 		Scriptable scope = createLocalScope(baseName);
-		Script serverScript = 
-			compile(scope, clientStubs, clientScriptResource, sharedScriptResource, serverScriptResource);
+		
+		Script serverScript = compile(
+			scope,
+			clientStubs,
+			clientScriptResource,
+			sharedScriptResource,
+			serverScriptResource
+		);
 		
 		return new AssociatedScriptBundle(
 			clientScriptResource,
@@ -111,39 +118,44 @@ class ScriptBundleCreator {
 		Pattern.compile("^function[\\s]*([^\\(]+)\\([^\\)]*\\)[\\s]*\\{[\\s]*$");
 	
 	@ScriptThread
-	private String extractStubs(String clientScript) {
+	private String extractClientStubs(String clientScript) {
 		StringBuilder stubs = new StringBuilder();
-		final String[] lines = COUNT_PATTERN.split(clientScript);
-		Matcher lastMatcher = null;
-		String previousLine = null;
-		for (String line : lines) {
-			if (lastMatcher == null) {
-				Matcher matcher = TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN.matcher(line);
-				if (matcher.matches()) {
-					lastMatcher = matcher;
-				} 
-			} else if ("}".equals(line) && lastMatcher != null) {
-				boolean hasReturn = previousLine.trim().startsWith("return ");
-				stubs.append("function ")
-					.append(lastMatcher.group(1))
-					.append("(){")
-					.append(hasReturn ? "return " : "")
-					.append("global['")
-					.append(hasReturn ? DoInvokeFunction.PROP_DO_INVOKE : DoCallFunction.PROP_DO_CALL)
-					.append("']('")
-					.append(lastMatcher.group(1))
-					.append("',global['")
-					.append(RhinoObjectCreator.PROP_CONVERT_ARGS)
-					.append("'](arguments))")
-					.append(";}\n");
-				
-				
-				lastMatcher = null;
-			}
-			
-			previousLine = line;
-		}
 		
+		if (clientScript != null) {
+			log.trace("extracting client stubs");
+			final String[] lines = COUNT_PATTERN.split(clientScript);
+			Matcher lastMatcher = null;
+			String previousLine = null;
+			for (String line : lines) {
+				if (lastMatcher == null) {
+					Matcher matcher = TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN.matcher(line);
+					if (matcher.matches()) {
+						lastMatcher = matcher;
+					} 
+				} else if ("}".equals(line) && lastMatcher != null) {
+					boolean hasReturn = previousLine.trim().startsWith("return ");
+					stubs.append("function ")
+						.append(lastMatcher.group(1))
+						.append("(){")
+						.append(hasReturn ? "return " : "")
+						.append("global['")
+						.append(hasReturn ? DoInvokeFunction.PROP_DO_INVOKE : DoCallFunction.PROP_DO_CALL)
+						.append("']('")
+						.append(lastMatcher.group(1))
+						.append("',global['")
+						.append(RhinoObjectCreator.PROP_CONVERT_ARGS)
+						.append("'](arguments))")
+						.append(";}\n");
+					
+					log.trace("found {}, {} return", lastMatcher.group(1), hasReturn ? "with" : "no");
+					
+					
+					lastMatcher = null;
+				}
+				
+				previousLine = line;
+			}
+		}
 		return stubs.toString();
 	}
 	
@@ -190,6 +202,8 @@ class ScriptBundleCreator {
 		Context context = rhinoObjectCreator.context();
 		try { 
 			
+			StringBuilder script = new StringBuilder();
+			
 			if (sharedScriptResource != null) {
 				try {
 					log.trace("evaluating shared script");
@@ -210,11 +224,11 @@ class ScriptBundleCreator {
 			if (clientScriptResource != null) {
 				try {
 					log.trace("evaluating client stub");
-					log.trace("{}", clientStub);
 					
 					context.evaluateString(local, clientStub, "client stub for " + serverScriptResource.path(), 1, null);
 				} catch (Exception e) {
-					log.error("couldn't evaluate the client stub, check function definitions in {}", clientScriptResource.path());
+					log.error("couldn't evaluate the client stub (follows), check function definitions in {}", clientScriptResource.path());
+					log.error("\n{}", clientStub);
 					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
 				}
 			}
