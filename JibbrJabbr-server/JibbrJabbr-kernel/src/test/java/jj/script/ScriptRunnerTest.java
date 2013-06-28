@@ -9,10 +9,10 @@ import jj.MockTaskCreator;
 import jj.ScriptExecutorFactory;
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
+import jj.http.JJHttpRequest;
+import jj.http.JJWebSocketConnection;
+import jj.http.JJHttpRequest.State;
 import jj.resource.ScriptResource;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJHttpRequest.State;
-import jj.webbit.JJWebSocketConnection;
 
 import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.jsoup.Jsoup;

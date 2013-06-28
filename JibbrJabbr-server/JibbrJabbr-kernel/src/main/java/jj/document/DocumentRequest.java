@@ -2,11 +2,10 @@ package jj.document;
 
 import jj.Sequence;
 import jj.resource.Resource;
-import jj.webbit.JJHttpRequest;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
 
 import org.jsoup.nodes.Document;
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpResponse;
 
 /**
  * All of the information associated with a document request,
@@ -23,8 +22,7 @@ public class DocumentRequest {
 	private final String mime;
 	private final Document document;
 	private final JJHttpRequest httpRequest;
-	private final HttpResponse httpResponse;
-	private final HttpControl httpControl;
+	private final JJHttpResponse httpResponse;
 	private final String id = "request " + idSequence.next();
 	
 	// this is a little hacky but the idea is if the request needed IO, it's the first time
@@ -38,8 +36,7 @@ public class DocumentRequest {
 		final Resource resource,
 		final Document document,
 		final JJHttpRequest httpRequest,
-		final HttpResponse httpResponse,
-		final HttpControl httpControl,
+		final JJHttpResponse httpResponse,
 		final boolean neededIO
 	) {
 		this.baseName = resource.baseName();
@@ -47,7 +44,6 @@ public class DocumentRequest {
 		this.document = document.clone();
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
-		this.httpControl = httpControl;
 		this.neededIO = neededIO;
 	}
 	
@@ -67,12 +63,8 @@ public class DocumentRequest {
 		return httpRequest;
 	}
 	
-	public HttpResponse httpResponse() {
+	public JJHttpResponse httpResponse() {
 		return httpResponse;
-	}
-	
-	public HttpControl httpControl() {
-		return httpControl;
 	}
 	
 	public String id() {

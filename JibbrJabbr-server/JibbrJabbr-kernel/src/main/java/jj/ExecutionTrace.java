@@ -15,9 +15,9 @@
  */
 package jj;
 
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.WebSocketConnection;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.JJWebSocketConnection;
 
 /**
  * @author jason
@@ -37,15 +37,15 @@ public interface ExecutionTrace {
 	 * @param request
 	 * @param response
 	 */
-	void start(HttpRequest request, HttpResponse response);
+	void start(JJHttpRequest request, JJHttpResponse response);
 
-	void end(HttpRequest request);
+	void end(JJHttpRequest request);
 
-	void start(WebSocketConnection connection);
+	void start(JJWebSocketConnection connection);
 	
-	void end(WebSocketConnection connection);
+	void end(JJWebSocketConnection connection);
 
-	void message(WebSocketConnection connection, String message);
+	void message(JJWebSocketConnection connection, String message);
 	
-	void send(WebSocketConnection connection, String message);
+	void send(JJWebSocketConnection connection, String message);
 }

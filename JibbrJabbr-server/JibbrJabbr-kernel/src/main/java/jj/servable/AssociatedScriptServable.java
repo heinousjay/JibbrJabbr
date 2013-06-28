@@ -12,14 +12,13 @@ import jj.configuration.Configuration;
 import jj.resource.ScriptResource;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJHttpResponse;
-import jj.webbit.RequestProcessor;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.RequestProcessor;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webbitserver.HttpControl;
 
 /**
  * handles automatic inclusion
@@ -78,8 +77,7 @@ class AssociatedScriptServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request,
-		final JJHttpResponse response,
-		final HttpControl control
+		final JJHttpResponse response
 	) throws IOException {
 		
 		final ScriptResource scriptResource = resourceFromUri(request.uri());

@@ -1,13 +1,12 @@
 package jj.script;
 
-import java.util.Map;
-
 import javax.inject.Singleton;
 
+import jj.DataStore;
 import jj.document.DocumentRequestProcessor;
 import jj.jqmessage.JQueryMessage;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJWebSocketConnection;
+import jj.http.JJHttpRequest;
+import jj.http.JJWebSocketConnection;
 
 import org.jsoup.nodes.Document;
 import org.mozilla.javascript.Context;
@@ -107,31 +106,31 @@ public class CurrentScriptContext {
 	}
 
 	private void addPendingContinuation(
-		Map<String, Object> data,
+		DataStore dataStore,
 		String key,
 		ContinuationPending continuationPending
 	) {
 		String pendingKey = String.format(PENDING_KEY, key);
 		
-		if (data.containsKey(pendingKey)) {
+		if (dataStore.containsData(pendingKey)) {
 			log.error("more than one continuation pending under key {} for {}", key, onBehalfOf());
-			log.error("current pending : {}", data.get(pendingKey));
+			log.error("current pending : {}", dataStore.data(pendingKey));
 			log.error("new pending : {}", continuationPending);
 			throw new AssertionError("more than one continuation pending for a connection.");
 		}
 		
-		data.put(pendingKey, continuationPending);
+		dataStore.data(pendingKey, continuationPending);
 	}
 
-	private ContinuationPending pendingContinuation(Map<String, Object> data, String key) {
+	private ContinuationPending pendingContinuation(DataStore dataStore, String key) {
 		String pendingKey = String.format(PENDING_KEY, key);
 		
-		if (data.get(pendingKey) == null) {
+		if (!dataStore.containsData(pendingKey)) {
 			log.error("asked to retrieve a pending continuation under the wrong key {} for {}", key, onBehalfOf());
 			throw new AssertionError("asked to retrieve a pending continuation under the wrong key");
 		}
 		
-		return (ContinuationPending)data.remove(pendingKey);
+		return (ContinuationPending)dataStore.removeData(pendingKey);
 	}
 	
 	/**
@@ -185,15 +184,15 @@ public class CurrentScriptContext {
 			
 			switch(type()) {
 			case HttpRequest:
-				addPendingContinuation(httpRequest().data(), pendingId, continuation);
+				addPendingContinuation(httpRequest(), pendingId, continuation);
 				break;
 			
 			case WebSocket:
-				addPendingContinuation(connection().data(), pendingId, continuation);
+				addPendingContinuation(connection(), pendingId, continuation);
 				break;
 			
 			case ModuleInitialization:
-				addPendingContinuation(requiredModule().data(), pendingId, continuation);
+				addPendingContinuation(requiredModule(), pendingId, continuation);
 				break;
 				
 			default:
@@ -212,13 +211,13 @@ public class CurrentScriptContext {
 		
 		switch(type()) {
 		case HttpRequest:
-			return pendingContinuation(httpRequest().data(), key);
+			return pendingContinuation(httpRequest(), key);
 		
 		case WebSocket:
-			return pendingContinuation(connection().data(), key);
+			return pendingContinuation(connection(), key);
 		
 		case ModuleInitialization:
-			return pendingContinuation(requiredModule().data(), key);
+			return pendingContinuation(requiredModule(), key);
 			
 		default:
 			throw new AssertionError("pending continuation request but it doesn't exist");

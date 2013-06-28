@@ -21,11 +21,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.logging.ExecutionTraceLogger;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.JJWebSocketConnection;
 
 import org.slf4j.Logger;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.WebSocketConnection;
 
 /**
  * @author jason
@@ -37,7 +37,7 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	private static final class State {
 		private JJRunnable prepared;
 		private JJRunnable current;
-		private HttpRequest request;
+		private JJHttpRequest request;
 		
 		@Override
 		public String toString() {
@@ -144,7 +144,7 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	}
 	
 	@Override
-	public void start(HttpRequest request, HttpResponse response) {
+	public void start(JJHttpRequest request, JJHttpResponse response) {
 		log.trace("Request started {}", request);
 		State state = current.get();
 		assert state == null : "somehow there is state left from some previous request " + state;
@@ -156,28 +156,28 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	}
 	
 	@Override
-	public void end(HttpRequest request) {
+	public void end(JJHttpRequest request) {
 		log.trace("Request ended {}", request);
 	}
 
 	@Override
-	public void start(WebSocketConnection connection) {
+	public void start(JJWebSocketConnection connection) {
 		log.trace("websocket connection started {}", connection);
 	}
 	
 	@Override
-	public void end(WebSocketConnection connection) {
+	public void end(JJWebSocketConnection connection) {
 		log.trace("websocket connection ended {}", connection);
 	}
 	
 	@Override
-	public void message(WebSocketConnection connection, String message) {
+	public void message(JJWebSocketConnection connection, String message) {
 		log.trace("message from websocket connection {}", connection);
 		log.trace(message);
 	}
 	
 	@Override
-	public void send(WebSocketConnection connection, String message) {
+	public void send(JJWebSocketConnection connection, String message) {
 		log.trace("sending on websocket connection {}", connection);
 		log.trace(message);
 	}

@@ -1,4 +1,4 @@
-package jj.webbit;
+package jj.http;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,8 +19,6 @@ import jj.script.ScriptBundleFinder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webbitserver.BaseWebSocketHandler;
-import org.webbitserver.WebSocketConnection;
 
 /**
  * bridges websocket connections into the correct script execution
@@ -28,7 +26,7 @@ import org.webbitserver.WebSocketConnection;
  *
  */
 @Singleton
-class JJWebSocketHandler extends BaseWebSocketHandler {
+public class JJWebSocketHandler {
 	
 	private Logger log = LoggerFactory.getLogger(JJWebSocketHandler.class);
 	
@@ -67,14 +65,13 @@ class JJWebSocketHandler extends BaseWebSocketHandler {
 		return Collections.unmodifiableMap(result);
 	}
 
-	@Override
 	@HttpControlThread
-	public void onOpen(WebSocketConnection connection) {
+	public void onOpen(JJWebSocketConnection connection) {
 		trace.start(connection);
-		String uri = connection.httpRequest().uri().substring(1);
+		String uri = connection.uri().substring(1);
 		AssociatedScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
-		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, scriptBundle == null, trace);
-		if (jjcon.immediateClosure()) {
+		
+		if (connection.immediateClosure()) {
 			log.info("connection attempted to an old script, attempting reload");
 			// need some way of noticing we are being hammered here?
 			// i mean i guess we just close em as they come in
@@ -82,30 +79,26 @@ class JJWebSocketHandler extends BaseWebSocketHandler {
 			connection.close();
 		} else {
 			log.info("new connection to {}", scriptBundle);
-			log.trace("{}", jjcon);
-			jjcon.scriptBundle(scriptBundle);
-			connections.addConnection(jjcon);
-			executors.scriptRunner().submit(jjcon, HostEvent.clientConnected, connection);
+			log.trace("{}", connection);
+			connection.scriptBundle(scriptBundle);
+			connections.addConnection(connection);
+			executors.scriptRunner().submit(connection, HostEvent.clientConnected, connection);
 		}
 	}
 
-	@Override
 	@HttpControlThread
-	public void onClose(WebSocketConnection connection) {
+	public void onClose(JJWebSocketConnection connection) {
 		trace.end(connection);
-		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false, trace);
 		// don't do anything reload command
-		if (!jjcon.immediateClosure()) {
-			executors.scriptRunner().submit(jjcon, HostEvent.clientDisconnected, connection);
-			connections.removeConnection(jjcon);
+		if (!connection.immediateClosure()) {
+			executors.scriptRunner().submit(connection, HostEvent.clientDisconnected, connection);
+			connections.removeConnection(connection);
 		}
 	}
 
-	@Override
 	@HttpControlThread
-	public void onMessage(WebSocketConnection connection, String msg) throws Throwable {
-		JJWebSocketConnection jjcon = new JJWebSocketConnection(connection, false, trace);
-		jjcon.markActivity();
+	public void onMessage(JJWebSocketConnection connection, String msg) throws Throwable {
+		connection.markActivity();
 		if ("jj-hi".equals(msg)) {
 			connection.send("jj-yo");
 		} else {
@@ -116,31 +109,29 @@ class JJWebSocketHandler extends BaseWebSocketHandler {
 				JQueryMessage message = JQueryMessage.fromString(msg);
 				
 				if (messageProcessors.containsKey(message.type())) {
-					messageProcessors.get(message.type()).handle(jjcon, message);
+					messageProcessors.get(message.type()).handle(connection, message);
 					success = true;
 				}
 			} catch (JQueryMessageException e) {}
 			
 			if (!success) {
 				log.warn("{} spoke gibberish to me: {}", 
-					jjcon,
+					connection,
 					msg
 				);
 			}
 		}
 	}
 
-	@Override
 	@HttpControlThread
-	public void onMessage(WebSocketConnection connection, byte[] msg) throws Throwable {
+	public void onMessage(JJWebSocketConnection connection, byte[] msg) throws Throwable {
 		// at some point this is going to become interesting,
 		// thinking about streaming bytes in for uploads...
 		log.info("receiving bytes, length is {}", msg.length);
 	}
 
-	@Override
 	@HttpControlThread
-	public void onPong(WebSocketConnection connection, byte[] msg) throws Throwable {
+	public void onPong(JJWebSocketConnection connection, byte[] msg) throws Throwable {
 		
 	}
 }

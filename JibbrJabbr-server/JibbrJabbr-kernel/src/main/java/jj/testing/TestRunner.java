@@ -15,6 +15,8 @@
  */
 package jj.testing;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -23,8 +25,9 @@ import javax.inject.Inject;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import jj.ExecutionTrace;
+import jj.JJExecutors;
 import jj.logging.TestRunnerLogger;
-import jj.webbit.JJEngineHttpHandler;
+import jj.http.JJEngineHttpHandler;
 
 /**
  * @author jason
@@ -55,14 +58,14 @@ class TestRunner {
 		}
 		
 		@Override
-		public int status() throws Exception {
+		public HttpResponseStatus status() throws Exception {
 			testRunnerLog.trace("status() on {}", response.id());
 			getResponse();
 			return response.status();
 		};
 		
 		@Override
-		public int status(final long timeout, final TimeUnit unit) throws Exception {
+		public HttpResponseStatus status(final long timeout, final TimeUnit unit) throws Exception {
 			testRunnerLog.trace("status({}, {}) on {}", timeout, unit, response.id());
 			getResponse(timeout, unit);
 			return response.status();
@@ -126,45 +129,50 @@ class TestRunner {
 		
 		@Override
 		public void dumpObjects() {
-			testRunnerLog.trace("{}", control);
-			testRunnerLog.trace("{}", control.request());
+			testRunnerLog.trace("{}", request);
 			testRunnerLog.trace("{}", response);
 		}
 	}
 	
-	private final TestHttpControl control;
+	private final JJExecutors executors;
+	private final TestHttpRequest request;
+	private final TestHttpResponse response;
 	private final JJEngineHttpHandler handler;
 	private final ExecutionTrace trace;
 	
 	@Inject
 	TestRunner(
-		final TestHttpControl control,
+		final JJExecutors executors,
+		final TestHttpRequest request,
+		final TestHttpResponse response,
 		final JJEngineHttpHandler handler,
 		final ExecutionTrace trace,
 		final @TestRunnerLogger Logger testRunnerLog
 	) {
-		this.control = control;
+		this.executors = executors;
+		this.request = request;
+		this.response = response;
 		this.handler = handler;
 		this.trace = trace;
 		this.testRunnerLog = testRunnerLog;
 	}
 
 	TestHttpRequest request() {
-		return control.request();
+		return request;
 	}
 	
 	TestHttpClient run() {
-		control.execute(new Runnable() {
+		executors.httpControlExecutor().execute(new Runnable() {
 			public void run() {
 				try {
-					trace.start(control.request(), control.response());
-					handler.handleHttpRequest(control.request(), control.response(), control);
+					trace.start(request, response);
+					handler.handleHttpRequest(request, response);
 				} catch (Throwable t) {
-					control.response().error(t);
+					response.error(t);
 				}
 			}
 		});
-		return new TestHttpClientImpl(control.response());
+		return new TestHttpClientImpl(response);
 	}
 	
 	

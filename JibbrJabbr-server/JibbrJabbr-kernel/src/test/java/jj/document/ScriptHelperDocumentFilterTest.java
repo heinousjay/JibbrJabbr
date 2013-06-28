@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import jj.configuration.Configuration;
+import jj.http.JJHttpRequest;
 import jj.jqmessage.JQueryMessage;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
@@ -17,7 +18,6 @@ import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 import jj.script.AssociatedScriptBundle;
-import jj.webbit.JJHttpRequest;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

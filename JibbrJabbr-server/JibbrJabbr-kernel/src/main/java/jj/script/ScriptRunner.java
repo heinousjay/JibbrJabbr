@@ -19,7 +19,7 @@ import jj.ScriptThread;
 import jj.TaskCreator;
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
-import jj.webbit.JJWebSocketConnection;
+import jj.http.JJWebSocketConnection;
 
 /**
  * DO NOT DEPEND ON THIS CLASS, DEPEND ON {@link JJExecutors}

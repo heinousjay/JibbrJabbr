@@ -15,8 +15,8 @@
  */
 package jj.servable;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
-import static org.jboss.netty.util.CharsetUtil.UTF_8;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 

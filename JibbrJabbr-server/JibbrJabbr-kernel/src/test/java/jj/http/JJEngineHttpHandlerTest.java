@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
 
 import static org.mockito.BDDMockito.*;
 
@@ -28,9 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
 
 /**
  * @author jason
@@ -43,18 +40,14 @@ public class JJEngineHttpHandlerTest {
 	@Mock Servable servable1;
 	@Mock Servable servable2;
 	@Mock Servable servable3;
-	@Mock JJHttpObjectsCreator creator;
-	@Mock HttpRequest request1;
-	@Mock HttpRequest request2;
-	@Mock HttpRequest request3;
-	@Mock HttpRequest request4;
+
 	@Mock JJHttpRequest httpRequest1;
 	@Mock JJHttpRequest httpRequest2;
 	@Mock JJHttpRequest httpRequest3;
 	@Mock JJHttpRequest httpRequest4;
-	@Mock HttpResponse response;
+	
 	@Mock JJHttpResponse httpResponse;
-	@Mock HttpControl control;
+	
 	@Mock RequestProcessor requestProcessor1;
 	@Mock RequestProcessor requestProcessor2;
 	@Mock RequestProcessor requestProcessor3;
@@ -65,35 +58,25 @@ public class JJEngineHttpHandlerTest {
 	public void before() throws Exception {
 		executors = new MockJJExecutors();
 		
-		given(creator.createJJHttpRequest(request1)).willReturn(httpRequest1);
-		given(creator.createJJHttpRequest(request2)).willReturn(httpRequest2);
-		given(creator.createJJHttpRequest(request3)).willReturn(httpRequest3);
-		given(creator.createJJHttpRequest(request4)).willReturn(httpRequest4);
-		
-		given(creator.createJJHttpResponse(httpRequest1, response)).willReturn(httpResponse);
-		given(creator.createJJHttpResponse(httpRequest2, response)).willReturn(httpResponse);
-		given(creator.createJJHttpResponse(httpRequest3, response)).willReturn(httpResponse);
-		given(creator.createJJHttpResponse(httpRequest4, response)).willReturn(httpResponse);
-		
 		given(servable1.isMatchingRequest(httpRequest1)).willReturn(true);
 		given(servable1.isMatchingRequest(httpRequest2)).willReturn(false);
 		given(servable1.isMatchingRequest(httpRequest3)).willReturn(false);
 		given(servable1.isMatchingRequest(httpRequest4)).willReturn(false);
-		given(servable1.makeRequestProcessor(httpRequest1, httpResponse, control)).willReturn(requestProcessor1);
+		given(servable1.makeRequestProcessor(httpRequest1, httpResponse)).willReturn(requestProcessor1);
 		
 		given(servable2.isMatchingRequest(httpRequest1)).willReturn(false);
 		given(servable2.isMatchingRequest(httpRequest2)).willReturn(true);
 		given(servable2.isMatchingRequest(httpRequest3)).willReturn(false);
 		given(servable2.isMatchingRequest(httpRequest4)).willReturn(true);
-		given(servable2.makeRequestProcessor(httpRequest2, httpResponse, control)).willReturn(requestProcessor2);
-		given(servable2.makeRequestProcessor(httpRequest4, httpResponse, control)).willReturn(null);
+		given(servable2.makeRequestProcessor(httpRequest2, httpResponse)).willReturn(requestProcessor2);
+		given(servable2.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(null);
 		
 		given(servable3.isMatchingRequest(httpRequest1)).willReturn(false);
 		given(servable3.isMatchingRequest(httpRequest2)).willReturn(false);
 		given(servable3.isMatchingRequest(httpRequest3)).willReturn(true);
 		given(servable3.isMatchingRequest(httpRequest4)).willReturn(true);
-		given(servable3.makeRequestProcessor(httpRequest3, httpResponse, control)).willReturn(requestProcessor3);
-		given(servable3.makeRequestProcessor(httpRequest4, httpResponse, control)).willReturn(requestProcessor3);
+		given(servable3.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
+		given(servable3.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
 		resourceTypes = new LinkedHashSet<>();
 		resourceTypes.add(servable1);
@@ -104,10 +87,10 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testBasicOperation() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, creator, resourceTypes);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes);
 		
 		//when
-		handler.handleHttpRequest(request1, response, control);
+		handler.handleHttpRequest(httpRequest1, httpResponse);
 		executors.executor.runUntilIdle();
 		
 		//then
@@ -115,7 +98,7 @@ public class JJEngineHttpHandlerTest {
 		verify(requestProcessor1).process();
 		
 		//when
-		handler.handleHttpRequest(request2, response, control);
+		handler.handleHttpRequest(httpRequest2, httpResponse);
 		executors.executor.runUntilIdle();
 		
 		//then
@@ -123,7 +106,7 @@ public class JJEngineHttpHandlerTest {
 		verify(requestProcessor2).process();
 		
 		//when
-		handler.handleHttpRequest(request3, response, control);
+		handler.handleHttpRequest(httpRequest3, httpResponse);
 		executors.executor.runUntilIdle();
 		
 		//then
@@ -131,36 +114,34 @@ public class JJEngineHttpHandlerTest {
 		verify(requestProcessor3).process();
 		
 		//when
-		handler.handleHttpRequest(request1, response, control);
+		handler.handleHttpRequest(httpRequest1, httpResponse);
 		executors.executor.runUntilIdle();
 		
 		//then
 		verify(requestProcessor1, times(2)).process();
 		
 		//when
-		handler.handleHttpRequest(request2, response, control);
+		handler.handleHttpRequest(httpRequest2, httpResponse);
 		executors.executor.runUntilIdle();
 		
 		//then
 		verify(requestProcessor2, times(2)).process();
 		
 		//when
-		handler.handleHttpRequest(request3, response, control);
+		handler.handleHttpRequest(httpRequest3, httpResponse);
 		executors.executor.runUntilIdle();
 		
 		//then
 		verify(requestProcessor3, times(2)).process();
-		
-		verify(control, never()).nextHandler();
 	}
 	
 	@Test
 	public void testHandover() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, creator, resourceTypes);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes);
 		
 		//when
-		handler.handleHttpRequest(request4, response, control);
+		handler.handleHttpRequest(httpRequest4, httpResponse);
 		executors.executor.runUntilIdle();
 		
 		//then
@@ -168,6 +149,5 @@ public class JJEngineHttpHandlerTest {
 		verify(servable3).isMatchingRequest(httpRequest4);
 		
 		verify(requestProcessor3).process();
-		verify(control, never()).nextHandler();
 	}
 }

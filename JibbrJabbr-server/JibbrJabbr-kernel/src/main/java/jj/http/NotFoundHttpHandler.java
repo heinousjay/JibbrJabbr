@@ -1,4 +1,4 @@
-package jj.webbit;
+package jj.http;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -6,15 +6,11 @@ import javax.inject.Singleton;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 @Singleton
-public class NotFoundHttpHandler implements HttpHandler {
+public class NotFoundHttpHandler {
 	
 	private static final String NOT_FOUND = "errors/404.html";
 	
@@ -25,11 +21,9 @@ public class NotFoundHttpHandler implements HttpHandler {
 		this.finder = finder;
 	}
 	
-	@Override
 	public void handleHttpRequest(
-		final HttpRequest request,
-		final HttpResponse response,
-		final HttpControl control
+		final JJHttpRequest request,
+		final JJHttpResponse response
 	) throws Exception {
 		// this can be overriden later on, perhaps? of course!
 		// but that will be handled in the engine handler. at
@@ -39,7 +33,7 @@ public class NotFoundHttpHandler implements HttpHandler {
 		if (notFound == null) { // the irony!
 			response.error(new IllegalStateException("internal assets are missing!"));
 		} else {
-			response.status(HttpResponseStatus.NOT_FOUND.getCode())
+			response.status(HttpResponseStatus.NOT_FOUND)
 				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 				.header(HttpHeaders.Names.CONTENT_TYPE, notFound.mime())
 				.header(HttpHeaders.Names.CONTENT_LENGTH, notFound.bytes().limit())

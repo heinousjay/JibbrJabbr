@@ -1,4 +1,4 @@
-package jj.webbit;
+package jj.http;
 
 /**
  * returned by a Servable if the request can be handled

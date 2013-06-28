@@ -13,34 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import jj.resource.Resource;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.wrapper.HttpResponseWrapper;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * @author jason
  *
  */
-public class JJHttpResponse extends HttpResponseWrapper {
+public class JJHttpResponse {
 
 	private static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
 	
+	private final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+	
 	private final JJHttpRequest request;
+	
+	private final Channel channel;
+	
+	private final Charset charset = StandardCharsets.UTF_8;
 	
 	/**
 	 * @param response
 	 */
-	public JJHttpResponse(final JJHttpRequest request, final HttpResponse response) {
-		super(response);
+	public JJHttpResponse(final JJHttpRequest request, final Channel channel) {
 		this.request = request;
+		this.channel = channel;
+	}
+	
+	public HttpResponseStatus status() {
+		return response.getStatus();
 	}
 	
 	/**
@@ -49,44 +63,52 @@ public class JJHttpResponse extends HttpResponseWrapper {
 	 * @return
 	 */
 	public JJHttpResponse status(final HttpResponseStatus status) {
-		status(status.getCode());
+		response.setStatus(status);
 		return this;
 	}
 	
 	public JJHttpResponse header(final String name, final String value) {
-		super.header(name, value);
+		response.headers().add(name, value);
 		return this;
 	}
-	
+
 	public JJHttpResponse headerIfNotSet(final String name, final String value) {
 		if (!containsHeader(name)) {
-			super.header(name, value);
+			header(name, value);
 		}
 		return this;
 	}
 	
+	/**
+	 * @param name
+	 * @return
+	 */
+	public boolean containsHeader(String name) {
+		return response.headers().contains(name);
+	}
+
 	public JJHttpResponse header(final String name, final Date date) {
-		super.header(name, date);
+		response.headers().add(name, date);
 		return this;
 	}
 	
 	public JJHttpResponse header(final String name, final long value) {
-		super.header(name, value);
+		response.headers().add(name, value);
 		return this;
 	}
 	
 	public JJHttpResponse content(final byte[] bytes) {
-		super.content(bytes);
+		response.content().writeBytes(bytes);
 		return this;
 	}
 	
 	public JJHttpResponse content(final ByteBuffer bytes) {
-		super.content(bytes);
+		response.content().writeBytes(bytes);
 		return this;
 	}
 	
 	public JJHttpResponse end() {
-		super.end();
+		channel.write(response);
 		return this;
 	}
 	
@@ -163,5 +185,34 @@ public class JJHttpResponse extends HttpResponseWrapper {
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.content(bytes)
 			.end();
+	}
+
+	/**
+	 * @param e
+	 */
+	public JJHttpResponse error(Throwable e) {
+		return this;
+	}
+
+	/**
+	 * @return
+	 */
+	public Charset charset() {
+		return charset;
+	}
+
+	/**
+	 * @param cacheControl
+	 * @return
+	 */
+	public String header(String name) {
+		return response.headers().get(name);
+	}
+
+	/**
+	 * @return
+	 */
+	public String contentsString() {
+		return response.content().toString(charset);
 	}
 }

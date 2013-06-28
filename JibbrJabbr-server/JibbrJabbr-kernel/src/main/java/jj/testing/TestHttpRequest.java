@@ -15,47 +15,29 @@
  */
 package jj.testing;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpRequest;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.webbitserver.helpers.DateHelper;
-import org.webbitserver.stub.StubHttpRequest;
+import jj.DateFormatHelper;
+import jj.http.JJHttpRequest;
 
 /**
  * @author jason
  *
  */
-class TestHttpRequest extends StubHttpRequest {
+class TestHttpRequest extends JJHttpRequest {
 	
-	private final Map<String, String> headers = new HashMap<>();
-	
-	public Map<String, String> headers() {
-		return Collections.unmodifiableMap(headers);
-	}
-	
-	@Override 
-	public String header(String name) {
-		return headers.get(name);
-	}
-
-	@Override
-	public StubHttpRequest header(String name, String value) {
-		if (value == null) {
-			headers.remove(name);
-		} else {
-			headers.put(name, value);
-		}
-		return this;
-	}
-
-	public StubHttpRequest header(String name, long value) {
-		return header(name, String.valueOf(value));
-	}
-
-	public StubHttpRequest header(String name, Date value) {
-		return header(name, DateHelper.rfc1123Format(value));
+	/**
+	 * @param request
+	 * @param channel
+	 */
+	public TestHttpRequest(final FullHttpRequest request, final Channel channel) {
+		super(request, channel);
 	}
 
 	@Override
@@ -64,9 +46,18 @@ class TestHttpRequest extends StubHttpRequest {
 			.append("[").append(id()).append("] {")
 			.append("method=").append(method())
 			.append(", uri=").append(uri())
-			.append(", headers=").append(headers())
+			.append(", headers=").append(request.headers())
 			.append(", body=").append(body())
 			.append("}")
 			.toString();
+	}
+
+	/**
+	 * @param uri
+	 * @return
+	 */
+	public TestHttpRequest uri(String uri) {
+		request.setUri(uri);
+		return this;
 	}
 }

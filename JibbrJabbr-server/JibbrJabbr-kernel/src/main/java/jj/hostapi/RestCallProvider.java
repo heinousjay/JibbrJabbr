@@ -12,7 +12,7 @@ import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
 import jj.uri.UriTemplate;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;

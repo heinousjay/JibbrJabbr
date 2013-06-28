@@ -12,9 +12,9 @@ import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.ScriptThread;
 import jj.script.AssociatedScriptBundle;
-import jj.webbit.JJHttpRequest;
+import jj.http.JJHttpRequest;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

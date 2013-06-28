@@ -16,11 +16,9 @@ import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJHttpResponse;
-import jj.webbit.RequestProcessor;
-
-import org.webbitserver.HttpControl;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.RequestProcessor;
 
 @Singleton
 class HtmlServable extends Servable {
@@ -120,8 +118,7 @@ class HtmlServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request,
-		final JJHttpResponse response,
-		final HttpControl control
+		final JJHttpResponse response
 	) throws IOException {
 		
 		DocumentRequestProcessorImpl result = null;
@@ -142,7 +139,7 @@ class HtmlServable extends Servable {
 				
 				result = new DocumentRequestProcessorImpl(
 					executors,
-					new DocumentRequest(htmlResource, htmlResource.document(), request, response, control, executors.isIOThread()),
+					new DocumentRequest(htmlResource, htmlResource.document(), request, response, executors.isIOThread()),
 					documentFilters
 				);
 			}

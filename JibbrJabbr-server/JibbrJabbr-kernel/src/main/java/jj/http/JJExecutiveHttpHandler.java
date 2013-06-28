@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -28,14 +27,8 @@ import jj.DateFormatHelper;
 import jj.ExecutionTrace;
 import jj.logging.AccessLogger;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.helpers.DateHelper;
-import org.webbitserver.wrapper.HttpResponseWrapper;
 
 /**
  * logs accesses in combined log format,
@@ -48,7 +41,7 @@ import org.webbitserver.wrapper.HttpResponseWrapper;
  *
  */
 @Singleton
-class JJExecutiveHttpHandler implements HttpHandler {
+class JJExecutiveHttpHandler {
 	
 	private static final String RESPONSE_HEADERS = "Response Headers";
 	
@@ -62,71 +55,34 @@ class JJExecutiveHttpHandler implements HttpHandler {
 		this.trace = trace;
 	}
 
-	@Override
 	public void handleHttpRequest(
-		final HttpRequest request,
-		final HttpResponse response,
-		final HttpControl control
+		final JJHttpRequest request,
+		final JJHttpResponse response
 	) throws Exception {
 		request.data(RESPONSE_HEADERS, new HashMap<String, String>());
 		
-		HttpResponseWrapper responseWrapper = new HttpResponseWrapper(response) {
-		 
-		 	@Override
-		 	public HttpResponseWrapper header(String name, String value) {
-		 		makeHeader(request, name, value);
-		 		return super.header(name, value);
-		 	}
-		 
-		 	@Override
-		 	public HttpResponseWrapper header(String name, long value) {
-		 		makeHeader(request, name, String.valueOf(value));
-		 		return super.header(name, value);
-		 	}
-		 	
-		 	@Override
-		 	public HttpResponseWrapper header(String name, Date value) {
-		 		makeHeader(request, name, DateHelper.rfc1123Format(value));
-		 		return super.header(name, value);
-		 	}
-		 
-			@Override
-			public HttpResponseWrapper end() {
-				log(request, response);
-				super.end();
-				trace.end(request);
-				return this;
-			}
-			
-			@Override
-			public HttpResponseWrapper error(Throwable error) {
-				log(request, response);
-				super.error(error);
-				trace.end(request);
-				return this;
-			}
-		};
 		try {
 			access.error("{}", request);
 			trace.start(request, response);
-			control.nextHandler(request, responseWrapper);
 		} catch (Throwable t) {
 			access.error("{}", request);
 			access.error("{}", t);
 		}
 	}
 	
-	private void log(final HttpRequest request, final HttpResponse response) {
+	private void log(final JJHttpRequest request, final JJHttpResponse response) {
 		
-		access.info("{} - - {} \"{} {} HTTP/1.1\" {} {} {} \"{}\"", 
-			extractIP(request.remoteAddress()),
-			DateFormatHelper.nowInAccessLogFormat(),
-			request.method(),
-			request.uri(),
-			response.status(),
-			header(request, HttpHeaders.Names.CONTENT_LENGTH),
-			extractReferer(request),
-			request.header(HttpHeaders.Names.USER_AGENT));
+		if (access.isInfoEnabled()) {
+			access.info("{} - - {} \"{} {} HTTP/1.1\" {} {} {} \"{}\"", 
+				extractIP(request.remoteAddress()),
+				DateFormatHelper.nowInAccessLogFormat(),
+				request.method(),
+				request.uri(),
+				response.status(),
+				header(request, HttpHeaders.Names.CONTENT_LENGTH),
+				extractReferer(request),
+				request.header(HttpHeaders.Names.USER_AGENT));
+		}
 		
 		if (access.isTraceEnabled()) {
 			access.trace("Request Headers");
@@ -146,7 +102,7 @@ class JJExecutiveHttpHandler implements HttpHandler {
 		return (remoteAddress instanceof InetSocketAddress) ? ((InetSocketAddress)remoteAddress).getAddress().getHostAddress() : remoteAddress.toString();
 	}
 	
-	private String extractReferer(final HttpRequest request) {
+	private String extractReferer(final JJHttpRequest request) {
 		
 		return request.hasHeader(HttpHeaders.Names.REFERER) ?
 			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :
@@ -154,15 +110,15 @@ class JJExecutiveHttpHandler implements HttpHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private HashMap<String, String> rh(final HttpRequest request) {
+	private HashMap<String, String> rh(final JJHttpRequest request) {
 		return ((HashMap<String, String>)request.data(RESPONSE_HEADERS));
 	}
 	
-	private String header(final HttpRequest request, final String name) {
+	private String header(final JJHttpRequest request, final String name) {
 		return rh(request).get(name);
 	}
 	
-	private void makeHeader(final HttpRequest request, final String name, final String value) {
+	private void makeHeader(final JJHttpRequest request, final String name, final String value) {
 		rh(request).put(name, value);
 	}
 

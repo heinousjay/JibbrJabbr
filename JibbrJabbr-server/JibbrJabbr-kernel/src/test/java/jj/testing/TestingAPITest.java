@@ -18,6 +18,8 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -51,7 +53,7 @@ public class TestingAPITest {
 		
 		TestHttpClient index = app.get("/index");
 		index.dumpObjects();
-		assertThat(index.status(), is(200));
+		assertThat(index.status(), is(HttpResponseStatus.OK));
 		index.dumpObjects();
 		assertThat(index.contentsString(), is(notNullValue()));
 		
@@ -59,7 +61,7 @@ public class TestingAPITest {
 		
 		TestHttpClient files = app.get("/files");
 		files.dumpObjects();
-		assertThat(files.status(), is(200));
+		assertThat(files.status(), is(HttpResponseStatus.OK));
 		files.dumpObjects();
 		assertThat(files.contentsString(), is(notNullValue()));
 		
@@ -70,7 +72,7 @@ public class TestingAPITest {
 	public void runNotFoundTest() throws Exception {
 		
 		TestHttpClient client = app.get("/non-existent");
-		assertThat(client.status(), is(404));
+		assertThat(client.status(), is(HttpResponseStatus.NOT_FOUND));
 		
 	}
 	
@@ -90,11 +92,11 @@ public class TestingAPITest {
 		
 		count = 0;
 		for (int i = 0; i < number; ++i) {
-			assertThat(clients[count].status(), is(200));
+			assertThat(clients[count].status(), is(HttpResponseStatus.OK));
 			assertThat(clients[count].contentsString(), is(notNullValue()));
 			assertThat(clients[count++].document().select("title").text(), is("JAYCHAT!"));
 			
-			assertThat(clients[count].status(), is(200));
+			assertThat(clients[count].status(), is(HttpResponseStatus.OK));
 			assertThat(clients[count].contentsString(), is(notNullValue()));
 			assertThat(clients[count++].document().select("title").text(), is("JAYCHAT!"));
 		}

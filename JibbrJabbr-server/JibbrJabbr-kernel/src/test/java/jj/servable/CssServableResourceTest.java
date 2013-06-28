@@ -10,8 +10,8 @@ import java.nio.file.Paths;
 
 import jj.JJ;
 import jj.configuration.Configuration;
+import jj.http.JJHttpRequest;
 import jj.servable.CssServable;
-import jj.webbit.JJHttpRequest;
 
 import org.junit.Before;
 import org.junit.Test;

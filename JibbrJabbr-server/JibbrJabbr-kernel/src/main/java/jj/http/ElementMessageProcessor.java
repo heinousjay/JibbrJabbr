@@ -13,49 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.ScriptableObject;
 
 import jj.JJExecutors;
 import jj.hostapi.EventSelection;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;
 import jj.script.CurrentScriptContext;
-import jj.script.EventNameHelper;
 
 /**
+ * handles an element response from the client, which can happen in
+ * response to creation at the moment
  * @author jason
  *
  */
 @Singleton
-class EventMessageProcessor implements WebSocketMessageProcessor {
+class ElementMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
+	
 	private final CurrentScriptContext context;
 	
 	@Inject
-	EventMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
+	ElementMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
 		this.executors = executors;
 		this.context = context;
 	}
 	
 	@Override
 	public Type type() {
-		return Type.Event;
+		return Type.Element;
 	}
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
-		NativeObject event = new NativeObject();
-		// need to get a way to make the target into the context this for the handler
-		EventSelection target = new EventSelection(message.event().target, context);
-		event.defineProperty("target", target, ScriptableObject.CONST);
-		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message), event);
+		executors.scriptRunner().submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
 	}
 
 }

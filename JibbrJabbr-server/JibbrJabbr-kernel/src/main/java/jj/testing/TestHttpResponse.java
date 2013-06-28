@@ -17,6 +17,7 @@ package jj.testing;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,23 +30,24 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
+import jj.DateFormatHelper;
 import jj.ExecutionTrace;
 import jj.JJExecutors;
 import jj.logging.TestRunnerLogger;
 import jj.resource.MimeTypes;
+import jj.http.JJHttpResponse;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
-import org.webbitserver.helpers.DateHelper;
-import org.webbitserver.stub.StubHttpResponse;
 
 /**
  * @author jason
  *
  */
-class TestHttpResponse extends StubHttpResponse {
+class TestHttpResponse extends JJHttpResponse {
 	
 	private final CountDownLatch latch = new CountDownLatch(1);
 	
@@ -63,10 +65,12 @@ class TestHttpResponse extends StubHttpResponse {
 	
 	@Inject
 	TestHttpResponse(
+		final TestHttpRequest request,
 		final JJExecutors executors,
 		final ExecutionTrace trace,
 		final @TestRunnerLogger Logger testRunnerLogger
 	) {
+		super(request, null);
 		this.executors = executors;
 		this.trace = trace;
 		this.testRunnerLogger = testRunnerLogger;
@@ -82,17 +86,15 @@ class TestHttpResponse extends StubHttpResponse {
 	
 	private final Map<String, String> headers = new HashMap<>();
 	
-	@Override
 	public TestHttpResponse end() {
 		testRunnerLogger.info("end called on {}", this);
-		super.end();
 		processResponse();
 		return this;
 	}
-	@Override
+
 	public TestHttpResponse error(Throwable t) {
 		testRunnerLogger.info("error called on {}", this);
-		super.error(t);
+
 		processResponse();
 		return this;
 	}
@@ -100,14 +102,12 @@ class TestHttpResponse extends StubHttpResponse {
 	public Map<String, String> headers() {
 		return Collections.unmodifiableMap(headers);
 	}
-	
-	@Override 
+	 
 	public String header(String name) {
 		return headers.get(name);
 	}
 
-	@Override
-	public StubHttpResponse header(String name, String value) {
+	public TestHttpResponse header(String name, String value) {
 		if (value == null) {
 			headers.remove(name);
 		} else {
@@ -116,14 +116,12 @@ class TestHttpResponse extends StubHttpResponse {
 		return this;
 	}
 
-	@Override
-	public StubHttpResponse header(String name, long value) {
+	public TestHttpResponse header(String name, long value) {
 		return header(name, String.valueOf(value));
 	}
 
-	@Override
-	public StubHttpResponse header(String name, Date value) {
-		return header(name, DateHelper.rfc1123Format(value));
+	public TestHttpResponse header(String name, Date value) {
+		return header(name, DateFormatHelper.headerFormat(value));
 	}
 	
 	public boolean isDone() {
@@ -149,6 +147,14 @@ class TestHttpResponse extends StubHttpResponse {
 		assert executors.isHttpControlThread();
 	}
 	
+	/**
+	 * @return
+	 */
+	public String contentsString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/**
 	 * waits until the server has responded, returning true to the first call to this
 	 * method or the timeout version and false to every subsequent call
@@ -178,15 +184,40 @@ class TestHttpResponse extends StubHttpResponse {
 			.append(", headers=").append(headers())
 			.append(", error=").append(error())
 			.append(", ended=").append(ended())
-			.append(", contents=").append(contents().length)
+			.append(", contents=").append(contents().readableBytes())
 			.append("}")
 			.toString();
 	}
 
 	/**
-	 * @param request
+	 * @return
 	 */
-	public void setRequest(final TestHttpRequest request) {
-		this.request = request;
+	public ByteBuf contents() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean ended() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * @return
+	 */
+	public Throwable error() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @return
+	 */
+	public Charset charset() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -10,13 +10,15 @@
 	<name>JibbrJabbr Kernel</name>
 	<dependencies>
 		<dependency>
-			<artifactId>netty</artifactId>
+			<artifactId>netty-all</artifactId>
 			<groupId>io.netty</groupId>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.webbitserver</groupId>
 			<artifactId>webbit</artifactId>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.mozilla</groupId>
 			<artifactId>rhino</artifactId>

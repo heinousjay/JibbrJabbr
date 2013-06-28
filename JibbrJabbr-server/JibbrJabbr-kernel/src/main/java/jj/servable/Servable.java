@@ -7,12 +7,11 @@ import java.nio.file.Path;
 
 import jj.IOThread;
 import jj.configuration.Configuration;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJHttpResponse;
-import jj.webbit.RequestProcessor;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.RequestProcessor;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.webbitserver.HttpControl;
+import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable {
 	
@@ -61,8 +60,7 @@ public abstract class Servable {
 	
 	public abstract RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request,
-		final JJHttpResponse response,
-		final HttpControl control
+		final JJHttpResponse response
 	) throws IOException;
 
 	

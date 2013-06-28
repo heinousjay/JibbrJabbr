@@ -2,14 +2,15 @@ package jj.logging;
 
 import static jj.logging.LoggingModule.*;
 
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
+
 import java.util.Iterator;
 
 import javax.inject.Singleton;
 
 import jj.JJServerListener;
 
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Slf4JLoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.AsyncAppender;

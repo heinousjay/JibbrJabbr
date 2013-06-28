@@ -6,11 +6,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJHttpResponse;
-import jj.webbit.RequestProcessor;
-
-import org.webbitserver.HttpControl;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.RequestProcessor;
 
 @Singleton
 class CssServable extends Servable {
@@ -31,8 +29,7 @@ class CssServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		JJHttpRequest request,
-		JJHttpResponse response,
-		HttpControl control
+		JJHttpResponse response
 	) throws IOException {
 		
 		// if this is a plain URL (no sha key) then find the latest matching css

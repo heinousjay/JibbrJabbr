@@ -25,7 +25,7 @@ import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.servable.ServableModule;
-import jj.webbit.WebbitModule;
+import jj.http.WebbitModule;
 
 /**
  * @author jason

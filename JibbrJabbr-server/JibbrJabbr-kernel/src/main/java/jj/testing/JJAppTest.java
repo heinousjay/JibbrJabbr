@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 import jj.JJServerLifecycle;
 import jj.StringUtils;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -82,11 +82,10 @@ public class JJAppTest implements TestRule {
 	}
 	
 	public TestHttpClient get(final String uri) throws Exception {
-		assertThat("supply a uri pls", uri, is(notNullValue()));
+		assertThat("supply a uri please", uri, is(notNullValue()));
 		TestRunner runner = injector.getInstance(TestRunner.class);
 		
 		runner.request().uri(uri)
-			.timestamp(System.nanoTime())
 			.header(HttpHeaders.Names.HOST, "localhost");
 		
 		return runner.run();

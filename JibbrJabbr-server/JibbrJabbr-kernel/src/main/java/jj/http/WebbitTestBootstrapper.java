@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
-
-import jj.http.JJWebSocketHandler;
-
+package jj.http;
 
 /**
  * @author jason
  *
  */
-class TestHandlerConnection  {
+public class WebbitTestBootstrapper {
 
-	TestHandlerConnection(JJWebSocketHandler handler) {
-		System.out.println("ha");
-	}
 }

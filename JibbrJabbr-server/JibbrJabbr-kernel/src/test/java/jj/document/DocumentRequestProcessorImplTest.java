@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -17,10 +16,13 @@ import jj.ScriptExecutorFactory;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
 import jj.resource.Resource;
-import jj.webbit.JJHttpRequest;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
@@ -28,8 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.webbitserver.stub.StubHttpControl;
-import org.webbitserver.stub.StubHttpResponse;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentRequestProcessorImplTest {
@@ -42,9 +42,11 @@ public class DocumentRequestProcessorImplTest {
 
 	@Mock Resource htmlResource;
 	
-	@Mock JJHttpRequest httpRequest;
-	StubHttpResponse httpResponse;
-	StubHttpControl httpControl;
+	@Mock FullHttpRequest request;
+	@Mock Channel channel;
+	
+	JJHttpRequest httpRequest;
+	JJHttpResponse httpResponse;
 
 	DocumentRequest documentRequest;
 	
@@ -75,6 +77,9 @@ public class DocumentRequestProcessorImplTest {
 	
 	@Before
 	public void before() {
+		httpRequest = new JJHttpRequest(request, channel);
+		httpResponse = new JJHttpResponse(httpRequest, channel);
+		
 		filterCalls = 0;
 		
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
@@ -86,12 +91,8 @@ public class DocumentRequestProcessorImplTest {
 		when(htmlResource.baseName()).thenReturn(baseName);
 		when(htmlResource.mime()).thenReturn(MIME);
 		
-		when(httpRequest.wallTime()).thenReturn(new BigDecimal(0));
 		
-		httpResponse = new StubHttpResponse();
-		httpControl = new StubHttpControl();
-		
-		documentRequest = new DocumentRequest(htmlResource, document, httpRequest, httpResponse, httpControl, false);
+		documentRequest = new DocumentRequest(htmlResource, document, httpRequest, httpResponse, false);
 	}
 
 	@Test

@@ -1,4 +1,4 @@
-package jj.webbit;
+package jj.http;
 
 import jj.JJServerListener;
 
@@ -19,14 +19,10 @@ public class WebbitModule extends AbstractModule {
 		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
 		
 		if (!isTest) {
-			serverListeners.addBinding().to(WebbitBootstrapper.class);
+			
 		}
 		
 		serverListeners.addBinding().to(WebSocketConnections.class);
-		
-		bind(org.webbitserver.WebSocketHandler.class).to(JJWebSocketHandler.class);
-		
-		
 		
 		Multibinder<WebSocketMessageProcessor> messageProcessors = Multibinder.newSetBinder(binder(), WebSocketMessageProcessor.class);
 		

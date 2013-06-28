@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpRequest;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
 
 /**
  * The things we do for testing
@@ -32,18 +32,13 @@ class JJHttpObjectsCreator {
 	@Inject
 	JJHttpObjectsCreator() {}
 	
-	JJHttpRequest createJJHttpRequest(final HttpRequest request) {
-		if (request instanceof JJHttpRequest) {
-			return (JJHttpRequest)request;
-		}
-		return new JJHttpRequest(request);
+	JJHttpRequest createJJHttpRequest(final FullHttpRequest request, final Channel channel) {
+
+		return new JJHttpRequest(request, channel);
 	}
 	
-	JJHttpResponse createJJHttpResponse(final JJHttpRequest request, final HttpResponse response) {
-		if (response instanceof JJHttpResponse) {
-			return (JJHttpResponse)response;
-		}
-		
-		return new JJHttpResponse(request, response);
+	JJHttpResponse createJJHttpResponse(final JJHttpRequest request, final Channel channel) {
+
+		return new JJHttpResponse(request, channel);
 	}
 }

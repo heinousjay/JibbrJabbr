@@ -13,43 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.ScriptableObject;
+
 import jj.JJExecutors;
-import jj.hostapi.ScriptJSON;
+import jj.hostapi.EventSelection;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;
+import jj.script.CurrentScriptContext;
+import jj.script.EventNameHelper;
 
 /**
- * processes incoming result messages into usable objects and restarts the
- * continuation
  * @author jason
  *
  */
 @Singleton
-class ResultMessageProcessor implements WebSocketMessageProcessor {
+class EventMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
-	
-	private final ScriptJSON json;
+	private final CurrentScriptContext context;
 	
 	@Inject
-	ResultMessageProcessor(final JJExecutors executors, final ScriptJSON json) {
+	EventMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
 		this.executors = executors;
-		this.json = json;
+		this.context = context;
 	}
 	
 	@Override
 	public Type type() {
-		return Type.Result;
+		return Type.Event;
 	}
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
-		executors.scriptRunner().submitPendingResult(connection, message.result().id, json.parse(message.result().value));
+		NativeObject event = new NativeObject();
+		// need to get a way to make the target into the context this for the handler
+		EventSelection target = new EventSelection(message.event().target, context);
+		event.defineProperty("target", target, ScriptableObject.CONST);
+		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message), event);
 	}
 
 }

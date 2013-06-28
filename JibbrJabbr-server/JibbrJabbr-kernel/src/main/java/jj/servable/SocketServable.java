@@ -7,12 +7,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJHttpResponse;
-import jj.webbit.RequestProcessor;
-
-import org.webbitserver.HttpControl;
-import org.webbitserver.WebSocketHandler;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.JJWebSocketHandler;
+import jj.http.RequestProcessor;
 
 /**
  * upgrades to a websocket connection for an
@@ -24,12 +22,12 @@ import org.webbitserver.WebSocketHandler;
 @Singleton
 class SocketServable extends Servable {
 	
-	private final WebSocketHandler webSocketHandler;
+	private final JJWebSocketHandler webSocketHandler;
 	
 	@Inject
 	SocketServable(
 		final Configuration configuration,
-		final WebSocketHandler webSocketHandler
+		final JJWebSocketHandler webSocketHandler
 	) {
 		super(configuration);
 		this.webSocketHandler = webSocketHandler;
@@ -51,8 +49,7 @@ class SocketServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request, 
-		final JJHttpResponse response, 
-		final HttpControl control
+		final JJHttpResponse response
 	) throws IOException {
 		
 		// 
@@ -62,7 +59,9 @@ class SocketServable extends Servable {
 			public void process() {
 				// this is the appropriate place to integrate socket.io's transport mechanisms
 				// if it becomes worthwhile to support downbrowser crap
-				control.upgradeToWebSocketConnection(webSocketHandler);
+				
+				//TODO make this work
+				//control.upgradeToWebSocketConnection(webSocketHandler);
 			}
 		};
 	}

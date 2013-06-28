@@ -200,9 +200,7 @@ class ScriptBundleCreator {
 		final ScriptResource serverScriptResource
 	) {
 		Context context = rhinoObjectCreator.context();
-		try { 
-			
-			StringBuilder script = new StringBuilder();
+		try {
 			
 			if (sharedScriptResource != null) {
 				try {

@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.script.CurrentScriptContext;
-import jj.webbit.JJWebSocketConnection;
+import jj.http.JJWebSocketConnection;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;

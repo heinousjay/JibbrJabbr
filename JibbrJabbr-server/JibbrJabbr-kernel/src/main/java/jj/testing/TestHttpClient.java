@@ -15,6 +15,8 @@
  */
 package jj.testing;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -26,8 +28,8 @@ import org.jsoup.nodes.Document;
  */
 public interface TestHttpClient {
 	
-	int status() throws Exception;
-	int status(final long timeout, final TimeUnit unit) throws Exception;
+	HttpResponseStatus status() throws Exception;
+	HttpResponseStatus status(final long timeout, final TimeUnit unit) throws Exception;
 	
 	Throwable error() throws Exception;
 	Throwable error(final long timeout, final TimeUnit unit) throws Exception;

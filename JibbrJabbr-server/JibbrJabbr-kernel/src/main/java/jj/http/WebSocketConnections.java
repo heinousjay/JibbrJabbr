@@ -1,4 +1,4 @@
-package jj.webbit;
+package jj.http;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 

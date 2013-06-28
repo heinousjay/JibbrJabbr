@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
 
 import static org.mockito.BDDMockito.*;
 
@@ -22,16 +22,18 @@ import java.net.InetSocketAddress;
 import jj.DateFormatHelper;
 import jj.ExecutionTrace;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
-import org.webbitserver.stub.StubHttpControl;
-import org.webbitserver.stub.StubHttpRequest;
-import org.webbitserver.stub.StubHttpResponse;
 
 /**
  * @author jason
@@ -43,28 +45,34 @@ public class JJExecutiveHttpHandlerTest {
 	private static final InetSocketAddress REMOTE_ADDRESS = new InetSocketAddress(80);
 	private static final String URI = "/slick!";
 	private static final String LENGTH = "3493459";
-	private static final int STATUS = 404;
+	private static final HttpResponseStatus STATUS = HttpResponseStatus.NOT_FOUND;
 	private static final String REFERRER = "slappy!";
 	private static final String USER_AGENT = "reticules";
 	
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
+	@Mock FullHttpRequest request;
+	@Mock Channel channel;
 
-	@Test
+	// ignored because i'm only keeping this 
+	// component around to save the access 
+	// logging code so i don't need to rewrite it
+	@Ignore @Test
 	public void test() throws Exception {
 		
 		// given
 		JJExecutiveHttpHandler h = new JJExecutiveHttpHandler(logger, trace);
 		willReturn(true).given(logger).isTraceEnabled();
+		given(channel.remoteAddress()).willReturn(REMOTE_ADDRESS);
 		
-		StubHttpRequest request = new StubHttpRequest();
-		request.header(HttpHeaders.Names.USER_AGENT, USER_AGENT);
-		request.header(HttpHeaders.Names.REFERER, REFERRER);
-		request.remoteAddress(REMOTE_ADDRESS);
-		request.method(HttpMethod.GET.toString());
-		request.uri(URI);
+		JJHttpRequest jjrequest = 
+			new JJHttpRequest(request, channel)
+			.header(HttpHeaders.Names.USER_AGENT, USER_AGENT)
+			.header(HttpHeaders.Names.REFERER, REFERRER)
+			.method(HttpMethod.GET)
+			.uri(URI);
 		
-		StubHttpResponse response = new StubHttpResponse();
+		JJHttpResponse response = new JJHttpResponse(jjrequest, channel);
 		response.status(STATUS);
 		
 		// when
@@ -74,13 +82,7 @@ public class JJExecutiveHttpHandlerTest {
 		
 		while (date1 == null || !date1.equals(date2)) {
 			date1 = DateFormatHelper.nowInAccessLogFormat();
-			StubHttpControl control = new StubHttpControl() {
-				public void nextHandler(org.webbitserver.HttpRequest request, org.webbitserver.HttpResponse response, org.webbitserver.HttpControl control) {
-					response.header(HttpHeaders.Names.CONTENT_LENGTH, LENGTH);
-					response.end();
-				};
-			};
-			h.handleHttpRequest(request, response, control);
+			h.handleHttpRequest(jjrequest, response);
 			date2 = DateFormatHelper.nowInAccessLogFormat();
 		}
 		

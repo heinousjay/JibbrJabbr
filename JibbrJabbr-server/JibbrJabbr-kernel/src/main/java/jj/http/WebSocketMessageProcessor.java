@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webbit;
+package jj.http;
+
+import jj.jqmessage.JQueryMessage;
 
 /**
+ * component based refactoring of handling incoming websocket messages
+ * 
  * @author jason
  *
  */
-public class WebbitTestBootstrapper {
+interface WebSocketMessageProcessor {
 
+	JQueryMessage.Type type();
+	
+	void handle(JJWebSocketConnection connection, JQueryMessage message);
 }

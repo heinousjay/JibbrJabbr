@@ -1,21 +1,19 @@
-package jj.webbit;
+package jj.http;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jj.DateFormatHelper;
+import jj.DataStore;
 import jj.ExecutionTrace;
 import jj.jqmessage.JQueryMessage;
 import jj.script.AssociatedScriptBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webbitserver.WebSocketConnection;
-import org.webbitserver.wrapper.WebSocketConnectionWrapper;
 
-public class JJWebSocketConnection extends WebSocketConnectionWrapper {
+public class JJWebSocketConnection implements DataStore {
 	
 	private static final String ASSOCIATED_SCRIPT_BUNDLE = "associated script bundle";
 	
@@ -30,31 +28,53 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	private final Logger log = LoggerFactory.getLogger(JJWebSocketConnection.class);
 	
 	private final ExecutionTrace trace;
+	
+	private final HashMap<String, Object> data = new HashMap<>();
 
-	JJWebSocketConnection(final WebSocketConnection connection, final boolean immediateClosure, final ExecutionTrace trace) {
-		super(connection);
+	JJWebSocketConnection(final boolean immediateClosure, final ExecutionTrace trace) {
 		this.trace = trace;
 		if (immediateClosure) {
-			data(IMMEDIATE_CLOSURE, Boolean.TRUE);
+			data.put(IMMEDIATE_CLOSURE, Boolean.TRUE);
 		} else {
 			markActivity();
 		}
 	}
 	
+	@Override
+	public JJWebSocketConnection data(String name, Object value) {
+		data.put(name, value);
+		return this;
+	}
+	
+	@Override
+	public Object data(String name) {
+		return data.get(name);
+	}
+	
+	@Override
+	public Object removeData(String name) {
+		return data.remove(name);
+	}
+	
+	@Override
+	public boolean containsData(String name) {
+		return data.containsKey(name);
+	}
+	
 	void markActivity() {
-		data().put(LAST_ACTIVITY, System.currentTimeMillis());
+		data.put(LAST_ACTIVITY, System.currentTimeMillis());
 	}
 	
 	long lastActivity() {
-		return (long)data().get(LAST_ACTIVITY);
+		return (long)data.get(LAST_ACTIVITY);
 	}
 	
 	boolean immediateClosure() {
-		return data().get(IMMEDIATE_CLOSURE) == Boolean.TRUE;
+		return data.get(IMMEDIATE_CLOSURE) == Boolean.TRUE;
 	}
 	
 	void scriptBundle(AssociatedScriptBundle associatedScriptBundle) {
-		data().put(ASSOCIATED_SCRIPT_BUNDLE, associatedScriptBundle);
+		data.put(ASSOCIATED_SCRIPT_BUNDLE, associatedScriptBundle);
 	}
 	
 	public String baseName() {
@@ -62,15 +82,15 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	}
 	
 	public AssociatedScriptBundle associatedScriptBundle() {
-		return (AssociatedScriptBundle)data().get(ASSOCIATED_SCRIPT_BUNDLE);
+		return (AssociatedScriptBundle)data.get(ASSOCIATED_SCRIPT_BUNDLE);
 	}
 	
 	public Map<String, Object> clientStorage() {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> map = (Map<String, Object>)data().get(CLIENT_STORAGE);
+		Map<String, Object> map = (Map<String, Object>)data.get(CLIENT_STORAGE);
 		if (map == null) {
 			map = new HashMap<>();
-			data().put(CLIENT_STORAGE, map);
+			data.put(CLIENT_STORAGE, map);
 		}
 		return map;
 	}
@@ -80,11 +100,10 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 		return this;
 	}
 	
-	@Override
 	public JJWebSocketConnection send(String message) {
 		markActivity();
 		log.trace("sending {} on {}", message, this);
-		super.send(message);
+		
 		return this;
 	}
 	
@@ -111,31 +130,32 @@ public class JJWebSocketConnection extends WebSocketConnectionWrapper {
 	
 	private List<JQueryMessage> messages() {
 		@SuppressWarnings("unchecked")
-		List<JQueryMessage> messages = (List<JQueryMessage>)data().get(MESSAGES);
+		List<JQueryMessage> messages = (List<JQueryMessage>)data.get(MESSAGES);
 		if (messages == null) {
 			messages = new ArrayList<>(4);
-			data().put(MESSAGES, messages);
+			data.put(MESSAGES, messages);
 		}
 		return messages;
 	}
 	
 	@Override
-	public int hashCode() {
-		return originalControl().hashCode();
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		// we only want object equality on our connections
-		return obj instanceof JJWebSocketConnection &&
-			((JJWebSocketConnection)obj).originalControl() == originalControl();
-	}
-	
-	@Override
 	public String toString() {
-		return "connection[" +
-			httpRequest().uri() +
-			"] started at " +
-			DateFormatHelper.basicFormat(httpRequest().timestamp());
+		return "connection";
+	}
+
+	/**
+	 * @return
+	 */
+	public String uri() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 */
+	public void close() {
+		// TODO Auto-generated method stub
+		
 	}
 }

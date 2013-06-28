@@ -7,14 +7,13 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
-import jj.webbit.JJHttpRequest;
-import jj.webbit.JJHttpResponse;
-import jj.webbit.RequestProcessor;
+import jj.http.JJHttpRequest;
+import jj.http.JJHttpResponse;
+import jj.http.RequestProcessor;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webbitserver.HttpControl;
 
 @Singleton
 class AssetServable extends Servable {
@@ -38,8 +37,7 @@ class AssetServable extends Servable {
 	@Override
 	public RequestProcessor makeRequestProcessor(
 		final JJHttpRequest request,
-		final JJHttpResponse response, 
-		final HttpControl control
+		final JJHttpResponse response
 	) throws IOException {
 		
 		// this one works inline, since assets are always preloaded

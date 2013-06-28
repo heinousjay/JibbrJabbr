@@ -1,4 +1,4 @@
-package jj.webbit;
+package jj.http;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,33 +13,24 @@ import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.servable.Servable;
 
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-
 /**
  * Acts as the bridge from webbit into our core.
  * @author jason
  *
  */
 @Singleton
-public class JJEngineHttpHandler implements HttpHandler {
+public class JJEngineHttpHandler {
 	
 	private final JJExecutors executors;
 	
 	private final Set<Servable> resourceTypes;
 	
-	private final JJHttpObjectsCreator creator;
-	
 	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
-		final JJHttpObjectsCreator creator,
 		final Set<Servable> resourceTypes
 	) {
 		this.executors = executors;
-		this.creator = creator;
 		this.resourceTypes = resourceTypes;
 	}
 	
@@ -56,30 +47,25 @@ public class JJEngineHttpHandler implements HttpHandler {
 		return result.toArray(new Servable[result.size()]);
 	}
 
-	@Override
 	@HttpControlThread
 	public void handleHttpRequest(
-		final HttpRequest request,
-		final HttpResponse response,
-		final HttpControl control
+		final JJHttpRequest request,
+		final JJHttpResponse response
 	) throws Exception {
-		final JJHttpRequest jjrequest = creator.createJJHttpRequest(request);
-		final JJHttpResponse jjresponse = creator.createJJHttpResponse(jjrequest, response);
 		// figure out if there's something for us to do
-		final Servable[] servables = findMatchingServables(jjrequest);
+		final Servable[] servables = findMatchingServables(request);
 		
 		if (servables.length > 0) {
-			dispatchNextServable(jjrequest, jjresponse, control, servables, new AtomicInteger());
+			dispatchNextServable(request, response, servables, new AtomicInteger());
 			
 		} else {
-			nextHandler(control, response);
+			nextHandler(response);
 		}
 	}
 	
 	private void dispatchNextServable(
 		final JJHttpRequest request,
 		final JJHttpResponse response,
-		final HttpControl control,
 		final Servable[] servables,
 		final AtomicInteger count
 	) {
@@ -91,16 +77,15 @@ public class JJEngineHttpHandler implements HttpHandler {
 					RequestProcessor requestProcessor = 
 						servables[count.getAndIncrement()].makeRequestProcessor(
 							request,
-							response,
-							control
+							response
 						);
 					
 					if (requestProcessor != null) {
 						requestProcessor.process();
 					} else if (count.get() < servables.length) {
-						dispatchNextServable(request, response, control, servables, count);
+						dispatchNextServable(request, response, servables, count);
 					} else {
-						nextHandler(control, response);
+						nextHandler(response);
 					}
 					
 				} catch (Throwable e) {
@@ -116,14 +101,15 @@ public class JJEngineHttpHandler implements HttpHandler {
 		}
 	}
 	
-	private void nextHandler(final HttpControl control, final HttpResponse response) {
+	private void nextHandler(final JJHttpResponse response) {
 		Runnable r = executors.prepareTask(new JJRunnable("HtmlEngine passing control to next handler") {
 			
 			@Override
 			@HttpControlThread
 			public void run() throws Exception {
 				try {
-					control.nextHandler();
+					
+					//control.nextHandler();
 				} catch (Throwable t) {
 					response.error(t);
 				}
