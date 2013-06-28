@@ -5,11 +5,11 @@ import jj.JJServerListener;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
-public class WebbitModule extends AbstractModule {
+public class HttpModule extends AbstractModule {
 	
 	private final boolean isTest;
 	
-	public WebbitModule(final boolean isTest) {
+	public HttpModule(final boolean isTest) {
 		this.isTest = isTest;
 	}
 

@@ -25,7 +25,7 @@ import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.servable.ServableModule;
-import jj.http.WebbitModule;
+import jj.http.HttpModule;
 
 /**
  * @author jason
@@ -99,7 +99,7 @@ public class CoreModule extends JJModule {
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
 		install(new ServableModule());
-		install(new WebbitModule(isTest));
+		install(new HttpModule(isTest));
 	}
 
 }
