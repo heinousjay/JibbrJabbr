@@ -69,14 +69,6 @@ public class TestingAPITest {
 	}
 	
 	@Test
-	public void runNotFoundTest() throws Exception {
-		
-		TestHttpClient client = app.get("/non-existent");
-		assertThat(client.status(), is(HttpResponseStatus.NOT_FOUND));
-		
-	}
-	
-	@Test
 	public void getLotsOfClients() throws Exception {
 		getLotsOfClients(3);
 	}

@@ -37,7 +37,6 @@ import jj.logging.TestRunnerLogger;
 import jj.resource.MimeTypes;
 import jj.http.JJHttpResponse;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -94,7 +93,6 @@ class TestHttpResponse extends JJHttpResponse {
 
 	public TestHttpResponse error(Throwable t) {
 		testRunnerLogger.info("error called on {}", this);
-
 		processResponse();
 		return this;
 	}
@@ -146,14 +144,6 @@ class TestHttpResponse extends JJHttpResponse {
 		latch.countDown();
 		assert executors.isHttpControlThread();
 	}
-	
-	/**
-	 * @return
-	 */
-	public String contentsString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/**
 	 * waits until the server has responded, returning true to the first call to this
@@ -184,17 +174,9 @@ class TestHttpResponse extends JJHttpResponse {
 			.append(", headers=").append(headers())
 			.append(", error=").append(error())
 			.append(", ended=").append(ended())
-			.append(", contents=").append(contents().readableBytes())
+			.append(", contents size=").append(response.content().readableBytes())
 			.append("}")
 			.toString();
-	}
-
-	/**
-	 * @return
-	 */
-	public ByteBuf contents() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

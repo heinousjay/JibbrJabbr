@@ -15,15 +15,11 @@
  */
 package jj.testing;
 
+import javax.inject.Inject;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import jj.DateFormatHelper;
 import jj.http.JJHttpRequest;
 
 /**
@@ -36,6 +32,7 @@ class TestHttpRequest extends JJHttpRequest {
 	 * @param request
 	 * @param channel
 	 */
+	@Inject
 	public TestHttpRequest(final FullHttpRequest request, final Channel channel) {
 		super(request, channel);
 	}
