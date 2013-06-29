@@ -43,7 +43,7 @@ class TestHttpRequest extends JJHttpRequest {
 			.append("[").append(id()).append("] {")
 			.append("method=").append(method())
 			.append(", uri=").append(uri())
-			.append(", headers=").append(request.headers())
+			.append(", headers=").append(request().headers())
 			.append(", body=").append(body())
 			.append("}")
 			.toString();
@@ -54,7 +54,7 @@ class TestHttpRequest extends JJHttpRequest {
 	 * @return
 	 */
 	public TestHttpRequest uri(String uri) {
-		request.setUri(uri);
+		request().setUri(uri);
 		return this;
 	}
 }

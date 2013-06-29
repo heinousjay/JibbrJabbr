@@ -75,10 +75,4 @@ public interface Resource {
 	 * @return
 	 */
 	String mime();
-	
-	/**
-	 * flag to indicate if the resource should be cached
-	 * @return
-	 */
-	boolean cache();
 }

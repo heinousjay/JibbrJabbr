@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jj.HttpControlThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.ScriptThread;
@@ -136,40 +135,30 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	}
 
 	private void writeResponse() {
-		executors.httpControlExecutor().execute(executors.prepareTask(new JJRunnable("Writing HTTP response") {
+		// pretty printing is turned off because it inserts weird spaces
+		// into the output if there are text nodes next to element node
+		// and it gets REALLY ANNOYING
+		documentRequest.document().outputSettings().prettyPrint(false).indentAmount(0);
+		final ByteBuffer bytes = UTF_8.encode(documentRequest.document().toString());
+		try {
+			documentRequest.httpResponse()
+				.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.remaining())
+				// clients shouldn't cache these responses at all
+				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
+				.header(HttpHeaders.Names.CONTENT_TYPE, documentRequest.mime())
+				.content(bytes)
+				.end();
 			
-			@Override
-			@HttpControlThread
-			public void run() throws Exception {
-				// pretty printing is turned off because it inserts weird spaces
-				// into the output if there are text nodes next to element node
-				// and it gets REALLY ANNOYING
-				documentRequest.document().outputSettings().prettyPrint(false).indentAmount(0);
-				final ByteBuffer bytes = UTF_8.encode(documentRequest.document().toString());
-				try {
-					documentRequest.httpResponse()
-						.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.remaining())
-						// clients shouldn't cache these responses at all
-						.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-						.header(
-							HttpHeaders.Names.CONTENT_TYPE, 
-							documentRequest.mime()
-						)
-						.content(bytes)
-						.end();
-					
-				} catch (Exception e) {
-					log.error("error responding to {}", documentRequest.httpRequest().uri());
-					throw e;
-				}
-				
-				log.info(
-					"request for [{}] completed in {} milliseconds (wall time)",
-					documentRequest.httpRequest().uri(),
-					documentRequest.httpRequest().wallTime()
-				);
-			}
-		}));
+		} catch (Exception e) {
+			log.error("error responding to {}", documentRequest.httpRequest().uri());
+			throw e;
+		}
+		
+		log.info(
+			"request for [{}] completed in {} milliseconds (wall time)",
+			documentRequest.httpRequest().uri(),
+			documentRequest.httpRequest().wallTime()
+		);
 	}
 	
 	@Override

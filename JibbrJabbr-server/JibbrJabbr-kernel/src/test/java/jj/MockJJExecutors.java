@@ -41,7 +41,6 @@ import jj.script.ScriptRunner;
 public class MockJJExecutors implements JJExecutors {
 	
 	public enum ThreadType {
-		HttpControlThread,
 		ScriptThread,
 		IOThread;
 	}
@@ -73,19 +72,6 @@ public class MockJJExecutors implements JJExecutors {
 	}
 	
 	private final List<ThreadType> executorSequence = new ArrayList<>();
-	
-	private int httpControlExecutorCount = 0;
-
-	@Override
-	public ScheduledExecutorService httpControlExecutor() {
-		executorSequence.add(HttpControlThread);
-		++httpControlExecutorCount;
-		return executor;
-	}
-	
-	public void assertHttpControlExecutorCountIs(int count) {
-		assertThat("http control executor count in " +  executorSequence, httpControlExecutorCount, is(count));
-	}
 	
 	private int ioExecutorCount = 0;
 
@@ -144,13 +130,6 @@ public class MockJJExecutors implements JJExecutors {
 	@Override
 	public boolean isIOThread() {
 		return isIOThread || (!threadTypeDeque.isEmpty() && threadTypeDeque.removeFirst() == IOThread);
-	}
-	
-	public boolean isHttpControlThread = false;
-
-	@Override
-	public boolean isHttpControlThread() {
-		return isHttpControlThread || (!threadTypeDeque.isEmpty() && threadTypeDeque.removeFirst() == HttpControlThread);
 	}
 	
 	public int ioPoolSize = 1;

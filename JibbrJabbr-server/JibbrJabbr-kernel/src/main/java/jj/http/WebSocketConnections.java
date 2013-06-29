@@ -12,7 +12,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.HttpControlThread;
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.JJServerListener;
@@ -71,15 +70,13 @@ public class WebSocketConnections implements JJServerListener {
 	}
 	
 	public void start() {
-		executors.httpControlExecutor().scheduleAtFixedRate(executors.prepareTask(new ActivityChecker()), 5, 5, SECONDS);
+		//executors.httpControlExecutor().scheduleAtFixedRate(executors.prepareTask(new ActivityChecker()), 5, 5, SECONDS);
 	}
 	
 	public void stop() {
 		
 	}
-		
-		
-	@HttpControlThread
+	
 	void addConnection(JJWebSocketConnection connection) {
 		
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
@@ -94,7 +91,6 @@ public class WebSocketConnections implements JJServerListener {
 		connectionSet.putIfAbsent(connection, Boolean.TRUE);
 	}
 	
-	@HttpControlThread
 	void removeConnection(JJWebSocketConnection connection) {
 		allConnections.remove(connection);
 		

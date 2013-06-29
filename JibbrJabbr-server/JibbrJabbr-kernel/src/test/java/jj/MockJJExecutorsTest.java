@@ -77,20 +77,19 @@ public class MockJJExecutorsTest {
 		
 		e.scriptExecutorFor("");
 		e.ioExecutor();
-		e.httpControlExecutor();
 		e.scriptExecutorFactory().executorFor("");
 		
-		e.assertExecutorSequence(ScriptThread, IOThread, HttpControlThread, ScriptThread);
+		e.assertExecutorSequence(ScriptThread, IOThread, ScriptThread);
 		
 		boolean worked = true;
 		try {
-			e.assertExecutorSequence(HttpControlThread, HttpControlThread, HttpControlThread, IOThread, HttpControlThread);
+			e.assertExecutorSequence(ScriptThread, ScriptThread, ScriptThread, IOThread, ScriptThread);
 			worked = false;
 		} catch (AssertionError error) {}
 		
 		assertThat("didn't assert correctly", worked, is(true));
 		
 		// should still have the sequence
-		e.assertExecutorSequence(ScriptThread, IOThread, HttpControlThread, ScriptThread);
+		e.assertExecutorSequence(ScriptThread, IOThread, ScriptThread);
 	}
 }

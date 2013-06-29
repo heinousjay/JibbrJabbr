@@ -142,7 +142,6 @@ class TestHttpResponse extends JJHttpResponse {
 		
 		trace.end(request);
 		latch.countDown();
-		assert executors.isHttpControlThread();
 	}
 
 	/**

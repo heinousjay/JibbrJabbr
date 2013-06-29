@@ -98,20 +98,15 @@ class ResourceFinderImpl implements ResourceFinder {
 		
 		Path path = resourceCreator.toPath(baseName, args);
 		URI pathUri = path.toUri();
-		Resource uncachedResource = null;
 		try {
 			result = resourceClass.cast(resourceCache.get(pathUri));
 			if (result == null) {
 				log.trace("loading {} at {}", resourceClass.getSimpleName(), path);
 				Resource resource = resourceCreator.create(baseName, args);
-				if (resource.cache()) {
-					if (resourceCache.putIfAbsent(pathUri, resource) == null) {
-						// if this was the first time we put this in the cache,
-						// we set up a file watch on it for background reloads
-						resourceWatchService.watch(resource);
-					}
-				} else {
-					uncachedResource = resource;
+				if (resourceCache.putIfAbsent(pathUri, resource) == null) {
+					// if this was the first time we put this in the cache,
+					// we set up a file watch on it for background reloads
+					resourceWatchService.watch(resource);
 				}
 			} else if (result.needsReplacing()) {
 				log.trace("replacing {} at {}", resourceClass.getSimpleName(), path);
@@ -119,7 +114,7 @@ class ResourceFinderImpl implements ResourceFinder {
 					log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceClass.getSimpleName(), path);
 				}
 			}
-			result = resourceClass.cast(uncachedResource != null ? uncachedResource : resourceCache.get(pathUri));
+			result = resourceClass.cast(resourceCache.get(pathUri));
 		
 		} catch (NullPointerException | NoSuchFileException e) {
 			log.trace("couldn't find {} at {}", resourceClass.getSimpleName(), path);

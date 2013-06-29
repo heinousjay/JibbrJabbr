@@ -48,7 +48,7 @@ public class JJHttpRequest implements DataStore {
 	
 	protected final String id = sequence.next();
 	
-	protected final FullHttpRequest request;
+	private final FullHttpRequest request;
 	
 	protected final Channel channel;
 	
@@ -263,5 +263,12 @@ public class JJHttpRequest implements DataStore {
 	public JJHttpRequest uri(String uri) {
 		request.setUri(uri);
 		return this;
+	}
+
+	/**
+	 * @return
+	 */
+	protected FullHttpRequest request() {
+		return request;
 	}
 }

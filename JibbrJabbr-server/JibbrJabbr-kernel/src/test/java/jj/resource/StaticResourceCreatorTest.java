@@ -41,11 +41,10 @@ public class StaticResourceCreatorTest extends ResourceBase {
 	}
 	
 	private void doTest(final String baseName) throws Exception {
-		// java is ugly and so requires this crap
-		StaticResource resource1 = testFileResource(baseName, new StaticResourceCreator(configuration), false, new Object[0]);
+		StaticResource resource1 = testFileResource(baseName, new StaticResourceCreator(configuration));
 		assertThat(resource1, is(notNullValue()));
 		assertThat(resource1.mime(), is(MimeTypes.get(baseName)));
-		assertThat(resource1.bytes().limit(), is(Files.readAllBytes(resource1.path()).length));
+		assertThat(resource1.size(), is(Files.size(resource1.path())));
 	}
 	
 	@Test

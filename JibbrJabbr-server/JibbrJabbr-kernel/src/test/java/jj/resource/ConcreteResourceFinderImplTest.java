@@ -97,16 +97,14 @@ public class ConcreteResourceFinderImplTest extends ResourceBase {
 		
 		// then
 		assertThat(resource2, is(notNullValue()));
-		// doesn't get cached
-		assertThat(toTest.findResource(StaticResource.class, "index.html"), is(nullValue()));
 		
 		// when
 		StaticResource resource3 = toTest.loadResource(StaticResource.class, "index.html");
 		
 		// then
 		assertThat(resource3, is(notNullValue()));
-		assertThat(resource2, is(not(sameInstance(resource3))));
-		assertThat(resource2.bytes(), is(resource3.bytes()));
+		assertThat(resource2, is(sameInstance(resource3)));
+		assertThat(resource2.size(), is(resource3.size()));
 		
 	}
 

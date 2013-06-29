@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.ExecutionTrace;
-import jj.HttpControlThread;
 import jj.JJExecutors;
 import jj.hostapi.HostEvent;
 import jj.jqmessage.JQueryMessage;
@@ -65,7 +64,6 @@ public class JJWebSocketHandler {
 		return Collections.unmodifiableMap(result);
 	}
 
-	@HttpControlThread
 	public void onOpen(JJWebSocketConnection connection) {
 		trace.start(connection);
 		String uri = connection.uri().substring(1);
@@ -86,7 +84,6 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	@HttpControlThread
 	public void onClose(JJWebSocketConnection connection) {
 		trace.end(connection);
 		// don't do anything reload command
@@ -96,7 +93,6 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	@HttpControlThread
 	public void onMessage(JJWebSocketConnection connection, String msg) throws Throwable {
 		connection.markActivity();
 		if ("jj-hi".equals(msg)) {
@@ -123,14 +119,12 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	@HttpControlThread
 	public void onMessage(JJWebSocketConnection connection, byte[] msg) throws Throwable {
 		// at some point this is going to become interesting,
 		// thinking about streaming bytes in for uploads...
 		log.info("receiving bytes, length is {}", msg.length);
 	}
 
-	@HttpControlThread
 	public void onPong(JJWebSocketConnection connection, byte[] msg) throws Throwable {
 		
 	}

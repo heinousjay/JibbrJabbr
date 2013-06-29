@@ -22,6 +22,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jj.JJServerListener;
 import jj.configuration.Configuration;
 
@@ -32,9 +35,11 @@ import jj.configuration.Configuration;
 @Singleton
 class NettyBootstrapInitializer implements JJServerListener {
 	
+	private final Logger logger = LoggerFactory.getLogger(NettyBootstrapInitializer.class);
+	
 	private final HttpServerInitializer initializer;
 	
-	private volatile ServerBootstrap serverBootstrap;
+	private ServerBootstrap serverBootstrap;
 	
 	@Inject
 	NettyBootstrapInitializer(
@@ -55,6 +60,8 @@ class NettyBootstrapInitializer implements JJServerListener {
 	public void start() throws Exception {
 		assert (serverBootstrap == null) : "cannot start an already started server";
 		serverBootstrap = serverBootstrap();
+		serverBootstrap.bind(8080).sync();
+		logger.info("Server started");
 	}
 
 	@Override
@@ -63,6 +70,7 @@ class NettyBootstrapInitializer implements JJServerListener {
 		serverBootstrap.group().shutdownGracefully();
 		serverBootstrap.childGroup().shutdownGracefully();
 		serverBootstrap = null;
+		logger.info("Server shut down");
 	}
 
 }

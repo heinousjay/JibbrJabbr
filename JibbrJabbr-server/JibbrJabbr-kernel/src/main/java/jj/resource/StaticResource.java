@@ -15,9 +15,15 @@
  */
 package jj.resource;
 
+import io.netty.channel.DefaultFileRegion;
+import io.netty.channel.FileRegion;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
+
+import jj.IOThread;
 
 /**
  * @author jason
@@ -27,14 +33,17 @@ public class StaticResource extends AbstractFileResource {
 
 	private final String mime;
 	
+	private final long size;
+	
 	/**
 	 * @param baseName
 	 * @param path
 	 * @throws IOException
 	 */
 	StaticResource(final Path basePath, final String baseName) throws IOException {
-		super(baseName, basePath.resolve(baseName));
+		super(baseName, basePath.resolve(baseName), false);
 		mime = MimeTypes.get(baseName);
+		size = Files.size(path);
 	}
 
 	@Override
@@ -47,14 +56,12 @@ public class StaticResource extends AbstractFileResource {
 		return mime;
 	}
 	
-	@Override
-	public boolean cache() {
-		return false;
+	public long size() {
+		return size;
 	}
 	
-	// this is bad!
-	public ByteBuffer bytes() {
-		return byteBuffer;
+	@IOThread
+	public FileRegion fileRegion() throws IOException {
+		return new DefaultFileRegion(FileChannel.open(path), 0, size);
 	}
-
 }

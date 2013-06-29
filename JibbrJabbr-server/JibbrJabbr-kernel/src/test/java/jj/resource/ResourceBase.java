@@ -50,20 +50,11 @@ public abstract class ResourceBase {
 		given(configuration.basePath()).willReturn(basePath);
 		given(configuration.baseUri()).willReturn(baseUri);
 	}
-	
-	protected <T extends Resource> T testFileResource(
-		final String baseName,
-		final ResourceCreator<T> toTest,
-		Object...args
-	) throws Exception {
-		return testFileResource(baseName, toTest, true, args);
-	}
 		
 
 	protected <T extends Resource> T testFileResource(
 		final String baseName,
 		final ResourceCreator<T> toTest,
-		final boolean cached,
 		Object...args
 	) throws Exception {
 		final Path path = toTest.toPath(baseName, args);
@@ -77,7 +68,6 @@ public abstract class ResourceBase {
 		assertThat(resource1.lastModified(), is(Files.getLastModifiedTime(path)));
 		assertThat(resource1.path(), is(path));
 		assertThat(resource1.sha1(), is(SHA1Helper.keyFor(bytes)));
-		assertThat(resource1.cache(), is(cached));
 		assertThat(resource1.needsReplacing(), is(false));
 		
 		return resource1;

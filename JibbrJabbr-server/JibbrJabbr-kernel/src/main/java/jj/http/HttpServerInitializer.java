@@ -15,15 +15,23 @@
  */
 package jj.http;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 /**
@@ -31,7 +39,14 @@ import javax.inject.Singleton;
  * 
  */
 @Singleton
-public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
+class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
+	
+	private final Provider<JJEngineHttpHandler> engineProvider;
+	
+	@Inject
+	public HttpServerInitializer(final Provider<JJEngineHttpHandler> engineProvider) {
+		this.engineProvider = engineProvider;
+	}
 
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
@@ -42,6 +57,7 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 		pipeline.addLast("compressor", new HttpContentCompressor());
 		pipeline.addLast("encoder", new HttpResponseEncoder());
 		pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+		pipeline.addLast("notFound", engineProvider.get());
 	}
 
 }

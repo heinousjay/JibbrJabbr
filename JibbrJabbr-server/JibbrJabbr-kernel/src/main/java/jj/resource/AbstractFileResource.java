@@ -33,11 +33,20 @@ public abstract class AbstractFileResource implements Resource {
 	protected final ByteBuffer byteBuffer;
 	
 	private final String toString;
-
+	
 	@IOThread
 	AbstractFileResource(
 		final String baseName,
 		final Path path
+	) throws IOException {
+		this(baseName, path, true);
+	}
+	
+	@IOThread
+	AbstractFileResource(
+		final String baseName,
+		final Path path,
+		final boolean keepBytes
 	) throws IOException {
 		
 		if (Files.size(path) > MAX_FILE_SIZE) {
@@ -47,9 +56,12 @@ public abstract class AbstractFileResource implements Resource {
 		this.baseName = baseName;
 		this.path = path;
 		this.lastModified = Files.getLastModifiedTime(this.path);
-		byteBuffer = readAllBytes(path);
-		sha1 = SHA1Helper.keyFor(byteBuffer);
+		
+		ByteBuffer bytes = readAllBytes(path);
+		sha1 = SHA1Helper.keyFor(bytes);
 		toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+		
+		byteBuffer = keepBytes ? bytes : null;
 	}
 	
 	private ByteBuffer readAllBytes(final Path path) throws IOException {
@@ -96,10 +108,5 @@ public abstract class AbstractFileResource implements Resource {
 	@Override
 	public final String toString() {
 		return toString;
-	}
-	
-	@Override
-	public boolean cache() {
-		return true;
 	}
 }

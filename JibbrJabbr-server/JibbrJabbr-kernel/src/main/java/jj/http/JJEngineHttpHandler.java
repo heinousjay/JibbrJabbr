@@ -1,14 +1,22 @@
 package jj.http;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-import jj.HttpControlThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.servable.Servable;
@@ -18,8 +26,9 @@ import jj.servable.Servable;
  * @author jason
  *
  */
-@Singleton
-public class JJEngineHttpHandler {
+public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+	
+	private static final Logger logger = LoggerFactory.getLogger(JJEngineHttpHandler.class);
 	
 	private final JJExecutors executors;
 	
@@ -46,9 +55,25 @@ public class JJEngineHttpHandler {
 		
 		return result.toArray(new Servable[result.size()]);
 	}
+	
 
-	@HttpControlThread
-	public void handleHttpRequest(
+
+	@Override
+	protected void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
+		JJHttpRequest request = new JJHttpRequest(msg, ctx.channel());
+		JJHttpResponse response = new JJHttpResponse(request, ctx.channel());
+		
+		handleHttpRequest(request, response);
+	}
+	
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		logger.error("engine caught an exception", cause);
+		ctx.channel().write(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR));
+		ctx.close();
+	}
+
+	void handleHttpRequest(
 		final JJHttpRequest request,
 		final JJHttpResponse response
 	) throws Exception {
@@ -59,7 +84,7 @@ public class JJEngineHttpHandler {
 			dispatchNextServable(request, response, servables, new AtomicInteger());
 			
 		} else {
-			nextHandler(response);
+			response.sendNotFound();
 		}
 	}
 	
@@ -69,7 +94,7 @@ public class JJEngineHttpHandler {
 		final Servable[] servables,
 		final AtomicInteger count
 	) {
-		Runnable r = executors.prepareTask(new JJRunnable("JJEngine webbit->core processing") {
+		executors.ioExecutor().execute(executors.prepareTask(new JJRunnable("JJEngine webbit->core processing") {
 			
 			@Override
 			public void run() throws Exception {
@@ -85,42 +110,13 @@ public class JJEngineHttpHandler {
 					} else if (count.get() < servables.length) {
 						dispatchNextServable(request, response, servables, count);
 					} else {
-						nextHandler(response);
+						response.sendNotFound();
 					}
 					
 				} catch (Throwable e) {
 					response.error(e);
 				}
 			}
-		});
-		
-		if (servables[0].needsIO(request)) {
-			executors.ioExecutor().execute(r);
-		} else {
-			executors.httpControlExecutor().execute(r);
-		}
+		}));
 	}
-	
-	private void nextHandler(final JJHttpResponse response) {
-		Runnable r = executors.prepareTask(new JJRunnable("HtmlEngine passing control to next handler") {
-			
-			@Override
-			@HttpControlThread
-			public void run() throws Exception {
-				try {
-					
-					//control.nextHandler();
-				} catch (Throwable t) {
-					response.error(t);
-				}
-			}
-			
-		});
-		if (executors.isHttpControlThread()) {
-			r.run();
-		} else {
-			executors.httpControlExecutor().execute(r);
-		}
-	}
-	
 }

@@ -21,8 +21,12 @@ import jj.http.JJHttpResponse;
 import jj.resource.Resource;
 
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
@@ -42,7 +46,7 @@ public class DocumentRequestProcessorImplTest {
 
 	@Mock Resource htmlResource;
 	
-	@Mock FullHttpRequest request;
+	FullHttpRequest request;
 	@Mock Channel channel;
 	
 	JJHttpRequest httpRequest;
@@ -77,6 +81,8 @@ public class DocumentRequestProcessorImplTest {
 	
 	@Before
 	public void before() {
+		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
+		
 		httpRequest = new JJHttpRequest(request, channel);
 		httpResponse = new JJHttpResponse(httpRequest, channel);
 		

@@ -8,8 +8,6 @@ import jj.script.ScriptRunner;
 public interface JJExecutors {
 
 	ScriptRunner scriptRunner();
-	
-	ScheduledExecutorService httpControlExecutor();
 
 	ExecutorService ioExecutor();
 
@@ -20,8 +18,6 @@ public interface JJExecutors {
 	boolean isScriptThread();
 
 	boolean isIOThread();
-	
-	boolean isHttpControlThread();
 
 	int ioPoolSize();
 	

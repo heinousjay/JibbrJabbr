@@ -25,9 +25,8 @@ import javax.inject.Inject;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import jj.ExecutionTrace;
-import jj.JJExecutors;
 import jj.logging.TestRunnerLogger;
-import jj.http.JJEngineHttpHandler;
+import jj.http.TestJJEngineHttpHandler;
 
 /**
  * @author jason
@@ -134,22 +133,19 @@ class TestRunner {
 		}
 	}
 	
-	private final JJExecutors executors;
 	private final TestHttpRequest request;
 	private final TestHttpResponse response;
-	private final JJEngineHttpHandler handler;
+	private final TestJJEngineHttpHandler handler;
 	private final ExecutionTrace trace;
 	
 	@Inject
 	TestRunner(
-		final JJExecutors executors,
 		final TestHttpRequest request,
 		final TestHttpResponse response,
-		final JJEngineHttpHandler handler,
+		final TestJJEngineHttpHandler handler,
 		final ExecutionTrace trace,
 		final @TestRunnerLogger Logger testRunnerLog
 	) {
-		this.executors = executors;
 		this.request = request;
 		this.response = response;
 		this.handler = handler;
@@ -162,16 +158,12 @@ class TestRunner {
 	}
 	
 	TestHttpClient run() {
-		executors.httpControlExecutor().execute(new Runnable() {
-			public void run() {
-				try {
-					trace.start(request, response);
-					handler.handleHttpRequest(request, response);
-				} catch (Throwable t) {
-					response.error(t);
-				}
-			}
-		});
+		try {
+			trace.start(request, response);
+			handler.handleHttpRequest(request, response);
+		} catch (Throwable t) {
+			response.error(t);
+		}
 		return new TestHttpClientImpl(response);
 	}
 	

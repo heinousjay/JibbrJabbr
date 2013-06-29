@@ -76,7 +76,6 @@ public class CoreModule extends JJModule {
 		install(new LoggingModule(isTest));
 		
 		addServerListenerBinding().to(IOExecutor.class);
-		addServerListenerBinding().to(HttpControlExecutor.class);
 		addServerListenerBinding().to(ScriptExecutorFactory.class);
 		addServerListenerBinding().to(ClientExecutor.class);
 		

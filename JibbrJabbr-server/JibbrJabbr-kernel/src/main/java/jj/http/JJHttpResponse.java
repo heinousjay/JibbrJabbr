@@ -20,14 +20,21 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jj.resource.Resource;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.FileRegion;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.LastHttpContent;
 
 /**
  * @author jason
@@ -36,6 +43,8 @@ import io.netty.handler.codec.http.HttpVersion;
 public class JJHttpResponse {
 
 	private static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
+	
+	private static final Logger logger = LoggerFactory.getLogger(JJHttpResponse.class);
 	
 	protected final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 	
@@ -51,6 +60,12 @@ public class JJHttpResponse {
 	public JJHttpResponse(final JJHttpRequest request, final Channel channel) {
 		this.request = request;
 		this.channel = channel;
+	}
+	
+	private void maybeClose() {
+		if (!HttpHeaders.isKeepAlive(request.request())) {
+			channel.close();
+		}
 	}
 	
 	public HttpResponseStatus status() {
@@ -102,14 +117,31 @@ public class JJHttpResponse {
 		return this;
 	}
 	
-	public JJHttpResponse content(final ByteBuffer bytes) {
-		response.content().writeBytes(bytes);
+	public JJHttpResponse content(final ByteBuffer buffer) {
+		response.content().writeBytes(Unpooled.wrappedBuffer(buffer));
 		return this;
 	}
 	
 	public JJHttpResponse end() {
-		channel.write(response);
+		channel.write(
+			MessageList.newInstance(2)
+				.add(response)
+				.add(LastHttpContent.EMPTY_LAST_CONTENT)
+		);
+		maybeClose();
 		return this;
+	}
+	
+	private final byte[] NOT_FOUND = "NOT FOUND!".getBytes(StandardCharsets.UTF_8);
+	public void sendNotFound() {
+		
+		status(HttpResponseStatus.NOT_FOUND)
+			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
+			.header(HttpHeaders.Names.CONTENT_LENGTH, NOT_FOUND.length)
+			.header(HttpHeaders.Names.CONTENT_TYPE, "text/plain; UTF-8");
+		
+		channel.write(response);
+		channel.close();
 	}
 	
 	/**
@@ -214,5 +246,20 @@ public class JJHttpResponse {
 	 */
 	public String contentsString() {
 		return response.content().toString(charset);
+	}
+
+	/**
+	 * @param fileRegion
+	 * @return
+	 */
+	public JJHttpResponse send(FileRegion fileRegion) {
+		MessageList<Object> messageList = 
+			MessageList.newInstance(3)
+			.add(response)
+			.add(fileRegion)
+			.add(LastHttpContent.EMPTY_LAST_CONTENT);
+		channel.write(messageList);
+		maybeClose();
+		return this;
 	}
 }

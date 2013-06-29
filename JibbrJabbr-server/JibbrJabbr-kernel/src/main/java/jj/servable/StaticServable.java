@@ -20,8 +20,6 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
@@ -29,6 +27,7 @@ import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 
+import io.netty.channel.FileRegion;
 import io.netty.handler.codec.http.HttpHeaders;
 
 /**
@@ -40,20 +39,16 @@ public class StaticServable extends Servable {
 
 	private final ResourceFinder resourceFinder;
 	
-	private final JJExecutors executors;
-	
 	/**
 	 * @param configuration
 	 */
 	@Inject
 	protected StaticServable(
 		final Configuration configuration,
-		final ResourceFinder resourceFinder,
-		final JJExecutors executors
+		final ResourceFinder resourceFinder
 	) {
 		super(configuration);
 		this.resourceFinder = resourceFinder;
-		this.executors = executors;
 	}
 	
 	/**
@@ -84,18 +79,15 @@ public class StaticServable extends Servable {
 				
 				@Override
 				public void process() {
-					executors.httpControlExecutor().submit(
-						executors.prepareTask(new JJRunnable("static resource http serving") {
-						
-							@Override
-							public void run() throws Exception {
-								response
-									.header(HttpHeaders.Names.CONTENT_TYPE, sr.mime())
-									.content(sr.bytes())
-									.end();
-							}
-						})
-					);
+					try {
+						FileRegion fileRegion = sr.fileRegion();
+						response
+							.header(HttpHeaders.Names.CONTENT_TYPE, sr.mime())
+							.header(HttpHeaders.Names.CONTENT_LENGTH, sr.size())
+							.send(fileRegion);
+					} catch (IOException e) {
+						response.error(e);
+					}
 				}
 			};
 		}

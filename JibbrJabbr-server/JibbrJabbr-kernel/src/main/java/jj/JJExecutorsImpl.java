@@ -28,7 +28,6 @@ class JJExecutorsImpl implements JJExecutors {
 
 	private final TaskCreator taskCreator;
 	private final ScriptRunner scriptRunner;
-	private final HttpControlExecutor httpControlExecutor;
 	private final IOExecutor ioExecutor;
 	private final ScriptExecutorFactory scriptExecutorFactory;
 	
@@ -36,23 +35,17 @@ class JJExecutorsImpl implements JJExecutors {
 	public JJExecutorsImpl(
 		final TaskCreator taskCreator,
 		final ScriptRunner scriptRunner,
-		final HttpControlExecutor httpControlExecutor,
 		final IOExecutor ioExecutor,
 		final ScriptExecutorFactory scriptExecutorFactory
 	) {
 		this.taskCreator = taskCreator;
 		this.scriptRunner = scriptRunner;
-		this.httpControlExecutor = httpControlExecutor;
 		this.ioExecutor = ioExecutor;
 		this.scriptExecutorFactory = scriptExecutorFactory;
 	}
 	
 	public ScriptRunner scriptRunner() {
 		return scriptRunner;
-	}
-	
-	public ScheduledExecutorService httpControlExecutor() {
-		return httpControlExecutor;
 	}
 	
 	public ExecutorService ioExecutor() {
@@ -75,10 +68,6 @@ class JJExecutorsImpl implements JJExecutors {
 
 	public boolean isIOThread() {
 		return IOExecutor.isIOThread();
-	}
-	
-	public boolean isHttpControlThread() {
-		return HttpControlExecutor.isHttpControlThread();
 	}
 	
 	public int ioPoolSize() {
