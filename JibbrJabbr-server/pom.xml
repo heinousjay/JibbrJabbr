@@ -23,7 +23,7 @@
 	<modules>
 		<module>JibbrJabbr-kernel</module>
 		<module>JibbrJabbr-bootstrapper</module>
-		<module>JibbrJabbr</module>
+		<module>JibbrJabbr-all</module>
 	</modules>
 
 	<dependencyManagement>
@@ -40,7 +40,7 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>JibbrJabbr</artifactId>
+				<artifactId>JibbrJabbr-all</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
