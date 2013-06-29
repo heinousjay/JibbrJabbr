@@ -19,7 +19,7 @@ public class HttpModule extends AbstractModule {
 		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
 		
 		if (!isTest) {
-			
+			serverListeners.addBinding().to(NettyBootstrapInitializer.class);
 		}
 		
 		serverListeners.addBinding().to(WebSocketConnections.class);

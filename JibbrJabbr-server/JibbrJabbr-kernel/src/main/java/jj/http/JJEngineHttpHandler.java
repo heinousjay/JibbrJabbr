@@ -14,7 +14,7 @@ import jj.JJRunnable;
 import jj.servable.Servable;
 
 /**
- * Acts as the bridge from webbit into our core.
+ * Acts as the bridge from netty into our core.
  * @author jason
  *
  */

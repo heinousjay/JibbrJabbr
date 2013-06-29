@@ -1,0 +1,68 @@
+/*
+ *    Copyright 2012 Jason Miller
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package jj.http;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.JJServerListener;
+import jj.configuration.Configuration;
+
+/**
+ * @author jason
+ *
+ */
+@Singleton
+class NettyBootstrapInitializer implements JJServerListener {
+	
+	private final HttpServerInitializer initializer;
+	
+	private volatile ServerBootstrap serverBootstrap;
+	
+	@Inject
+	NettyBootstrapInitializer(
+		final HttpServerInitializer initializer,
+		final Configuration configuration
+	) {
+		this.initializer = initializer;
+	}
+	
+	private ServerBootstrap serverBootstrap() {
+		return new ServerBootstrap()
+			.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+			.channel(NioServerSocketChannel.class)
+			.childHandler(initializer);
+	}
+	
+	@Override
+	public void start() throws Exception {
+		assert (serverBootstrap == null) : "cannot start an already started server";
+		serverBootstrap = serverBootstrap();
+	}
+
+	@Override
+	public void stop() {
+		assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
+		serverBootstrap.group().shutdownGracefully();
+		serverBootstrap.childGroup().shutdownGracefully();
+		serverBootstrap = null;
+	}
+
+}
