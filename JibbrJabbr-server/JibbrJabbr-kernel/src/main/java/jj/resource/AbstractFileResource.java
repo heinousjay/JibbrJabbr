@@ -61,7 +61,7 @@ public abstract class AbstractFileResource implements Resource {
 		this.path = path;
 		this.lastModified = Files.getLastModifiedTime(this.path);
 		
-		if (keepBytes) {
+		if (!large) {
 			byteBuffer = readAllBytes(path);
 			sha1 = SHA1Helper.keyFor(byteBuffer);
 			toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
