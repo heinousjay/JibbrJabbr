@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>JibbrJabbr</artifactId>
@@ -17,14 +16,14 @@
 		<!-- the integration test project will probably care -->
 		<!-- hopefully there will be a better way -->
 		<distro.id>all</distro.id>
-		<distro.jarname>JibbrJabbr-${project.version}-${distro.id}.jar</distro.jarname>
 	</properties>
 
 	<modules>
 		<module>JibbrJabbr-kernel</module>
 		<module>JibbrJabbr-bootstrapper</module>
 		<module>JibbrJabbr-all</module>
-	</modules>
+    <module>JibbrJabbr-test</module>
+  </modules>
 
 	<dependencyManagement>
 		<dependencies>
@@ -170,13 +169,13 @@
 			<id>repository-netty.forge.cloudbees.com</id>
 			<url>http://repository-netty.forge.cloudbees.com/snapshot/</url>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
 			<id>sonatype-snapshots</id>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</snapshots>
 			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
 		</repository>

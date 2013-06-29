@@ -38,6 +38,8 @@ import org.junit.Test;
  */
 public class TestingAPITest {
 	
+	static final String TITLE = "TITLE GOES HERE";
+	
 	static final String basePath;
 	
 	static {
@@ -57,15 +59,15 @@ public class TestingAPITest {
 		index.dumpObjects();
 		assertThat(index.contentsString(), is(notNullValue()));
 		
-		assertThat(index.document().select("title").text(), is("JAYCHAT!"));
+		assertThat(index.document().select("title").text(), is(TITLE));
 		
-		TestHttpClient files = app.get("/files");
+		TestHttpClient files = app.get("/animal");
 		files.dumpObjects();
 		assertThat(files.status(), is(HttpResponseStatus.OK));
 		files.dumpObjects();
 		assertThat(files.contentsString(), is(notNullValue()));
 		
-		assertThat(files.document().select("title").text(), is("files test"));
+		assertThat(files.document().select("title").text(), is("ANIMAL!"));
 	}
 	
 	@Test
@@ -86,11 +88,11 @@ public class TestingAPITest {
 		for (int i = 0; i < number; ++i) {
 			assertThat(clients[count].status(), is(HttpResponseStatus.OK));
 			assertThat(clients[count].contentsString(), is(notNullValue()));
-			assertThat(clients[count++].document().select("title").text(), is("JAYCHAT!"));
+			assertThat(clients[count++].document().select("title").text(), is(TITLE));
 			
 			assertThat(clients[count].status(), is(HttpResponseStatus.OK));
 			assertThat(clients[count].contentsString(), is(notNullValue()));
-			assertThat(clients[count++].document().select("title").text(), is("JAYCHAT!"));
+			assertThat(clients[count++].document().select("title").text(), is(TITLE));
 		}
 		
 		return true;

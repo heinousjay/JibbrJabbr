@@ -44,7 +44,3 @@ $(function() {
 		}
 	});
 });
-
-function what() {
-	alert('what?');
-}
