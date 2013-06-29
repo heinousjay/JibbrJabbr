@@ -30,6 +30,7 @@ public abstract class AbstractFileResource implements Resource {
 	protected final String sha1;
 	protected final Path path;
 	protected final FileTime lastModified;
+	protected final long size;
 	protected final ByteBuffer byteBuffer;
 	
 	private final String toString;
@@ -49,7 +50,10 @@ public abstract class AbstractFileResource implements Resource {
 		final boolean keepBytes
 	) throws IOException {
 		
-		if (Files.size(path) > MAX_FILE_SIZE) {
+		size = Files.size(path);
+		boolean large = size > MAX_FILE_SIZE;
+		
+		if (large && keepBytes) {
 			throw new IOException(AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_FILE_SIZE + " bytes");
 		}
 		
@@ -57,11 +61,15 @@ public abstract class AbstractFileResource implements Resource {
 		this.path = path;
 		this.lastModified = Files.getLastModifiedTime(this.path);
 		
-		ByteBuffer bytes = readAllBytes(path);
-		sha1 = SHA1Helper.keyFor(bytes);
-		toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
-		
-		byteBuffer = keepBytes ? bytes : null;
+		if (keepBytes) {
+			byteBuffer = readAllBytes(path);
+			sha1 = SHA1Helper.keyFor(byteBuffer);
+			toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+		} else {
+			byteBuffer = null;
+			sha1 = "1111222233334444555566667777888899990000";
+			toString = "this ain't right son " + path;
+		}
 	}
 	
 	private ByteBuffer readAllBytes(final Path path) throws IOException {
@@ -91,6 +99,11 @@ public abstract class AbstractFileResource implements Resource {
 	@Override
 	public FileTime lastModified() {
 		return lastModified;
+	}
+
+	@Override
+	public long size() {
+		return size;
 	}
 	
 	@Override

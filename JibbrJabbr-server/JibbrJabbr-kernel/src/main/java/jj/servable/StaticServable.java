@@ -27,9 +27,6 @@ import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 
-import io.netty.channel.FileRegion;
-import io.netty.handler.codec.http.HttpHeaders;
-
 /**
  * @author jason
  *
@@ -80,11 +77,7 @@ public class StaticServable extends Servable {
 				@Override
 				public void process() {
 					try {
-						FileRegion fileRegion = sr.fileRegion();
-						response
-							.header(HttpHeaders.Names.CONTENT_TYPE, sr.mime())
-							.header(HttpHeaders.Names.CONTENT_LENGTH, sr.size())
-							.send(fileRegion);
+						response.sendUncachedResource(sr);
 					} catch (IOException e) {
 						response.error(e);
 					}

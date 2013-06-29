@@ -48,6 +48,12 @@ public interface Resource {
 	FileTime lastModified();
 	
 	/**
+	 * size of the file in bytes
+	 * @return
+	 */
+	long size();
+	
+	/**
 	 * time this resource was last modified as
 	 * a java.util.Date
 	 * @return

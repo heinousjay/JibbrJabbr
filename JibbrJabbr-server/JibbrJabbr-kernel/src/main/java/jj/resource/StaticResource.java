@@ -20,7 +20,6 @@ import io.netty.channel.FileRegion;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.IOThread;
@@ -29,11 +28,9 @@ import jj.IOThread;
  * @author jason
  *
  */
-public class StaticResource extends AbstractFileResource {
+public class StaticResource extends AbstractFileResource implements TransferableResource {
 
 	private final String mime;
-	
-	private final long size;
 	
 	/**
 	 * @param baseName
@@ -43,7 +40,6 @@ public class StaticResource extends AbstractFileResource {
 	StaticResource(final Path basePath, final String baseName) throws IOException {
 		super(baseName, basePath.resolve(baseName), false);
 		mime = MimeTypes.get(baseName);
-		size = Files.size(path);
 	}
 
 	@Override
@@ -56,11 +52,8 @@ public class StaticResource extends AbstractFileResource {
 		return mime;
 	}
 	
-	public long size() {
-		return size;
-	}
-	
 	@IOThread
+	@Override
 	public FileRegion fileRegion() throws IOException {
 		return new DefaultFileRegion(FileChannel.open(path), 0, size);
 	}

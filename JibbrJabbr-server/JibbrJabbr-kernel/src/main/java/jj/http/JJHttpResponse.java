@@ -15,19 +15,17 @@
  */
 package jj.http;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.resource.Resource;
+import jj.resource.TransferableResource;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.FileRegion;
 import io.netty.channel.MessageList;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -43,8 +41,6 @@ import io.netty.handler.codec.http.LastHttpContent;
 public class JJHttpResponse {
 
 	private static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
-	
-	private static final Logger logger = LoggerFactory.getLogger(JJHttpResponse.class);
 	
 	protected final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 	
@@ -138,7 +134,8 @@ public class JJHttpResponse {
 		status(HttpResponseStatus.NOT_FOUND)
 			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 			.header(HttpHeaders.Names.CONTENT_LENGTH, NOT_FOUND.length)
-			.header(HttpHeaders.Names.CONTENT_TYPE, "text/plain; UTF-8");
+			.header(HttpHeaders.Names.CONTENT_TYPE, "text/plain; UTF-8")
+			.content(NOT_FOUND);
 		
 		channel.write(response);
 		channel.close();
@@ -247,17 +244,28 @@ public class JJHttpResponse {
 	public String contentsString() {
 		return response.content().toString(charset);
 	}
+	
+	public JJHttpResponse sendUncachedResource(TransferableResource resource) throws IOException {
+		return header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
+			.sendCachedResource(resource);
+	}
 
 	/**
 	 * @param fileRegion
 	 * @return
 	 */
-	public JJHttpResponse send(FileRegion fileRegion) {
+	public JJHttpResponse sendCachedResource(TransferableResource resource) throws IOException {
+		headerIfNotSet(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
+			.header(HttpHeaders.Names.ETAG, resource.sha1())
+			.header(HttpHeaders.Names.LAST_MODIFIED, resource.lastModifiedDate())
+			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size());
+		
 		MessageList<Object> messageList = 
 			MessageList.newInstance(3)
-			.add(response)
-			.add(fileRegion)
-			.add(LastHttpContent.EMPTY_LAST_CONTENT);
+				.add(response)
+				.add(resource.fileRegion())
+				.add(LastHttpContent.EMPTY_LAST_CONTENT);
 		channel.write(messageList);
 		maybeClose();
 		return this;
