@@ -19,6 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
@@ -59,12 +61,20 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 	
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		Attribute<JJWebSocketConnection> connectionAttribute = ctx.channel().attr(CONNECTION_ATTRIBUTE_KEY);
+		final Attribute<JJWebSocketConnection> connectionAttribute = ctx.channel().attr(CONNECTION_ATTRIBUTE_KEY);
 		JJWebSocketConnection connection = connectionAttribute.get();
 		assert(connection == null) : "new websocket handler instance created and somehow the connection already exists";
 		
 		connectionAttribute.setIfAbsent(connectionProvider.get());
 		handler.onOpen(connectionAttribute.get());
+		
+		ctx.channel().closeFuture().addListener(new ChannelFutureListener() {
+			
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				handler.onClose(connectionAttribute.get());
+			}
+		});
 	}
 	
 	@Override
@@ -76,7 +86,6 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 		if (frame instanceof CloseWebSocketFrame) {
 			
 			handshaker.close(ctx.channel(), (CloseWebSocketFrame)frame.retain());
-			handler.onClose(connection);
 		
 		} else if (frame instanceof PingWebSocketFrame) {
 			
