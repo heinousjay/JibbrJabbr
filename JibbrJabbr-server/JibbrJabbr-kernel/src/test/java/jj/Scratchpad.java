@@ -1,5 +1,14 @@
 package jj;
 
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.FileChannel.MapMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
@@ -15,7 +24,7 @@ public class Scratchpad {
 
 	final String html = "<html><head><title data-i18n='superoo' data-i18n-id='underoo'>balls</title></head></html>";
 
-	@Test
+	@Ignore @Test
 	public void testNormalizeString() {
 		
 		System.out.println("|" + StringUtil.normaliseWhitespace("			   something   	\n\r \n\r		") + "|");
@@ -43,7 +52,7 @@ public class Scratchpad {
 	
 	
 	@SuppressWarnings("unused")
-	@Test
+	@Ignore @Test
 	public void jsoupCoarseProfile() {
 		
 		// 15,000 iterations so it JITs stuff

@@ -10,12 +10,10 @@ public class ServableModule extends JJModule {
 	protected void configure() {
 		Multibinder<Servable> servables = Multibinder.newSetBinder(binder(), Servable.class);
 		
-		// HtmlServable is always first
-		servables.addBinding().to(HtmlServable.class);
+		// DocumentServable is always first
+		servables.addBinding().to(DocumentServable.class);
 		
 		servables.addBinding().to(AssociatedScriptServable.class);
-		
-		servables.addBinding().to(SocketServable.class);
 		
 		//.addComponent(CssServable.class)
 		

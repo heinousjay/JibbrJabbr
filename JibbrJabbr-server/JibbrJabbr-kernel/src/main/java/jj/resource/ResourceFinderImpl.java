@@ -116,12 +116,8 @@ class ResourceFinderImpl implements ResourceFinder {
 			}
 			result = resourceClass.cast(resourceCache.get(pathUri));
 		
-		} catch (NullPointerException | NoSuchFileException e) {
+		} catch (NullPointerException | NoSuchFileException | ClassCastException cce) {
 			log.trace("couldn't find {} at {}", resourceClass.getSimpleName(), path);
-		
-		} catch (ClassCastException cce) {
-			log.info("resource at {} was expected to be of type {} but was {}", pathUri, resourceClass, resourceCache.get(pathUri).getClass());
-			
 		} catch (IOException ioe) {
 			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), path);
 			log.error("", ioe);

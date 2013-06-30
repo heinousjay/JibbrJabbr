@@ -21,7 +21,7 @@ import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 
 @Singleton
-class HtmlServable extends Servable {
+class DocumentServable extends Servable {
 	
 	public static final String SLASH = "/";
 	public static final String DOT = ".";
@@ -33,7 +33,7 @@ class HtmlServable extends Servable {
 	private final Set<DocumentFilter> documentFilters;
 	
 	@Inject
-	HtmlServable(
+	DocumentServable(
 		final Configuration configuration,
 		final ResourceFinder resourceFinder, 
 		final JJExecutors executors,

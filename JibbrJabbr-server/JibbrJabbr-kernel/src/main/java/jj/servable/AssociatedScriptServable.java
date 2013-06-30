@@ -17,9 +17,6 @@ import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * handles automatic inclusion
  * @author jason
@@ -27,8 +24,6 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 class AssociatedScriptServable extends Servable {
-	
-	private final Logger log = LoggerFactory.getLogger(AssociatedScriptServable.class);
 	
 	private final ScriptBundleFinder finder;
 
@@ -87,18 +82,12 @@ class AssociatedScriptServable extends Servable {
 				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
 					script.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 					
-					response.sendNotModified(script, true);
+					response.sendNotModified(script);
 					
 				} else {
 				
 					response.sendCachedResource(script);
 				}
-				
-				log.info(
-					"request for [{}] completed in {} milliseconds (wall time)",
-					request.uri(),
-					request.wallTime()
-				);
 			}
 		};
 	}

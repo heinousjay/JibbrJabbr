@@ -15,7 +15,14 @@
  */
 package jj.document;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.resource.ResourceFinder;
+import jj.resource.StaticResource;
+import jj.servable.URIMatch;
+
+import org.jsoup.nodes.Element;
 
 /**
  * @author jason
@@ -23,17 +30,46 @@ import javax.inject.Singleton;
  */
 @Singleton
 class ResourceUrlDocumentFilter implements DocumentFilter {
+	
+	private static final String HREF = "href";
+	private static final String SRC = "src";
+	private static final String SELECTOR = "[" + HREF + "],[" + SRC + "]";
+	
+	private final ResourceFinder resourceFinder;
+	
+	@Inject
+	ResourceUrlDocumentFilter(final ResourceFinder resourceFinder) {
+		this.resourceFinder = resourceFinder;
+	}
 
 	@Override
 	public boolean needsIO(DocumentRequest documentRequest) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
+	}
+	
+	private String massageURL(String url) {
+		URIMatch uriMatch = new URIMatch(url);
+		
+		StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
+		if (resource != null && uriMatch.sha == null) {
+			return resource.uri();
+		}
+		
+		return url;
 	}
 
 	@Override
 	public void filter(DocumentRequest documentRequest) {
-		// TODO Auto-generated method stub
-
+		for(Element el : documentRequest.document().select(SELECTOR)) {
+			
+			if (el.hasAttr(HREF)) {
+				el.attr(HREF, massageURL(el.attr(HREF)));
+			}
+			
+			if (el.hasAttr(SRC)) {
+				el.attr(SRC, massageURL(el.attr(SRC)));
+			}
+		}
 	}
 
 }

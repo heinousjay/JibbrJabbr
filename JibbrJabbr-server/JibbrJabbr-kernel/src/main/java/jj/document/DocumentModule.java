@@ -12,7 +12,8 @@ public class DocumentModule extends JJModule {
 	protected void configure() {
 		Multibinder<DocumentFilter> filters = Multibinder.newSetBinder(binder(), DocumentFilter.class);
 		
-		filters.addBinding().to(ScriptHelperDocumentFilter.class);
 		filters.addBinding().to(InlineMessagesDocumentFilter.class);
+		filters.addBinding().to(ResourceUrlDocumentFilter.class);
+		filters.addBinding().to(ScriptHelperDocumentFilter.class);
 	}
 }

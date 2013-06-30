@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.DateFormatHelper;
+import jj.Version;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
@@ -53,6 +54,13 @@ import io.netty.handler.codec.http.LastHttpContent;
  *
  */
 public class JJHttpResponse {
+	
+	private static final String SERVER_NAME = String.format(
+		"%s/%s (%s)",
+		Version.name,
+		Version.version,
+		Version.branchName		
+	);
 
 	private static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
 	
@@ -75,9 +83,7 @@ public class JJHttpResponse {
 		this.request = request;
 		this.channel = channel;
 		this.access = access;
-		
-		header("X-Request-ID", request.id());
-		header("X-Channel-ID", channel.id());
+		header(HttpHeaders.Names.SERVER, SERVER_NAME);
 	}
 	
 	private void maybeClose(final ChannelFuture f) {
@@ -160,11 +166,8 @@ public class JJHttpResponse {
 	}
 	
 	public JJHttpResponse end() {
-		maybeClose(channel.write(
-			MessageList.newInstance(2)
-				.add(response)
-				.add(LastHttpContent.EMPTY_LAST_CONTENT)
-		));
+		header(HttpHeaders.Names.DATE, new Date());
+		maybeClose(channel.write(response));
 		return this;
 	}
 	
@@ -184,16 +187,13 @@ public class JJHttpResponse {
 	}
 	
 	/**
-	 * Sends a 304 Not Modified for the given resource and ends the response,
-	 * allowing the result to be cached for one year
+	 * Sends a 304 Not Modified for the given resource and ends the response
 	 * @param resource
 	 * @return
 	 */
-	public JJHttpResponse sendNotModified(final Resource resource, final boolean cacheable) {
+	public JJHttpResponse sendNotModified(final Resource resource) {
 		return status(HttpResponseStatus.NOT_MODIFIED)
-			.header(HttpHeaders.Names.CACHE_CONTROL, cacheable ? MAX_AGE_ONE_YEAR : HttpHeaders.Values.NO_CACHE)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
-			.header(HttpHeaders.Names.LAST_MODIFIED, resource.lastModifiedDate())
 			.end();
 	}
 	
@@ -208,7 +208,7 @@ public class JJHttpResponse {
 	
 	/**
 	 * Sends a 307 Temporary Redirect to the given resource, using the fully qualified
-	 * asset URL and not allowing the redirect to be cached
+	 * asset URL and disallowing the redirect to be cached
 	 * @param resource
 	 * @return
 	 */
@@ -230,7 +230,6 @@ public class JJHttpResponse {
 		return status(HttpResponseStatus.OK)
 			.header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
-			.header(HttpHeaders.Names.LAST_MODIFIED, resource.lastModifiedDate())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().limit())
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.content(resource.bytes())
@@ -298,10 +297,18 @@ public class JJHttpResponse {
 	 */
 	public JJHttpResponse sendCachedResource(TransferableResource resource) throws IOException {
 		headerIfNotSet(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
-			.header(HttpHeaders.Names.ETAG, resource.sha1())
-			.header(HttpHeaders.Names.LAST_MODIFIED, resource.lastModifiedDate())
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
-			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size());
+			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size())
+			.header(HttpHeaders.Names.DATE, new Date());
+		
+		if (resource.sha1() != null) {
+			header(HttpHeaders.Names.ETAG, resource.sha1());
+		}
+		
+		// TODO! use a chunked file transfer if there is an SSL handler in the pipeline
+		// which i guess means the TransferableResource will need a method to return a
+		// RandomAccessFile instead of a FileRegion.  which I guess is good, it takes
+		// a netty dependency out of there
 		
 		MessageList<Object> messageList = 
 			MessageList.newInstance(3)
@@ -328,6 +335,12 @@ public class JJHttpResponse {
 	}
 	
 	private void log() {
+		
+		log.info(
+			"request for [{}] completed in {} milliseconds (wall time)",
+			request.uri(),
+			request.wallTime()
+		);
 		
 		if (access.isInfoEnabled()) {
 			access.info("{} - - {} \"{} {} {}\" {} {} {} \"{}\"", 

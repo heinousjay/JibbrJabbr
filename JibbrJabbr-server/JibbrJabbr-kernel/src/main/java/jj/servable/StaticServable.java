@@ -22,9 +22,6 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
@@ -38,8 +35,6 @@ import jj.http.RequestProcessor;
  */
 @Singleton
 public class StaticServable extends Servable {
-	
-	private final Logger log = LoggerFactory.getLogger(StaticServable.class);
 
 	private final ResourceFinder resourceFinder;
 	
@@ -76,8 +71,8 @@ public class StaticServable extends Servable {
 		final JJHttpRequest request,
 		final JJHttpResponse response
 	) throws IOException {
-		
-		final StaticResource sr = resourceFinder.loadResource(StaticResource.class, baseName(request));
+		final URIMatch match = new URIMatch(request.uri());
+		final StaticResource sr = resourceFinder.loadResource(StaticResource.class, match.baseName);
 		if (sr != null && isServablePath(sr.path())) {
 			return new RequestProcessor() {
 				
@@ -85,12 +80,11 @@ public class StaticServable extends Servable {
 				public void process() {
 
 					try {
-						URIMatch match = new URIMatch(request.uri());
 						
 						if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
 							sr.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 							
-							response.sendNotModified(sr, match.sha != null);
+							response.sendNotModified(sr);
 	
 						} else if (match.sha == null) {
 							
@@ -104,14 +98,8 @@ public class StaticServable extends Servable {
 							
 							response.sendCachedResource(sr);
 						}
-					
-						log.info(
-							"request for [{}] completed in {} milliseconds (wall time)",
-							request.uri(),
-							request.wallTime()
-						);
 						
-					} catch (IOException e) {
+					} catch (Throwable e) {
 						response.error(e);
 					}
 				}

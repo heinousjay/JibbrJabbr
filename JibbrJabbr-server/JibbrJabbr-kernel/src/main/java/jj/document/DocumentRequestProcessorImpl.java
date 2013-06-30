@@ -15,8 +15,6 @@ import jj.http.JJHttpRequest;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Coordinates the resources necessary to execute a request
@@ -29,8 +27,6 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	
 	@SuppressWarnings("serial")
 	private static class FilterList extends ArrayList<DocumentFilter> {}
-	
-	private final Logger log = LoggerFactory.getLogger(DocumentRequestProcessorImpl.class);
 	
 	/** the executors in which we run */
 	final JJExecutors executors;
@@ -96,7 +92,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		executeScriptFilters(makeFilterList(filters, false));
 		// the response gets written when this complete
 		FilterList ioFilters = makeFilterList(filters, true);
-		dispatchIONextFilter(ioFilters, new AtomicInteger(0));
+		dispatchIOFilter(ioFilters, new AtomicInteger(0));
 	}
 	
 	private void executeScriptFilters(final FilterList scriptFilters) {
@@ -106,31 +102,31 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		}
 	}
 	
-	private void dispatchIONextFilter(final FilterList ioFilters, final AtomicInteger currentIOFilter) {
+	private void dispatchIOFilter(final FilterList ioFilters, final AtomicInteger ioFilterIndex) {
 		// this is slightly more complicated - we need to
 		// ensure strict ordering of filter execution because
 		// we don't want to synchronize on the document,
 		// so we dispatch into an IO thread and loop from there
 		// using an AtomicInteger because we need volatile semantics
-		final int index = currentIOFilter.getAndIncrement();
+		final int index = ioFilterIndex.getAndIncrement();
 		if (index >= ioFilters.size()) {
 			writeResponse();
 		} else {
-			final String taskName = String.format("DocumentFilter%s", (executors.isIOThread() ? "  w/IO" : ""));
-			Runnable r = executors.prepareTask(new JJRunnable(taskName) {
+			final DocumentFilter filter = ioFilters.get(index);
+			final String taskName = 
+				String.format("Document filter %s %s",
+					filter.getClass().getSimpleName(),
+					(executors.isIOThread() ? "w/IO" : "")
+				);
+			executors.ioExecutor().submit(executors.prepareTask(new JJRunnable(taskName) {
 				
 				@Override
 				public void run() throws Exception {
 					// not asserting IO thread here since this is only called from the next few lines
-					ioFilters.get(index).filter(documentRequest);
-					dispatchIONextFilter(ioFilters, currentIOFilter);
+					filter.filter(documentRequest);
+					dispatchIOFilter(ioFilters, ioFilterIndex);
 				}
-			});
-			if (executors.isIOThread()) {
-				r.run();
-			} else {
-				executors.ioExecutor().submit(r);
-			}
+			}));
 		}
 	}
 
@@ -150,15 +146,8 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 				.end();
 			
 		} catch (Exception e) {
-			log.error("error responding to {}", documentRequest.httpRequest().uri());
-			throw e;
+			documentRequest.httpResponse().error(e);
 		}
-		
-		log.info(
-			"request for [{}] completed in {} milliseconds (wall time)",
-			documentRequest.httpRequest().uri(),
-			documentRequest.httpRequest().wallTime()
-		);
 	}
 	
 	@Override
