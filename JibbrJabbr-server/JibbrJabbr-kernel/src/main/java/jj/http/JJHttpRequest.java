@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.DataStore;
 import jj.DateFormatHelper;
 import jj.Sequence;
@@ -22,6 +25,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 
+@Singleton
 public class JJHttpRequest implements DataStore {
 	
 	public enum State {
@@ -62,6 +66,7 @@ public class JJHttpRequest implements DataStore {
 	
 	private ArrayList<JQueryMessage> messages;
 	
+	@Inject
 	public JJHttpRequest(final FullHttpRequest request, final Channel channel) {
 		this.request = request;
 		this.channel = channel;

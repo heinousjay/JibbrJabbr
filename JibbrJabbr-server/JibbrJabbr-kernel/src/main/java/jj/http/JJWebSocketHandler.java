@@ -93,7 +93,7 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	public void onMessage(JJWebSocketConnection connection, String msg) throws Throwable {
+	public void onMessage(JJWebSocketConnection connection, String msg) {
 		connection.markActivity();
 		if ("jj-hi".equals(msg)) {
 			connection.send("jj-yo");
@@ -119,13 +119,13 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	public void onMessage(JJWebSocketConnection connection, byte[] msg) throws Throwable {
+	public void onMessage(JJWebSocketConnection connection, byte[] msg) {
 		// at some point this is going to become interesting,
 		// thinking about streaming bytes in for uploads...
 		log.info("receiving bytes, length is {}", msg.length);
 	}
 
-	public void onPong(JJWebSocketConnection connection, byte[] msg) throws Throwable {
+	public void onPong(JJWebSocketConnection connection, byte[] msg) {
 		
 	}
 }

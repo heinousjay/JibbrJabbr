@@ -61,7 +61,6 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	@Override
 	public void filter(DocumentRequest documentRequest) {
 		for(Element el : documentRequest.document().select(SELECTOR)) {
-			System.out.println(el);
 			if (el.hasAttr(HREF)) {
 				el.attr(HREF, massageURL(el.attr(HREF)));
 			}

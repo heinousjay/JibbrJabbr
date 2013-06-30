@@ -27,11 +27,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.DateFormatHelper;
 import jj.Version;
+import jj.logging.AccessLogger;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
@@ -53,6 +57,7 @@ import io.netty.handler.codec.http.LastHttpContent;
  * @author jason
  *
  */
+@Singleton
 public class JJHttpResponse {
 	
 	private static final String SERVER_NAME = String.format(
@@ -79,7 +84,12 @@ public class JJHttpResponse {
 	/**
 	 * @param response
 	 */
-	public JJHttpResponse(final JJHttpRequest request, final Channel channel, final Logger access) {
+	@Inject
+	public JJHttpResponse(
+		final JJHttpRequest request,
+		final Channel channel,
+		final @AccessLogger Logger access
+	) {
 		this.request = request;
 		this.channel = channel;
 		this.access = access;

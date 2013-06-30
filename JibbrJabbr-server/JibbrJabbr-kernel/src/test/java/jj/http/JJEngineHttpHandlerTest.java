@@ -31,6 +31,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
+import com.google.inject.Injector;
+
 /**
  * @author jason
  *
@@ -40,6 +42,7 @@ public class JJEngineHttpHandlerTest {
 	
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
+	@Mock Injector injector;
 
 	MockJJExecutors executors;
 	@Mock Servable servable1;
@@ -92,7 +95,7 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testBasicOperation() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, logger, trace);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace);
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
@@ -143,7 +146,7 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testHandover() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, logger, trace);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace);
 		
 		//when
 		handler.handleHttpRequest(httpRequest4, httpResponse);

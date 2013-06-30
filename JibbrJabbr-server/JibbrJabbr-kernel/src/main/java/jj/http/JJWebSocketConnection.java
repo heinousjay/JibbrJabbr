@@ -1,9 +1,18 @@
 package jj.http;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.DataStore;
 import jj.ExecutionTrace;
@@ -13,6 +22,7 @@ import jj.script.AssociatedScriptBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class JJWebSocketConnection implements DataStore {
 	
 	private static final String ASSOCIATED_SCRIPT_BUNDLE = "associated script bundle";
@@ -29,15 +39,22 @@ public class JJWebSocketConnection implements DataStore {
 	
 	private final ExecutionTrace trace;
 	
+	private final FullHttpRequest request;
+	
+	private final Channel channel;
+	
 	private final HashMap<String, Object> data = new HashMap<>();
 
-	JJWebSocketConnection(final boolean immediateClosure, final ExecutionTrace trace) {
+	@Inject
+	JJWebSocketConnection(
+		final ExecutionTrace trace,
+		final FullHttpRequest request,
+		final Channel channel
+	) {
 		this.trace = trace;
-		if (immediateClosure) {
-			data.put(IMMEDIATE_CLOSURE, Boolean.TRUE);
-		} else {
-			markActivity();
-		}
+		this.request = request;
+		this.channel = channel;
+		markActivity();
 	}
 	
 	@Override
@@ -103,7 +120,7 @@ public class JJWebSocketConnection implements DataStore {
 	public JJWebSocketConnection send(String message) {
 		markActivity();
 		log.trace("sending {} on {}", message, this);
-		
+		channel.write(new TextWebSocketFrame(message));
 		return this;
 	}
 	
@@ -148,14 +165,13 @@ public class JJWebSocketConnection implements DataStore {
 	 */
 	public String uri() {
 		// TODO Auto-generated method stub
-		return null;
+		return request.getUri();
 	}
 
 	/**
 	 * 
 	 */
 	public void close() {
-		// TODO Auto-generated method stub
-		
+		channel.write(new CloseWebSocketFrame(1000, null)).addListener(ChannelFutureListener.CLOSE);
 	}
 }
