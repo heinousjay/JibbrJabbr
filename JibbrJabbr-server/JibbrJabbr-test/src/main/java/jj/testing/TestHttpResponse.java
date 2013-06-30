@@ -82,8 +82,6 @@ class TestHttpResponse extends JJHttpResponse {
 		return id;
 	}
 	
-	private final Map<String, String> headers = new HashMap<>();
-	
 	public TestHttpResponse end() {
 		testRunnerLogger.info("end called on {}", this);
 		processResponse();
@@ -94,31 +92,6 @@ class TestHttpResponse extends JJHttpResponse {
 		testRunnerLogger.info("error called on {}", this);
 		processResponse();
 		return this;
-	}
-	
-	public Map<String, String> headers() {
-		return Collections.unmodifiableMap(headers);
-	}
-	 
-	public String header(String name) {
-		return headers.get(name);
-	}
-
-	public TestHttpResponse header(String name, String value) {
-		if (value == null) {
-			headers.remove(name);
-		} else {
-			headers.put(name, value);
-		}
-		return this;
-	}
-
-	public TestHttpResponse header(String name, long value) {
-		return header(name, String.valueOf(value));
-	}
-
-	public TestHttpResponse header(String name, Date value) {
-		return header(name, DateFormatHelper.headerFormat(value));
 	}
 	
 	public boolean isDone() {
@@ -169,7 +142,7 @@ class TestHttpResponse extends JJHttpResponse {
 			.append("[").append(id()).append("] {")
 			.append("charset=").append(charset())
 			.append(", status=").append(status())
-			.append(", headers=").append(headers())
+			.append(", headers=").append(response.headers())
 			.append(", error=").append(error())
 			.append(", ended=").append(ended())
 			.append(", contents size=").append(response.content().readableBytes())

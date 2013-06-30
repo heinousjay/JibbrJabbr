@@ -47,21 +47,21 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 		return true;
 	}
 	
-	private String massageURL(String url) {
+	private String massageURL(final String url) {
 		URIMatch uriMatch = new URIMatch(url);
-		
-		StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
-		if (resource != null && uriMatch.sha == null) {
-			return resource.uri();
+		if (uriMatch.baseName != null) {
+			StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
+			if (resource != null && uriMatch.sha == null) {
+				return resource.uri();
+			}
 		}
-		
 		return url;
 	}
 
 	@Override
 	public void filter(DocumentRequest documentRequest) {
 		for(Element el : documentRequest.document().select(SELECTOR)) {
-			
+			System.out.println(el);
 			if (el.hasAttr(HREF)) {
 				el.attr(HREF, massageURL(el.attr(HREF)));
 			}

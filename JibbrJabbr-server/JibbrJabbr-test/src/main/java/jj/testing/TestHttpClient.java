@@ -34,9 +34,6 @@ public interface TestHttpClient {
 	Throwable error() throws Exception;
 	Throwable error(final long timeout, final TimeUnit unit) throws Exception;
 	
-	Map<String, String> headers() throws Exception;
-	Map<String, String> headers(final long timeout, final TimeUnit unit) throws Exception;
-	
 	String contentsString() throws Exception;
 	String contentsString(final long timeout, final TimeUnit unit) throws Exception;
 	

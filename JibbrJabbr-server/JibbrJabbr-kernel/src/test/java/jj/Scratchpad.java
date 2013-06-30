@@ -1,14 +1,5 @@
 package jj;
 
-import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.channels.FileChannel.MapMode;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
@@ -50,8 +41,6 @@ public class Scratchpad {
 		System.out.println(doc);
 	}
 	
-	
-	@SuppressWarnings("unused")
 	@Ignore @Test
 	public void jsoupCoarseProfile() {
 		
@@ -63,6 +52,7 @@ public class Scratchpad {
 		long start = System.nanoTime();
 		
 		for (int i = 0; i < 15000; ++i) {
+			@SuppressWarnings("unused")
 			Document doc = Jsoup.parse(html);
 		}
 		
@@ -74,6 +64,7 @@ public class Scratchpad {
 		
 		
 		for (int i = 0; i < 15000; ++i) {
+			@SuppressWarnings("unused")
 			Document doc2 = doc.clone();
 		}
 		
@@ -82,6 +73,7 @@ public class Scratchpad {
 		start = System.nanoTime();
 		
 		for (int i = 0; i < 15000; ++i) {
+			@SuppressWarnings("unused")
 			Document doc3 = Jsoup.parse(html);
 		}
 		
@@ -93,6 +85,7 @@ public class Scratchpad {
 		
 		
 		for (int i = 0; i < 15000; ++i) {
+			@SuppressWarnings("unused")
 			Document doc5 = doc4.clone();
 		}
 		

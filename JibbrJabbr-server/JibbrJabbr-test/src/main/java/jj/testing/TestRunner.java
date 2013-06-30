@@ -17,7 +17,6 @@ package jj.testing;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -82,20 +81,6 @@ class TestRunner {
 			testRunnerLog.trace("error({}, {}) on {}", timeout, unit, response.id());
 			getResponse(timeout, unit);
 			return response.error();
-		}
-		
-		@Override
-		public Map<String, String> headers() throws Exception {
-			testRunnerLog.trace("headers() on {}", response.id());
-			getResponse();
-			return response.headers();
-		}
-		
-		@Override
-		public Map<String, String> headers(final long timeout, final TimeUnit unit) throws Exception {
-			testRunnerLog.trace("headers({}, {}) on {}", timeout, unit, response.id());
-			getResponse(timeout, unit);
-			return response.headers();
 		}
 		
 		@Override
