@@ -15,19 +15,15 @@
  */
 package jj.http;
 
-import io.netty.channel.ChannelHandlerContext;
+import static jj.http.HttpServerInitializer.PipelineStages.*;
+
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 import javax.inject.Inject;
@@ -41,6 +37,15 @@ import javax.inject.Singleton;
 @Singleton
 class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 	
+	enum PipelineStages {
+		Decoder,
+		Aggregator,
+		Encoder,
+		Compressor,
+		ChunkedWriter,
+		JJEngine
+	}
+	
 	private final Provider<JJEngineHttpHandler> engineProvider;
 	
 	@Inject
@@ -52,12 +57,12 @@ class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 	protected void initChannel(SocketChannel ch) throws Exception {
 		ChannelPipeline pipeline = ch.pipeline();
 
-		pipeline.addLast("decoder", new HttpRequestDecoder());
-		pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
-		pipeline.addLast("compressor", new HttpContentCompressor());
-		pipeline.addLast("encoder", new HttpResponseEncoder());
-		pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
-		pipeline.addLast("notFound", engineProvider.get());
+		pipeline.addLast(Decoder.toString(), new HttpRequestDecoder());
+		pipeline.addLast(Aggregator.toString(), new HttpObjectAggregator(65536));
+		pipeline.addLast(Encoder.toString(), new HttpResponseEncoder());
+		pipeline.addLast(Compressor.toString(), new HttpContentCompressor());
+		pipeline.addLast(ChunkedWriter.toString(), new ChunkedWriteHandler());
+		pipeline.addLast(JJEngine.toString(), engineProvider.get());
 	}
 
 }

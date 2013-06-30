@@ -9,7 +9,7 @@ import java.nio.file.Path;
  * @author jason
  *
  */
-public class AssetResource extends AbstractFileResource {
+public class AssetResource extends AbstractFileResource implements LoadedResource {
 	
 	private final String mime;
 	

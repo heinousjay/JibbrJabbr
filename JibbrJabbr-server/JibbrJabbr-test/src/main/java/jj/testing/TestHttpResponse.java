@@ -16,6 +16,7 @@
 package jj.testing;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mockito.Mockito.mock;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -32,11 +33,12 @@ import javax.inject.Inject;
 
 import jj.DateFormatHelper;
 import jj.ExecutionTrace;
-import jj.JJExecutors;
+import jj.logging.AccessLogger;
 import jj.logging.TestRunnerLogger;
 import jj.resource.MimeTypes;
 import jj.http.JJHttpResponse;
 
+import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -52,8 +54,6 @@ class TestHttpResponse extends JJHttpResponse {
 	
 	private int id = 0;
 	
-	private final JJExecutors executors;
-	
 	private TestHttpRequest request;
 	
 	private final ExecutionTrace trace;
@@ -65,12 +65,11 @@ class TestHttpResponse extends JJHttpResponse {
 	@Inject
 	TestHttpResponse(
 		final TestHttpRequest request,
-		final JJExecutors executors,
 		final ExecutionTrace trace,
-		final @TestRunnerLogger Logger testRunnerLogger
+		final @TestRunnerLogger Logger testRunnerLogger,
+		final @AccessLogger Logger accessLogger
 	) {
-		super(request, null);
-		this.executors = executors;
+		super(request, mock(Channel.class), accessLogger);
 		this.trace = trace;
 		this.testRunnerLogger = testRunnerLogger;
 	}

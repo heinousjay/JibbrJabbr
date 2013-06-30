@@ -48,27 +48,25 @@ class AssetServable extends Servable {
 				
 				URIMatch match = new URIMatch(request.uri());
 				AssetResource asset = resourceFinder.findResource(AssetResource.class, match.baseName);
-				if (match.sha == null || !match.sha.equals(asset.sha1())) {
+				
+				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
+					asset.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 					
+					response.sendNotModified(asset, match.sha != null);
+
+				} else if (match.sha == null) {
+					
+					response.sendUncachedResource(asset);
+					
+				} else if (!match.sha.equals(asset.sha1())) {
+				
 					response.sendTemporaryRedirect(asset);
 					
 				} else {
 					
-					boolean notModified = false;
-					
-					if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
-						asset.sha1().equals(request.header(HttpHeaders.Names.ETAG))) {
-						
-						response.sendNotModified(asset);
-						notModified = true;
-					}
-					
-					if (!notModified) {
-						
-						response.sendCachedResource(asset, asset.bytes());
-					}
+					response.sendCachedResource(asset);
 				}
-				
+			
 				log.info(
 					"request for [{}] completed in {} milliseconds (wall time)",
 					request.uri(),

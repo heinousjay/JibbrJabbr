@@ -1,9 +1,10 @@
 package jj.servable;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import io.netty.handler.codec.http.HttpHeaders;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,7 +17,6 @@ import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 
-import io.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,31 +40,29 @@ class AssociatedScriptServable extends Servable {
 	
 	private ScriptResource typeFromBundle(AssociatedScriptBundle bundle, String typeSpec) {
 		ScriptResource result = null;
-		if ("".equals(typeSpec)) {
+		if (typeSpec == null) {
 			result = bundle.clientScriptResource();
-		} else if (".shared".equals(typeSpec)) {
+		} else if ("shared".equals(typeSpec)) {
 			result = bundle.sharedScriptResource();
-		} else if (".server".equals(typeSpec)) {
+		} else if ("server".equals(typeSpec)) {
 			result = bundle.serverScriptResource();
 		}
 		return result;
 	}
 	
+	private static final Pattern TYPE_PATTERN = Pattern.compile("(.+?)(?:\\.(server|shared))?\\.js");
+	
 	private ScriptResource resourceFromUri(String uri) {
-		int firstDot = uri.indexOf('.');
-		int lastDot = uri.lastIndexOf('.');
 		ScriptResource result = null;
-		if (firstDot != -1) {
-			// skip the /
-			String key = uri.substring(1, firstDot);
-			String type = uri.substring(firstDot, lastDot);
-			String suffix = uri.substring(lastDot);
-			if (".js".equals(suffix)) {
-				AssociatedScriptBundle scriptBundle = finder.forBaseNameAndKey(key);
-				if (scriptBundle != null) {
-					result = typeFromBundle(scriptBundle, type);
-				}
+		URIMatch uriMatch = new URIMatch(uri);
+		Matcher typeMatcher = TYPE_PATTERN.matcher(uriMatch.baseName);
+		if (uriMatch.sha != null && typeMatcher.matches()) {
+			
+			AssociatedScriptBundle scriptBundle = finder.forBaseNameAndKey(uriMatch.sha + "/" + typeMatcher.group(1));
+			if (scriptBundle != null) {
+				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
 			}
+		
 		}
 		return result;
 	}
@@ -80,21 +78,21 @@ class AssociatedScriptServable extends Servable {
 		final JJHttpResponse response
 	) throws IOException {
 		
-		final ScriptResource scriptResource = resourceFromUri(request.uri());
-		// we can serve this one inline for now
 		return new RequestProcessor() {
 			
 			@Override
 			public void process() {
+				final ScriptResource script = resourceFromUri(request.uri());
 				
-				ByteBuffer buf = UTF_8.encode(scriptResource.script());
+				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
+					script.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
+					
+					response.sendNotModified(script, true);
+					
+				} else {
 				
-				response.header(HttpHeaders.Names.CONTENT_LENGTH, buf.remaining())
-					.header(HttpHeaders.Names.CACHE_CONTROL, TWENTY_YEARS)
-					.header(HttpHeaders.Names.CONTENT_TYPE, scriptResource.mime())
-					.content(buf)
-					.end();
-
+					response.sendCachedResource(script);
+				}
 				
 				log.info(
 					"request for [{}] completed in {} milliseconds (wall time)",

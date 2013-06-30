@@ -20,7 +20,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+
+import jj.ExecutionTrace;
 import jj.JJExecutors;
+import jj.logging.AccessLogger;
 import jj.servable.Servable;
 
 /**
@@ -36,8 +40,13 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 	 * @param resourceTypes
 	 */
 	@Inject
-	TestJJEngineHttpHandler(final JJExecutors executors, final Set<Servable> resourceTypes) {
-		super(executors, resourceTypes);
+	TestJJEngineHttpHandler(
+		final JJExecutors executors,
+		final Set<Servable> resourceTypes,
+		final @AccessLogger Logger logger,
+		final ExecutionTrace trace
+	) {
+		super(executors, resourceTypes, logger, trace);
 	}
 
 	@Override

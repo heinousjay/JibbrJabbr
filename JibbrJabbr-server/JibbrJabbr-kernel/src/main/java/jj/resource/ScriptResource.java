@@ -3,11 +3,12 @@ package jj.resource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
 import jj.IOThread;
 
-public class ScriptResource extends AbstractFileResource {
+public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	
 	private final ScriptResourceType type;
 	private final String uri;
@@ -24,6 +25,7 @@ public class ScriptResource extends AbstractFileResource {
 		// our URI has our sha1 in it to allow for far-future caching
 		uri = sha1 + "/" + baseName + type.suffix();
 		script = UTF_8.decode(byteBuffer).toString();
+		byteBuffer.flip();
 	}
 	
 	public ScriptResourceType type() {
@@ -47,5 +49,10 @@ public class ScriptResource extends AbstractFileResource {
 	@Override
 	public String mime() {
 		return "application/javascript; charset=UTF-8";
+	}
+	
+	@Override
+	public ByteBuffer bytes() {
+		return byteBuffer;
 	}
 }

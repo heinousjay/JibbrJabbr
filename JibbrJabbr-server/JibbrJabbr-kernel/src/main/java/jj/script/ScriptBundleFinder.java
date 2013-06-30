@@ -35,7 +35,7 @@ public class ScriptBundleFinder {
 		return found;
 	}
 	
-	private AssociatedScriptBundle forBaseNameAndKey(String baseName, String key) {
+	public AssociatedScriptBundle forBaseNameAndKey(String baseName, String key) {
 		ScriptBundle found = null;
 		ScriptBundle scriptBundle = scriptBundles.get(baseName);
 		while (scriptBundle != null && found == null) {

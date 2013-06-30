@@ -4,21 +4,29 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.DateFormatHelper;
+import jj.ExecutionTrace;
 import jj.JJExecutors;
 import jj.JJRunnable;
+import jj.logging.AccessLogger;
 import jj.servable.Servable;
 
 /**
@@ -34,13 +42,21 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final Set<Servable> resourceTypes;
 	
+	private final Logger access;
+	
+	private final ExecutionTrace trace;
+	
 	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
-		final Set<Servable> resourceTypes
+		final Set<Servable> resourceTypes,
+		final @AccessLogger Logger access, 
+		final ExecutionTrace trace
 	) {
 		this.executors = executors;
 		this.resourceTypes = resourceTypes;
+		this.access = access;
+		this.trace = trace;
 	}
 	
 	private Servable[] findMatchingServables(final JJHttpRequest request) {
@@ -56,14 +72,26 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		return result.toArray(new Servable[result.size()]);
 	}
 	
-
+	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
+	
+	private void handshakeWebsocket(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
+		String uri = HTTP_REPLACER.matcher(msg.headers().get(HttpHeaders.Names.ORIGIN) + msg.getUri()).replaceFirst("ws");
+		
+		System.out.println(uri);
+	}
 
 	@Override
-	protected void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
+	protected void messageReceived(final ChannelHandlerContext ctx, final FullHttpRequest msg) throws Exception {
 		JJHttpRequest request = new JJHttpRequest(msg, ctx.channel());
-		JJHttpResponse response = new JJHttpResponse(request, ctx.channel());
+		JJHttpResponse response = new JJHttpResponse(request, ctx.channel(), access);
 		
-		handleHttpRequest(request, response);
+		if (!msg.getDecoderResult().isSuccess()) {
+			response.sendError(HttpResponseStatus.BAD_REQUEST);
+		} else if (msg.getUri().endsWith(".socket")) {
+			handshakeWebsocket(ctx, msg);
+		} else {
+			handleHttpRequest(request, response);
+		}
 	}
 	
 	@Override
@@ -77,6 +105,9 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final JJHttpRequest request,
 		final JJHttpResponse response
 	) throws Exception {
+		
+		trace.start(request, response);
+		
 		// figure out if there's something for us to do
 		final Servable[] servables = findMatchingServables(request);
 		

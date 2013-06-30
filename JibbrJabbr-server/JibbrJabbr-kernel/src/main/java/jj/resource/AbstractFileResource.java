@@ -20,9 +20,10 @@ import jj.SHA1Helper;
  */
 public abstract class AbstractFileResource implements Resource {
 	
-	// for now, a hard line in the sand.  webbit doesn't much like large files,
-	// so even this number might be optimistic
-	private static final long MAX_FILE_SIZE = 1000000;
+	// beyond this, we don't keep bytes
+	private static final long MAX_IN_MEMORY_SIZE  = 1000000;
+	// beyond this, we don't read the SHA
+	private static final long MAX_READ_AND_DIGEST = 10000000;
 
 	private static final Object[] EMPTY_ARGS = {};
 	
@@ -51,24 +52,28 @@ public abstract class AbstractFileResource implements Resource {
 	) throws IOException {
 		
 		size = Files.size(path);
-		boolean large = size > MAX_FILE_SIZE;
+		boolean large = size > MAX_IN_MEMORY_SIZE;
 		
 		if (large && keepBytes) {
-			throw new IOException(AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_FILE_SIZE + " bytes");
+			throw new IOException(AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_IN_MEMORY_SIZE + " bytes");
 		}
 		
 		this.baseName = baseName;
 		this.path = path;
 		this.lastModified = Files.getLastModifiedTime(this.path);
 		
-		if (!large) {
+		if (keepBytes) {
 			byteBuffer = readAllBytes(path);
 			sha1 = SHA1Helper.keyFor(byteBuffer);
 			toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+		} else if (size <= MAX_READ_AND_DIGEST) {
+			byteBuffer = null;
+			sha1 = SHA1Helper.keyFor(path);
+			toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
 		} else {
 			byteBuffer = null;
-			sha1 = "1111222233334444555566667777888899990000";
-			toString = "this ain't right son " + path;
+			sha1 = null;
+			toString =  getClass().getSimpleName() + " (large) at " + path;
 		}
 	}
 	

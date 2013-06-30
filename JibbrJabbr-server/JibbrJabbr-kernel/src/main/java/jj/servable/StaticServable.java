@@ -15,10 +15,15 @@
  */
 package jj.servable;
 
+import io.netty.handler.codec.http.HttpHeaders;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
@@ -33,6 +38,8 @@ import jj.http.RequestProcessor;
  */
 @Singleton
 public class StaticServable extends Servable {
+	
+	private final Logger log = LoggerFactory.getLogger(StaticServable.class);
 
 	private final ResourceFinder resourceFinder;
 	
@@ -76,8 +83,34 @@ public class StaticServable extends Servable {
 				
 				@Override
 				public void process() {
+
 					try {
-						response.sendUncachedResource(sr);
+						URIMatch match = new URIMatch(request.uri());
+						
+						if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
+							sr.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
+							
+							response.sendNotModified(sr, match.sha != null);
+	
+						} else if (match.sha == null) {
+							
+							response.sendUncachedResource(sr);
+							
+						} else if (!match.sha.equals(sr.sha1())) {
+						
+							response.sendTemporaryRedirect(sr);
+							
+						} else {
+							
+							response.sendCachedResource(sr);
+						}
+					
+						log.info(
+							"request for [{}] completed in {} milliseconds (wall time)",
+							request.uri(),
+							request.wallTime()
+						);
+						
 					} catch (IOException e) {
 						response.error(e);
 					}

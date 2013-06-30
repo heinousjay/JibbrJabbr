@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentRequestProcessorImplTest {
@@ -48,6 +49,7 @@ public class DocumentRequestProcessorImplTest {
 	
 	FullHttpRequest request;
 	@Mock Channel channel;
+	@Mock Logger access;
 	
 	JJHttpRequest httpRequest;
 	JJHttpResponse httpResponse;
@@ -84,7 +86,7 @@ public class DocumentRequestProcessorImplTest {
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		
 		httpRequest = new JJHttpRequest(request, channel);
-		httpResponse = new JJHttpResponse(httpRequest, channel);
+		httpResponse = new JJHttpResponse(httpRequest, channel, access);
 		
 		filterCalls = 0;
 		

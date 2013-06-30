@@ -53,6 +53,7 @@ public class JJExecutiveHttpHandlerTest {
 	@Mock ExecutionTrace trace;
 	@Mock FullHttpRequest request;
 	@Mock Channel channel;
+	@Mock Logger access;
 
 	// ignored because i'm only keeping this 
 	// component around to save the access 
@@ -61,7 +62,7 @@ public class JJExecutiveHttpHandlerTest {
 	public void test() throws Exception {
 		
 		// given
-		JJExecutiveHttpHandler h = new JJExecutiveHttpHandler(logger, trace);
+		//JJExecutiveHttpHandler h = new JJExecutiveHttpHandler(logger, trace);
 		willReturn(true).given(logger).isTraceEnabled();
 		given(channel.remoteAddress()).willReturn(REMOTE_ADDRESS);
 		
@@ -72,7 +73,7 @@ public class JJExecutiveHttpHandlerTest {
 			.method(HttpMethod.GET)
 			.uri(URI);
 		
-		JJHttpResponse response = new JJHttpResponse(jjrequest, channel);
+		JJHttpResponse response = new JJHttpResponse(jjrequest, channel, access);
 		response.status(STATUS);
 		
 		// when
@@ -82,7 +83,7 @@ public class JJExecutiveHttpHandlerTest {
 		
 		while (date1 == null || !date1.equals(date2)) {
 			date1 = DateFormatHelper.nowInAccessLogFormat();
-			h.handleHttpRequest(jjrequest, response);
+			//h.handleHttpRequest(jjrequest, response);
 			date2 = DateFormatHelper.nowInAccessLogFormat();
 		}
 		
