@@ -44,6 +44,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.DefaultFileRegion;
 import io.netty.channel.MessageList;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -315,15 +316,10 @@ public class JJHttpResponse {
 			header(HttpHeaders.Names.ETAG, resource.sha1());
 		}
 		
-		// TODO! use a chunked file transfer if there is an SSL handler in the pipeline
-		// which i guess means the TransferableResource will need a method to return a
-		// RandomAccessFile instead of a FileRegion.  which I guess is good, it takes
-		// a netty dependency out of there
-		
 		MessageList<Object> messageList = 
 			MessageList.newInstance(3)
 				.add(response)
-				.add(resource.fileRegion())
+				.add(new DefaultFileRegion(resource.randomAccessFile().getChannel(), 0, resource.size()))
 				.add(LastHttpContent.EMPTY_LAST_CONTENT);
 		
 		channel.pipeline().remove(Compressor.toString());

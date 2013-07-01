@@ -43,7 +43,8 @@ class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 		Encoder,
 		Compressor,
 		ChunkedWriter,
-		JJEngine
+		JJEngine,
+		JJWebsocketHandler
 	}
 	
 	private final Provider<JJEngineHttpHandler> engineProvider;

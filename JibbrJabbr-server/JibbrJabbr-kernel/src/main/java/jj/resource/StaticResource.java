@@ -15,11 +15,8 @@
  */
 package jj.resource;
 
-import io.netty.channel.DefaultFileRegion;
-import io.netty.channel.FileRegion;
-
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.io.RandomAccessFile;
 import java.nio.file.Path;
 
 import jj.IOThread;
@@ -52,9 +49,9 @@ public class StaticResource extends AbstractFileResource implements Transferable
 		return mime;
 	}
 	
-	@IOThread
 	@Override
-	public FileRegion fileRegion() throws IOException {
-		return new DefaultFileRegion(FileChannel.open(path), 0, size);
+	@IOThread
+	public RandomAccessFile randomAccessFile() throws IOException {
+		return new RandomAccessFile(path.toFile(), "r");
 	}
 }

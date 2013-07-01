@@ -16,8 +16,7 @@
 package jj.resource;
 
 import java.io.IOException;
-
-import io.netty.channel.FileRegion;
+import java.io.RandomAccessFile;
 
 /**
  * @author jason
@@ -25,5 +24,5 @@ import io.netty.channel.FileRegion;
  */
 public interface TransferableResource extends Resource {
 
-	FileRegion fileRegion() throws IOException;
+	RandomAccessFile randomAccessFile() throws IOException;
 }

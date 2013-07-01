@@ -1,5 +1,7 @@
 package jj.http;
 
+import static jj.http.HttpServerInitializer.PipelineStages.*;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -102,8 +104,9 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 							}
 							
 						});
-						
-						ctx.pipeline().replace(JJEngineHttpHandler.this, "JJWebsocketHandler", injector.getInstance(WebSocketFrameHandler.class));
+						ctx.pipeline()
+							.replace(JJEngineHttpHandler.this, JJWebsocketHandler.toString(), injector.getInstance(WebSocketFrameHandler.class))
+							.remove(Compressor.toString());
 					} else {
 						ctx.channel().close();
 					}
