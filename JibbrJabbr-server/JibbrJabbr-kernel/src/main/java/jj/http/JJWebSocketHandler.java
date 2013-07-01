@@ -64,12 +64,12 @@ public class JJWebSocketHandler {
 		return Collections.unmodifiableMap(result);
 	}
 
-	public void onOpen(JJWebSocketConnection connection) {
+	public void opened(JJWebSocketConnection connection) {
 		trace.start(connection);
 		String uri = connection.uri().substring(1);
 		AssociatedScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
 		
-		if (connection.immediateClosure()) {
+		if (scriptBundle == null) {
 			log.info("connection attempted to an old script, attempting reload");
 			// need some way of noticing we are being hammered here?
 			// i mean i guess we just close em as they come in
@@ -84,7 +84,7 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	public void onClose(JJWebSocketConnection connection) {
+	public void closed(JJWebSocketConnection connection) {
 		trace.end(connection);
 		// don't do anything reload command
 		if (!connection.immediateClosure()) {
@@ -93,7 +93,7 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	public void onMessage(JJWebSocketConnection connection, String msg) {
+	public void messageReceived(JJWebSocketConnection connection, String msg) {
 		connection.markActivity();
 		if ("jj-hi".equals(msg)) {
 			connection.send("jj-yo");
@@ -119,13 +119,13 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	public void onMessage(JJWebSocketConnection connection, byte[] msg) {
+	public void messageReceived(JJWebSocketConnection connection, byte[] msg) {
 		// at some point this is going to become interesting,
 		// thinking about streaming bytes in for uploads...
 		log.info("receiving bytes, length is {}", msg.length);
 	}
 
-	public void onPong(JJWebSocketConnection connection, byte[] msg) {
+	public void ponged(JJWebSocketConnection connection, byte[] msg) {
 		
 	}
 }

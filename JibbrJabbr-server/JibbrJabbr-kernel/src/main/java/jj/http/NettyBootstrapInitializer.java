@@ -37,13 +37,13 @@ class NettyBootstrapInitializer implements JJServerListener {
 	
 	private final Logger logger = LoggerFactory.getLogger(NettyBootstrapInitializer.class);
 	
-	private final HttpServerInitializer initializer;
+	private final HttpServerChannelInitializer initializer;
 	
 	private ServerBootstrap serverBootstrap;
 	
 	@Inject
 	NettyBootstrapInitializer(
-		final HttpServerInitializer initializer,
+		final HttpServerChannelInitializer initializer,
 		final Configuration configuration
 	) {
 		this.initializer = initializer;

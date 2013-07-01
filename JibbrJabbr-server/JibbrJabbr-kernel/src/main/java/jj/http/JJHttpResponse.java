@@ -15,7 +15,7 @@
  */
 package jj.http;
 
-import static jj.http.HttpServerInitializer.PipelineStages.*;
+import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

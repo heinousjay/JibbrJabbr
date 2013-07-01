@@ -16,7 +16,6 @@
 package jj.http;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import io.netty.channel.ChannelFuture;
@@ -30,8 +29,6 @@ import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
-import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
 
 /**
  * @author jason
@@ -39,49 +36,40 @@ import io.netty.util.AttributeKey;
  */
 @Singleton
 class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
-	
-	private static final AttributeKey<JJWebSocketConnection> CONNECTION_ATTRIBUTE_KEY = new AttributeKey<>("connection");
 
 	private final WebSocketServerHandshaker handshaker;
 	
 	private final JJWebSocketHandler handler;
 	
-	private final Provider<JJWebSocketConnection> connectionProvider;
+	private final JJWebSocketConnection connection;
 	
 	@Inject
 	WebSocketFrameHandler(
 		final WebSocketServerHandshaker handshaker,
 		final JJWebSocketHandler handler,
-		final Provider<JJWebSocketConnection> connectionProvider
+		final JJWebSocketConnection connection
 	) {
 		this.handshaker = handshaker;
 		this.handler = handler;
-		this.connectionProvider = connectionProvider;
+		this.connection = connection;
 	}
 	
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		final Attribute<JJWebSocketConnection> connectionAttribute = ctx.channel().attr(CONNECTION_ATTRIBUTE_KEY);
-		JJWebSocketConnection connection = connectionAttribute.get();
-		assert(connection == null) : "new websocket handler instance created and somehow the connection already exists";
 		
-		connectionAttribute.setIfAbsent(connectionProvider.get());
-		handler.onOpen(connectionAttribute.get());
+		handler.opened(connection);
 		
 		ctx.channel().closeFuture().addListener(new ChannelFutureListener() {
 			
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				handler.onClose(connectionAttribute.get());
+				handler.closed(connection);
 			}
 		});
 	}
 	
 	@Override
 	protected void messageReceived(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
-		
-		Attribute<JJWebSocketConnection> connectionAttribute = ctx.channel().attr(CONNECTION_ATTRIBUTE_KEY);
-		JJWebSocketConnection connection = connectionAttribute.get();
 		
 		if (frame instanceof CloseWebSocketFrame) {
 			
@@ -93,15 +81,15 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			
 		} else if (frame instanceof PongWebSocketFrame) {
 				
-			handler.onPong(connection, frame.content().array());
+			handler.ponged(connection, frame.content().array());
 				
 		} else if (frame instanceof TextWebSocketFrame) {
 			
-			handler.onMessage(connection, ((TextWebSocketFrame)frame).text());
+			handler.messageReceived(connection, ((TextWebSocketFrame)frame).text());
 			
 		} else if (frame instanceof BinaryWebSocketFrame) {
 			
-			handler.onMessage(connection, frame.content().array());
+			handler.messageReceived(connection, frame.content().array());
 		}
 	}
 }

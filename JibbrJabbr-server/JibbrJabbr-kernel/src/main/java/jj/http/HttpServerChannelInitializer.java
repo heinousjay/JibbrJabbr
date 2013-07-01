@@ -15,7 +15,7 @@
  */
 package jj.http;
 
-import static jj.http.HttpServerInitializer.PipelineStages.*;
+import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -35,7 +35,7 @@ import javax.inject.Singleton;
  * 
  */
 @Singleton
-class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
+class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 	
 	enum PipelineStages {
 		Decoder,
@@ -50,7 +50,7 @@ class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 	private final Provider<JJEngineHttpHandler> engineProvider;
 	
 	@Inject
-	public HttpServerInitializer(final Provider<JJEngineHttpHandler> engineProvider) {
+	public HttpServerChannelInitializer(final Provider<JJEngineHttpHandler> engineProvider) {
 		this.engineProvider = engineProvider;
 	}
 
@@ -58,12 +58,12 @@ class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 	protected void initChannel(SocketChannel ch) throws Exception {
 		ChannelPipeline pipeline = ch.pipeline();
 
-		pipeline.addLast(Decoder.toString(), new HttpRequestDecoder());
-		pipeline.addLast(Aggregator.toString(), new HttpObjectAggregator(65536));
-		pipeline.addLast(Encoder.toString(), new HttpResponseEncoder());
-		pipeline.addLast(Compressor.toString(), new HttpContentCompressor());
-		pipeline.addLast(ChunkedWriter.toString(), new ChunkedWriteHandler());
-		pipeline.addLast(JJEngine.toString(), engineProvider.get());
+		pipeline.addLast(Decoder.toString(), new HttpRequestDecoder())
+			.addLast(Aggregator.toString(), new HttpObjectAggregator(8192))
+			.addLast(Encoder.toString(), new HttpResponseEncoder())
+			.addLast(Compressor.toString(), new HttpContentCompressor())
+			.addLast(ChunkedWriter.toString(), new ChunkedWriteHandler())
+			.addLast(JJEngine.toString(), engineProvider.get());
 	}
 
 }

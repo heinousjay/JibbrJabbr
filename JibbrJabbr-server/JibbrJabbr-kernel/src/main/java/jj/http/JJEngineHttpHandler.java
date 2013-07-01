@@ -1,6 +1,6 @@
 package jj.http;
 
-import static jj.http.HttpServerInitializer.PipelineStages.*;
+import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -102,8 +102,8 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 								bind(WebSocketServerHandshaker.class).toInstance(handshaker);
 								bind(WebSocketFrameHandler.class);
 							}
-							
 						});
+						
 						ctx.pipeline()
 							.replace(JJEngineHttpHandler.this, JJWebsocketHandler.toString(), injector.getInstance(WebSocketFrameHandler.class))
 							.remove(Compressor.toString());
