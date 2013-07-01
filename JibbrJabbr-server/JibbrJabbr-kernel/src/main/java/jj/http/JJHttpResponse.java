@@ -82,6 +82,8 @@ public class JJHttpResponse {
 	
 	private final Logger access;
 	
+	private volatile boolean isCommitted = false;
+	
 	/**
 	 * @param response
 	 */
@@ -95,6 +97,10 @@ public class JJHttpResponse {
 		this.channel = channel;
 		this.access = access;
 		header(HttpHeaders.Names.SERVER, SERVER_NAME);
+	}
+	
+	private void assertNotCommitted() {
+		assert !isCommitted : "response has already been committed.  modification is not permitted";
 	}
 	
 	private void maybeClose(final ChannelFuture f) {
@@ -115,16 +121,19 @@ public class JJHttpResponse {
 	 * @return
 	 */
 	public JJHttpResponse status(final HttpResponseStatus status) {
+		assertNotCommitted();
 		response.setStatus(status);
 		return this;
 	}
 	
 	public JJHttpResponse header(final String name, final String value) {
+		assertNotCommitted();
 		response.headers().add(name, value);
 		return this;
 	}
 
 	public JJHttpResponse headerIfNotSet(final String name, final String value) {
+		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
 		}
@@ -132,6 +141,7 @@ public class JJHttpResponse {
 	}
 
 	public JJHttpResponse headerIfNotSet(final String name, final long value) {
+		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
 		}
@@ -147,11 +157,13 @@ public class JJHttpResponse {
 	}
 
 	public JJHttpResponse header(final String name, final Date date) {
+		assertNotCommitted();
 		response.headers().add(name, date);
 		return this;
 	}
 	
 	public JJHttpResponse header(final String name, final long value) {
+		assertNotCommitted();
 		response.headers().add(name, value);
 		return this;
 	}
@@ -159,6 +171,7 @@ public class JJHttpResponse {
 	 * @return
 	 */
 	public List<Entry<String, String>> allHeaders() {
+		// TODO make unmodifiable if committed
 		return response.headers().entries();
 	}
 	
@@ -167,34 +180,39 @@ public class JJHttpResponse {
 	}
 	
 	public JJHttpResponse content(final byte[] bytes) {
+		assertNotCommitted();
 		response.content().writeBytes(bytes);
 		return this;
 	}
 	
 	public JJHttpResponse content(final ByteBuffer buffer) {
+		assertNotCommitted();
 		response.content().writeBytes(Unpooled.wrappedBuffer(buffer));
 		return this;
 	}
 	
 	public JJHttpResponse end() {
+		assertNotCommitted();
 		header(HttpHeaders.Names.DATE, new Date());
 		maybeClose(channel.write(response));
+		isCommitted = true;
 		return this;
 	}
 	
 	public void sendNotFound() {
+		assertNotCommitted();
 		sendError(HttpResponseStatus.NOT_FOUND);
 	}
 	
 	public void sendError(final HttpResponseStatus status) {
+		assertNotCommitted();
 		byte[] body = status.reasonPhrase().getBytes(StandardCharsets.UTF_8);
 		status(status)
 			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 			.header(HttpHeaders.Names.CONTENT_LENGTH, body.length)
 			.header(HttpHeaders.Names.CONTENT_TYPE, "text/plain; UTF-8")
-			.content(body);
-		
-		maybeClose(channel.write(response));
+			.content(body)
+			.end();
 	}
 	
 	/**
@@ -203,6 +221,7 @@ public class JJHttpResponse {
 	 * @return
 	 */
 	public JJHttpResponse sendNotModified(final Resource resource) {
+		assertNotCommitted();
 		return status(HttpResponseStatus.NOT_MODIFIED)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
 			.end();
@@ -224,7 +243,7 @@ public class JJHttpResponse {
 	 * @return
 	 */
 	public JJHttpResponse sendTemporaryRedirect(final Resource resource) {
-		
+		assertNotCommitted();
 		return status(HttpResponseStatus.TEMPORARY_REDIRECT)
 			.header(HttpHeaders.Names.LOCATION, makeAbsoluteURL(resource))
 			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
@@ -238,6 +257,7 @@ public class JJHttpResponse {
 	 * @return
 	 */
 	public JJHttpResponse sendCachedResource(final LoadedResource resource) {
+		assertNotCommitted();
 		return status(HttpResponseStatus.OK)
 			.header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
@@ -259,7 +279,7 @@ public class JJHttpResponse {
 	 * @return
 	 */
 	public JJHttpResponse sendUncachedResource(final LoadedResource resource) {
-		
+		assertNotCommitted();
 		return status(HttpResponseStatus.OK)
 			.headerIfNotSet(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE)
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().remaining())
@@ -296,19 +316,26 @@ public class JJHttpResponse {
 	}
 	
 	public JJHttpResponse sendUncachedResource(TransferableResource resource) throws IOException {
+		assertNotCommitted();
 		return header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE)
-			.sendCachedResource(resource);
+			.sendTransferableResource(resource);
+	}
+	
+	public JJHttpResponse sendCachedResource(TransferableResource resource) throws IOException {
+		assertNotCommitted();
+		return header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
+			.sendTransferableResource(resource);
 	}
 
 	/**
-	 * 
+	 * Transfers a resource to the connected client using the operating system
+	 * zero-copy facilities.
 	 * 
 	 * @param resource
 	 * @return
 	 */
-	public JJHttpResponse sendCachedResource(TransferableResource resource) throws IOException {
-		headerIfNotSet(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
-			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+	private JJHttpResponse sendTransferableResource(TransferableResource resource) throws IOException {
+		header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size())
 			.header(HttpHeaders.Names.DATE, new Date());
 		
@@ -337,8 +364,12 @@ public class JJHttpResponse {
 			}
 		});
 		
+		isCommitted = true;
+		
 		return this;
 	}
+	
+	// move all of this to another handler
 	
 	private void log() {
 		
