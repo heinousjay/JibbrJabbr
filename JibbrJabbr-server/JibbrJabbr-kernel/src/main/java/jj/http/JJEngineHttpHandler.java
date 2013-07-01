@@ -174,7 +174,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final Servable[] servables,
 		final AtomicInteger count
 	) {
-		executors.ioExecutor().execute(executors.prepareTask(new JJRunnable("JJEngine webbit->core processing") {
+		executors.ioExecutor().execute(executors.prepareTask(new JJRunnable("JJEngine core processing") {
 			
 			@Override
 			public void run() throws Exception {

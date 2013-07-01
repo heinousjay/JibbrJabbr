@@ -19,7 +19,7 @@ import org.jsoup.nodes.Document;
 /**
  * Coordinates the resources necessary to execute a request
  * to serve an HTML5 Document, and hands the result back to
- * webbit
+ * to client
  * @author jason
  *
  */

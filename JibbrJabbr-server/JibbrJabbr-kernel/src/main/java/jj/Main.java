@@ -45,9 +45,7 @@ public class Main {
 	}
 	
 	public void dispose() {
-		// nothing to do until i figure out how
-		// to get the daemon start on binding.  need
-		// to modify webbit to support this
+		// we can daemon start again!
 	}
 
 }
