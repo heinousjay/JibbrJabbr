@@ -356,7 +356,7 @@ public class JJHttpResponse {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (HttpHeaders.isKeepAlive(request.request())) {
-					channel.pipeline().addAfter(Encoder.toString(), Compressor.toString(), new HttpContentCompressor());
+					channel.pipeline().addBefore(JJEngine.toString(), Compressor.toString(), new HttpContentCompressor());
 				} else {
 					channel.close();
 				}
@@ -369,7 +369,7 @@ public class JJHttpResponse {
 		return this;
 	}
 	
-	// move all of this to another handler
+	// move all of this to another handler!
 	
 	private void log() {
 		
@@ -407,7 +407,7 @@ public class JJHttpResponse {
 	}
 	
 	private String extractIP(final SocketAddress remoteAddress) {
-		
+		// TODO check X-Forwarded-For header
 		return (remoteAddress instanceof InetSocketAddress) ? 
 			((InetSocketAddress)remoteAddress).getAddress().getHostAddress() : 
 			remoteAddress.toString();

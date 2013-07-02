@@ -23,7 +23,7 @@ public class DocumentRequest {
 	private final Document document;
 	private final JJHttpRequest httpRequest;
 	private final JJHttpResponse httpResponse;
-	private final String id = "request " + idSequence.next();
+	private final String id = "document request " + idSequence.next();
 	
 	// this is a little hacky but the idea is if the request needed IO, it's the first time
 	// through, so the ResourceUrlDocumentFilter will also need IO to warm up the cache

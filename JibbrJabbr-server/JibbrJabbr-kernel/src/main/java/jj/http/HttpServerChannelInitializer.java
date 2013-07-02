@@ -61,8 +61,8 @@ class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 		pipeline.addLast(Decoder.toString(), new HttpRequestDecoder())
 			.addLast(Aggregator.toString(), new HttpObjectAggregator(8192))
 			.addLast(Encoder.toString(), new HttpResponseEncoder())
-			.addLast(Compressor.toString(), new HttpContentCompressor())
 			.addLast(ChunkedWriter.toString(), new ChunkedWriteHandler())
+			.addLast(Compressor.toString(), new HttpContentCompressor())
 			.addLast(JJEngine.toString(), engineProvider.get());
 	}
 

@@ -5,7 +5,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.JJExecutors;
 import jj.JJRunnable;
@@ -89,44 +88,27 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	public void respond() {
 		assert executors.isScriptThread() : "must be called in a script thread";
 		
-		executeScriptFilters(makeFilterList(filters, false));
-		// the response gets written when this complete
-		FilterList ioFilters = makeFilterList(filters, true);
-		dispatchIOFilter(ioFilters, new AtomicInteger(0));
-	}
-	
-	private void executeScriptFilters(final FilterList scriptFilters) {
-		// well this one is easy
-		for (DocumentFilter filter : scriptFilters) {
-			filter.filter(documentRequest);
-		}
-	}
-	
-	private void dispatchIOFilter(final FilterList ioFilters, final AtomicInteger ioFilterIndex) {
-		// this is slightly more complicated - we need to
-		// ensure strict ordering of filter execution because
-		// we don't want to synchronize on the document,
-		// so we dispatch into an IO thread and loop from there
-		// using an AtomicInteger because we need volatile semantics
-		final int index = ioFilterIndex.getAndIncrement();
-		if (index >= ioFilters.size()) {
+		executeFilters(makeFilterList(filters, false));
+		
+		final FilterList ioFilters = makeFilterList(filters, true);
+		
+		if (ioFilters.isEmpty()) {
 			writeResponse();
 		} else {
-			final DocumentFilter filter = ioFilters.get(index);
-			final String taskName = 
-				String.format("Document filter %s %s",
-					filter.getClass().getSimpleName(),
-					(executors.isIOThread() ? "w/IO" : "")
-				);
-			executors.ioExecutor().submit(executors.prepareTask(new JJRunnable(taskName) {
+			executors.ioExecutor().submit(executors.prepareTask(new JJRunnable("Document filtering requiring I/O") {
 				
 				@Override
 				public void run() throws Exception {
-					// not asserting IO thread here since this is only called from the next few lines
-					filter.filter(documentRequest);
-					dispatchIOFilter(ioFilters, ioFilterIndex);
+					executeFilters(ioFilters);
+					writeResponse();
 				}
 			}));
+		}
+	}
+	
+	private void executeFilters(final FilterList filterList) {
+		for (DocumentFilter filter : filterList) {
+			filter.filter(documentRequest);
 		}
 	}
 
