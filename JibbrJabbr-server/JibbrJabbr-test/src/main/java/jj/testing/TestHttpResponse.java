@@ -19,10 +19,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.mock;
 
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -31,7 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
-import jj.DateFormatHelper;
 import jj.ExecutionTrace;
 import jj.logging.AccessLogger;
 import jj.logging.TestRunnerLogger;

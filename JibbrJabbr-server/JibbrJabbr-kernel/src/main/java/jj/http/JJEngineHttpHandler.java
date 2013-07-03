@@ -1,26 +1,16 @@
 package jj.http;
 
-import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
-
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
-import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
-
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -51,17 +41,21 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final ExecutionTrace trace;
 	
+	private final WebSocketConnectionMaker webSocketConnectionMaker;
+	
 	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
 		final Set<Servable> resourceTypes,
 		final Injector parentInjector,
-		final ExecutionTrace trace
+		final ExecutionTrace trace,
+		final WebSocketConnectionMaker webSocketConnectionMaker
 	) {
 		this.executors = executors;
 		this.resourceTypes = resourceTypes;
 		this.parentInjector = parentInjector;
 		this.trace = trace;
+		this.webSocketConnectionMaker = webSocketConnectionMaker;
 	}
 	
 	private Servable[] findMatchingServables(final JJHttpRequest request) {
@@ -75,44 +69,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		}
 		
 		return result.toArray(new Servable[result.size()]);
-	}
-	
-	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
-	
-	private void handshakeWebsocket(final ChannelHandlerContext ctx, final FullHttpRequest request) {
-		final String uri = 
-			HTTP_REPLACER.matcher(request.headers().get(HttpHeaders.Names.ORIGIN) + request.getUri()).replaceFirst("ws");
-		
-		WebSocketServerHandshakerFactory handshakerFactory = new WebSocketServerHandshakerFactory(uri, null, false);
-		final WebSocketServerHandshaker handshaker = handshakerFactory.newHandshaker(request);
-		if (handshaker == null) {
-			WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
-		} else {
-			handshaker.handshake(ctx.channel(), request).addListener(new ChannelFutureListener() {
-				
-				@Override
-				public void operationComplete(ChannelFuture future) throws Exception {
-					if (future.isSuccess()) {
-						Injector injector = parentInjector.createChildInjector(new AbstractModule() {
-							@Override
-							protected void configure() {
-								bind(JJWebSocketConnection.class);
-								bind(Channel.class).toInstance(ctx.channel());
-								bind(FullHttpRequest.class).toInstance(request);
-								bind(WebSocketServerHandshaker.class).toInstance(handshaker);
-								bind(WebSocketFrameHandler.class);
-							}
-						});
-						
-						ctx.pipeline()
-							.replace(JJEngineHttpHandler.this, JJWebsocketHandler.toString(), injector.getInstance(WebSocketFrameHandler.class))
-							.remove(Compressor.toString());
-					} else {
-						ctx.channel().close();
-					}
-				}
-			});
-		}
 	}
 
 	@Override
@@ -133,9 +89,9 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		
 			injector.getInstance(JJHttpResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
-		} else if (request.getUri().endsWith(".socket")) {
+		} else if (webSocketConnectionMaker.isWebSocketRequest(request)) {
 		
-			handshakeWebsocket(ctx, request);
+			webSocketConnectionMaker.handshakeWebsocket(ctx, request);
 			
 		} else {
 			

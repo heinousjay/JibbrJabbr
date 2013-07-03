@@ -43,9 +43,10 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 		final JJExecutors executors,
 		final Set<Servable> resourceTypes,
 		final Injector injector,
-		final ExecutionTrace trace
+		final ExecutionTrace trace,
+		final WebSocketConnectionMaker webSocketConnectionMaker
 	) {
-		super(executors, resourceTypes, injector, trace);
+		super(executors, resourceTypes, injector, trace, webSocketConnectionMaker);
 	}
 
 	@Override

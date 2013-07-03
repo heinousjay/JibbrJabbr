@@ -26,20 +26,26 @@ import java.util.regex.Pattern;
  */
 public class URIMatch {
 	
-	private static final Pattern URI_PATTERN = Pattern.compile("^/(?:([\\da-f]{40})/)?(.*)$");
+	private static final Pattern URI_PATTERN = Pattern.compile("^/(?:([\\da-f]{40})/)?(.+?)(?:\\.(.+))?$");
 
 	public final String sha;
+	public final String name;
+	public final String extension;
 	public final String baseName;
 	
 	public URIMatch(final String uri) {
 		Matcher matcher = URI_PATTERN.matcher(uri);
 		String shaCandidate = null;
-		String baseNameCandidate = null;
+		String nameCandidate = null;
+		String extensionCandidate = null;
 		if (matcher.matches()) {
 			shaCandidate = matcher.group(1);
-			baseNameCandidate = matcher.group(2);
+			nameCandidate = matcher.group(2);
+			extensionCandidate = matcher.group(3);
 		}
 		sha = shaCandidate;
-		baseName = baseNameCandidate;
+		name = nameCandidate;
+		extension = extensionCandidate;
+		baseName = name + (extensionCandidate == null ? "" : "." + extensionCandidate);
 	}
 }

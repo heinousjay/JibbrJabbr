@@ -13,8 +13,6 @@ import jj.JJExecutors;
 import jj.hostapi.HostEvent;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessageException;
-import jj.script.AssociatedScriptBundle;
-import jj.script.ScriptBundleFinder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +27,7 @@ public class JJWebSocketHandler {
 	
 	private Logger log = LoggerFactory.getLogger(JJWebSocketHandler.class);
 	
-	private final ScriptBundleFinder scriptBundleFinder;
-	
 	private final JJExecutors executors;
-	
-	private final WebSocketConnections connections;
 	
 	private final ExecutionTrace trace;
 	
@@ -41,15 +35,11 @@ public class JJWebSocketHandler {
 	
 	@Inject
 	JJWebSocketHandler(
-		final ScriptBundleFinder scriptBundleFinder,
 		final JJExecutors executors,
-		final WebSocketConnections connections,
 		final ExecutionTrace trace,
 		final Set<WebSocketMessageProcessor> messageProcessors
 	) {
-		this.scriptBundleFinder = scriptBundleFinder;
 		this.executors = executors;
-		this.connections = connections;
 		this.trace = trace;
 		this.messageProcessors = makeMessageProcessors(messageProcessors);
 	}
@@ -66,56 +56,33 @@ public class JJWebSocketHandler {
 
 	public void opened(JJWebSocketConnection connection) {
 		trace.start(connection);
-		String uri = connection.uri().substring(1);
-		AssociatedScriptBundle scriptBundle = scriptBundleFinder.forSocketUri(uri);
-		
-		if (scriptBundle == null) {
-			log.info("connection attempted to an old script, attempting reload");
-			// need some way of noticing we are being hammered here?
-			// i mean i guess we just close em as they come in
-			connection.send("jj-reload");
-			connection.close();
-		} else {
-			log.info("new connection to {}", scriptBundle);
-			log.trace("{}", connection);
-			connection.scriptBundle(scriptBundle);
-			connections.addConnection(connection);
-			executors.scriptRunner().submit(connection, HostEvent.clientConnected, connection);
-		}
+		executors.scriptRunner().submit(connection, HostEvent.clientConnected, connection);
 	}
 
 	public void closed(JJWebSocketConnection connection) {
 		trace.end(connection);
-		// don't do anything reload command
-		if (!connection.immediateClosure()) {
-			executors.scriptRunner().submit(connection, HostEvent.clientDisconnected, connection);
-			connections.removeConnection(connection);
-		}
+		executors.scriptRunner().submit(connection, HostEvent.clientDisconnected, connection);
 	}
 
 	public void messageReceived(JJWebSocketConnection connection, String msg) {
 		connection.markActivity();
-		if ("jj-hi".equals(msg)) {
-			connection.send("jj-yo");
-		} else {
-			trace.message(connection, msg);
-			boolean success = false;
+		trace.message(connection, msg);
+		boolean success = false;
+		
+		try {
+			JQueryMessage message = JQueryMessage.fromString(msg);
 			
-			try {
-				JQueryMessage message = JQueryMessage.fromString(msg);
-				
-				if (messageProcessors.containsKey(message.type())) {
-					messageProcessors.get(message.type()).handle(connection, message);
-					success = true;
-				}
-			} catch (JQueryMessageException e) {}
-			
-			if (!success) {
-				log.warn("{} spoke gibberish to me: {}", 
-					connection,
-					msg
-				);
+			if (messageProcessors.containsKey(message.type())) {
+				messageProcessors.get(message.type()).handle(connection, message);
+				success = true;
 			}
+		} catch (JQueryMessageException e) {}
+		
+		if (!success) {
+			log.warn("{} spoke gibberish to me: {}", 
+				connection,
+				msg
+			);
 		}
 	}
 

@@ -8,7 +8,7 @@ import javax.inject.Singleton;
 
 import jj.script.CurrentScriptContext;
 import jj.http.JJWebSocketConnection;
-import jj.http.WebSocketConnections;
+import jj.http.WebSocketConnectionTracker;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -31,12 +31,12 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 	
 	private final CurrentScriptContext context;
 	
-	private final WebSocketConnections connections;
+	private final WebSocketConnectionTracker connections;
 	
 	@Inject
 	PrepareConnectionIteratorFunction(
 		final CurrentScriptContext context,
-		final WebSocketConnections connections
+		final WebSocketConnectionTracker connections
 	) {
 		this.context = context;
 		this.connections = connections;

@@ -43,6 +43,7 @@ public class JJEngineHttpHandlerTest {
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
 	@Mock Injector injector;
+	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
 	MockJJExecutors executors;
 	@Mock Servable servable1;
@@ -95,7 +96,7 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testBasicOperation() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker);
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
@@ -146,7 +147,7 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testHandover() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker);
 		
 		//when
 		handler.handleHttpRequest(httpRequest4, httpResponse);

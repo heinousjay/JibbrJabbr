@@ -22,7 +22,7 @@ public class HttpModule extends AbstractModule {
 			serverListeners.addBinding().to(NettyBootstrapInitializer.class);
 		}
 		
-		serverListeners.addBinding().to(WebSocketConnections.class);
+		serverListeners.addBinding().to(WebSocketConnectionTracker.class);
 		
 		Multibinder<WebSocketMessageProcessor> messageProcessors = Multibinder.newSetBinder(binder(), WebSocketMessageProcessor.class);
 		

@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.servable.URIMatch;
+
 @Singleton
 public class ScriptBundleFinder {
 	
@@ -36,16 +38,14 @@ public class ScriptBundleFinder {
 	}
 	
 	public AssociatedScriptBundle forBaseNameAndKey(String baseName, String key) {
-		ScriptBundle found = null;
 		ScriptBundle scriptBundle = scriptBundles.get(baseName);
-		while (scriptBundle != null && found == null) {
-			if (scriptBundle.sha1().equals(key)) {
-				found = scriptBundle;
-			} else {
-				found = null;
-			}
-		}
-		return found instanceof AssociatedScriptBundle ? (AssociatedScriptBundle)found : null;
+		return scriptBundle instanceof AssociatedScriptBundle && scriptBundle.sha1().equals(key) ?
+			(AssociatedScriptBundle)scriptBundle :
+			null;
+	}
+	
+	public AssociatedScriptBundle forURIMatch(final URIMatch match) {
+		return forBaseNameAndKey(match.name, match.sha);
 	}
 
 	public AssociatedScriptBundle forSocketUri(String socketUri) {

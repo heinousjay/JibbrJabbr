@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.DataStore;
+import jj.DateFormatHelper;
 import jj.ExecutionTrace;
 import jj.jqmessage.JQueryMessage;
 import jj.script.AssociatedScriptBundle;
@@ -25,36 +26,44 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class JJWebSocketConnection implements DataStore {
 	
-	private static final String ASSOCIATED_SCRIPT_BUNDLE = "associated script bundle";
-	
-	private static final String IMMEDIATE_CLOSURE = "immediate closure";
-	
-	private static final String MESSAGES = "messages";
-	
 	private static final String CLIENT_STORAGE = "client storage";
-	
-	private static final String LAST_ACTIVITY = "last activity";
 	
 	private final Logger log = LoggerFactory.getLogger(JJWebSocketConnection.class);
 	
 	private final ExecutionTrace trace;
 	
-	private final FullHttpRequest request;
+	private final String uri;
 	
 	private final Channel channel;
 	
+	private final AssociatedScriptBundle scriptBundle;
+	
 	private final HashMap<String, Object> data = new HashMap<>();
+	
+	// room for four messages initially should be good
+	private final List<JQueryMessage> messages = new ArrayList<>(4);
+	
+	// accessed from many threads
+	private volatile long lastActivity = System.currentTimeMillis();
+	
+	private final String description;
 
 	@Inject
 	JJWebSocketConnection(
 		final ExecutionTrace trace,
 		final FullHttpRequest request,
-		final Channel channel
+		final Channel channel,
+		final AssociatedScriptBundle scriptBundle
 	) {
 		this.trace = trace;
-		this.request = request;
+		this.uri = request.getUri();
 		this.channel = channel;
-		markActivity();
+		this.scriptBundle = scriptBundle;
+		description = String.format(
+			"WebSocket connection to %s started at %s",
+			channel.remoteAddress(),
+			DateFormatHelper.nowInBasicFormat()
+		);
 	}
 	
 	@Override
@@ -79,19 +88,11 @@ public class JJWebSocketConnection implements DataStore {
 	}
 	
 	void markActivity() {
-		data.put(LAST_ACTIVITY, System.currentTimeMillis());
+		lastActivity = System.currentTimeMillis();
 	}
 	
 	long lastActivity() {
-		return (long)data.get(LAST_ACTIVITY);
-	}
-	
-	boolean immediateClosure() {
-		return data.get(IMMEDIATE_CLOSURE) == Boolean.TRUE;
-	}
-	
-	void scriptBundle(AssociatedScriptBundle associatedScriptBundle) {
-		data.put(ASSOCIATED_SCRIPT_BUNDLE, associatedScriptBundle);
+		return lastActivity;
 	}
 	
 	public String baseName() {
@@ -99,7 +100,7 @@ public class JJWebSocketConnection implements DataStore {
 	}
 	
 	public AssociatedScriptBundle associatedScriptBundle() {
-		return (AssociatedScriptBundle)data.get(ASSOCIATED_SCRIPT_BUNDLE);
+		return scriptBundle;
 	}
 	
 	public Map<String, Object> clientStorage() {
@@ -113,7 +114,7 @@ public class JJWebSocketConnection implements DataStore {
 	}
 	
 	public JJWebSocketConnection send(JQueryMessage message) {
-		messages().add(message);
+		messages.add(message);
 		return this;
 	}
 	
@@ -125,47 +126,37 @@ public class JJWebSocketConnection implements DataStore {
 	}
 	
 	public void end() {
-		if (!messages().isEmpty()) {
+		if (!messages.isEmpty()) {
+			markActivity();
 			String message = serialize();
 			trace.send(this, message);
-			send(message);
+			channel.write(new TextWebSocketFrame(message));
 		}
 	}
 	
 	private String serialize() {
 		StringBuilder output = new StringBuilder();
-		if (!messages().isEmpty()) {
+		if (!messages.isEmpty()) {
 			output.append("[");
-			for (JQueryMessage message : messages()) {
+			for (JQueryMessage message : messages) {
 				output.append(message).append(',');
 			}
 			output.setCharAt(output.length() - 1, ']');
-			messages().clear();
+			messages.clear();
 		}
 		return output.toString();
 	}
 	
-	private List<JQueryMessage> messages() {
-		@SuppressWarnings("unchecked")
-		List<JQueryMessage> messages = (List<JQueryMessage>)data.get(MESSAGES);
-		if (messages == null) {
-			messages = new ArrayList<>(4);
-			data.put(MESSAGES, messages);
-		}
-		return messages;
-	}
-	
 	@Override
 	public String toString() {
-		return "connection";
+		return description;
 	}
 
 	/**
 	 * @return
 	 */
 	public String uri() {
-		// TODO Auto-generated method stub
-		return request.getUri();
+		return uri;
 	}
 
 	/**

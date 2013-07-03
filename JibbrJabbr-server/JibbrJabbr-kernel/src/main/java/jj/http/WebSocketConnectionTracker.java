@@ -23,9 +23,9 @@ import jj.script.AssociatedScriptBundle;
  *
  */
 @Singleton
-public class WebSocketConnections implements JJServerListener {
+public class WebSocketConnectionTracker implements JJServerListener {
 	
-	private final Logger log = LoggerFactory.getLogger(WebSocketConnections.class);
+	private final Logger log = LoggerFactory.getLogger(WebSocketConnectionTracker.class);
 	
 	private final class ActivityChecker extends JJRunnable {
 		
@@ -61,12 +61,9 @@ public class WebSocketConnections implements JJServerListener {
 	ConcurrentHashMap<AssociatedScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> 
 	perScript =
 		new ConcurrentHashMap<>();
-		
-	private final JJExecutors executors;
 	
 	@Inject
-	public WebSocketConnections(final JJExecutors executors) {
-		this.executors = executors;
+	public WebSocketConnectionTracker() {
 	}
 	
 	public void start() {

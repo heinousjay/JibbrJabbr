@@ -43,26 +43,32 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 	
 	private final JJWebSocketConnection connection;
 	
+	private final WebSocketConnectionTracker connectionTracker;
+	
 	@Inject
 	WebSocketFrameHandler(
 		final WebSocketServerHandshaker handshaker,
 		final JJWebSocketHandler handler,
-		final JJWebSocketConnection connection
+		final JJWebSocketConnection connection,
+		final WebSocketConnectionTracker connectionTracker
 	) {
 		this.handshaker = handshaker;
 		this.handler = handler;
 		this.connection = connection;
+		this.connectionTracker = connectionTracker;
 	}
 	
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		
+
+		connectionTracker.addConnection(connection);
 		handler.opened(connection);
 		
 		ctx.channel().closeFuture().addListener(new ChannelFutureListener() {
 			
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
+				connectionTracker.removeConnection(connection);
 				handler.closed(connection);
 			}
 		});
@@ -84,8 +90,12 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			handler.ponged(connection, frame.content().array());
 				
 		} else if (frame instanceof TextWebSocketFrame) {
-			
-			handler.messageReceived(connection, ((TextWebSocketFrame)frame).text());
+			String text = ((TextWebSocketFrame)frame).text();
+			if ("jj-hi".equals(text)) {
+				connection.send("jj-yo");
+			} else {
+				handler.messageReceived(connection, text);
+			}
 			
 		} else if (frame instanceof BinaryWebSocketFrame) {
 			

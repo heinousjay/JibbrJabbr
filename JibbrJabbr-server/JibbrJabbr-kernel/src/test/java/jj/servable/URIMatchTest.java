@@ -31,18 +31,34 @@ public class URIMatchTest {
 		URIMatch match = new URIMatch("/be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj.js");
 		assertThat(match.sha, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47"));
 		assertThat(match.baseName, is("jj.js"));
+		assertThat(match.name, is("jj"));
+		assertThat(match.extension, is("js"));
 		
 		match = new URIMatch("/jj.js");
 		assertThat(match.sha, is(nullValue()));
 		assertThat(match.baseName, is("jj.js"));
+		assertThat(match.name, is("jj"));
+		assertThat(match.extension, is("js"));
 		
 		match = new URIMatch("/be03b9352e1e254cae9a58cff2b20e0c8d547/jj.js");
 		assertThat(match.sha, is(nullValue()));
 		assertThat(match.baseName, is("be03b9352e1e254cae9a58cff2b20e0c8d547/jj.js"));
+		assertThat(match.name, is("be03b9352e1e254cae9a58cff2b20e0c8d547/jj"));
+		assertThat(match.extension, is("js"));
 		
 		match = new URIMatch("/be03b9352e1e254cae9a58cff2b20e0c8d513e47/be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj.js");
 		assertThat(match.sha, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47"));
 		assertThat(match.baseName, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj.js"));
+		assertThat(match.name, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj"));
+		assertThat(match.extension, is("js"));
+		
+
+		match = new URIMatch("/be03b9352e1e254cae9a58cff2b20e0c8d513e47/be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj");
+		assertThat(match.sha, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47"));
+		assertThat(match.baseName, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj"));
+		assertThat(match.name, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj"));
+		assertThat(match.extension, is(nullValue()));
+		
 	}
 
 }
