@@ -79,27 +79,33 @@ public class WebSocketConnectionTracker implements JJServerListener {
 			perScript.get(connection.associatedScriptBundle());
 		
 		if (connectionSet == null) {
-			connectionSet = new ConcurrentHashMap<>(16, 0.75F, 2);
-			perScript.put(connection.associatedScriptBundle(), connectionSet);
+			perScript.putIfAbsent(
+				connection.associatedScriptBundle(),
+				new ConcurrentHashMap<JJWebSocketConnection, Boolean>(16, 0.75F, 2)
+			);
+			connectionSet = perScript.get(connection.associatedScriptBundle());
 		}
 		connectionSet.putIfAbsent(connection, Boolean.TRUE);
 	}
 	
 	void removeConnection(JJWebSocketConnection connection) {
+		
 		allConnections.remove(connection);
 		
 		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
 			perScript.get(connection.associatedScriptBundle());
-		if (connectionSet != null) {
-			connectionSet.remove(connection);
-			if (connectionSet.isEmpty()) {
-				perScript.remove(connection.associatedScriptBundle());
-			}
-		}
+		
+		assert (connectionSet != null) : "couldn't find a connection set to remove a connection.  impossible!";
+		
+		connectionSet.remove(connection);
 	}
 	
 	public Set<JJWebSocketConnection> forScript(AssociatedScriptBundle scriptBundle) {
+		
 		ConcurrentHashMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptBundle);		
-		return (connections != null) ? connections.keySet() : Collections.<JJWebSocketConnection>emptySet();
+		
+		return (connections != null) ?
+			Collections.unmodifiableSet(connections.keySet()) :
+			Collections.<JJWebSocketConnection>emptySet();
 	}
 }
