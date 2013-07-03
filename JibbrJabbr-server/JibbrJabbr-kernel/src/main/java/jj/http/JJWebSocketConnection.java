@@ -2,14 +2,15 @@ package jj.http;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.internal.PlatformDependent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,43 +21,34 @@ import jj.ExecutionTrace;
 import jj.jqmessage.JQueryMessage;
 import jj.script.AssociatedScriptBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Singleton
 public class JJWebSocketConnection implements DataStore {
 	
-	private static final String CLIENT_STORAGE = "client storage";
-	
-	private final Logger log = LoggerFactory.getLogger(JJWebSocketConnection.class);
+	private static final String CLIENT_STORAGE = "JJWebSocketConnection client storage";
 	
 	private final ExecutionTrace trace;
-	
-	private final String uri;
 	
 	private final Channel channel;
 	
 	private final AssociatedScriptBundle scriptBundle;
 	
-	private final HashMap<String, Object> data = new HashMap<>();
+	private final ConcurrentMap<String, Object> data = PlatformDependent.<String, Object>newConcurrentHashMap();
 	
 	// room for four messages initially should be good
 	private final List<JQueryMessage> messages = new ArrayList<>(4);
 	
+	private final String description;
+	
 	// accessed from many threads
 	private volatile long lastActivity = System.currentTimeMillis();
-	
-	private final String description;
 
 	@Inject
 	JJWebSocketConnection(
 		final ExecutionTrace trace,
-		final FullHttpRequest request,
 		final Channel channel,
 		final AssociatedScriptBundle scriptBundle
 	) {
 		this.trace = trace;
-		this.uri = request.getUri();
 		this.channel = channel;
 		this.scriptBundle = scriptBundle;
 		description = String.format(
@@ -104,6 +96,7 @@ public class JJWebSocketConnection implements DataStore {
 	}
 	
 	public Map<String, Object> clientStorage() {
+		// TODO move this to something more independent so it can be picked up and put down
 		@SuppressWarnings("unchecked")
 		Map<String, Object> map = (Map<String, Object>)data.get(CLIENT_STORAGE);
 		if (map == null) {
@@ -120,7 +113,7 @@ public class JJWebSocketConnection implements DataStore {
 	
 	public JJWebSocketConnection send(String message) {
 		markActivity();
-		log.trace("sending {} on {}", message, this);
+		trace.send(this, message);
 		channel.write(new TextWebSocketFrame(message));
 		return this;
 	}
@@ -150,13 +143,6 @@ public class JJWebSocketConnection implements DataStore {
 	@Override
 	public String toString() {
 		return description;
-	}
-
-	/**
-	 * @return
-	 */
-	public String uri() {
-		return uri;
 	}
 
 	/**

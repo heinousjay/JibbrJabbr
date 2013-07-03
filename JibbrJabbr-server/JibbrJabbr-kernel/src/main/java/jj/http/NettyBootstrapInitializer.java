@@ -37,21 +37,25 @@ class NettyBootstrapInitializer implements JJServerListener {
 	
 	private final Logger logger = LoggerFactory.getLogger(NettyBootstrapInitializer.class);
 	
+	private final JJNioEventLoopGroup ioEventLoopGroup;
+	
 	private final HttpServerChannelInitializer initializer;
 	
 	private ServerBootstrap serverBootstrap;
 	
 	@Inject
 	NettyBootstrapInitializer(
+		final JJNioEventLoopGroup ioEventLoopGroup,
 		final HttpServerChannelInitializer initializer,
 		final Configuration configuration
 	) {
+		this.ioEventLoopGroup = ioEventLoopGroup;
 		this.initializer = initializer;
 	}
 	
 	private ServerBootstrap serverBootstrap() {
 		return new ServerBootstrap()
-			.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+			.group(new NioEventLoopGroup(1), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(initializer);
 	}

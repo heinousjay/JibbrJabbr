@@ -12,8 +12,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
 import jj.JJServerListener;
 import jj.script.AssociatedScriptBundle;
 
@@ -27,19 +25,10 @@ public class WebSocketConnectionTracker implements JJServerListener {
 	
 	private final Logger log = LoggerFactory.getLogger(WebSocketConnectionTracker.class);
 	
-	private final class ActivityChecker extends JJRunnable {
-		
-		private ActivityChecker() {
-			 super("WebSocket connection activity checker");
-		}
-		
-		@Override
-		protected boolean ignoreInExecutionTrace() {
-			return true;
-		}
+	private final class ActivityChecker implements Runnable {
 
 		@Override
-		public void run() throws Exception {
+		public void run() {
 			
 			for (JJWebSocketConnection connection : allConnections.keySet()) {
 				if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
@@ -47,6 +36,11 @@ public class WebSocketConnectionTracker implements JJServerListener {
 					connection.close();
 				}
 			}
+		}
+		
+		@Override
+		public String toString() {
+			return ActivityChecker.class.getSimpleName();
 		}
 		
 	}
@@ -61,17 +55,20 @@ public class WebSocketConnectionTracker implements JJServerListener {
 	ConcurrentHashMap<AssociatedScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> 
 	perScript =
 		new ConcurrentHashMap<>();
+		
+	private final JJNioEventLoopGroup eventLoopGroup;
 	
 	@Inject
-	public WebSocketConnectionTracker() {
+	public WebSocketConnectionTracker(final JJNioEventLoopGroup eventLoopGroup) {
+		this.eventLoopGroup = eventLoopGroup;
 	}
 	
 	public void start() {
-		//executors.httpControlExecutor().scheduleAtFixedRate(executors.prepareTask(new ActivityChecker()), 5, 5, SECONDS);
+		eventLoopGroup.scheduleAtFixedRate(new ActivityChecker(), 5, 5, SECONDS);
 	}
 	
 	public void stop() {
-		
+		// nothing to do, really.  it's going to shut down anyway
 	}
 	
 	void addConnection(JJWebSocketConnection connection) {

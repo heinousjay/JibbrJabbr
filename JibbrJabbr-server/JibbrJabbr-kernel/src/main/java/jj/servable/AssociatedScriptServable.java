@@ -53,7 +53,7 @@ class AssociatedScriptServable extends Servable {
 		Matcher typeMatcher = TYPE_PATTERN.matcher(uriMatch.baseName);
 		if (uriMatch.sha != null && typeMatcher.matches()) {
 			
-			AssociatedScriptBundle scriptBundle = finder.forBaseNameAndKey(uriMatch.sha + "/" + typeMatcher.group(1));
+			AssociatedScriptBundle scriptBundle = finder.forBaseNameAndSha(typeMatcher.group(1), uriMatch.sha);
 			if (scriptBundle != null) {
 				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
 			}
