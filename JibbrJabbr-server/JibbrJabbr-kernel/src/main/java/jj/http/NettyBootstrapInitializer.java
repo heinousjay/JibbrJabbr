@@ -15,6 +15,9 @@
  */
 package jj.http;
 
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -34,6 +37,17 @@ import jj.configuration.Configuration;
  */
 @Singleton
 class NettyBootstrapInitializer implements JJServerListener {
+	
+	private static final ThreadFactory threadFactory = new ThreadFactory() {
+		
+		private final AtomicInteger id = new AtomicInteger();
+		
+		@Override
+		public Thread newThread(Runnable r) {
+			
+			return new Thread(r, "JibbrJabbr HTTP Boss Handler  " + id.incrementAndGet());
+		}
+	};
 	
 	private final Logger logger = LoggerFactory.getLogger(NettyBootstrapInitializer.class);
 	
@@ -55,7 +69,7 @@ class NettyBootstrapInitializer implements JJServerListener {
 	
 	private ServerBootstrap serverBootstrap() {
 		return new ServerBootstrap()
-			.group(new NioEventLoopGroup(1), ioEventLoopGroup)
+			.group(new NioEventLoopGroup(1, threadFactory), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(initializer);
 	}

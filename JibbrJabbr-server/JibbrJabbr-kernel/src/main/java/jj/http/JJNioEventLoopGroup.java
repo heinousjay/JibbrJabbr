@@ -16,6 +16,7 @@
 package jj.http;
 
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,10 +32,12 @@ class JJNioEventLoopGroup extends NioEventLoopGroup {
 	
 	private static final ThreadFactory threadFactory = new ThreadFactory() {
 		
+		private final AtomicInteger id = new AtomicInteger();
+		
 		@Override
 		public Thread newThread(Runnable r) {
 			
-			return new Thread(r, "Thread name!");
+			return new Thread(r, "JibbrJabbr HTTP I/O Handler  " + id.incrementAndGet());
 		}
 	};
 
