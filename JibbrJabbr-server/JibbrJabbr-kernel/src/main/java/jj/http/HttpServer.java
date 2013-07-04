@@ -36,7 +36,7 @@ import jj.configuration.Configuration;
  *
  */
 @Singleton
-class NettyBootstrapInitializer implements JJServerListener {
+class HttpServer implements JJServerListener {
 	
 	private static final ThreadFactory threadFactory = new ThreadFactory() {
 		
@@ -49,7 +49,7 @@ class NettyBootstrapInitializer implements JJServerListener {
 		}
 	};
 	
-	private final Logger logger = LoggerFactory.getLogger(NettyBootstrapInitializer.class);
+	private final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 	
 	private final JJNioEventLoopGroup ioEventLoopGroup;
 	
@@ -58,7 +58,7 @@ class NettyBootstrapInitializer implements JJServerListener {
 	private ServerBootstrap serverBootstrap;
 	
 	@Inject
-	NettyBootstrapInitializer(
+	HttpServer(
 		final JJNioEventLoopGroup ioEventLoopGroup,
 		final HttpServerChannelInitializer initializer,
 		final Configuration configuration

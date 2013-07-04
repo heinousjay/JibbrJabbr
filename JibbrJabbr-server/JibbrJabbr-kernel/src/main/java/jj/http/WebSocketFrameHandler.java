@@ -93,7 +93,8 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			
 			String text = ((TextWebSocketFrame)frame).text();
 			if ("jj-hi".equals(text)) {
-				connection.send("jj-yo");
+				connection.markActivity();
+				ctx.channel().write(new TextWebSocketFrame("jj-yo"));
 			} else {
 				handler.messageReceived(connection, text);
 			}

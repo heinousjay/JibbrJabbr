@@ -111,13 +111,6 @@ public class JJWebSocketConnection implements DataStore {
 		return this;
 	}
 	
-	public JJWebSocketConnection send(String message) {
-		markActivity();
-		trace.send(this, message);
-		channel.write(new TextWebSocketFrame(message));
-		return this;
-	}
-	
 	public void end() {
 		if (!messages.isEmpty()) {
 			markActivity();

@@ -43,6 +43,6 @@ class JJNioEventLoopGroup extends NioEventLoopGroup {
 
 	@Inject
 	JJNioEventLoopGroup() {
-		super(Runtime.getRuntime().availableProcessors() * 2, threadFactory);
+		super(Runtime.getRuntime().availableProcessors(), threadFactory);
 	}
 }
