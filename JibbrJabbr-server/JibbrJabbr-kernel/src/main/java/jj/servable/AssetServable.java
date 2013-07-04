@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
-import jj.resource.URIMatch;
+import jj.uri.URIMatch;
 import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;

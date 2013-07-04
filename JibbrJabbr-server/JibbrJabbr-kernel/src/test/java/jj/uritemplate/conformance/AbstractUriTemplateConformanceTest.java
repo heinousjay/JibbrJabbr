@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jj.uri.conformance;
+package jj.uritemplate.conformance;
 
 import static org.junit.Assert.*;
 

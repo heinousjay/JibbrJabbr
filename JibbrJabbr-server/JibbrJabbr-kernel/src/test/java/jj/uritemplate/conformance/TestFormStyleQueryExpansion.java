@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri.conformance;
+package jj.uritemplate.conformance;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,13 +9,14 @@ import java.util.Map;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * A TestFragmentExpansion.
+ * A TestFormStyleQueryExpansion.
  * 
  * @author <a href="ryan@damnhandy.com">Ryan J. McDonough</a>
  * @version $Revision: 1.1 $
  */
-public class TestFragmentExpansion extends AbstractUriTemplateConformanceTest
+public class TestFormStyleQueryExpansion extends AbstractUriTemplateConformanceTest
 {
+
    /**
     * FIXME Comment this
     * 
@@ -25,19 +26,19 @@ public class TestFragmentExpansion extends AbstractUriTemplateConformanceTest
    @Parameters
    public static Collection<Object[]> testData() throws Exception
    {
-      return loadTestData("fragment-expansion.json");
+      return loadTestData("form-style-query-expansion.json");
    }
 
    /**
     * 
-    * Create a new TestFragmentExpansion.
+    * Create a new TestFormStyleQueryExpansion.
     * 
     * @param vars
     * @param expression
     * @param expected
     * @param testsuite
     */
-   public TestFragmentExpansion(Map<String, Object> vars, String template, Object expected, String testsuite)
+   public TestFormStyleQueryExpansion(Map<String, Object> vars, String template, Object expected, String testsuite)
    {
       super(vars, template, expected, testsuite);
    }

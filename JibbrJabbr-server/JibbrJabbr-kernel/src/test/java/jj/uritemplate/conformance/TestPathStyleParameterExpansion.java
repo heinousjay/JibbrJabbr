@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri.conformance;
+package jj.uritemplate.conformance;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,12 +9,12 @@ import java.util.Map;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * A TestVariableExpansion.
+ * A TestPathStyleParameterExpansion.
  * 
  * @author <a href="ryan@damnhandy.com">Ryan J. McDonough</a>
  * @version $Revision: 1.1 $
  */
-public class TestVariableExpansion extends AbstractUriTemplateConformanceTest
+public class TestPathStyleParameterExpansion extends AbstractUriTemplateConformanceTest
 {
 
    /**
@@ -26,19 +26,19 @@ public class TestVariableExpansion extends AbstractUriTemplateConformanceTest
    @Parameters
    public static Collection<Object[]> testData() throws Exception
    {
-      return loadTestData("variable-expansion.json");
+      return loadTestData("path-style-parameter-expansion.json");
    }
-   
+
    /**
     * 
-    * Create a new TestVariableExpansion.
+    * Create a new TestPathStyleParameterExpansion.
     * 
     * @param vars
     * @param expression
     * @param expected
     * @param testsuite
     */
-   public TestVariableExpansion(Map<String, Object> vars, String template, Object expected, String testsuite)
+   public TestPathStyleParameterExpansion(Map<String, Object> vars, String template, Object expected, String testsuite)
    {
       super(vars, template, expected, testsuite);
    }

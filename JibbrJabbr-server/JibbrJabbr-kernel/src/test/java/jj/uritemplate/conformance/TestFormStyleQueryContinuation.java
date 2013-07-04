@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri.conformance;
+package jj.uritemplate.conformance;
 
 import java.util.Collection;
 import java.util.Map;

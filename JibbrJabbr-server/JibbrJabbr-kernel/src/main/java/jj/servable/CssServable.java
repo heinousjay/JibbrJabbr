@@ -13,7 +13,7 @@ import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 import jj.resource.CssResource;
 import jj.resource.ResourceFinder;
-import jj.resource.URIMatch;
+import jj.uri.URIMatch;
 
 @Singleton
 class CssServable extends Servable {

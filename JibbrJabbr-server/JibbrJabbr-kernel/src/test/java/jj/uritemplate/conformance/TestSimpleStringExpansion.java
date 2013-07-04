@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri.conformance;
+package jj.uritemplate.conformance;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,12 +9,12 @@ import java.util.Map;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * A TestReservedExpansion.
+ * A TestSimpleStringExpansion.
  * 
  * @author <a href="ryan@damnhandy.com">Ryan J. McDonough</a>
  * @version $Revision: 1.1 $
  */
-public class TestReservedExpansion extends AbstractUriTemplateConformanceTest
+public class TestSimpleStringExpansion extends AbstractUriTemplateConformanceTest
 {
 
    /**
@@ -26,21 +26,19 @@ public class TestReservedExpansion extends AbstractUriTemplateConformanceTest
    @Parameters
    public static Collection<Object[]> testData() throws Exception
    {
-      return loadTestData("reserved-expansion.json");
+      return loadTestData("simple-string-expansion.json");
    }
-
    /**
     * 
-    * Create a new TestReservedExpansion.
+    * Create a new TestSimpleStringExpansion.
     * 
     * @param vars
     * @param expression
     * @param expected
     * @param testsuite
     */
-   public TestReservedExpansion(Map<String, Object> vars, String template, Object expected, String testsuite)
+   public TestSimpleStringExpansion(Map<String, Object> vars, String template, Object expected, String testsuite)
    {
-      // FIXME TestReservedExpansion constructor
       super(vars, template, expected, testsuite);
    }
 
