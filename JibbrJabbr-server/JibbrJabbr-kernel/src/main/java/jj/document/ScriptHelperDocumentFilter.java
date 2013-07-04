@@ -23,7 +23,7 @@ import org.jsoup.nodes.Element;
 @Singleton
 class ScriptHelperDocumentFilter implements DocumentFilter {
 
-	public static final String JQUERY_JS = "jquery-2.0.2.min.js";
+	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
 	public static final String JJ_JS = "jj.js";
 
 	private final Configuration configuration;
@@ -68,7 +68,8 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 		if (scriptBundle != null) {
 			
 			// internal version of jquery
-			addScript(documentRequest.document(), resourceFinder.findResource(AssetResource.class, JQUERY_JS).uri());
+			// it's versioned already, so no need for sha-ing
+			addScript(documentRequest.document(), "/" + resourceFinder.findResource(AssetResource.class, JQUERY_JS).baseName());
 			
 			// jj script
 			String wsURI = "ws://" + documentRequest.httpRequest().host() + "/" + scriptBundle.toSocketUri();

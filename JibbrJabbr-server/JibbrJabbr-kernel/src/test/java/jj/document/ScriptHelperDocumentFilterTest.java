@@ -30,8 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptHelperDocumentFilterTest {
 	
-	static final String JQUERY_SHA = "aeb0805239eb1c1158894f8d25b4272ee6e67e44";
-	static final String JQUERY_URI = "/" + JQUERY_SHA + "/" + ScriptHelperDocumentFilter.JQUERY_JS;
+	static final String JQUERY_URI = "/" + ScriptHelperDocumentFilter.JQUERY_JS;
 	static final String JJ_SHA = "be03b9352e1e254cae9a58cff2b20e0c8d513e47";
 	static final String JJ_URI = "/" + JJ_SHA + "/" + ScriptHelperDocumentFilter.JJ_JS;
 	
@@ -78,8 +77,8 @@ public class ScriptHelperDocumentFilterTest {
 		when(resourceFinder.findResource(AssetResource.class, ScriptHelperDocumentFilter.JJ_JS))
 			.thenReturn(jjJs);
 		
-		when(jqueryJs.sha1()).thenReturn(JQUERY_SHA);
 		when(jqueryJs.uri()).thenReturn(JQUERY_URI);
+		when(jqueryJs.baseName()).thenReturn(ScriptHelperDocumentFilter.JQUERY_JS);
 		
 		when(jjJs.sha1()).thenReturn(JJ_SHA);
 		when(jjJs.uri()).thenReturn(JJ_URI);
