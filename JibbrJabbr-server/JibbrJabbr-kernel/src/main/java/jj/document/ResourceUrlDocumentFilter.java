@@ -49,7 +49,7 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	
 	private String massageURL(final String url) {
 		URIMatch uriMatch = new URIMatch(url);
-		if (uriMatch.baseName != null) {
+		if (uriMatch.baseName != null && !"css".equals(uriMatch.extension)) {
 			StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
 			if (resource != null && uriMatch.sha == null) {
 				return resource.uri();

@@ -59,6 +59,12 @@ public class URIMatchTest {
 		assertThat(match.name, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj"));
 		assertThat(match.extension, is(nullValue()));
 		
+		match = new URIMatch("/jquery.fancybox.css");
+		assertThat(match.sha, is(nullValue()));
+		assertThat(match.baseName, is("jquery.fancybox.css"));
+		assertThat(match.name, is("jquery.fancybox"));
+		assertThat(match.extension, is("css"));
+		
 	}
 
 }
