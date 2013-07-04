@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.servable;
+package jj.resource;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 
 import jj.JJ;
 import jj.configuration.Configuration;
+import jj.resource.LessProcessor;
 
 import org.junit.Before;
 import org.junit.Test;

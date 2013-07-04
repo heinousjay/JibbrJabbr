@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.servable;
+package jj.resource;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * Simple immutable carrier of a match against a URI, potentially preceded by

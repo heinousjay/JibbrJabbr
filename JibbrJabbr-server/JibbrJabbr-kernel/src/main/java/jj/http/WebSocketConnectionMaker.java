@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.resource.URIMatch;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
-import jj.servable.URIMatch;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;

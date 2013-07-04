@@ -36,7 +36,7 @@ public class NotFoundHttpHandler {
 			response.status(HttpResponseStatus.NOT_FOUND)
 				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 				.header(HttpHeaders.Names.CONTENT_TYPE, notFound.mime())
-				.header(HttpHeaders.Names.CONTENT_LENGTH, notFound.bytes().limit())
+				.header(HttpHeaders.Names.CONTENT_LENGTH, notFound.bytes().readableBytes())
 				.content(notFound.bytes())
 				.end();
 		}

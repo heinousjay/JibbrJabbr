@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
+import jj.resource.URIMatch;
 import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
@@ -48,14 +49,6 @@ public class StaticServable extends Servable {
 	) {
 		super(configuration);
 		this.resourceFinder = resourceFinder;
-	}
-	
-	/**
-	 * we always need IO
-	 */
-	@Override
-	public boolean needsIO(final JJHttpRequest request) {
-		return true;
 	}
 
 	/**

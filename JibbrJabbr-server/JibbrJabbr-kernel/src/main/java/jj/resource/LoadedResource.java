@@ -15,7 +15,8 @@
  */
 package jj.resource;
 
-import java.nio.ByteBuffer;
+import io.netty.buffer.ByteBuf;
+
 
 /**
  * @author jason
@@ -23,5 +24,5 @@ import java.nio.ByteBuffer;
  */
 public interface LoadedResource extends Resource {
 	
-	ByteBuffer bytes();
+	ByteBuf bytes();
 }

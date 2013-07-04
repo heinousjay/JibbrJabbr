@@ -2,8 +2,9 @@ package jj.resource;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
 import jj.IOThread;
@@ -24,8 +25,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 		this.type = type;
 		// our URI has our sha1 in it to allow for far-future caching
 		uri = sha1 + "/" + baseName + type.suffix();
-		script = UTF_8.decode(byteBuffer).toString();
-		byteBuffer.flip();
+		script = byteBuffer.toString(UTF_8);
 	}
 	
 	public ScriptResourceType type() {
@@ -52,7 +52,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	}
 	
 	@Override
-	public ByteBuffer bytes() {
+	public ByteBuf bytes() {
 		return byteBuffer;
 	}
 }

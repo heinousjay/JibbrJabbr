@@ -1,6 +1,8 @@
+
+
 body {
 	margin: 25px;
-	background: #334455;
+	background:  #334455;
 	color: #FFE47A;
 	font-family: helvetica,arial,sans-serif;
 }
@@ -14,14 +16,16 @@ body {
 	color: #0033FF;
 }
 
+@welcome-shadow:#00BB22;
+
 #welcome {
 	font-size: 44pt;
 	margin: 5px auto;
 	text-align: center;
-	text-shadow: -4px 0 3px #00BB22, 
-		0 4px 3px #00BB22, 
-		4px 0 3px #00BB22, 
-		0 -4px 3px #00BB22;
+	text-shadow: -4px 0 3px @welcome-shadow, 
+		0 4px 3px @welcome-shadow, 
+		4px 0 3px @welcome-shadow, 
+		0 -4px 3px @welcome-shadow;
 }
 
 #topic-holder {

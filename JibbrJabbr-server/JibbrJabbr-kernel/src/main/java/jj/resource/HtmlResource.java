@@ -56,7 +56,7 @@ public class HtmlResource extends AbstractFileResource {
 	) throws IOException {
 		super(baseName, path);
 		this.uri = baseName;
-		String html = UTF_8.decode(byteBuffer).toString();
+		String html = byteBuffer.toString(UTF_8);
 		this.document = Parser.htmlParser().parseInput(html, baseName);
 		CommentNodeFinder commentNodeFinder = new CommentNodeFinder();
 		new NodeTraversor(commentNodeFinder).traverse(document);

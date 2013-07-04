@@ -37,6 +37,7 @@ public class ResourceModule extends JJModule {
 		Multibinder<ResourceCreator<?>> resourceCreators = 
 			Multibinder.newSetBinder(binder(), new TypeLiteral<ResourceCreator<?>>() {});
 		resourceCreators.addBinding().to(AssetResourceCreator.class);
+		resourceCreators.addBinding().to(CssResourceCreator.class);
 		resourceCreators.addBinding().to(HtmlResourceCreator.class);
 		resourceCreators.addBinding().to(ScriptResourceCreator.class);
 		resourceCreators.addBinding().to(StaticResourceCreator.class);

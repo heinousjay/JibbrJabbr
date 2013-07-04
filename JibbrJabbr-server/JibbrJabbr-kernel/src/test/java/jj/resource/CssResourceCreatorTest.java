@@ -15,30 +15,31 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-import java.nio.file.Files;
-
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public class PropertiesResourceCreatorTest extends ResourceBase {
+public class CssResourceCreatorTest extends ResourceBase {
+	
+	LessProcessor lessProcessor;
+	
+	@Before
+	public void before() throws Exception {
+		lessProcessor = new LessProcessor(configuration);
+	}
 
 	@Test
 	public void test() throws Exception {
-		doTest("index");
-	}
-	
-	private void doTest(final String baseName) throws Exception {
-
-		PropertiesResource resource1 = testFileResource(baseName, new PropertiesResourceCreator(configuration));
-		assertThat(resource1, is(notNullValue()));
-		assertThat(resource1.byteBuffer.readableBytes(), is(Files.readAllBytes(resource1.path).length));
+		CssResource css = testFileResource("jj/resource/test.css", new CssResourceCreator(configuration, lessProcessor));
+		CssResource less = testFileResource("jj/resource/test.css", new CssResourceCreator(configuration, lessProcessor), Boolean.TRUE);
+		
+		assertThat(css.bytes(), is(less.bytes()));
 	}
 
 }

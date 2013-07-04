@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
-import jj.servable.URIMatch;
+import jj.resource.URIMatch;
 
 import org.jsoup.nodes.Element;
 

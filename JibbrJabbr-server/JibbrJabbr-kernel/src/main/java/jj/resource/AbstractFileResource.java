@@ -1,7 +1,9 @@
 package jj.resource;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
@@ -32,7 +34,7 @@ public abstract class AbstractFileResource implements Resource {
 	protected final Path path;
 	protected final FileTime lastModified;
 	protected final long size;
-	protected final ByteBuffer byteBuffer;
+	protected final ByteBuf byteBuffer;
 	
 	private final String toString;
 	
@@ -77,8 +79,8 @@ public abstract class AbstractFileResource implements Resource {
 		}
 	}
 	
-	private ByteBuffer readAllBytes(final Path path) throws IOException {
-		return ByteBuffer.wrap(Files.readAllBytes(path));
+	private ByteBuf readAllBytes(final Path path) throws IOException {
+		return Unpooled.wrappedBuffer(Files.readAllBytes(path));
 	}
 	
 	@Override

@@ -15,7 +15,7 @@ public class ServableModule extends JJModule {
 		
 		servables.addBinding().to(AssociatedScriptServable.class);
 		
-		//.addComponent(CssServable.class)
+		servables.addBinding().to(CssServable.class);
 		
 		// StaticServable is always second last
 		servables.addBinding().to(StaticServable.class);

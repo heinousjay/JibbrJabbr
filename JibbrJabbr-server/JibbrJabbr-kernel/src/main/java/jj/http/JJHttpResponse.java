@@ -20,7 +20,6 @@ import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -40,6 +39,7 @@ import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -185,7 +185,7 @@ public class JJHttpResponse {
 		return this;
 	}
 	
-	public JJHttpResponse content(final ByteBuffer buffer) {
+	public JJHttpResponse content(final ByteBuf buffer) {
 		assertNotCommitted();
 		response.content().writeBytes(Unpooled.wrappedBuffer(buffer));
 		return this;
@@ -261,7 +261,7 @@ public class JJHttpResponse {
 		return status(HttpResponseStatus.OK)
 			.header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
-			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().limit())
+			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.content(resource.bytes())
 			.end();
@@ -282,7 +282,8 @@ public class JJHttpResponse {
 		assertNotCommitted();
 		return status(HttpResponseStatus.OK)
 			.headerIfNotSet(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE)
-			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().remaining())
+			.header(HttpHeaders.Names.ETAG, resource.sha1())
+			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.content(resource.bytes())
 			.end();

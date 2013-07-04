@@ -2,6 +2,8 @@ package jj;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -42,6 +44,10 @@ public class SHA1Helper {
 	
 	public static String keyFor(final byte[] bytes) {
 		return toHex(sha1.get().digest(bytes));
+	}
+	
+	public static String keyFor(final ByteBuf byteBuf) {
+		return toHex(sha1.get().digest(byteBuf.array()));
 	}
 	
 	public static String keyFor(final ByteBuffer bytes) {

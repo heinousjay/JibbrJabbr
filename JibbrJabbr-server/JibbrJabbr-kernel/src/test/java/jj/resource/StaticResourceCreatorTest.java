@@ -33,7 +33,7 @@ public class StaticResourceCreatorTest extends ResourceBase {
 	public void test() throws Exception {
 		
 		doTest("blank.gif");
-		doTest("style.css");
+		doTest("README.txt");
 		doTest("helpers/jquery.fancybox-media.js");
 		
 		// this only works in test, since the class files in this directory

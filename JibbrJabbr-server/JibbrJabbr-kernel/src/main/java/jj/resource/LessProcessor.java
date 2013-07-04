@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.servable;
+package jj.resource;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -37,6 +40,7 @@ import jj.configuration.Configuration;
  * @author jason
  *
  */
+@Singleton
 class LessProcessor {
 	
 	private static final String SCRIPT_NAME = "less-1.4.0.rhino.js";
@@ -106,6 +110,7 @@ class LessProcessor {
 	private final ScriptableObject global;
 	private final Configuration configuration;
 	
+	@Inject
 	LessProcessor(
 		final Configuration configuration
 	) throws IOException {
@@ -114,14 +119,13 @@ class LessProcessor {
 	}
 	
 	String process(final String baseName) {
-		Path path = configuration.basePath().resolve(baseName);
 		
 		Context context = context();
 		try {
 			Scriptable local = context.newObject(global);
 			local.setPrototype(global);
 		    local.setParentScope(null);
-			Object result = context.evaluateString(local, "runLess('" + path.getFileName() + "');", baseName, 1, null);
+			Object result = context.evaluateString(local, "runLess('" + baseName + "');", baseName, 1, null);
 			if (result == Scriptable.NOT_FOUND) {
 				return null;
 			}

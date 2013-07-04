@@ -15,30 +15,70 @@
  */
 package jj.resource;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import io.netty.buffer.Unpooled;
+
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.configuration.Configuration;
 
 /**
  * @author jason
  *
  */
+@Singleton
 class CssResourceCreator implements ResourceCreator<CssResource> {
+	
+	private static final Pattern DOT_CSS = Pattern.compile("\\.css$");
+	
+	private final Configuration configuration;
+	private final LessProcessor lessProcessor;
+	
+	@Inject
+	CssResourceCreator(final Configuration configuration, final LessProcessor lessProcessor) {
+		this.configuration = configuration;
+		this.lessProcessor = lessProcessor;
+	}
 
 	@Override
 	public Class<CssResource> type() {
 		return CssResource.class;
 	}
+	
+	private String toLess(final String baseName) {
+		return DOT_CSS.matcher(baseName).replaceFirst(".less");
+	}
 
+	/**
+	 * takes one parameter, if Boolean.TRUE then this tries to load a .less file
+	 */
 	@Override
-	public Path toPath(String baseName, Object... args) {
-		// TODO Auto-generated method stub
-		return null;
+	public Path toPath(final String baseName, Object... args) {
+		
+		if (args.length == 1 && Boolean.TRUE.equals(args[0])) {
+			return configuration.basePath().resolve(toLess(baseName));
+			
+		}
+		return configuration.basePath().resolve(baseName);
 	}
 
 	@Override
 	public CssResource create(String baseName, Object... args) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		boolean less = args.length == 1 && Boolean.TRUE.equals(args[0]);
+		CssResource resource = new CssResource(baseName, toPath(baseName, args), less);
+		
+		if (less) {
+			byte[] bytes = lessProcessor.process(toLess(baseName)).getBytes(UTF_8);
+			resource.lessBytes = Unpooled.wrappedBuffer(bytes);
+		}
+		
+		return resource;
 	}
 
 }

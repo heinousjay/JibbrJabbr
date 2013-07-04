@@ -20,7 +20,7 @@ public class HtmlResourceCreatorTest extends ResourceBase {
 		HtmlResource resource1 = testFileResource(baseName, new HtmlResourceCreator(configuration));
 		assertThat(resource1, is(notNullValue()));
 		assertThat(resource1.mime(), is(MimeTypes.get(".html")));
-		assertThat(resource1.byteBuffer.limit(), is(Files.readAllBytes(resource1.path()).length));
+		assertThat(resource1.byteBuffer.readableBytes(), is(Files.readAllBytes(resource1.path()).length));
 		assertThat(resource1.document(), is(notNullValue()));
 	}
 	

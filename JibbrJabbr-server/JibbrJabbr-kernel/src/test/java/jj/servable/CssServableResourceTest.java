@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import jj.JJ;
 import jj.configuration.Configuration;
 import jj.http.JJHttpRequest;
+import jj.resource.ResourceFinder;
 import jj.servable.CssServable;
 
 import org.junit.Before;
@@ -25,6 +26,7 @@ public class CssServableResourceTest {
 	Path basePath = Paths.get(JJ.uri(CssServableResourceTest.class)).getParent();
 	
 	@Mock Configuration configuration;
+	@Mock ResourceFinder resourceFinder;
 	
 	@Mock JJHttpRequest request;
 	
@@ -38,11 +40,11 @@ public class CssServableResourceTest {
 		
 		// given
 		given(request.uri())
-			.willReturn("/style/da39a3ee5e6b4b0d3255bfef95601890afd80709.css")
+			.willReturn("/da39a3ee5e6b4b0d3255bfef95601890afd80709/style.css")
 			.willReturn("/not/a/path/to/servable.css");
 		
 		// when
-		CssServable cssServableResource = new CssServable(configuration);
+		CssServable cssServableResource = new CssServable(configuration, resourceFinder);
 		
 		// then
 		assertThat(cssServableResource.isMatchingRequest(request), is(true));

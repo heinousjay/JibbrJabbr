@@ -46,35 +46,10 @@ class DocumentServable extends Servable {
 	}
 	
 	@Override
-	public boolean needsIO(final JJHttpRequest request) {
-		return resourceFinder.findResource(HtmlResource.class, toBaseName(request)) == null;
-	}
-	
-	@Override
 	public boolean isMatchingRequest(final JJHttpRequest request) {
 		return request.uri().endsWith(DOT_HTML) ||
 			request.uri().endsWith(SLASH) ||
 			request.uri().lastIndexOf(DOT) <= request.uri().lastIndexOf(SLASH);
-	}
-	
-	private String toBaseName(final JJHttpRequest request) {
-		String uri = request.uri().substring(1);
-		// for now, we ignore parameters? sure
-		if (uri.indexOf("?") != -1) {
-			uri = uri.substring(0, uri.indexOf("?"));
-		}
-		Path result = null;
-		if (uri.endsWith(DOT_HTML)) {
-			result = basePath.resolve(uri).normalize();
-		} else if (uri.endsWith(SLASH)) {
-			result = basePath.resolve(uri).resolve(INDEX).normalize();
-		} else if ("".equals(uri)) {
-			result = basePath.resolve(INDEX);
-		} else {
-			result = basePath.resolve(uri + DOT_HTML).normalize();
-		}
-		String baseName = result.startsWith(basePath) ? basePath.relativize(result).toString() : DOT_HTML;		
-		return baseName.substring(0, baseName.length() - DOT_HTML.length());
 	}
 	
 	private Path toPath(final JJHttpRequest request) {

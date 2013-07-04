@@ -1,7 +1,8 @@
 package jj.resource;
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
 /**
@@ -28,7 +29,7 @@ public class AssetResource extends AbstractFileResource implements LoadedResourc
 		return mime;
 	}
 	
-	public ByteBuffer bytes() {
+	public ByteBuf bytes() {
 		return byteBuffer;
 	}
 

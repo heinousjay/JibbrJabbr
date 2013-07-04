@@ -2,7 +2,6 @@ package jj.document;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -117,10 +116,10 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		// into the output if there are text nodes next to element node
 		// and it gets REALLY ANNOYING
 		documentRequest.document().outputSettings().prettyPrint(false).indentAmount(0);
-		final ByteBuffer bytes = UTF_8.encode(documentRequest.document().toString());
+		byte[] bytes = documentRequest.document().toString().getBytes(UTF_8);
 		try {
 			documentRequest.httpResponse()
-				.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.remaining())
+				.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
 				// clients shouldn't cache these responses at all
 				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 				.header(HttpHeaders.Names.CONTENT_TYPE, documentRequest.mime())

@@ -3,7 +3,7 @@ package jj.script;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.servable.URIMatch;
+import jj.resource.URIMatch;
 
 @Singleton
 public class ScriptBundleFinder {

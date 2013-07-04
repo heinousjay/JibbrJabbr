@@ -38,15 +38,6 @@ public abstract class Servable {
 	}
 	
 	/**
-	 * flag to indicate if loading processing this resource should happen
-	 * in an IO thread
-	 * @return
-	 */
-	public boolean needsIO(final JJHttpRequest request) {
-		return false;
-	}
-	
-	/**
 	 * Indicates if the incoming request can potentially be served by this servable.
 	 * this is more or less a first opportunity for trivial rejections (like extensions
 	 * you aren't interested in, or the lack of matching resources in the cache.. whatever

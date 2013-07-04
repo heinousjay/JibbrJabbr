@@ -34,7 +34,7 @@ public class PropertiesResource extends AbstractFileResource {
 		uri = sha1 + "/" + baseName;
 		
 		properties =
-			new PropertyResourceBundle(new StringReader(UTF_8.decode(byteBuffer).toString()));
+			new PropertyResourceBundle(new StringReader(byteBuffer.toString(UTF_8)));
 	}
 	
 	public PropertyResourceBundle properties() {

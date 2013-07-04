@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.resource.ScriptResource;
+import jj.resource.URIMatch;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
 import jj.http.JJHttpRequest;
