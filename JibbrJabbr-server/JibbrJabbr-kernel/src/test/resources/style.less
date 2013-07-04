@@ -1,4 +1,12 @@
+.rounded-corners (@radius: 5px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  -ms-border-radius: @radius;
+  -o-border-radius: @radius;
+  border-radius: @radius;
+}
 
+@welcome-shadow:#00BB22;
 
 body {
 	margin: 25px;
@@ -15,8 +23,6 @@ body {
 	background-color: #456;
 	color: #0033FF;
 }
-
-@welcome-shadow:#00BB22;
 
 #welcome {
 	font-size: 44pt;
@@ -46,7 +52,7 @@ body {
 }
 
 div, section {
-	border-radius: 5px;
+	.rounded-corners;
 	padding: 2px;
 }
 
@@ -105,13 +111,13 @@ div, section {
 	font-weight: bold;
 	background-color: #FFCC00;
 	border: 2px outset #FFCC00;
-	border-radius: 5px;
+	.rounded-corners;
 }
 
 #userInput {
 	margin: 6px 2px 0;
 	border: 3px inset #456;
-	border-radius: 5px;
+	.rounded-corners;
 	background-color: #eee;
 	width: 520px;
 	padding: 3px;

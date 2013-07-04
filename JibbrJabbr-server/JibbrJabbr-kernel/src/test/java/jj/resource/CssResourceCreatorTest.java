@@ -17,6 +17,7 @@ package jj.resource;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,15 +32,22 @@ public class CssResourceCreatorTest extends ResourceBase {
 	
 	@Before
 	public void before() throws Exception {
-		lessProcessor = new LessProcessor(configuration);
+		lessProcessor = spy(new LessProcessor(configuration));
 	}
 
 	@Test
 	public void test() throws Exception {
-		CssResource css = testFileResource("jj/resource/test.css", new CssResourceCreator(configuration, lessProcessor));
-		CssResource less = testFileResource("jj/resource/test.css", new CssResourceCreator(configuration, lessProcessor), Boolean.TRUE);
+		CssResourceCreator toTest = new CssResourceCreator(configuration, lessProcessor);
 		
-		assertThat(css.bytes(), is(less.bytes()));
+		CssResource css = testFileResource("jj/resource/test.css", toTest);
+		CssResource less = toTest.create("jj/resource/test.css", Boolean.TRUE);
+		
+		// just to prove that one of these was actually less processed
+		verify(lessProcessor).process("jj/resource/test.less");
+		
+		// and we should end up with the same thing
+		assertThat(css.bytes().compareTo(less.bytes()), is(0));
+		
 	}
 
 }

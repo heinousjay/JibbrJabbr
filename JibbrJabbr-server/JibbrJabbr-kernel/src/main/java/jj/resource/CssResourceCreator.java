@@ -17,8 +17,6 @@ package jj.resource;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import io.netty.buffer.Unpooled;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
@@ -26,6 +24,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.SHA1Helper;
 import jj.configuration.Configuration;
 
 /**
@@ -75,7 +74,8 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 		
 		if (less) {
 			byte[] bytes = lessProcessor.process(toLess(baseName)).getBytes(UTF_8);
-			resource.lessBytes = Unpooled.wrappedBuffer(bytes);
+			resource.byteBuffer.clear().writeBytes(bytes);
+			resource.sha1 = SHA1Helper.keyFor(resource.byteBuffer);
 		}
 		
 		return resource;
