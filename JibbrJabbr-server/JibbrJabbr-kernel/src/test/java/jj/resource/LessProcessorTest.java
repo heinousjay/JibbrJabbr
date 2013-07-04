@@ -18,13 +18,14 @@ package jj.resource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.ExecutionTrace;
 import jj.JJ;
 import jj.configuration.Configuration;
 import jj.resource.LessProcessor;
@@ -46,13 +47,14 @@ public class LessProcessorTest {
 	Path basePath;
 	String testCss;
 	@Mock Configuration configuration;
+	@Mock ExecutionTrace trace;
 	
 	@Before
 	public void before() throws IOException {
 		basePath = Paths.get(JJ.uri(LessProcessorTest.class)).getParent();
 		testCss = new String(Files.readAllBytes(basePath.resolve("test.css")), UTF_8);
 		given(configuration.basePath()).willReturn(basePath);
-		underTest = new LessProcessor(configuration);
+		underTest = new LessProcessor(configuration, trace);
 	}
 	
 	@Test
@@ -63,6 +65,11 @@ public class LessProcessorTest {
 		// we don't so much care that less does what less does
 		// as we care that it worked.
 		assertThat(output, is(testCss));
+		
+		verify(trace).startLessProcessing("test.less");
+		verify(trace).loadLessResource("test.less");
+		verify(trace).loadLessResource("test2.less");
+		verify(trace).finishLessProcessing("test.less");
 	}
 
 }

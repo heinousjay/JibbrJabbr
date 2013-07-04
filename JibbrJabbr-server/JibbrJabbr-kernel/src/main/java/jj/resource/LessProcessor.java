@@ -31,6 +31,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.ExecutionTrace;
 import jj.configuration.Configuration;
 
 /**
@@ -55,28 +56,6 @@ class LessProcessor {
 				sb.append(read).append('\n');
 			}
 			return sb.toString();
-		}
-	}
-	
-	private static class ReadFileFunction extends BaseFunction {
-		
-		private static final long serialVersionUID = -1L;
-		
-		private final Path basePath;
-		
-		ReadFileFunction(final Path basePath) {
-			this.basePath = basePath;
-		}
-		
-		@Override
-		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-			try {
-				return new String(Files.readAllBytes(basePath.resolve(String.valueOf(args[0]))), UTF_8);
-			} catch (IOException io) {
-				
-			}
-			
-			return Scriptable.NOT_FOUND;
 		}
 	}
 	
@@ -106,22 +85,50 @@ class LessProcessor {
 			return object;
 		}
 	}
+	
+	private class ReadFileFunction extends BaseFunction {
+		
+		private static final long serialVersionUID = -1L;
+		
+		private final Path basePath;
+		
+		ReadFileFunction(final Path basePath) {
+			this.basePath = basePath;
+		}
+		
+		@Override
+		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+			String resourceName = String.valueOf(args[0]);
+			try {
+				trace.loadLessResource(resourceName);
+				return new String(Files.readAllBytes(basePath.resolve(resourceName)), UTF_8);
+			} catch (IOException io) {
+				trace.errorLoadingLessResource(resourceName, io);
+			}
+			
+			return Scriptable.NOT_FOUND;
+		}
+	}
 
 	private final ScriptableObject global;
 	private final Configuration configuration;
+	private final ExecutionTrace trace;
 	
 	@Inject
 	LessProcessor(
-		final Configuration configuration
+		final Configuration configuration,
+		final ExecutionTrace trace
 	) throws IOException {
 		this.configuration = configuration;
 		global = makeGlobal();
+		this.trace = trace;
 	}
 	
 	String process(final String baseName) {
 		
 		Context context = context();
 		try {
+			trace.startLessProcessing(baseName);
 			Scriptable local = context.newObject(global);
 			local.setPrototype(global);
 		    local.setParentScope(null);
@@ -133,6 +140,7 @@ class LessProcessor {
 		} finally {
 			Context.exit();
 			NameFunction.name.set(null);
+			trace.finishLessProcessing(baseName);
 		}
 	}
 	

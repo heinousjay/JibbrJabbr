@@ -19,6 +19,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.nio.file.Files;
+
+import jj.ExecutionTrace;
+import jj.SHA1Helper;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +37,7 @@ public class CssResourceCreatorTest extends ResourceBase {
 	
 	@Before
 	public void before() throws Exception {
-		lessProcessor = spy(new LessProcessor(configuration));
+		lessProcessor = spy(new LessProcessor(configuration, mock(ExecutionTrace.class)));
 	}
 
 	@Test
@@ -40,6 +45,8 @@ public class CssResourceCreatorTest extends ResourceBase {
 		CssResourceCreator toTest = new CssResourceCreator(configuration, lessProcessor);
 		
 		CssResource css = testFileResource("jj/resource/test.css", toTest);
+		assertThat(css.sha1(), is(SHA1Helper.keyFor(Files.readAllBytes(css.path()))));
+		
 		CssResource less = toTest.create("jj/resource/test.css", Boolean.TRUE);
 		
 		// just to prove that one of these was actually less processed

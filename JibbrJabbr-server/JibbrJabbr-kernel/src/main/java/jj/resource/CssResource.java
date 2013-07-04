@@ -10,6 +10,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
 import jj.IOThread;
+import jj.SHA1Helper;
 
 public class CssResource implements LoadedResource {
 	
@@ -25,10 +26,12 @@ public class CssResource implements LoadedResource {
 		this.baseName = baseName;
 		this.path = path;
 		this.less = less;
+		this.size = Files.size(this.path);
 		this.lastModified = Files.getLastModifiedTime(this.path);
-		this.byteBuffer = Unpooled.buffer((int)Files.size(this.path));
+		this.byteBuffer = Unpooled.buffer((int)this.size);
 		if (!less) {
 			this.byteBuffer.writeBytes(Files.readAllBytes(this.path));
+			this.sha1 = SHA1Helper.keyFor(this.byteBuffer);
 		}
 	}
 

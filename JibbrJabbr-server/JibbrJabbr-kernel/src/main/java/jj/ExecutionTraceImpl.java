@@ -15,6 +15,7 @@
  */
 package jj;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
@@ -135,8 +136,9 @@ class ExecutionTraceImpl implements ExecutionTrace {
 		current.set(null);
 		
 		State state = currentTracker.get(task);
-		assert state != null : "task ended and no state.  que?";
-		if (state.prepared == null) {
+		if (state == null) {
+			log.error("additionally, no state was available in the current tracker for {}", task);
+		} else if (state.prepared == null) {
 			boolean removed = currentTracker.remove(task, state);
 			assert removed : "something is really whacky here";
 			log.trace("end processing");
@@ -180,5 +182,26 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	public void send(JJWebSocketConnection connection, String message) {
 		log.trace("sending on websocket connection {}", connection);
 		log.trace(message);
+	}
+	
+	@Override
+	public void startLessProcessing(String baseName) {
+		log.trace("beginning processing of less servable at {}", baseName);
+	}
+	
+	@Override
+	public void loadLessResource(String resourceName) {
+		log.trace("loading less resource {}", resourceName);
+	}
+	
+	@Override
+	public void errorLoadingLessResource(String resourceName, IOException io) {
+		log.error("trouble loading less resource {}", resourceName);
+		log.error("", io);
+	}
+	
+	@Override
+	public void finishLessProcessing(String baseName) {
+		log.trace("finished processing less servable at {}", baseName);
 	}
 }

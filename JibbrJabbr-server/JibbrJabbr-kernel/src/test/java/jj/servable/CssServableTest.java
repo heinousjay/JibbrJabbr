@@ -46,6 +46,7 @@ public class CssServableTest {
 		// given
 		given(request.uri()).willReturn("/style.css");
 		given(resourceFinder.loadResource(CssResource.class, "style.css", true)).willReturn(cssResource);
+		given(cssResource.path()).willReturn(basePath.resolve("style.css"));
 		
 		// when
 		CssServable cssServable = new CssServable(configuration, resourceFinder);

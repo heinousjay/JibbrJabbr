@@ -15,6 +15,8 @@
  */
 package jj;
 
+import java.io.IOException;
+
 import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.JJWebSocketConnection;
@@ -48,4 +50,17 @@ public interface ExecutionTrace {
 	void message(JJWebSocketConnection connection, String message);
 	
 	void send(JJWebSocketConnection connection, String message);
+	
+	
+	void startLessProcessing(String baseName);
+	
+	void loadLessResource(String resourceName);
+	
+	void finishLessProcessing(String baseName);
+
+	/**
+	 * @param resourceName
+	 * @param io
+	 */
+	void errorLoadingLessResource(String resourceName, IOException io);
 }

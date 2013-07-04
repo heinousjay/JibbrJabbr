@@ -50,6 +50,10 @@ class CssServable extends Servable {
 		
 		if (resource == null) {
 			return null;
+		} else if (!isServablePath(resource.path())) {
+			// TODO log this.  and really make this logic
+			// centralized somehow
+			return null;
 		}
 		
 		final CssResource css = resource;
