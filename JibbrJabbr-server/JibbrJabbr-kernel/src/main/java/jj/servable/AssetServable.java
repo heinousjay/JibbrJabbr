@@ -28,7 +28,9 @@ class AssetServable extends Servable {
 	@Override
 	public boolean isMatchingRequest(JJHttpRequest httpRequest) {
 		// if the baseName exists in the cache, we happy
-		return resourceFinder.findResource(AssetResource.class, new URIMatch(httpRequest.uri()).baseName) != null;
+		URIMatch match = new URIMatch(httpRequest.uri());
+		
+		return resourceFinder.findResource(AssetResource.class, match.baseName) != null;
 	}
 
 	@Override
@@ -49,11 +51,15 @@ class AssetServable extends Servable {
 				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
 					asset.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 					
-					response.sendNotModified(asset);
+					response.sendNotModified(asset, match.versioned);
 
 				} else if (match.sha == null) {
 					
-					response.sendUncachedResource(asset);
+					if (match.versioned) {
+						response.sendCachedResource(asset);
+					} else {
+						response.sendUncachedResource(asset);
+					}
 					
 				} else if (!match.sha.equals(asset.sha1())) {
 				

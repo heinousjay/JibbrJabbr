@@ -26,6 +26,18 @@ import org.junit.Test;
  *
  */
 public class URIMatchTest {
+	
+	@Test
+	public void testVersioned() {
+		URIMatch match = new URIMatch("/be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj.js");
+		assertThat(match.versioned, is(true));
+		
+		match = new URIMatch("/jquery-2.0.2.min.js");
+		assertThat(match.versioned, is(true));
+		
+		match = new URIMatch("/jquery-2.0.2.js");
+		assertThat(match.versioned, is(true));
+	}
 
 	@Test
 	public void test() {
@@ -34,6 +46,7 @@ public class URIMatchTest {
 		assertThat(match.baseName, is("jj.js"));
 		assertThat(match.name, is("jj"));
 		assertThat(match.extension, is("js"));
+		assertThat(match.versioned, is(true));
 	}
 	
 	@Test
@@ -43,6 +56,7 @@ public class URIMatchTest {
 		assertThat(match.baseName, is("jj.js"));
 		assertThat(match.name, is("jj"));
 		assertThat(match.extension, is("js"));
+		assertThat(match.versioned, is(false));
 	}
 
 	@Test
@@ -52,6 +66,7 @@ public class URIMatchTest {
 		assertThat(match.baseName, is("be03b9352e1e254cae9a58cff2b20e0c8d547/jj.js"));
 		assertThat(match.name, is("be03b9352e1e254cae9a58cff2b20e0c8d547/jj"));
 		assertThat(match.extension, is("js"));
+		assertThat(match.versioned, is(false));
 	}
 
 	@Test
@@ -61,6 +76,7 @@ public class URIMatchTest {
 		assertThat(match.baseName, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj.js"));
 		assertThat(match.name, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj"));
 		assertThat(match.extension, is("js"));
+		assertThat(match.versioned, is(true));
 	}
 
 	@Test
@@ -70,6 +86,7 @@ public class URIMatchTest {
 		assertThat(match.baseName, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj"));
 		assertThat(match.name, is("be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj"));
 		assertThat(match.extension, is(nullValue()));
+		assertThat(match.versioned, is(true));
 	}
 
 	@Test
@@ -79,5 +96,6 @@ public class URIMatchTest {
 		assertThat(match.baseName, is("jquery.fancybox.css"));
 		assertThat(match.name, is("jquery.fancybox"));
 		assertThat(match.extension, is("css"));
+		assertThat(match.versioned, is(false));
 	}
 }

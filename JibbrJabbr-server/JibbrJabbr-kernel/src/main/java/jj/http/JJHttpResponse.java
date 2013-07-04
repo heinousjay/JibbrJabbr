@@ -221,7 +221,16 @@ public class JJHttpResponse {
 	 * @return
 	 */
 	public JJHttpResponse sendNotModified(final Resource resource) {
+		return sendNotModified(resource, false);
+	}
+	
+	public JJHttpResponse sendNotModified(final Resource resource, boolean cache) {
 		assertNotCommitted();
+		
+		if (cache) {
+			header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
+		}
+		
 		return status(HttpResponseStatus.NOT_MODIFIED)
 			.header(HttpHeaders.Names.ETAG, resource.sha1())
 			.end();

@@ -147,7 +147,7 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	
 	@Override
 	public void start(JJHttpRequest request, JJHttpResponse response) {
-		log.trace("Request started {}", request);
+		log.trace("Request started {}", request.uri());
 		State state = current.get();
 		assert state == null : "somehow there is state left from some previous request " + state;
 		

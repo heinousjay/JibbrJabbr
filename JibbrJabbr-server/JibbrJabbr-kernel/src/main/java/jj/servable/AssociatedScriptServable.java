@@ -60,6 +60,7 @@ class AssociatedScriptServable extends Servable {
 			}
 		
 		}
+		
 		return result;
 	}
 
