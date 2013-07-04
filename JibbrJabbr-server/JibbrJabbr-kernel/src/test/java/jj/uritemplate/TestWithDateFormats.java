@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.assertEquals;
 
@@ -12,6 +12,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+
+import jj.uritemplate.UriTemplate;
 
 import org.junit.Before;
 import org.junit.Ignore;

@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jj.uri.UriTemplate;
+import jj.uritemplate.UriTemplate;
 
 
 import org.junit.Test;

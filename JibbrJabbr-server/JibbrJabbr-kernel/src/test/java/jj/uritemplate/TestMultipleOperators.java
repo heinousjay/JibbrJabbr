@@ -2,12 +2,14 @@
  *
  *
  */
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import jj.uritemplate.UriTemplate;
 
 import org.junit.Test;
 

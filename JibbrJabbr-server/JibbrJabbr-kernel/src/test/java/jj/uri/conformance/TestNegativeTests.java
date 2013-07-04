@@ -8,9 +8,9 @@ import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Map;
 
-import jj.uri.ExpressionParseException;
-import jj.uri.UriTemplate;
-import jj.uri.VariableExpansionException;
+import jj.uritemplate.ExpressionParseException;
+import jj.uritemplate.UriTemplate;
+import jj.uritemplate.VariableExpansionException;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;

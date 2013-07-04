@@ -13,33 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package jj.uritemplate;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
-* When this annotation is placed on a field or getter method, the
-* annotation value will be used instead of the property name.
+* Marks a field or property as transient so that it is not included in
+* the expansion.
 *
 * @author <a href="ryan@damnhandy.com">Ryan J. McDonough</a>
 * @version $Revision: 1.1 $
 * @since 1.0
 */
 @Documented
-@Retention(RUNTIME)
-@Target({FIELD, METHOD})
-public @interface VarName {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface UriTransient {
 
-   /**
-* Returns the preferred name of the property.
-*
-* @return
-*/
-   String value();
 }

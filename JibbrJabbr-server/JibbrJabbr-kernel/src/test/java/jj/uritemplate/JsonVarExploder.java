@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
+
+import jj.uritemplate.VariableExpansionException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;

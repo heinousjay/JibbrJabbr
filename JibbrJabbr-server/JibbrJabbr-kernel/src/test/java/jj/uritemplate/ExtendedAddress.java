@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 /**
  * A subclass of {@link Address} to verify that field-level annotation are still being 

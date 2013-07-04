@@ -1,7 +1,10 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
+
+import jj.uritemplate.UriTransient;
+import jj.uritemplate.VarName;
 
 /**
  * 

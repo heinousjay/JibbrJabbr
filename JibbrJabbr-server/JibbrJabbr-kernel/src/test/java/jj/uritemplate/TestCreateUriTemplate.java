@@ -1,13 +1,15 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.Map.Entry;
+
+import jj.uritemplate.UriTemplate;
 
 /**
  * Simple tests to validate the UriTemplate API.

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import jj.JJ;
-import jj.uri.UriTemplate;
+import jj.uritemplate.UriTemplate;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,9 +1,10 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.*;
+import jj.uritemplate.UriTemplate;
 
 import org.junit.Test;
 

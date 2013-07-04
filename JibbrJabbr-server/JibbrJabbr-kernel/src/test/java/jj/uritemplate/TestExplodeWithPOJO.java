@@ -1,12 +1,15 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import jj.uritemplate.UriTemplate;
+import jj.uritemplate.VarExploder;
 
 import org.junit.Test;
 

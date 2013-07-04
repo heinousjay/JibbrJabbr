@@ -1,10 +1,12 @@
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
+
+import jj.uritemplate.UriUtil;
 
 public class UriUtilTest {
 

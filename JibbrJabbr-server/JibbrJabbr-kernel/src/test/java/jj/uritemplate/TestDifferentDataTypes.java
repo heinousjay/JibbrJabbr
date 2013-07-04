@@ -1,7 +1,7 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jj.uritemplate.UriTemplate;
+import jj.uritemplate.VariableExpansionException;
 
 import org.junit.Test;
 

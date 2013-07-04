@@ -10,7 +10,7 @@ import javax.inject.Inject;
 
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
-import jj.uri.UriTemplate;
+import jj.uritemplate.UriTemplate;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.mozilla.javascript.BaseFunction;

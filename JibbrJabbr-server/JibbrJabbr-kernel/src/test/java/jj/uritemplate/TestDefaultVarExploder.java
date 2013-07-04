@@ -1,13 +1,15 @@
 /*
  * 
  */
-package jj.uri;
+package jj.uritemplate;
 
 import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import jj.uritemplate.VarExploder;
 
 import org.junit.Test;
 

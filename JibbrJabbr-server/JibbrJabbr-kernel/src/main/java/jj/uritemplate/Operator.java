@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.uritemplate;
 
-import static jj.uri.UriTemplate.DEFAULT_SEPARATOR;
+import static jj.uritemplate.UriTemplate.DEFAULT_SEPARATOR;
 
 /**
  * @author jason
