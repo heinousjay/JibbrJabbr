@@ -50,14 +50,15 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	}
 	
 	private String massageURL(final String url) {
-		URIMatch uriMatch = new URIMatch(url.substring(URI_PREPEND.length()));
-		if (uriMatch.baseName != null && !"css".equals(uriMatch.extension)) {
+		String path = url.substring(URI_PREPEND.length());
+		URIMatch uriMatch = new URIMatch(path);
+		if (!uriMatch.versioned && uriMatch.baseName != null && !"css".equals(uriMatch.extension)) {
 			StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
 			if (resource != null && uriMatch.sha == null) {
 				return resource.uri();
 			}
 		}
-		return url;
+		return path;
 	}
 
 	@Override

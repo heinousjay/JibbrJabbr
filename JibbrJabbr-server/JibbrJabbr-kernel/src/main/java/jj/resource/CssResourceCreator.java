@@ -81,12 +81,20 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 		CssResource resource = new CssResource(baseName, toPath(baseName, args), less);
 		
 		if (less) {
-			byte[] bytes = lessProcessor.process(toLess(baseName)).getBytes(UTF_8);
+			String processed = fixUrls(lessProcessor.process(toLess(baseName)));
+			
+			byte[] bytes = processed.getBytes(UTF_8);
 			resource.byteBuffer.clear().writeBytes(bytes);
 			resource.sha1 = SHA1Helper.keyFor(resource.byteBuffer);
+		} else {
+			
 		}
 		
 		return resource;
+	}
+	
+	private String fixUrls(String css) {
+		return css;
 	}
 
 }

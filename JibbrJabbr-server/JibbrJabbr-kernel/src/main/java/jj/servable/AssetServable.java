@@ -53,13 +53,13 @@ class AssetServable extends Servable {
 					
 					response.sendNotModified(asset, match.versioned);
 
+				} else if (match.versioned) {
+					
+					response.sendCachedResource(asset);
+					
 				} else if (match.sha == null) {
 					
-					if (match.versioned) {
-						response.sendCachedResource(asset);
-					} else {
-						response.sendUncachedResource(asset);
-					}
+					response.sendUncachedResource(asset);
 					
 				} else if (!match.sha.equals(asset.sha1())) {
 				

@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class URIMatch {
 	
 	private static final Pattern URI_PATTERN = Pattern.compile("^/(?:([\\da-f]{40})/)?(.*?)(?:\\.([^.]+))?$");
-	private static final Pattern VERSION_PATTERN = Pattern.compile("-\\d+(?:[.]\\d+)*(?:[.]min)?$");
+	private static final Pattern VERSION_PATTERN = Pattern.compile("-\\d+(?:[.]\\d+)*(?:[.-]min)?$");
 
 	public final String sha;
 	public final String name;

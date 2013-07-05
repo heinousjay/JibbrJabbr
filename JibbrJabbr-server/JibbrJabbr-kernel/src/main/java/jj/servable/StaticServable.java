@@ -78,6 +78,10 @@ public class StaticServable extends Servable {
 							sr.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 							
 							response.sendNotModified(sr);
+							
+						} else if (match.versioned) {
+							
+							response.sendCachedResource(sr);
 	
 						} else if (match.sha == null) {
 							
