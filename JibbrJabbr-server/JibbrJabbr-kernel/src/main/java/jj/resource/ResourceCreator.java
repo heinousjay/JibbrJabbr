@@ -19,6 +19,15 @@ interface ResourceCreator<T extends Resource> {
 	Class<T> type();
 	
 	/**
+	 * Indicates if this creator can create a resource for the
+	 * given name and args
+	 * @param name
+	 * @param args
+	 * @return
+	 */
+	boolean canLoad(final String name, final Object...args);
+	
+	/**
 	 * convert the given basename and set of arguments into a path.  this
 	 * path is used to key the resulting resource in the cache, and is the
 	 * key the file watcher uses to notify of a reload, so your create method

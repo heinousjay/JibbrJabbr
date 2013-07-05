@@ -15,10 +15,42 @@
  */
 package jj.document;
 
+import static org.mockito.BDDMockito.*;
+import jj.resource.ResourceFinder;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
 /**
  * @author jason
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ResourceUrlDocumentFilterTest {
 
+	@Mock ResourceFinder resourceFinder;
+	@Mock DocumentRequest documentRequest;
+	Document document;
+	
+	@Before
+	public void before() {
+		document = Jsoup.parse("<a href='style.css'>style</a>");
+		given(documentRequest.document()).willReturn(document);
+		
+	}
+	
+	@Test
+	public void test() {
+		ResourceUrlDocumentFilter underTest = new ResourceUrlDocumentFilter(resourceFinder);
+		given(documentRequest.uri()).willReturn("/");
+		underTest.filter(documentRequest);
+		given(documentRequest.uri()).willReturn("/files");
+		underTest.filter(documentRequest);
+	}
+	
 }

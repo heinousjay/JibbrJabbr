@@ -31,6 +31,8 @@ import org.jsoup.nodes.Element;
 @Singleton
 class ResourceUrlDocumentFilter implements DocumentFilter {
 	
+	private static final String URI_PREPEND = "http://notreal.com";
+	
 	private static final String HREF = "href";
 	private static final String SRC = "src";
 	private static final String SELECTOR = "[" + HREF + "],[" + SRC + "]";
@@ -48,7 +50,7 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	}
 	
 	private String massageURL(final String url) {
-		URIMatch uriMatch = new URIMatch(url);
+		URIMatch uriMatch = new URIMatch(url.substring(URI_PREPEND.length()));
 		if (uriMatch.baseName != null && !"css".equals(uriMatch.extension)) {
 			StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
 			if (resource != null && uriMatch.sha == null) {
@@ -60,15 +62,17 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 
 	@Override
 	public void filter(DocumentRequest documentRequest) {
+		documentRequest.document().setBaseUri(URI_PREPEND + documentRequest.uri());
 		for(Element el : documentRequest.document().select(SELECTOR)) {
 			if (el.hasAttr(HREF)) {
-				el.attr(HREF, massageURL(el.attr(HREF)));
+				el.attr(HREF, massageURL(el.absUrl(HREF)));
 			}
 			
 			if (el.hasAttr(SRC)) {
-				el.attr(SRC, massageURL(el.attr(SRC)));
+				el.attr(SRC, massageURL(el.absUrl(SRC)));
 			}
 		}
+		documentRequest.document().setBaseUri("");
 	}
 
 }

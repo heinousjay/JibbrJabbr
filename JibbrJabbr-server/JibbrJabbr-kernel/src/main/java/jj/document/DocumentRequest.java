@@ -42,6 +42,7 @@ public class DocumentRequest {
 		this.baseName = resource.baseName();
 		this.mime = resource.mime();
 		this.document = document.clone();
+		this.document.setBaseUri(httpRequest.uri());
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
 		this.neededIO = neededIO;
@@ -57,6 +58,10 @@ public class DocumentRequest {
 	
 	public Document document() {
 		return document;
+	}
+	
+	public String uri() {
+		return httpRequest.uri();
 	}
 	
 	public JJHttpRequest httpRequest() {

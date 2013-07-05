@@ -43,6 +43,12 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	public Class<AssetResource> type() {
 		return AssetResource.class;
 	}
+	
+	@Override
+	public boolean canLoad(String name, Object... args) {
+		// we load whatever
+		return true;
+	}
 
 	@Override
 	public Path toPath(String baseName, Object... args) {

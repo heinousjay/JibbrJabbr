@@ -35,6 +35,7 @@ import jj.configuration.Configuration;
 class CssResourceCreator implements ResourceCreator<CssResource> {
 	
 	private static final Pattern DOT_CSS = Pattern.compile("\\.css$");
+	private static final Pattern DOT_LESS = Pattern.compile("\\.less$");
 	
 	private final Configuration configuration;
 	private final LessProcessor lessProcessor;
@@ -52,6 +53,13 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 	
 	private String toLess(final String baseName) {
 		return DOT_CSS.matcher(baseName).replaceFirst(".less");
+	}
+	
+	@Override
+	public boolean canLoad(String name, Object... args) {
+		return (args.length == 1 && Boolean.TRUE.equals(args[0])) ?
+			DOT_LESS.matcher(name).find() :
+			DOT_CSS.matcher(name).find();
 	}
 
 	/**

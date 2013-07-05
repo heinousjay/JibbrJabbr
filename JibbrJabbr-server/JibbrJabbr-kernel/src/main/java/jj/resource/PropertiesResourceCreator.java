@@ -22,6 +22,11 @@ class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
 	public Class<PropertiesResource> type() {
 		return PropertiesResource.class;
 	}
+	
+	@Override
+	public boolean canLoad(String name, Object... args) {
+		return true;
+	}
 
 	@Override
 	public Path toPath(String baseName, Object... args) {

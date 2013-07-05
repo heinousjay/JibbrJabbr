@@ -22,6 +22,11 @@ class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 	public Class<ScriptResource> type() {
 		return ScriptResource.class;
 	}
+	
+	@Override
+	public boolean canLoad(String name, Object... args) {
+		return true;
+	}
 
 	@Override
 	public Path toPath(String baseName, Object... args) {

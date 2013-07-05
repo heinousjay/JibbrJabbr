@@ -79,6 +79,13 @@ class ResourceFinderImpl implements ResourceFinder {
 		log.trace("result {}", result);
 		return result;
 	}
+	
+	@Override
+	@IOThread
+	public Resource loadResource(String baseName, Object... args) {
+		assert executors.isIOThread() : "Can only call loadResource from an I/O thread";
+		return null;
+	}
 
 	@SuppressWarnings("unchecked")
 	@IOThread
@@ -88,7 +95,6 @@ class ResourceFinderImpl implements ResourceFinder {
 		String baseName,
 		Object... args
 	) {
-		
 		assert executors.isIOThread() : "Can only call loadResource from an I/O thread";
 		
 		ResourceCreator<T> resourceCreator = (ResourceCreator<T>)resourceCreators.get(resourceClass);

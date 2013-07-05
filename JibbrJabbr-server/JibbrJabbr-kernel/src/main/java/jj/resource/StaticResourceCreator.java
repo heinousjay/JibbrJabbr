@@ -41,6 +41,11 @@ class StaticResourceCreator implements ResourceCreator<StaticResource> {
 	public Class<StaticResource> type() {
 		return StaticResource.class;
 	}
+	
+	@Override
+	public boolean canLoad(String name, Object... args) {
+		return true;
+	}
 
 	@Override
 	public Path toPath(String baseName, Object... args) {

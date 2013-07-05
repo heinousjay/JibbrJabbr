@@ -30,6 +30,9 @@ public interface ResourceFinder {
 	 */
 	<T extends Resource> T findResource(Class<T> resourceClass, String baseName, Object...args);
 	
+	@IOThread
+	Resource loadResource(String baseName, Object...args);
+	
 	/**
 	 * loads a resource matching the given resource spec, if necessary, and populates
 	 * the cache.  can only be called from an IO thread.  if the resource spec does
