@@ -61,15 +61,11 @@ jQuery(function($) {
 
 	    function connect(reconnectAttempt) {
 	        ws = new WebSocket(url, protocols);
-	        if (debug) {
-	            console.debug('ReconnectingWebSocket', 'attempt-connect', url);
-	        }
+	        debug && console.debug('ReconnectingWebSocket', 'attempt-connect', url);
 	        
 	        var localWs = ws;
 	        var timeout = setTimeout(function() {
-	            if (debug) {
-	                console.debug('ReconnectingWebSocket', 'connection-timeout', url);
-	            }
+	            debug && console.debug('ReconnectingWebSocket', 'connection-timeout', url);
 	            timedOut = true;
 	            localWs.close();
 	            timedOut = false;
@@ -77,9 +73,7 @@ jQuery(function($) {
 	        
 	        ws.onopen = function(event) {
 	            clearTimeout(timeout);
-	            if (debug) {
-	                console.debug('ReconnectingWebSocket', 'onopen', url);
-	            }
+	            debug && console.debug('ReconnectingWebSocket', 'onopen', url);
 	            self.readyState = WebSocket.OPEN;
 	            reconnectAttempt = false;
 	            
@@ -99,9 +93,7 @@ jQuery(function($) {
 	            } else {
 	                self.readyState = WebSocket.CONNECTING;
 	                if (!reconnectAttempt && !timedOut) {
-	                    if (debug) {
-	                        console.debug('ReconnectingWebSocket', 'onclose', url);
-	                    }
+	                	debug && console.debug('ReconnectingWebSocket', 'onclose', url);
 	                    self.onclose(event);
 	                }
 	                setTimeout(function() {
@@ -110,15 +102,11 @@ jQuery(function($) {
 	            }
 	        };
 	        ws.onmessage = function(event) {
-	            if (debug) {
-	                console.debug('ReconnectingWebSocket', 'onmessage', url, event.data);
-	            }
-	         self.onmessage(event);
+	            debug && console.debug('ReconnectingWebSocket', 'onmessage', url, event.data);
+	            self.onmessage(event);
 	        };
 	        ws.onerror = function(event) {
-	            if (debug) {
-	                console.debug('ReconnectingWebSocket', 'onerror', url, event);
-	            }
+	            debug && console.debug('ReconnectingWebSocket', 'onerror', url, event);
 	            self.onerror(event);
 	        };
 	    }
@@ -126,14 +114,10 @@ jQuery(function($) {
 
 	    this.send = function(data) {
 	        if (ws) {
-	            if (debug) {
-	                console.debug('ReconnectingWebSocket', 'send', url, data);
-	            }
+	        	debug && console.debug('ReconnectingWebSocket', 'send', url, data);
 	            return ws.send(data);
 	        } else {
-	            if (debug) {
-	                console.debug('ReconnectingWebSocket', 'buffer', url, data);
-	            }
+	        	debug && console.debug('ReconnectingWebSocket', 'buffer', url, data);
 	            messageBuffer.push(data);
 	        }
 	    };
@@ -152,17 +136,17 @@ jQuery(function($) {
 	    };
 	}
 	
+	var debug = false; //me.data('jj-debug') === true;
 	
 	if (('WebSocket' in window) &&
 		('localStorage' in window) &&
 		('console' in window)) 
 	{
+
 		// our api goes here!
 		window.$j = {};
 		
 		var me = $('#jj-connector-script');
-		
-		var debug = me.data('jj-debug') === true;
 		me.removeAttr('data-jj-debug');
 		
 		$j.debug = function(on) {
@@ -190,7 +174,7 @@ jQuery(function($) {
 				function doHeartbeat() {
 					switch(state) {
 					case PongReceived:
-						console.debug("ping");
+						debug && console.debug("ping");
 						ws.send('jj-hi');
 						state = WaitingForPong;
 						ponged = false;
@@ -198,12 +182,12 @@ jQuery(function($) {
 						break;
 					case WaitingForPong:
 						if (ponged) {
-							console.debug("pong");
+							debug && console.debug("pong");
 							ponged = false;
 							state = PongReceived;
 							heartbeatId = setTimeout(doHeartbeat, heartbeatTimeout);
 						} else {
-							console.debug("no pong from server.  uh oh");
+							debug && console.debug("no pong from server.  uh oh");
 						}
 						break;
 					}
@@ -233,7 +217,7 @@ jQuery(function($) {
 		var ws = new WebSocket(host);
 		ws.onopen = function() {
 			
-			console.debug("WebSocket open", host);
+			debug && console.debug("WebSocket open", host);
 			
 			heartbeat();
 			$(window).trigger($.Event('socketopen'));
@@ -241,23 +225,23 @@ jQuery(function($) {
 		
 		ws.onclose = function() {
 			
-			console.debug("WebSocket closed", host);
+			debug && console.debug("WebSocket closed", host);
 			
 			heartbeat.closed();
 			$(window).trigger($.Event('socketclose'));
 		}
 		
 		ws.onerror = function(error) {
-			console.error("WebSocket errored", error);
+			debug && console.error("WebSocket errored", error);
 		}
 		ws.onmessage = function(msg) {
-			if (debug) console.debug("WebSocket onmessage", msg);
+			debug && console.debug("WebSocket onmessage", msg);
 			if (!processRaw(msg.data)) {
 				try {
 					processMessages(JSON.parse(msg.data));
 				} catch (e) {
-					console.warn('received messages that cannot be parsed');
-					console.warn(e);
+					debug && console.warn('received messages that cannot be parsed');
+					debug && console.warn(e);
 				}
 			}
 		}
@@ -276,7 +260,7 @@ jQuery(function($) {
 		var rawMessages = {
 			// shutdown message
 			'jj-bye': function() {
-				if (debug) console.debug('server said bye');
+				debug && console.debug('server said bye');
 				return true;
 			},
 			// pong for the pinger
@@ -286,7 +270,7 @@ jQuery(function($) {
 			},
 			// we are out of date and need to reload
 			'jj-reload': function() {
-				if (debug) console.debug('server said reload');
+				debug && console.debug('server said reload');
 				window.location.href = window.location.href;
 				return true;
 			}
@@ -297,7 +281,7 @@ jQuery(function($) {
 		}
 
 		function send(payload) {
-			if (debug) console.debug("WebSocket", "send", payload);
+			debug && console.debug("WebSocket", "send", payload);
 			var message = JSON.stringify(payload);
 			if (ws)
 			ws.send(message);
@@ -312,8 +296,8 @@ jQuery(function($) {
 					if (type in messageProcessors) {
 						messageProcessors[type](message[type]);
 					} else {
-						console.warn('do not understand how to process a message of type ' + type);
-						console.warn(message[type]);
+						debug && console.warn('do not understand how to process a message of type ' + type);
+						debug && console.warn(message[type]);
 					}
 				});
 			});
@@ -348,12 +332,12 @@ jQuery(function($) {
 					context: binding.context || ''
 				};
 				var eventConfig = determineEventConfig(binding);
-				if (debug) console.log("binding", eventConfig, binding);
+				debug && console.log("binding", eventConfig, binding);
 				eventConfig.context.on(eventConfig.name, binding.selector, data, eventConfig.handler);
 			},
 			'unbind': function(unbinding) {
 				var eventConfig = determineEventConfig(unbinding);
-				if (debug) console.log("unbinding", eventConfig, unbinding);
+				debug && console.log("unbinding", eventConfig, unbinding);
 				eventConfig.context.off(eventConfig.name, unbinding.selector, eventConfig.handler);
 			},
 			'get': function(get) {
@@ -394,7 +378,7 @@ jQuery(function($) {
 				if (toCall) {
 					toCall.apply(window, JSON.parse(call.args));
 				} else {
-					console.warn('asked to call a nonexistent function ' + call.name);
+					debug && console.warn('asked to call a nonexistent function ' + call.name);
 				}
 			},
 			'invoke': function(invoke) {
@@ -402,7 +386,7 @@ jQuery(function($) {
 				if (toInvoke) {
 					result(invoke.id, toInvoke.apply(window, JSON.parse(invoke.args)));
 				} else {
-					console.warn('asked to invoke a nonexistent function ' + invoke.name);
+					debug && console.warn('asked to invoke a nonexistent function ' + invoke.name);
 				}
 			}
 		}
