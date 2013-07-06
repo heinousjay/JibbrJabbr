@@ -349,7 +349,7 @@ jQuery(function($) {
 			if (handler != null) {
 				return {
 					context: context,
-					name: eventName + '.jj', // todo, work the context and selector into this name space
+					name: eventName + '.jj-events', // todo, work the context and selector into this name space
 					handler: handler
 				};
 			}
@@ -372,6 +372,9 @@ jQuery(function($) {
 				if (eventConfig) {
 					debug && console.log("unbinding", eventConfig, unbinding);
 					eventConfig.context.off(eventConfig.name, unbinding.selector, eventConfig.handler);
+					if (eventConfig.handler.clean) {
+						eventConfig.handler.clean();
+					}
 				}
 			},
 			'get': function(get) {
@@ -402,10 +405,15 @@ jQuery(function($) {
 				delete creationHoldingPen[append.child];
 			},
 			'store': function(store) {
-				localStorage[store.key] = JSON.parse(store.value);
+				localStorage[store.key] = store.value;
 			},
 			'retrieve': function(retrieve) {
-				result(retrieve.id, JSON.stringify(localStorage[retrieve.key]));
+				var value = localStorage[retrieve.key];
+				if (value) {
+					result(retrieve.id, JSON.parse(value));
+				} else {
+					result(retrieve.id);
+				}
 			},
 			'call': function(call) {
 				var toCall = window[call.name];
@@ -445,9 +453,9 @@ jQuery(function($) {
 			// only send if we have an id
 			if (id) {
 				send({
-					'result' : {
+					'result': {
 						'id': id,
-						'value' : JSON.stringify(result)
+						'value': JSON.stringify(result)
 					}
 				});
 			}
@@ -509,12 +517,16 @@ jQuery(function($) {
 					event.form = JSON.stringify(values);
 					sendEvent(event);
 				},
-				prep : function(element) {
+				prep: function(element) {
 					if (element.length == 1 && element.get(0).submit) {
-						$('input[type=submit][name],input[type=button][name],button[name]', element).click(function(){
+						var event = function() {
 							var el = $(this);
 							$(this.form).data('jj-last-clicked', el);
-						});
+						};
+						this.handler.clean = function() {
+							$(element).off('.jj-submit-handler');
+						}
+						$(element).on('click.jj-submit-handler', 'input[type=submit][name],button[type=submit][name]', event);
 						return this.handler;
 					} else {
 						return null;

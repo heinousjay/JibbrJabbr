@@ -11,10 +11,10 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 @Singleton
-class DoRetrieveFunction extends BaseFunction implements HostObject, ContributesScript {
+class DoRetrieveFunction extends BaseFunction implements HostObject {
 	private static final long serialVersionUID = 1L;
 	
-	private static final String PROP_DO_RETRIEVE = "//doRetrieve";
+	private static final String RETRIEVE = "retrieve";
 	
 	private final CurrentScriptContext context;
 	
@@ -25,7 +25,7 @@ class DoRetrieveFunction extends BaseFunction implements HostObject, Contributes
 	
 	@Override
 	public String name() {
-		return PROP_DO_RETRIEVE;
+		return RETRIEVE;
 	}
 	
 	@Override
@@ -49,12 +49,10 @@ class DoRetrieveFunction extends BaseFunction implements HostObject, Contributes
 	}
 	
 	@Override
-	public String script() {
-		return "function retrieve(key){return JSON.parse(global['" + PROP_DO_RETRIEVE + "'](key));}";
-	}
-	
-	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+		if (args.length != 1) {
+			throw new IllegalArgumentException("retrieve can only be called with a key");
+		}
 		if (context.connection() == null) {
 			throw new IllegalStateException("cannot retrieve remote info during " + context.httpRequest().state());
 		}
