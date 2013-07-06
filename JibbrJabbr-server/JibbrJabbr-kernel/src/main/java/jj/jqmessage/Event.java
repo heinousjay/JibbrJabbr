@@ -20,4 +20,7 @@ public class Event {
 	
 	@JsonProperty
 	public String target;
+	
+	@JsonProperty
+	public String form;
 }

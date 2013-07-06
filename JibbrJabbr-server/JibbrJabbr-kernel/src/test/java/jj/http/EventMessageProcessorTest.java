@@ -44,7 +44,7 @@ public class EventMessageProcessorTest {
 		
 		//given
 		given(executors.scriptRunner()).willReturn(scriptRunner);
-		EventMessageProcessor emp = new EventMessageProcessor(executors, null);
+		EventMessageProcessor emp = new EventMessageProcessor(executors, null, null);
 		JQueryMessage event = MessageMaker.makeEvent("selector", "type");
 		
 		//when

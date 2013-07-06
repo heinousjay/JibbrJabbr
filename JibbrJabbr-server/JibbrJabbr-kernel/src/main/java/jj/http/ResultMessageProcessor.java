@@ -49,7 +49,8 @@ class ResultMessageProcessor implements WebSocketMessageProcessor {
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
-		executors.scriptRunner().submitPendingResult(connection, message.result().id, json.parse(message.result().value));
+		Object value = message.result().value == null ? null : json.parse(message.result().value);
+		executors.scriptRunner().submitPendingResult(connection, message.result().id, value);
 	}
 
 }

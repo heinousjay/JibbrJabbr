@@ -1,4 +1,32 @@
 
+(function($){
+	$.fn.serializeObject = function() {
+		var arrayData = this.serializeArray(),
+			objectData = {};
+
+		$.each(arrayData, function() {
+			var value;
+
+			if (this.value != null) {
+				value = this.value;
+			} else {
+				value = '';
+			}
+
+			if (objectData[this.name] != null) {
+				if (!objectData[this.name].push) {
+					objectData[this.name] = [objectData[this.name]];
+				}
+				objectData[this.name].push(value);
+			} else {
+				objectData[this.name] = value;
+			}
+		});
+
+		return objectData;
+	};
+})(jQuery);
+
 
 jQuery(function($) {
 	
@@ -140,7 +168,7 @@ jQuery(function($) {
 	
 	if (('WebSocket' in window) &&
 		('localStorage' in window) &&
-		('console' in window)) 
+		('JSON' in window)) 
 	{
 
 		// our api goes here!
@@ -316,13 +344,15 @@ jQuery(function($) {
 			var proxy = eventProxies[eventName];
 			if (proxy) {
 				eventName = proxy.as;
-				handler = proxy.handler;
+				handler = proxy.prep(binding.selector ? $(binding.selector, context) : context);
 			}
-			return {
-				context: context,
-				name: eventName + '.jj',
-				handler: handler
-			};
+			if (handler != null) {
+				return {
+					context: context,
+					name: eventName + '.jj', // todo, work the context and selector into this name space
+					handler: handler
+				};
+			}
 		}
 		
 		var messageProcessors = {
@@ -332,13 +362,17 @@ jQuery(function($) {
 					context: binding.context || ''
 				};
 				var eventConfig = determineEventConfig(binding);
-				debug && console.log("binding", eventConfig, binding);
-				eventConfig.context.on(eventConfig.name, binding.selector, data, eventConfig.handler);
+				if (eventConfig) {
+					debug && console.log("binding", eventConfig, binding);
+					eventConfig.context.on(eventConfig.name, binding.selector, data, eventConfig.handler);
+				}
 			},
 			'unbind': function(unbinding) {
 				var eventConfig = determineEventConfig(unbinding);
-				debug && console.log("unbinding", eventConfig, unbinding);
-				eventConfig.context.off(eventConfig.name, unbinding.selector, eventConfig.handler);
+				if (eventConfig) {
+					debug && console.log("unbinding", eventConfig, unbinding);
+					eventConfig.context.off(eventConfig.name, unbinding.selector, eventConfig.handler);
+				}
 			},
 			'get': function(get) {
 				if ('name' in get) {
@@ -368,10 +402,10 @@ jQuery(function($) {
 				delete creationHoldingPen[append.child];
 			},
 			'store': function(store) {
-				localStorage[store.key] = store.value;
+				localStorage[store.key] = JSON.parse(store.value);
 			},
 			'retrieve': function(retrieve) {
-				result(retrieve.id, localStorage[retrieve.key]);
+				result(retrieve.id, JSON.stringify(localStorage[retrieve.key]));
 			},
 			'call': function(call) {
 				var toCall = window[call.name];
@@ -432,6 +466,7 @@ jQuery(function($) {
 						target: '#' + (target.attr('id') || idify(target))
 					}
 				};
+			if (event.form) toSend.event.form = event.form;
 			send(toSend);
 		}
 		
@@ -443,6 +478,46 @@ jQuery(function($) {
 					if (event.which == 13) { // incorporate jquery ui? maybe, maybe
 						event.type = 'enter';
 						sendEvent(event);
+					}
+				},
+				prep: function(element) {
+					return this.handler;
+				}
+			},
+			'submit': {
+				as: 'submit',
+				handler: function(event) {
+					event.preventDefault();
+					var form = $(this);
+					var values = form.serializeObject();
+					var clicked = form.data('jj-last-clicked');
+					if (clicked) {
+						form.removeData('jj-last-clicked');
+						var name = clicked.attr('name');
+						var val = clicked.val();
+						if (typeof name == 'string' && typeof val == 'string') {
+							if (name in values) {
+								if (!('push' in values[name])) {
+									values[name] = [values[name]];
+								}
+								values[name].push(val);
+							} else {
+								values[name] = val;
+							}
+						}
+					}
+					event.form = JSON.stringify(values);
+					sendEvent(event);
+				},
+				prep : function(element) {
+					if (element.length == 1 && element.get(0).submit) {
+						$('input[type=submit][name],input[type=button][name],button[name]', element).click(function(){
+							var el = $(this);
+							$(this.form).data('jj-last-clicked', el);
+						});
+						return this.handler;
+					} else {
+						return null;
 					}
 				}
 			}
