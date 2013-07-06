@@ -15,6 +15,8 @@
  */
 package jj.script;
 
+import java.nio.file.Paths;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -51,8 +53,9 @@ class ScriptBundleHelper {
 		this.executors = executors;
 	}
 	
-	private ScriptResource moduleScript(final String moduleIdentifier) {
-		return finder.findResource(ScriptResource.class, moduleIdentifier, ScriptResourceType.Module);
+	private ScriptResource moduleScript(final String baseName, final String moduleIdentifier) {
+		String path = Paths.get(baseName).resolveSibling(moduleIdentifier).toString();
+		return finder.findResource(ScriptResource.class, path, ScriptResourceType.Module);
 	}
 	
 	private ScriptResource clientScript(final String baseName) {
@@ -149,9 +152,9 @@ class ScriptBundleHelper {
 				(ModuleScriptBundle)scriptBundle :
 				null;
 		
-		if (candidate != null && moduleScript(moduleIdentifier) != null) {
+		if (candidate != null && moduleScript(baseName, moduleIdentifier) != null) {
 			if (isObselete(candidate)) {
-				ModuleScriptBundle newBundle = creator.createScriptBundle(moduleScript(moduleIdentifier), moduleIdentifier, baseName);
+				ModuleScriptBundle newBundle = creator.createScriptBundle(moduleScript(baseName, moduleIdentifier), moduleIdentifier, baseName);
 				
 				if (!scriptBundles.replace(key, candidate, newBundle)) {
 					throw new AssertionError("multiple threads are attempting to manipulate a single script bundle");
@@ -169,7 +172,7 @@ class ScriptBundleHelper {
 	@ScriptThread
 	private ModuleScriptBundle newScriptBundleFor(final String key, final String baseName, final String moduleIdentifier) {
 		
-		ScriptResource script = moduleScript(moduleIdentifier);
+		ScriptResource script = moduleScript(baseName, moduleIdentifier);
 		
 		ModuleScriptBundle newBundle = creator.createScriptBundle(script, moduleIdentifier, baseName);
 		

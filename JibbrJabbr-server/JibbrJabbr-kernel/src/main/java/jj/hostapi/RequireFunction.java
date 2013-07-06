@@ -142,7 +142,9 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 		return "function require(id) {" +
 					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
 					"var result = global['" + REQUIRE + "'](id); " +
-					"if ('getCause' in result) throw result; " +
+					"if (result['getClass'] && java.jj.hostapi.RequiredModuleException.isAssignableFrom(result.getClass())) { " +
+						"throw result;" + 
+					"} " +
 					"return result;" +
 				"}";
 	}

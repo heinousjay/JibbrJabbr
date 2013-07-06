@@ -57,7 +57,7 @@ public class ScriptBundleCreatorTest {
 	@Before
 	public void before() {
 		
-		baseName = "index";
+		baseName = "chat/index";
 		
 		global = Context.enter().initStandardObjects();
 		Context.exit();
@@ -80,7 +80,7 @@ public class ScriptBundleCreatorTest {
 	public void testModuleBundleCreation() {
 		
 		// given
-		final String moduleIdentifier = "messages";
+		final String moduleIdentifier = "helpers/messages";
 		
 		// doesn't really matter what our path is
 		Path path = Paths.get(JJ.uri(ScriptBundleCreatorTest.class));

@@ -15,6 +15,9 @@
  */
 package jj.script;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -61,6 +64,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	private void loadScript(final RequiredModule requiredModule) {
 		
 		final String baseName = context.baseName();
+		final String path = Paths.get(baseName).resolveSibling(requiredModule.identifier()).toString();
 		
 		executors.ioExecutor().submit(
 			executors.prepareTask(new JJRunnable("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
@@ -68,7 +72,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 				@Override
 				public void run() throws Exception {
 					ScriptResource scriptResource = 
-						finder.loadResource(ScriptResource.class, requiredModule.identifier(), ScriptResourceType.Module);
+						finder.loadResource(ScriptResource.class, path, ScriptResourceType.Module);
 					
 					// at this point do we need to check if we got scooped? inside
 					// the script thread makes more sense really, if we check here

@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
@@ -52,7 +53,9 @@ public abstract class AbstractFileResource implements Resource {
 		final Path path,
 		final boolean keepBytes
 	) throws IOException {
-		
+		if (!Files.isRegularFile(path)) {
+			throw new NoSuchFileException(path.toString());
+		}
 		size = Files.size(path);
 		boolean large = size > MAX_IN_MEMORY_SIZE;
 		
