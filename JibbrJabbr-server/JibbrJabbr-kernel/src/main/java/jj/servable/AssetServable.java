@@ -12,7 +12,6 @@ import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 
-import io.netty.handler.codec.http.HttpHeaders;
 
 @Singleton
 class AssetServable extends Servable {
@@ -48,27 +47,7 @@ class AssetServable extends Servable {
 				URIMatch match = new URIMatch(request.uri());
 				AssetResource asset = resourceFinder.findResource(AssetResource.class, match.baseName);
 				
-				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
-					asset.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
-					
-					response.sendNotModified(asset, match.versioned);
-
-				} else if (match.versioned) {
-					
-					response.sendCachedResource(asset);
-					
-				} else if (match.sha == null) {
-					
-					response.sendUncachedResource(asset);
-					
-				} else if (!match.sha.equals(asset.sha1())) {
-				
-					response.sendTemporaryRedirect(asset);
-					
-				} else {
-					
-					response.sendCachedResource(asset);
-				}
+				doStandardResponse(request, response, match, asset);
 			}
 		};
 	}

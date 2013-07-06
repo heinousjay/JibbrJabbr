@@ -10,6 +10,8 @@ import jj.configuration.Configuration;
 import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
+import jj.resource.Resource;
+import jj.uri.URIMatch;
 
 import io.netty.handler.codec.http.HttpHeaders;
 
@@ -53,5 +55,41 @@ public abstract class Servable {
 		final JJHttpRequest request,
 		final JJHttpResponse response
 	) throws IOException;
+
+	/**
+	 * Produces a standard response for a resource, handling caching, validation, and
+	 * efficient transfer of the bytes, and erroring out on error
+	 * @param request
+	 * @param response
+	 * @param match
+	 * @param resource
+	 */
+	protected void doStandardResponse(final JJHttpRequest request, final JJHttpResponse response, URIMatch match, Resource resource) {
+		try {
+			if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
+				resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
+				
+				response.sendNotModified(resource, match.versioned);
+	
+			} else if (match.versioned) {
+				
+				response.sendCachedResource(resource);
+				
+			} else if (match.sha == null) {
+				
+				response.sendUncachedResource(resource);
+				
+			} else if (!match.sha.equals(resource.sha1())) {
+			
+				response.sendTemporaryRedirect(resource);
+				
+			} else {
+				
+				response.sendCachedResource(resource);
+			}
+		} catch (Exception e) {
+			response.error(e);
+		}
+	}
 
 }

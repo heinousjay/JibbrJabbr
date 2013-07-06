@@ -34,8 +34,8 @@ public class MockJJExecutorsTest {
 		e.addThreadTypes(ScriptThread, 2);
 		e.addThreadTypes(IOThread, 2);
 		
-		assertThat(e.isScriptThread(), is(true));
-		assertThat(e.isScriptThread(), is(true));
+		assertThat(e.isScriptThreadFor(""), is(true));
+		assertThat(e.isScriptThreadFor(""), is(true));
 		
 		boolean worked = true;
 		try {
@@ -55,8 +55,8 @@ public class MockJJExecutorsTest {
 
 		assertThat(e.isIOThread(), is(false));
 		assertThat(e.isIOThread(), is(false));
-		assertThat(e.isScriptThread(), is(false));
-		assertThat(e.isScriptThread(), is(false));
+		assertThat(e.isScriptThreadFor(""), is(false));
+		assertThat(e.isScriptThreadFor(""), is(false));
 		
 		e.assertThreadTypesEmpty();
 		

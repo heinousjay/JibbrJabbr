@@ -37,6 +37,21 @@ public class URIMatchTest {
 		
 		match = new URIMatch("/jquery-2.0.2.js");
 		assertThat(match.versioned, is(true));
+		
+		match = new URIMatch("/jquery-2.0.2.alpha.min.js");
+		assertThat(match.versioned, is(true));
+		
+		match = new URIMatch("/jquery-2.0.2-pre.js");
+		assertThat(match.versioned, is(true));
+		
+		match = new URIMatch("/fancybox-2.1.5/fancybox.pack.js");
+		assertThat(match.versioned, is(true));
+		
+		match = new URIMatch("/fancybox-2.1.5.min/fancybox.pack.js");
+		assertThat(match.versioned, is(false));
+		
+		match = new URIMatch("/fancybox/fancybox-2.1.5.pack.js");
+		assertThat(match.versioned, is(true));
 	}
 
 	@Test

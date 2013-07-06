@@ -48,7 +48,7 @@ public class JJHttpRequest implements DataStore {
 	
 	private static final String HEADER_X_HOST = "x-host";
 	
-	private static final String HEADER_X_SECURE = "x-secure";
+	private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
 	
 	protected final String id = sequence.next();
 	
@@ -128,7 +128,7 @@ public class JJHttpRequest implements DataStore {
 	}
 	
 	public boolean secure() {
-		return "true".equals(header(HEADER_X_SECURE));
+		return "https".equals(header(HEADER_X_FORWARDED_PROTO));
 	}
 	
 	public URI absoluteUri() {

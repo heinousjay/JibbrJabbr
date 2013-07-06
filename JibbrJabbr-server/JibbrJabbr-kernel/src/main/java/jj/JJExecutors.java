@@ -15,7 +15,7 @@ public interface JJExecutors {
 
 	ScheduledExecutorService scriptExecutorFor(String baseName);
 
-	boolean isScriptThread();
+	boolean isScriptThreadFor(String baseName);
 
 	boolean isIOThread();
 

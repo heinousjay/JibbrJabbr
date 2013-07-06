@@ -16,6 +16,7 @@ import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
+import jj.uri.URIMatch;
 import jj.http.JJHttpRequest;
 import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
@@ -25,7 +26,8 @@ class DocumentServable extends Servable {
 	
 	public static final String SLASH = "/";
 	public static final String DOT = ".";
-	public static final String DOT_HTML = DOT + "html";
+	public static final String HTML = "html";
+	public static final String DOT_HTML = DOT + HTML;
 	public static final String INDEX = "index" + DOT_HTML;
 	
 	private final ResourceFinder resourceFinder;
@@ -53,8 +55,10 @@ class DocumentServable extends Servable {
 	}
 	
 	private Path toPath(final JJHttpRequest request) {
-		String uri = request.uri().substring(1);
+		URIMatch match = new URIMatch(request.uri());
 		Path result = null;
+		String uri = request.uri().substring(1);
+		
 		if (uri.endsWith(DOT_HTML)) {
 			result = basePath.resolve(uri).normalize();
 		} else if (uri.endsWith(SLASH)) {
@@ -99,7 +103,7 @@ class DocumentServable extends Servable {
 		DocumentRequestProcessorImpl result = null;
 		Path path = toPath(request);
 		
-		if (path != null) {
+		if (path != null && isServablePath(path)) {
 			
 			String baseName = toBaseName(path);
 			

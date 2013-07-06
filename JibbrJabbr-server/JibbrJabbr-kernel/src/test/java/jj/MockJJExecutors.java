@@ -121,7 +121,7 @@ public class MockJJExecutors implements JJExecutors {
 	public boolean isScriptThread = false;
 	
 	@Override
-	public boolean isScriptThread() {
+	public boolean isScriptThreadFor(String baseName) {
 		return isScriptThread || (!threadTypeDeque.isEmpty() && threadTypeDeque.removeFirst() == ScriptThread);
 	}
 	

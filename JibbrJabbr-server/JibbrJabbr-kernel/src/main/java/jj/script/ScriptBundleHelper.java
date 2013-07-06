@@ -18,6 +18,7 @@ package jj.script;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.JJExecutors;
 import jj.ScriptThread;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
@@ -35,16 +36,19 @@ class ScriptBundleHelper {
 	private final ResourceFinder finder;
 	private final ScriptBundles scriptBundles;
 	private final ScriptBundleCreator creator;
+	private final JJExecutors executors;
 	
 	@Inject
 	ScriptBundleHelper(
 		final ResourceFinder finder,
 		final ScriptBundles scriptBundles,
-		final ScriptBundleCreator creator
+		final ScriptBundleCreator creator,
+		final JJExecutors executors
 	) {
 		this.finder = finder;
 		this.scriptBundles = scriptBundles;
 		this.creator = creator;
+		this.executors = executors;
 	}
 	
 	private ScriptResource moduleScript(final String moduleIdentifier) {
@@ -86,6 +90,8 @@ class ScriptBundleHelper {
 	 */
 	@ScriptThread
 	public AssociatedScriptBundle scriptBundleFor(final String baseName) {
+		
+		assert (executors.isScriptThreadFor(baseName)) : "";
 		
 		ScriptBundle scriptBundle = scriptBundles.get(baseName);
 		AssociatedScriptBundle candidate = 

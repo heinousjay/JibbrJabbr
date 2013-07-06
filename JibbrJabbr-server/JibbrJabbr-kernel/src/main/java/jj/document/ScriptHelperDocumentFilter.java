@@ -72,7 +72,12 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			addScript(documentRequest.document(), "/" + resourceFinder.findResource(AssetResource.class, JQUERY_JS).baseName());
 			
 			// jj script
-			String wsURI = "ws://" + documentRequest.httpRequest().host() + "/" + scriptBundle.toSocketUri();
+			String wsURI = "ws" + 
+				(documentRequest.httpRequest().secure() ? "s" : "") + 
+				"://" + 
+				documentRequest.httpRequest().host() + 
+				"/" + 
+				scriptBundle.toSocketUri();
 			
 			Element jjScript = 
 				makeScriptTag(documentRequest.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())

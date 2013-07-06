@@ -1,7 +1,5 @@
 package jj.servable;
 
-import io.netty.handler.codec.http.HttpHeaders;
-
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -61,24 +59,8 @@ class CssServable extends Servable {
 		return new RequestProcessor() {
 			
 			@Override
-			public void process() {
-				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
-					css.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
-					
-					response.sendNotModified(css);
-
-				} else if (match.sha == null) {
-					
-					response.sendUncachedResource(css);
-					
-				} else if (!match.sha.equals(css.sha1())) {
-				
-					response.sendTemporaryRedirect(css);
-					
-				} else {
-					
-					response.sendCachedResource(css);
-				}
+			public void process() throws IOException {
+				doStandardResponse(request, response, match, css);
 			}
 		};
 	}

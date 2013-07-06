@@ -258,45 +258,6 @@ public class JJHttpResponse {
 			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
 			.end();
 	}
-	
-	/**
-	 * Responds with the given resource metadata and bytes as a 200 OK, allowing the
-	 * result to be cached for one year 
-	 * @param resource
-	 * @return
-	 */
-	public JJHttpResponse sendCachedResource(final LoadedResource resource) {
-		assertNotCommitted();
-		return status(HttpResponseStatus.OK)
-			.header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
-			.header(HttpHeaders.Names.ETAG, resource.sha1())
-			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
-			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
-			.content(resource.bytes())
-			.end();
-	}
-	
-	/**
-	 * Responds with the given resource and bytes as a 200 OK, not setting any
-	 * validation headers and turning caching off if no cache control headers have
-	 * previously been set on the response.  this is the appropriate responding
-	 * method for dynamically generated responses (not including simple statically
-	 * compiled dynamic resources, like less->css)
-	 * 
-	 * @param resource
-	 * @param bytes
-	 * @return
-	 */
-	public JJHttpResponse sendUncachedResource(final LoadedResource resource) {
-		assertNotCommitted();
-		return status(HttpResponseStatus.OK)
-			.headerIfNotSet(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE)
-			.header(HttpHeaders.Names.ETAG, resource.sha1())
-			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
-			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
-			.content(resource.bytes())
-			.end();
-	}
 
 	/**
 	 * @param e
@@ -325,16 +286,47 @@ public class JJHttpResponse {
 		return response.content().toString(charset);
 	}
 	
-	public JJHttpResponse sendUncachedResource(TransferableResource resource) throws IOException {
+	public JJHttpResponse sendUncachedResource(Resource resource) throws IOException {
 		assertNotCommitted();
-		return header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE)
-			.sendTransferableResource(resource);
+		header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE);
+		if (resource instanceof TransferableResource) {
+			return sendResource((TransferableResource)resource);
+		} else if (resource instanceof LoadedResource) {
+			return sendResource((LoadedResource)resource);
+		}
+		
+		throw new AssertionError("trying to send a resource I don't understand");
 	}
 	
-	public JJHttpResponse sendCachedResource(TransferableResource resource) throws IOException {
+	public JJHttpResponse sendCachedResource(Resource resource) throws IOException {
 		assertNotCommitted();
-		return header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR)
-			.sendTransferableResource(resource);
+		header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
+		if (resource instanceof TransferableResource) {
+			return sendResource((TransferableResource)resource);
+		} else if (resource instanceof LoadedResource) {
+			return sendResource((LoadedResource)resource);
+		}
+		
+		throw new AssertionError("trying to send a resource I don't understand");
+	}
+	
+	/**
+	 * Responds with the given resource and bytes as a 200 OK, not setting any
+	 * validation headers and turning caching off if no cache control headers have
+	 * previously been set on the response.  this is the appropriate responding
+	 * method for dynamically generated responses (not including simple statically
+	 * compiled dynamic resources, like less->css)
+	 * 
+	 * @param resource
+	 * @param bytes
+	 * @return
+	 */
+	private JJHttpResponse sendResource(final LoadedResource resource) {
+		return header(HttpHeaders.Names.ETAG, resource.sha1())
+			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
+			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+			.content(resource.bytes())
+			.end();
 	}
 
 	/**
@@ -344,7 +336,7 @@ public class JJHttpResponse {
 	 * @param resource
 	 * @return
 	 */
-	private JJHttpResponse sendTransferableResource(TransferableResource resource) throws IOException {
+	private JJHttpResponse sendResource(TransferableResource resource) throws IOException {
 		header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size())
 			.header(HttpHeaders.Names.DATE, new Date());

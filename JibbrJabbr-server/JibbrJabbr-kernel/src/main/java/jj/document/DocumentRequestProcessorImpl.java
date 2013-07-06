@@ -85,7 +85,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	 */
 	@ScriptThread
 	public void respond() {
-		assert executors.isScriptThread() : "must be called in a script thread";
+		assert executors.isScriptThreadFor(baseName()) : "must be called in a script thread for " + baseName();
 		
 		executeFilters(makeFilterList(filters, false));
 		

@@ -62,8 +62,9 @@ class JJExecutorsImpl implements JJExecutors {
 		return scriptExecutorFactory.executorFor(baseName);
 	}
 	
-	public boolean isScriptThread() {
-		return scriptExecutorFactory.isScriptThread();
+	@Override
+	public boolean isScriptThreadFor(String baseName) {
+		return scriptExecutorFactory.isScriptThreadFor(baseName);
 	}
 
 	public boolean isIOThread() {

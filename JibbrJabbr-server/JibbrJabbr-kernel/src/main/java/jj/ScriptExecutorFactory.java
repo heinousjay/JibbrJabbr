@@ -83,7 +83,8 @@ public class ScriptExecutorFactory implements JJServerListener {
 		return executor;
 	}
 	
-	public boolean isScriptThread() {
+	public boolean isScriptThreadFor(String baseName) {
+		// TODO if this gets smart about handing out scripts take this into account
 		return flag.get() != null;
 	}
 
@@ -95,6 +96,13 @@ public class ScriptExecutorFactory implements JJServerListener {
 	@Override
 	public void stop() {
 		executor.shutdownNow();
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isScriptThread() {
+		return flag.get() != null;
 	}
 
 }

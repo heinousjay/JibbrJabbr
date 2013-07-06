@@ -15,8 +15,6 @@
  */
 package jj.servable;
 
-import io.netty.handler.codec.http.HttpHeaders;
-
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -65,40 +63,14 @@ public class StaticServable extends Servable {
 		final JJHttpResponse response
 	) throws IOException {
 		final URIMatch match = new URIMatch(request.uri());
-		final StaticResource sr = resourceFinder.loadResource(StaticResource.class, match.baseName);
-		if (sr != null && isServablePath(sr.path())) {
+		final StaticResource resource = resourceFinder.loadResource(StaticResource.class, match.baseName);
+		if (resource != null && isServablePath(resource.path())) {
 			return new RequestProcessor() {
 				
 				@Override
 				public void process() {
 
-					try {
-						
-						if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
-							sr.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
-							
-							response.sendNotModified(sr);
-							
-						} else if (match.versioned) {
-							
-							response.sendCachedResource(sr);
-	
-						} else if (match.sha == null) {
-							
-							response.sendUncachedResource(sr);
-							
-						} else if (!match.sha.equals(sr.sha1())) {
-						
-							response.sendTemporaryRedirect(sr);
-							
-						} else {
-							
-							response.sendCachedResource(sr);
-						}
-						
-					} catch (Throwable e) {
-						response.error(e);
-					}
+					doStandardResponse(request, response, match, resource);
 				}
 			};
 		}

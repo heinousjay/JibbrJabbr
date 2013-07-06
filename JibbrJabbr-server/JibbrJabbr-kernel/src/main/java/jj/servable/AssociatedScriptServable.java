@@ -19,7 +19,9 @@ import jj.http.JJHttpResponse;
 import jj.http.RequestProcessor;
 
 /**
- * handles automatic inclusion
+ * handles serving the scripts associated with a document
+ * request.  A special SHA key is generated to version a
+ * particular group of scripts according to a bundle.
  * @author jason
  *
  */
@@ -58,7 +60,6 @@ class AssociatedScriptServable extends Servable {
 			if (scriptBundle != null) {
 				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
 			}
-		
 		}
 		
 		return result;
@@ -78,13 +79,13 @@ class AssociatedScriptServable extends Servable {
 		return new RequestProcessor() {
 			
 			@Override
-			public void process() {
+			public void process() throws IOException {
 				final ScriptResource script = resourceFromUri(request.uri());
 				
 				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
 					script.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 					
-					response.sendNotModified(script);
+					response.sendNotModified(script, true);
 					
 				} else {
 				
