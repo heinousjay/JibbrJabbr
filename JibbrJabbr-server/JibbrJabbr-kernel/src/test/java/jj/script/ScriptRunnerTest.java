@@ -284,6 +284,20 @@ public class ScriptRunnerTest {
 		verify(continuationCoordinator).execute(associatedScriptBundle, eventFunction);
 		verify(connection).getFunction(eventName);
 		verify(associatedScriptBundle).getFunction(eventName);
+
+		//given
+		eventName = EventNameHelper.makeEventName("jason", "miller", "rocks");
+		given(associatedScriptBundle.getFunction(eventName)).willReturn(null);
+		given(connection.getFunction(eventName)).willReturn(eventFunction);
+		
+		// when
+		scriptRunner.submit(connection, eventName);
+		executor.runUntilIdle();
+		
+		// then
+		verify(continuationCoordinator, times(2)).execute(associatedScriptBundle, eventFunction);
+		verify(connection).getFunction(eventName);
+		verify(associatedScriptBundle, never()).getFunction(eventName);
 		
 	}
 	
