@@ -92,14 +92,11 @@ class ContinuationCoordinator {
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(AssociatedScriptBundle scriptBundle, String functionName, Object...args) {
+	ContinuationState execute(AssociatedScriptBundle scriptBundle, Callable function, Object...args) {
 		
 		assert (scriptBundle != null) : "cannot execute without a script bundle";
-		
-		Callable function = scriptBundle.getFunction(functionName);
 		if (function != null) {
 			
-			log.trace("executing function {} in {}", functionName, scriptBundle);
 			
 			try {
 				rhinoObjectCreator.context().callFunctionWithContinuations(function, scriptBundle.scope(), args);
@@ -113,7 +110,7 @@ class ContinuationCoordinator {
 				Context.exit();
 			}	
 		} else {
-			log.warn("ignoring attempt to execute nonexistent function {} from {}", functionName, scriptBundle);
+			log.warn("ignoring attempt to execute nonexistent function in context of {}", scriptBundle);
 		}
 		
 		return null;

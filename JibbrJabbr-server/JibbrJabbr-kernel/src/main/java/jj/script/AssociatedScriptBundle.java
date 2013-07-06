@@ -108,6 +108,10 @@ public class AssociatedScriptBundle implements ScriptBundle {
 		functions.put(name, function);
 	}
 	
+	public boolean removeFunction(String name) {
+		return functions.remove(name) != null;
+	}
+	
 	public boolean removeFunction(String name, Callable function) {
 		return (functions.get(name) == function) && (functions.remove(name) == function);
 	}

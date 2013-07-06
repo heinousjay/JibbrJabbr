@@ -72,8 +72,21 @@ public class EventSelection implements Selection {
 	public Selection on(String type, String selector, Callable function) {
 		verifyContext("bind an event");
 		context.connection().send(JQueryMessage.makeBind(this.selector, selector, type));
-		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
+		context.connection().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
+	}
+	
+	public Selection off(String type) {
+		return off(type, "");
+	}
+	
+	public Selection off(String type, String selector) {
+		verifyContext("unbind an event");
+		if (context.connection().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type))) {
+			context.connection().send(JQueryMessage.makeUnbind(this.selector, selector, type));
+		}
+		return this;
+		
 	}
 	
 	public Selection off(String type, Callable function) {
@@ -82,7 +95,7 @@ public class EventSelection implements Selection {
 	
 	public Selection off(String type, String selector, Callable function) {
 		verifyContext("unbind an event");
-		if (context.associatedScriptBundle().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type), function)) {
+		if (context.connection().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type), function)) {
 			context.connection().send(JQueryMessage.makeUnbind(this.selector, selector, type));
 		}
 		return this;

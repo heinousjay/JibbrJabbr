@@ -127,7 +127,7 @@ public class ScriptRunner {
 		
 		context.httpRequest().startingReadyFunction();
 		final ContinuationState continuationState = 
-				continuationCoordinator.execute(scriptBundle, READY_FUNCTION_KEY);
+				continuationCoordinator.execute(scriptBundle, scriptBundle.getFunction(READY_FUNCTION_KEY));
 		
 		if (continuationState == null) {
 			log.trace("ready function execution - completed, serving document");
@@ -314,9 +314,12 @@ public class ScriptRunner {
 			public void run() throws Exception {
 				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
+				AssociatedScriptBundle bundle = connection.associatedScriptBundle();
+				Callable function = connection.getFunction(event);
+				if (function == null) function = bundle.getFunction(event);
 				try {
 					processContinuationState(
-						continuationCoordinator.execute(connection.associatedScriptBundle(), event, args)
+						continuationCoordinator.execute(bundle, function, args)
 					);
 				} finally {
 					context.end();

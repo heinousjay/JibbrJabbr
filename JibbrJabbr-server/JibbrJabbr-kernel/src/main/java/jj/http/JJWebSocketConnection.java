@@ -4,16 +4,16 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.internal.PlatformDependent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import org.mozilla.javascript.Callable;
 
 import jj.DataStore;
 import jj.DateFormatHelper;
@@ -26,13 +26,15 @@ public class JJWebSocketConnection implements DataStore {
 	
 	private static final String CLIENT_STORAGE = "JJWebSocketConnection client storage";
 	
+	private final HashMap<String, Callable> functions = new HashMap<>();
+	
 	private final ExecutionTrace trace;
 	
 	private final Channel channel;
 	
 	private final AssociatedScriptBundle scriptBundle;
 	
-	private final ConcurrentMap<String, Object> data = PlatformDependent.<String, Object>newConcurrentHashMap();
+	private final HashMap<String, Object> data = new HashMap<>();
 	
 	// room for four messages initially should be good
 	private final List<JQueryMessage> messages = new ArrayList<>(4);
@@ -77,6 +79,22 @@ public class JJWebSocketConnection implements DataStore {
 	@Override
 	public boolean containsData(String name) {
 		return data.containsKey(name);
+	}
+	
+	public Callable getFunction(String name) {
+		return functions.get(name);
+	}
+
+	public void addFunction(String name, Callable function) {
+		functions.put(name, function);
+	}
+	
+	public boolean removeFunction(String name) {
+		return functions.remove(name) != null;
+	}
+	
+	public boolean removeFunction(String name, Callable function) {
+		return (functions.get(name) == function) && (functions.remove(name) == function);
 	}
 	
 	void markActivity() {
