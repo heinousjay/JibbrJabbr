@@ -55,7 +55,7 @@
 			<dependency>
 				<artifactId>netty-all</artifactId>
 				<groupId>io.netty</groupId>
-				<version>4.0.0.CR6</version>
+				<version>4.0.0.CR9</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mozilla</groupId>
