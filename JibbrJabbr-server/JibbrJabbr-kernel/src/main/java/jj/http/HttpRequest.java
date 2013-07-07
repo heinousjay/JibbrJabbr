@@ -130,14 +130,4 @@ public interface HttpRequest extends DataStore {
 	 */
 	HttpRequest header(String name, String value);
 
-	/**
-	 * @param string
-	 */
-	HttpRequest method(HttpMethod method);
-
-	/**
-	 * @param uri
-	 */
-	HttpRequest uri(String uri);
-
 }

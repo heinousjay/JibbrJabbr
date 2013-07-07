@@ -163,14 +163,4 @@ public class MockHttpRequest implements HttpRequest {
 		return this;
 	}
 
-	@Override
-	public HttpRequest method(HttpMethod method) {
-		return this;
-	}
-
-	@Override
-	public HttpRequest uri(String uri) {
-		return this;
-	}
-
 }
