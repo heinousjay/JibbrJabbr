@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
+package jj.http;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mockito.Mockito.mock;
-
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,13 +28,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import jj.ExecutionTrace;
-import jj.logging.AccessLogger;
 import jj.logging.TestRunnerLogger;
 import jj.resource.MimeTypes;
-import jj.http.JJHttpResponse;
+import jj.resource.Resource;
+import jj.resource.TransferableResource;
+import jj.http.HttpResponse;
 
-import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -43,7 +45,7 @@ import org.slf4j.Logger;
  * @author jason
  *
  */
-class TestHttpResponse extends JJHttpResponse {
+public class TestHttpResponse extends AbstractHttpResponse {
 	
 	private final CountDownLatch latch = new CountDownLatch(1);
 	
@@ -59,12 +61,9 @@ class TestHttpResponse extends JJHttpResponse {
 	
 	@Inject
 	TestHttpResponse(
-		final TestHttpRequest request,
 		final ExecutionTrace trace,
-		final @TestRunnerLogger Logger testRunnerLogger,
-		final @AccessLogger Logger accessLogger
+		final @TestRunnerLogger Logger testRunnerLogger
 	) {
-		super(request, mock(Channel.class), accessLogger);
 		this.trace = trace;
 		this.testRunnerLogger = testRunnerLogger;
 	}
@@ -73,20 +72,46 @@ class TestHttpResponse extends JJHttpResponse {
 		this.id = id;
 	}
 	
-	int id() {
+	public int id() {
 		return id;
 	}
 	
+	@Override
+	protected String makeAbsoluteURL(Resource resource) {
+		return "http://localhost/" + resource.uri();
+	}
+	
+	private volatile boolean ended = false;
+	
 	public TestHttpResponse end() {
+		markCommitted();
 		testRunnerLogger.info("end called on {}", this);
 		processResponse();
+		ended = true;
 		return this;
 	}
 
+	/**
+	 * @return
+	 */
+	public boolean ended() {
+		return ended;
+	}
+	
+	private volatile Throwable error = null;
+
 	public TestHttpResponse error(Throwable t) {
-		testRunnerLogger.info("error called on {}", this);
-		processResponse();
+		testRunnerLogger.error("request errored", t);
+		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+		error = t;
 		return this;
+	}
+
+	/**
+	 * @return
+	 */
+	public Throwable error() {
+		return error;
 	}
 	
 	public boolean isDone() {
@@ -107,7 +132,7 @@ class TestHttpResponse extends JJHttpResponse {
 			}
 		}
 		
-		trace.end(request);
+		trace.end(request, this);
 		latch.countDown();
 	}
 
@@ -137,35 +162,27 @@ class TestHttpResponse extends JJHttpResponse {
 			.append("[").append(id()).append("] {")
 			.append("charset=").append(charset())
 			.append(", status=").append(status())
-			.append(", headers=").append(response.headers())
+			//.append(", headers=").append(response.headers())
 			.append(", error=").append(error())
 			.append(", ended=").append(ended())
-			.append(", contents size=").append(response.content().readableBytes())
+			//.append(", contents size=").append(response.content().readableBytes())
 			.append("}")
 			.toString();
 	}
 
-	/**
-	 * @return
-	 */
-	public boolean ended() {
-		// TODO Auto-generated method stub
-		return false;
+	@Override
+	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
+		try (FileChannel channel = resource.randomAccessFile().getChannel()) {
+			ByteBuffer buffer = ByteBuffer.allocate((int)channel.size());
+			while (buffer.position() < buffer.capacity()) {
+				channel.read(buffer);
+			}
+			content(buffer.array());
+		}
+		return end();
 	}
-
-	/**
-	 * @return
-	 */
-	public Throwable error() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * @return
-	 */
-	public Charset charset() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public HttpHeaders headers() {
+		return response.headers();
 	}
 }

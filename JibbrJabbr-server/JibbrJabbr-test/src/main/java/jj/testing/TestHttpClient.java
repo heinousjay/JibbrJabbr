@@ -15,6 +15,7 @@
  */
 package jj.testing;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.Map;
@@ -41,4 +42,15 @@ public interface TestHttpClient {
 	Document document(long timeout, TimeUnit unit) throws Exception;
 	
 	void dumpObjects();
+	/**
+	 * @return
+	 */
+	String uri();
+	
+	/**
+	 * @param headers
+	 * @return
+	 * @throws Exception 
+	 */
+	boolean matchesHeaders(HttpHeaders headers) throws Exception;
 }

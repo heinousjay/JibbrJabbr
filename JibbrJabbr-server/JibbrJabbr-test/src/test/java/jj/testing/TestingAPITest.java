@@ -18,8 +18,12 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -29,6 +33,7 @@ import java.util.concurrent.Future;
 
 import jj.JJ;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,7 +43,20 @@ import org.junit.Test;
  */
 public class TestingAPITest {
 	
-	static final String TITLE = "TITLE GOES HERE";
+	/**
+	 * 
+	 */
+	private static final String TITLE = "title";
+	/**
+	 * 
+	 */
+	private static final String INDEX = "/index";
+	/**
+	 * 
+	 */
+	private static final String ANIMAL = "/animal";
+	static final String INDEX_TITLE = "TITLE GOES HERE";
+	static final String ANIMAL_TITLE = "ANIMAL!";
 	
 	static final String basePath;
 	
@@ -50,24 +68,77 @@ public class TestingAPITest {
 	@Rule
 	public JJAppTest app = new JJAppTest(basePath);
 	
+	private String loadText(int number) throws Exception {
+		return new String(Files.readAllBytes(Paths.get(basePath, (number % 10) + ".txt")), StandardCharsets.UTF_8);
+	}
+	
+	@Ignore @Test
+	public void runStaticTest() throws Exception {
+		TestHttpClient[] clients = new TestHttpClient[100];
+		HttpHeaders headers = new DefaultHttpHeaders();
+		for (int i = 0; i < clients.length; ++i) {
+			clients[i] = app.get("/" + (i % 10) + ".txt");
+		}
+		
+		for (int i = 0; i < clients.length; ++i) {
+			assertThat(clients[i].contentsString(), is(loadText(i)));
+			clients[i].matchesHeaders(headers);
+		}
+	}
+	
 	@Test
 	public void runBasicTest() throws Exception {
 		
-		TestHttpClient index = app.get("/index");
-		index.dumpObjects();
+		TestHttpClient index = app.get(INDEX);
+		TestHttpClient animal = app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL);
+		app.get(INDEX);
+		app.get(ANIMAL).contentsString();
+		
+		//index.dumpObjects();
 		assertThat(index.status(), is(HttpResponseStatus.OK));
-		index.dumpObjects();
+		//index.dumpObjects();
 		assertThat(index.contentsString(), is(notNullValue()));
 		
-		assertThat(index.document().select("title").text(), is(TITLE));
+		assertThat(index.document().select(TITLE).text(), is(INDEX_TITLE));
+		//animal.dumpObjects();
+		assertThat(animal.status(), is(HttpResponseStatus.OK));
+		//animal.dumpObjects();
+		assertThat(animal.contentsString(), is(notNullValue()));
 		
-		TestHttpClient files = app.get("/animal");
-		files.dumpObjects();
-		assertThat(files.status(), is(HttpResponseStatus.OK));
-		files.dumpObjects();
-		assertThat(files.contentsString(), is(notNullValue()));
+		assertThat(animal.document().select(TITLE).text(), is(ANIMAL_TITLE));
 		
-		assertThat(files.document().select("title").text(), is("ANIMAL!"));
+		index = app.get(INDEX);
+		animal = app.get(ANIMAL);
+		//index.dumpObjects();
+		assertThat(index.status(), is(HttpResponseStatus.OK));
+		//index.dumpObjects();
+		assertThat(index.contentsString(), is(notNullValue()));
+		
+		assertThat(index.document().select(TITLE).text(), is(INDEX_TITLE));
+		//animal.dumpObjects();
+		assertThat(animal.status(), is(HttpResponseStatus.OK));
+		//animal.dumpObjects();
+		assertThat(animal.contentsString(), is(notNullValue()));
+		
+		assertThat(animal.document().select(TITLE).text(), is(ANIMAL_TITLE));
 	}
 	
 	@Test
@@ -80,38 +151,51 @@ public class TestingAPITest {
 		TestHttpClient[] clients = new TestHttpClient[number * 2];
 		int count = 0;
 		for (int i = 0; i < number; ++i) {
-			clients[count++] = app.get("/index");
-			clients[count++] = app.get("/index");
+			clients[count++] = app.get(INDEX);
+			clients[count++] = app.get(ANIMAL);
 		}
 		
 		count = 0;
 		for (int i = 0; i < number; ++i) {
-			assertThat(clients[count].status(), is(HttpResponseStatus.OK));
-			assertThat(clients[count].contentsString(), is(notNullValue()));
-			assertThat(clients[count++].document().select("title").text(), is(TITLE));
+			String display = String.valueOf(count) + ": " + clients[count].uri();
+			try {
+				assertThat(display, clients[count].status(), is(HttpResponseStatus.OK));
+				assertThat(display, clients[count].contentsString(), is(notNullValue()));
+				assertThat(display, clients[count++].document().select(TITLE).text(), is(INDEX_TITLE));
+			} catch (Exception e) {
+				System.err.println(display);
+				throw e;
+			}
 			
-			assertThat(clients[count].status(), is(HttpResponseStatus.OK));
-			assertThat(clients[count].contentsString(), is(notNullValue()));
-			assertThat(clients[count++].document().select("title").text(), is(TITLE));
+			display = String.valueOf(count) + ": " + clients[count].uri();
+			try {
+				assertThat(display, clients[count].status(), is(HttpResponseStatus.OK));
+				assertThat(display, clients[count].contentsString(), is(notNullValue()));
+				assertThat(display, clients[count++].document().select(TITLE).text(), is(ANIMAL_TITLE));
+			} catch (Exception e) {
+				System.err.println(display);
+				throw e;
+			}
 		}
 		
 		return true;
 	}
 	
-	//@Test
+	@Ignore @Test
 	public void areYouKiddingMe() throws Throwable {
 		final long startingTotalMemory = Runtime.getRuntime().totalMemory();
 		final long startingMaxMemory = Runtime.getRuntime().maxMemory();
 		final long startingFreeMemory = Runtime.getRuntime().freeMemory();
-		final int totalClients = 4800;
-		final int totalThreads = 12;
+		final int totalClients = 4800; // total number of clients made.  this * totalThreads is how many
+		// requests total will be made
+		final int totalThreads = 12; // must always be even, represents the total number of in-flight requests
 		final ExecutorService e = Executors.newFixedThreadPool(totalThreads);
 		final long start = System.currentTimeMillis();
 		
 		final Callable<Boolean> c = new Callable<Boolean>() {
 			
 			public Boolean call() throws Exception {
-				return getLotsOfClients(6);
+				return getLotsOfClients(totalThreads / 2);
 			};
 		};
 		
@@ -135,14 +219,14 @@ public class TestingAPITest {
 		if (!success) throw new AssertionError("NOT SUCCESS, somehow");
 		
 		
-		System.out.println("loaded " + (totalClients * 12) + " pages in " + (System.currentTimeMillis() - start) + " milliseconds.");
+		System.out.println("loaded " + (totalClients * totalThreads) + " pages in " + (System.currentTimeMillis() - start) + " milliseconds.");
 		System.out.println("free\t" + startingFreeMemory + "\ttotal\t" + startingTotalMemory + "\tmax\t" + startingMaxMemory + " at start");
 		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory() + " at finish");
 		Runtime.getRuntime().gc();
 		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory() + " after GC");
 	}
 	
-	//@Test
+	@Ignore @Test
 	public void areYouKiddingMePart2() throws Throwable {
 		areYouKiddingMe();
 		System.out.println();

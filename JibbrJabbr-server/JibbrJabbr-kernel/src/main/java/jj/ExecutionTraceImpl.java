@@ -119,8 +119,10 @@ class ExecutionTraceImpl implements ExecutionTrace {
 		current.set(null);
 		
 		State state = currentTracker.get(task);
-		assert state != null : "task ended and no state.  que?";
-		if (state.prepared == null) {
+		if (state == null) {
+			log.error("however, no state was available in the current tracker for {}", task);
+			log.error("current stacktrace: ", new Exception());
+		} else if (state.prepared == null) {
 			boolean removed = currentTracker.remove(task, state);
 			assert removed : "something is really whacky here";
 			log.trace("end processing");
@@ -130,14 +132,15 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	@Override
 	public void taskCompletedWithError(JJRunnable task, Throwable error) {
 		
-		log.error("task [{}] completed with error:", task);
-		log.error("", error);
+		log.error("task [{}] completed", task);
+		log.error("with error:", error);
 		
 		current.set(null);
 		
 		State state = currentTracker.get(task);
 		if (state == null) {
 			log.error("additionally, no state was available in the current tracker for {}", task);
+			log.error("current stacktrace: ", new Exception());
 		} else if (state.prepared == null) {
 			boolean removed = currentTracker.remove(task, state);
 			assert removed : "something is really whacky here";

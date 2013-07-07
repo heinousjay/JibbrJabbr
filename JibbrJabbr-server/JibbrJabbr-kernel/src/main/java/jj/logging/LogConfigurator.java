@@ -36,8 +36,19 @@ class LogConfigurator implements JJServerListener {
 	private final AsyncAppender asyncAppender;
 	
 	LogConfigurator(boolean isTest) {
-		
-		asyncAppender = new AsyncAppender();
+		if (isTest) {
+			this.asyncAppender = null;
+			logger.setLevel(Level.OFF);
+			((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.TRACE);
+			((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.TRACE);
+			InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+		} else {
+			this.asyncAppender = initialize();
+		}
+	}
+	
+	private AsyncAppender initialize() {
+		AsyncAppender asyncAppender = new AsyncAppender();
 		asyncAppender.setContext(context);
 		
 		Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
@@ -53,7 +64,6 @@ class LogConfigurator implements JJServerListener {
 		logger.addAppender(asyncAppender);
 		
 		// make sure netty logs to our log
-		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
 		logger.setLevel(Level.DEBUG); // start from clean
 		
@@ -62,20 +72,23 @@ class LogConfigurator implements JJServerListener {
 		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.DEBUG);
 		
 		// logs events specifically related to running inside a JJAppTest
-		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.OFF);
+		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.TRACE);
 		
 		// the http access log
-		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.INFO);
+		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(Level.OFF);
 		
 		// execution trace logging.  lots of info about the path of execution for interactions
 		// with the system
-		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.TRACE);
+		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.OFF);
 		
+		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+		
+		return asyncAppender;
 	}
 	
 	@Override
 	public void start() throws Exception {
-		// nothing to do here
+		
 	}
 
 	@Override

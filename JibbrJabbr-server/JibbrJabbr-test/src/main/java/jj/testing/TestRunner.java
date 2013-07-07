@@ -15,8 +15,11 @@
  */
 package jj.testing;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -25,6 +28,8 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import jj.ExecutionTrace;
 import jj.logging.TestRunnerLogger;
+import jj.http.TestHttpRequest;
+import jj.http.TestHttpResponse;
 import jj.http.TestJJEngineHttpHandler;
 
 /**
@@ -33,14 +38,10 @@ import jj.http.TestJJEngineHttpHandler;
  */
 class TestRunner {
 	
-	private final Logger testRunnerLog;
-	
 	private final class TestHttpClientImpl implements TestHttpClient {
 		
-		private final TestHttpResponse response;
 		
-		private TestHttpClientImpl(final TestHttpResponse response) {
-			this.response = response;
+		private TestHttpClientImpl() {
 		}
 		
 		private void getResponse() throws Exception {
@@ -116,12 +117,24 @@ class TestRunner {
 			testRunnerLog.trace("{}", request);
 			testRunnerLog.trace("{}", response);
 		}
+		
+		@Override
+		public String uri() {
+			return request.uri();
+		}
+
+		@Override
+		public boolean matchesHeaders(HttpHeaders headers) throws Exception {
+			testRunnerLog.trace("matchesHeaders() on {} with \n{}", response.id(), response.headers());
+			response.get();
+			return true;
+		}
 	}
 	
 	private final TestHttpRequest request;
 	private final TestHttpResponse response;
 	private final TestJJEngineHttpHandler handler;
-	private final ExecutionTrace trace;
+	private final Logger testRunnerLog;
 	
 	@Inject
 	TestRunner(
@@ -134,7 +147,6 @@ class TestRunner {
 		this.request = request;
 		this.response = response;
 		this.handler = handler;
-		this.trace = trace;
 		this.testRunnerLog = testRunnerLog;
 	}
 
@@ -144,12 +156,12 @@ class TestRunner {
 	
 	TestHttpClient run() {
 		try {
-			trace.start(request, response);
+			testRunnerLog.info("starting request {}", request);
 			handler.handleHttpRequest(request, response);
 		} catch (Throwable t) {
 			response.error(t);
 		}
-		return new TestHttpClientImpl(response);
+		return new TestHttpClientImpl();
 	}
 	
 	

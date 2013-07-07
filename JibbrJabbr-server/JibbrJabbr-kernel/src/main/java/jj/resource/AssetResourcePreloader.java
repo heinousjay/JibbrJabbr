@@ -37,31 +37,17 @@ class AssetResourcePreloader implements JJServerListener {
 	@Override
 	public void start() throws Exception {
 		
-		executors.ioExecutor().submit(executors.prepareTask(new JJRunnable("internal asset preloader") {
+		log.debug("preloading internal assets");
 
-			@Override
-			protected boolean ignoreInExecutionTrace() {
-				return true;
+		if (AssetResourceCreator.basePath != null) {
+			doWalk(AssetResourceCreator.basePath);
+		} else if (AssetResourceCreator.myJar != null) {
+			try (FileSystem myJarFS = FileSystems.newFileSystem(AssetResourceCreator.myJar, null)) {
+				doWalk(myJarFS.getPath("/jj/assets"));
 			}
-			
-			@Override
-			public void run() throws Exception {
-				log.debug("preloading internal assets");
-
-				if (AssetResourceCreator.basePath != null) {
-					doWalk(AssetResourceCreator.basePath);
-				} else if (AssetResourceCreator.myJar != null) {
-					try (FileSystem myJarFS = FileSystems.newFileSystem(AssetResourceCreator.myJar, null)) {
-						doWalk(myJarFS.getPath("/jj/assets"));
-					}
-				}
-				
-				
-				log.debug("preload complete");
-				
-			}
-		}));
+		}
 		
+		log.debug("preload complete");
 	}
 	
 	private void doWalk(final Path path) throws Exception {
@@ -75,8 +61,18 @@ class AssetResourcePreloader implements JJServerListener {
 
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				String baseName = path.relativize(file).toString();
-				finder.loadResource(AssetResource.class, baseName);
+				final String baseName = path.relativize(file).toString();
+				executors.ioExecutor().submit(executors.prepareTask(new JJRunnable("internal asset preloader") {
+					@Override
+					protected boolean ignoreInExecutionTrace() {
+						return true;
+					}
+					
+					@Override
+					public void run() throws Exception {
+						finder.loadResource(AssetResource.class, baseName);
+					}
+				}));
 				return FileVisitResult.CONTINUE;
 			}
 
@@ -97,6 +93,5 @@ class AssetResourcePreloader implements JJServerListener {
 
 	@Override
 	public void stop() {
-		//nothing to do
 	}
 }

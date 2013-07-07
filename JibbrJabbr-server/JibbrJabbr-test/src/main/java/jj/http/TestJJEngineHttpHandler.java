@@ -50,7 +50,7 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 	}
 
 	@Override
-	public void handleHttpRequest(JJHttpRequest request, JJHttpResponse response) throws Exception {
+	public void handleHttpRequest(HttpRequest request, HttpResponse response) throws Exception {
 		super.handleHttpRequest(request, response);
 	}
 }

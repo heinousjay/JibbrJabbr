@@ -63,9 +63,18 @@ public class JJAppTest implements TestRule {
 				injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(basePath, description));
 				
 				try {
+					System.out.println("============================================================");
+					System.out.println(" Starting the server up.");
+					System.out.println("============================================================");
 					injector.getInstance(JJServerLifecycle.class).start();
+					System.out.println("============================================================");
+					System.out.println(" executing " + description);
+					System.out.println("============================================================");
 					base.evaluate();
 				} finally {
+					System.out.println("============================================================");
+					System.out.println(" Shutting the server down.");
+					System.out.println("============================================================");
 					injector.getInstance(JJServerLifecycle.class).stop();
 					injector = null;
 				}
