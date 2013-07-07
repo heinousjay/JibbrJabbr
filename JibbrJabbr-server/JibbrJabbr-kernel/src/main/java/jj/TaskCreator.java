@@ -15,6 +15,7 @@
  */
 package jj;
 
+import java.math.BigDecimal;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -33,6 +34,66 @@ import javax.inject.Singleton;
 @Singleton
 public class TaskCreator {
 	
+	final class JJTask implements Runnable {
+		
+		final JJRunnable parent;
+		final JJRunnable runnable;
+		
+		final long creationTime = System.currentTimeMillis(); 
+		
+		private final boolean traceLog;
+		
+		private JJTask(final JJRunnable runnable) {
+			this.parent = current.get();
+			this.runnable = runnable;
+			
+			traceLog = !runnable.ignoreInExecutionTrace(); 
+			if (traceLog) trace.preparingTask(this);
+		}
+		
+		private volatile long startNanos;
+		private volatile long endNanos;
+		private volatile long endTime;
+		
+		@Override
+		public final void run() {
+
+			try {
+				startNanos = System.nanoTime();
+				current.set(runnable);
+				if (traceLog) trace.startingTask(this);
+				runnable.run();
+				if (traceLog) trace.taskCompletedSuccessfully(this);
+			} catch (OutOfMemoryError rethrow) {
+				throw rethrow;
+			} catch (Throwable t) {
+				if (traceLog) trace.taskCompletedWithError(this, t);
+			} finally {
+				current.set(null);
+				endNanos = System.nanoTime();
+				endTime = System.currentTimeMillis();
+			}
+		}
+		
+		public boolean isCompleted() {
+			return endTime != 0;
+		}
+		
+		public String executionTime() {
+			return endNanos == 0 ? "not finished" : BigDecimal.valueOf(endNanos - startNanos, 6).toString() + " milliseconds";
+		}
+		
+		@Override
+		public String toString() {
+			return new StringBuilder(runnable.toString())
+				.append(" started from ")
+				.append(parent)
+				.append(" took ")
+				.append(executionTime())
+				.toString();
+		}
+	}
+	
 	private static final ThreadLocal<JJRunnable> current = new ThreadLocal<JJRunnable>() {};
 
 	private final ExecutionTrace trace;
@@ -44,34 +105,9 @@ public class TaskCreator {
 		this.trace = trace;
 	}
 	
-	public Runnable prepareTask(final JJRunnable task) {
+	public Runnable prepareTask(final JJRunnable runnable) {
 		
-		final boolean traceLog = !task.ignoreInExecutionTrace(); 
-		if (traceLog) trace.preparingTask(current.get(), task);
-		
-		return new Runnable() {
-			
-			@Override
-			public final void run() {
-				try {
-					current.set(task);
-					if (traceLog) trace.startingTask(task);
-					task.run();
-					if (traceLog) trace.taskCompletedSuccessfully(task);
-				} catch (OutOfMemoryError rethrow) {
-					throw rethrow;
-				} catch (Throwable t) {
-					if (traceLog) trace.taskCompletedWithError(task, t);
-				} finally {
-					current.set(null);
-				}
-			}
-			
-			@Override
-			public String toString() {
-				return task.toString();
-			}
-		};
+		return new JJTask(runnable);
 	}
 	
 	<T> RunnableFuture<T> newIOTask(final Runnable runnable, final T value) {

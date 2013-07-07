@@ -16,11 +16,11 @@
 package jj;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.TaskCreator.JJTask;
 import jj.logging.ExecutionTraceLogger;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -35,25 +35,6 @@ import org.slf4j.Logger;
 @Singleton
 class ExecutionTraceImpl implements ExecutionTrace {
 	
-	private static final class State {
-		private JJRunnable prepared;
-		private JJRunnable current;
-		private HttpRequest request;
-		
-		@Override
-		public String toString() {
-			return new StringBuilder()
-				.append("prepared=").append(prepared)
-				.append(",current=").append(current)
-				.append(",request=").append(request)
-				.toString();
-		}
-	}
-	
-	private final ThreadLocal<State> current = new ThreadLocal<State>();
-	private final ConcurrentHashMap<JJRunnable, State> currentTracker = new ConcurrentHashMap<>();
-	private final ConcurrentHashMap<JJRunnable, State> preparedTracker = new ConcurrentHashMap<>();
-	
 	private final Logger log;
 	
 	@Inject
@@ -62,97 +43,28 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	}
 	
 	@Override
-	public void preparingTask(JJRunnable oldTask, JJRunnable newTask) {
-		State state;
-		if (oldTask != null) {
-			log.trace("task [{}] is preparing [{}]", oldTask, newTask);
-			state = currentTracker.get(oldTask);
-			
-			assert state != null : "preparing a JJRunnable from a JJRunnable but no state is in place";
-			assert state.prepared == null : "preparing a JJRunnable but one is already prepared";
-			assert state.current == oldTask : "state data is all screwed up";
-			
-		} else {
-			log.trace("thread [{}] is preparing [{}]", Thread.currentThread().getName(), newTask);
-			
-			assert !currentTracker.containsKey(newTask) : "preparing a JJRunnable from outside but there is already a current task";
-			
-			state = new State();
-		}
-		state.prepared = newTask;
-		boolean wasAbleToStore = (preparedTracker.putIfAbsent(newTask, state) == null);
+	public void preparingTask(JJTask task) {
 		
-		assert wasAbleToStore : "task [" + newTask + "] had previous prepared state";
 	}
 	
 	@Override
-	public void startingTask(JJRunnable task) {
-		
-		log.trace("starting task [{}]", task);
-		State state = preparedTracker.get(task);
-		
-		assert state != null && state.prepared == task : "starting a task [" + task + "] that wasn't prepared";
-		
-		JJRunnable oldTask = state.current;
-		if (oldTask != null) {
-			boolean removed = currentTracker.remove(oldTask, state);
-			
-			assert removed : "old task [" + task + "] mapping in current tracker was not correct";
-		}
+	public void startingTask(JJTask task) {
 
-		boolean removed = preparedTracker.remove(task, state);
-		
-		assert removed : "old task [" + task + "] mapping in prepared tracker was not correct";
-		
-		state.current = task;
-		state.prepared = null;
-		
-		currentTracker.putIfAbsent(task, state);
-		assert current.get() == null : "state is already stored in current";
-		current.set(state);
 	}
 	
 	@Override
-	public void taskCompletedSuccessfully(JJRunnable task) {
-		log.trace("successful completion of task [{}]", task);
-		
-		current.set(null);
-		
-		State state = currentTracker.get(task);
-		if (state == null) {
-			log.error("however, no state was available in the current tracker for {}", task);
-			log.error("current stacktrace: ", new Exception());
-		} else if (state.prepared == null) {
-			boolean removed = currentTracker.remove(task, state);
-			assert removed : "something is really whacky here";
-			log.trace("end processing");
-		}
+	public void taskCompletedSuccessfully(JJTask task) {
+
 	}
 	
 	@Override
-	public void taskCompletedWithError(JJRunnable task, Throwable error) {
-		
-		log.error("task [{}] completed", task);
-		log.error("with error:", error);
-		
-		current.set(null);
-		
-		State state = currentTracker.get(task);
-		if (state == null) {
-			log.error("additionally, no state was available in the current tracker for {}", task);
-			log.error("current stacktrace: ", new Exception());
-		} else if (state.prepared == null) {
-			boolean removed = currentTracker.remove(task, state);
-			assert removed : "something is really whacky here";
-			log.trace("end processing");
-		}
+	public void taskCompletedWithError(JJTask task, Throwable error) {
+
 	}
 	
 	@Override
 	public void start(HttpRequest request, HttpResponse response) {
 		log.trace("Request started {}", request.uri());
-		State state = current.get();
-		assert state == null : "somehow there is state left from some previous request " + state;
 	}
 	
 	@Override

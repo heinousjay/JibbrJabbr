@@ -39,8 +39,8 @@ class LogConfigurator implements JJServerListener {
 		if (isTest) {
 			this.asyncAppender = null;
 			logger.setLevel(Level.OFF);
-			((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.TRACE);
-			((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.TRACE);
+			((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.ERROR);
+			((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.ERROR);
 			InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		} else {
 			this.asyncAppender = initialize();
