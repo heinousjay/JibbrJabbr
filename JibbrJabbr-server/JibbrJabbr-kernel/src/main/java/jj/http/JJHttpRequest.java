@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.DataStore;
 import jj.DateFormatHelper;
 import jj.Sequence;
 import jj.jqmessage.JQueryMessage;
@@ -26,23 +25,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 
 @Singleton
-public class JJHttpRequest implements DataStore {
-	
-	public enum State {
-		Uninitialized,
-		InitialExecution {
-			@Override
-			public String toString() {
-				return "Initial execution";
-			}
-		},
-		ReadyFunctionExecution {
-			@Override
-			public String toString() {
-				return "Ready function execution";
-			}
-		};
-	}
+class JJHttpRequest implements HttpRequest {
 	
 	private static final Sequence sequence = new Sequence();
 	
@@ -60,14 +43,14 @@ public class JJHttpRequest implements DataStore {
 	
 	protected final long startTime = System.nanoTime();
 	
-	protected State state = State.Uninitialized;
+	protected HttpRequestState state = HttpRequestState.Uninitialized;
 	
 	protected AssociatedScriptBundle associatedScriptBundle;
 	
 	private ArrayList<JQueryMessage> messages;
 	
 	@Inject
-	public JJHttpRequest(final FullHttpRequest request, final Channel channel) {
+	JJHttpRequest(final FullHttpRequest request, final Channel channel) {
 		this.request = request;
 		this.channel = channel;
 	}
@@ -93,44 +76,53 @@ public class JJHttpRequest implements DataStore {
 		return data.remove(name);
 	}
 
+	@Override
 	public BigDecimal wallTime() {
 		return BigDecimal.valueOf(System.nanoTime() - startTime, 6);
 	}
 	
+	@Override
 	public AssociatedScriptBundle associatedScriptBundle() {
 		return associatedScriptBundle;
 	}
 	
+	@Override
 	public JJHttpRequest associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
 		this.associatedScriptBundle = associatedScriptBundle;
 		return this;
 	}
 	
+	@Override
 	public JJHttpRequest startingInitialExecution() {
-		state = State.InitialExecution;
+		state = HttpRequestState.InitialExecution;
 		associatedScriptBundle().initializing(true);
 		return this;
 	}
 	
+	@Override
 	public JJHttpRequest startingReadyFunction() {
-		state = State.ReadyFunctionExecution;
+		state = HttpRequestState.ReadyFunctionExecution;
 		return this;
 	}
 	
-	public State state() {
+	@Override
+	public HttpRequestState state() {
 		return state;
 	}
 	
+	@Override
 	public String host() {
 		String xHost = header(HEADER_X_HOST);
 		String host = header(HttpHeaders.Names.HOST);
 		return xHost == null ? host : xHost;
 	}
 	
+	@Override
 	public boolean secure() {
 		return "https".equals(header(HEADER_X_FORWARDED_PROTO));
 	}
 	
+	@Override
 	public URI absoluteUri() {
 		return URI.create(
 			new StringBuilder("http")
@@ -148,6 +140,7 @@ public class JJHttpRequest implements DataStore {
 	 * some other case may come up
 	 * @param message
 	 */
+	@Override
 	public JJHttpRequest addStartupJQueryMessage(final JQueryMessage message) {
 		if (messages == null) {
 			messages = new ArrayList<>();
@@ -156,6 +149,7 @@ public class JJHttpRequest implements DataStore {
 		return this;
 	}
 	
+	@Override
 	public List<JQueryMessage> startupJQueryMessages() {
 		ArrayList<JQueryMessage> messages = this.messages;
 		this.messages = null;
@@ -175,6 +169,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public long timestamp() {
 		return startTime;
 	}
@@ -182,6 +177,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public SocketAddress remoteAddress() {
 		return channel.remoteAddress();
 	}
@@ -189,6 +185,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public String uri() {
 		return request.getUri();
 	}
@@ -197,6 +194,7 @@ public class JJHttpRequest implements DataStore {
 	 * @param ifNoneMatch
 	 * @return
 	 */
+	@Override
 	public boolean hasHeader(String ifNoneMatch) {
 		return request.headers().contains(ifNoneMatch);
 	}
@@ -205,6 +203,7 @@ public class JJHttpRequest implements DataStore {
 	 * @param etag
 	 * @return
 	 */
+	@Override
 	public String header(String name) {
 		return request.headers().get(name);
 	}
@@ -212,6 +211,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public String id() {
 		return id;
 	}
@@ -219,6 +219,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public String body() {
 		return request.content().toString(charset());
 	}
@@ -226,6 +227,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public Charset charset() {
 		// TODO figure this out some day
 		return StandardCharsets.UTF_8;
@@ -234,6 +236,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public HttpMethod method() {
 		return request.getMethod();
 	}
@@ -241,6 +244,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @return
 	 */
+	@Override
 	public List<Entry<String, String>> allHeaders() {
 		return request.headers().entries();
 	}
@@ -249,6 +253,7 @@ public class JJHttpRequest implements DataStore {
 	 * @param userAgent
 	 * @param userAgent2
 	 */
+	@Override
 	public JJHttpRequest header(String name, String value) {
 		request.headers().add(name, value);
 		return this;
@@ -257,6 +262,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @param string
 	 */
+	@Override
 	public JJHttpRequest method(HttpMethod method) {
 		request.setMethod(method);
 		return this;
@@ -265,6 +271,7 @@ public class JJHttpRequest implements DataStore {
 	/**
 	 * @param uri
 	 */
+	@Override
 	public JJHttpRequest uri(String uri) {
 		request.setUri(uri);
 		return this;

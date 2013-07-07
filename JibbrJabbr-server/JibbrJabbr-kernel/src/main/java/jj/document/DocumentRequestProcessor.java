@@ -1,14 +1,14 @@
 package jj.document;
 
 import jj.script.AssociatedScriptBundle;
-import jj.http.JJHttpRequest;
+import jj.http.HttpRequest;
 import jj.http.RequestProcessor;
 
 import org.jsoup.nodes.Document;
 
 public interface DocumentRequestProcessor extends RequestProcessor {
 
-	JJHttpRequest httpRequest();
+	HttpRequest httpRequest();
 	
 	AssociatedScriptBundle associatedScriptBundle();
 	

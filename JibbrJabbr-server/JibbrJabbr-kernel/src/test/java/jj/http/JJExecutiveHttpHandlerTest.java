@@ -20,6 +20,7 @@ import static org.mockito.BDDMockito.*;
 import java.net.InetSocketAddress;
 
 import jj.DateFormatHelper;
+import jj.DevNullExecutionTraceImpl;
 import jj.ExecutionTrace;
 
 import io.netty.channel.Channel;
@@ -73,7 +74,7 @@ public class JJExecutiveHttpHandlerTest {
 			.method(HttpMethod.GET)
 			.uri(URI);
 		
-		JJHttpResponse response = new JJHttpResponse(jjrequest, channel, access);
+		HttpResponse response = new JJHttpResponse(jjrequest, channel, access, new DevNullExecutionTraceImpl());
 		response.status(STATUS);
 		
 		// when

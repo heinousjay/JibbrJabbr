@@ -9,9 +9,9 @@ import jj.MockTaskCreator;
 import jj.ScriptExecutorFactory;
 import jj.document.DocumentRequestProcessor;
 import jj.hostapi.HostEvent;
-import jj.http.JJHttpRequest;
+import jj.http.HttpRequestState;
 import jj.http.JJWebSocketConnection;
-import jj.http.JJHttpRequest.State;
+import jj.http.MockHttpRequest;
 import jj.resource.ScriptResource;
 
 import org.jmock.lib.concurrent.DeterministicScheduler;
@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Callable;
 
@@ -54,7 +55,7 @@ public class ScriptRunnerTest {
 	
 	MockTaskCreator taskCreator = new MockTaskCreator();
 	
-	@Mock JJHttpRequest httpRequest;
+	@Spy MockHttpRequest httpRequest;
 	
 	ScriptRunner scriptRunner;
 	
@@ -158,7 +159,7 @@ public class ScriptRunnerTest {
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		givenADocumentRequest();
 		
-		given(httpRequest.state()).willReturn(State.InitialExecution);
+		given(httpRequest.state()).willReturn(HttpRequestState.InitialExecution);
 		
 		// when
 		scriptRunner.submit(documentRequestProcessor);
@@ -191,7 +192,7 @@ public class ScriptRunnerTest {
 			.willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
-		given(httpRequest.state()).willReturn(State.ReadyFunctionExecution);
+		given(httpRequest.state()).willReturn(HttpRequestState.ReadyFunctionExecution);
 		givenADocumentRequest();
 		
 		// when
@@ -395,7 +396,7 @@ public class ScriptRunnerTest {
 		given(currentScriptContext.type()).willReturn(ScriptContextType.HttpRequest);
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
 		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
-		given(httpRequest.state()).willReturn(State.Uninitialized);
+		given(httpRequest.state()).willReturn(HttpRequestState.Uninitialized);
 		
 		// when
 		executor.runUntilIdle();
@@ -434,7 +435,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
-		given(httpRequest.state()).willReturn(State.Uninitialized);
+		given(httpRequest.state()).willReturn(HttpRequestState.Uninitialized);
 		
 		// when
 		executor.runNextPendingCommand();

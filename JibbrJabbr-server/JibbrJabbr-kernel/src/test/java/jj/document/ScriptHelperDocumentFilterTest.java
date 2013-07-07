@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import jj.configuration.Configuration;
-import jj.http.JJHttpRequest;
+import jj.http.MockHttpRequest;
 import jj.jqmessage.JQueryMessage;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,7 +42,7 @@ public class ScriptHelperDocumentFilterTest {
 	@Mock AssociatedScriptBundle associatedScriptBundle;
 	@Mock CurrentScriptContext context;
 	@Mock ScriptResource scriptResource;
-	@Mock JJHttpRequest httpRequest;
+	@Spy MockHttpRequest httpRequest;
 	@Mock ResourceFinder resourceFinder;
 	@Mock AssetResource jqueryJs;
 	@Mock AssetResource jjJs;

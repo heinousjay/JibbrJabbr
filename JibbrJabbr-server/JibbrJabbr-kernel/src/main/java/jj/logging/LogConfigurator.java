@@ -55,7 +55,9 @@ class LogConfigurator implements JJServerListener {
 		// make sure netty logs to our log
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
-		logger.setLevel(Level.WARN); // start from clean
+		logger.setLevel(Level.DEBUG); // start from clean
+		
+		((Logger)LoggerFactory.getLogger("io.netty")).setLevel(Level.WARN);
 		
 		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.DEBUG);
 		

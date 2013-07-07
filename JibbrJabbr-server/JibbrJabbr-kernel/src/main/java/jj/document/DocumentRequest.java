@@ -2,8 +2,8 @@ package jj.document;
 
 import jj.Sequence;
 import jj.resource.Resource;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 
 import org.jsoup.nodes.Document;
 
@@ -21,8 +21,8 @@ public class DocumentRequest {
 	private final String baseName;
 	private final String mime;
 	private final Document document;
-	private final JJHttpRequest httpRequest;
-	private final JJHttpResponse httpResponse;
+	private final HttpRequest httpRequest;
+	private final HttpResponse httpResponse;
 	private final String id = "document request " + idSequence.next();
 	
 	// this is a little hacky but the idea is if the request needed IO, it's the first time
@@ -35,8 +35,8 @@ public class DocumentRequest {
 	public DocumentRequest(
 		final Resource resource,
 		final Document document,
-		final JJHttpRequest httpRequest,
-		final JJHttpResponse httpResponse,
+		final HttpRequest httpRequest,
+		final HttpResponse httpResponse,
 		final boolean neededIO
 	) {
 		this.baseName = resource.baseName();
@@ -64,11 +64,11 @@ public class DocumentRequest {
 		return httpRequest.uri();
 	}
 	
-	public JJHttpRequest httpRequest() {
+	public HttpRequest httpRequest() {
 		return httpRequest;
 	}
 	
-	public JJHttpResponse httpResponse() {
+	public HttpResponse httpResponse() {
 		return httpResponse;
 	}
 	

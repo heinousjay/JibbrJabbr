@@ -14,8 +14,8 @@ import jj.resource.ScriptResource;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
 import jj.uri.URIMatch;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.RequestProcessor;
 
 /**
@@ -66,14 +66,14 @@ class AssociatedScriptServable extends Servable {
 	}
 
 	@Override
-	public boolean isMatchingRequest(final JJHttpRequest request) {
+	public boolean isMatchingRequest(final HttpRequest request) {
 		return resourceFromUri(request.uri()) != null;
 	}
 
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws IOException {
 		
 		return new RequestProcessor() {

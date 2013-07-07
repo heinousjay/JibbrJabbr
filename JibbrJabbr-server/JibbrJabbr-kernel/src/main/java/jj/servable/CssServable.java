@@ -6,8 +6,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.RequestProcessor;
 import jj.resource.CssResource;
 import jj.resource.ResourceFinder;
@@ -30,15 +30,15 @@ class CssServable extends Servable {
 	}
 
 	@Override
-	public boolean isMatchingRequest(final JJHttpRequest request) {
+	public boolean isMatchingRequest(final HttpRequest request) {
 		// match everything that ends in .css
 		return request.uri().endsWith(CSS);
 	}
 
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws IOException {
 		final URIMatch match = new URIMatch(request.uri());
 		CssResource resource = resourceFinder.loadResource(CssResource.class, match.baseName, true);

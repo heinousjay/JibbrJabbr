@@ -10,8 +10,8 @@ import java.nio.file.Paths;
 
 import jj.JJ;
 import jj.configuration.Configuration;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.RequestProcessor;
 import jj.resource.CssResource;
 import jj.resource.ResourceFinder;
@@ -32,8 +32,8 @@ public class CssServableTest {
 	@Mock ResourceFinder resourceFinder;
 	@Mock CssResource cssResource;
 	
-	@Mock JJHttpRequest request;
-	@Mock JJHttpResponse response;
+	@Mock HttpRequest request;
+	@Mock HttpResponse response;
 	
 	@Before
 	public void before() {

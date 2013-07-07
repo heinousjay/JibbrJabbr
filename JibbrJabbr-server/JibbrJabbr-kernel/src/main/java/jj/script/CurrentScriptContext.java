@@ -5,7 +5,7 @@ import javax.inject.Singleton;
 import jj.DataStore;
 import jj.document.DocumentRequestProcessor;
 import jj.jqmessage.JQueryMessage;
-import jj.http.JJHttpRequest;
+import jj.http.HttpRequest;
 import jj.http.JJWebSocketConnection;
 
 import org.jsoup.nodes.Document;
@@ -66,7 +66,7 @@ public class CurrentScriptContext {
 		return currentContext.get().documentRequestProcessor;
 	}
 	
-	public JJHttpRequest httpRequest() {
+	public HttpRequest httpRequest() {
 		return currentContext.get().documentRequestProcessor.httpRequest();
 	}
 	

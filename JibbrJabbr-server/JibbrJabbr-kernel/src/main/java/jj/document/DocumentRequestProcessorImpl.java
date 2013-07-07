@@ -9,7 +9,7 @@ import jj.JJExecutors;
 import jj.JJRunnable;
 import jj.ScriptThread;
 import jj.script.AssociatedScriptBundle;
-import jj.http.JJHttpRequest;
+import jj.http.HttpRequest;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.nodes.Document;
@@ -55,7 +55,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		return filterList;
 	}
 	
-	public JJHttpRequest httpRequest() {
+	public HttpRequest httpRequest() {
 		return documentRequest.httpRequest();
 	}
 	

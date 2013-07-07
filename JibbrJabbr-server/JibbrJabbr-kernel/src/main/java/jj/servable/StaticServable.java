@@ -24,8 +24,8 @@ import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
 import jj.uri.URIMatch;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.RequestProcessor;
 
 /**
@@ -53,14 +53,14 @@ public class StaticServable extends Servable {
 	 * we always (potentially) match
 	 */
 	@Override
-	public boolean isMatchingRequest(final JJHttpRequest httpRequest) {
+	public boolean isMatchingRequest(final HttpRequest httpRequest) {
 		return true;
 	}
 
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws IOException {
 		final URIMatch match = new URIMatch(request.uri());
 		final StaticResource resource = resourceFinder.loadResource(StaticResource.class, match.baseName);

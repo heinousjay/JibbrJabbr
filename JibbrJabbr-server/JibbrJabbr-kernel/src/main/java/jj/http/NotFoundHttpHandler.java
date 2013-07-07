@@ -22,8 +22,8 @@ public class NotFoundHttpHandler {
 	}
 	
 	public void handleHttpRequest(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws Exception {
 		// this can be overriden later on, perhaps? of course!
 		// but that will be handled in the engine handler. at

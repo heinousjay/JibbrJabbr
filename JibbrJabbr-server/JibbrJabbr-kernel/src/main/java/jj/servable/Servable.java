@@ -7,8 +7,8 @@ import java.nio.file.Path;
 
 import jj.IOThread;
 import jj.configuration.Configuration;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.RequestProcessor;
 import jj.resource.Resource;
 import jj.uri.URIMatch;
@@ -49,11 +49,11 @@ public abstract class Servable {
 	 * @param httpRequest
 	 * @return
 	 */
-	public abstract boolean isMatchingRequest(final JJHttpRequest httpRequest);
+	public abstract boolean isMatchingRequest(final HttpRequest httpRequest);
 	
 	public abstract RequestProcessor makeRequestProcessor(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws IOException;
 
 	/**
@@ -64,7 +64,7 @@ public abstract class Servable {
 	 * @param match
 	 * @param resource
 	 */
-	protected void doStandardResponse(final JJHttpRequest request, final JJHttpResponse response, URIMatch match, Resource resource) {
+	protected void doStandardResponse(final HttpRequest request, final HttpResponse response, URIMatch match, Resource resource) {
 		try {
 			if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
 				resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {

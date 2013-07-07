@@ -22,8 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.logging.ExecutionTraceLogger;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.JJWebSocketConnection;
 
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	private static final class State {
 		private JJRunnable prepared;
 		private JJRunnable current;
-		private JJHttpRequest request;
+		private HttpRequest request;
 		
 		@Override
 		public String toString() {
@@ -146,19 +146,14 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	}
 	
 	@Override
-	public void start(JJHttpRequest request, JJHttpResponse response) {
+	public void start(HttpRequest request, HttpResponse response) {
 		log.trace("Request started {}", request.uri());
 		State state = current.get();
 		assert state == null : "somehow there is state left from some previous request " + state;
-		
-		
-		//state = new State();
-		//state.request = request;
-		//current.set(state);
 	}
 	
 	@Override
-	public void end(JJHttpRequest request) {
+	public void end(HttpRequest request, HttpResponse response) {
 		log.trace("Request ended {}", request);
 	}
 

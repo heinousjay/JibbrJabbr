@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.MockJJExecutors;
+import jj.MockJJExecutors.ThreadType;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
@@ -49,7 +50,7 @@ public class ScriptBundleHelperTest {
 	@Before
 	public void before() {
 		scriptBundles = new ScriptBundles();
-		
+		executors = new MockJJExecutors();
 	}
 
 	@Test
@@ -91,6 +92,8 @@ public class ScriptBundleHelperTest {
 		given(finder.findResource(ScriptResource.class, "index", ScriptResourceType.Server)).willReturn(scriptResource2);
 		
 		given(creator.createScriptBundle(scriptResource1, null, scriptResource2, baseName)).willReturn(associatedScriptBundle);
+		
+		executors.addThreadTypes(ThreadType.ScriptThread, 10);
 		
 		ScriptBundleHelper underTest = new ScriptBundleHelper(finder, scriptBundles, creator, executors);
 		

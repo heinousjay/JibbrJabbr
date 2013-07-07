@@ -15,7 +15,6 @@
  */
 package jj.script;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;

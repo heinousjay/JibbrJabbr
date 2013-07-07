@@ -8,8 +8,8 @@ import jj.configuration.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 import jj.uri.URIMatch;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.RequestProcessor;
 
 
@@ -25,7 +25,7 @@ class AssetServable extends Servable {
 	}
 	
 	@Override
-	public boolean isMatchingRequest(JJHttpRequest httpRequest) {
+	public boolean isMatchingRequest(HttpRequest httpRequest) {
 		// if the baseName exists in the cache, we happy
 		URIMatch match = new URIMatch(httpRequest.uri());
 		
@@ -34,8 +34,8 @@ class AssetServable extends Servable {
 
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws IOException {
 		
 		// this one works inline, since assets are always preloaded

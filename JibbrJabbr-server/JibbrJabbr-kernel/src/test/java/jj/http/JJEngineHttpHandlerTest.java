@@ -55,7 +55,7 @@ public class JJEngineHttpHandlerTest {
 	@Mock JJHttpRequest httpRequest3;
 	@Mock JJHttpRequest httpRequest4;
 	
-	@Mock JJHttpResponse httpResponse;
+	@Mock HttpResponse httpResponse;
 	
 	@Mock RequestProcessor requestProcessor1;
 	@Mock RequestProcessor requestProcessor2;

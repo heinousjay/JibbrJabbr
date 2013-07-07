@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.DateFormatHelper;
+import jj.ExecutionTrace;
 import jj.Version;
 import jj.logging.AccessLogger;
 import jj.resource.LoadedResource;
@@ -59,7 +60,7 @@ import io.netty.handler.codec.http.LastHttpContent;
  *
  */
 @Singleton
-public class JJHttpResponse {
+class JJHttpResponse implements HttpResponse {
 	
 	private static final String SERVER_NAME = String.format(
 		"%s/%s (%s)",
@@ -82,20 +83,24 @@ public class JJHttpResponse {
 	
 	private final Logger access;
 	
+	private final ExecutionTrace trace;
+	
 	private volatile boolean isCommitted = false;
 	
 	/**
 	 * @param response
 	 */
 	@Inject
-	public JJHttpResponse(
+	JJHttpResponse(
 		final JJHttpRequest request,
 		final Channel channel,
-		final @AccessLogger Logger access
+		final @AccessLogger Logger access,
+		final ExecutionTrace trace
 	) {
 		this.request = request;
 		this.channel = channel;
 		this.access = access;
+		this.trace = trace;
 		header(HttpHeaders.Names.SERVER, SERVER_NAME);
 	}
 	
@@ -111,6 +116,7 @@ public class JJHttpResponse {
 		log();
 	}
 	
+	@Override
 	public HttpResponseStatus status() {
 		return response.getStatus();
 	}
@@ -120,19 +126,22 @@ public class JJHttpResponse {
 	 * @param status
 	 * @return
 	 */
-	public JJHttpResponse status(final HttpResponseStatus status) {
+	@Override
+	public HttpResponse status(final HttpResponseStatus status) {
 		assertNotCommitted();
 		response.setStatus(status);
 		return this;
 	}
 	
-	public JJHttpResponse header(final String name, final String value) {
+	@Override
+	public HttpResponse header(final String name, final String value) {
 		assertNotCommitted();
 		response.headers().add(name, value);
 		return this;
 	}
 
-	public JJHttpResponse headerIfNotSet(final String name, final String value) {
+	@Override
+	public HttpResponse headerIfNotSet(final String name, final String value) {
 		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
@@ -140,7 +149,8 @@ public class JJHttpResponse {
 		return this;
 	}
 
-	public JJHttpResponse headerIfNotSet(final String name, final long value) {
+	@Override
+	public HttpResponse headerIfNotSet(final String name, final long value) {
 		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
@@ -152,17 +162,20 @@ public class JJHttpResponse {
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public boolean containsHeader(String name) {
 		return response.headers().contains(name);
 	}
 
-	public JJHttpResponse header(final String name, final Date date) {
+	@Override
+	public HttpResponse header(final String name, final Date date) {
 		assertNotCommitted();
 		response.headers().add(name, date);
 		return this;
 	}
 	
-	public JJHttpResponse header(final String name, final long value) {
+	@Override
+	public HttpResponse header(final String name, final long value) {
 		assertNotCommitted();
 		response.headers().add(name, value);
 		return this;
@@ -170,40 +183,48 @@ public class JJHttpResponse {
 	/**
 	 * @return
 	 */
+	@Override
 	public List<Entry<String, String>> allHeaders() {
 		// TODO make unmodifiable if committed
 		return response.headers().entries();
 	}
 	
+	@Override
 	public HttpVersion version() {
 		return response.getProtocolVersion();
 	}
 	
-	public JJHttpResponse content(final byte[] bytes) {
+	@Override
+	public HttpResponse content(final byte[] bytes) {
 		assertNotCommitted();
 		response.content().writeBytes(bytes);
 		return this;
 	}
 	
-	public JJHttpResponse content(final ByteBuf buffer) {
+	@Override
+	public HttpResponse content(final ByteBuf buffer) {
 		assertNotCommitted();
 		response.content().writeBytes(Unpooled.wrappedBuffer(buffer));
 		return this;
 	}
 	
-	public JJHttpResponse end() {
+	@Override
+	public HttpResponse end() {
 		assertNotCommitted();
 		header(HttpHeaders.Names.DATE, new Date());
 		maybeClose(channel.write(response));
 		isCommitted = true;
+		trace.end(request, this);
 		return this;
 	}
 	
+	@Override
 	public void sendNotFound() {
 		assertNotCommitted();
 		sendError(HttpResponseStatus.NOT_FOUND);
 	}
 	
+	@Override
 	public void sendError(final HttpResponseStatus status) {
 		assertNotCommitted();
 		byte[] body = status.reasonPhrase().getBytes(StandardCharsets.UTF_8);
@@ -220,11 +241,13 @@ public class JJHttpResponse {
 	 * @param resource
 	 * @return
 	 */
-	public JJHttpResponse sendNotModified(final Resource resource) {
+	@Override
+	public HttpResponse sendNotModified(final Resource resource) {
 		return sendNotModified(resource, false);
 	}
 	
-	public JJHttpResponse sendNotModified(final Resource resource, boolean cache) {
+	@Override
+	public HttpResponse sendNotModified(final Resource resource, boolean cache) {
 		assertNotCommitted();
 		
 		if (cache) {
@@ -251,7 +274,8 @@ public class JJHttpResponse {
 	 * @param resource
 	 * @return
 	 */
-	public JJHttpResponse sendTemporaryRedirect(final Resource resource) {
+	@Override
+	public HttpResponse sendTemporaryRedirect(final Resource resource) {
 		assertNotCommitted();
 		return status(HttpResponseStatus.TEMPORARY_REDIRECT)
 			.header(HttpHeaders.Names.LOCATION, makeAbsoluteURL(resource))
@@ -262,7 +286,8 @@ public class JJHttpResponse {
 	/**
 	 * @param e
 	 */
-	public JJHttpResponse error(Throwable e) {
+	@Override
+	public HttpResponse error(Throwable e) {
 		log.error("response ended in error", e);
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		return this;
@@ -271,10 +296,12 @@ public class JJHttpResponse {
 	/**
 	 * @return
 	 */
+	@Override
 	public Charset charset() {
 		return charset;
 	}
 
+	@Override
 	public String header(String name) {
 		return response.headers().get(name);
 	}
@@ -282,11 +309,13 @@ public class JJHttpResponse {
 	/**
 	 * @return
 	 */
+	@Override
 	public String contentsString() {
 		return response.content().toString(charset);
 	}
 	
-	public JJHttpResponse sendUncachedResource(Resource resource) throws IOException {
+	@Override
+	public HttpResponse sendUncachedResource(Resource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE);
 		if (resource instanceof TransferableResource) {
@@ -298,7 +327,8 @@ public class JJHttpResponse {
 		throw new AssertionError("trying to send a resource I don't understand");
 	}
 	
-	public JJHttpResponse sendCachedResource(Resource resource) throws IOException {
+	@Override
+	public HttpResponse sendCachedResource(Resource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
 		if (resource instanceof TransferableResource) {
@@ -321,7 +351,7 @@ public class JJHttpResponse {
 	 * @param bytes
 	 * @return
 	 */
-	private JJHttpResponse sendResource(final LoadedResource resource) {
+	private HttpResponse sendResource(final LoadedResource resource) {
 		return header(HttpHeaders.Names.ETAG, resource.sha1())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
@@ -336,7 +366,7 @@ public class JJHttpResponse {
 	 * @param resource
 	 * @return
 	 */
-	private JJHttpResponse sendResource(TransferableResource resource) throws IOException {
+	private HttpResponse sendResource(TransferableResource resource) throws IOException {
 		header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size())
 			.header(HttpHeaders.Names.DATE, new Date());
@@ -365,7 +395,6 @@ public class JJHttpResponse {
 				log();
 			}
 		});
-		
 		isCommitted = true;
 		
 		return this;
@@ -415,7 +444,7 @@ public class JJHttpResponse {
 			remoteAddress.toString();
 	}
 	
-	private String extractReferer(final JJHttpRequest request) {
+	private String extractReferer(final HttpRequest request) {
 		
 		return request.hasHeader(HttpHeaders.Names.REFERER) ?
 			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :

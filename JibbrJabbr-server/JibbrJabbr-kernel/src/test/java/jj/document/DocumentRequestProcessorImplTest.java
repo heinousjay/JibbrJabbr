@@ -16,23 +16,19 @@ import jj.ScriptExecutorFactory;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.MockHttpRequest;
+import jj.http.MockHttpResponse;
 import jj.resource.Resource;
 
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
@@ -47,12 +43,11 @@ public class DocumentRequestProcessorImplTest {
 
 	@Mock Resource htmlResource;
 	
-	FullHttpRequest request;
 	@Mock Channel channel;
 	@Mock Logger access;
 	
-	JJHttpRequest httpRequest;
-	JJHttpResponse httpResponse;
+	@Spy MockHttpRequest httpRequest;
+	@Spy MockHttpResponse httpResponse;
 
 	DocumentRequest documentRequest;
 	
@@ -81,16 +76,14 @@ public class DocumentRequestProcessorImplTest {
 	
 	private static final String MIME = "mime-type";
 	
+	private static final String HTML = "<html><head><title>what</title></head><body></body></html>";
+	
 	@Before
 	public void before() {
-		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		
-		httpRequest = new JJHttpRequest(request, channel);
-		httpResponse = new JJHttpResponse(httpRequest, channel, access);
 		
 		filterCalls = 0;
 		
-		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
+		document = Jsoup.parse(HTML);
 		document.outputSettings().prettyPrint(false);
 		baseName = "baseName";
 
@@ -99,6 +92,7 @@ public class DocumentRequestProcessorImplTest {
 		when(htmlResource.baseName()).thenReturn(baseName);
 		when(htmlResource.mime()).thenReturn(MIME);
 		
+		when(httpRequest.uri()).thenReturn("/");
 		
 		documentRequest = new DocumentRequest(htmlResource, document, httpRequest, httpResponse, false);
 	}
@@ -138,15 +132,17 @@ public class DocumentRequestProcessorImplTest {
 		
 		executors.isScriptThread = true;
 		
+		byte[] bytes = HTML.getBytes(UTF_8);
+		
 		// when
 		toTest.respond();
 		executors.executor.runUntilIdle();
 		
 		// then
-		assertThat(httpResponse.charset(), is(UTF_8));
-		assertThat(httpResponse.header(HttpHeaders.Names.CACHE_CONTROL), is (HttpHeaders.Values.NO_STORE));
-		assertThat(httpResponse.header(HttpHeaders.Names.CONTENT_TYPE), is(MIME));
-		assertThat(httpResponse.contentsString(), is(document.toString()));
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MIME);
+		verify(httpResponse).content(bytes);
 	}
 
 }

@@ -17,8 +17,8 @@ package jj;
 
 import java.io.IOException;
 
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.JJWebSocketConnection;
 
 /**
@@ -39,9 +39,9 @@ public interface ExecutionTrace {
 	 * @param request
 	 * @param response
 	 */
-	void start(JJHttpRequest request, JJHttpResponse response);
+	void start(HttpRequest request, HttpResponse response);
 
-	void end(JJHttpRequest request);
+	void end(HttpRequest request, HttpResponse response);
 
 	void start(JJWebSocketConnection connection);
 	

@@ -17,8 +17,8 @@ import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
 import jj.uri.URIMatch;
-import jj.http.JJHttpRequest;
-import jj.http.JJHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.RequestProcessor;
 
 @Singleton
@@ -48,16 +48,16 @@ class DocumentServable extends Servable {
 	}
 	
 	@Override
-	public boolean isMatchingRequest(final JJHttpRequest request) {
+	public boolean isMatchingRequest(final HttpRequest request) {
 		return request.uri().endsWith(DOT_HTML) ||
 			request.uri().endsWith(SLASH) ||
 			request.uri().lastIndexOf(DOT) <= request.uri().lastIndexOf(SLASH);
 	}
 	
-	private Path toPath(final JJHttpRequest request) {
+	private Path toPath(final HttpRequest request) {
 		URIMatch match = new URIMatch(request.uri());
 		Path result = null;
-		String uri = request.uri().substring(1);
+		String uri = match.baseName;
 		
 		if (uri.endsWith(DOT_HTML)) {
 			result = basePath.resolve(uri).normalize();
@@ -96,8 +96,8 @@ class DocumentServable extends Servable {
 	
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws IOException {
 		
 		DocumentRequestProcessorImpl result = null;

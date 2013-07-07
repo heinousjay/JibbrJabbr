@@ -59,7 +59,7 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 			@Override
 			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 				// well.. whatever.  we're about to die bb yeah
-				System.err.println("I/O executor is rejecting tasks. this would be surprising.");
+				System.err.println("I/O executor is rejecting tasks. this is a surprise if it's not a shutdown.");
 			}
 		};
 		

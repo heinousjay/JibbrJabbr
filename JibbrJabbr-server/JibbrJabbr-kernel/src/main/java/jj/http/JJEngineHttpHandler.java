@@ -10,7 +10,6 @@ import io.netty.handler.codec.http.HttpVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -58,7 +57,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		this.webSocketConnectionMaker = webSocketConnectionMaker;
 	}
 	
-	private Servable[] findMatchingServables(final JJHttpRequest request) {
+	private Servable[] findMatchingServables(final HttpRequest request) {
 		
 		List<Servable> result = new ArrayList<>();
 		
@@ -80,8 +79,8 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 			protected void configure() {
 				bind(Channel.class).toInstance(ctx.channel());
 				bind(FullHttpRequest.class).toInstance(request);
-				bind(JJHttpRequest.class);
-				bind(JJHttpResponse.class);
+				bind(HttpRequest.class).to(JJHttpRequest.class);
+				bind(HttpResponse.class).to(JJHttpResponse.class);
 			}
 		});
 		
@@ -107,8 +106,8 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	}
 
 	void handleHttpRequest(
-		final JJHttpRequest request,
-		final JJHttpResponse response
+		final HttpRequest request,
+		final HttpResponse response
 	) throws Exception {
 		
 		trace.start(request, response);
@@ -116,39 +115,23 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		// figure out if there's something for us to do
 		final Servable[] servables = findMatchingServables(request);
 		
-		if (servables.length > 0) {
-			dispatchNextServable(request, response, servables, new AtomicInteger());
-			
-		} else {
-			response.sendNotFound();
-		}
-	}
-	
-	private void dispatchNextServable(
-		final JJHttpRequest request,
-		final JJHttpResponse response,
-		final Servable[] servables,
-		final AtomicInteger count
-	) {
+		assert (servables.length > 0) : "";
 		executors.ioExecutor().execute(executors.prepareTask(new JJRunnable("JJEngine core processing") {
-			
 			@Override
 			public void run() throws Exception {
 				try {
-					RequestProcessor requestProcessor = 
-						servables[count.getAndIncrement()].makeRequestProcessor(
-							request,
-							response
-						);
-					
-					if (requestProcessor != null) {
-						requestProcessor.process();
-					} else if (count.get() < servables.length) {
-						dispatchNextServable(request, response, servables, count);
-					} else {
+					boolean found = false;
+					for (Servable servable : servables) {
+						RequestProcessor requestProcessor = servable.makeRequestProcessor(request, response);
+						if (requestProcessor != null) {
+							requestProcessor.process();
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
 						response.sendNotFound();
 					}
-					
 				} catch (Throwable e) {
 					response.error(e);
 				}
