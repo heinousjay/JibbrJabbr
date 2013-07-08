@@ -17,7 +17,6 @@ package jj.execution;
 
 import java.io.IOException;
 
-import jj.execution.TaskCreator.JJTask;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.JJWebSocketConnection;
@@ -28,13 +27,13 @@ import jj.http.JJWebSocketConnection;
  */
 public interface ExecutionTrace {
 	
-	void preparingTask(JJTask task);
+	void preparingTask(JJTask<?> task);
 	
-	void startingTask(JJTask task);
+	void startingTask(JJTask<?> task);
 	
-	void taskCompletedSuccessfully(JJTask task);
+	void taskCompletedSuccessfully(JJTask<?> task);
 	
-	void taskCompletedWithError(JJTask task, Throwable error);
+	void taskCompletedWithError(JJTask<?> task, Throwable error);
 	
 	/**
 	 * @param request

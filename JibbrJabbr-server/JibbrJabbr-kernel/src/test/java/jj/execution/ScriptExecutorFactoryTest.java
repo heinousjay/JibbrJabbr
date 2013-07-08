@@ -15,12 +15,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ScriptExecutorFactoryTest {
 
 	ScriptExecutorFactory scriptExecutorFactory;
-	@Mock JJTaskCreator taskCreator;
 	@Mock JJScheduledTask<?> jjScheduledTask;
 	
 	@Before
 	public void before() {
-		scriptExecutorFactory = new ScriptExecutorFactory(taskCreator);
+		scriptExecutorFactory = new ScriptExecutorFactory();
 	}
 	
 	@Test

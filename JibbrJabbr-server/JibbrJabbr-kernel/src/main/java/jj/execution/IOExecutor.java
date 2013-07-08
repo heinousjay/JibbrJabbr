@@ -65,12 +65,9 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 			}
 		};
 		
-	private final TaskCreator creator;
 		
 	@Inject
-	public IOExecutor(
-		final TaskCreator creator
-	) {
+	public IOExecutor() {
 		super(
 			WORKER_COUNT, 
 			WORKER_COUNT,
@@ -80,12 +77,11 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 			threadFactory,
 			rejectedExecutionHandler
 		);
-		this.creator = creator;
 	}
 	
 	@Override
 	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-		return creator.newIOTask(runnable, value);
+		return new JJTask<>(runnable, value);
 	}
 
 	@Override

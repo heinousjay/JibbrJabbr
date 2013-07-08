@@ -17,7 +17,6 @@ package jj.execution;
 
 import java.io.IOException;
 
-import jj.execution.TaskCreator.JJTask;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.JJWebSocketConnection;
@@ -29,25 +28,25 @@ import jj.http.JJWebSocketConnection;
 public class DevNullExecutionTraceImpl implements ExecutionTrace {
 
 	@Override
-	public void preparingTask(JJTask task) {
+	public void preparingTask(JJTask<?> task) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void startingTask(JJTask task) {
+	public void startingTask(JJTask<?> task) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void taskCompletedSuccessfully(JJTask task) {
+	public void taskCompletedSuccessfully(JJTask<?> task) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void taskCompletedWithError(JJTask task, Throwable error) {
+	public void taskCompletedWithError(JJTask<?> task, Throwable error) {
 		// TODO Auto-generated method stub
 		
 	}

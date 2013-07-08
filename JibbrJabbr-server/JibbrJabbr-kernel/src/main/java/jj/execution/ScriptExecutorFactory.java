@@ -59,9 +59,7 @@ public class ScriptExecutorFactory implements JJServerListener {
 	private final ScheduledThreadPoolExecutor executor;
 		
 	@Inject
-	ScriptExecutorFactory(
-		final JJTaskCreator taskCreator
-	) {
+	ScriptExecutorFactory() {
 		executor = new ScheduledThreadPoolExecutor(1, threadFactory, rejectedExecutionHandler) {
 			
 			{
@@ -69,13 +67,12 @@ public class ScriptExecutorFactory implements JJServerListener {
 				setRemoveOnCancelPolicy(true);
 			}
 			
-			@SuppressWarnings("unchecked")
 			@Override
 			protected <V> RunnableScheduledFuture<V> decorateTask(
 				final Runnable runnable,
 				final RunnableScheduledFuture<V> task
 			) {
-				return (RunnableScheduledFuture<V>)taskCreator.decorateTask(runnable, task);
+				return new JJScheduledTask<>(runnable, task);
 			}
 			
 			@Override

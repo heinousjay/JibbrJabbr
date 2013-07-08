@@ -78,13 +78,9 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 				System.err.println("ran out of room for an client task.  OOM error coming shortly!");
 			}
 		};
-	
-	private final JJTaskCreator taskCreator;
 		
 	@Inject
-	ClientExecutor(
-		final JJTaskCreator taskCreator
-	) {
+	ClientExecutor() {
 		super(
 			1, 
 			threadFactory,
@@ -92,16 +88,14 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 		);
 		this.setCorePoolSize(WORKER_COUNT);
 		this.setMaximumPoolSize(WORKER_COUNT);
-		this.taskCreator = taskCreator;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	protected <V> RunnableScheduledFuture<V> decorateTask(
 		final Runnable runnable,
 		final RunnableScheduledFuture<V> task
 	) {
-		return (RunnableScheduledFuture<V>)taskCreator.decorateTask(runnable, task);
+		return new JJScheduledTask<V>(runnable, task);
 	}
 	
 	@Override

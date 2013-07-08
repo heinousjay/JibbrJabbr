@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.logging.ExecutionTraceLogger;
-import jj.execution.TaskCreator.JJTask;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.JJWebSocketConnection;
@@ -43,22 +42,22 @@ class ExecutionTraceImpl implements ExecutionTrace {
 	}
 	
 	@Override
-	public void preparingTask(JJTask task) {
+	public void preparingTask(JJTask<?> task) {
 		
 	}
 	
 	@Override
-	public void startingTask(JJTask task) {
+	public void startingTask(JJTask<?> task) {
 
 	}
 	
 	@Override
-	public void taskCompletedSuccessfully(JJTask task) {
+	public void taskCompletedSuccessfully(JJTask<?> task) {
 
 	}
 	
 	@Override
-	public void taskCompletedWithError(JJTask task, Throwable error) {
+	public void taskCompletedWithError(JJTask<?> task, Throwable error) {
 
 	}
 	

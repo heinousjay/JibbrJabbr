@@ -32,7 +32,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import jj.execution.JJExecutors;
-import jj.execution.JJRunnable;
 import jj.execution.ScriptExecutorFactory;
 import jj.script.ScriptRunner;
 
