@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
-import jj.IOThread;
 import jj.SHA1Helper;
+import jj.execution.IOThread;
 
 public class CssResource implements LoadedResource {
 	

@@ -10,8 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
-import jj.IOThread;
 import jj.SHA1Helper;
+import jj.execution.IOThread;
 
 // needs to be public or mockito can't mock this, so the constructor
 // is package protected to prevent outside things from deriving from

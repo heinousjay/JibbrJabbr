@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.execution;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.is;
-import static jj.MockJJExecutors.ThreadType.*;
+import static jj.execution.MockJJExecutors.ThreadType.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayDeque;
@@ -30,6 +30,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
+import jj.execution.ScriptExecutorFactory;
 import jj.script.ScriptRunner;
 
 /**
@@ -137,13 +141,6 @@ public class MockJJExecutors implements JJExecutors {
 	@Override
 	public int ioPoolSize() {
 		return ioPoolSize;
-	}
-	
-	public final MockTaskCreator taskCreator = new MockTaskCreator();
-
-	@Override
-	public Runnable prepareTask(final JJRunnable task) {
-		return taskCreator.prepareTask(task);
 	}
 
 }

@@ -25,9 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.ExecutionTrace;
 import jj.JJ;
 import jj.configuration.Configuration;
+import jj.execution.ExecutionTrace;
 import jj.resource.LessProcessor;
 
 import org.junit.Before;

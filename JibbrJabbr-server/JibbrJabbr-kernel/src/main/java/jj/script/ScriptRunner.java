@@ -12,12 +12,11 @@ import org.mozilla.javascript.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
-import jj.ScriptExecutorFactory;
-import jj.ScriptThread;
-import jj.TaskCreator;
 import jj.document.DocumentRequestProcessor;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
+import jj.execution.ScriptExecutorFactory;
+import jj.execution.ScriptThread;
 import jj.hostapi.HostEvent;
 import jj.http.JJWebSocketConnection;
 
@@ -45,8 +44,6 @@ public class ScriptRunner {
 	
 	private final CurrentScriptContext context;
 	
-	private final TaskCreator taskCreator;
-	
 	private final ScriptExecutorFactory scriptExecutorFactory;
 	
 	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
@@ -56,7 +53,6 @@ public class ScriptRunner {
 		final ScriptBundleHelper scriptBundleHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
-		final TaskCreator taskCreator,
 		final ScriptExecutorFactory scriptExecutorFactory,
 		final Set<ContinuationProcessor> continuationProcessors
 	) {
@@ -67,7 +63,6 @@ public class ScriptRunner {
 		this.scriptBundleHelper = scriptBundleHelper;
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
-		this.taskCreator = taskCreator;
 		this.scriptExecutorFactory = scriptExecutorFactory;
 		this.continuationProcessors = makeContinuationProcessors(continuationProcessors);
 	}
@@ -163,7 +158,7 @@ public class ScriptRunner {
 		submit(baseName, new JJRunnable("document request [" + documentRequestProcessor + "]") {
 
 			@Override
-			public void run() throws Exception {
+			public void doRun() throws Exception {
 				
 				log.trace("preparing to execute document request {}", baseName);
 				
@@ -241,7 +236,7 @@ public class ScriptRunner {
 		submit(scriptBundle.baseName(), new JJRunnable("module parent resumption") {
 
 			@Override
-			public void run() throws Exception {
+			public void doRun() throws Exception {
 				log.debug("resuming module parent with exports");
 				context.restore(requiredModule.parentContext());
 				try {
@@ -260,7 +255,7 @@ public class ScriptRunner {
 		submit(baseName, new JJRunnable("module script initialization for [" + identifier + "]") {
 			
 			@Override
-			public void run() throws Exception {
+			public void doRun() throws Exception {
 				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
 				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
 				context.initialize(scriptBundle, requiredModule);
@@ -281,7 +276,7 @@ public class ScriptRunner {
 		submit(connection.baseName(), new JJRunnable("resuming continuation on [" + connection + "]") {
 			
 			@Override
-			public void run() throws Exception {
+			public void doRun() throws Exception {
 				context.initialize(connection);
 				try {
 					resumeContinuation(pendingKey, result);
@@ -311,7 +306,7 @@ public class ScriptRunner {
 		submit(connection.baseName(), new JJRunnable("host event on WebSocket connection") {
 
 			@Override
-			public void run() throws Exception {
+			public void doRun() throws Exception {
 				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
 				AssociatedScriptBundle bundle = connection.associatedScriptBundle();
@@ -335,7 +330,7 @@ public class ScriptRunner {
 	 */
 	private void submit(final String baseName, final JJRunnable runnable) {
 		
-		scriptExecutorFactory.executorFor(baseName).submit(taskCreator.prepareTask(runnable));
+		scriptExecutorFactory.executorFor(baseName).submit(runnable);
 	}
 	
 	/**

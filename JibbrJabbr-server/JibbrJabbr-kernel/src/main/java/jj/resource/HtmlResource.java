@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 
-import jj.IOThread;
+import jj.execution.IOThread;
 
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;

@@ -8,8 +8,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.ExecutionTrace;
-import jj.JJExecutors;
+import jj.execution.ExecutionTrace;
+import jj.execution.JJExecutors;
 import jj.hostapi.HostEvent;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessageException;

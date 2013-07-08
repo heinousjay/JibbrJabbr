@@ -7,11 +7,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJExecutors;
 import jj.configuration.Configuration;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
+import jj.execution.JJExecutors;
 import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;

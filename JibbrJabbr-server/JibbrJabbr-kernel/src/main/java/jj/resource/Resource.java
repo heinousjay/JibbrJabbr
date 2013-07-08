@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
-import jj.IOThread;
+import jj.execution.IOThread;
 
 /**
  * represents some resource loaded from the file system

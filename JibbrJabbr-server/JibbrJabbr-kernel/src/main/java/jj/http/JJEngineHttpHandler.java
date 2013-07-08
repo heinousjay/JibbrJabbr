@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
-import jj.ExecutionTrace;
-import jj.JJExecutors;
-import jj.JJRunnable;
+import jj.execution.ExecutionTrace;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
 import jj.servable.Servable;
 
 /**
@@ -116,9 +116,9 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final Servable[] servables = findMatchingServables(request);
 		
 		assert (servables.length > 0) : "";
-		executors.ioExecutor().execute(executors.prepareTask(new JJRunnable("JJEngine core processing") {
+		executors.ioExecutor().submit(new JJRunnable("JJEngine core processing") {
 			@Override
-			public void run() throws Exception {
+			public void doRun() throws Exception {
 				try {
 					boolean found = false;
 					for (Servable servable : servables) {
@@ -136,6 +136,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 					response.error(e);
 				}
 			}
-		}));
+		});
 	}
 }

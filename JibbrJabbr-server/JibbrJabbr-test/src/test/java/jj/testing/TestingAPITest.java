@@ -226,7 +226,7 @@ public class TestingAPITest {
 		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory() + " after GC");
 	}
 	
-	@Test
+	@Ignore @Test
 	public void areYouKiddingMePart2() throws Throwable {
 		areYouKiddingMe();
 		System.out.println();

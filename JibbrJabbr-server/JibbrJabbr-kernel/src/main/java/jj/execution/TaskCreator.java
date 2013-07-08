@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.execution;
 
 import java.math.BigDecimal;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
-import java.util.concurrent.RunnableScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -62,7 +56,7 @@ public class TaskCreator {
 				startNanos = System.nanoTime();
 				current.set(runnable);
 				if (traceLog) trace.startingTask(this);
-				runnable.run();
+				runnable.doRun();
 				if (traceLog) trace.taskCompletedSuccessfully(this);
 			} catch (OutOfMemoryError rethrow) {
 				throw rethrow;
@@ -105,7 +99,7 @@ public class TaskCreator {
 		this.trace = trace;
 	}
 	
-	public Runnable prepareTask(final JJRunnable runnable) {
+	private Runnable prepareTask(final JJRunnable runnable) {
 		
 		return new JJTask(runnable);
 	}
@@ -124,72 +118,6 @@ public class TaskCreator {
 				} finally {
 				}
 			}
-		};
-	}
-	
-	<V> RunnableScheduledFuture<V> newClientTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
-		return prepareTask(runnable, task);
-	}
-	
-	<V> RunnableScheduledFuture<V> newHttpTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
-		return prepareTask(runnable, task);
-	}
-	
-	<V> RunnableScheduledFuture<V> newScriptTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
-		return prepareTask(runnable, task);
-	}
-	
-	private <V> RunnableScheduledFuture<V> prepareTask(final Runnable runnable, final RunnableScheduledFuture<V> task) {
-		return new RunnableScheduledFuture<V>() {
-
-			@Override
-			public void run() {
-				try {
-					task.run();
-				} finally {
-				}
-			}
-
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return task.cancel(mayInterruptIfRunning);
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return task.isCancelled();
-			}
-
-			@Override
-			public boolean isDone() {
-				return task.isDone();
-			}
-
-			@Override
-			public V get() throws InterruptedException, ExecutionException {
-				return task.get();
-			}
-
-			@Override
-			public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-				return task.get(timeout, unit);
-			}
-
-			@Override
-			public long getDelay(TimeUnit unit) {
-				return task.getDelay(unit);
-			}
-
-			@Override
-			public int compareTo(Delayed o) {
-				return task.compareTo(o);
-			}
-
-			@Override
-			public boolean isPeriodic() {
-				return task.isPeriodic();
-			}
-			
 		};
 	}
 }

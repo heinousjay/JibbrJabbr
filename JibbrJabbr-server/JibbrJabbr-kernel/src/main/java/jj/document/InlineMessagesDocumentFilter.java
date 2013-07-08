@@ -6,7 +6,7 @@ import java.util.PropertyResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJExecutors;
+import jj.execution.JJExecutors;
 import jj.resource.PropertiesResource;
 import jj.resource.ResourceFinder;
 

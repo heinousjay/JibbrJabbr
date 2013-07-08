@@ -5,9 +5,8 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.MockTaskCreator;
-import jj.ScriptExecutorFactory;
 import jj.document.DocumentRequestProcessor;
+import jj.execution.ScriptExecutorFactory;
 import jj.hostapi.HostEvent;
 import jj.http.HttpRequestState;
 import jj.http.JJWebSocketConnection;
@@ -53,8 +52,6 @@ public class ScriptRunnerTest {
 	
 	DeterministicScheduler executor;
 	
-	MockTaskCreator taskCreator = new MockTaskCreator();
-	
 	@Spy MockHttpRequest httpRequest;
 	
 	ScriptRunner scriptRunner;
@@ -96,7 +93,6 @@ public class ScriptRunnerTest {
 			scriptBundleHelper,
 			continuationCoordinator,
 			currentScriptContext,
-			taskCreator,
 			scriptExecutorFactory,
 			continuationProcessors
 		);

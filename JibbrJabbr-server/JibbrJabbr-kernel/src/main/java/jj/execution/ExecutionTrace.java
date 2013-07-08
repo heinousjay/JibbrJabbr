@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.execution;
 
 import java.io.IOException;
 
-import jj.TaskCreator.JJTask;
+import jj.execution.TaskCreator.JJTask;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.JJWebSocketConnection;

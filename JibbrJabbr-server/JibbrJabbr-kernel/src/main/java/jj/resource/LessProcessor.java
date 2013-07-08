@@ -31,8 +31,8 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.ExecutionTrace;
 import jj.configuration.Configuration;
+import jj.execution.ExecutionTrace;
 
 /**
  * accepts a path that represents a less source file,

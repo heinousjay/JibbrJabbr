@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.JJExecutors;
+import jj.execution.JJExecutors;
 
 import org.junit.Before;
 import org.junit.Test;

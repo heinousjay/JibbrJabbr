@@ -20,6 +20,7 @@ import org.mozilla.javascript.ContextFactory;
 
 import jj.client.ClientModule;
 import jj.document.DocumentModule;
+import jj.execution.ExecutionModule;
 import jj.hostapi.HostApiModule;
 import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
@@ -75,25 +76,13 @@ public class CoreModule extends JJModule {
 		// we need the logging module to configure our async logger before we do anything that might log
 		install(new LoggingModule(isTest));
 		
-		addServerListenerBinding().to(IOExecutor.class);
-		addServerListenerBinding().to(ScriptExecutorFactory.class);
-		addServerListenerBinding().to(ClientExecutor.class);
-		
 		// you want the command line args?  HAVE AT EM
 		bind(String[].class).toInstance(args);
-		
-		// for now.  this will have different installations in different
-		// environments, i'd think.  if you replace this binding you'll also
-		// have to  do something with TaskCreator
-		bind(ExecutionTrace.class).to(ExecutionTraceImpl.class);
-		
-		// a good place to break apart crafty circular dependencies.  this is
-		// the most popular object in the system.  for good reason.
-		bind(JJExecutors.class).to(JJExecutorsImpl.class);
 		
 		// and install our little pieces
 		install(new ClientModule());
 		install(new DocumentModule());
+		install(new ExecutionModule());
 		install(new HostApiModule());
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());

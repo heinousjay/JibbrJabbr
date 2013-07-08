@@ -15,9 +15,9 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
 import jj.JJServerListener;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
 
 @Singleton
 class AssetResourcePreloader implements JJServerListener {
@@ -62,17 +62,17 @@ class AssetResourcePreloader implements JJServerListener {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 				final String baseName = path.relativize(file).toString();
-				executors.ioExecutor().submit(executors.prepareTask(new JJRunnable("internal asset preloader") {
+				executors.ioExecutor().submit(new JJRunnable("internal asset preloader") {
 					@Override
 					protected boolean ignoreInExecutionTrace() {
 						return true;
 					}
 					
 					@Override
-					public void run() throws Exception {
+					public void doRun() throws Exception {
 						finder.loadResource(AssetResource.class, baseName);
 					}
-				}));
+				});
 				return FileVisitResult.CONTINUE;
 			}
 

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.PropertyResourceBundle;
 
-import jj.JJExecutors;
+import jj.execution.JJExecutors;
 import jj.resource.HtmlResource;
 import jj.resource.PropertiesResource;
 import jj.resource.ResourceFinder;

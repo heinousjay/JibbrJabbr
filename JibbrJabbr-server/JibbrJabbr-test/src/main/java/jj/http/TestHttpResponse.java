@@ -27,11 +27,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
-import jj.ExecutionTrace;
 import jj.logging.TestRunnerLogger;
 import jj.resource.MimeTypes;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
+import jj.execution.ExecutionTrace;
 import jj.http.HttpResponse;
 
 import io.netty.handler.codec.http.HttpHeaders;

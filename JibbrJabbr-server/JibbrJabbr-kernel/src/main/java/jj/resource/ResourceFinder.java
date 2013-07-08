@@ -1,6 +1,6 @@
 package jj.resource;
 
-import jj.IOThread;
+import jj.execution.IOThread;
 
 /**
  * Inject this to get resources from the filesystem

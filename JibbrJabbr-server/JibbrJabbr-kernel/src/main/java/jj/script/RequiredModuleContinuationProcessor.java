@@ -20,8 +20,8 @@ import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
 import jj.hostapi.RequiredModuleException;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
@@ -66,10 +66,10 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		final String path = Paths.get(baseName).resolveSibling(requiredModule.identifier()).toString();
 		
 		executors.ioExecutor().submit(
-			executors.prepareTask(new JJRunnable("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
+			new JJRunnable("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
 			
 				@Override
-				public void run() throws Exception {
+				public void doRun() throws Exception {
 					ScriptResource scriptResource = 
 						finder.loadResource(ScriptResource.class, path, ScriptResourceType.Module);
 					
@@ -87,7 +87,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 						resumeContinuationAfterError(requiredModule, baseName, new RequiredModuleException(requiredModule.identifier()));
 					}
 				}
-			})
+			}
 		);
 	}
 	
@@ -98,10 +98,10 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	) {
 		
 		executors.scriptExecutorFor(baseName).submit(
-			executors.prepareTask(new JJRunnable("required module " + require.identifier() + " error result in [" + baseName + "]") {
+			new JJRunnable("required module " + require.identifier() + " error result in [" + baseName + "]") {
 			
 				@Override
-				public void run() throws Exception {
+				public void doRun() throws Exception {
 					
 					context.restore(require.parentContext());
 					
@@ -111,7 +111,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 						context.end();
 					}
 				}
-			})
+			}
 		);
 	}
 

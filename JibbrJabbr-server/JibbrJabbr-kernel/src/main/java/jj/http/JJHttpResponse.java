@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.DateFormatHelper;
-import jj.ExecutionTrace;
 import jj.Version;
+import jj.execution.ExecutionTrace;
 import jj.logging.AccessLogger;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;

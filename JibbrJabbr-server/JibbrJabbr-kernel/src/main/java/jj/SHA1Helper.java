@@ -14,6 +14,8 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import jj.execution.IOThread;
+
 /** 
  * 
  * @author jason

@@ -1,4 +1,4 @@
-package jj;
+package jj.execution;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,19 +26,16 @@ import jj.script.ScriptRunner;
 @Singleton
 class JJExecutorsImpl implements JJExecutors {
 
-	private final TaskCreator taskCreator;
 	private final ScriptRunner scriptRunner;
 	private final IOExecutor ioExecutor;
 	private final ScriptExecutorFactory scriptExecutorFactory;
 	
 	@Inject
 	public JJExecutorsImpl(
-		final TaskCreator taskCreator,
 		final ScriptRunner scriptRunner,
 		final IOExecutor ioExecutor,
 		final ScriptExecutorFactory scriptExecutorFactory
 	) {
-		this.taskCreator = taskCreator;
 		this.scriptRunner = scriptRunner;
 		this.ioExecutor = ioExecutor;
 		this.scriptExecutorFactory = scriptExecutorFactory;
@@ -73,10 +70,5 @@ class JJExecutorsImpl implements JJExecutors {
 	
 	public int ioPoolSize() {
 		return ioExecutor.getMaximumPoolSize();
-	}
-	
-	public Runnable prepareTask(final JJRunnable task) {
-		return taskCreator.prepareTask(task);
-		
 	}
 }

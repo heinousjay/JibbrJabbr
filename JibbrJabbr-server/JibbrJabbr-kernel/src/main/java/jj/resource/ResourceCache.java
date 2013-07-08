@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.IOExecutor;
+import jj.execution.IOExecutor;
 
 /**
  * central lookup for all resources, mapped from the URI

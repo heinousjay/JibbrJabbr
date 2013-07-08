@@ -17,7 +17,7 @@ import org.mozilla.javascript.Callable;
 
 import jj.DataStore;
 import jj.DateFormatHelper;
-import jj.ExecutionTrace;
+import jj.execution.ExecutionTrace;
 import jj.jqmessage.JQueryMessage;
 import jj.script.AssociatedScriptBundle;
 

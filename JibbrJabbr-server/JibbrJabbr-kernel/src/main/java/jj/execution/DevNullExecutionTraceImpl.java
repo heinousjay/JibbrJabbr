@@ -13,105 +13,103 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.execution;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import jj.TaskCreator.JJTask;
-import jj.logging.ExecutionTraceLogger;
+import jj.execution.TaskCreator.JJTask;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.JJWebSocketConnection;
-
-import org.slf4j.Logger;
 
 /**
  * @author jason
  *
  */
-@Singleton
-class ExecutionTraceImpl implements ExecutionTrace {
-	
-	private final Logger log;
-	
-	@Inject
-	ExecutionTraceImpl(final @ExecutionTraceLogger Logger log) {
-		this.log = log;
-	}
-	
+public class DevNullExecutionTraceImpl implements ExecutionTrace {
+
 	@Override
 	public void preparingTask(JJTask task) {
+		// TODO Auto-generated method stub
 		
 	}
-	
+
 	@Override
 	public void startingTask(JJTask task) {
-
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void taskCompletedSuccessfully(JJTask task) {
-
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void taskCompletedWithError(JJTask task, Throwable error) {
-
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void start(HttpRequest request, HttpResponse response) {
-		log.trace("Request started {}", request.uri());
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void end(HttpRequest request, HttpResponse response) {
-		log.trace("Request ended {}", request);
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void start(JJWebSocketConnection connection) {
-		log.trace("websocket connection started {}", connection);
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void end(JJWebSocketConnection connection) {
-		log.trace("websocket connection ended {}", connection);
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void message(JJWebSocketConnection connection, String message) {
-		log.trace("message from websocket connection {}", connection);
-		log.trace(message);
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void send(JJWebSocketConnection connection, String message) {
-		log.trace("sending on websocket connection {}", connection);
-		log.trace(message);
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void startLessProcessing(String baseName) {
-		log.trace("beginning processing of less servable at {}", baseName);
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
 	public void loadLessResource(String resourceName) {
-		log.trace("loading less resource {}", resourceName);
+		// TODO Auto-generated method stub
+		
 	}
-	
-	@Override
-	public void errorLoadingLessResource(String resourceName, IOException io) {
-		log.error("trouble loading less resource {}", resourceName);
-		log.error("", io);
-	}
-	
+
 	@Override
 	public void finishLessProcessing(String baseName) {
-		log.trace("finished processing less servable at {}", baseName);
+		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public void errorLoadingLessResource(String resourceName, IOException io) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

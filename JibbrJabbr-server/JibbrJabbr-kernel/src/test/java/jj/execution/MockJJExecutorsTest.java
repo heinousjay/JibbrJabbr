@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.execution;
 
-import static jj.MockJJExecutors.ThreadType.*;
+import static jj.execution.MockJJExecutors.ThreadType.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 

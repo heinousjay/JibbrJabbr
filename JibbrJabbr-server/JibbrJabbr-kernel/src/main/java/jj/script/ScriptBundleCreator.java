@@ -13,7 +13,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.ScriptThread;
+import jj.execution.ScriptThread;
 import jj.hostapi.DoCallFunction;
 import jj.hostapi.DoInvokeFunction;
 import jj.hostapi.RhinoObjectCreator;

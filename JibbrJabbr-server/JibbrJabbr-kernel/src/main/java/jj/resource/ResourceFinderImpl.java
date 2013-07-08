@@ -15,8 +15,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.IOThread;
-import jj.JJExecutors;
+import jj.execution.IOThread;
+import jj.execution.JJExecutors;
 
 /**
  * coordinates access to the resource cache for the outside

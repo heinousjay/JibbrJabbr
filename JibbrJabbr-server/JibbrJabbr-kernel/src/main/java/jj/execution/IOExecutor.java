@@ -1,4 +1,4 @@
-package jj;
+package jj.execution;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -10,6 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.JJServerListener;
 
 /**
  * You should almost certainly not depend on this class.  depend on

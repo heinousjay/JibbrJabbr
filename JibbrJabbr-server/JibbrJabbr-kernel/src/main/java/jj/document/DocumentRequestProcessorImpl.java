@@ -5,10 +5,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.util.ArrayList;
 import java.util.Set;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
-import jj.ScriptThread;
 import jj.script.AssociatedScriptBundle;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
+import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
 
 import io.netty.handler.codec.http.HttpHeaders;
@@ -94,14 +94,14 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		if (ioFilters.isEmpty()) {
 			writeResponse();
 		} else {
-			executors.ioExecutor().submit(executors.prepareTask(new JJRunnable("Document filtering requiring I/O") {
+			executors.ioExecutor().submit(new JJRunnable("Document filtering requiring I/O") {
 				
 				@Override
-				public void run() throws Exception {
+				public void doRun() throws Exception {
 					executeFilters(ioFilters);
 					writeResponse();
 				}
-			}));
+			});
 		}
 	}
 	

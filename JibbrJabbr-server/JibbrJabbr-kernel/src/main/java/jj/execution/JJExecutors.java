@@ -1,4 +1,4 @@
-package jj;
+package jj.execution;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,7 +20,5 @@ public interface JJExecutors {
 	boolean isIOThread();
 
 	int ioPoolSize();
-	
-	Runnable prepareTask(JJRunnable task);
 
 }

@@ -16,7 +16,7 @@
 package jj.resource;
 
 import static org.mockito.BDDMockito.*;
-import jj.MockJJExecutors;
+import jj.execution.MockJJExecutors;
 
 import org.junit.Before;
 import org.junit.Test;

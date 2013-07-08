@@ -20,8 +20,8 @@ import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJExecutors;
-import jj.ScriptThread;
+import jj.execution.JJExecutors;
+import jj.execution.ScriptThread;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;

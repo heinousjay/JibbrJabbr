@@ -1,7 +1,7 @@
 package jj.document;
 
 
-import static jj.MockJJExecutors.ThreadType.*;
+import static jj.execution.MockJJExecutors.ThreadType.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -11,11 +11,11 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import jj.MockJJExecutors;
-import jj.ScriptExecutorFactory;
 import jj.document.DocumentFilter;
 import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
+import jj.execution.MockJJExecutors;
+import jj.execution.ScriptExecutorFactory;
 import jj.http.MockHttpRequest;
 import jj.http.MockHttpResponse;
 import jj.resource.Resource;

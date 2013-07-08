@@ -17,7 +17,7 @@ package jj.http;
 
 import static org.mockito.BDDMockito.*;
 
-import jj.JJExecutors;
+import jj.execution.JJExecutors;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.MessageMaker;
 import jj.script.EventNameHelper;

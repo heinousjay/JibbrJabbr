@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.execution;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -24,6 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.JJServerListener;
 
 
 /**
@@ -76,11 +79,11 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 			}
 		};
 	
-	private final TaskCreator creator;
+	private final JJTaskCreator taskCreator;
 		
 	@Inject
 	ClientExecutor(
-		final TaskCreator creator
+		final JJTaskCreator taskCreator
 	) {
 		super(
 			1, 
@@ -89,12 +92,26 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 		);
 		this.setCorePoolSize(WORKER_COUNT);
 		this.setMaximumPoolSize(WORKER_COUNT);
-		this.creator = creator;
+		this.taskCreator = taskCreator;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <V> RunnableScheduledFuture<V> decorateTask(
+		final Runnable runnable,
+		final RunnableScheduledFuture<V> task
+	) {
+		return (RunnableScheduledFuture<V>)taskCreator.decorateTask(runnable, task);
 	}
 	
 	@Override
-	protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable, RunnableScheduledFuture<V> task) {
-		return creator.newClientTask(runnable, task);
+	protected <V> RunnableScheduledFuture<V> decorateTask(
+		final Callable<V> callable,
+		final RunnableScheduledFuture<V> task
+	) {
+		System.err.println("something asked for a callable");
+		new Exception().printStackTrace();
+		return task;
 	}
 
 	@Override

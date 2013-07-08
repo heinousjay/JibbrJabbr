@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import jj.MockJJExecutors;
+import jj.execution.MockJJExecutors;
 import jj.hostapi.ScriptJSON;
 
 import org.junit.Before;

@@ -26,8 +26,8 @@ import javax.inject.Inject;
 
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
-import jj.ExecutionTrace;
 import jj.logging.TestRunnerLogger;
+import jj.execution.ExecutionTrace;
 import jj.http.TestHttpRequest;
 import jj.http.TestHttpResponse;
 import jj.http.TestJJEngineHttpHandler;

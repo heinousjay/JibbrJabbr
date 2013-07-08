@@ -5,8 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
-import jj.IOThread;
 import jj.configuration.Configuration;
+import jj.execution.IOThread;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.RequestProcessor;

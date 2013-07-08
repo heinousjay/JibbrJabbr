@@ -21,8 +21,8 @@ import static org.mockito.Mockito.*;
 
 import java.nio.file.Files;
 
-import jj.ExecutionTrace;
 import jj.SHA1Helper;
+import jj.execution.ExecutionTrace;
 
 import org.junit.Before;
 import org.junit.Test;

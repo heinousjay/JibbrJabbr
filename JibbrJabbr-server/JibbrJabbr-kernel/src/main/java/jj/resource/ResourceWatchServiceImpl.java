@@ -17,8 +17,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
 
 /**
  * watches for file changes on resources we've already loaded
@@ -61,7 +61,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 	}
 	
 	public void start() {
-		executors.ioExecutor().submit(executors.prepareTask(loop));
+		executors.ioExecutor().submit(loop);
 	}
 	
 	public void stop() {
@@ -84,7 +84,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 		}
 		
 		@Override
-		public void run() throws Exception {
+		public void doRun() throws Exception {
 			// we're a daemon thread, run till we can't run no more
 			// or get interrupted, whichever comes first
 			while (true) {
@@ -114,7 +114,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 							if (resource != null) {
 								// this thread is only to handle the
 								// WatchEvents
-								executors.ioExecutor().submit(executors.prepareTask(
+								executors.ioExecutor().submit(
 									new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
 									
 										@Override
@@ -123,7 +123,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 										}
 	
 										@Override
-										public void run() throws Exception {
+										public void doRun() throws Exception {
 											log.info("reloading {}",path);
 											resourceFinder.loadResource(
 												resource.getClass(),
@@ -131,7 +131,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 												resource.creationArgs()
 											);
 										}
-									})
+									}
 								);
 							}
 						}

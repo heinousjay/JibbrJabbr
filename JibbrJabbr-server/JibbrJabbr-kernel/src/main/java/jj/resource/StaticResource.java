@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 
-import jj.IOThread;
+import jj.execution.IOThread;
 
 /**
  * @author jason

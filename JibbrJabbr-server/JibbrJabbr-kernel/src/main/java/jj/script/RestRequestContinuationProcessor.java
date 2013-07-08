@@ -8,8 +8,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJExecutors;
-import jj.JJRunnable;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
 import jj.hostapi.ScriptJSON;
 
 import com.ning.http.client.AsyncHttpClient;
@@ -54,10 +54,10 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 		try {
 			final ListenableFuture<Response> response = httpClient.executeRequest(restRequest.request());
 			response.addListener(
-				executors.prepareTask(new JJRunnable("REST response with id [" + restRequest.id() + "]") {
-					
+				new JJRunnable("REST response with id [" + restRequest.id() + "]") {
+							
 					@Override
-					public void run() throws Exception {
+					public void doRun() throws Exception {
 						context.restore(scriptContext);
 						try {
 							// TODO obviously this isn't right yet
@@ -76,7 +76,7 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 							context.end();
 						}
 					}
-				}), executors.scriptExecutorFor(context.baseName()));
+				}, executors.scriptExecutorFor(context.baseName()));
 			
 		} catch (IOException e) {
 			log.error("trouble executing {}", restRequest);

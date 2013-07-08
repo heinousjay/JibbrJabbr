@@ -18,7 +18,7 @@ package jj.http;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJExecutors;
+import jj.execution.JJExecutors;
 import jj.hostapi.ScriptJSON;
 import jj.jqmessage.JQueryMessage;
 import jj.jqmessage.JQueryMessage.Type;

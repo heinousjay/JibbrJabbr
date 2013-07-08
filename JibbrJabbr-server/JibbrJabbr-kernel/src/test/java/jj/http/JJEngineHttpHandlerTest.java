@@ -20,8 +20,8 @@ import static org.mockito.BDDMockito.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import jj.ExecutionTrace;
-import jj.MockJJExecutors;
+import jj.execution.ExecutionTrace;
+import jj.execution.MockJJExecutors;
 import jj.servable.Servable;
 
 import org.junit.Before;

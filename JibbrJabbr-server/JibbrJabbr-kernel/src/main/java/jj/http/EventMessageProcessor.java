@@ -21,8 +21,8 @@ import javax.inject.Singleton;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.JJExecutors;
 import jj.StringUtils;
+import jj.execution.JJExecutors;
 import jj.hostapi.EventSelection;
 import jj.hostapi.ScriptJSON;
 import jj.jqmessage.JQueryMessage;

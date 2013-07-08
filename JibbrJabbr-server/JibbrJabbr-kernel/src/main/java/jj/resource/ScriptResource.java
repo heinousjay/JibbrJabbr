@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import jj.IOThread;
+import jj.execution.IOThread;
 
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	

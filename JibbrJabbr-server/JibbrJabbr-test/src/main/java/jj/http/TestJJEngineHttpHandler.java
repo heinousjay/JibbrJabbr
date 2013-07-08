@@ -22,8 +22,8 @@ import javax.inject.Singleton;
 
 import com.google.inject.Injector;
 
-import jj.ExecutionTrace;
-import jj.JJExecutors;
+import jj.execution.ExecutionTrace;
+import jj.execution.JJExecutors;
 import jj.servable.Servable;
 
 /**

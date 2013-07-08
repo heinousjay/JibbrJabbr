@@ -18,7 +18,7 @@ package jj.client;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import jj.ClientExecutor;
+import jj.execution.ClientExecutor;
 
 import com.ning.http.client.AsyncHttpClientConfig;
 
