@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.execution;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,22 +29,24 @@ import io.netty.channel.nio.NioEventLoopGroup;
  *
  */
 @Singleton
-class JJNioEventLoopGroup extends NioEventLoopGroup {
-	
-	private static final ThreadFactory threadFactory = new ThreadFactory() {
-		
-		private final AtomicInteger id = new AtomicInteger();
-		
-		@Override
-		public Thread newThread(Runnable r) {
-			
-			return new Thread(r, "JibbrJabbr HTTP I/O Handler  " + id.incrementAndGet());
-		}
-	};
+public class JJNioEventLoopGroup extends NioEventLoopGroup {
 
 	@Inject
-	JJNioEventLoopGroup() {
-		super(Runtime.getRuntime().availableProcessors(), threadFactory);
+	JJNioEventLoopGroup(
+		final UncaughtExceptionHandler uncaughtExceptionHandler
+	) {
+		super(Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+			
+			private final AtomicInteger id = new AtomicInteger();
+			
+			@Override
+			public Thread newThread(Runnable r) {
+				
+				Thread thread = new Thread(r, "JibbrJabbr HTTP I/O Handler  " + id.incrementAndGet());
+				thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+				return thread;
+			}
+		});
 	}
 	
 	

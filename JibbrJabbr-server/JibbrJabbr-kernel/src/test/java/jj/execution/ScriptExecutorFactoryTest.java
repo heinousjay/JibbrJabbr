@@ -19,7 +19,14 @@ public class ScriptExecutorFactoryTest {
 	
 	@Before
 	public void before() {
-		scriptExecutorFactory = new ScriptExecutorFactory();
+		scriptExecutorFactory = new ScriptExecutorFactory(new Thread.UncaughtExceptionHandler() {
+			
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
 	@Test

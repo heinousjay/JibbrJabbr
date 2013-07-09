@@ -118,7 +118,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		assert (servables.length > 0) : "";
 		executors.ioExecutor().submit(new JJRunnable("JJEngine core processing") {
 			@Override
-			public void doRun() throws Exception {
+			public void run() {
 				try {
 					boolean found = false;
 					for (Servable servable : servables) {

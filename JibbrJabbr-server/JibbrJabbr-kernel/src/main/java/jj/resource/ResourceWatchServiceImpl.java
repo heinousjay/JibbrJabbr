@@ -3,6 +3,7 @@ package jj.resource;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 import java.io.IOException;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,7 +66,6 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 	}
 	
 	public void stop() {
-		log.info("stopping the resource watch service");
 		try {
 			watcher.close();
 		} catch (IOException e) {}
@@ -84,66 +84,69 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 		}
 		
 		@Override
-		public void doRun() throws Exception {
-			// we're a daemon thread, run till we can't run no more
-			// or get interrupted, whichever comes first
-			while (true) {
-				WatchKey watchKey = watcher.take();
-				if (watchKey.isValid()) {
-					final Path directory = (Path)watchKey.watchable();
-					
-					for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
+		public void run() {
+			try {
+				// we're a daemon thread, run till we can't run no more
+				// or get interrupted, whichever comes first
+				while (true) {
+					WatchKey watchKey = watcher.take();
+					if (watchKey.isValid()) {
+						final Path directory = (Path)watchKey.watchable();
 						
-						final Kind<?> kind = watchEvent.kind();
-						if (kind == OVERFLOW) {
-							log.warn("FileWatchService OVERFLOW - not sure what this means!");
-							continue; // for now. not sure what else to do
-						}
-						final WatchEvent<Path> event = cast(watchEvent);
-						final Path context = event.context();
-						final Path path = directory.resolve(context);
-						
-						if (kind == ENTRY_DELETE) {
-							// it'll get reloaded if it gets recreated
-							// later and someone wants it
-							log.info("removing {}", path);
-							resourceCache.remove(path.toUri());
-						
-						} else if (kind == ENTRY_MODIFY) {
-							final Resource resource = resourceCache.get(path.toUri());
-							if (resource != null) {
-								// this thread is only to handle the
-								// WatchEvents
-								executors.ioExecutor().submit(
-									new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
-									
-										@Override
-										protected boolean ignoreInExecutionTrace() {
-											return true;
+						for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
+							
+							final Kind<?> kind = watchEvent.kind();
+							if (kind == OVERFLOW) {
+								log.warn("FileWatchService OVERFLOW - not sure what this means!");
+								continue; // for now. not sure what else to do
+							}
+							final WatchEvent<Path> event = cast(watchEvent);
+							final Path context = event.context();
+							final Path path = directory.resolve(context);
+							
+							if (kind == ENTRY_DELETE) {
+								// it'll get reloaded if it gets recreated
+								// later and someone wants it
+								log.info("removing {}", path);
+								resourceCache.remove(path.toUri());
+							
+							} else if (kind == ENTRY_MODIFY) {
+								final Resource resource = resourceCache.get(path.toUri());
+								if (resource != null) {
+									// this thread is only to handle the
+									// WatchEvents
+									executors.ioExecutor().submit(
+										new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
+										
+											@Override
+											protected boolean ignoreInExecutionTrace() {
+												return true;
+											}
+		
+											@Override
+											public void run() {
+												log.info("reloading {}",path);
+												resourceFinder.loadResource(
+													resource.getClass(),
+													resource.baseName(),
+													resource.creationArgs()
+												);
+											}
 										}
-	
-										@Override
-										public void doRun() throws Exception {
-											log.info("reloading {}",path);
-											resourceFinder.loadResource(
-												resource.getClass(),
-												resource.baseName(),
-												resource.creationArgs()
-											);
-										}
-									}
-								);
+									);
+								}
 							}
 						}
+						
+						if (!Files.exists(directory)) {
+							watchKey.cancel();
+						}
 					}
 					
-					if (!Files.exists(directory)) {
-						watchKey.cancel();
-					}
+					watchKey.reset();
 				}
-				
-				watchKey.reset();
-			}
+			// this is the quit signal
+			} catch(ClosedWatchServiceException | InterruptedException e) {}
 		}
 	};
 }

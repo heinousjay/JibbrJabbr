@@ -1,5 +1,6 @@
 package jj.document;
 
+import static jj.resource.AssetResource.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -22,9 +23,6 @@ import org.jsoup.nodes.Element;
  */
 @Singleton
 class ScriptHelperDocumentFilter implements DocumentFilter {
-
-	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
-	public static final String JJ_JS = "jj.js";
 
 	private final Configuration configuration;
 	private final CurrentScriptContext context;

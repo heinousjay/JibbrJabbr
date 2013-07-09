@@ -15,6 +15,7 @@
  */
 package jj.execution;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableScheduledFuture;
@@ -47,44 +48,42 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 	// reaper +
 	// half the processors
 	public static final int WORKER_COUNT = 1 + (int)(Runtime.getRuntime().availableProcessors() * 0.5);
-	
-	private static final ThreadFactory threadFactory = new ThreadFactory() {
-		
-		private final AtomicInteger id = new AtomicInteger();
-		
-		@Override
-		public Thread newThread(final Runnable r) {
-			final String name = String.format(
-				"JibbrJabbr Http Client I/O Handler %d", 
-				id.incrementAndGet()
-			);
-			Thread thread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					flag.set(Boolean.TRUE);
-					r.run();
-				}
-			}, name);
-			thread.setDaemon(true);
-			return thread;
-		}
-	};
-	
-	private static final RejectedExecutionHandler rejectedExecutionHandler =
-		new RejectedExecutionHandler() {
-			
-			@Override
-			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-				System.err.println("ran out of room for an client task.  OOM error coming shortly!");
-			}
-		};
 		
 	@Inject
-	ClientExecutor() {
+	ClientExecutor(
+		final UncaughtExceptionHandler uncaughtExceptionHandler
+	) {
 		super(
 			1, 
-			threadFactory,
-			rejectedExecutionHandler
+			new ThreadFactory() {
+				
+				private final AtomicInteger id = new AtomicInteger();
+				
+				@Override
+				public Thread newThread(final Runnable r) {
+					final String name = String.format(
+						"JibbrJabbr Http Client I/O Handler %d", 
+						id.incrementAndGet()
+					);
+					Thread thread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							flag.set(Boolean.TRUE);
+							r.run();
+						}
+					}, name);
+					thread.setDaemon(true);
+					thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+					return thread;
+				}
+			},
+			new RejectedExecutionHandler() {
+				
+				@Override
+				public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+					System.err.println("ran out of room for an client task.  OOM error coming shortly!");
+				}
+			}
 		);
 		this.setCorePoolSize(WORKER_COUNT);
 		this.setMaximumPoolSize(WORKER_COUNT);
@@ -95,7 +94,7 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 		final Runnable runnable,
 		final RunnableScheduledFuture<V> task
 	) {
-		return new JJScheduledTask<V>(runnable, task);
+		return new JJScheduledTask<>(runnable, task);
 	}
 	
 	@Override

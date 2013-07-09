@@ -28,9 +28,10 @@ import com.google.inject.Provides;
  */
 public class LoggingModule extends JJModule {
 	
-	public static final String ACCESS_LOGGER = "access";
-	public static final String TEST_RUNNER_LOGGER = "test runner";
-	public static final String EXECUTION_TRACE_LOGGER = "execution trace";
+	static final String ACCESS_LOGGER = "access";
+	static final String TEST_RUNNER_LOGGER = "test runner";
+	static final String EXECUTION_TRACE_LOGGER = "execution trace";
+	static final String EMERGENCY_LOGGER = "emergency";
 	
 	private final boolean isTest;
 	
@@ -60,6 +61,11 @@ public class LoggingModule extends JJModule {
 	@Provides @ExecutionTraceLogger
 	public Logger provideExecutionTraceLogger() {
 		return LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER);
+	}
+	
+	@Provides @EmergencyLogger
+	public Logger provideEmergencyLogger() {
+		return LoggerFactory.getLogger(EMERGENCY_LOGGER);
 	}
 
 }

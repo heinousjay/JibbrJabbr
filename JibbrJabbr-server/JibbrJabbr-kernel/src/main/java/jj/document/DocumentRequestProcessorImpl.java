@@ -97,7 +97,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 			executors.ioExecutor().submit(new JJRunnable("Document filtering requiring I/O") {
 				
 				@Override
-				public void doRun() throws Exception {
+				public void run() {
 					executeFilters(ioFilters);
 					writeResponse();
 				}

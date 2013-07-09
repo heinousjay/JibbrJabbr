@@ -69,7 +69,7 @@ class AssetResourcePreloader implements JJServerListener {
 					}
 					
 					@Override
-					public void doRun() throws Exception {
+					public void run() {
 						finder.loadResource(AssetResource.class, baseName);
 					}
 				});

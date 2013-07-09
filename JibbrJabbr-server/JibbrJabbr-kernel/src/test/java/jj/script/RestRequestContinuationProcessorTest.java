@@ -20,7 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import jj.execution.MockJJExecutors;
-import jj.hostapi.ScriptJSON;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +46,6 @@ public class RestRequestContinuationProcessorTest {
 	@Mock AsyncHttpClient client;
 	@Mock ListenableFuture<Response> future;
 	MockJJExecutors executors;
-	@Mock ScriptJSON json;
 	@Mock ContinuationState continuationState;
 	@Mock Runnable returnedRunnable;
 	Runnable runnable;
@@ -80,7 +78,7 @@ public class RestRequestContinuationProcessorTest {
 		//given
 		
 		//when
-		new RestRequestContinuationProcessor(context, client, executors, json).process(continuationState);
+		new RestRequestContinuationProcessor(context, client, executors).process(continuationState);
 		
 		//then
 		assertThat(runnable, is(notNullValue()));
@@ -95,7 +93,6 @@ public class RestRequestContinuationProcessorTest {
 		//then
 		verify(context).restore(scriptContext);
 		verify(executors.scriptRunner).restartAfterContinuation(BDDMockito.any(String.class), BDDMockito.any(Object.class));
-		verify(json).parse(null);
 	}
 
 }

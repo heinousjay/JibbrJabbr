@@ -1,6 +1,8 @@
 package jj.script;
 
 import java.io.IOException;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
-import jj.hostapi.ScriptJSON;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
@@ -27,19 +28,15 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 	
 	private final JJExecutors executors;
 	
-	private final ScriptJSON json;
-	
 	@Inject
 	RestRequestContinuationProcessor(
 		final CurrentScriptContext context,
 		final AsyncHttpClient httpClient,
-		final JJExecutors executors,
-		final ScriptJSON json
+		final JJExecutors executors
 	) {
 		this.context = context;
 		this.httpClient = httpClient;
 		this.executors = executors;
-		this.json = json;
 	}
 	
 	@Override
@@ -57,21 +54,24 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 				new JJRunnable("REST response with id [" + restRequest.id() + "]") {
 							
 					@Override
-					public void doRun() throws Exception {
+					public void run() {
 						context.restore(scriptContext);
 						try {
-							// TODO obviously this isn't right yet
-							String body = response.get().getResponseBody();
 							executors
 								.scriptRunner()
 								.restartAfterContinuation(
 									restRequest.id(),
-									json.parse(body)
+									response.get()
 								);
-							
-						} catch (Exception e) {
-							log.error("trouble executing {}", restRequest);
-							throw e;
+						} catch (InterruptedException | CancellationException e) {
+							// ignore this, we're shutting down
+						} catch (ExecutionException e) {
+							executors
+							.scriptRunner()
+							.restartAfterContinuation(
+								restRequest.id(),
+								e.getCause()
+							);
 						} finally {
 							context.end();
 						}

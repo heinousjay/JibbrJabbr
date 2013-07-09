@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.JJServerListener;
+import jj.execution.JJNioEventLoopGroup;
 import jj.script.AssociatedScriptBundle;
 
 /**

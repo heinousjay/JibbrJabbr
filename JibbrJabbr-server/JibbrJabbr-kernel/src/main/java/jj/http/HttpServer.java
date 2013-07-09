@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJServerListener;
 import jj.configuration.Configuration;
+import jj.execution.JJNioEventLoopGroup;
 
 /**
  * @author jason

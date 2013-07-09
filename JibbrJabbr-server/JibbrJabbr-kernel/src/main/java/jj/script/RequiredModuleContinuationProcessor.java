@@ -69,7 +69,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 			new JJRunnable("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
 			
 				@Override
-				public void doRun() throws Exception {
+				public void run() {
 					ScriptResource scriptResource = 
 						finder.loadResource(ScriptResource.class, path, ScriptResourceType.Module);
 					
@@ -101,7 +101,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 			new JJRunnable("required module " + require.identifier() + " error result in [" + baseName + "]") {
 			
 				@Override
-				public void doRun() throws Exception {
+				public void run() {
 					
 					context.restore(require.parentContext());
 					

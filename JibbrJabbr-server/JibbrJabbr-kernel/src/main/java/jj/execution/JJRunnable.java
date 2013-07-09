@@ -18,19 +18,19 @@ public abstract class JJRunnable implements Runnable {
 	}
 	
 	@Override
-	public final void run() {
+	public void run() {
 		try {
 			doRun();
 		} catch (Exception e) {
-			throw new AssertionError("exception travelled to JJRunnable.  catch this earlier!", e);
+			e.printStackTrace();
+			throw new AssertionError("exception travelled to JJRunnable! BAD", e);
 		}
 	}
 
-	public abstract void doRun() throws Exception;
+	public void doRun() {}
 	
 	@Override
 	public final String toString() {
 		return name;
 	}
-
 }

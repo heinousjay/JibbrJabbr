@@ -68,7 +68,7 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 	@Override
 	public Path toPath(final String baseName, Object... args) {
 		
-		if (args.length == 1 && Boolean.TRUE.equals(args[0])) {
+		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
 			return configuration.basePath().resolve(toLess(baseName));
 			
 		}

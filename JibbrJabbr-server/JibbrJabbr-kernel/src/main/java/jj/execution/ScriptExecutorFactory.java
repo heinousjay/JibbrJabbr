@@ -1,5 +1,6 @@
 package jj.execution;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableScheduledFuture;
@@ -26,41 +27,42 @@ public class ScriptExecutorFactory implements JJServerListener {
 	private final Logger log = LoggerFactory.getLogger(ScriptExecutorFactory.class);
 	
 	private final AtomicInteger seq = new AtomicInteger();
-	
-	private final ThreadFactory threadFactory =
-		new ThreadFactory() {
-			
-			@Override
-			public Thread newThread(final Runnable r) {
-				
-				String name = String.format("ScriptExecutor %s", seq.incrementAndGet());
-				Thread thread = new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						flag.set(true);
-						r.run();
-					}
-				}, name);
-				thread.setDaemon(true);
-				return thread;
-			}
-		};
-		
-	private final RejectedExecutionHandler rejectedExecutionHandler =
-		new RejectedExecutionHandler() {
-			
-			@Override
-			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-				log.error("a script task was rejected.  it's like a miracle only backwards.  system crash imminent.");
-			}
-		};
-		
+
 	private final ScheduledThreadPoolExecutor executor;
 		
 	@Inject
-	ScriptExecutorFactory() {
-		executor = new ScheduledThreadPoolExecutor(1, threadFactory, rejectedExecutionHandler) {
+	ScriptExecutorFactory(
+		final UncaughtExceptionHandler uncaughtExceptionHandler
+	) {
+		executor = new ScheduledThreadPoolExecutor(
+			1,
+			new ThreadFactory() {
+				
+				@Override
+				public Thread newThread(final Runnable r) {
+					
+					String name = String.format("ScriptExecutor %s", seq.incrementAndGet());
+					Thread thread = new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							flag.set(true);
+							r.run();
+						}
+					}, name);
+					thread.setDaemon(true);
+					thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+					return thread;
+				}
+			},
+			new RejectedExecutionHandler() {
+				
+				@Override
+				public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+					log.error("a script task was rejected.  it's like a miracle only backwards.  system crash imminent.");
+				}
+			}
+		) {
 			
 			{
 				setExecuteExistingDelayedTasksAfterShutdownPolicy(false);

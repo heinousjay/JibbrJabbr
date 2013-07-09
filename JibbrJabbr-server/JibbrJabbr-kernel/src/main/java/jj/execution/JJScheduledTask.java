@@ -46,6 +46,10 @@ class JJScheduledTask<V> implements RunnableScheduledFuture<V> {
 
 	@Override
 	public void run() {
+
+		if (runnable instanceof JJRunnable) {
+			
+		}
 		try {
 			delegate.run();
 		} finally {

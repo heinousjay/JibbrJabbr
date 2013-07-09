@@ -15,6 +15,8 @@
  */
 package jj.execution;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+
 import jj.JJModule;
 
 /**
@@ -39,6 +41,8 @@ public class ExecutionModule extends JJModule {
 		// a good place to break apart crafty circular dependencies.  this is
 		// the most popular object in the system.  for good reason.
 		bind(JJExecutors.class).to(JJExecutorsImpl.class);
+		
+		bind(UncaughtExceptionHandler.class).to(JJUncaughtExceptionHandler.class);
 		
 	}
 

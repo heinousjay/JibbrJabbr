@@ -3,6 +3,7 @@ package jj.document;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static jj.resource.AssetResource.*;
 
 import java.net.URI;
 import java.util.List;
@@ -31,9 +32,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptHelperDocumentFilterTest {
 	
-	static final String JQUERY_URI = "/" + ScriptHelperDocumentFilter.JQUERY_JS;
+	static final String JQUERY_URI = "/" + JQUERY_JS;
 	static final String JJ_SHA = "be03b9352e1e254cae9a58cff2b20e0c8d513e47";
-	static final String JJ_URI = "/" + JJ_SHA + "/" + ScriptHelperDocumentFilter.JJ_JS;
+	static final String JJ_URI = "/" + JJ_SHA + "/" + JJ_JS;
 	
 	String scriptUri;
 	String socketUri;
@@ -73,13 +74,13 @@ public class ScriptHelperDocumentFilterTest {
 		when(documentRequest.document()).thenReturn(document);
 		when(documentRequest.httpRequest()).thenReturn(httpRequest);
 		
-		when(resourceFinder.findResource(AssetResource.class, ScriptHelperDocumentFilter.JQUERY_JS))
+		when(resourceFinder.findResource(AssetResource.class, JQUERY_JS))
 			.thenReturn(jqueryJs);
-		when(resourceFinder.findResource(AssetResource.class, ScriptHelperDocumentFilter.JJ_JS))
+		when(resourceFinder.findResource(AssetResource.class, JJ_JS))
 			.thenReturn(jjJs);
 		
 		when(jqueryJs.uri()).thenReturn(JQUERY_URI);
-		when(jqueryJs.baseName()).thenReturn(ScriptHelperDocumentFilter.JQUERY_JS);
+		when(jqueryJs.baseName()).thenReturn(JQUERY_JS);
 		
 		when(jjJs.sha1()).thenReturn(JJ_SHA);
 		when(jjJs.uri()).thenReturn(JJ_URI);

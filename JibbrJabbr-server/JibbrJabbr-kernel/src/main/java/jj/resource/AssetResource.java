@@ -12,6 +12,9 @@ import java.nio.file.Path;
  */
 public class AssetResource extends AbstractFileResource implements LoadedResource {
 	
+	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
+	public static final String JJ_JS = "jj.js";
+	public static final String FAVICON_ICO = "favicon.ico";
 	private final String mime;
 	
 	AssetResource(final Path basePath, final String baseName) throws IOException {
