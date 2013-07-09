@@ -18,7 +18,6 @@ package jj.testing;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.nodes.Document;
@@ -37,6 +36,9 @@ public interface TestHttpClient {
 	
 	String contentsString() throws Exception;
 	String contentsString(final long timeout, final TimeUnit unit) throws Exception;
+	
+	byte[] contentBytes() throws Exception;
+	byte[] contentBytes(long timeout, TimeUnit unit) throws Exception;
 	
 	Document document() throws Exception;
 	Document document(long timeout, TimeUnit unit) throws Exception;

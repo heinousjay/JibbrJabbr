@@ -129,6 +129,20 @@ class TestRunner {
 			response.get();
 			return true;
 		}
+
+		@Override
+		public byte[] contentBytes() throws Exception {
+			testRunnerLog.trace("contentBytes() on {} with \n{}", response.id(), response.headers());
+			response.get();
+			return response.contentBytes();
+		}
+
+		@Override
+		public byte[] contentBytes(long timeout, TimeUnit unit) throws Exception {
+			testRunnerLog.trace("contentBytes() on {} with \n{}", response.id(), response.headers());
+			response.get(timeout, unit);
+			return response.contentBytes();
+		}
 	}
 	
 	private final TestHttpRequest request;

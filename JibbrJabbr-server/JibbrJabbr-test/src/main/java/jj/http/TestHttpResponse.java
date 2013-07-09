@@ -128,7 +128,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 
 		if (MimeTypes.get("html").equalsIgnoreCase(header(HttpHeaders.Names.CONTENT_TYPE))) {
 			if (!document.compareAndSet(null, Jsoup.parse(contentsString()))) {
-				new AssertionError("document was not null").printStackTrace();
+				new AssertionError("document was null").printStackTrace();
 			}
 		}
 		
@@ -162,10 +162,10 @@ public class TestHttpResponse extends AbstractHttpResponse {
 			.append("[").append(id()).append("] {")
 			.append("charset=").append(charset())
 			.append(", status=").append(status())
-			//.append(", headers=").append(response.headers())
+			.append(", headers=").append(response.headers())
 			.append(", error=").append(error())
 			.append(", ended=").append(ended())
-			//.append(", contents size=").append(response.content().readableBytes())
+			.append(", contents size=").append(response.content().readableBytes())
 			.append("}")
 			.toString();
 	}
@@ -184,5 +184,11 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	public HttpHeaders headers() {
 		return response.headers();
+	}
+	
+	public byte[] contentBytes() {
+		byte[] contentBytes = new byte[response.content().readableBytes()];
+		response.content().slice().readBytes(contentBytes);
+		return contentBytes;
 	}
 }

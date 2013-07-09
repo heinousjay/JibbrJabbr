@@ -1,0 +1,169 @@
+body {
+	margin: 25px;
+	background: #334455;
+	font-family: Helvetica,Arial,sans-serif;
+	color:#FFCC00;
+}
+
+a {
+	text-decoration: none;
+	color: #00FFCC;
+}
+
+a:hover {
+	color:#CCFF00;
+}
+
+input[type=text],
+input[type=password]
+textarea {
+	border: 3px inset #456;
+	border-radius: 5px;
+	background-color: #eee;
+	padding: 2px 5px;
+}
+
+button,
+input[type=submit],
+input[type=button],
+input[type=reset] {
+	background-color: #FFCC00;
+	border: 2px outset #FFCC00;
+	border-radius: 5px;
+}
+
+input[disabled],
+button[disabled] {
+	color: #222;
+	background-color: #DDD;
+	border-color: #888;
+}
+
+#container {
+	padding: 10px;
+	margin: 0 auto;
+	width: 838px;
+	box-shadow: 4px 7px 5px black;
+	background-color: #456;
+	color: #0033FF;
+}
+
+#welcome {
+	font-size: 44pt;
+	margin: 5px auto;
+	text-align: center;
+	text-shadow: -4px 0 3px #00BB22, 
+		0 4px 3px #00BB22, 
+		4px 0 3px #00BB22, 
+		0 -4px 3px #00BB22;
+}
+
+#topic-holder {
+	width: 820px;
+	height: 60px;
+	border: 3px inset #456;
+	margin: 12px 9px 0;
+	background-color:#FFE47A;
+	padding:0;
+}
+
+#topic-holder > div {
+	padding: 5px;
+	width:810px;
+	height:50px;
+	line-height:50px;
+	overflow:hidden;
+}
+
+div, section {
+	border-radius: 5px;
+	padding: 2px;
+}
+
+.highlighted {
+	background-color: yellow;
+}
+
+#left-pane {
+	width: 600px;
+	height: 360px;
+	float: left;
+	margin: 6px;
+}
+
+#right-pane {
+	width: 200px;
+	height: 360px;
+	float: left;
+	margin: 6px;
+}
+
+#chatbox {
+	width: 100%;
+	height: 325px;
+	border: 3px inset #456;
+	background-color: #FFE47A;
+	font-size: 15px;
+	font-weight: bold;
+	overflow: auto;
+}
+
+#chatbox div {
+	width: 99%;
+	overflow: hidden;
+}
+
+.chat-text {
+	color: #333;
+	font-weight: normal;
+}
+
+#users {
+	width: 100%;
+	height: 357px;
+	border: 3px inset #456;
+	background-color: #FFE47A;
+	overflow: auto;
+	font-size: 15px;
+	font-weight: bold;
+	text-align: center;
+}
+
+#button1 {
+	margin: 6px 2px 0;
+	font-size:15px;
+	font-weight: bold;
+}
+
+#userInput {
+	margin: 6px 2px 0;
+	width: 520px;
+	padding: 3px;
+	font-size: 15px;
+}
+
+#user-name-form {
+	margin: 5px auto;
+}
+
+#user-name-form input, #user-name-form button {
+	font-size: 15px;
+}
+
+#user-name{
+	width: 170px;
+}
+
+#user-name-modal {
+	width: 435px;
+	height: 45px;
+}
+
+#user-name-message-try-another {
+	position:absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	line-height: 40px;
+	text-align:center;
+}
