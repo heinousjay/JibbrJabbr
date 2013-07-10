@@ -25,11 +25,16 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import jj.JJ;
-import jj.resource.AssetResource;
+import jj.resource.TestAssetResourceCreator;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -43,31 +48,87 @@ import org.junit.Test;
  */
 public class TestingAPITest {
 	
+	public static class VerifiableRequest {
+		
+		public final String uri;
+		public final byte[] bytes;
+		
+		public VerifiableRequest(final String uri, final byte[] bytes) {
+			this.uri = uri;
+			this.bytes = bytes;
+		}
+	}
+	
 	/**
 	 * 
 	 */
 	private static final String INDEX_HTML_RENDERED = "index.html.rendered";
 	private static final String ANIMAL_HTML_RENDERED = "animal.html.rendered";
-	/**
-	 * 
-	 */
-	private static final String TITLE = "title";
-	/**
-	 * 
-	 */
+
 	private static final String INDEX = "/index";
-	/**
-	 * 
-	 */
+
 	private static final String ANIMAL = "/animal";
 	static final String INDEX_TITLE = "API TEST SUCCESS";
 	static final String ANIMAL_TITLE = "ANIMAL!";
 	
 	static final String basePath;
+	private static final Path indexHtmlRenderedPath;
+	private static final Path animalHtmlRenderedPath;
+	
+	public static final VerifiableRequest[] statics;
+	public static final VerifiableRequest[] documents;
+	public static final VerifiableRequest[] stylesheets;
+	public static final VerifiableRequest[] assets;
+	
+	private static VerifiableRequest makeResourceRequest(String name) throws Exception {
+		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(basePath, name)));
+	}
 	
 	static {
-		// well it's ugly, but it's portable
-		basePath = Paths.get(JJ.uri(TestingAPITest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
+		try {
+			// well it's ugly, but it's portable
+			basePath = Paths.get(JJ.uri(TestingAPITest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
+			indexHtmlRenderedPath = Paths.get(basePath, INDEX_HTML_RENDERED);
+			animalHtmlRenderedPath = Paths.get(basePath, ANIMAL_HTML_RENDERED);
+			
+			List<VerifiableRequest> work = new ArrayList<>();
+			work.add(makeResourceRequest("0.txt"));
+			work.add(makeResourceRequest("1.txt"));
+			work.add(makeResourceRequest("2.txt"));
+			work.add(makeResourceRequest("3.txt"));
+			work.add(makeResourceRequest("4.txt"));
+			work.add(makeResourceRequest("5.txt"));
+			work.add(makeResourceRequest("6.txt"));
+			work.add(makeResourceRequest("7.txt"));
+			work.add(makeResourceRequest("8.txt"));
+			work.add(makeResourceRequest("9.txt"));
+		
+			statics = work.toArray(new VerifiableRequest[work.size()]);
+			
+			work = new ArrayList<>();
+			work.add(new VerifiableRequest(INDEX, Files.readAllBytes(indexHtmlRenderedPath)));
+			work.add(new VerifiableRequest(ANIMAL, Files.readAllBytes(animalHtmlRenderedPath)));
+			
+			documents = work.toArray(new VerifiableRequest[work.size()]);
+			
+			work = new ArrayList<>();
+			work.add(makeResourceRequest("test.css"));
+			work.add(makeResourceRequest("style.css"));
+			
+			stylesheets = work.toArray(new VerifiableRequest[work.size()]);
+			
+			TestAssetResourceCreator assetCreator = new TestAssetResourceCreator();
+			work = new ArrayList<>();
+			work.add(new VerifiableRequest("/" + JQUERY_JS, assetCreator.toBytes(JQUERY_JS)));
+			work.add(new VerifiableRequest("/" + JJ_JS, assetCreator.toBytes(JJ_JS)));
+			work.add(new VerifiableRequest("/" + FAVICON_ICO, assetCreator.toBytes(FAVICON_ICO)));
+			
+			assets = work.toArray(new VerifiableRequest[work.size()]);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new AssertionError("failed!", e);
+		}
 	}
 	
 	@Rule
@@ -78,29 +139,27 @@ public class TestingAPITest {
 		Path path(int i);
 	}
 	
-	private final Path indexHtmlRenderedPath = Paths.get(basePath, INDEX_HTML_RENDERED);
-	private final Path animalHtmlRenderedPath = Paths.get(basePath, ANIMAL_HTML_RENDERED);
+	static interface RequestMaker {
+		VerifiableRequest make();
+	}
 	
-	private void runStressTestPattern(int totalClients, Namer namer) throws Exception {
-		TestHttpClient[] clients = new TestHttpClient[totalClients];
-		for (int i = 0; i < clients.length; ++i) {
-			clients[i] = app.get(namer.name(i));
-		}
-		
-		for (int i = 0; i < clients.length; ++i) {
+	private void runStressTestPattern(final int totalClients, final RequestMaker maker) throws Exception {
+		for (int i = 0; i < totalClients; ++i) {
+			final VerifiableRequest request = maker.make();
+			final TestHttpClient client = app.get(request.uri);
 			try {
-				assertThat(clients[i].status(), is(HttpResponseStatus.OK));
-				assertThat(namer.name(i), clients[i].contentBytes(), is(Files.readAllBytes(namer.path(i))));
-			} catch (AssertionError e) {
-				System.out.print(new StringBuilder()
-					.append(i).append(System.lineSeparator())
-					.append(namer.name(i)).append(System.lineSeparator())
-					.append(clients[i].contentsString()).append(System.lineSeparator())
-					.append(namer.path(i)).append(System.lineSeparator())
+				
+				assertThat(client.status(), is(HttpResponseStatus.OK));
+				assertThat(request.uri, client.contentBytes(), is(request.bytes));
+			} catch (Exception e) {
+				System.err.print(new StringBuilder()
+					.append(request.uri).append(System.lineSeparator())
 				);
+				e.printStackTrace();
 				throw new AssertionError("stress test failed");
 			}
 		}
+		
 	}
 	
 	@Ignore
@@ -116,216 +175,63 @@ public class TestingAPITest {
 		Files.write(animalHtmlRenderedPath, bytes);
 	}
 	
+	private void runBasicStressTest(final int total , final VerifiableRequest[] toRun) throws Exception {
+		runStressTestPattern(total, new RequestMaker() {
+			
+			private AtomicInteger count = new AtomicInteger(total);
+			
+			@Override
+			public VerifiableRequest make() {
+				return toRun[count.getAndIncrement() % toRun.length];
+			}
+		});
+	}
+	
 	@Test
 	public void runDocumentTest() throws Exception {
-		runStressTestPattern(300, new Namer() {
-
-			@Override
-			public String name(int i) {
-				return INDEX;
-			}
-
-			@Override
-			public Path path(int i) {
-				return indexHtmlRenderedPath;
-			}
-			
-		});
+		runBasicStressTest(400, documents);
 	}
 	
 	@Test
 	public void runStaticTest() throws Exception {
-		runStressTestPattern(300, new Namer() {
-
-			@Override
-			public String name(int i) {
-				return "/" + (i % 10) + ".txt";
-			}
-			
-			@Override
-			public Path path(int i) {
-				return Paths.get(basePath, name(i));
-			}
-			
-		});
+		runBasicStressTest(400, statics);
 	}
 	
 	@Test
 	public void runCssTest() throws Exception {
-		runStressTestPattern(300, new Namer() {
-
-			@Override
-			public String name(int i) {
-				return "/" + (i % 2 == 0 ? "style.css" : "test.css");
-			}
-			
-			@Override
-			public Path path(int i) {
-				return Paths.get(basePath, name(i));
-			}
-			
-		});
+		runBasicStressTest(400, stylesheets);
 	}
 	
 	@Test
 	public void runAssetTest() throws Exception {
-		runStressTestPattern(300, new Namer() {
-
-			private final String[] names = {
-				JQUERY_JS,
-				JJ_JS,
-				FAVICON_ICO
-			};
-			
-			@Override
-			public String name(int i) {
-				return "/" + names[i % names.length];
-			}
-			
-			@Override
-			public Path path(int i) {
-				return Paths.get(JJ.uri(AssetResource.class)).getParent().getParent().resolve("assets").resolve(names[i % names.length]);
-			}
-			
-		});
+		runBasicStressTest(400, assets);
+	}
+	
+	private VerifiableRequest[] makeAll() {
+		List<VerifiableRequest> requests = new ArrayList<>();
+		Collections.addAll(requests, documents);
+		Collections.addAll(requests, statics);
+		Collections.addAll(requests, stylesheets);
+		Collections.addAll(requests, assets);
+		return requests.toArray(new VerifiableRequest[requests.size()]);
 	}
 	
 	@Test
 	public void runMixedTest() throws Exception {
-		runStressTestPattern(350, new Namer() {
-
-			private final String[] names = {
-				JQUERY_JS,
-				JJ_JS,
-				FAVICON_ICO,
-				"test.css",
-				"style.css",
-				"2.txt",
-				INDEX.substring(1)
-			};
-
-			@Override
-			public String name(int i) {
-				return "/" + names[i % names.length];
-			}
-
-			@Override
-			public Path path(int i) {
-				switch(i % names.length) {
-				case 0: case 1: case 2:
-					return Paths.get(JJ.uri(AssetResource.class)).getParent().getParent().resolve("assets").resolve(names[i % names.length]);
-				case 3: case 4: case 5:
-					return Paths.get(basePath, names[i % names.length]);
-				case 6:
-					return indexHtmlRenderedPath;
-				default:
-					throw new AssertionError("something went really wrong");
-				}
-			}
-			
-		});
+		runBasicStressTest(1600, makeAll());
 	}
 	
+	@Ignore
 	@Test
-	public void runBasicTest() throws Exception {
-		
-		TestHttpClient index = app.get(INDEX);
-		TestHttpClient animal = app.get(ANIMAL);
-		
-		// just fire off a bunch of requests we ignore
-		// in the meantime
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		app.get(INDEX);
-		app.get(ANIMAL);
-		
-		
-		// TODO - add more interesting verifications
-		// TODO - use the http client to do this instead?
-		assertThat(index.status(), is(HttpResponseStatus.OK));
-		assertThat(index.contentsString(), is(notNullValue()));
-		assertThat(index.document().select(TITLE).text(), is(INDEX_TITLE));
-		
-		assertThat(animal.status(), is(HttpResponseStatus.OK));
-		assertThat(animal.contentsString(), is(notNullValue()));
-		assertThat(animal.document().select(TITLE).text(), is(ANIMAL_TITLE));
-		
-		index = app.get(INDEX);
-		animal = app.get(ANIMAL);
-		
-		assertThat(index.status(), is(HttpResponseStatus.OK));
-		assertThat(index.contentsString(), is(notNullValue()));
-		assertThat(index.document().select(TITLE).text(), is(INDEX_TITLE));
-		
-		assertThat(animal.status(), is(HttpResponseStatus.OK));
-		assertThat(animal.contentsString(), is(notNullValue()));
-		assertThat(animal.document().select(TITLE).text(), is(ANIMAL_TITLE));
-	}
-	
-	@Test
-	public void getLotsOfDocuments() throws Exception {
-		getLotsOfDocuments(200);
-	}
-	
-	private boolean getLotsOfDocuments(final int number) throws Exception {
-		
-		TestHttpClient[] clients = new TestHttpClient[number * 2];
-		int count = 0;
-		for (int i = 0; i < number; ++i) {
-			clients[count++] = app.get(INDEX);
-			clients[count++] = app.get(ANIMAL);
-		}
-		
-		count = 0;
-		for (int i = 0; i < number; ++i) {
-			String display = String.valueOf(count) + ": " + clients[count].uri();
-			try {
-				assertThat(display, clients[count].status(), is(HttpResponseStatus.OK));
-				assertThat(display, clients[count].contentsString(), is(notNullValue()));
-				assertThat(display, clients[count++].document().select(TITLE).text(), is(INDEX_TITLE));
-			} catch (Exception e) {
-				System.err.println(display);
-				throw e;
-			}
-			
-			display = String.valueOf(count) + ": " + clients[count].uri();
-			try {
-				assertThat(display, clients[count].status(), is(HttpResponseStatus.OK));
-				assertThat(display, clients[count].contentsString(), is(notNullValue()));
-				assertThat(display, clients[count++].document().select(TITLE).text(), is(ANIMAL_TITLE));
-			} catch (Exception e) {
-				System.err.println(display);
-				throw e;
-			}
-		}
-		
-		return true;
-	}
-	
-	@Test
-	public void poundIt() throws Exception {
-		poundIt(12, 4000);
+	public void poundIt() throws Throwable {
+		timePoundIt(12, 4000);
 	}
 	
 	public void poundIt(final int threadCount, final int perClientRequestCount) throws Exception {
+		final VerifiableRequest[] requests = makeAll();
 		final CountDownLatch latch = new CountDownLatch(threadCount);
-		ExecutorService service = Executors.newFixedThreadPool(threadCount);
+		final ExecutorService service = Executors.newFixedThreadPool(threadCount);
+	
 		final Throwable[] throwables = new Throwable[threadCount];
 		try {
 			for (int i = 0; i < threadCount; ++i) {
@@ -335,41 +241,7 @@ public class TestingAPITest {
 					@Override
 					public void run() {
 						try {
-							runStressTestPattern(perClientRequestCount, new Namer() {
-
-								private final String[] names = {
-									JQUERY_JS,
-									JJ_JS,
-									FAVICON_ICO,
-									"test.css",
-									"style.css",
-									"2.txt",
-									INDEX.substring(1),
-									ANIMAL.substring(1)
-								};
-
-								@Override
-								public String name(int i) {
-									return "/" + names[i % names.length];
-								}
-
-								@Override
-								public Path path(int i) {
-									switch(i % names.length) {
-									case 0: case 1: case 2:
-										return Paths.get(JJ.uri(AssetResource.class)).getParent().getParent().resolve("assets").resolve(names[i % names.length]);
-									case 3: case 4: case 5:
-										return Paths.get(basePath, names[i % names.length]);
-									case 6:
-										return indexHtmlRenderedPath;
-									case 7:
-										return animalHtmlRenderedPath;
-									default:
-										throw new AssertionError("something went really wrong");
-									}
-								}
-								
-							});
+							runBasicStressTest(perClientRequestCount, requests);
 						} catch (Throwable t) {
 							throwables[index] = t;
 						} finally {
