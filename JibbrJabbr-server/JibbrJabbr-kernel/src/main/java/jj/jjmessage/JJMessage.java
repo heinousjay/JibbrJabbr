@@ -135,6 +135,9 @@ public class JJMessage {
 	 * @return
 	 */
 	public static JJMessage makeInvoke(String name, String args) {
+		assert !isEmpty(name) : "invoke message requires type";
+		assert !isEmpty(args) && args.startsWith("[") && args.endsWith("]") :
+			"invoke message must have a JSON array argument";
 		JJMessage result = new JJMessage(Invoke);
 		result.invoke().id = makeId();
 		result.invoke().name = name;
@@ -150,6 +153,9 @@ public class JJMessage {
 	 * @return
 	 */
 	public static JJMessage makeCall(String name, String args) {
+		assert !isEmpty(name) : "call message requires type";
+		assert !isEmpty(args) && args.startsWith("[") && args.endsWith("]") :
+			"call message must have a JSON array argument";
 		JJMessage result = new JJMessage(Call);
 		result.call().name = name;
 		result.call().args = args;

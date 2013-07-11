@@ -43,6 +43,11 @@ public class MessagesTest {
 		assertThat(message.id(), is(nullValue()));
 		assertThat(message.resultId(), is(nullValue()));
 	}
+	
+	private void verifyExpectsResult(JJMessage message) {
+		assertThat(message.expectsResult(), is(true));
+		assertThat(message.id(), is(notNullValue()));
+	}
 
 	@Test
 	public void testAppend() throws Exception {
@@ -138,7 +143,81 @@ public class MessagesTest {
 	}
 	
 	@Test
-	public void testSomething() throws Exception {
+	public void testCall() throws Exception {
 		JJMessage message = JJMessage.makeCall("name", "[]");
+		assertThat(message, is(notNullValue()));
+		assertThat(message.type(), is(Call));
+		assertThat(message.call(), is(notNullValue()));
+		
+		verifyExpectsNoResult(message);
+		
+		assertThat(message.call().name, is("name"));
+		assertThat(message.call().args, is("[]"));
+		
+		boolean errored = false;
+		
+		try {
+			JJMessage.makeCall(null, "[]");
+		} catch (AssertionError e) { errored = true; }
+		
+		if (!errored) fail("call should not have allowed null name");
+		
+		try {
+			JJMessage.makeCall("name", "");
+		} catch (AssertionError e) { errored = true; }
+		
+		if (!errored) fail("call should not have allowed empty type");
+		
+		String serialized = message.toString();
+		
+		Map<String, Map<String, String>> map = 
+			mapper.readValue(serialized, new TypeReference<Map<String, Map<String, String>>>() {});
+		
+		assertThat(map.containsKey("call"), is(true));
+		assertThat(map.size(), is(1));
+		Map<String, String> map2 = map.get("call");
+		assertThat(map2.get("name"), is("name"));
+		assertThat(map2.get("args"), is("[]"));
+		assertThat(map2.size(), is(2));
+	}
+	
+	@Test
+	public void testInvoke() throws Exception {
+		JJMessage message = JJMessage.makeInvoke("name", "[]");
+		assertThat(message, is(notNullValue()));
+		assertThat(message.type(), is(Invoke));
+		assertThat(message.invoke(), is(notNullValue()));
+		
+		verifyExpectsResult(message);
+		
+		assertThat(message.invoke().name, is("name"));
+		assertThat(message.invoke().args, is("[]"));
+		
+		boolean errored = false;
+		
+		try {
+			JJMessage.makeInvoke(null, "[]");
+		} catch (AssertionError e) { errored = true; }
+		
+		if (!errored) fail("invoke should not have allowed null name");
+		
+		try {
+			JJMessage.makeInvoke("name", "");
+		} catch (AssertionError e) { errored = true; }
+		
+		if (!errored) fail("invoke should not have allowed empty type");
+		
+		String serialized = message.toString();
+		
+		Map<String, Map<String, String>> map = 
+			mapper.readValue(serialized, new TypeReference<Map<String, Map<String, String>>>() {});
+		
+		assertThat(map.containsKey("invoke"), is(true));
+		assertThat(map.size(), is(1));
+		Map<String, String> map2 = map.get("invoke");
+		assertThat(map2.get("name"), is("name"));
+		assertThat(map2.get("args"), is("[]"));
+		assertThat(map2.get("id"), is(notNullValue()));
+		assertThat(map2.size(), is(3));
 	}
 }
