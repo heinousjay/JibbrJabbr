@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
+ * Annotates a Logger parameter to get the
+ * Access logger instance.
  * @author jason
  *
  */
