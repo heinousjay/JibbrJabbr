@@ -17,12 +17,15 @@ package jj.resource;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 
 /**
  * @author jason
  *
  */
 public interface TransferableResource extends Resource {
+	
+	FileChannel fileChannel() throws IOException;
 
 	RandomAccessFile randomAccessFile() throws IOException;
 }

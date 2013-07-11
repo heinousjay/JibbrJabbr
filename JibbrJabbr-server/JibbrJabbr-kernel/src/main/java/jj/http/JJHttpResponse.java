@@ -15,8 +15,6 @@
  */
 package jj.http;
 
-import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -41,7 +39,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.DefaultFileRegion;
 import io.netty.channel.MessageList;
-import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
@@ -126,33 +123,23 @@ class JJHttpResponse extends AbstractHttpResponse {
 
 	/**
 	 * actually writes the stuff to the channel
+	 * 
+	 * how to test this? 
 	 */
 	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
 		MessageList<Object> messageList = 
 			MessageList.newInstance(3)
 				.add(response)
-				.add(new DefaultFileRegion(resource.randomAccessFile().getChannel(), 0, resource.size()))
+				.add(new DefaultFileRegion(resource.fileChannel(), 0, resource.size()))
 				.add(LastHttpContent.EMPTY_LAST_CONTENT);
 		
-		channel.pipeline().remove(Compressor.toString());
-		
-		channel.write(messageList).addListener(new ChannelFutureListener() {
-			
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				if (HttpHeaders.isKeepAlive(request.request())) {
-					channel.pipeline().addBefore(JJEngine.toString(), Compressor.toString(), new HttpContentCompressor());
-				} else {
-					channel.close();
-				}
-				log();
-			}
-		});
+		maybeClose(channel.write(messageList));
 		markCommitted();
+		trace.end(request, this);
 		return this;
 	}
 	
-	// move all of this to another handler!
+	// move all of this to a higher-level handler
 	
 	private void log() {
 		
@@ -190,7 +177,7 @@ class JJHttpResponse extends AbstractHttpResponse {
 	}
 	
 	private String extractIP(final SocketAddress remoteAddress) {
-		// TODO check X-Forwarded-For header
+		
 		return (remoteAddress instanceof InetSocketAddress) ? 
 			((InetSocketAddress)remoteAddress).getAddress().getHostAddress() : 
 			remoteAddress.toString();
@@ -208,5 +195,13 @@ class JJHttpResponse extends AbstractHttpResponse {
 			return String.valueOf(response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
 		}
 		return "0";
+	}
+
+	/**
+	 * @return {@code true} if the response has no body, {@code false} otherwise
+	 */
+	public boolean hasNoBody() {
+		// TODO Auto-generated method stub
+		return response.content().readableBytes() == 0;
 	}
 }

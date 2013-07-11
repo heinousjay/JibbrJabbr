@@ -20,12 +20,9 @@ import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
-import io.netty.handler.stream.ChunkedWriteHandler;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -41,8 +38,6 @@ class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 		Decoder,
 		Aggregator,
 		Encoder,
-		Compressor,
-		ChunkedWriter,
 		JJEngine,
 		JJWebsocketHandler
 	}
@@ -61,8 +56,6 @@ class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 		pipeline.addLast(Decoder.toString(), new HttpRequestDecoder())
 			.addLast(Aggregator.toString(), new HttpObjectAggregator(8192))
 			.addLast(Encoder.toString(), new HttpResponseEncoder())
-			.addLast(ChunkedWriter.toString(), new ChunkedWriteHandler())
-			.addLast(Compressor.toString(), new HttpContentCompressor())
 			.addLast(JJEngine.toString(), engineProvider.get());
 	}
 

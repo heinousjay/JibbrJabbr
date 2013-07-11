@@ -17,6 +17,7 @@ package jj.resource;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 
 import jj.execution.IOThread;
@@ -47,6 +48,12 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	@Override
 	public String mime() {
 		return mime;
+	}
+	
+	@Override
+	@IOThread
+	public FileChannel fileChannel() throws IOException {
+		return FileChannel.open(path);
 	}
 	
 	@Override

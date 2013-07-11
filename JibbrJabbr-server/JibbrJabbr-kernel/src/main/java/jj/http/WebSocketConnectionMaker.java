@@ -98,7 +98,6 @@ class WebSocketConnectionMaker {
 								}
 							});
 							
-							ctx.pipeline().remove(Compressor.toString());
 							ctx.pipeline().replace(
 								JJEngine.toString(),
 								JJWebsocketHandler.toString(),
