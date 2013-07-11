@@ -33,19 +33,45 @@ import jj.resource.Resource;
  */
 public interface HttpResponse {
 
+	/**
+	 * Retrieve the status of the outgoing response.  Defaults to
+	 * {@code 200 OK}.
+	 * @return
+	 */
 	HttpResponseStatus status();
 
 	/**
-	 * sets the status of the outgoing response
+	 * sets the status of the outgoing response.
 	 * @param status
 	 * @return
 	 */
 	HttpResponse status(HttpResponseStatus status);
 
+	/**
+	 * Set the header by name and value. This method will
+	 * add a header if one already exists.
+	 * @param name
+	 * @param value
+	 * @return
+	 */
 	HttpResponse header(String name, String value);
-
+	
+	/**
+	 * Set the header by name and value, if no header by this
+	 * name exists
+	 * @param name
+	 * @param value
+	 * @return
+	 */
 	HttpResponse headerIfNotSet(String name, String value);
 
+	/**
+	 * Set the header by name and value, if no header by this
+	 * name exists
+	 * @param name
+	 * @param value
+	 * @return
+	 */
 	HttpResponse headerIfNotSet(String name, long value);
 
 	/**

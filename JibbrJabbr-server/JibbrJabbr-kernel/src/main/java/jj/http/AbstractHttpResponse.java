@@ -35,6 +35,7 @@ import jj.resource.Resource;
 import jj.resource.TransferableResource;
 
 /**
+ * Used to generate an HTTP response.  
  * @author jason
  *
  */
@@ -193,7 +194,8 @@ abstract class AbstractHttpResponse  implements HttpResponse {
 	}
 
 	/**
-	 * Sends a 304 Not Modified for the given resource and ends the response
+	 * Sends a 304 Not Modified for the given resource with no cache headers. Ends
+	 * the response.
 	 * @param resource
 	 * @return
 	 */
@@ -202,6 +204,13 @@ abstract class AbstractHttpResponse  implements HttpResponse {
 		return sendNotModified(resource, false);
 	}
 
+	/**
+	 * Sends a 304 Not Modified for the given resource, caching the response for
+	 * one year if {@code cache} is true.  Ends the response.
+	 * @param resource
+	 * @param cache
+	 * @return
+	 */
 	@Override
 	public HttpResponse sendNotModified(final Resource resource, boolean cache) {
 		assertNotCommitted();
@@ -224,7 +233,7 @@ abstract class AbstractHttpResponse  implements HttpResponse {
 
 	/**
 	 * Sends a 307 Temporary Redirect to the given resource, using the fully qualified
-	 * asset URL and disallowing the redirect to be cached
+	 * asset URL and disallowing the redirect to be cached.  Ends the response.
 	 * @param resource
 	 * @return
 	 */
@@ -299,8 +308,6 @@ abstract class AbstractHttpResponse  implements HttpResponse {
 		if (resource.sha1() != null) {
 			header(HttpHeaders.Names.ETAG, resource.sha1());
 		}
-		
-		
 		
 		return doSendTransferableResource(resource);
 	}
