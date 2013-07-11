@@ -33,7 +33,7 @@ public class Main {
 		
 		lifecycle = Guice.createInjector(Stage.PRODUCTION, new CoreModule(args, false)).getInstance(JJServerLifecycle.class);
 		
-		log.info("Welcome to {} version {} built on {}", Version.name, Version.version, Version.buildDate);
+		log.info("Welcome to {} version {} commit {}", Version.name, Version.version, Version.commitId);
 	}
 	
 	public void start() throws Exception {
