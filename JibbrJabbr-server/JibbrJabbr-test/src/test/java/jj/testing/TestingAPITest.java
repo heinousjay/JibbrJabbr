@@ -68,10 +68,8 @@ public class TestingAPITest {
 	private static final String INDEX = "/index";
 
 	private static final String ANIMAL = "/animal";
-	static final String INDEX_TITLE = "API TEST SUCCESS";
-	static final String ANIMAL_TITLE = "ANIMAL!";
 	
-	static final String basePath;
+	private static final String basePath;
 	private static final Path indexHtmlRenderedPath;
 	private static final Path animalHtmlRenderedPath;
 	
