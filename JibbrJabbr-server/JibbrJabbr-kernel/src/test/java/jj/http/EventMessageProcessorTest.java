@@ -18,8 +18,8 @@ package jj.http;
 import static org.mockito.BDDMockito.*;
 
 import jj.execution.JJExecutors;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.MessageMaker;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.MessageMaker;
 import jj.script.EventNameHelper;
 import jj.script.ScriptRunner;
 
@@ -45,7 +45,7 @@ public class EventMessageProcessorTest {
 		//given
 		given(executors.scriptRunner()).willReturn(scriptRunner);
 		EventMessageProcessor emp = new EventMessageProcessor(executors, null, null);
-		JQueryMessage event = MessageMaker.makeEvent("selector", "type");
+		JJMessage event = MessageMaker.makeEvent("selector", "type");
 		
 		//when
 		emp.handle(connection, event);

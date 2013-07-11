@@ -9,18 +9,18 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class JQueryMessageContinuationProcessor implements ContinuationProcessor {
+class JJMessageContinuationProcessor implements ContinuationProcessor {
 	
 	private final CurrentScriptContext context;
 	
 	@Inject
-	JQueryMessageContinuationProcessor(final CurrentScriptContext context) {
+	JJMessageContinuationProcessor(final CurrentScriptContext context) {
 		this.context = context;
 	}
 
 	@Override
 	public ContinuationType type() {
-		return ContinuationType.JQueryMessage;
+		return ContinuationType.JJMessage;
 	}
 
 	@Override
@@ -29,7 +29,7 @@ class JQueryMessageContinuationProcessor implements ContinuationProcessor {
 		// of a connected WebSocket client, we we just send the message
 		// along to the client and let any results get handled by
 		// the connection listener
-		context.connection().send(continuationState.jQueryMessage());
+		context.connection().send(continuationState.jjMessage());
 	}
 
 }

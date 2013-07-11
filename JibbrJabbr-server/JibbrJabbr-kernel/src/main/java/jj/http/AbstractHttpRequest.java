@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 
 import jj.DateFormatHelper;
 import jj.Sequence;
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.AssociatedScriptBundle;
 
 /**
@@ -56,7 +56,7 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	
 	protected final String id = sequence.next();
 	
-	protected ArrayList<JQueryMessage> messages;
+	protected ArrayList<JJMessage> messages;
 	
 	protected final FullHttpRequest request;
 
@@ -161,7 +161,7 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	 * @param message
 	 */
 	@Override
-	public HttpRequest addStartupJQueryMessage(final JQueryMessage message) {
+	public HttpRequest addStartupJJMessage(final JJMessage message) {
 		if (messages == null) {
 			messages = new ArrayList<>();
 		}
@@ -170,10 +170,10 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	}
 
 	@Override
-	public List<JQueryMessage> startupJQueryMessages() {
-		ArrayList<JQueryMessage> messages = this.messages;
+	public List<JJMessage> startupJJMessages() {
+		ArrayList<JJMessage> messages = this.messages;
 		this.messages = null;
-		return messages == null ? Collections.<JQueryMessage>emptyList() : messages;
+		return messages == null ? Collections.<JJMessage>emptyList() : messages;
 	}
 
 	/**

@@ -3,7 +3,7 @@ package jj.hostapi;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
@@ -54,7 +54,7 @@ public class DoCallFunction extends BaseFunction implements HostObject {
 		if (context.connection() == null) {
 			throw new IllegalStateException("cannot call remote functions during " + context.httpRequest().state());
 		}
-		context.connection().send(JQueryMessage.makeCall(String.valueOf(args[0]), String.valueOf(args[1])));
+		context.connection().send(JJMessage.makeCall(String.valueOf(args[0]), String.valueOf(args[1])));
 		return Undefined.instance;
 	}
 	

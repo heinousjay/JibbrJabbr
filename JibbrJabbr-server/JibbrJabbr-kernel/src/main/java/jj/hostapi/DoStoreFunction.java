@@ -3,7 +3,7 @@ package jj.hostapi;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
@@ -59,7 +59,7 @@ class DoStoreFunction extends BaseFunction implements HostObject, ContributesScr
 		if (context.connection() == null) {
 			throw new IllegalStateException("cannot store remote info during " + context.httpRequest().state());
 		}
-		context.connection().send(JQueryMessage.makeStore(String.valueOf(args[0]), String.valueOf(args[1])));
+		context.connection().send(JJMessage.makeStore(String.valueOf(args[0]), String.valueOf(args[1])));
 		return Undefined.instance;
 	}
 	

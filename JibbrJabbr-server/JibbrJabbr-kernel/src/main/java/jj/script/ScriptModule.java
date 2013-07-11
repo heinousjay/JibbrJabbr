@@ -12,7 +12,7 @@ public class ScriptModule extends JJModule {
 		
 		Multibinder<ContinuationProcessor> continuationProcessors = 
 			Multibinder.newSetBinder(binder(), ContinuationProcessor.class);
-		continuationProcessors.addBinding().to(JQueryMessageContinuationProcessor.class);
+		continuationProcessors.addBinding().to(JJMessageContinuationProcessor.class);
 		continuationProcessors.addBinding().to(RestRequestContinuationProcessor.class);
 		continuationProcessors.addBinding().to(RequiredModuleContinuationProcessor.class);
 		

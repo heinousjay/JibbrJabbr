@@ -83,7 +83,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				.attr("data-jj-socket-url", wsURI)
 				.attr(
 					"data-jj-startup-messages", 
-					context.httpRequest().startupJQueryMessages().toString()
+					context.httpRequest().startupJJMessages().toString()
 				);
 			if (configuration.debugClient()) {
 				jjScript.attr("data-jj-debug", "true");

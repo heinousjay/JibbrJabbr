@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.jqmessage;
+package jj.jjmessage;
+
+import jj.jjmessage.Element;
+import jj.jjmessage.Event;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.Result;
 
 /**
  * Helper to create messages for other tests
@@ -23,24 +28,24 @@ package jj.jqmessage;
  */
 public class MessageMaker {
 
-	public static JQueryMessage makeEvent(final String selector, final String type) {
-		JQueryMessage result = new JQueryMessage();
+	public static JJMessage makeEvent(final String selector, final String type) {
+		JJMessage result = new JJMessage();
 		result.event(new Event());
 		result.event().selector = selector;
 		result.event().type = type;
 		return result;
 	}
 	
-	public static JQueryMessage makeResult(final String id, final String value) {
-		JQueryMessage result = new JQueryMessage();
+	public static JJMessage makeResult(final String id, final String value) {
+		JJMessage result = new JJMessage();
 		result.result(new Result());
 		result.result().id = id;
 		result.result().value = value;
 		return result;
 	}
 	
-	public static JQueryMessage makeElement(final String id, final String selector) {
-		JQueryMessage result = new JQueryMessage();
+	public static JJMessage makeElement(final String id, final String selector) {
+		JJMessage result = new JJMessage();
 		result.element(new Element());
 		result.element().id = id;
 		result.element().selector = selector;

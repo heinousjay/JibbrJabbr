@@ -1,8 +1,8 @@
-package jj.jqmessage;
+package jj.jjmessage;
 
 import static jj.StringUtils.*;
 // lololololol java
-import static jj.jqmessage.JQueryMessage.Type.*;
+import static jj.jjmessage.JJMessage.Type.*;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author jason
  *
  */
-public class JQueryMessage {
+public class JJMessage {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
@@ -68,12 +68,12 @@ public class JQueryMessage {
 		return String.format("jqm-%s", ids.next());
 	}
 	
-	public static JQueryMessage makeGet(String selector, String type) {
+	public static JJMessage makeGet(String selector, String type) {
 		return makeGet(selector, type, null);
 	}
 	
-	public static JQueryMessage makeGet(String selector, String type, String name) {
-		JQueryMessage result = new JQueryMessage(Get);
+	public static JJMessage makeGet(String selector, String type, String name) {
+		JJMessage result = new JJMessage(Get);
 		result.get().id = makeId();
 		result.get().selector = selector;
 		result.get().type = type;
@@ -81,12 +81,12 @@ public class JQueryMessage {
 		return result;
 	}
 	
-	public static JQueryMessage makeSet(String selector, String type, String value) {
+	public static JJMessage makeSet(String selector, String type, String value) {
 		return makeSet(selector, type, null, value);
 	}
 	
-	public static JQueryMessage makeSet(String selector, String type, String name, String value) {
-		JQueryMessage result = new JQueryMessage(Set);
+	public static JJMessage makeSet(String selector, String type, String name, String value) {
+		JJMessage result = new JJMessage(Set);
 		result.set().selector = selector;
 		result.set().type = type;
 		result.set().name = name;
@@ -94,33 +94,33 @@ public class JQueryMessage {
 		return result;
 	}
 	
-	public static JQueryMessage makeInlineCreate(String html, Map<?,?> args) {
-		JQueryMessage result = new JQueryMessage(Create);
+	public static JJMessage makeInlineCreate(String html, Map<?,?> args) {
+		JJMessage result = new JJMessage(Create);
 		result.create().html = html;
 		result.create().args = args;
 		return result;
 	}
 
-	public static JQueryMessage makeCreate(String html, Map<?,?> args) {
-		JQueryMessage result = new JQueryMessage(Create);
+	public static JJMessage makeCreate(String html, Map<?,?> args) {
+		JJMessage result = new JJMessage(Create);
 		result.create().id = makeId();
 		result.create().html = html;
 		result.create().args = args;
 		return result;
 	}
 	
-	public static JQueryMessage makeAppend(String parent, String child) {
+	public static JJMessage makeAppend(String parent, String child) {
 		assert !isEmpty(parent) : "append message requires parent";
 		assert !isEmpty(child) : "append message requires child";
-		JQueryMessage result = new JQueryMessage(Append);
+		JJMessage result = new JJMessage(Append);
 		result.append().parent = parent;
 		result.append().child = child;
 		return result;
 	}
 	
-	public static JQueryMessage makeBind(String context, String selector, String type) {
+	public static JJMessage makeBind(String context, String selector, String type) {
 		assert !isEmpty(type) : "bind message requires type";
-		JQueryMessage result = new JQueryMessage(Bind);
+		JJMessage result = new JJMessage(Bind);
 		result.bind().context = context;
 		result.bind().selector = selector;
 		result.bind().type = type;
@@ -134,8 +134,8 @@ public class JQueryMessage {
 	 * @param args the JSON reprepesentation of the arguments array
 	 * @return
 	 */
-	public static JQueryMessage makeInvoke(String name, String args) {
-		JQueryMessage result = new JQueryMessage(Invoke);
+	public static JJMessage makeInvoke(String name, String args) {
+		JJMessage result = new JJMessage(Invoke);
 		result.invoke().id = makeId();
 		result.invoke().name = name;
 		result.invoke().args = args;
@@ -149,22 +149,22 @@ public class JQueryMessage {
 	 * @param args the JSON reprepesentation of the arguments array
 	 * @return
 	 */
-	public static JQueryMessage makeCall(String name, String args) {
-		JQueryMessage result = new JQueryMessage(Call);
+	public static JJMessage makeCall(String name, String args) {
+		JJMessage result = new JJMessage(Call);
 		result.call().name = name;
 		result.call().args = args;
 		return result;
 	}
 	
-	public static JQueryMessage makeStore(String key, String value) {
-		JQueryMessage result = new JQueryMessage(Store);
+	public static JJMessage makeStore(String key, String value) {
+		JJMessage result = new JJMessage(Store);
 		result.store().key = key;
 		result.store().value = value;
 		return result;
 	}
 	
-	public static JQueryMessage makeRetrieve(String key) {
-		JQueryMessage result = new JQueryMessage(Retrieve);
+	public static JJMessage makeRetrieve(String key) {
+		JJMessage result = new JJMessage(Retrieve);
 		result.retrieve().id = makeId();
 		result.retrieve().key = key;
 		return result;
@@ -172,18 +172,18 @@ public class JQueryMessage {
 	
 
 	
-	public static JQueryMessage makeUnbind(String context, String selector, String type) {
+	public static JJMessage makeUnbind(String context, String selector, String type) {
 		assert !isEmpty(type) : "unbind message requires type";
-		JQueryMessage result = new JQueryMessage(Unbind);
+		JJMessage result = new JJMessage(Unbind);
 		result.unbind().context = context;
 		result.unbind().selector = selector;
 		result.unbind().type = type;
 		return result;
 	}
 	
-	JQueryMessage() {}
+	JJMessage() {}
 	
-	JQueryMessage(final Type type) {
+	JJMessage(final Type type) {
 		switch(this.type = type) {
 		case Append:
 			message = new Append();
@@ -216,7 +216,7 @@ public class JQueryMessage {
 			message = new Unbind();
 			break;
 		default:
-			throw new AssertionError("can't create a JQueryMessage of type " + type);
+			throw new AssertionError("can't create a JJMessage of type " + type);
 		}
 	}
 	
@@ -322,15 +322,15 @@ public class JQueryMessage {
 		try {
 			return mapper.writeValueAsString(this);
 		} catch (Exception e) {
-			throw new JQueryMessageException(e);
+			throw new JJMessageException(e);
 		}
 	}
 	
-	public static JQueryMessage fromString(String input) {
+	public static JJMessage fromString(String input) {
 		try {
-			return mapper.readValue(input, JQueryMessage.class);
+			return mapper.readValue(input, JJMessage.class);
 		} catch (Exception e) {
-			throw new JQueryMessageException(e);
+			throw new JJMessageException(e);
 		}
 	}
 

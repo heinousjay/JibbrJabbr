@@ -81,7 +81,7 @@ public class ScriptRunnerTest {
 		when(scriptExecutorFactory.executorFor(baseName)).thenReturn(executor);
 		
 		when(continuationProcessor1.type()).thenReturn(ContinuationType.AsyncHttpRequest);
-		when(continuationProcessor2.type()).thenReturn(ContinuationType.JQueryMessage);
+		when(continuationProcessor2.type()).thenReturn(ContinuationType.JJMessage);
 		when(continuationProcessor3.type()).thenReturn(ContinuationType.RequiredModule);
 		
 		Set<ContinuationProcessor> continuationProcessors = new HashSet<>();
@@ -299,7 +299,7 @@ public class ScriptRunnerTest {
 	}
 	
 	@Test
-	public void testWebSocketJQueryMessageEventWithNoContinuation() {
+	public void testWebSocketJJMessageEventWithNoContinuation() {
 		
 		// given
 		givenAWebSocketMessage();
@@ -314,14 +314,14 @@ public class ScriptRunnerTest {
 	}
 	
 	@Test
-	public void testWebSocketJQueryMessageEventWithContinuations() {
+	public void testWebSocketJJMessageEventWithContinuations() {
 		
 		// given
 		givenAWebSocketMessage();
 		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
 		
 		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
-		given(continuationState.type()).willReturn(ContinuationType.JQueryMessage);
+		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
 		given(continuationCoordinator.execute(associatedScriptBundle, eventFunction)).willReturn(continuationState);
 		
 		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
@@ -347,7 +347,7 @@ public class ScriptRunnerTest {
 	}
 	
 	@Test
-	public void testWebSocketJQueryMessageResultWithNoContinuation() {
+	public void testWebSocketJJMessageResultWithNoContinuation() {
 		
 		// given
 		final String key = "0";
@@ -408,7 +408,7 @@ public class ScriptRunnerTest {
 		// given
 		RequiredModule module = givenAModuleRequire();
 		given(continuationCoordinator.execute(moduleScriptBundle)).willReturn(continuationState);
-		given(continuationState.type()).willReturn(ContinuationType.JQueryMessage);
+		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
 		
 		// when
 		scriptRunner.submit(module);

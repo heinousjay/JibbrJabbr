@@ -1,6 +1,6 @@
 package jj.hostapi;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 import jj.script.ScriptContextType;
@@ -38,28 +38,28 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection hide() {
 		verifyContext("hide a selection");
-		context.connection().send(JQueryMessage.makeSet(this.selector, "hide", null));
+		context.connection().send(JJMessage.makeSet(this.selector, "hide", null));
 		return this;
 	}
 
 	@Override
 	public Selection hide(final String duration) {
 		verifyContext("hide a selection");
-		context.connection().send(JQueryMessage.makeSet(this.selector, "hide", duration));
+		context.connection().send(JJMessage.makeSet(this.selector, "hide", duration));
 		return this;
 	}
 
 	@Override
 	public Selection show() {
 		verifyContext("show a selection");
-		context.connection().send(JQueryMessage.makeSet(this.selector, "show", null));
+		context.connection().send(JJMessage.makeSet(this.selector, "show", null));
 		return this;
 	}
 
 	@Override
 	public Selection show(final String duration) {
 		verifyContext("show a selection");
-		context.connection().send(JQueryMessage.makeSet(this.selector, "show", duration));
+		context.connection().send(JJMessage.makeSet(this.selector, "show", duration));
 		return this;
 	}
 	
@@ -71,7 +71,7 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection on(String type, String selector, Callable function) {
 		verifyContext("bind an event");
-		context.connection().send(JQueryMessage.makeBind(this.selector, selector, type));
+		context.connection().send(JJMessage.makeBind(this.selector, selector, type));
 		context.connection().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
 	}
@@ -83,7 +83,7 @@ public class EventSelection implements Selection {
 	public Selection off(String type, String selector) {
 		verifyContext("unbind an event");
 		if (context.connection().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type))) {
-			context.connection().send(JQueryMessage.makeUnbind(this.selector, selector, type));
+			context.connection().send(JJMessage.makeUnbind(this.selector, selector, type));
 		}
 		return this;
 		
@@ -96,7 +96,7 @@ public class EventSelection implements Selection {
 	public Selection off(String type, String selector, Callable function) {
 		verifyContext("unbind an event");
 		if (context.connection().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type), function)) {
-			context.connection().send(JQueryMessage.makeUnbind(this.selector, selector, type));
+			context.connection().send(JJMessage.makeUnbind(this.selector, selector, type));
 		}
 		return this;
 	}
@@ -130,179 +130,179 @@ public class EventSelection implements Selection {
 	
 	public String data(String key) {
 		verifyContext("get data");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "data", key));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "data", key));
 	}
 
 	@Override
 	public Selection data(String key, String value) {
 		verifyContext("set data");
-		context.connection().send(JQueryMessage.makeSet(selector, "data", key, value));
+		context.connection().send(JJMessage.makeSet(selector, "data", key, value));
 		return this;
 	}
 
 	@Override
 	public Selection text(String text) {
 		verifyContext("retrieve text");
-		context.connection().send(JQueryMessage.makeSet(selector, "text", text));
+		context.connection().send(JJMessage.makeSet(selector, "text", text));
 		return this;
 	}
 
 	@Override
 	public Selection append(Selection selection) {
 		verifyContext("append");
-		context.connection().send(JQueryMessage.makeAppend(selector, selection.selector()));
+		context.connection().send(JJMessage.makeAppend(selector, selection.selector()));
 		return this;
 	}
 
 	@Override
 	public String attr(String attributeKey) {
 		verifyContext("get an attribute value");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "attr", attributeKey));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "attr", attributeKey));
 	}
 	
 	public String prop(String propKey) {
 		verifyContext("get an property value");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "prop", propKey));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "prop", propKey));
 	}
 
 	@Override
 	public boolean hasAttr(String attributeKey) {
 		verifyContext("check for an attribute");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasAttr", attributeKey));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "hasAttr", attributeKey));
 	}
 
 	@Override
 	public Selection attr(String attributeKey, String attributeValue) {
 		verifyContext("set an attribute");
-		context.connection().send(JQueryMessage.makeSet(selector, "attr", attributeKey, attributeValue));
+		context.connection().send(JJMessage.makeSet(selector, "attr", attributeKey, attributeValue));
 		return this;
 	}
 
 	public Selection prop(String propKey, String propValue) {
 		verifyContext("set an property");
-		context.connection().send(JQueryMessage.makeSet(selector, "prop", propKey, propValue));
+		context.connection().send(JJMessage.makeSet(selector, "prop", propKey, propValue));
 		return this;
 	}
 
 	@Override
 	public Selection removeAttr(String attributeKey) {
 		verifyContext("remove an attribute");
-		context.connection().send(JQueryMessage.makeSet(selector, "removeAttr", attributeKey));
+		context.connection().send(JJMessage.makeSet(selector, "removeAttr", attributeKey));
 		return this;
 	}
 
 	@Override
 	public Selection addClass(String className) {
 		verifyContext("add a class");
-		context.connection().send(JQueryMessage.makeSet(selector, "addClass", className));
+		context.connection().send(JJMessage.makeSet(selector, "addClass", className));
 		return this;
 	}
 
 	@Override
 	public Selection removeClass(String className) {
 		verifyContext("remove a class");
-		context.connection().send(JQueryMessage.makeSet(selector, "removeClass", className));
+		context.connection().send(JJMessage.makeSet(selector, "removeClass", className));
 		return this;
 	}
 
 	@Override
 	public Selection toggleClass(String className) {
 		verifyContext("toggle a class");
-		context.connection().send(JQueryMessage.makeSet(selector, "toggleClass", className));
+		context.connection().send(JJMessage.makeSet(selector, "toggleClass", className));
 		return this;
 	}
 
 	@Override
 	public boolean hasClass(String className) {
 		verifyContext("check for a class");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "hasClass", className));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "hasClass", className));
 	}
 
 	@Override
 	public String val() {
 		verifyContext("retrieve a value");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "val"));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "val"));
 	}
 
 	@Override
 	public Selection val(String value) {
 		verifyContext("set a value");
-		context.connection().send(JQueryMessage.makeSet(selector, "val", value));
+		context.connection().send(JJMessage.makeSet(selector, "val", value));
 		return this;
 	}
 
 	@Override
 	public String text() {
 		verifyContext("retrieve text");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "text"));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "text"));
 	}
 
 	@Override
 	public String html() {
 		verifyContext("retrieve html");
-		throw context.prepareContinuation(JQueryMessage.makeGet(selector, "html"));
+		throw context.prepareContinuation(JJMessage.makeGet(selector, "html"));
 	}
 
 	@Override
 	public Selection html(String html) {
 		verifyContext("set html");
-		context.connection().send(JQueryMessage.makeSet(selector, "html", html));
+		context.connection().send(JJMessage.makeSet(selector, "html", html));
 		return this;
 	}
 
 	@Override
 	public Selection prepend(String html) {
 		verifyContext("prepend html");
-		context.connection().send(JQueryMessage.makeSet(selector, "prepend", html));
+		context.connection().send(JJMessage.makeSet(selector, "prepend", html));
 		return this;
 	}
 
 	@Override
 	public Selection append(String html) {
 		verifyContext("append html");
-		context.connection().send(JQueryMessage.makeSet(selector, "append", html));
+		context.connection().send(JJMessage.makeSet(selector, "append", html));
 		return this;
 	}
 
 	@Override
 	public Selection before(String html) {
 		verifyContext("set html before");
-		context.connection().send(JQueryMessage.makeSet(selector, "before", html));
+		context.connection().send(JJMessage.makeSet(selector, "before", html));
 		return this;
 	}
 
 	@Override
 	public Selection after(String html) {
 		verifyContext("set html after");
-		context.connection().send(JQueryMessage.makeSet(selector, "after", html));
+		context.connection().send(JJMessage.makeSet(selector, "after", html));
 		return this;
 	}
 
 	@Override
 	public Selection wrap(String html) {
 		verifyContext("wrap elements with html");
-		context.connection().send(JQueryMessage.makeSet(selector, "wrap", html));
+		context.connection().send(JJMessage.makeSet(selector, "wrap", html));
 		return this;
 	}
 
 	@Override
 	public Selection unwrap() {
 		verifyContext("unwrap elements");
-		context.connection().send(JQueryMessage.makeSet(selector, "unwrap", ""));
+		context.connection().send(JJMessage.makeSet(selector, "unwrap", ""));
 		return this;
 	}
 
 	@Override
 	public Selection empty() {
 		verifyContext("empty an element set");
-		context.connection().send(JQueryMessage.makeSet(selector, "empty", ""));
+		context.connection().send(JJMessage.makeSet(selector, "empty", ""));
 		return this;
 	}
 
 	@Override
 	public Selection remove() {
 		verifyContext("remove elements");
-		context.connection().send(JQueryMessage.makeSet(selector, "remove", ""));
+		context.connection().send(JJMessage.makeSet(selector, "remove", ""));
 		return this;
 	}
 

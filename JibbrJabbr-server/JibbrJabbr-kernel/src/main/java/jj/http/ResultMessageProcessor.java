@@ -20,8 +20,8 @@ import javax.inject.Singleton;
 
 import jj.execution.JJExecutors;
 import jj.hostapi.ScriptJSON;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.JQueryMessage.Type;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.JJMessage.Type;
 
 /**
  * processes incoming result messages into usable objects and restarts the
@@ -48,7 +48,7 @@ class ResultMessageProcessor implements WebSocketMessageProcessor {
 	}
 
 	@Override
-	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
+	public void handle(JJWebSocketConnection connection, JJMessage message) {
 		Object value = message.result().value == null ? null : json.parse(message.result().value);
 		executors.scriptRunner().submitPendingResult(connection, message.result().id, value);
 	}

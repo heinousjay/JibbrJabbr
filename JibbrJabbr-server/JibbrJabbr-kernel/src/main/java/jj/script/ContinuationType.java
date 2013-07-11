@@ -1,7 +1,7 @@
 package jj.script;
 
 public enum ContinuationType {
-	JQueryMessage,
+	JJMessage,
 	AsyncHttpRequest,
 	RequiredModule; 
 }

@@ -25,8 +25,8 @@ import jj.StringUtils;
 import jj.execution.JJExecutors;
 import jj.hostapi.EventSelection;
 import jj.hostapi.ScriptJSON;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.JQueryMessage.Type;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 
@@ -58,7 +58,7 @@ class EventMessageProcessor implements WebSocketMessageProcessor {
 	}
 
 	@Override
-	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
+	public void handle(JJWebSocketConnection connection, JJMessage message) {
 		NativeObject event = new NativeObject();
 		// need to get a way to make the target into the context this for the handler
 		EventSelection target = new EventSelection(message.event().target, context);

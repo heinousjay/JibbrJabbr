@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import jj.DataStore;
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.AssociatedScriptBundle;
 
 /**
@@ -66,9 +66,9 @@ public interface HttpRequest extends DataStore {
 	 * some other case may come up
 	 * @param message
 	 */
-	HttpRequest addStartupJQueryMessage(JQueryMessage message);
+	HttpRequest addStartupJJMessage(JJMessage message);
 
-	List<JQueryMessage> startupJQueryMessages();
+	List<JJMessage> startupJJMessages();
 
 	String toString();
 

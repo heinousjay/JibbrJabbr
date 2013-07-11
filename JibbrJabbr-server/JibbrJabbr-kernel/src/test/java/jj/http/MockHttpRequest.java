@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map.Entry;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.AssociatedScriptBundle;
 
 /**
@@ -99,12 +99,12 @@ public class MockHttpRequest implements HttpRequest {
 	}
 
 	@Override
-	public HttpRequest addStartupJQueryMessage(JQueryMessage message) {
+	public HttpRequest addStartupJJMessage(JJMessage message) {
 		return this;
 	}
 
 	@Override
-	public List<JQueryMessage> startupJQueryMessages() {
+	public List<JJMessage> startupJJMessages() {
 		return null;
 	}
 

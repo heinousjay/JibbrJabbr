@@ -18,7 +18,7 @@ import org.mozilla.javascript.Callable;
 import jj.DataStore;
 import jj.DateFormatHelper;
 import jj.execution.ExecutionTrace;
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.AssociatedScriptBundle;
 
 @Singleton
@@ -37,7 +37,7 @@ public class JJWebSocketConnection implements DataStore {
 	private final HashMap<String, Object> data = new HashMap<>();
 	
 	// room for four messages initially should be good
-	private final List<JQueryMessage> messages = new ArrayList<>(4);
+	private final List<JJMessage> messages = new ArrayList<>(4);
 	
 	private final String description;
 	
@@ -124,7 +124,7 @@ public class JJWebSocketConnection implements DataStore {
 		return map;
 	}
 	
-	public JJWebSocketConnection send(JQueryMessage message) {
+	public JJWebSocketConnection send(JJMessage message) {
 		messages.add(message);
 		return this;
 	}
@@ -142,7 +142,7 @@ public class JJWebSocketConnection implements DataStore {
 		StringBuilder output = new StringBuilder();
 		if (!messages.isEmpty()) {
 			output.append("[");
-			for (JQueryMessage message : messages) {
+			for (JJMessage message : messages) {
 				output.append(message).append(',');
 			}
 			output.setCharAt(output.length() - 1, ']');

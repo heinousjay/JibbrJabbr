@@ -1,4 +1,4 @@
-package jj.jqmessage;
+package jj.jjmessage;
 
 import java.util.Map;
 

@@ -4,7 +4,7 @@ import javax.inject.Singleton;
 
 import jj.DataStore;
 import jj.document.DocumentRequestProcessor;
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.http.HttpRequest;
 import jj.http.JJWebSocketConnection;
 
@@ -141,12 +141,12 @@ public class CurrentScriptContext {
 	 * 
 	 * the result will return a string
 	 * 
-	 * @param jQueryMessage
+	 * @param jjMessage
 	 * @return
 	 */
-	public ContinuationPending prepareContinuation(JQueryMessage jQueryMessage) {
-		ContinuationState continuationState = new ContinuationState(jQueryMessage);
-		throw prepareContinuation(jQueryMessage.id(), continuationState);
+	public ContinuationPending prepareContinuation(JJMessage jjMessage) {
+		ContinuationState continuationState = new ContinuationState(jjMessage);
+		throw prepareContinuation(jjMessage.id(), continuationState);
 	}
 	
 	/**

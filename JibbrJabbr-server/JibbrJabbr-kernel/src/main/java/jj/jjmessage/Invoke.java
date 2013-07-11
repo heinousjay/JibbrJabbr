@@ -1,4 +1,4 @@
-package jj.jqmessage;
+package jj.jjmessage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

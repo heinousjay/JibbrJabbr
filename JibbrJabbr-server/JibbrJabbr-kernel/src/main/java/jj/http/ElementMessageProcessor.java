@@ -20,8 +20,8 @@ import javax.inject.Singleton;
 
 import jj.execution.JJExecutors;
 import jj.hostapi.EventSelection;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.JQueryMessage.Type;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;
 
 /**
@@ -49,7 +49,7 @@ class ElementMessageProcessor implements WebSocketMessageProcessor {
 	}
 
 	@Override
-	public void handle(JJWebSocketConnection connection, JQueryMessage message) {
+	public void handle(JJWebSocketConnection connection, JJMessage message) {
 		executors.scriptRunner().submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
 	}
 

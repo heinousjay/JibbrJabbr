@@ -15,9 +15,9 @@
  */
 package jj.script;
 
-import jj.jqmessage.Event;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.JQueryMessage.Type;
+import jj.jjmessage.Event;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.JJMessage.Type;
 
 /**
  * common functions for making a consistent event name
@@ -29,7 +29,7 @@ public class EventNameHelper {
 
 	private static final String FORMAT = "%s-%s(%s)";
 	
-	public static String makeEventName(JQueryMessage eventMessage) {
+	public static String makeEventName(JJMessage eventMessage) {
 		assert eventMessage != null && eventMessage.type() == Type.Event : "only event messages can be made into event names";
 		Event event = eventMessage.event();
 		return makeEventName(event.context, event.selector, event.type);

@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.jqmessage;
+package jj.jjmessage;
 
-import static jj.jqmessage.JQueryMessage.Type.*;
+import static jj.jjmessage.JJMessage.Type.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.Map;
+
+import jj.jjmessage.JJMessage;
 
 import org.junit.Test;
 
@@ -36,28 +38,20 @@ public class MessagesTest {
 	
 	ObjectMapper mapper = new ObjectMapper();
 
-	@Test
-	public void testAppend() throws Exception {
-		JQueryMessage message = JQueryMessage.makeAppend("parent", "child");
-		assertThat(message, is(notNullValue()));
-		assertThat(message.type(), is(Append));
-		
-		assertThat(message.append(), is(notNullValue()));
-		assertThat(message.bind(), is(nullValue()));
-		assertThat(message.call(), is(nullValue()));
-		assertThat(message.create(), is(nullValue()));
-		assertThat(message.element(), is(nullValue()));
-		assertThat(message.event(), is(nullValue()));
-		assertThat(message.get(), is(nullValue()));
-		assertThat(message.invoke(), is(nullValue()));
-		assertThat(message.result(), is(nullValue()));
-		assertThat(message.retrieve(), is(nullValue()));
-		assertThat(message.set(), is(nullValue()));
-		assertThat(message.store(), is(nullValue()));
-		
+	private void verifyExpectsNoResult(JJMessage message) {
 		assertThat(message.expectsResult(), is(false));
 		assertThat(message.id(), is(nullValue()));
 		assertThat(message.resultId(), is(nullValue()));
+	}
+
+	@Test
+	public void testAppend() throws Exception {
+		JJMessage message = JJMessage.makeAppend("parent", "child");
+		assertThat(message, is(notNullValue()));
+		assertThat(message.type(), is(Append));
+		assertThat(message.append(), is(notNullValue()));
+		
+		verifyExpectsNoResult(message);
 		
 		assertThat(message.append().parent, is("parent"));
 		assertThat(message.append().child, is("child"));
@@ -66,25 +60,25 @@ public class MessagesTest {
 		boolean errored = false;
 		
 		try {
-			JQueryMessage.makeAppend(null, "child");
+			JJMessage.makeAppend(null, "child");
 		} catch (AssertionError e) { errored = true; }
 		
 		if (!errored) fail("append should not have allowed null parent");
 		
 		try {
-			JQueryMessage.makeAppend("", "child");
+			JJMessage.makeAppend("", "child");
 		} catch (AssertionError e) { errored = true; }
 		
 		if (!errored) fail("append should not have allowed empty parent");
 		
 		try {
-			JQueryMessage.makeAppend("parent", null);
+			JJMessage.makeAppend("parent", null);
 		} catch (AssertionError e) { errored = true; }
 		
 		if (!errored) fail("append should not have allowed null child");
 		
 		try {
-			JQueryMessage.makeAppend("parent", "");
+			JJMessage.makeAppend("parent", "");
 		} catch (AssertionError e) { errored = true; }
 		
 		if (!errored) fail("append should not have allowed empty child");
@@ -104,26 +98,12 @@ public class MessagesTest {
 
 	@Test
 	public void testBind() throws Exception {
-		JQueryMessage message = JQueryMessage.makeBind("context", "selector", "type");
+		JJMessage message = JJMessage.makeBind("context", "selector", "type");
 		assertThat(message, is(notNullValue()));
 		assertThat(message.type(), is(Bind));
-		
-		assertThat(message.append(), is(nullValue()));
 		assertThat(message.bind(), is(notNullValue()));
-		assertThat(message.call(), is(nullValue()));
-		assertThat(message.create(), is(nullValue()));
-		assertThat(message.element(), is(nullValue()));
-		assertThat(message.event(), is(nullValue()));
-		assertThat(message.get(), is(nullValue()));
-		assertThat(message.invoke(), is(nullValue()));
-		assertThat(message.result(), is(nullValue()));
-		assertThat(message.retrieve(), is(nullValue()));
-		assertThat(message.set(), is(nullValue()));
-		assertThat(message.store(), is(nullValue()));
 		
-		assertThat(message.expectsResult(), is(false));
-		assertThat(message.id(), is(nullValue()));
-		assertThat(message.resultId(), is(nullValue()));
+		verifyExpectsNoResult(message);
 		
 		assertThat(message.bind().context, is("context"));
 		assertThat(message.bind().selector, is("selector"));
@@ -132,13 +112,13 @@ public class MessagesTest {
 		boolean errored = false;
 		
 		try {
-			JQueryMessage.makeBind(null, "selector", null);
+			JJMessage.makeBind(null, "selector", null);
 		} catch (AssertionError e) { errored = true; }
 		
 		if (!errored) fail("bind should not have allowed null type");
 		
 		try {
-			JQueryMessage.makeBind(null, "selector", "");
+			JJMessage.makeBind(null, "selector", "");
 		} catch (AssertionError e) { errored = true; }
 		
 		if (!errored) fail("bind should not have allowed empty type");
@@ -155,5 +135,10 @@ public class MessagesTest {
 		assertThat(map2.get("selector"), is("selector"));
 		assertThat(map2.get("type"), is("type"));
 		assertThat(map2.size(), is(3));
+	}
+	
+	@Test
+	public void testSomething() throws Exception {
+		JJMessage message = JJMessage.makeCall("name", "[]");
 	}
 }

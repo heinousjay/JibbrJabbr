@@ -2,7 +2,7 @@ package jj.script;
 
 import java.io.Serializable;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 
 public class ContinuationState implements Serializable {
 	
@@ -10,9 +10,9 @@ public class ContinuationState implements Serializable {
 	
 	private final ContinuationType type;
 	
-	public ContinuationState(final JQueryMessage jQueryMessage) {
-		this.type = ContinuationType.JQueryMessage; 
-		this.message = jQueryMessage;
+	public ContinuationState(final JJMessage jjMessage) {
+		this.type = ContinuationType.JJMessage; 
+		this.message = jjMessage;
 	}
 	
 	public ContinuationState(final RestRequest request) {
@@ -31,8 +31,8 @@ public class ContinuationState implements Serializable {
 		return type;
 	}
 	
-	public JQueryMessage jQueryMessage() {
-		return type == ContinuationType.JQueryMessage ? (JQueryMessage)message : null;
+	public JJMessage jjMessage() {
+		return type == ContinuationType.JJMessage ? (JJMessage)message : null;
 	}
 	
 	public RestRequest restRequest() {
@@ -47,8 +47,8 @@ public class ContinuationState implements Serializable {
 		switch (type) {
 		case AsyncHttpRequest:
 			return restRequest().id();
-		case JQueryMessage:
-			return jQueryMessage().id();
+		case JJMessage:
+			return jjMessage().id();
 		case RequiredModule:
 			return requiredModule().pendingKey();
 		}

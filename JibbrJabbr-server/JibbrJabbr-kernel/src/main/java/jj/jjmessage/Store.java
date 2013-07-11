@@ -1,14 +1,18 @@
-package jj.jqmessage;
+package jj.jjmessage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Retrieval request
+ * storage request
+ * 
  * @author jason
  *
  */
-public class Retrieve extends ExpectsResult {
+public class Store {
 
 	@JsonProperty
 	public String key;
+	
+	@JsonProperty
+	public String value;
 }

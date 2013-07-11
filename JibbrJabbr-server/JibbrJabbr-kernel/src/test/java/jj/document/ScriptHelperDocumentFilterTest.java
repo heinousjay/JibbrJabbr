@@ -12,7 +12,7 @@ import java.util.Collections;
 
 import jj.configuration.Configuration;
 import jj.http.MockHttpRequest;
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
@@ -67,7 +67,7 @@ public class ScriptHelperDocumentFilterTest {
 		when(context.associatedScriptBundle()).thenReturn(associatedScriptBundle);
 		when(context.httpRequest()).thenReturn(httpRequest);
 		
-		when(httpRequest.startupJQueryMessages()).thenReturn(Collections.<JQueryMessage>emptyList());
+		when(httpRequest.startupJJMessages()).thenReturn(Collections.<JJMessage>emptyList());
 		when(httpRequest.host()).thenReturn("localhost:8080");
 
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
@@ -169,13 +169,13 @@ public class ScriptHelperDocumentFilterTest {
 	public void testMessagesAreAddedCorrectlyToTheScript() {
 		
 		// given
-		List<JQueryMessage> messages = Arrays.asList(
-			JQueryMessage.makeBind("a.fancybox", "", "click"),
-			JQueryMessage.makeBind("a.fancyvideo", "", "click"),
-			JQueryMessage.makeBind("#chatbox", "", "enter")
+		List<JJMessage> messages = Arrays.asList(
+			JJMessage.makeBind("a.fancybox", "", "click"),
+			JJMessage.makeBind("a.fancyvideo", "", "click"),
+			JJMessage.makeBind("#chatbox", "", "enter")
 		);
 		
-		given(httpRequest.startupJQueryMessages()).willReturn(messages);
+		given(httpRequest.startupJJMessages()).willReturn(messages);
 		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
 		
 		// when 

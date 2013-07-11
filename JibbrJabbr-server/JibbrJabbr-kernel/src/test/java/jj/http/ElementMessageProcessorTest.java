@@ -17,8 +17,8 @@ package jj.http;
 
 import static org.mockito.BDDMockito.*;
 import jj.execution.JJExecutors;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.MessageMaker;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.MessageMaker;
 import jj.script.ScriptRunner;
 
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class ElementMessageProcessorTest {
 		//given
 		given(executors.scriptRunner()).willReturn(scriptRunner);
 		ElementMessageProcessor emp = new ElementMessageProcessor(executors, null);
-		JQueryMessage jqm = MessageMaker.makeElement("id", "selector");
+		JJMessage jqm = MessageMaker.makeElement("id", "selector");
 		
 		//when
 		emp.handle(connection, jqm);

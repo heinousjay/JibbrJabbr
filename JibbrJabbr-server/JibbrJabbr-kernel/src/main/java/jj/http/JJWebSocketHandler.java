@@ -11,8 +11,8 @@ import javax.inject.Singleton;
 import jj.execution.ExecutionTrace;
 import jj.execution.JJExecutors;
 import jj.hostapi.HostEvent;
-import jj.jqmessage.JQueryMessage;
-import jj.jqmessage.JQueryMessageException;
+import jj.jjmessage.JJMessage;
+import jj.jjmessage.JJMessageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class JJWebSocketHandler {
 	
 	private final ExecutionTrace trace;
 	
-	private final Map<JQueryMessage.Type, WebSocketMessageProcessor> messageProcessors;
+	private final Map<JJMessage.Type, WebSocketMessageProcessor> messageProcessors;
 	
 	@Inject
 	JJWebSocketHandler(
@@ -45,9 +45,9 @@ public class JJWebSocketHandler {
 	}
 	
 	private 
-	Map<JQueryMessage.Type, WebSocketMessageProcessor> 
+	Map<JJMessage.Type, WebSocketMessageProcessor> 
 	makeMessageProcessors(final Set<WebSocketMessageProcessor> messageProcessors) {
-		HashMap<JQueryMessage.Type, WebSocketMessageProcessor> result = new HashMap<>();
+		HashMap<JJMessage.Type, WebSocketMessageProcessor> result = new HashMap<>();
 		for (WebSocketMessageProcessor messageProcessor : messageProcessors) {
 			result.put(messageProcessor.type(), messageProcessor);
 		}
@@ -70,13 +70,13 @@ public class JJWebSocketHandler {
 		boolean success = false;
 		
 		try {
-			JQueryMessage message = JQueryMessage.fromString(msg);
+			JJMessage message = JJMessage.fromString(msg);
 			
 			if (messageProcessors.containsKey(message.type())) {
 				messageProcessors.get(message.type()).handle(connection, message);
 				success = true;
 			}
-		} catch (JQueryMessageException e) {}
+		} catch (JJMessageException e) {}
 		
 		if (!success) {
 			log.warn("{} spoke gibberish to me: {}", 

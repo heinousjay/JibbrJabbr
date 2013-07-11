@@ -3,7 +3,7 @@ package jj.hostapi;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 import jj.script.ScriptContextType;
 
@@ -56,7 +56,7 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 			throw new IllegalStateException("cannot invoke remote functions without a connecton");
 		}
 		throw context.prepareContinuation(
-			JQueryMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]))
+			JJMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]))
 		);
 	}
 	

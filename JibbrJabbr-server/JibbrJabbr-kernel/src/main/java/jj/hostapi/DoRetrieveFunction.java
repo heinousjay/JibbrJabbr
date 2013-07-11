@@ -3,7 +3,7 @@ package jj.hostapi;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
@@ -57,7 +57,7 @@ class DoRetrieveFunction extends BaseFunction implements HostObject {
 			throw new IllegalStateException("cannot retrieve remote info during " + context.httpRequest().state());
 		}
 		throw context.prepareContinuation(
-			JQueryMessage.makeRetrieve(String.valueOf(args[0]))
+			JJMessage.makeRetrieve(String.valueOf(args[0]))
 		);
 	}
 	

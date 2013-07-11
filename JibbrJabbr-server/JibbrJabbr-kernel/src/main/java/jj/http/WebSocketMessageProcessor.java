@@ -15,7 +15,7 @@
  */
 package jj.http;
 
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 
 /**
  * component based refactoring of handling incoming websocket messages
@@ -25,7 +25,7 @@ import jj.jqmessage.JQueryMessage;
  */
 interface WebSocketMessageProcessor {
 
-	JQueryMessage.Type type();
+	JJMessage.Type type();
 	
-	void handle(JJWebSocketConnection connection, JQueryMessage message);
+	void handle(JJWebSocketConnection connection, JJMessage message);
 }

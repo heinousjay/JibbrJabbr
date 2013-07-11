@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.SelectorFormatException;
-import jj.jqmessage.JQueryMessage;
+import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptRunner;
@@ -176,11 +176,11 @@ final class DollarFunction extends BaseFunction implements HostObject {
 			if (args.containsKey(ATTR_ID)) {
 				// we can just return immediately, since we can make a unique selector here
 				// so fire-and-forget style
-				context.connection().send(JQueryMessage.makeInlineCreate(html, args));
+				context.connection().send(JJMessage.makeInlineCreate(html, args));
 				return new EventSelection(String.format("#%s", args.get(ATTR_ID)), context);
 			} else {
 				throw context.prepareContinuation(
-					JQueryMessage.makeCreate(html, args));
+					JJMessage.makeCreate(html, args));
 			}
 		}
 		
