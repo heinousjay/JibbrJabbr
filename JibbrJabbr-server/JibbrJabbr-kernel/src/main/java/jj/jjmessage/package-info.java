@@ -6,7 +6,8 @@
  * </p>
  * 
  * <p>
- * At some point, replace the fields with tags
+ * At some point, replace the fields with tags to make
+ * the last paragraph true
  * </p>
  */
 package jj.jjmessage;
