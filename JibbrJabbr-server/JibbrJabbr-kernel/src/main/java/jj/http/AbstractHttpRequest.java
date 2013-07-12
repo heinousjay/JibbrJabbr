@@ -229,6 +229,16 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	}
 
 	/**
+	 * @param userAgent
+	 * @param userAgent2
+	 */
+	@Override
+	public HttpRequest header(String name, String value) {
+		request.headers().add(name, value);
+		return this;
+	}
+
+	/**
 	 * @return
 	 */
 	@Override
@@ -250,16 +260,6 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	@Override
 	public List<Entry<String, String>> allHeaders() {
 		return request.headers().entries();
-	}
-
-	/**
-	 * @param userAgent
-	 * @param userAgent2
-	 */
-	@Override
-	public HttpRequest header(String name, String value) {
-		request.headers().add(name, value);
-		return this;
 	}
 
 }
