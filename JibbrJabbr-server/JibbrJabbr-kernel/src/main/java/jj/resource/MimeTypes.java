@@ -25,6 +25,10 @@ import java.util.Map;
  */
 public class MimeTypes {
 
+	/**
+	 * 
+	 */
+	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final Map<String, String> mimeTypes;
 	
 	static {
@@ -60,6 +64,13 @@ public class MimeTypes {
 
 	public static String get(final String path) {
 		final String extension = extension(path);
-		return mimeTypes.containsKey(extension) ? mimeTypes.get(extension) : "application/octet-stream";
+		return mimeTypes.containsKey(extension) ? mimeTypes.get(extension) : DEFAULT_MIME_TYPE;
+	}
+
+	/**
+	 * @return
+	 */
+	public static String getDefault() {
+		return DEFAULT_MIME_TYPE;
 	}
 }

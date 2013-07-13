@@ -15,19 +15,16 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 
-import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.SHA1Helper;
 import jj.configuration.Configuration;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -37,42 +34,25 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public abstract class ResourceBase {
+public class ConfigResourceCreatorTest {
 	
-	URI baseUri;
 	Path basePath;
 	@Mock Configuration configuration;
 	
+	ConfigResourceCreator toTest;
+	
 	@Before
-	public final void setup() throws Exception {
-		baseUri = URI.create("http://localhost:8080/");
+	public void before() throws Exception {
 		basePath = Paths.get(ResourceBase.class.getResource("/config.js").toURI()).getParent();
 		given(configuration.basePath()).willReturn(basePath);
-		given(configuration.baseUri()).willReturn(baseUri);
-	}
 		
+		toTest = new ConfigResourceCreator(configuration);
+	}
 
-	protected <T extends Resource> T testFileResource(
-		final String baseName,
-		final ResourceCreator<T> toTest,
-		Object...args
-	) throws Exception {
-		final Path path = toTest.toPath(baseName, args);
+	@Test
+	public void testCreate() throws Exception {
 		
-		assertTrue(baseName + " does not exist", Files.exists(path));
-		
-		T resource1 = toTest.create(baseName, args);
-		final byte[] bytes = Files.readAllBytes(path);
-		assertThat(resource1, is(notNullValue()));
-		assertThat(resource1.baseName(), is(baseName));
-		assertThat(resource1.lastModified(), is(Files.getLastModifiedTime(path)));
-		assertThat(resource1.path(), is(path));
-		assertThat(resource1.needsReplacing(), is(false));
-		
-		if (!(resource1 instanceof CssResource)) { 
-			assertThat(resource1.sha1(), is(SHA1Helper.keyFor(bytes))); 
-		}
-		
-		return resource1;
+		ConfigResource resource = toTest.create(ConfigResource.CONFIG_JS);
 	}
+
 }
