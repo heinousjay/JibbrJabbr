@@ -20,8 +20,8 @@ import org.mozilla.javascript.ContextFactory;
 
 import jj.client.ClientModule;
 import jj.document.DocumentModule;
+import jj.engine.HostApiModule;
 import jj.execution.ExecutionModule;
-import jj.hostapi.HostApiModule;
 import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;

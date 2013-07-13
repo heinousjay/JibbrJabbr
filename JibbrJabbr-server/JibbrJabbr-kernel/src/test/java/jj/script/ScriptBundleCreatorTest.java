@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.JJ;
-import jj.hostapi.RhinoObjectCreator;
+import jj.engine.EngineAPI;
 import jj.resource.ScriptResource;
 
 import org.junit.Before;
@@ -48,7 +48,7 @@ public class ScriptBundleCreatorTest {
 	
 	@Mock ScriptResource moduleScriptResource;
 	
-	@Mock RhinoObjectCreator rhinoObjectCreator;
+	@Mock EngineAPI rhinoObjectCreator;
 	
 	ScriptBundleCreator scriptBundleCreator;
 	

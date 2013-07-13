@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.document.DocumentRequestProcessor;
+import jj.engine.HostEvent;
 import jj.execution.ScriptExecutorFactory;
-import jj.hostapi.HostEvent;
 import jj.http.HttpRequestState;
 import jj.http.JJWebSocketConnection;
 import jj.http.MockHttpRequest;

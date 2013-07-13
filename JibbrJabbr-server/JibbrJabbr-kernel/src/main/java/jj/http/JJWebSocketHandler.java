@@ -8,9 +8,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.engine.HostEvent;
 import jj.execution.ExecutionTrace;
 import jj.execution.JJExecutors;
-import jj.hostapi.HostEvent;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessageException;
 

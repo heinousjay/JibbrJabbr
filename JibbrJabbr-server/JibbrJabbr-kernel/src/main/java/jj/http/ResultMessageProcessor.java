@@ -18,8 +18,8 @@ package jj.http;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.engine.ScriptJSON;
 import jj.execution.JJExecutors;
-import jj.hostapi.ScriptJSON;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 

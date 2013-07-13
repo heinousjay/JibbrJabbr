@@ -13,11 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.document.DocumentRequestProcessor;
+import jj.engine.HostEvent;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 import jj.execution.ScriptExecutorFactory;
 import jj.execution.ScriptThread;
-import jj.hostapi.HostEvent;
 import jj.http.JJWebSocketConnection;
 
 /**

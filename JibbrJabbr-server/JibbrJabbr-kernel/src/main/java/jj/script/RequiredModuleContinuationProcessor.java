@@ -20,9 +20,9 @@ import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.engine.RequiredModuleException;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
-import jj.hostapi.RequiredModuleException;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;

@@ -18,7 +18,7 @@ package jj.script;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import jj.hostapi.RhinoObjectCreator;
+import jj.engine.EngineAPI;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock ScriptBundle scriptBundle;
 	
-	@Mock RhinoObjectCreator rhinoObjectCreator;
+	@Mock EngineAPI rhinoObjectCreator;
 	
 	@Mock CurrentScriptContext currentScriptContext;
 

@@ -13,10 +13,10 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.engine.DoCallFunction;
+import jj.engine.DoInvokeFunction;
+import jj.engine.EngineAPI;
 import jj.execution.ScriptThread;
-import jj.hostapi.DoCallFunction;
-import jj.hostapi.DoInvokeFunction;
-import jj.hostapi.RhinoObjectCreator;
 import jj.resource.ScriptResource;
 
 /**
@@ -32,10 +32,10 @@ class ScriptBundleCreator {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptBundleCreator.class);
 	
-	private final RhinoObjectCreator rhinoObjectCreator;
+	private final EngineAPI rhinoObjectCreator;
 	
 	@Inject
-	ScriptBundleCreator(final RhinoObjectCreator rhinoObjectCreator) {
+	ScriptBundleCreator(final EngineAPI rhinoObjectCreator) {
 		this.rhinoObjectCreator = rhinoObjectCreator;
 	}
 	
@@ -143,7 +143,7 @@ class ScriptBundleCreator {
 						.append("']('")
 						.append(lastMatcher.group(1))
 						.append("',global['")
-						.append(RhinoObjectCreator.PROP_CONVERT_ARGS)
+						.append(EngineAPI.PROP_CONVERT_ARGS)
 						.append("'](arguments))")
 						.append(";}\n");
 					

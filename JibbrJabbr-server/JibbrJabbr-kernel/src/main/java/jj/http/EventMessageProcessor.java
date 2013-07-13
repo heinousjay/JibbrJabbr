@@ -22,9 +22,9 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.StringUtils;
+import jj.engine.EventSelection;
+import jj.engine.ScriptJSON;
 import jj.execution.JJExecutors;
-import jj.hostapi.EventSelection;
-import jj.hostapi.ScriptJSON;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;

@@ -12,7 +12,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.hostapi.RhinoObjectCreator;
+import jj.engine.EngineAPI;
 
 /**
  * Coordinates processing a continuable script, returning the 
@@ -25,13 +25,13 @@ class ContinuationCoordinator {
 	
 	private final Logger log = LoggerFactory.getLogger(ContinuationCoordinator.class);
 
-	private final RhinoObjectCreator rhinoObjectCreator;
+	private final EngineAPI rhinoObjectCreator;
 	
 	private final CurrentScriptContext currentScriptContext;
 	
 	@Inject
 	ContinuationCoordinator(
-		final RhinoObjectCreator rhinoObjectCreator,
+		final EngineAPI rhinoObjectCreator,
 		final CurrentScriptContext currentScriptContext
 	) {
 		this.rhinoObjectCreator = rhinoObjectCreator;

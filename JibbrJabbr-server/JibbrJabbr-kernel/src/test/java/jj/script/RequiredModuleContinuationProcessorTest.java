@@ -16,8 +16,8 @@
 package jj.script;
 
 import static org.mockito.BDDMockito.*;
+import jj.engine.RequiredModuleException;
 import jj.execution.MockJJExecutors;
-import jj.hostapi.RequiredModuleException;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;

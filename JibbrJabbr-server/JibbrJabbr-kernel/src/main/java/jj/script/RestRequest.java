@@ -1,7 +1,7 @@
 package jj.script;
 
 import jj.Sequence;
-import jj.hostapi.MIME;
+import jj.engine.MIME;
 
 import com.ning.http.client.Request;
 
