@@ -32,4 +32,7 @@ a toy.
 
 If you try running the tests and you're getting weird errors, make sure you've enabled assertions.
 
-Owes a spiritual debt to [webbit](https://github.com/webbit/webbit).
+Owes a spiritual debt to [webbit](https://github.com/webbit/webbit).  Owes debts of a different
+nature to [Guice](https://code.google.com/p/google-guice/), [Netty](https://github.com/netty/netty),
+[Rhino](https://github.com/mozilla/rhino), [jsoup](https://github.com/jhy/jsoup), and 
+[jQuery](https://github.com/jquery/jquery).
