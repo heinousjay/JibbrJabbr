@@ -80,6 +80,7 @@ class EngineAPIImpl implements EngineAPI {
 				} catch (RhinoException re) {
 					log.error("trouble evaluating host object {} script {}", hostObject.getClass().getName(), script);
 					log.error("received exception", re);
+					throw new AssertionError("bad host object!", re);
 				}
 			}
 		}
