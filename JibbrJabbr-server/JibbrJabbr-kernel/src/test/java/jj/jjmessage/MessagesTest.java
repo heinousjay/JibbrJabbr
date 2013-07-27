@@ -19,6 +19,7 @@ import static jj.jjmessage.JJMessage.Type.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import jj.jjmessage.JJMessage;
@@ -180,6 +181,18 @@ public class MessagesTest {
 		assertThat(map2.get("args"), is("[]"));
 		assertThat(map2.size(), is(2));
 	}
+
+	@Test
+	public void testCreate() throws Exception {
+		Map<String, String> args = new HashMap<>();
+		
+		JJMessage message = JJMessage.makeCreate("<a>", args);
+		assertThat(message, is(notNullValue()));
+		assertThat(message.type(), is(Create));
+		assertThat(message.create(), is(notNullValue()));
+		
+		verifyExpectsResult(message);
+	}
 	
 	@Test
 	public void testInvoke() throws Exception {
@@ -205,7 +218,7 @@ public class MessagesTest {
 			JJMessage.makeInvoke("name", "");
 		} catch (AssertionError e) { errored = true; }
 		
-		if (!errored) fail("invoke should not have allowed empty type");
+		if (!errored) fail("invoke should not have allowed empty args");
 		
 		String serialized = message.toString();
 		
