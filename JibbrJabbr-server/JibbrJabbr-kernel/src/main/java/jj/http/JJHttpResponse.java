@@ -201,7 +201,6 @@ class JJHttpResponse extends AbstractHttpResponse {
 	 * @return {@code true} if the response has no body, {@code false} otherwise
 	 */
 	public boolean hasNoBody() {
-		// TODO Auto-generated method stub
 		return response.content().readableBytes() == 0;
 	}
 }
