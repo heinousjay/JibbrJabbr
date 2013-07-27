@@ -170,7 +170,7 @@ public class ScriptRunner {
 						documentRequestProcessor.respond();
 					} finally {
 						context.end();
-					}	
+					}
 				} else {
 					
 					documentRequestProcessor.scriptBundle(scriptBundle);
@@ -189,7 +189,7 @@ public class ScriptRunner {
 						
 					} finally {
 						context.end();
-					}	
+					}
 				}
 			}
 		});
