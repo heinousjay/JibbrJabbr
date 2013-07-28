@@ -1,4 +1,4 @@
-package jj.http;
+package jj.http.server;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,6 +21,9 @@ import com.google.inject.Injector;
 import jj.execution.ExecutionTrace;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
+import jj.servable.RequestProcessor;
 import jj.servable.Servable;
 
 /**

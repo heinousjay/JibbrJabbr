@@ -26,7 +26,6 @@ import jj.resource.StaticResource;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.RequestProcessor;
 
 /**
  * @author jason

@@ -16,7 +16,6 @@ import jj.script.ScriptBundleFinder;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.RequestProcessor;
 
 /**
  * handles serving the scripts associated with a document

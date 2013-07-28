@@ -26,9 +26,9 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import jj.logging.TestRunnerLogger;
 import jj.execution.ExecutionTrace;
-import jj.http.TestHttpRequest;
-import jj.http.TestHttpResponse;
-import jj.http.TestJJEngineHttpHandler;
+import jj.http.server.TestHttpRequest;
+import jj.http.server.TestHttpResponse;
+import jj.http.server.TestJJEngineHttpHandler;
 
 /**
  * @author jason

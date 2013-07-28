@@ -9,7 +9,6 @@ import jj.configuration.Configuration;
 import jj.execution.IOThread;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.RequestProcessor;
 import jj.resource.Resource;
 import jj.uri.URIMatch;
 

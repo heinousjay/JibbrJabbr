@@ -15,7 +15,7 @@
  */
 package jj.testing;
 
-import jj.http.JJWebSocketHandler;
+import jj.http.server.JJWebSocketHandler;
 
 
 /**

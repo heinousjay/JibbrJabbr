@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 import jj.execution.ExecutionTrace;
+import jj.http.AbstractHttpResponse;
+import jj.http.server.JJHttpRequest;
+import jj.http.server.JJHttpResponse;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
@@ -113,18 +116,22 @@ public class JJHttpResponseTest {
 		assertThat(response.hasNoBody(), is(true));
 	}
 	
+	private void verifyInlineResponse() {
+		
+		verify(channel).newPromise();
+		verify(channel).write(any(), eq(p));
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
+	}
+	
 	@Test
 	public void testNotFound() {
 		
 		response.sendNotFound();
 		
-		assertThat(response.response.getStatus(), is(HttpResponseStatus.NOT_FOUND));
-		
-		verify(channel).newPromise();
-		verify(channel).write(response.response, p);
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		assertThat(response.status(), is(HttpResponseStatus.NOT_FOUND));
+		verifyInlineResponse();
 	}
 	
 	LoadedResource givenALoadedResource() throws IOException {
@@ -139,49 +146,30 @@ public class JJHttpResponseTest {
 
 	@Test
 	public void testCachedLoadedResource() throws IOException {
+		
 		testCachedResource(givenALoadedResource());
-		
-		verify(channel).newPromise();
-		verify(channel).write(response.response, p);
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		verifyInlineResponse();
 	}
 	
 	@Test
 	public void testUncachedLoadedResource() throws IOException {
 		
 		testUncachedResource(givenALoadedResource());
-		
-		verify(channel).newPromise();
-		verify(channel).write(response.response, p);
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		verifyInlineResponse();
 	}
 	
 	@Test
 	public void testCachedNotModifiedLoadedResource() throws IOException {
 		
 		testCachedNotModifiedResource(givenALoadedResource());
-		
-		verify(channel).newPromise();
-		verify(channel).write(response.response, p);
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		verifyInlineResponse();
 	}
 	
 	@Test
 	public void testUncachedNotModifiedLoadedResource() throws IOException {
 		
 		testUncachedNotModifiedResource(givenALoadedResource());
-		
-		verify(channel).newPromise();
-		verify(channel).write(response.response, p);
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		verifyInlineResponse();
 	}
 	
 	TransferableResource givenATransferableResource() throws IOException {
@@ -194,14 +182,9 @@ public class JJHttpResponseTest {
 		
 		return tr;
 	}
-	
-	@Test
-	public void testCachedTransferableResource() throws IOException {
-		
-		testCachedResource(givenATransferableResource());
-		
+
+	private void verifyTransferredResponse() {
 		verify(channel).newPromise();
-		verify(channel).write(response.response);
 		// this verifies the response write, and the file region write
 		verify(channel, times(2)).write(any());
 		// this verifies the LastHttpContent and the promise
@@ -209,46 +192,34 @@ public class JJHttpResponseTest {
 		verify(channel).flush();
 		
 		verifyNoMoreInteractions(channel);
+	}
+	
+	@Test
+	public void testCachedTransferableResource() throws IOException {
+		
+		testCachedResource(givenATransferableResource());
+		verifyTransferredResponse();
 	}
 	
 	@Test
 	public void testUncachedTransferableResource() throws IOException {
 		
 		testUncachedResource(givenATransferableResource());
-
-		verify(channel).newPromise();
-		verify(channel).write(response.response);
-		// this verifies the response write, and the file region write
-		verify(channel, times(2)).write(any());
-		// this verifies the LastHttpContent and the promise
-		verify(channel).write(anyObject(), eq(p));
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		verifyTransferredResponse();
 	}
 	
 	@Test
 	public void testCachedNotModifiedTransferableResource() throws IOException {
 		
 		testCachedNotModifiedResource(givenATransferableResource());
-		
-		verify(channel).newPromise();
-		verify(channel).write(response.response, p);
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		verifyInlineResponse();
 	}
 	
 	@Test
 	public void testUncachedNotModifiedTransferableResource() throws IOException {
 		
 		testUncachedNotModifiedResource(givenATransferableResource());
-		
-		verify(channel).newPromise();
-		verify(channel).write(response.response, p);
-		verify(channel).flush();
-		
-		verifyNoMoreInteractions(channel);
+		verifyInlineResponse();
 	}
 
 }

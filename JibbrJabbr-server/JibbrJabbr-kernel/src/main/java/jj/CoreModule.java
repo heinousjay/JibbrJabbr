@@ -25,8 +25,8 @@ import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.servable.ServableModule;
-import jj.http.HttpModule;
 import jj.http.client.ClientModule;
+import jj.http.server.HttpModule;
 
 /**
  * @author jason

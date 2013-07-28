@@ -1,9 +1,12 @@
-package jj.http;
+package jj.http.server;
 
 import java.net.SocketAddress;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.http.AbstractHttpRequest;
+import jj.http.HttpRequest;
 
 
 import io.netty.channel.Channel;

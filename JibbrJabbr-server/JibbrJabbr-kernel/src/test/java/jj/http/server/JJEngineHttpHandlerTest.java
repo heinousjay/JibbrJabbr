@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import static org.mockito.BDDMockito.*;
 
@@ -22,6 +22,11 @@ import java.util.Set;
 
 import jj.execution.ExecutionTrace;
 import jj.execution.MockJJExecutors;
+import jj.http.HttpResponse;
+import jj.http.server.JJEngineHttpHandler;
+import jj.http.server.JJHttpRequest;
+import jj.http.server.WebSocketConnectionMaker;
+import jj.servable.RequestProcessor;
 import jj.servable.Servable;
 
 import org.junit.Before;

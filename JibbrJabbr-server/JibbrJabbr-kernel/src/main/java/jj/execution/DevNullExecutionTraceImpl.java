@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.JJWebSocketConnection;
+import jj.http.server.JJWebSocketConnection;
 
 /**
  * @author jason

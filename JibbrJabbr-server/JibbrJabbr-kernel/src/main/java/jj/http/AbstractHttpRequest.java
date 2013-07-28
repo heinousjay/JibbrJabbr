@@ -34,7 +34,7 @@ import jj.Sequence;
  * @author jason
  *
  */
-abstract class AbstractHttpRequest implements HttpRequest {
+public abstract class AbstractHttpRequest implements HttpRequest {
 
 	private static final Sequence sequence = new Sequence();
 	
@@ -53,7 +53,7 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	/**
 	 * 
 	 */
-	AbstractHttpRequest(final FullHttpRequest request) {
+	protected AbstractHttpRequest(final FullHttpRequest request) {
 		this.request = request;
 	}
 

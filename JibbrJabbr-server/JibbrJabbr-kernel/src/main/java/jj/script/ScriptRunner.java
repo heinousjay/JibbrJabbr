@@ -18,7 +18,7 @@ import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 import jj.execution.ScriptExecutorFactory;
 import jj.execution.ScriptThread;
-import jj.http.JJWebSocketConnection;
+import jj.http.server.JJWebSocketConnection;
 
 /**
  * DO NOT DEPEND ON THIS CLASS, DEPEND ON {@link JJExecutors}

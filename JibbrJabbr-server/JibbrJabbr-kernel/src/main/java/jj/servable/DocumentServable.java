@@ -18,7 +18,6 @@ import jj.resource.ScriptResourceType;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.RequestProcessor;
 
 @Singleton
 class DocumentServable extends Servable {

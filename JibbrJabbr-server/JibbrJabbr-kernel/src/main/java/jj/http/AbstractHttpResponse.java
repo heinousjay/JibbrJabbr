@@ -39,9 +39,9 @@ import jj.resource.TransferableResource;
  * @author jason
  *
  */
-abstract class AbstractHttpResponse  implements HttpResponse {
+public abstract class AbstractHttpResponse  implements HttpResponse {
 
-	protected static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
+	public static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
 	protected final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 	private volatile boolean isCommitted = false;
 	protected final Charset charset = StandardCharsets.UTF_8;
@@ -49,7 +49,7 @@ abstract class AbstractHttpResponse  implements HttpResponse {
 	/**
 	 * 
 	 */
-	public AbstractHttpResponse() {
+	protected AbstractHttpResponse() {
 		super();
 	}
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.IOException;
@@ -32,6 +32,7 @@ import jj.resource.MimeTypes;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import jj.execution.ExecutionTrace;
+import jj.http.AbstractHttpResponse;
 import jj.http.HttpResponse;
 
 import io.netty.handler.codec.http.HttpHeaders;

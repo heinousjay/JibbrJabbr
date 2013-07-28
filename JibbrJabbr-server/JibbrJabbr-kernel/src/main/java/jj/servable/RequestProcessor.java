@@ -1,4 +1,4 @@
-package jj.http;
+package jj.servable;
 
 import java.io.IOException;
 

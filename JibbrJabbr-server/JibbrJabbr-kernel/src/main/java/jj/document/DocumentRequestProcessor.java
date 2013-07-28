@@ -3,8 +3,8 @@ package jj.document;
 import java.util.List;
 
 import jj.script.AssociatedScriptBundle;
+import jj.servable.RequestProcessor;
 import jj.http.HttpRequest;
-import jj.http.RequestProcessor;
 import jj.jjmessage.JJMessage;
 
 import org.jsoup.nodes.Document;

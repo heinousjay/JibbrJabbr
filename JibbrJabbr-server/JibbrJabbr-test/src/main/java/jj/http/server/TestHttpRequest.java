@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import javax.inject.Inject;
+
+import jj.http.AbstractHttpRequest;
 
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;

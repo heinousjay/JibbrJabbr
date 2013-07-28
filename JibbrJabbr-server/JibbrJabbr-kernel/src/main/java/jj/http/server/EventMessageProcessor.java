@@ -13,44 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.ScriptableObject;
+
+import jj.StringUtils;
 import jj.engine.EventSelection;
+import jj.engine.ScriptJSON;
 import jj.execution.JJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;
+import jj.script.EventNameHelper;
 
 /**
- * handles an element response from the client, which can happen in
- * response to creation at the moment
  * @author jason
  *
  */
 @Singleton
-class ElementMessageProcessor implements WebSocketMessageProcessor {
+class EventMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
-	
 	private final CurrentScriptContext context;
+	private final ScriptJSON scriptJSON;
 	
 	@Inject
-	ElementMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
+	EventMessageProcessor(
+		final JJExecutors executors,
+		final CurrentScriptContext context,
+		final ScriptJSON scriptJSON
+	) {
 		this.executors = executors;
 		this.context = context;
+		this.scriptJSON = scriptJSON;
 	}
 	
 	@Override
 	public Type type() {
-		return Type.Element;
+		return Type.Event;
 	}
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JJMessage message) {
-		executors.scriptRunner().submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
+		NativeObject event = new NativeObject();
+		// need to get a way to make the target into the context this for the handler
+		EventSelection target = new EventSelection(message.event().target, context);
+		event.defineProperty("target", target, ScriptableObject.CONST);
+		if (!StringUtils.isEmpty(message.event().form)) {
+			event.defineProperty("form", scriptJSON.parse(message.event().form), ScriptableObject.CONST);
+		}
+		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message), event);
 	}
 
 }

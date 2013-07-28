@@ -1,4 +1,4 @@
-package jj.http;
+package jj.http.server;
 
 import java.util.Collections;
 import java.util.HashMap;

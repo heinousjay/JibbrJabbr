@@ -9,8 +9,8 @@ import jj.document.DocumentRequestProcessor;
 import jj.document.DocumentRequestState;
 import jj.engine.HostEvent;
 import jj.execution.ScriptExecutorFactory;
-import jj.http.JJWebSocketConnection;
 import jj.http.MockHttpRequest;
+import jj.http.server.JJWebSocketConnection;
 import jj.resource.ScriptResource;
 
 import org.jmock.lib.concurrent.DeterministicScheduler;

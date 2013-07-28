@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import static org.mockito.BDDMockito.*;
-
 import jj.execution.JJExecutors;
+import jj.http.server.ElementMessageProcessor;
+import jj.http.server.JJWebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
-import jj.script.EventNameHelper;
 import jj.script.ScriptRunner;
 
 import org.junit.Test;
@@ -33,7 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class EventMessageProcessorTest {
+public class ElementMessageProcessorTest {
 
 	@Mock JJExecutors executors;
 	@Mock ScriptRunner scriptRunner;
@@ -44,14 +44,15 @@ public class EventMessageProcessorTest {
 		
 		//given
 		given(executors.scriptRunner()).willReturn(scriptRunner);
-		EventMessageProcessor emp = new EventMessageProcessor(executors, null, null);
-		JJMessage event = MessageMaker.makeEvent("selector", "type");
+		ElementMessageProcessor emp = new ElementMessageProcessor(executors, null);
+		JJMessage jqm = MessageMaker.makeElement("id", "selector");
 		
 		//when
-		emp.handle(connection, event);
+		emp.handle(connection, jqm);
 		
 		//then
-		verify(scriptRunner).submit(eq(connection), eq(EventNameHelper.makeEventName(event)), anyVararg());
+		verify(scriptRunner).submitPendingResult(eq(connection), eq("id"), anyVararg());
+		
 	}
 
 }

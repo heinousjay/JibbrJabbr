@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
-import static jj.http.HttpServerChannelInitializer.PipelineStages.*;
+import static jj.http.server.HttpServerChannelInitializer.PipelineStages.*;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

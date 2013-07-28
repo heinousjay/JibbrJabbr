@@ -1,8 +1,10 @@
-package jj.http;
+package jj.http.server;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 

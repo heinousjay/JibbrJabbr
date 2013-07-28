@@ -3,7 +3,7 @@ package jj.script;
 import static jj.script.ScriptContextType.*;
 
 import jj.document.DocumentRequestProcessor;
-import jj.http.JJWebSocketConnection;
+import jj.http.server.JJWebSocketConnection;
 
 class ScriptContext {
 	

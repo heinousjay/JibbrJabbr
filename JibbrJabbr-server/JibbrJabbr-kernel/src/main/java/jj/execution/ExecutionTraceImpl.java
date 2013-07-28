@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 import jj.logging.ExecutionTraceLogger;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.JJWebSocketConnection;
+import jj.http.server.JJWebSocketConnection;
 
 import org.slf4j.Logger;
 

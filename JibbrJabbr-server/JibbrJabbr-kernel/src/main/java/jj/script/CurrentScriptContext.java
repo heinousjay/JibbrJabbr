@@ -6,7 +6,7 @@ import jj.DataStore;
 import jj.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.http.HttpRequest;
-import jj.http.JJWebSocketConnection;
+import jj.http.server.JJWebSocketConnection;
 
 import org.jsoup.nodes.Document;
 import org.mozilla.javascript.Context;

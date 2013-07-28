@@ -1,4 +1,4 @@
-package jj.http;
+package jj.http.server;
 
 import jj.JJServerListener;
 

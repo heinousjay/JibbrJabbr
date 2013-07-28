@@ -13,44 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.engine.ScriptJSON;
+import jj.engine.EventSelection;
 import jj.execution.JJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
+import jj.script.CurrentScriptContext;
 
 /**
- * processes incoming result messages into usable objects and restarts the
- * continuation
+ * handles an element response from the client, which can happen in
+ * response to creation at the moment
  * @author jason
  *
  */
 @Singleton
-class ResultMessageProcessor implements WebSocketMessageProcessor {
+class ElementMessageProcessor implements WebSocketMessageProcessor {
 
 	private final JJExecutors executors;
 	
-	private final ScriptJSON json;
+	private final CurrentScriptContext context;
 	
 	@Inject
-	ResultMessageProcessor(final JJExecutors executors, final ScriptJSON json) {
+	ElementMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
 		this.executors = executors;
-		this.json = json;
+		this.context = context;
 	}
 	
 	@Override
 	public Type type() {
-		return Type.Result;
+		return Type.Element;
 	}
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JJMessage message) {
-		Object value = message.result().value == null ? null : json.parse(message.result().value);
-		executors.scriptRunner().submitPendingResult(connection, message.result().id, value);
+		executors.scriptRunner().submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
 	}
 
 }

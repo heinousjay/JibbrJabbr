@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
+package jj.http.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -29,6 +29,9 @@ import org.slf4j.LoggerFactory;
 import jj.DateFormatHelper;
 import jj.Version;
 import jj.execution.ExecutionTrace;
+import jj.http.AbstractHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.logging.AccessLogger;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
