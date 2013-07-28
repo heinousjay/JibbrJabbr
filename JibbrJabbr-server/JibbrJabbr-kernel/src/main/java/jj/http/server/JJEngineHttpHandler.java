@@ -23,8 +23,8 @@ import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.servable.RequestProcessor;
-import jj.servable.Servable;
+import jj.http.server.servable.RequestProcessor;
+import jj.http.server.servable.Servable;
 
 /**
  * Acts as the bridge from netty into our core.

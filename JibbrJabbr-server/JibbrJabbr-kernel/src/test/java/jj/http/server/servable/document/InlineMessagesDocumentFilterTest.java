@@ -1,4 +1,4 @@
-package jj.document;
+package jj.http.server.servable.document;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -9,6 +9,8 @@ import java.io.StringReader;
 import java.util.PropertyResourceBundle;
 
 import jj.execution.JJExecutors;
+import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.http.server.servable.document.InlineMessagesDocumentFilter;
 import jj.resource.HtmlResource;
 import jj.resource.PropertiesResource;
 import jj.resource.ResourceFinder;

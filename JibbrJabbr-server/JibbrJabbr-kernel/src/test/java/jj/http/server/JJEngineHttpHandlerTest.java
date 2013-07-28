@@ -26,8 +26,8 @@ import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
 import jj.http.server.JJHttpRequest;
 import jj.http.server.WebSocketConnectionMaker;
-import jj.servable.RequestProcessor;
-import jj.servable.Servable;
+import jj.http.server.servable.RequestProcessor;
+import jj.http.server.servable.Servable;
 
 import org.junit.Before;
 import org.junit.Test;

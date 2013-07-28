@@ -1,10 +1,10 @@
-package jj.document;
+package jj.http.server.servable.document;
 
 import java.util.List;
 
 import jj.script.AssociatedScriptBundle;
-import jj.servable.RequestProcessor;
 import jj.http.HttpRequest;
+import jj.http.server.servable.RequestProcessor;
 import jj.jjmessage.JJMessage;
 
 import org.jsoup.nodes.Document;

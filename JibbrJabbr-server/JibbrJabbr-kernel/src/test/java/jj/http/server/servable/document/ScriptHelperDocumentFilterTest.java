@@ -1,4 +1,4 @@
-package jj.document;
+package jj.http.server.servable.document;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -12,6 +12,8 @@ import java.util.Collections;
 
 import jj.configuration.Configuration;
 import jj.http.MockHttpRequest;
+import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.http.server.servable.document.ScriptHelperDocumentFilter;
 import jj.jjmessage.JJMessage;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;

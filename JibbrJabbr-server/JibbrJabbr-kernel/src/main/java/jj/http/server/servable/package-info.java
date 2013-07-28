@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
-
-public enum DocumentRequestState {
-	Uninitialized,
-	InitialExecution {
-		@Override
-		public String toString() {
-			return "Initial execution";
-		}
-	},
-	ReadyFunctionExecution {
-		@Override
-		public String toString() {
-			return "Ready function execution";
-		}
-	};
-}
+/**
+ * classes for determining how to handle requests to the server
+ * 
+ * @author jason
+ *
+ */
+package jj.http.server.servable;

@@ -1,4 +1,4 @@
-package jj.servable;
+package jj.http.server.servable;
 
 import io.netty.handler.codec.http.HttpHeaders;
 

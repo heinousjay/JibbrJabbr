@@ -1,4 +1,4 @@
-package jj.servable;
+package jj.http.server.servable;
 
 import jj.JJModule;
 

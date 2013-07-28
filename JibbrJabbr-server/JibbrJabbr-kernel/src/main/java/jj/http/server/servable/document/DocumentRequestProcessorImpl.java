@@ -1,4 +1,4 @@
-package jj.document;
+package jj.http.server.servable.document;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

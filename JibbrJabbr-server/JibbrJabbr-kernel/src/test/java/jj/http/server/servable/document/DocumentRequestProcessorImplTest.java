@@ -1,4 +1,4 @@
-package jj.document;
+package jj.http.server.servable.document;
 
 
 import static jj.execution.MockJJExecutors.ThreadType.*;
@@ -11,12 +11,13 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import jj.document.DocumentFilter;
-import jj.document.DocumentRequestProcessorImpl;
 import jj.execution.MockJJExecutors;
 import jj.execution.ScriptExecutorFactory;
 import jj.http.MockHttpRequest;
 import jj.http.MockHttpResponse;
+import jj.http.server.servable.document.DocumentFilter;
+import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.http.server.servable.document.DocumentRequestProcessorImpl;
 import jj.resource.HtmlResource;
 
 import io.netty.channel.Channel;

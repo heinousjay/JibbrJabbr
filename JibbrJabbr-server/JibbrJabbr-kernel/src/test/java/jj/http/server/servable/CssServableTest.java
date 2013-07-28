@@ -1,4 +1,4 @@
-package jj.servable;
+package jj.http.server.servable;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -12,9 +12,10 @@ import jj.JJ;
 import jj.configuration.Configuration;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
+import jj.http.server.servable.CssServable;
+import jj.http.server.servable.RequestProcessor;
 import jj.resource.CssResource;
 import jj.resource.ResourceFinder;
-import jj.servable.CssServable;
 
 import org.junit.Before;
 import org.junit.Test;

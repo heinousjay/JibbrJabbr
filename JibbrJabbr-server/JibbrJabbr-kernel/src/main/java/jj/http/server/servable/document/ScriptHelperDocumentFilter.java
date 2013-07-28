@@ -1,4 +1,4 @@
-package jj.document;
+package jj.http.server.servable.document;
 
 import static jj.resource.AssetResource.*;
 import javax.inject.Inject;

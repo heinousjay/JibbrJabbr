@@ -5,12 +5,12 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.document.DocumentRequestProcessor;
-import jj.document.DocumentRequestState;
 import jj.engine.HostEvent;
 import jj.execution.ScriptExecutorFactory;
 import jj.http.MockHttpRequest;
 import jj.http.server.JJWebSocketConnection;
+import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.http.server.servable.document.DocumentRequestState;
 import jj.resource.ScriptResource;
 
 import org.jmock.lib.concurrent.DeterministicScheduler;

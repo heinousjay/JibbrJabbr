@@ -18,15 +18,15 @@ package jj;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 
-import jj.document.DocumentModule;
 import jj.engine.HostApiModule;
 import jj.execution.ExecutionModule;
 import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
-import jj.servable.ServableModule;
 import jj.http.client.ClientModule;
 import jj.http.server.HttpModule;
+import jj.http.server.servable.ServableModule;
+import jj.http.server.servable.document.DocumentModule;
 
 /**
  * @author jason

@@ -3,10 +3,10 @@ package jj.script;
 import javax.inject.Singleton;
 
 import jj.DataStore;
-import jj.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
+import jj.http.server.servable.document.DocumentRequestProcessor;
 
 import org.jsoup.nodes.Document;
 import org.mozilla.javascript.Context;

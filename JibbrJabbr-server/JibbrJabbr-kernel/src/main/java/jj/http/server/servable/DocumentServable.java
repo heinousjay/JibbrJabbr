@@ -1,4 +1,4 @@
-package jj.servable;
+package jj.http.server.servable;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -8,8 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.document.DocumentFilter;
-import jj.document.DocumentRequestProcessorImpl;
 import jj.execution.JJExecutors;
 import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
@@ -18,6 +16,8 @@ import jj.resource.ScriptResourceType;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
+import jj.http.server.servable.document.DocumentFilter;
+import jj.http.server.servable.document.DocumentRequestProcessorImpl;
 
 @Singleton
 class DocumentServable extends Servable {

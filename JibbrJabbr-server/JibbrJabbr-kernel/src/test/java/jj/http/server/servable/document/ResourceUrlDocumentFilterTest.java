@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
+package jj.http.server.servable.document;
 
 import static org.mockito.BDDMockito.*;
+import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.http.server.servable.document.ResourceUrlDocumentFilter;
 import jj.resource.ResourceFinder;
 
 import org.jsoup.Jsoup;

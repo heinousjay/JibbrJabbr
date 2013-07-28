@@ -28,7 +28,7 @@ import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
 import jj.http.server.WebSocketConnectionMaker;
-import jj.servable.Servable;
+import jj.http.server.servable.Servable;
 
 /**
  * just exposing a method for testing
