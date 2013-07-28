@@ -99,7 +99,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 			
 		} else {
 			
-			handleHttpRequest(injector.getInstance(JJHttpServerRequest.class), injector.getInstance(JJHttpServerResponse.class));
+			handleHttpRequest(injector.getInstance(HttpRequest.class), injector.getInstance(HttpResponse.class));
 		}
 	}
 	
