@@ -16,8 +16,6 @@ import jj.execution.ScriptExecutorFactory;
 import jj.http.MockHttpRequest;
 import jj.http.MockHttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
-import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.http.server.servable.document.DocumentRequestProcessorImpl;
 import jj.resource.HtmlResource;
 
 import io.netty.channel.Channel;
@@ -33,7 +31,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DocumentRequestProcessorImplTest {
+public class DocumentRequestProcessorTest {
 	
 	Document document;
 	String baseName;
@@ -109,8 +107,8 @@ public class DocumentRequestProcessorImplTest {
 		executors.addThreadTypes(ScriptThread, 4);
 		executors.addThreadTypes(IOThread, 2);
 		
-		DocumentRequestProcessorImpl toTest = 
-			new DocumentRequestProcessorImpl(executors, htmlResource, httpRequest, httpResponse, filters);
+		DocumentRequestProcessor toTest = 
+			new DocumentRequestProcessor(executors, htmlResource, httpRequest, httpResponse, filters);
 		
 		// when
 		toTest.respond();
@@ -124,8 +122,8 @@ public class DocumentRequestProcessorImplTest {
 	@Test
 	public void testWritesDocumentCorrectly() {
 		// given
-		DocumentRequestProcessorImpl toTest = 
-				new DocumentRequestProcessorImpl(executors, htmlResource, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
+		DocumentRequestProcessor toTest = 
+				new DocumentRequestProcessor(executors, htmlResource, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
 		
 		executors.isScriptThread = true;
 		

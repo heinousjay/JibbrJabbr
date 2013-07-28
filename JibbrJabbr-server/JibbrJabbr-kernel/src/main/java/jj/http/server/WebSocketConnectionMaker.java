@@ -116,7 +116,7 @@ class WebSocketConnectionMaker {
 	private boolean isWebSocketURI(final FullHttpRequest request) {
 		URIMatch uriMatch = new URIMatch(request.getUri());
 		return "socket".equals(uriMatch.extension) &&
-			uriMatch.sha != null;
+			uriMatch.sha1 != null;
 	}
 	
 	boolean isWebSocketRequest(final FullHttpRequest request) {

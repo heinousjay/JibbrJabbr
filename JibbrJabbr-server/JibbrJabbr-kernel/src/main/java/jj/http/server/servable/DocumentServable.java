@@ -2,13 +2,14 @@ package jj.http.server.servable;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+
 import jj.configuration.Configuration;
-import jj.execution.JJExecutors;
+import jj.execution.IOThread;
 import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
@@ -16,8 +17,7 @@ import jj.resource.ScriptResourceType;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.server.servable.document.DocumentFilter;
-import jj.http.server.servable.document.DocumentRequestProcessorImpl;
+import jj.http.server.servable.document.DocumentRequestProcessor;
 
 @Singleton
 class DocumentServable extends Servable {
@@ -29,20 +29,17 @@ class DocumentServable extends Servable {
 	public static final String INDEX = "index" + DOT_HTML;
 	
 	private final ResourceFinder resourceFinder;
-	private final JJExecutors executors;
-	private final Set<DocumentFilter> documentFilters;
+	private final Injector parentInjector;
 	
 	@Inject
 	DocumentServable(
 		final Configuration configuration,
-		final ResourceFinder resourceFinder, 
-		final JJExecutors executors,
-		final Set<DocumentFilter> documentFilters
+		final ResourceFinder resourceFinder,
+		final Injector parentInjector
 	) {
 		super(configuration);
 		this.resourceFinder = resourceFinder;
-		this.executors = executors;
-		this.documentFilters = documentFilters;
+		this.parentInjector = parentInjector;
 	}
 	
 	@Override
@@ -82,45 +79,44 @@ class DocumentServable extends Servable {
 	}
 	
 	private void ensureScriptPreload(final String baseName) {
-		if (executors.isIOThread()) {
-			// since we're in the IO thread already and we might need this stuff soon, as a small
-			// optimization to avoid jumping right back into the I/O thread after dispatching this
-			// into the script thread, we just "prime the pump"
-			resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Client);
-			resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Shared);
-			resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Server);
-		}
+		// since we're in the IO thread already and we might need this stuff soon, as a small
+		// optimization to avoid jumping right back into the I/O thread after dispatching this
+		// into the script thread, we just "prime the pump"
+		resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Client);
+		resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Shared);
+		resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Server);
 	}
 	
 	@Override
+	@IOThread
 	public RequestProcessor makeRequestProcessor(
 		final HttpRequest request,
 		final HttpResponse response
 	) throws IOException {
 		
-		DocumentRequestProcessorImpl result = null;
+		RequestProcessor result = null;
 		Path path = toPath(request);
 		
-		if (path != null && isServablePath(path)) {
+		if (path != null) {
 			
 			String baseName = toBaseName(path);
 			
-			HtmlResource htmlResource = 
-				executors.isIOThread() ?
-				resourceFinder.loadResource(HtmlResource.class, baseName) :
-				resourceFinder.findResource(HtmlResource.class, baseName);
+			final HtmlResource htmlResource = resourceFinder.loadResource(HtmlResource.class, baseName);
 			
 			if (htmlResource != null) {
 			
 				ensureScriptPreload(baseName);
 				
-				result = new DocumentRequestProcessorImpl(
-					executors,
-					htmlResource,
-					request,
-					response,
-					documentFilters
-				);
+				result = parentInjector.createChildInjector(new AbstractModule() {
+					
+					@Override
+					protected void configure() {
+						bind(HtmlResource.class).toInstance(htmlResource);
+						bind(HttpRequest.class).toInstance(request);
+						bind(HttpResponse.class).toInstance(response);
+						bind(RequestProcessor.class).to(DocumentRequestProcessor.class);
+					}
+				}).getInstance(RequestProcessor.class);
 			}
 		}
 		

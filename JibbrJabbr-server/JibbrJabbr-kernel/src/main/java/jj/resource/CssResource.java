@@ -12,6 +12,19 @@ import java.util.Date;
 import jj.SHA1Helper;
 import jj.execution.IOThread;
 
+/**
+ * <p>
+ * represents a css file, optionally loaded by processing a less file
+ * </p>
+ * 
+ * <p>
+ * takes a single argument, true if this should be a less file, false or empty if
+ * a regular stylesheet.
+ * </p>
+ * 
+ * @author jason
+ *
+ */
 public class CssResource implements LoadedResource {
 	
 	protected final String baseName;

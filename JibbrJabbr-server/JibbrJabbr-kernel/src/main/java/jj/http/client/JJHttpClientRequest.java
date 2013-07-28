@@ -19,7 +19,6 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import jj.http.AbstractHttpRequest;
-import jj.http.HttpRequest;
 
 /**
  * @author jason

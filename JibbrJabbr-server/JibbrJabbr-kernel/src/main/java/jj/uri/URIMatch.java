@@ -43,7 +43,7 @@ public class URIMatch {
 	private static final Pattern URI_PATTERN = Pattern.compile("^/(?:([\\da-f]{40})/)?(.*?)(?:\\.([^.]+))?$");
 	private static final Pattern VERSION_PATTERN = Pattern.compile("-\\d+(?:[.]\\d+)*(?:[.-]?(?:alpha|beta|pre))?(?:(?:[.-](?:min|pack))?$|/)");
 
-	public final String sha;
+	public final String sha1;
 	public final String name;
 	public final String extension;
 	public final String baseName;
@@ -59,10 +59,10 @@ public class URIMatch {
 			nameCandidate = matcher.group(2);
 			extensionCandidate = matcher.group(3);
 		}
-		sha = shaCandidate;
+		sha1 = shaCandidate;
 		name = nameCandidate;
 		extension = extensionCandidate;
 		baseName = name == null ? null : name + (extensionCandidate == null ? "" : "." + extensionCandidate);
-		versioned = sha != null || (nameCandidate != null && VERSION_PATTERN.matcher(nameCandidate).find());
+		versioned = sha1 != null || (nameCandidate != null && VERSION_PATTERN.matcher(nameCandidate).find());
 	}
 }

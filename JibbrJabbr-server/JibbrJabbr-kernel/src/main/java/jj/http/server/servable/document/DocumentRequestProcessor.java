@@ -1,47 +1,177 @@
 package jj.http.server.servable.document;
 
-import java.util.List;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.resource.HtmlResource;
 import jj.script.AssociatedScriptBundle;
+import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
+import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
 import jj.jjmessage.JJMessage;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.nodes.Document;
 
-public interface DocumentRequestProcessor extends RequestProcessor {
-
-	HttpRequest httpRequest();
+/**
+ * Coordinates the resources necessary to execute a request
+ * to serve an HTML5 Document, and hands the result back to
+ * to client
+ * @author jason
+ *
+ */
+@Singleton
+public class DocumentRequestProcessor implements RequestProcessor {
 	
-	AssociatedScriptBundle associatedScriptBundle();
+	@SuppressWarnings("serial")
+	private static class FilterList extends ArrayList<DocumentFilter> {}
 	
-	DocumentRequestProcessor associatedScriptBundle(AssociatedScriptBundle scriptBundle);
-
-	Document document();
+	/** the executors in which we run */
+	final JJExecutors executors;
 	
-	String baseName();
+	private final HtmlResource resource;
+	
+	private final Document document;
+	
+	private final HttpRequest httpRequest;
+	
+	private final HttpResponse httpResponse;
+	
+	private final Set<DocumentFilter> filters;
+	
+	private ArrayList<JJMessage> messages; 
+	
+	private AssociatedScriptBundle associatedScriptBundle;
+	
+	private volatile DocumentRequestState state = DocumentRequestState.Uninitialized;
 
+	@Inject
+	DocumentRequestProcessor(
+		final JJExecutors executors,
+		final HtmlResource resource,
+		final HttpRequest httpRequest,
+		final HttpResponse httpResponse,
+		final Set<DocumentFilter> filters
+	) {
+		this.executors = executors;
+		this.resource = resource;
+		this.document = resource.document().clone();
+		this.httpRequest = httpRequest;
+		this.httpResponse = httpResponse;
+		this.filters = filters;
+	}
+	
+	private FilterList makeFilterList(final Set<DocumentFilter> filters, final boolean io) {
+		FilterList filterList = new FilterList();
+		for (DocumentFilter filter: filters) {
+			if (filter.needsIO(this) && io || 
+				(!filter.needsIO(this) && !io)) {
+				filterList.add(filter);
+			}
+		}
+		return filterList;
+	}
+	
+	public HttpRequest httpRequest() {
+		return httpRequest;
+	}
+	
+	public Document document() {
+		return document;
+	}
+	
+	public String baseName() {
+		return resource.baseName();
+	}
+	
+	@Override
+	public void process() {
+		executors.scriptRunner().submit(this);
+	}
+	
 	/**
-	 * called by the script executor when it has completed processing this
+	 * Pulls the document together and spits it out
 	 */
-	void respond();
+	@ScriptThread
+	public void respond() {
+		assert executors.isScriptThreadFor(baseName()) : "must be called in a script thread for " + baseName();
+		
+		executeFilters(makeFilterList(filters, false));
+		
+		final FilterList ioFilters = makeFilterList(filters, true);
+		
+		if (ioFilters.isEmpty()) {
+			writeResponse();
+		} else {
+			executors.ioExecutor().submit(new JJRunnable("Document filtering requiring I/O") {
+				
+				@Override
+				public void run() {
+					executeFilters(ioFilters);
+					writeResponse();
+				}
+			});
+		}
+	}
+	
+	private void executeFilters(final FilterList filterList) {
+		for (DocumentFilter filter : filterList) {
+			filter.filter(this);
+		}
+	}
 
-	/**
-	 * @return 
-	 * 
-	 */
-	DocumentRequestProcessor startingInitialExecution();
-
-	/**
-	 * @return
-	 */
-	DocumentRequestProcessor startingReadyFunction();
-
-	/**
-	 * @return
-	 */
-	DocumentRequestState state();
-
+	private void writeResponse() {
+		// pretty printing is turned off because it inserts weird spaces
+		// into the output if there are text nodes next to element node
+		// and it gets REALLY ANNOYING
+		document.outputSettings().prettyPrint(false).indentAmount(0);
+		byte[] bytes = document.toString().getBytes(UTF_8);
+		try {
+			httpResponse
+				.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
+				// clients shouldn't cache these responses at all
+				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
+				.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+				.content(bytes)
+				.end();
+			
+		} catch (Exception e) {
+			httpResponse.error(e);
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return httpRequest.uri();
+	}
+	
+	
+	public DocumentRequestProcessor startingInitialExecution() {
+		state = DocumentRequestState.InitialExecution;
+		associatedScriptBundle().initializing(true);
+		return this;
+	}
+	
+	
+	public DocumentRequestProcessor startingReadyFunction() {
+		state = DocumentRequestState.ReadyFunctionExecution;
+		return this;
+	}
+	
+	public DocumentRequestState state() {
+		return state;
+	}
+	
 
 
 	/**
@@ -49,18 +179,32 @@ public interface DocumentRequestProcessor extends RequestProcessor {
 	 * on the client.  initially intended for event bindings but
 	 * some other case may come up
 	 * @param message
-	 * @return this, for chaining
 	 */
-	DocumentRequestProcessor addStartupJJMessage(JJMessage message);
+	public DocumentRequestProcessor addStartupJJMessage(final JJMessage message) {
+		if (messages == null) {
+			messages = new ArrayList<>();
+		}
+		messages.add(message);
+		return this;
+	}
 
-	/**
-	 * @return
-	 */
-	List<JJMessage> startupJJMessages();
-
-	/**
-	 * @return
-	 */
-	String uri();
-
+	public List<JJMessage> startupJJMessages() {
+		ArrayList<JJMessage> messages = this.messages;
+		this.messages = null;
+		return messages == null ? Collections.<JJMessage>emptyList() : messages;
+	}
+	
+	
+	public AssociatedScriptBundle associatedScriptBundle() {
+		return associatedScriptBundle;
+	}
+	
+	public DocumentRequestProcessor associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
+		this.associatedScriptBundle = associatedScriptBundle;
+		return this;
+	}
+	
+	public String uri() {
+		return httpRequest.uri();
+	}
 }

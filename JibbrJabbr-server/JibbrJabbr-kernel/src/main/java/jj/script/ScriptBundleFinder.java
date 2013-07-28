@@ -29,7 +29,7 @@ public class ScriptBundleFinder {
 	}
 	
 	public AssociatedScriptBundle forURIMatch(final URIMatch match) {
-		return forBaseNameAndSha(match.name, match.sha);
+		return forBaseNameAndSha(match.name, match.sha1);
 	}
 	
 }

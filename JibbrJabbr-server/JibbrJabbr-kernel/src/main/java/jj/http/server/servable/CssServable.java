@@ -39,28 +39,28 @@ class CssServable extends Servable {
 		final HttpRequest request,
 		final HttpResponse response
 	) throws IOException {
+		
 		final URIMatch match = new URIMatch(request.uri());
+		
+		// try less first
 		CssResource resource = resourceFinder.loadResource(CssResource.class, match.baseName, true);
 		if (resource == null) {
 			resource = resourceFinder.loadResource(CssResource.class, match.baseName);
 		}
 		
-		if (resource == null) {
-			return null;
-		} else if (!isServablePath(resource.path())) {
-			// TODO log this.  and really make this logic
-			// centralized somehow
-			return null;
-		}
-		
-		final CssResource css = resource;
-		
-		return new RequestProcessor() {
+		RequestProcessor result = null;
+		if (resource != null && isServablePath(resource.path())) {
 			
-			@Override
-			public void process() throws IOException {
-				doStandardResponse(request, response, match, css);
-			}
-		};
+			final CssResource css = resource;
+			
+			result = new RequestProcessor() {
+				
+				@Override
+				public void process() throws IOException {
+					doStandardResponse(request, response, match, css);
+				}
+			};
+		}
+		return result;
 	}
 }

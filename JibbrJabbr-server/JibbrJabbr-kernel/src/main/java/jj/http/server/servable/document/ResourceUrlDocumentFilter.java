@@ -54,7 +54,7 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 		URIMatch uriMatch = new URIMatch(path);
 		if (!uriMatch.versioned && uriMatch.baseName != null && !"css".equals(uriMatch.extension)) {
 			StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
-			if (resource != null && uriMatch.sha == null) {
+			if (resource != null && uriMatch.sha1 == null) {
 				return resource.uri();
 			}
 		}

@@ -53,9 +53,9 @@ class AssociatedScriptServable extends Servable {
 		ScriptResource result = null;
 		URIMatch uriMatch = new URIMatch(uri);
 		Matcher typeMatcher = TYPE_PATTERN.matcher(uriMatch.baseName);
-		if (uriMatch.sha != null && typeMatcher.matches()) {
+		if (uriMatch.sha1 != null && typeMatcher.matches()) {
 			
-			AssociatedScriptBundle scriptBundle = finder.forBaseNameAndSha(typeMatcher.group(1), uriMatch.sha);
+			AssociatedScriptBundle scriptBundle = finder.forBaseNameAndSha(typeMatcher.group(1), uriMatch.sha1);
 			if (scriptBundle != null) {
 				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
 			}
