@@ -13,11 +13,12 @@ import java.util.Set;
 
 import jj.execution.MockJJExecutors;
 import jj.execution.ScriptExecutorFactory;
-import jj.http.MockHttpRequest;
-import jj.http.MockHttpResponse;
+import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
 import jj.resource.HtmlResource;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
@@ -26,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
@@ -44,8 +44,8 @@ public class DocumentRequestProcessorTest {
 	@Mock Channel channel;
 	@Mock Logger access;
 	
-	@Spy MockHttpRequest httpRequest;
-	@Spy MockHttpResponse httpResponse;
+	@Mock HttpRequest httpRequest;
+	@Mock HttpResponse httpResponse;
 	
 	int filterCalls;
 	
@@ -90,6 +90,12 @@ public class DocumentRequestProcessorTest {
 		when(htmlResource.document()).thenReturn(document);
 		
 		when(httpRequest.uri()).thenReturn("/");
+		
+		// convenient to use, anyway
+		given(httpResponse.header(anyString(), anyString())).willReturn(httpResponse);
+		given(httpResponse.header(anyString(), any(Long.class))).willReturn(httpResponse);
+		given(httpResponse.content(any(ByteBuf.class))).willReturn(httpResponse);
+		given(httpResponse.end()).willReturn(httpResponse);
 	}
 
 	@Test

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import jj.DataStore;
+import jj.uri.URIMatch;
 
 /**
  * @author jason
@@ -58,6 +59,8 @@ public interface HttpRequest extends DataStore {
 	 * @return
 	 */
 	String uri();
+	
+	URIMatch uriMatch();
 
 	/**
 	 * @param ifNoneMatch

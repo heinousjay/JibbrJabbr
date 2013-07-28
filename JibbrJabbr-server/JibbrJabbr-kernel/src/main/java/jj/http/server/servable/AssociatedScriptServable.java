@@ -41,21 +41,19 @@ class AssociatedScriptServable extends Servable {
 			result = bundle.clientScriptResource();
 		} else if ("shared".equals(typeSpec)) {
 			result = bundle.sharedScriptResource();
-		} else if ("server".equals(typeSpec)) {
-			result = bundle.serverScriptResource();
-		}
+		} 
 		return result;
 	}
 	
 	private static final Pattern TYPE_PATTERN = Pattern.compile("(.+?)(?:\\.(server|shared))?\\.js");
 	
-	private ScriptResource resourceFromUri(String uri) {
+	private ScriptResource resourceFromRequest(HttpRequest httpRequest) {
 		ScriptResource result = null;
-		URIMatch uriMatch = new URIMatch(uri);
+		URIMatch uriMatch = httpRequest.uriMatch();
 		Matcher typeMatcher = TYPE_PATTERN.matcher(uriMatch.baseName);
 		if (uriMatch.sha1 != null && typeMatcher.matches()) {
 			
-			AssociatedScriptBundle scriptBundle = finder.forBaseNameAndSha(typeMatcher.group(1), uriMatch.sha1);
+			AssociatedScriptBundle scriptBundle = finder.forURIMatch(uriMatch);
 			if (scriptBundle != null) {
 				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
 			}
@@ -66,7 +64,7 @@ class AssociatedScriptServable extends Servable {
 
 	@Override
 	public boolean isMatchingRequest(final HttpRequest request) {
-		return resourceFromUri(request.uri()) != null;
+		return resourceFromRequest(request) != null;
 	}
 
 	@Override
@@ -74,12 +72,12 @@ class AssociatedScriptServable extends Servable {
 		final HttpRequest request,
 		final HttpResponse response
 	) throws IOException {
+		final ScriptResource script = resourceFromRequest(request);
 		
-		return new RequestProcessor() {
+		return script == null ? null : new RequestProcessor() {
 			
 			@Override
 			public void process() throws IOException {
-				final ScriptResource script = resourceFromUri(request.uri());
 				
 				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
 					script.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {

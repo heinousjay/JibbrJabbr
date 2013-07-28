@@ -64,14 +64,7 @@ public class StaticServable extends Servable {
 		final URIMatch match = new URIMatch(request.uri());
 		final StaticResource resource = resourceFinder.loadResource(StaticResource.class, match.baseName);
 		if (resource != null && isServablePath(resource.path())) {
-			return new RequestProcessor() {
-				
-				@Override
-				public void process() {
-
-					doStandardResponse(request, response, match, resource);
-				}
-			};
+			return makeStandardRequestProcessor(request, response, match, resource);
 		}
 		
 		return null;

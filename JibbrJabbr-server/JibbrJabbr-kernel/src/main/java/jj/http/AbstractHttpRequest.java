@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import jj.Sequence;
+import jj.uri.URIMatch;
 
 /**
  * @author jason
@@ -136,6 +137,10 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	@Override
 	public String uri() {
 		return request.getUri();
+	}
+	
+	public URIMatch uriMatch() {
+		return new URIMatch(request.getUri());
 	}
 
 	/**

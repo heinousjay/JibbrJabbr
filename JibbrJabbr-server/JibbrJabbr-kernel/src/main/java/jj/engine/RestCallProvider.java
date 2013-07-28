@@ -11,7 +11,7 @@ import jj.http.client.HttpClient;
 import jj.http.client.JJHttpClientRequest;
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
-import jj.uritemplate.UriTemplate;
+import jj.uri.Route;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.mozilla.javascript.BaseFunction;
@@ -75,18 +75,15 @@ class RestCallProvider {
 			
 			// we need to JSON serialize this.  yay
 			if (!params.isEmpty()) {
-				UriTemplate path = new UriTemplate(options.path());
+				Route route = new Route(options.path());
 				// one at a time, because we need to do string conversions here
+				Map<String, String> routeParams = new HashMap<>();
 				for (String key : params.keySet()) {
 					String param = (String)Context.jsToJava(params.get(key), String.class);
-					path.set(key, param);
+					routeParams.put(key, param);
 				}
 				
-				url.append(path.expand());
-				
-				for (String match : path.matches()) {
-					params.remove(match);
-				}
+				url.append(route.generate(routeParams));
 				
 				// then if anything is left
 				// that gets consumed according to what we produce

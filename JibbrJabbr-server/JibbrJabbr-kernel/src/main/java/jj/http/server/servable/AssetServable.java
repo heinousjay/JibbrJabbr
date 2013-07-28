@@ -37,18 +37,10 @@ class AssetServable extends Servable {
 		final HttpResponse response
 	) throws IOException {
 		
-		// this one works inline, since assets are always preloaded
-		return new RequestProcessor() {
-			
-			@Override
-			public void process() {
-				
-				URIMatch match = new URIMatch(request.uri());
-				AssetResource asset = resourceFinder.findResource(AssetResource.class, match.baseName);
-				
-				doStandardResponse(request, response, match, asset);
-			}
-		};
+		final URIMatch match = new URIMatch(request.uri());
+		final AssetResource asset = resourceFinder.findResource(AssetResource.class, match.baseName);
+
+		return asset == null ? null : makeStandardRequestProcessor(request, response, match, asset);
 	}
 
 }

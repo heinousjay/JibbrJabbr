@@ -51,15 +51,7 @@ class CssServable extends Servable {
 		RequestProcessor result = null;
 		if (resource != null && isServablePath(resource.path())) {
 			
-			final CssResource css = resource;
-			
-			result = new RequestProcessor() {
-				
-				@Override
-				public void process() throws IOException {
-					doStandardResponse(request, response, match, css);
-				}
-			};
+			result = makeStandardRequestProcessor(request, response, match, resource);
 		}
 		return result;
 	}

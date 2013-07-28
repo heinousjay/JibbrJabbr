@@ -69,9 +69,9 @@ class LogConfigurator implements JJServerListener {
 		
 		logger.setLevel(Level.DEBUG); // start from clean
 		
-		((Logger)LoggerFactory.getLogger("io.netty")).setLevel(Level.OFF);
+		((Logger)LoggerFactory.getLogger("io.netty")).setLevel(Level.ERROR);
 		
-		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.DEBUG);
+		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.ERROR);
 		
 		// logs events specifically related to running inside a JJAppTest
 		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.OFF);
@@ -81,7 +81,7 @@ class LogConfigurator implements JJServerListener {
 		
 		// execution trace logging.  lots of info about the path of execution for interactions
 		// with the system
-		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.OFF);
+		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(Level.ERROR);
 		
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		

@@ -7,7 +7,7 @@ import java.util.Set;
 
 import jj.engine.HostEvent;
 import jj.execution.ScriptExecutorFactory;
-import jj.http.MockHttpRequest;
+import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.DocumentRequestState;
@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Callable;
 
@@ -52,7 +51,7 @@ public class ScriptRunnerTest {
 	
 	DeterministicScheduler executor;
 	
-	@Spy MockHttpRequest httpRequest;
+	@Mock HttpRequest httpRequest;
 	
 	ScriptRunner scriptRunner;
 	

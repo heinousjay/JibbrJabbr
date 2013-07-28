@@ -92,7 +92,7 @@ public class ServableTest extends ServableTestBase {
 		given(request.uri()).willReturn(UNVERSIONED_URI);
 		URIMatch match = new URIMatch(UNVERSIONED_URI);
 		
-		si.doStandardResponse(request, response, match, resource);
+		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
 		verify(response).sendUncachedResource(resource);
 	}
@@ -105,7 +105,7 @@ public class ServableTest extends ServableTestBase {
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
-		si.doStandardResponse(request, response, match, resource);
+		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
 		verify(response).sendCachedResource(resource);
 	}
@@ -121,7 +121,7 @@ public class ServableTest extends ServableTestBase {
 		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		si.doStandardResponse(request, response, match, resource);
+		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
 		verify(response).sendNotModified(resource, true);
 	}
@@ -137,7 +137,7 @@ public class ServableTest extends ServableTestBase {
 		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		si.doStandardResponse(request, response, match, resource);
+		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
 		verify(response).sendNotModified(resource, false);
 	}
@@ -150,7 +150,7 @@ public class ServableTest extends ServableTestBase {
 		
 		given(resource.sha1()).willReturn("some other sha1");
 		
-		si.doStandardResponse(request, response, match, resource);
+		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
 		verify(response).sendTemporaryRedirect(resource);
 	}
