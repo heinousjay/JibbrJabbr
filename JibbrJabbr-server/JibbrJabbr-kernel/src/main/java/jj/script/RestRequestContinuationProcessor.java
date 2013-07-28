@@ -3,15 +3,11 @@ package jj.script;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
-import java.io.IOException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
@@ -20,8 +16,6 @@ import jj.http.client.JJHttpClientResponse;
 
 @Singleton
 class RestRequestContinuationProcessor implements ContinuationProcessor {
-	
-	private final Logger log = LoggerFactory.getLogger(RestRequestContinuationProcessor.class);
 
 	private final CurrentScriptContext context;
 	
