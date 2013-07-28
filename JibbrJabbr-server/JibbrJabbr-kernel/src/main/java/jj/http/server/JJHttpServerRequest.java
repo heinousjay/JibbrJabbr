@@ -13,12 +13,12 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 @Singleton
-public class JJHttpRequest extends AbstractHttpRequest implements HttpRequest {
+class JJHttpServerRequest extends AbstractHttpRequest implements HttpRequest {
 	
 	protected final Channel channel;
 	
 	@Inject
-	JJHttpRequest(final FullHttpRequest request, final Channel channel) {
+	JJHttpServerRequest(final FullHttpRequest request, final Channel channel) {
 		super(request);
 		this.channel = channel;
 	}

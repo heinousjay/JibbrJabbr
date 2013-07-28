@@ -26,8 +26,8 @@ import java.nio.channels.FileChannel;
 
 import jj.execution.ExecutionTrace;
 import jj.http.AbstractHttpResponse;
-import jj.http.server.JJHttpRequest;
-import jj.http.server.JJHttpResponse;
+import jj.http.server.JJHttpServerRequest;
+import jj.http.server.JJHttpServerResponse;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
@@ -60,19 +60,19 @@ public class JJHttpResponseTest {
 	final long size = bytes.readableBytes();
 	
 	DefaultFullHttpRequest nettyRequest;
-	JJHttpRequest request;
+	JJHttpServerRequest request;
 	@Mock Channel channel;
 	@Mock ChannelPromise p;
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
-	JJHttpResponse response;
+	JJHttpServerResponse response;
 
 	@Before
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		request = new JJHttpRequest(nettyRequest, channel);
+		request = new JJHttpServerRequest(nettyRequest, channel);
 		
-		response = new JJHttpResponse(request, channel, logger, trace);
+		response = new JJHttpServerResponse(request, channel, logger, trace);
 		assertThat(response.charset(), is(UTF_8));
 		
 		given(channel.newPromise()).willReturn(p);

@@ -84,14 +84,14 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 			protected void configure() {
 				bind(Channel.class).toInstance(ctx.channel());
 				bind(FullHttpRequest.class).toInstance(request);
-				bind(HttpRequest.class).to(JJHttpRequest.class);
-				bind(HttpResponse.class).to(JJHttpResponse.class);
+				bind(HttpRequest.class).to(JJHttpServerRequest.class);
+				bind(HttpResponse.class).to(JJHttpServerResponse.class);
 			}
 		});
 		
 		if (!request.getDecoderResult().isSuccess()) {
 		
-			injector.getInstance(JJHttpResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
+			injector.getInstance(JJHttpServerResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
 		} else if (webSocketConnectionMaker.isWebSocketRequest(request)) {
 		
@@ -99,7 +99,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 			
 		} else {
 			
-			handleHttpRequest(injector.getInstance(JJHttpRequest.class), injector.getInstance(JJHttpResponse.class));
+			handleHttpRequest(injector.getInstance(JJHttpServerRequest.class), injector.getInstance(JJHttpServerResponse.class));
 		}
 	}
 	

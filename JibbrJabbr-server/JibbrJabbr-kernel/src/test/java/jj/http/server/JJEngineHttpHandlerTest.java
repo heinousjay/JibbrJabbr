@@ -24,7 +24,7 @@ import jj.execution.ExecutionTrace;
 import jj.execution.MockJJExecutors;
 import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
-import jj.http.server.JJHttpRequest;
+import jj.http.server.JJHttpServerRequest;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
@@ -55,10 +55,10 @@ public class JJEngineHttpHandlerTest {
 	@Mock Servable servable2;
 	@Mock Servable servable3;
 
-	@Mock JJHttpRequest httpRequest1;
-	@Mock JJHttpRequest httpRequest2;
-	@Mock JJHttpRequest httpRequest3;
-	@Mock JJHttpRequest httpRequest4;
+	@Mock JJHttpServerRequest httpRequest1;
+	@Mock JJHttpServerRequest httpRequest2;
+	@Mock JJHttpServerRequest httpRequest3;
+	@Mock JJHttpServerRequest httpRequest4;
 	
 	@Mock HttpResponse httpResponse;
 	

@@ -49,7 +49,7 @@ import io.netty.handler.codec.http.LastHttpContent;
  *
  */
 @Singleton
-public class JJHttpResponse extends AbstractHttpResponse {
+class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private static final String SERVER_NAME = String.format(
 		"%s/%s (%s)",
@@ -58,9 +58,9 @@ public class JJHttpResponse extends AbstractHttpResponse {
 		Version.branchName		
 	);
 
-	private static final Logger log = LoggerFactory.getLogger(JJHttpResponse.class);
+	private static final Logger log = LoggerFactory.getLogger(JJHttpServerResponse.class);
 	
-	private final JJHttpRequest request;
+	private final JJHttpServerRequest request;
 	
 	private final Channel channel;
 	
@@ -72,8 +72,8 @@ public class JJHttpResponse extends AbstractHttpResponse {
 	 * @param response
 	 */
 	@Inject
-	JJHttpResponse(
-		final JJHttpRequest request,
+	JJHttpServerResponse(
+		final JJHttpServerRequest request,
 		final Channel channel,
 		final @AccessLogger Logger access,
 		final ExecutionTrace trace
