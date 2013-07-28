@@ -135,6 +135,7 @@ public class JJWebSocketConnection implements DataStore {
 			String message = serialize();
 			trace.send(this, message);
 			channel.write(new TextWebSocketFrame(message));
+			channel.flush();
 		}
 	}
 	

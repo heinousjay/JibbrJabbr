@@ -18,7 +18,6 @@ package jj;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 
-import jj.client.ClientModule;
 import jj.document.DocumentModule;
 import jj.engine.HostApiModule;
 import jj.execution.ExecutionModule;
@@ -27,6 +26,7 @@ import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.servable.ServableModule;
 import jj.http.HttpModule;
+import jj.http.client.ClientModule;
 
 /**
  * @author jason

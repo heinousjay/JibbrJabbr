@@ -20,7 +20,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Date;
 import java.util.Map.Entry;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -35,10 +34,9 @@ import jj.resource.Resource;
 import jj.resource.TransferableResource;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultFileRegion;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
@@ -84,19 +82,22 @@ class JJHttpResponse extends AbstractHttpResponse {
 		header(HttpHeaders.Names.SERVER, SERVER_NAME);
 	}
 	
-	private void maybeClose(final ChannelFuture f) {
+	private ChannelPromise maybeClose(final ChannelPromise p) {
 		if (!HttpHeaders.isKeepAlive(request.request())) {
-			f.addListener(ChannelFutureListener.CLOSE);
+			p.addListener(ChannelFutureListener.CLOSE);
 		}
 		
 		log();
+		
+		return p;
 	}
 	
 	@Override
 	public HttpResponse end() {
 		assertNotCommitted();
 		header(HttpHeaders.Names.DATE, new Date());
-		maybeClose(channel.write(response));
+		channel.write(response, maybeClose(channel.newPromise()));
+		channel.flush();
 		markCommitted();
 		trace.end(request, this);
 		return this;
@@ -127,13 +128,12 @@ class JJHttpResponse extends AbstractHttpResponse {
 	 * how to test this? 
 	 */
 	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
-		MessageList<Object> messageList = 
-			MessageList.newInstance(3)
-				.add(response)
-				.add(new DefaultFileRegion(resource.fileChannel(), 0, resource.size()))
-				.add(LastHttpContent.EMPTY_LAST_CONTENT);
 		
-		maybeClose(channel.write(messageList));
+		channel.write(response);
+		channel.write(new DefaultFileRegion(resource.fileChannel(), 0, resource.size()));
+		channel.write(LastHttpContent.EMPTY_LAST_CONTENT, maybeClose(channel.newPromise()));
+		channel.flush();
+		
 		markCommitted();
 		trace.end(request, this);
 		return this;

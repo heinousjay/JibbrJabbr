@@ -13,34 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.client;
+package jj.http.client;
 
-import javax.inject.Singleton;
+import java.net.SocketAddress;
 
-import jj.JJModule;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
  * @author jason
  *
  */
-public class ClientModule extends JJModule {
+public class BootstrapCreator {
 	
-	@Override
-	protected void configure() {
+	private NioEventLoopGroup eventLoopGroup;
 	
-		bind(AsyncHttpClientConfig.class).toProvider(AsyncHttpClientConfigProvider.class);
+	private SocketAddress localAddress;
+	
+	private PlaintextChannelInitializer plaintextInitializer;
+	
+	private SecureChannelInitializer secureInitializer;
+	
+	public Bootstrap plaintextHttpBootstrap() {
 		
-		try {
-			bind(AsyncHttpClient.class)
-				.toConstructor(
-					AsyncHttpClient.class.getConstructor(AsyncHttpClientConfig.class)
-				)
-				.in(Singleton.class);
-		} catch (Exception e) {
-			throw new AssertionError("couldn't get the right constructor", e);
-		}
+		return new Bootstrap()
+			.channel(NioSocketChannel.class)
+			.group(eventLoopGroup)
+			.localAddress(localAddress)
+			.handler(plaintextInitializer);
+		
 	}
+	
+	
 }

@@ -19,4 +19,4 @@
  * @author jason
  *
  */
-package jj.client;
+package jj.http.client;

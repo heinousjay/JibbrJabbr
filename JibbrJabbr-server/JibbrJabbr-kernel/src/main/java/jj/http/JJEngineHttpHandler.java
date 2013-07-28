@@ -69,9 +69,11 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		
 		return result.toArray(new Servable[result.size()]);
 	}
+	
+	
 
 	@Override
-	protected void messageReceived(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
+	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
 		
 		Injector injector = parentInjector.createChildInjector(new AbstractModule() {
 			

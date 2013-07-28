@@ -22,8 +22,8 @@
 		<module>JibbrJabbr-kernel</module>
 		<module>JibbrJabbr-bootstrapper</module>
 		<module>JibbrJabbr-all</module>
-    <module>JibbrJabbr-test</module>
-  </modules>
+		<module>JibbrJabbr-test</module>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>
@@ -55,7 +55,7 @@
 			<dependency>
 				<artifactId>netty-all</artifactId>
 				<groupId>io.netty</groupId>
-				<version>4.0.0.CR9</version>
+				<version>4.0.4.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mozilla</groupId>

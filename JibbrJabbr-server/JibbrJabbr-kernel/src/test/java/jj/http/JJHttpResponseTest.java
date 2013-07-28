@@ -31,12 +31,15 @@ import jj.resource.TransferableResource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.MessageList;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.DefaultFileRegion;
+import io.netty.channel.FileRegion;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.LastHttpContent;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,6 +63,7 @@ public class JJHttpResponseTest {
 	DefaultFullHttpRequest nettyRequest;
 	JJHttpRequest request;
 	@Mock Channel channel;
+	@Mock ChannelPromise p;
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
 	JJHttpResponse response;
@@ -71,6 +75,8 @@ public class JJHttpResponseTest {
 		
 		response = new JJHttpResponse(request, channel, logger, trace);
 		assertThat(response.charset(), is(UTF_8));
+		
+		given(channel.newPromise()).willReturn(p);
 	}
 
 	private void testCachedResource(Resource resource) throws IOException {
@@ -118,7 +124,11 @@ public class JJHttpResponseTest {
 		
 		assertThat(response.response.getStatus(), is(HttpResponseStatus.NOT_FOUND));
 		
-		verify(channel).write(response.response);
+		verify(channel).newPromise();
+		verify(channel).write(response.response, p);
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
 	}
 	
 	LoadedResource givenALoadedResource() throws IOException {
@@ -135,7 +145,11 @@ public class JJHttpResponseTest {
 	public void testCachedLoadedResource() throws IOException {
 		testCachedResource(givenALoadedResource());
 		
-		verify(channel).write(response.response);
+		verify(channel).newPromise();
+		verify(channel).write(response.response, p);
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
 	}
 	
 	@Test
@@ -143,7 +157,11 @@ public class JJHttpResponseTest {
 		
 		testUncachedResource(givenALoadedResource());
 		
-		verify(channel).write(response.response);
+		verify(channel).newPromise();
+		verify(channel).write(response.response, p);
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
 	}
 	
 	@Test
@@ -151,7 +169,11 @@ public class JJHttpResponseTest {
 		
 		testCachedNotModifiedResource(givenALoadedResource());
 		
-		verify(channel).write(response.response);
+		verify(channel).newPromise();
+		verify(channel).write(response.response, p);
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
 	}
 	
 	@Test
@@ -159,7 +181,11 @@ public class JJHttpResponseTest {
 		
 		testUncachedNotModifiedResource(givenALoadedResource());
 		
-		verify(channel).write(response.response);
+		verify(channel).newPromise();
+		verify(channel).write(response.response, p);
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
 	}
 	
 	TransferableResource givenATransferableResource() throws IOException {
@@ -178,16 +204,31 @@ public class JJHttpResponseTest {
 		
 		testCachedResource(givenATransferableResource());
 		
+		verify(channel).newPromise();
+		verify(channel).write(response.response);
+		// this verifies the response write, and the file region write
+		verify(channel, times(2)).write(any());
+		// this verifies the LastHttpContent and the promise
+		verify(channel).write(anyObject(), eq(p));
+		verify(channel).flush();
 		
-		verify(channel).write(any(MessageList.class));
+		verifyNoMoreInteractions(channel);
 	}
 	
 	@Test
 	public void testUncachedTransferableResource() throws IOException {
 		
 		testUncachedResource(givenATransferableResource());
+
+		verify(channel).newPromise();
+		verify(channel).write(response.response);
+		// this verifies the response write, and the file region write
+		verify(channel, times(2)).write(any());
+		// this verifies the LastHttpContent and the promise
+		verify(channel).write(anyObject(), eq(p));
+		verify(channel).flush();
 		
-		verify(channel).write(any(MessageList.class));
+		verifyNoMoreInteractions(channel);
 	}
 	
 	@Test
@@ -195,7 +236,11 @@ public class JJHttpResponseTest {
 		
 		testCachedNotModifiedResource(givenATransferableResource());
 		
-		verify(channel).write(response.response);
+		verify(channel).newPromise();
+		verify(channel).write(response.response, p);
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
 	}
 	
 	@Test
@@ -203,7 +248,11 @@ public class JJHttpResponseTest {
 		
 		testUncachedNotModifiedResource(givenATransferableResource());
 		
-		verify(channel).write(response.response);
+		verify(channel).newPromise();
+		verify(channel).write(response.response, p);
+		verify(channel).flush();
+		
+		verifyNoMoreInteractions(channel);
 	}
 
 }
