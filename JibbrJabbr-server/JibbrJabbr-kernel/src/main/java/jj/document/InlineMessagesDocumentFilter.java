@@ -54,9 +54,9 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 	}
 	
 	@Override
-	public void filter(final DocumentRequest documentRequest) {
+	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
 		
-		String baseName = documentRequest.baseName();
+		String baseName = documentRequestProcessor.baseName();
 		
 		PropertiesResource resource = 
 			executors.isIOThread() ?	
@@ -66,13 +66,13 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		if (resource != null) {
 			final PropertyResourceBundle bundle = resource.properties();
 			for (String key : bundle.keySet()) {
-				Elements e = documentRequest.document().select("[data-i18n=" + key + "]");
+				Elements e = documentRequestProcessor.document().select("[data-i18n=" + key + "]");
 				if (!e.isEmpty()) {
 					e.html(bundle.getString(key)).removeAttr("data-i18n");
 				}
 			}
 			final String KEY = "data-i18n-";
-			for (final Element el : documentRequest.document().select("[^" + KEY + "]")) {
+			for (final Element el : documentRequestProcessor.document().select("[^" + KEY + "]")) {
 				for (final Attribute attr : el.attributes()) {
 					if (attr.getKey().startsWith(KEY)) {
 						String newAttr = attr.getKey().substring(KEY.length());
@@ -88,10 +88,10 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		}
 	}
 	
-	public boolean needsIO(final DocumentRequest documentRequest) {
+	public boolean needsIO(final DocumentRequestProcessor documentRequestProcessor) {
 		return resourceFinder.findResource(
 			PropertiesResource.class, 
-			documentRequest.baseName()
+			documentRequestProcessor.baseName()
 		) == null;
 	}
 

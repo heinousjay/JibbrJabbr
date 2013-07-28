@@ -45,7 +45,7 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	}
 
 	@Override
-	public boolean needsIO(DocumentRequest documentRequest) {
+	public boolean needsIO(final DocumentRequestProcessor documentRequestProcessor) {
 		return true;
 	}
 	
@@ -62,9 +62,9 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	}
 
 	@Override
-	public void filter(DocumentRequest documentRequest) {
-		documentRequest.document().setBaseUri(URI_PREPEND + documentRequest.uri());
-		for(Element el : documentRequest.document().select(SELECTOR)) {
+	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
+		documentRequestProcessor.document().setBaseUri(URI_PREPEND + documentRequestProcessor.uri());
+		for(Element el : documentRequestProcessor.document().select(SELECTOR)) {
 			if (el.hasAttr(HREF)) {
 				el.attr(HREF, massageURL(el.absUrl(HREF)));
 			}
@@ -73,7 +73,7 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 				el.attr(SRC, massageURL(el.absUrl(SRC)));
 			}
 		}
-		documentRequest.document().setBaseUri("");
+		documentRequestProcessor.document().setBaseUri("");
 	}
 
 }

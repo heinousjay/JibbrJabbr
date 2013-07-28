@@ -58,4 +58,9 @@ public interface DocumentRequestProcessor extends RequestProcessor {
 	 */
 	List<JJMessage> startupJJMessages();
 
+	/**
+	 * @return
+	 */
+	String uri();
+
 }

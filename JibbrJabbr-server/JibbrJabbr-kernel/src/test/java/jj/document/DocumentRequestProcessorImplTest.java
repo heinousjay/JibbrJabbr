@@ -12,13 +12,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jj.document.DocumentFilter;
-import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
 import jj.execution.MockJJExecutors;
 import jj.execution.ScriptExecutorFactory;
 import jj.http.MockHttpRequest;
 import jj.http.MockHttpResponse;
-import jj.resource.Resource;
+import jj.resource.HtmlResource;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -41,15 +40,13 @@ public class DocumentRequestProcessorImplTest {
 	@Mock ScriptExecutorFactory scriptExecutorFactory;
 	MockJJExecutors executors;
 
-	@Mock Resource htmlResource;
+	@Mock HtmlResource htmlResource;
 	
 	@Mock Channel channel;
 	@Mock Logger access;
 	
 	@Spy MockHttpRequest httpRequest;
 	@Spy MockHttpResponse httpResponse;
-
-	DocumentRequest documentRequest;
 	
 	int filterCalls;
 	
@@ -64,12 +61,12 @@ public class DocumentRequestProcessorImplTest {
 		}
 		
 		@Override
-		public boolean needsIO(DocumentRequest documentRequest) {
+		public boolean needsIO(DocumentRequestProcessor documentRequestProcessor) {
 			return io;
 		}
 
 		@Override
-		public void filter(DocumentRequest documentRequest) {
+		public void filter(DocumentRequestProcessor documentRequestProcessor) {
 			assertThat(++filterCalls, is(sequence));
 		}
 	}
@@ -91,10 +88,9 @@ public class DocumentRequestProcessorImplTest {
 		
 		when(htmlResource.baseName()).thenReturn(baseName);
 		when(htmlResource.mime()).thenReturn(MIME);
+		when(htmlResource.document()).thenReturn(document);
 		
 		when(httpRequest.uri()).thenReturn("/");
-		
-		documentRequest = new DocumentRequest(htmlResource, document, httpRequest, httpResponse, false);
 	}
 
 	@Test
@@ -113,7 +109,7 @@ public class DocumentRequestProcessorImplTest {
 		executors.addThreadTypes(IOThread, 2);
 		
 		DocumentRequestProcessorImpl toTest = 
-			new DocumentRequestProcessorImpl(executors, documentRequest, filters);
+			new DocumentRequestProcessorImpl(executors, htmlResource, httpRequest, httpResponse, filters);
 		
 		// when
 		toTest.respond();
@@ -128,7 +124,7 @@ public class DocumentRequestProcessorImplTest {
 	public void testWritesDocumentCorrectly() {
 		// given
 		DocumentRequestProcessorImpl toTest = 
-				new DocumentRequestProcessorImpl(executors, documentRequest, Collections.<DocumentFilter>emptySet());
+				new DocumentRequestProcessorImpl(executors, htmlResource, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
 		
 		executors.isScriptThread = true;
 		

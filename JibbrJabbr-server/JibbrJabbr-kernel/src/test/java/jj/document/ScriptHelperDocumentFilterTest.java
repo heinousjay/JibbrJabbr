@@ -48,7 +48,6 @@ public class ScriptHelperDocumentFilterTest {
 	@Mock AssetResource jqueryJs;
 	@Mock AssetResource jjJs;
 	Document document;
-	@Mock DocumentRequest documentRequest;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 
 	ScriptHelperDocumentFilter filter;
@@ -73,8 +72,8 @@ public class ScriptHelperDocumentFilterTest {
 		when(httpRequest.host()).thenReturn("localhost:8080");
 
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
-		when(documentRequest.document()).thenReturn(document);
-		when(documentRequest.httpRequest()).thenReturn(httpRequest);
+		when(documentRequestProcessor.document()).thenReturn(document);
+		when(documentRequestProcessor.httpRequest()).thenReturn(httpRequest);
 		
 		when(resourceFinder.findResource(AssetResource.class, JQUERY_JS))
 			.thenReturn(jqueryJs);
@@ -101,7 +100,7 @@ public class ScriptHelperDocumentFilterTest {
 			.willReturn(ScriptResourceType.Client);
 		
 		// when
-		filter.filter(documentRequest);
+		filter.filter(documentRequestProcessor);
 		
 		// then
 		assertThat(document.select("script[type=text/javascript]").size(), is(4));
@@ -120,7 +119,7 @@ public class ScriptHelperDocumentFilterTest {
 		given(scriptResource.type()).willReturn(ScriptResourceType.Client);
 		
 		// when
-		filter.filter(documentRequest);
+		filter.filter(documentRequestProcessor);
 		
 		// then
 		assertThat(document.select("script[type=text/javascript]").size(), is(3));
@@ -139,7 +138,7 @@ public class ScriptHelperDocumentFilterTest {
 		given(scriptResource.type()).willReturn(ScriptResourceType.Shared);
 		
 		//when
-		filter.filter(documentRequest);
+		filter.filter(documentRequestProcessor);
 		
 		// then
 		assertThat(document.select("script[type=text/javascript]").size(), is(3));
@@ -156,7 +155,7 @@ public class ScriptHelperDocumentFilterTest {
 		// given our default state
 		
 		// when
-		filter.filter(documentRequest);
+		filter.filter(documentRequestProcessor);
 		
 		//then
 		assertThat(document.select("script[type=text/javascript]").size(), is(2));
@@ -181,7 +180,7 @@ public class ScriptHelperDocumentFilterTest {
 		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
 		
 		// when 
-		filter.filter(documentRequest);
+		filter.filter(documentRequestProcessor);
 		
 		// then
 		assertThat(document.select("#jj-connector-script").attr("data-jj-startup-messages"), is(messages.toString()));

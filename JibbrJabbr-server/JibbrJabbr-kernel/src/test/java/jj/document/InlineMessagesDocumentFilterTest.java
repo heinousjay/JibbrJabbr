@@ -26,7 +26,7 @@ public class InlineMessagesDocumentFilterTest {
 	@Mock ResourceFinder resourceFinder;
 	@Mock PropertiesResource propertiesResource;
 	PropertyResourceBundle bundle;
-	@Mock DocumentRequest documentRequest;
+	@Mock DocumentRequestProcessor documentRequestProcessor;
 	@Mock HtmlResource htmlResource;
 	Document document;
 	InlineMessagesDocumentFilter toTest;
@@ -48,9 +48,9 @@ public class InlineMessagesDocumentFilterTest {
 		given(propertiesResource.properties()).willReturn(bundle);
 		
 		document = Jsoup.parse("<a id=\"test\" data-i18n-href=\"goodbye\" data-i18n-title=\"title\" data-i18n=\"hi\">HI MESSAGE HERE</a><p data-i18n=\"hi\">HI MESSAGE HERE ALSO</p>");
-		given(documentRequest.document()).willReturn(document);
+		given(documentRequestProcessor.document()).willReturn(document);
 		
-		given(documentRequest.baseName()).willReturn(baseName);
+		given(documentRequestProcessor.baseName()).willReturn(baseName);
 		
 		given(resourceFinder.findResource(PropertiesResource.class, baseName)).willReturn(propertiesResource);
 		
@@ -58,7 +58,7 @@ public class InlineMessagesDocumentFilterTest {
 		
 		
 		// when
-		toTest.filter(documentRequest);
+		toTest.filter(documentRequestProcessor);
 		
 		// then
 		assertThat(document.select("a").text(), is("Why, hello there"));

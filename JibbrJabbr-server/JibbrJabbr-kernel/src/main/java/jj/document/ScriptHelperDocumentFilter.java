@@ -61,24 +61,24 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 	}
 
 	@Override
-	public void filter(final DocumentRequest documentRequest) {
+	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
 		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle();
 		if (scriptBundle != null) {
 			
 			// internal version of jquery
 			// it's versioned already, so no need for sha-ing
-			addScript(documentRequest.document(), "/" + resourceFinder.findResource(AssetResource.class, JQUERY_JS).baseName());
+			addScript(documentRequestProcessor.document(), "/" + resourceFinder.findResource(AssetResource.class, JQUERY_JS).baseName());
 			
 			// jj script
 			String wsURI = "ws" + 
-				(documentRequest.httpRequest().secure() ? "s" : "") + 
+				(documentRequestProcessor.httpRequest().secure() ? "s" : "") + 
 				"://" + 
-				documentRequest.httpRequest().host() + 
+				documentRequestProcessor.httpRequest().host() + 
 				"/" + 
 				scriptBundle.toSocketUri();
 			
 			Element jjScript = 
-				makeScriptTag(documentRequest.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())
+				makeScriptTag(documentRequestProcessor.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())
 				.attr("id", "jj-connector-script")
 				.attr("data-jj-socket-url", wsURI)
 				.attr(
@@ -88,15 +88,15 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			if (configuration.debugClient()) {
 				jjScript.attr("data-jj-debug", "true");
 			}
-			addScript(documentRequest.document(), jjScript);
+			addScript(documentRequestProcessor.document(), jjScript);
 			
 			// associated scripts
-			addScript(documentRequest.document(), scriptBundle, scriptBundle.sharedScriptResource());
-			addScript(documentRequest.document(), scriptBundle, scriptBundle.clientScriptResource());
+			addScript(documentRequestProcessor.document(), scriptBundle, scriptBundle.sharedScriptResource());
+			addScript(documentRequestProcessor.document(), scriptBundle, scriptBundle.clientScriptResource());
 		}
 	}
 
-	public boolean needsIO(final DocumentRequest documentRequest) {
+	public boolean needsIO(final DocumentRequestProcessor documentRequestProcessor) {
 		return false;
 	}
 }

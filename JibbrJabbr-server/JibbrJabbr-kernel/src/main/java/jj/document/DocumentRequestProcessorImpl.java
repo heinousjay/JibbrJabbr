@@ -7,11 +7,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import jj.resource.HtmlResource;
 import jj.script.AssociatedScriptBundle;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
+import jj.http.HttpResponse;
 import jj.jjmessage.JJMessage;
 
 import io.netty.handler.codec.http.HttpHeaders;
@@ -32,8 +34,13 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	/** the executors in which we run */
 	final JJExecutors executors;
 	
-	/** the document request */
-	private final DocumentRequest documentRequest;
+	private final HtmlResource resource;
+	
+	private final Document document;
+	
+	private final HttpRequest httpRequest;
+	
+	private final HttpResponse httpResponse;
 	
 	private final Set<DocumentFilter> filters;
 	
@@ -45,19 +52,24 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 
 	public DocumentRequestProcessorImpl(
 		final JJExecutors executors,
-		final DocumentRequest documentRequest,
+		final HtmlResource resource,
+		final HttpRequest httpRequest,
+		final HttpResponse httpResponse,
 		final Set<DocumentFilter> filters
 	) {
 		this.executors = executors;
-		this.documentRequest = documentRequest;
+		this.resource = resource;
+		this.document = resource.document().clone();
+		this.httpRequest = httpRequest;
+		this.httpResponse = httpResponse;
 		this.filters = filters;
 	}
 	
 	private FilterList makeFilterList(final Set<DocumentFilter> filters, final boolean io) {
 		FilterList filterList = new FilterList();
 		for (DocumentFilter filter: filters) {
-			if (filter.needsIO(documentRequest) && io || 
-				(!filter.needsIO(documentRequest) && !io)) {
+			if (filter.needsIO(this) && io || 
+				(!filter.needsIO(this) && !io)) {
 				filterList.add(filter);
 			}
 		}
@@ -65,15 +77,15 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	}
 	
 	public HttpRequest httpRequest() {
-		return documentRequest.httpRequest();
+		return httpRequest;
 	}
 	
 	public Document document() {
-		return documentRequest.document();
+		return document;
 	}
 	
 	public String baseName() {
-		return documentRequest.baseName();
+		return resource.baseName();
 	}
 	
 	@Override
@@ -108,7 +120,7 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	
 	private void executeFilters(final FilterList filterList) {
 		for (DocumentFilter filter : filterList) {
-			filter.filter(documentRequest);
+			filter.filter(this);
 		}
 	}
 
@@ -116,25 +128,25 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 		// pretty printing is turned off because it inserts weird spaces
 		// into the output if there are text nodes next to element node
 		// and it gets REALLY ANNOYING
-		documentRequest.document().outputSettings().prettyPrint(false).indentAmount(0);
-		byte[] bytes = documentRequest.document().toString().getBytes(UTF_8);
+		document.outputSettings().prettyPrint(false).indentAmount(0);
+		byte[] bytes = document.toString().getBytes(UTF_8);
 		try {
-			documentRequest.httpResponse()
+			httpResponse
 				.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
 				// clients shouldn't cache these responses at all
 				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-				.header(HttpHeaders.Names.CONTENT_TYPE, documentRequest.mime())
+				.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 				.content(bytes)
 				.end();
 			
 		} catch (Exception e) {
-			documentRequest.httpResponse().error(e);
+			httpResponse.error(e);
 		}
 	}
 	
 	@Override
 	public String toString() {
-		return httpRequest().uri();
+		return httpRequest.uri();
 	}
 	
 
@@ -191,5 +203,10 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	public DocumentRequestProcessor associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
 		this.associatedScriptBundle = associatedScriptBundle;
 		return this;
+	}
+	
+	@Override
+	public String uri() {
+		return httpRequest.uri();
 	}
 }

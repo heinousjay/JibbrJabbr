@@ -16,7 +16,7 @@ public interface DocumentFilter {
 	 * flag indicating this needs to do IO
 	 * @return
 	 */
-	public boolean needsIO(DocumentRequest documentRequest);
+	public boolean needsIO(DocumentRequestProcessor documentRequestProcessor);
 
-	public void filter(DocumentRequest documentRequest);
+	public void filter(DocumentRequestProcessor documentRequestProcessor);
 }

@@ -34,23 +34,23 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ResourceUrlDocumentFilterTest {
 
 	@Mock ResourceFinder resourceFinder;
-	@Mock DocumentRequest documentRequest;
+	@Mock DocumentRequestProcessor documentRequestProcessor;
 	Document document;
 	
 	@Before
 	public void before() {
 		document = Jsoup.parse("<a href='style.css'>style</a>");
-		given(documentRequest.document()).willReturn(document);
+		given(documentRequestProcessor.document()).willReturn(document);
 		
 	}
 	
 	@Test
 	public void test() {
 		ResourceUrlDocumentFilter underTest = new ResourceUrlDocumentFilter(resourceFinder);
-		given(documentRequest.uri()).willReturn("/");
-		underTest.filter(documentRequest);
-		given(documentRequest.uri()).willReturn("/files");
-		underTest.filter(documentRequest);
+		given(documentRequestProcessor.uri()).willReturn("/");
+		underTest.filter(documentRequestProcessor);
+		given(documentRequestProcessor.uri()).willReturn("/files");
+		underTest.filter(documentRequestProcessor);
 	}
 	
 }

@@ -9,7 +9,6 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.document.DocumentFilter;
-import jj.document.DocumentRequest;
 import jj.document.DocumentRequestProcessorImpl;
 import jj.execution.JJExecutors;
 import jj.resource.HtmlResource;
@@ -118,7 +117,9 @@ class DocumentServable extends Servable {
 				
 				result = new DocumentRequestProcessorImpl(
 					executors,
-					new DocumentRequest(htmlResource, htmlResource.document(), request, response, executors.isIOThread()),
+					htmlResource,
+					request,
+					response,
 					documentFilters
 				);
 			}
