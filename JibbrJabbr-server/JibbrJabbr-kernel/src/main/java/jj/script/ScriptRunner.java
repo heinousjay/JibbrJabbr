@@ -172,7 +172,7 @@ public class ScriptRunner {
 					}
 				} else {
 					
-					documentRequestProcessor.scriptBundle(scriptBundle);
+					documentRequestProcessor.associatedScriptBundle(scriptBundle);
 					
 					try {
 						context.initialize(documentRequestProcessor);

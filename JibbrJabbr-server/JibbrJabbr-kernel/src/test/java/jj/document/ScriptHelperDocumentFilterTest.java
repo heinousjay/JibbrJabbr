@@ -49,6 +49,7 @@ public class ScriptHelperDocumentFilterTest {
 	@Mock AssetResource jjJs;
 	Document document;
 	@Mock DocumentRequest documentRequest;
+	@Mock DocumentRequestProcessor documentRequestProcessor;
 
 	ScriptHelperDocumentFilter filter;
 	
@@ -66,8 +67,9 @@ public class ScriptHelperDocumentFilterTest {
 		
 		when(context.associatedScriptBundle()).thenReturn(associatedScriptBundle);
 		when(context.httpRequest()).thenReturn(httpRequest);
+		when(context.documentRequestProcessor()).thenReturn(documentRequestProcessor);
 		
-		when(httpRequest.startupJJMessages()).thenReturn(Collections.<JJMessage>emptyList());
+		when(documentRequestProcessor.startupJJMessages()).thenReturn(Collections.<JJMessage>emptyList());
 		when(httpRequest.host()).thenReturn("localhost:8080");
 
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
@@ -175,7 +177,7 @@ public class ScriptHelperDocumentFilterTest {
 			JJMessage.makeBind("#chatbox", "", "enter")
 		);
 		
-		given(httpRequest.startupJJMessages()).willReturn(messages);
+		given(documentRequestProcessor.startupJJMessages()).willReturn(messages);
 		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
 		
 		// when 

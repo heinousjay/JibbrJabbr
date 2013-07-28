@@ -3,6 +3,8 @@ package jj.document;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import jj.script.AssociatedScriptBundle;
@@ -10,6 +12,7 @@ import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
+import jj.jjmessage.JJMessage;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.nodes.Document;
@@ -33,6 +36,10 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	private final DocumentRequest documentRequest;
 	
 	private final Set<DocumentFilter> filters;
+	
+	private ArrayList<JJMessage> messages; 
+	
+	private AssociatedScriptBundle associatedScriptBundle;
 	
 	private volatile DocumentRequestState state = DocumentRequestState.Uninitialized;
 
@@ -59,14 +66,6 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	
 	public HttpRequest httpRequest() {
 		return documentRequest.httpRequest();
-	}
-	
-	public AssociatedScriptBundle associatedScriptBundle() {
-		return documentRequest.httpRequest().associatedScriptBundle();
-	}
-	
-	public void scriptBundle(AssociatedScriptBundle scriptBundle) {
-		documentRequest.httpRequest().associatedScriptBundle(scriptBundle);
 	}
 	
 	public Document document() {
@@ -156,5 +155,41 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	@Override
 	public DocumentRequestState state() {
 		return state;
+	}
+	
+
+
+	/**
+	 * adds a message intended to be processed a framework startup
+	 * on the client.  initially intended for event bindings but
+	 * some other case may come up
+	 * @param message
+	 */
+	@Override
+	public DocumentRequestProcessor addStartupJJMessage(final JJMessage message) {
+		if (messages == null) {
+			messages = new ArrayList<>();
+		}
+		messages.add(message);
+		return this;
+	}
+
+	@Override
+	public List<JJMessage> startupJJMessages() {
+		ArrayList<JJMessage> messages = this.messages;
+		this.messages = null;
+		return messages == null ? Collections.<JJMessage>emptyList() : messages;
+	}
+	
+
+	@Override
+	public AssociatedScriptBundle associatedScriptBundle() {
+		return associatedScriptBundle;
+	}
+
+	@Override
+	public DocumentRequestProcessor associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
+		this.associatedScriptBundle = associatedScriptBundle;
+		return this;
 	}
 }

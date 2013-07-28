@@ -24,9 +24,6 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map.Entry;
 
-import jj.jjmessage.JJMessage;
-import jj.script.AssociatedScriptBundle;
-
 /**
  * @author jason
  *
@@ -57,17 +54,7 @@ public class MockHttpRequest implements HttpRequest {
 	public BigDecimal wallTime() {
 		return null;
 	}
-
-	@Override
-	public AssociatedScriptBundle associatedScriptBundle() {
-		return null;
-	}
-
-	@Override
-	public HttpRequest associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
-		return this;
-	}
-
+	
 	@Override
 	public String host() {
 		return null;
@@ -80,16 +67,6 @@ public class MockHttpRequest implements HttpRequest {
 
 	@Override
 	public URI absoluteUri() {
-		return null;
-	}
-
-	@Override
-	public HttpRequest addStartupJJMessage(JJMessage message) {
-		return this;
-	}
-
-	@Override
-	public List<JJMessage> startupJJMessages() {
 		return null;
 	}
 

@@ -1,8 +1,11 @@
 package jj.document;
 
+import java.util.List;
+
 import jj.script.AssociatedScriptBundle;
 import jj.http.HttpRequest;
 import jj.http.RequestProcessor;
+import jj.jjmessage.JJMessage;
 
 import org.jsoup.nodes.Document;
 
@@ -12,7 +15,7 @@ public interface DocumentRequestProcessor extends RequestProcessor {
 	
 	AssociatedScriptBundle associatedScriptBundle();
 	
-	void scriptBundle(AssociatedScriptBundle scriptBundle);
+	DocumentRequestProcessor associatedScriptBundle(AssociatedScriptBundle scriptBundle);
 
 	Document document();
 	
@@ -38,5 +41,21 @@ public interface DocumentRequestProcessor extends RequestProcessor {
 	 * @return
 	 */
 	DocumentRequestState state();
+
+
+
+	/**
+	 * adds a message intended to be processed a framework startup
+	 * on the client.  initially intended for event bindings but
+	 * some other case may come up
+	 * @param message
+	 * @return this, for chaining
+	 */
+	DocumentRequestProcessor addStartupJJMessage(JJMessage message);
+
+	/**
+	 * @return
+	 */
+	List<JJMessage> startupJJMessages();
 
 }

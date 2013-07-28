@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import jj.DataStore;
-import jj.jjmessage.JJMessage;
-import jj.script.AssociatedScriptBundle;
 
 /**
  * @author jason
@@ -44,25 +42,11 @@ public interface HttpRequest extends DataStore {
 
 	BigDecimal wallTime();
 
-	AssociatedScriptBundle associatedScriptBundle();
-
-	HttpRequest associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle);
-
 	String host();
 
 	boolean secure();
 
 	URI absoluteUri();
-
-	/**
-	 * adds a message intended to be processed a framework startup
-	 * on the client.  initially intended for event bindings but
-	 * some other case may come up
-	 * @param message
-	 */
-	HttpRequest addStartupJJMessage(JJMessage message);
-
-	List<JJMessage> startupJJMessages();
 
 	String toString();
 

@@ -43,25 +43,25 @@ class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection hide() {
-		context.httpRequest().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", null));
+		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", null));
 		return this;
 	}
 
 	@Override
 	public Selection hide(final String duration) {
-		context.httpRequest().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", duration));
+		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", duration));
 		return this;
 	}
 
 	@Override
 	public Selection show() {
-		context.httpRequest().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", null));
+		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", null));
 		return this;
 	}
 
 	@Override
 	public Selection show(final String duration) {
-		context.httpRequest().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", duration));
+		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", duration));
 		return this;
 	}
 	
@@ -73,7 +73,7 @@ class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection on(final String type, final String selector, final Callable function) {
-		context.httpRequest().addStartupJJMessage(JJMessage.makeBind(this.selector, selector, type));
+		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeBind(this.selector, selector, type));
 		context.associatedScriptBundle().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
 	}

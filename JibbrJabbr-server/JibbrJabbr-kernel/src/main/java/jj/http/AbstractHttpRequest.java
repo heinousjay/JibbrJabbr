@@ -23,16 +23,12 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
 import jj.DateFormatHelper;
 import jj.Sequence;
-import jj.jjmessage.JJMessage;
-import jj.script.AssociatedScriptBundle;
 
 /**
  * @author jason
@@ -50,11 +46,7 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	
 	protected final long startTime = System.nanoTime();
 	
-	protected AssociatedScriptBundle associatedScriptBundle;
-	
 	protected final String id = sequence.next();
-	
-	protected ArrayList<JJMessage> messages;
 	
 	protected final FullHttpRequest request;
 
@@ -90,17 +82,6 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	public BigDecimal wallTime() {
 		return BigDecimal.valueOf(System.nanoTime() - startTime, 6);
 	}
-
-	@Override
-	public AssociatedScriptBundle associatedScriptBundle() {
-		return associatedScriptBundle;
-	}
-
-	@Override
-	public HttpRequest associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
-		this.associatedScriptBundle = associatedScriptBundle;
-		return this;
-	}
 	
 	/**
 	 * @return
@@ -132,28 +113,6 @@ abstract class AbstractHttpRequest implements HttpRequest {
 				.append(uri())
 				.toString()
 		);
-	}
-
-	/**
-	 * adds a message intended to be processed a framework startup
-	 * on the client.  initially intended for event bindings but
-	 * some other case may come up
-	 * @param message
-	 */
-	@Override
-	public HttpRequest addStartupJJMessage(final JJMessage message) {
-		if (messages == null) {
-			messages = new ArrayList<>();
-		}
-		messages.add(message);
-		return this;
-	}
-
-	@Override
-	public List<JJMessage> startupJJMessages() {
-		ArrayList<JJMessage> messages = this.messages;
-		this.messages = null;
-		return messages == null ? Collections.<JJMessage>emptyList() : messages;
 	}
 
 	/**
