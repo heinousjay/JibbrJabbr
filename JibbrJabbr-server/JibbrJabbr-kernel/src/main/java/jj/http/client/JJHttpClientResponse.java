@@ -15,36 +15,41 @@
  */
 package jj.http.client;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import java.io.IOException;
 
-import jj.execution.ClientExecutor;
-
-import com.ning.http.client.AsyncHttpClientConfig;
+import jj.http.AbstractHttpResponse;
+import jj.http.HttpResponse;
+import jj.resource.Resource;
+import jj.resource.TransferableResource;
 
 /**
  * @author jason
  *
  */
-class AsyncHttpClientConfigProvider implements Provider<AsyncHttpClientConfig> {
+public class JJHttpClientResponse extends AbstractHttpResponse {
 
-	private final ClientExecutor executor;
-	
-	@Inject
-	AsyncHttpClientConfigProvider(final ClientExecutor executor) {
-		this.executor = executor;
-	}
-	
 	@Override
-	public AsyncHttpClientConfig get() {
+	public HttpResponse end() {
 		// TODO Auto-generated method stub
-		return new AsyncHttpClientConfig.Builder()
-			.setCompressionEnabled(true)
-			.setUserAgent("JibbrJabbr RestCall subsystem/Netty 3.5.11Final")
-			.setIOThreadMultiplier(1)
-			.setFollowRedirects(true)
-			.setScheduledExecutorService(executor)
-			.setExecutorService(executor)
-			.build();
+		return null;
 	}
+
+	@Override
+	public HttpResponse error(Throwable e) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected String makeAbsoluteURL(Resource resource) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

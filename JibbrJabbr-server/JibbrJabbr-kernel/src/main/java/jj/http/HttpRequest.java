@@ -18,7 +18,6 @@ package jj.http;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.math.BigDecimal;
-import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -54,11 +53,6 @@ public interface HttpRequest extends DataStore {
 	 * @return
 	 */
 	long timestamp();
-
-	/**
-	 * @return
-	 */
-	SocketAddress remoteAddress();
 
 	/**
 	 * @return

@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.DateFormatHelper;
 import jj.http.AbstractHttpRequest;
 import jj.http.HttpRequest;
 
@@ -26,7 +27,6 @@ class JJHttpServerRequest extends AbstractHttpRequest implements HttpRequest {
 	/**
 	 * @return
 	 */
-	@Override
 	public SocketAddress remoteAddress() {
 		return channel.remoteAddress();
 	}
@@ -36,5 +36,15 @@ class JJHttpServerRequest extends AbstractHttpRequest implements HttpRequest {
 	 */
 	protected FullHttpRequest request() {
 		return request;
+	}
+
+	@Override
+	public String toString() {
+		return "httpRequest[" +
+			remoteAddress() +
+			"] started at " +
+			DateFormatHelper.basicFormat(timestamp()) +
+			" with data " +
+			data;
 	}
 }

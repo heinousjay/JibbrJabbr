@@ -1,5 +1,8 @@
 package jj.script;
 
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
+
 import java.io.IOException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -12,10 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.Response;
+import jj.http.client.HttpClient;
+import jj.http.client.JJHttpClientResponse;
 
 @Singleton
 class RestRequestContinuationProcessor implements ContinuationProcessor {
@@ -24,14 +25,14 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 
 	private final CurrentScriptContext context;
 	
-	private final AsyncHttpClient httpClient;
+	private final HttpClient httpClient;
 	
 	private final JJExecutors executors;
 	
 	@Inject
 	RestRequestContinuationProcessor(
 		final CurrentScriptContext context,
-		final AsyncHttpClient httpClient,
+		final HttpClient httpClient,
 		final JJExecutors executors
 	) {
 		this.context = context;
@@ -48,44 +49,45 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 	public void process(final ContinuationState continuationState) {
 		final ScriptContext scriptContext = context.save();
 		final RestRequest restRequest = continuationState.restRequest();
-		try {
-			final ListenableFuture<Response> response = httpClient.executeRequest(restRequest.request());
-			response.addListener(
-				new JJRunnable("REST response with id [" + restRequest.id() + "]") {
+		httpClient.execute(restRequest.request()).addListener(
+			new GenericFutureListener<Future<JJHttpClientResponse>>() {
+
+				@Override
+				public void operationComplete(final Future<JJHttpClientResponse> future) throws Exception {
+					
+					executors.scriptExecutorFor(context.baseName()).submit(
+						new JJRunnable("REST response with id [" + restRequest.id() + "]") {
 							
-					@Override
-					public void run() {
-						context.restore(scriptContext);
-						try {
-							executors
-								.scriptRunner()
-								.restartAfterContinuation(
-									restRequest.id(),
-									response.get()
-								);
-						} catch (InterruptedException | CancellationException e) {
-							// ignore this, we're shutting down
-						} catch (ExecutionException e) {
-							executors
-							.scriptRunner()
-							.restartAfterContinuation(
-								restRequest.id(),
-								e.getCause()
-							);
-						} finally {
-							context.end();
+							@Override
+							public void run() {
+								context.restore(scriptContext);
+								try {
+									executors
+										.scriptRunner()
+										.restartAfterContinuation(
+											restRequest.id(),
+											future.get()
+										);
+								} catch (InterruptedException | CancellationException e) {
+									// ignore this, we're shutting down
+								} catch (ExecutionException e) {
+									executors
+									.scriptRunner()
+									.restartAfterContinuation(
+										restRequest.id(),
+										e.getCause()
+									);
+								} finally {
+									context.end();
+								}
+							}
 						}
-					}
-				}, executors.scriptExecutorFor(context.baseName()));
-			
-		} catch (IOException e) {
-			log.error("trouble executing {}", restRequest);
-			log.error("", e);
-			executors
-				.scriptRunner()
-				.restartAfterContinuation(restRequest.id(), e);
-		}
-		
+					);
+				}
+				
+				
+			}
+		);
 	}
 
 }

@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import jj.DateFormatHelper;
 import jj.Sequence;
 
 /**
@@ -129,16 +128,6 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	@Override
 	public Charset charset() {
 		return StandardCharsets.UTF_8;
-	}
-
-	@Override
-	public String toString() {
-		return "httpRequest[" +
-			remoteAddress() +
-			"] started at " +
-			DateFormatHelper.basicFormat(timestamp()) +
-			" with data " +
-			data;
 	}
 
 	/**

@@ -13,35 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.engine;
+package jj.http.client;
 
-import static jj.engine.MIME.*;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-enum Method {
-	GET {
-		@Override
-		MIME produces() {
-			return UrlEncoded;
-		}
-	},
-	POST {
-		@Override
-		MIME produces() {
-			return JSON;
-		}
-	},
-	PUT {
-		@Override
-		MIME produces() {
-			return JSON;
-		}
-	},
-	DELETE {
-		@Override
-		MIME produces() {
-			return UrlEncoded;
-		}
-	};
+import io.netty.util.concurrent.DefaultPromise;
+import io.netty.util.concurrent.Future;
+
+/**
+ * @author jason
+ *
+ */
+@Singleton
+public class HttpClient {
 	
-	abstract MIME produces();
+	@Inject
+	HttpClient() {
+		
+	}
+
+	public Future<JJHttpClientResponse> execute(JJHttpClientRequest request) {
+		
+		
+		return new DefaultPromise<>(null);
+	}
 }

@@ -2,12 +2,13 @@ package jj.engine;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import jj.http.client.HttpClient;
+import jj.http.client.JJHttpClientRequest;
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
 import jj.uritemplate.UriTemplate;
@@ -24,15 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
 
 class RestCallProvider {
 	
 	private final Logger log = LoggerFactory.getLogger(RestCallProvider.class);
 	
-	private final AsyncHttpClient httpClient;
+	private final HttpClient httpClient;
 	
 	private final CurrentScriptContext context;
 	
@@ -111,22 +109,19 @@ class RestCallProvider {
 				url.append(options.path());
 			}
 			
-			final RequestBuilder requestBuilder = new RequestBuilder(options.method().toString())
-				.setUrl(url.toString())
-				.addHeader("Accept", options.accept().toString());
+			final JJHttpClientRequest request = 
+				new JJHttpClientRequest(options.method(), url.toString())
+				.header(HttpHeaders.Names.ACCEPT, options.accept().toString());
 			
 			if (body != null && !"".equals(body.trim())) {
 				byte[] bytes = UTF_8.encode(body).array();
 				
-				requestBuilder
-					.addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=UTF-8")
-					.addHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(bytes.length))
-					.setBody(bytes);
+				request
+					.header(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=UTF-8")
+					.header(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(bytes.length));
+					// TODO!
+					//.setBody(bytes);
 			}
-				
-			
-			
-			final Request request = requestBuilder.build();
 			
 			log.debug("performing REST request {}", request);
 
@@ -135,14 +130,7 @@ class RestCallProvider {
 				throw context.prepareContinuation(new RestRequest(request));
 			} else {
 				// just fire and forget!
-				try {
-					httpClient.executeRequest(request);
-				} catch (IOException e) {
-					log.error("executing a REST request went poorly", e);
-					// TODO probably need to throw something here, no?
-					// something more direct and intelligent of course
-					throw new RuntimeException(e);
-				}
+				httpClient.execute(request);
 			}
 			
 			
@@ -157,7 +145,7 @@ class RestCallProvider {
 	
 	@Inject
 	RestCallProvider(
-		final AsyncHttpClient httpClient,
+		final HttpClient httpClient,
 		final CurrentScriptContext context
 	) {
 		this.httpClient = httpClient;

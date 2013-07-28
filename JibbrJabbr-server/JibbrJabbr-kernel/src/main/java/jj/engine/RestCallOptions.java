@@ -1,8 +1,11 @@
 package jj.engine;
 
 import static jj.engine.MIME.*;
-import static jj.engine.Method.*;
 
+import io.netty.handler.codec.http.HttpMethod;
+
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;
@@ -17,6 +20,18 @@ import org.mozilla.javascript.ScriptableObject;
  *
  */
 class RestCallOptions {
+	
+	private static final Map<HttpMethod, MIME> PRODUCTION_DEFAULTS;
+	
+	static {
+		HashMap<HttpMethod, MIME> worker = new HashMap<>();
+		worker.put(HttpMethod.GET, UrlEncoded);
+		worker.put(HttpMethod.POST, JSON);
+		worker.put(HttpMethod.PUT, JSON);
+		worker.put(HttpMethod.DELETE, UrlEncoded);
+		
+		PRODUCTION_DEFAULTS = Collections.unmodifiableMap(worker);
+	}
 
 	private static final String PATH = "path";
 	private static final String METHOD = "method";
@@ -26,13 +41,13 @@ class RestCallOptions {
 	private static final String IGNORE_RESULT = "ignoreResult";
 	
 	private static final String DEFAULT_PATH = "";
-	private static final Method DEFAULT_METHOD = GET;
+	private static final HttpMethod DEFAULT_METHOD = HttpMethod.GET;
 	private static final MIME DEFAULT_ACCEPT = JSON;
 	private static final Map<String, Object> DEFAULT_PARAMS = null;
 	private static final boolean DEFAULT_IGNORE_RESULT = false;
 	
 	private final String path;
-	private final Method method;
+	private final HttpMethod method;
 	private final MIME accept;
 	private final MIME produce;
 	private final Map<String, Object> params;
@@ -54,9 +69,9 @@ class RestCallOptions {
 			DEFAULT_PATH;
 	}
 	
-	private Method method(final Scriptable options) {
+	private HttpMethod method(final Scriptable options) {
 		return options != null && ScriptableObject.hasProperty(options, METHOD) ?
-			Method.valueOf(toJavaString(options, METHOD)) :
+			HttpMethod.valueOf(toJavaString(options, METHOD)) :
 			DEFAULT_METHOD;
 	}
 	
@@ -69,7 +84,7 @@ class RestCallOptions {
 	private MIME produce(final Scriptable options) {
 		return options != null && ScriptableObject.hasProperty(options, PRODUCE) ?
 			MIME.valueOf(toJavaString(options, PRODUCE)) :
-			method(options).produces();
+			PRODUCTION_DEFAULTS.get(method(options));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -114,7 +129,7 @@ class RestCallOptions {
 		return path;
 	}
 	
-	Method method() {
+	HttpMethod method() {
 		return method;
 	}
 	

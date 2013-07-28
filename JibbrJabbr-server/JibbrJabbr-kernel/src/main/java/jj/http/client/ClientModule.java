@@ -15,12 +15,7 @@
  */
 package jj.http.client;
 
-import javax.inject.Singleton;
-
 import jj.JJModule;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 
 /**
  * @author jason
@@ -30,17 +25,6 @@ public class ClientModule extends JJModule {
 	
 	@Override
 	protected void configure() {
-	
-		bind(AsyncHttpClientConfig.class).toProvider(AsyncHttpClientConfigProvider.class);
 		
-		try {
-			bind(AsyncHttpClient.class)
-				.toConstructor(
-					AsyncHttpClient.class.getConstructor(AsyncHttpClientConfig.class)
-				)
-				.in(Singleton.class);
-		} catch (Exception e) {
-			throw new AssertionError("couldn't get the right constructor", e);
-		}
 	}
 }
