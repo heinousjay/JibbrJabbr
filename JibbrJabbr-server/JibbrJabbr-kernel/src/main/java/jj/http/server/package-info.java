@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http;
-
-public enum HttpRequestState {
-	Uninitialized,
-	InitialExecution {
-		@Override
-		public String toString() {
-			return "Initial execution";
-		}
-	},
-	ReadyFunctionExecution {
-		@Override
-		public String toString() {
-			return "Ready function execution";
-		}
-	};
-}
+/**
+ * Manages the HTTP server
+ * 
+ * @author jason
+ *
+ */
+package jj.http.server;

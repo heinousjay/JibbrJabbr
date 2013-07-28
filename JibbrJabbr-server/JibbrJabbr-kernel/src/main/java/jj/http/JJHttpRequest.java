@@ -10,7 +10,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 @Singleton
-class JJHttpRequest extends AbstractHttpRequest implements HttpRequest {
+public class JJHttpRequest extends AbstractHttpRequest implements HttpRequest {
 	
 	protected final Channel channel;
 	

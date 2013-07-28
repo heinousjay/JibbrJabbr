@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.document.DocumentRequestProcessor;
+import jj.document.DocumentRequestState;
 import jj.engine.HostEvent;
 import jj.execution.ScriptExecutorFactory;
-import jj.http.HttpRequestState;
 import jj.http.JJWebSocketConnection;
 import jj.http.MockHttpRequest;
 import jj.resource.ScriptResource;
@@ -141,8 +141,8 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(httpRequest).startingInitialExecution();
-		verify(httpRequest).startingReadyFunction();
+		verify(documentRequestProcessor).startingInitialExecution();
+		verify(documentRequestProcessor).startingReadyFunction();
 		verify(documentRequestProcessor).respond();
 	}
 	
@@ -155,14 +155,14 @@ public class ScriptRunnerTest {
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		givenADocumentRequest();
 		
-		given(httpRequest.state()).willReturn(HttpRequestState.InitialExecution);
+		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.InitialExecution);
 		
 		// when
 		scriptRunner.submit(documentRequestProcessor);
 		executor.runUntilIdle();
 		
 		// then
-		verify(httpRequest).startingInitialExecution();
+		verify(documentRequestProcessor).startingInitialExecution();
 		verify(continuationProcessor1).process(continuationState);
 		
 		// given
@@ -172,7 +172,7 @@ public class ScriptRunnerTest {
 		scriptRunner.restartAfterContinuation("", null);
 		
 		// then
-		verify(httpRequest).startingReadyFunction();
+		verify(documentRequestProcessor).startingReadyFunction();
 		verify(documentRequestProcessor).respond(); // verifies execution processing
 	}
 	
@@ -188,7 +188,7 @@ public class ScriptRunnerTest {
 			.willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
-		given(httpRequest.state()).willReturn(HttpRequestState.ReadyFunctionExecution);
+		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.ReadyFunctionExecution);
 		givenADocumentRequest();
 		
 		// when
@@ -196,8 +196,8 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(httpRequest).startingInitialExecution();
-		verify(httpRequest).startingReadyFunction();
+		verify(documentRequestProcessor).startingInitialExecution();
+		verify(documentRequestProcessor).startingReadyFunction();
 		verify(continuationProcessor1).process(continuationState);
 		
 		// given
@@ -391,8 +391,8 @@ public class ScriptRunnerTest {
 		// given
 		given(currentScriptContext.type()).willReturn(ScriptContextType.HttpRequest);
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
-		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
-		given(httpRequest.state()).willReturn(HttpRequestState.Uninitialized);
+		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
+		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.Uninitialized);
 		
 		// when
 		executor.runUntilIdle();
@@ -431,7 +431,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
-		given(httpRequest.state()).willReturn(HttpRequestState.Uninitialized);
+		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.Uninitialized);
 		
 		// when
 		executor.runNextPendingCommand();

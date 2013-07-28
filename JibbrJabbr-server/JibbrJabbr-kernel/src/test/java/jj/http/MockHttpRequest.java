@@ -69,21 +69,6 @@ public class MockHttpRequest implements HttpRequest {
 	}
 
 	@Override
-	public HttpRequest startingInitialExecution() {
-		return this;
-	}
-
-	@Override
-	public HttpRequest startingReadyFunction() {
-		return this;
-	}
-
-	@Override
-	public HttpRequestState state() {
-		return null;
-	}
-
-	@Override
 	public String host() {
 		return null;
 	}

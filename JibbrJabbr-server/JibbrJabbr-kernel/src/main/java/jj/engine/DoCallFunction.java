@@ -52,7 +52,7 @@ public class DoCallFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		if (context.connection() == null) {
-			throw new IllegalStateException("cannot call remote functions during " + context.httpRequest().state());
+			throw new IllegalStateException("cannot call remote functions during " + context.documentRequestProcessor().state());
 		}
 		context.connection().send(JJMessage.makeCall(String.valueOf(args[0]), String.valueOf(args[1])));
 		return Undefined.instance;

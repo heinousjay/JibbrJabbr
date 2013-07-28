@@ -50,8 +50,6 @@ abstract class AbstractHttpRequest implements HttpRequest {
 	
 	protected final long startTime = System.nanoTime();
 	
-	protected HttpRequestState state = HttpRequestState.Uninitialized;
-	
 	protected AssociatedScriptBundle associatedScriptBundle;
 	
 	protected final String id = sequence.next();
@@ -103,25 +101,7 @@ abstract class AbstractHttpRequest implements HttpRequest {
 		this.associatedScriptBundle = associatedScriptBundle;
 		return this;
 	}
-
-	@Override
-	public HttpRequest startingInitialExecution() {
-		state = HttpRequestState.InitialExecution;
-		associatedScriptBundle().initializing(true);
-		return this;
-	}
-
-	@Override
-	public HttpRequest startingReadyFunction() {
-		state = HttpRequestState.ReadyFunctionExecution;
-		return this;
-	}
-
-	@Override
-	public HttpRequestState state() {
-		return state;
-	}
-
+	
 	/**
 	 * @return
 	 */

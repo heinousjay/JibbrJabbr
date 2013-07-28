@@ -54,7 +54,7 @@ class DoRetrieveFunction extends BaseFunction implements HostObject {
 			throw new IllegalArgumentException("retrieve can only be called with a key");
 		}
 		if (context.connection() == null) {
-			throw new IllegalStateException("cannot retrieve remote info during " + context.httpRequest().state());
+			throw new IllegalStateException("cannot retrieve remote info during " + context.documentRequestProcessor().state());
 		}
 		throw context.prepareContinuation(
 			JJMessage.makeRetrieve(String.valueOf(args[0]))

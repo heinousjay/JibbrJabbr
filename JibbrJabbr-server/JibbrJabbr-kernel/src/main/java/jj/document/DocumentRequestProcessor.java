@@ -23,4 +23,20 @@ public interface DocumentRequestProcessor extends RequestProcessor {
 	 */
 	void respond();
 
+	/**
+	 * @return 
+	 * 
+	 */
+	DocumentRequestProcessor startingInitialExecution();
+
+	/**
+	 * @return
+	 */
+	DocumentRequestProcessor startingReadyFunction();
+
+	/**
+	 * @return
+	 */
+	DocumentRequestState state();
+
 }

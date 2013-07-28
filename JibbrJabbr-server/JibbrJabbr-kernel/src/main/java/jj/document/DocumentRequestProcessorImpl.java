@@ -33,6 +33,8 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	private final DocumentRequest documentRequest;
 	
 	private final Set<DocumentFilter> filters;
+	
+	private volatile DocumentRequestState state = DocumentRequestState.Uninitialized;
 
 	public DocumentRequestProcessorImpl(
 		final JJExecutors executors,
@@ -134,5 +136,25 @@ public class DocumentRequestProcessorImpl implements DocumentRequestProcessor {
 	@Override
 	public String toString() {
 		return httpRequest().uri();
+	}
+	
+
+	@Override
+	public DocumentRequestProcessor startingInitialExecution() {
+		state = DocumentRequestState.InitialExecution;
+		associatedScriptBundle().initializing(true);
+		return this;
+	}
+	
+	
+	@Override
+	public DocumentRequestProcessor startingReadyFunction() {
+		state = DocumentRequestState.ReadyFunctionExecution;
+		return this;
+	}
+	
+	@Override
+	public DocumentRequestState state() {
+		return state;
 	}
 }

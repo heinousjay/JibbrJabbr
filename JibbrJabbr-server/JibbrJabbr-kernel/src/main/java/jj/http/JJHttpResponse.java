@@ -46,7 +46,7 @@ import io.netty.handler.codec.http.LastHttpContent;
  *
  */
 @Singleton
-class JJHttpResponse extends AbstractHttpResponse {
+public class JJHttpResponse extends AbstractHttpResponse {
 	
 	private static final String SERVER_NAME = String.format(
 		"%s/%s (%s)",

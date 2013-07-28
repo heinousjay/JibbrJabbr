@@ -57,7 +57,7 @@ class DoStoreFunction extends BaseFunction implements HostObject, ContributesScr
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		if (context.connection() == null) {
-			throw new IllegalStateException("cannot store remote info during " + context.httpRequest().state());
+			throw new IllegalStateException("cannot store remote info during " + context.documentRequestProcessor().state());
 		}
 		context.connection().send(JJMessage.makeStore(String.valueOf(args[0]), String.valueOf(args[1])));
 		return Undefined.instance;

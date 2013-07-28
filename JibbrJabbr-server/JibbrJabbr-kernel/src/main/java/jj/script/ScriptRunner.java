@@ -78,8 +78,7 @@ public class ScriptRunner {
 	@ScriptThread
 	private void httpRequestInitialExecution() {
 		log.trace("performing initial execution of a document request");
-		
-		context.httpRequest().startingInitialExecution();
+		context.documentRequestProcessor().startingInitialExecution();
 		final ContinuationState continuationState = 
 				continuationCoordinator.execute(context.associatedScriptBundle());
 		
@@ -120,7 +119,7 @@ public class ScriptRunner {
 		}
 		log.trace("starting ready function execution");
 		
-		context.httpRequest().startingReadyFunction();
+		context.documentRequestProcessor().startingReadyFunction();
 		final ContinuationState continuationState = 
 				continuationCoordinator.execute(scriptBundle, scriptBundle.getFunction(READY_FUNCTION_KEY));
 		
@@ -362,7 +361,7 @@ public class ScriptRunner {
 		switch (context.type()) {
 		
 		case HttpRequest:
-			switch (context.httpRequest().state()) {
+			switch (context.documentRequestProcessor().state()) {
 			case InitialExecution:
 				resumeHttpRequestInitialExecution(pendingKey, result);
 				break;

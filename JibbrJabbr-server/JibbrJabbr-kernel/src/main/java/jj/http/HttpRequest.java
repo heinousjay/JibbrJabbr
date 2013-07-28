@@ -48,12 +48,6 @@ public interface HttpRequest extends DataStore {
 
 	HttpRequest associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle);
 
-	HttpRequest startingInitialExecution();
-
-	HttpRequest startingReadyFunction();
-
-	HttpRequestState state();
-
 	String host();
 
 	boolean secure();
