@@ -24,7 +24,7 @@ import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.http.client.ClientModule;
-import jj.http.server.HttpModule;
+import jj.http.server.HttpServerModule;
 import jj.http.server.servable.ServableModule;
 import jj.http.server.servable.document.DocumentModule;
 
@@ -87,7 +87,7 @@ public class CoreModule extends JJModule {
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
 		install(new ServableModule());
-		install(new HttpModule(isTest));
+		install(new HttpServerModule(isTest));
 	}
 
 }

@@ -18,6 +18,7 @@ package jj.http.server.servable;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import io.netty.handler.codec.http.HttpHeaders;
 import jj.resource.ScriptResource;
 import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
@@ -32,6 +33,8 @@ import org.mockito.Mock;
  *
  */
 public class AssociatedScriptServableTest extends ServableTestBase {
+	
+	static final String SHA1 = "1234567890123456789012345678901234567890";
 
 	AssociatedScriptServable as;
 	@Mock ScriptBundleFinder finder;
@@ -47,27 +50,37 @@ public class AssociatedScriptServableTest extends ServableTestBase {
 		given(bundle.clientScriptResource()).willReturn(scriptResource1);
 		given(bundle.sharedScriptResource()).willReturn(scriptResource2);
 		given(bundle.serverScriptResource()).willReturn(scriptResource3);
+		
+		given(scriptResource1.sha1()).willReturn(SHA1);
+		given(scriptResource2.sha1()).willReturn(SHA1);
+		given(scriptResource3.sha1()).willReturn(SHA1);
+		
 	}
 	
-	private void configureMatch(String uri) {
+	private void configureMatch(String uri, boolean withValidationHeader) {
 		match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
 		given(finder.forURIMatch(match)).willReturn(bundle);
+		
+		if (withValidationHeader) {
+			given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
+			given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(match.sha1);
+		}
 	}
 	
 	@Test
 	public void testIsMatchingRequest() {
-		configureMatch("/1234567890123456789012345678901234567890/index.js");
+		configureMatch("/" + SHA1 + "/index.js", false);
 		assertThat(as.isMatchingRequest(request), is(true));
-		configureMatch("/1234567890123456789012345678901234567890/index.shared.js");
+		configureMatch("/" + SHA1 + "/index.shared.js", false);
 		assertThat(as.isMatchingRequest(request), is(true));
-		configureMatch("/1234567890123456789012345678901234567890/index.server.js");
+		configureMatch("/" + SHA1 + "/index.server.js", false);
 		assertThat(as.isMatchingRequest(request), is(false));
 	}
 
 	@Test
-	public void testMakeRequestProcessor1() throws Exception {
-		configureMatch("/1234567890123456789012345678901234567890/index.js");
+	public void testMakeRequestProcessorClientCachedResponse() throws Exception {
+		configureMatch("/" + SHA1 + "/index.js", false);
 		
 		as.makeRequestProcessor(request, response).process();
 		
@@ -75,8 +88,8 @@ public class AssociatedScriptServableTest extends ServableTestBase {
 	}
 
 	@Test
-	public void testMakeRequestProcessor2() throws Exception {
-		configureMatch("/1234567890123456789012345678901234567890/index.shared.js");
+	public void testMakeRequestProcessorSharedCachedResponse() throws Exception {
+		configureMatch("/" + SHA1 + "/index.shared.js", false);
 		
 		as.makeRequestProcessor(request, response).process();
 		
@@ -84,8 +97,26 @@ public class AssociatedScriptServableTest extends ServableTestBase {
 	}
 
 	@Test
-	public void testMakeRequestProcessor3() throws Exception {
-		configureMatch("/1234567890123456789012345678901234567890/index.server.js");
+	public void testMakeRequestProcessorClientNotModifiedResponse() throws Exception {
+		configureMatch("/" + SHA1 + "/index.js", true);
+		
+		as.makeRequestProcessor(request, response).process();
+		
+		verify(response).sendNotModified(scriptResource1, true);
+	}
+
+	@Test
+	public void testMakeRequestProcessorSharedNotModifiedResponse() throws Exception {
+		configureMatch("/" + SHA1 + "/index.shared.js", true);
+		
+		as.makeRequestProcessor(request, response).process();
+		
+		verify(response).sendNotModified(scriptResource2, true);
+	}
+
+	@Test
+	public void testMakeRequestProcessorServerNoResponse() throws Exception {
+		configureMatch("/" + SHA1 + "/index.server.js", false);
 		
 		assertThat(as.makeRequestProcessor(request, response), is(nullValue()));
 	}
