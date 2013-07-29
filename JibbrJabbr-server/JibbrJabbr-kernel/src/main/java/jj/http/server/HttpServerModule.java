@@ -1,11 +1,9 @@
 package jj.http.server;
 
-import jj.JJServerListener;
-
-import com.google.inject.AbstractModule;
+import jj.JJModule;
 import com.google.inject.multibindings.Multibinder;
 
-public class HttpServerModule extends AbstractModule {
+public class HttpServerModule extends JJModule {
 	
 	private final boolean isTest;
 	
@@ -16,13 +14,11 @@ public class HttpServerModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		
-		Multibinder<JJServerListener> serverListeners = Multibinder.newSetBinder(binder(), JJServerListener.class);
-		
 		if (!isTest) {
-			serverListeners.addBinding().to(HttpServer.class);
+			addServerListenerBinding().to(HttpServer.class);
 		}
 		
-		serverListeners.addBinding().to(WebSocketConnectionTracker.class);
+		addServerListenerBinding().to(WebSocketConnectionTracker.class);
 		
 		Multibinder<WebSocketMessageProcessor> messageProcessors = Multibinder.newSetBinder(binder(), WebSocketMessageProcessor.class);
 		

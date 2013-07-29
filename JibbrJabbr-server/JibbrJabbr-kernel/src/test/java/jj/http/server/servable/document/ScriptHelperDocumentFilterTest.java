@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.resource.AssetResource.*;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,11 +55,9 @@ public class ScriptHelperDocumentFilterTest {
 	@Before
 	public void before() {
 		
-		when(configuration.baseUri()).thenReturn(URI.create("http://localhost:8080/"));
-		
 		scriptUri = "index/blahblahblah";
 		socketUri = "socketURI";
-		webSocketUri = configuration.baseUri().toString().replace("http", "ws") + socketUri;
+		webSocketUri = "ws://localhost:8080/" + socketUri;
 		
 		when(associatedScriptBundle.toUri()).thenReturn(scriptUri);
 		when(associatedScriptBundle.toSocketUri()).thenReturn(socketUri);

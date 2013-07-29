@@ -71,7 +71,7 @@ class LogConfigurator implements JJServerListener {
 		
 		((Logger)LoggerFactory.getLogger("io.netty")).setLevel(Level.ERROR);
 		
-		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.ERROR);
+		((Logger)LoggerFactory.getLogger("jj")).setLevel(Level.INFO);
 		
 		// logs events specifically related to running inside a JJAppTest
 		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(Level.OFF);

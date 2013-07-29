@@ -18,7 +18,6 @@ package jj.configuration;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -33,7 +32,6 @@ import org.junit.Test;
  */
 public class ConfigurationTest {
 	
-	URI realUri = URI.create("http://localhost:8080/");
 	Path realPath;
 
 	@Before 
@@ -43,15 +41,9 @@ public class ConfigurationTest {
 	
 	@Test
 	public void test() {
-		Configuration toTest = new Configuration(new String[] {realUri.toString(), realPath.toString()});
+		Configuration toTest = new Configuration(new String[] {realPath.toString()});
 		
 		assertThat(toTest.basePath(), is(realPath));
-		assertThat(toTest.baseUri(), is(realUri));
-		
-		toTest = new Configuration(new String[] {realPath.toString(), realUri.toString()});
-		
-		assertThat(toTest.basePath(), is(realPath));
-		assertThat(toTest.baseUri(), is(realUri));
 	}
 
 }

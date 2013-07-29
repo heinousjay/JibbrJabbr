@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,16 +38,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class ResourceBase {
 	
-	URI baseUri;
 	Path basePath;
 	@Mock Configuration configuration;
 	
 	@Before
 	public final void setup() throws Exception {
-		baseUri = URI.create("http://localhost:8080/");
 		basePath = Paths.get(ResourceBase.class.getResource("/config.js").toURI()).getParent();
 		given(configuration.basePath()).willReturn(basePath);
-		given(configuration.baseUri()).willReturn(baseUri);
 	}
 		
 
