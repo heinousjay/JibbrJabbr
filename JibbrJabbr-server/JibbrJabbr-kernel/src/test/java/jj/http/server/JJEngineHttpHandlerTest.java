@@ -101,7 +101,7 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testBasicOperation() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker, logger);
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
@@ -152,7 +152,7 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testHandover() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker);
+		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker, logger);
 		
 		//when
 		handler.handleHttpRequest(httpRequest4, httpResponse);

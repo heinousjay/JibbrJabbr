@@ -20,6 +20,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+
 import com.google.inject.Injector;
 
 import jj.execution.ExecutionTrace;
@@ -29,6 +31,7 @@ import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.Servable;
+import jj.logging.EmergencyLogger;
 
 /**
  * just exposing a method for testing
@@ -48,9 +51,10 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 		final Set<Servable> resourceTypes,
 		final Injector injector,
 		final ExecutionTrace trace,
-		final WebSocketConnectionMaker webSocketConnectionMaker
+		final WebSocketConnectionMaker webSocketConnectionMaker,
+		final @EmergencyLogger Logger logger
 	) {
-		super(executors, resourceTypes, injector, trace, webSocketConnectionMaker);
+		super(executors, resourceTypes, injector, trace, webSocketConnectionMaker, logger);
 	}
 
 	@Override

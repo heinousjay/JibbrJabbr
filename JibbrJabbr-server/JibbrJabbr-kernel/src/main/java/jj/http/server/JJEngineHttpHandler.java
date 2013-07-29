@@ -1,19 +1,21 @@
 package jj.http.server;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -25,6 +27,7 @@ import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
+import jj.logging.EmergencyLogger;
 
 /**
  * Acts as the bridge from netty into our core.
@@ -32,8 +35,6 @@ import jj.http.server.servable.Servable;
  *
  */
 public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-	
-	private static final Logger logger = LoggerFactory.getLogger(JJEngineHttpHandler.class);
 	
 	private final JJExecutors executors;
 	
@@ -45,19 +46,23 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final WebSocketConnectionMaker webSocketConnectionMaker;
 	
+	private final Logger logger;
+	
 	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
 		final Set<Servable> resourceTypes,
 		final Injector parentInjector,
 		final ExecutionTrace trace,
-		final WebSocketConnectionMaker webSocketConnectionMaker
+		final WebSocketConnectionMaker webSocketConnectionMaker,
+		final @EmergencyLogger Logger logger
 	) {
 		this.executors = executors;
 		this.resourceTypes = resourceTypes;
 		this.parentInjector = parentInjector;
 		this.trace = trace;
 		this.webSocketConnectionMaker = webSocketConnectionMaker;
+		this.logger = logger;
 	}
 	
 	private Servable[] findMatchingServables(final HttpRequest request) {
@@ -105,9 +110,12 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.error("engine caught an exception", cause);
-		ctx.channel().write(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR));
-		ctx.close();
+		if (!(cause instanceof IOException)) {
+			logger.error("engine caught an exception", cause);
+			ctx.channel()
+				.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR))
+				.addListener(ChannelFutureListener.CLOSE);
+		}
 	}
 
 	void handleHttpRequest(

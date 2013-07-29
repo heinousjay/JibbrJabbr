@@ -24,6 +24,9 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
+ * Request injection of the emergency logger, used to log critical
+ * errors.  Generally speaking, this logger is always on
+ * 
  * @author jason
  *
  */
