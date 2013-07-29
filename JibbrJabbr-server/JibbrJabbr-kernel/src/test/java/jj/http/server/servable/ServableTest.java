@@ -87,7 +87,7 @@ public class ServableTest extends ServableTestBase {
 	}
 	
 	@Test
-	public void testStandardResponseUncachedLoadedResource() throws Exception {
+	public void testStandardResponseUncachedResource() throws Exception {
 		
 		given(request.uri()).willReturn(UNVERSIONED_URI);
 		URIMatch match = new URIMatch(UNVERSIONED_URI);
@@ -98,7 +98,7 @@ public class ServableTest extends ServableTestBase {
 	}
 	
 	@Test
-	public void testStandardResponseCachedLoadedResource() throws Exception {
+	public void testStandardResponseCachedResource() throws Exception {
 		
 		given(request.uri()).willReturn(VERSIONED_URI);
 		URIMatch match = new URIMatch(VERSIONED_URI);
@@ -143,7 +143,7 @@ public class ServableTest extends ServableTestBase {
 	}
 	
 	@Test
-	public void sendStandardResponseTemporaryRedirect() throws Exception {
+	public void testStandardResponseTemporaryRedirect() throws Exception {
 		
 		given(request.uri()).willReturn(VERSIONED_URI);
 		URIMatch match = new URIMatch(VERSIONED_URI);
@@ -153,6 +153,23 @@ public class ServableTest extends ServableTestBase {
 		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
 		verify(response).sendTemporaryRedirect(resource);
+	}
+	
+	@Test
+	public void testStandardResponseError() throws Exception {
+		
+		given(request.uri()).willReturn(VERSIONED_URI);
+		URIMatch match = new URIMatch(VERSIONED_URI);
+		
+		given(resource.sha1()).willReturn("some other sha1");
+		
+		RuntimeException toThrow = new RuntimeException();
+		
+		given(response.sendTemporaryRedirect(resource)).willThrow(toThrow);
+		
+		si.makeStandardRequestProcessor(request, response, match, resource).process();
+		
+		verify(response).error(toThrow);
 	}
 
 }

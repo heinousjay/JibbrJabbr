@@ -15,9 +15,12 @@
  */
 package jj.resource;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -53,6 +56,8 @@ public class ConfigResourceCreatorTest {
 	public void testCreate() throws Exception {
 		
 		ConfigResource resource = toTest.create(ConfigResource.CONFIG_JS);
+		
+		assertThat(resource.script().getBytes(UTF_8), is(Files.readAllBytes(basePath.resolve(ConfigResource.CONFIG_JS))));
 	}
 
 }
