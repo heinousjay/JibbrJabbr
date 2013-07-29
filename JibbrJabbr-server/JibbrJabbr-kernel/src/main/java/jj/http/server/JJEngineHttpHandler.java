@@ -96,7 +96,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		
 		if (!request.getDecoderResult().isSuccess()) {
 		
-			injector.getInstance(JJHttpServerResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
+			injector.getInstance(HttpResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
 		} else if (webSocketConnectionMaker.isWebSocketRequest(request)) {
 		
@@ -112,9 +112,12 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		if (!(cause instanceof IOException)) {
 			logger.error("engine caught an exception", cause);
-			ctx.channel()
-				.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR))
-				.addListener(ChannelFutureListener.CLOSE);
+			try {
+				ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR))
+					.addListener(ChannelFutureListener.CLOSE);
+			} catch (Exception e) {
+				logger.error("additionally, an exception occurred while responding with an error", e);
+			}
 		}
 	}
 
@@ -128,7 +131,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		// figure out if there's something for us to do
 		final Servable[] servables = findMatchingServables(request);
 		
-		assert (servables.length > 0) : "";
+		assert (servables.length > 0) : "no servables found - something is misconfigured";
 		executors.ioExecutor().submit(new JJRunnable("JJEngine core processing") {
 			@Override
 			public void run() {

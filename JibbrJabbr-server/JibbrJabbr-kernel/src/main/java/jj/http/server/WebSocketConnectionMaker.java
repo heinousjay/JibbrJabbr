@@ -22,6 +22,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
@@ -62,6 +63,7 @@ class WebSocketConnectionMaker {
 	}
 	
 	void handshakeWebsocket(final ChannelHandlerContext ctx, final FullHttpRequest request) {
+		// this may or may not always be right... but I also don't really care.
 		final String uri = 
 			HTTP_REPLACER.matcher(request.headers().get(HttpHeaders.Names.ORIGIN) + request.getUri()).replaceFirst("ws");
 		
@@ -70,58 +72,73 @@ class WebSocketConnectionMaker {
 		if (handshaker == null) {
 			WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
 		} else {
-			handshaker.handshake(ctx.channel(), request).addListener(new ChannelFutureListener() {
-				
-				@Override
-				public void operationComplete(ChannelFuture future) throws Exception {
-					if (future.isSuccess()) {
+			doHandshake(ctx, request, handshaker);
+		}
+	}
+
+	private void doHandshake(
+		final ChannelHandlerContext ctx,
+		final FullHttpRequest request,
+		final WebSocketServerHandshaker handshaker
+	) {
+		handshaker.handshake(ctx.channel(), request).addListener(new ChannelFutureListener() {
+			
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				if (future.isSuccess()) {
+					
+					URIMatch uriMatch = new URIMatch(request.getUri());
+					final AssociatedScriptBundle scriptBundle = scriptBundleFinder.forURIMatch(uriMatch);
+					
+					if (scriptBundle == null) {
 						
-						URIMatch uriMatch = new URIMatch(request.getUri());
-						final AssociatedScriptBundle scriptBundle = scriptBundleFinder.forURIMatch(uriMatch);
-						
-						if (scriptBundle == null) {
-							
-							ctx.channel().write(new TextWebSocketFrame("jj-reload"));
-							handshaker.close(ctx.channel(), new CloseWebSocketFrame(1000, null));
-							
-						} else {
-						
-							Injector injector = parentInjector.createChildInjector(new AbstractModule() {
+						ctx.channel().writeAndFlush(new TextWebSocketFrame("jj-reload"))
+							.addListener(new ChannelFutureListener() {
+								
 								@Override
-								protected void configure() {
-									bind(JJWebSocketConnection.class);
-									bind(Channel.class).toInstance(ctx.channel());
-									bind(FullHttpRequest.class).toInstance(request);
-									bind(WebSocketServerHandshaker.class).toInstance(handshaker);
-									bind(WebSocketFrameHandler.class);
-									bind(AssociatedScriptBundle.class).toInstance(scriptBundle);
+								public void operationComplete(ChannelFuture future) throws Exception {
+									handshaker.close(ctx.channel(), new CloseWebSocketFrame(1000, null));
 								}
 							});
-							
-							ctx.pipeline().replace(
-								JJEngine.toString(),
-								JJWebsocketHandler.toString(),
-								injector.getInstance(WebSocketFrameHandler.class)
-							);
-						}
+						
 						
 					} else {
-						ctx.channel().close();
+					
+						Injector injector = parentInjector.createChildInjector(new AbstractModule() {
+							@Override
+							protected void configure() {
+								bind(JJWebSocketConnection.class);
+								bind(Channel.class).toInstance(ctx.channel());
+								bind(FullHttpRequest.class).toInstance(request);
+								bind(WebSocketServerHandshaker.class).toInstance(handshaker);
+								bind(WebSocketFrameHandler.class);
+								bind(AssociatedScriptBundle.class).toInstance(scriptBundle);
+							}
+						});
+						
+						ctx.pipeline().replace(
+							JJEngine.toString(),
+							JJWebsocketHandler.toString(),
+							injector.getInstance(WebSocketFrameHandler.class)
+						);
 					}
+					
+				} else {
+					ctx.channel().close();
 				}
-			});
-		}
+			}
+		});
 	}
 	
 	private boolean isWebSocketURI(final FullHttpRequest request) {
 		URIMatch uriMatch = new URIMatch(request.getUri());
-		return "socket".equals(uriMatch.extension) &&
-			uriMatch.sha1 != null;
+		return "socket".equals(uriMatch.extension) && uriMatch.sha1 != null;
 	}
 	
 	boolean isWebSocketRequest(final FullHttpRequest request) {
 		
-		return HttpHeaders.Values.UPGRADE.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.CONNECTION)) &&
+		return HttpMethod.GET.equals(request.getMethod()) &&
+			HttpHeaders.Values.UPGRADE.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.CONNECTION)) &&
 			HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.UPGRADE)) &&
 			isWebSocketURI(request);
 	}

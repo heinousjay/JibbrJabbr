@@ -15,13 +15,29 @@
  */
 package jj.http.server;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+
+import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jj.execution.ExecutionTrace;
 import jj.execution.MockJJExecutors;
+import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
 import jj.http.server.JJHttpServerRequest;
@@ -32,11 +48,16 @@ import jj.http.server.servable.Servable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
+import com.google.inject.Binder;
 import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.binder.AnnotatedBindingBuilder;
 
 /**
  * @author jason
@@ -47,7 +68,15 @@ public class JJEngineHttpHandlerTest {
 	
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
+	@Mock ChannelHandlerContext ctx;
+	@Mock Channel channel;
+	@Mock ChannelFuture channelFuture;
 	@Mock Injector injector;
+	@Mock Binder binder;
+	@Mock AnnotatedBindingBuilder<Object> abb;
+	@Captor ArgumentCaptor<Module> moduleCaptor;
+	@Captor ArgumentCaptor<FullHttpResponse> responseCaptor;
+	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
 	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
 	MockJJExecutors executors;
@@ -59,6 +88,7 @@ public class JJEngineHttpHandlerTest {
 	@Mock JJHttpServerRequest httpRequest2;
 	@Mock JJHttpServerRequest httpRequest3;
 	@Mock JJHttpServerRequest httpRequest4;
+	@Mock JJHttpServerRequest httpRequest5;
 	
 	@Mock HttpResponse httpResponse;
 	
@@ -66,6 +96,8 @@ public class JJEngineHttpHandlerTest {
 	@Mock RequestProcessor requestProcessor2;
 	@Mock RequestProcessor requestProcessor3;
 	Set<Servable> resourceTypes;
+	
+	JJEngineHttpHandler handler;
 	
 	//given
 	@Before
@@ -76,12 +108,14 @@ public class JJEngineHttpHandlerTest {
 		given(servable1.isMatchingRequest(httpRequest2)).willReturn(false);
 		given(servable1.isMatchingRequest(httpRequest3)).willReturn(false);
 		given(servable1.isMatchingRequest(httpRequest4)).willReturn(false);
+		given(servable3.isMatchingRequest(httpRequest5)).willReturn(false);
 		given(servable1.makeRequestProcessor(httpRequest1, httpResponse)).willReturn(requestProcessor1);
 		
 		given(servable2.isMatchingRequest(httpRequest1)).willReturn(false);
 		given(servable2.isMatchingRequest(httpRequest2)).willReturn(true);
 		given(servable2.isMatchingRequest(httpRequest3)).willReturn(false);
 		given(servable2.isMatchingRequest(httpRequest4)).willReturn(true);
+		given(servable3.isMatchingRequest(httpRequest5)).willReturn(false);
 		given(servable2.makeRequestProcessor(httpRequest2, httpResponse)).willReturn(requestProcessor2);
 		given(servable2.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(null);
 		
@@ -89,6 +123,7 @@ public class JJEngineHttpHandlerTest {
 		given(servable3.isMatchingRequest(httpRequest2)).willReturn(false);
 		given(servable3.isMatchingRequest(httpRequest3)).willReturn(true);
 		given(servable3.isMatchingRequest(httpRequest4)).willReturn(true);
+		given(servable3.isMatchingRequest(httpRequest5)).willReturn(true);
 		given(servable3.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
 		given(servable3.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
@@ -96,12 +131,117 @@ public class JJEngineHttpHandlerTest {
 		resourceTypes.add(servable1);
 		resourceTypes.add(servable2);
 		resourceTypes.add(servable3);
+		
+		handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker, logger);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void prepareInjectorStubbing() {
+		// little ugly, but sets up an injector that will return our mocks
+		given(ctx.channel()).willReturn(channel);
+		given(injector.getInstance(HttpRequest.class)).willReturn(httpRequest1);
+		given(injector.getInstance(HttpResponse.class)).willReturn(httpResponse);
+		given(injector.createChildInjector(any(Module.class))).willReturn(injector);
+		given(binder.bind(any(Class.class))).willReturn(abb);
 	}
 	
 	@Test
-	public void testBasicOperation() throws Exception {
+	public void testChannelRead0BadRequest() throws Exception {
+		FullHttpRequest fullHttpRequest = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
+		given(fullHttpRequest.getDecoderResult().isSuccess()).willReturn(false);
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker, logger);
+		prepareInjectorStubbing();
+		
+		handler.channelRead0(ctx, fullHttpRequest);
+		
+		verify(httpResponse).sendError(HttpResponseStatus.BAD_REQUEST);
+	}
+	
+	@Test
+	public void testChannelRead0WebSocketRequest() throws Exception {
+		
+		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
+		given(webSocketConnectionMaker.isWebSocketRequest(fullHttpRequest)).willReturn(true);
+		
+		handler.channelRead0(ctx, fullHttpRequest);
+		
+		verify(webSocketConnectionMaker).handshakeWebsocket(ctx, fullHttpRequest);
+	}
+	
+	@Test
+	public void testChannelRead0HttpRequest() throws Exception {
+		
+		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
+		
+		prepareInjectorStubbing();
+		
+		handler.channelRead0(ctx, fullHttpRequest);
+		
+		verify(injector).createChildInjector(moduleCaptor.capture());
+		
+		Module module = moduleCaptor.getValue();
+		assertThat(module, is(notNullValue()));
+		
+		module.configure(binder);
+		
+		verify(binder).bind(Channel.class);
+		verify(abb).toInstance(channel);
+		verify(binder).bind(FullHttpRequest.class);
+		verify(abb).toInstance(fullHttpRequest);
+		verify(binder).bind(HttpRequest.class);
+		verify(abb).to(JJHttpServerRequest.class);
+		verify(binder).bind(HttpResponse.class);
+		verify(abb).to(JJHttpServerResponse.class);
+	}
+	
+	@Test
+	public void testIOExceptionCaught() throws Exception {
+		// IO exceptions are ignored at this point.  can't do anything about them anyway
+		
+		IOException ioe = new IOException();
+		handler.exceptionCaught(ctx, ioe);
+		verifyNoMoreInteractions(logger);
+		verifyNoMoreInteractions(ctx);
+	}
+	
+	@Test
+	public void testExceptionCaught() throws Exception {
+		
+		given(ctx.writeAndFlush(any())).willReturn(channelFuture);
+		
+		Throwable t = new Throwable();
+		handler.exceptionCaught(ctx, t);
+		
+		verify(logger).error(anyString(), eq(t));
+		verifyNoMoreInteractions(logger);
+		
+		verify(ctx).writeAndFlush(responseCaptor.capture());
+		
+		FullHttpResponse response = responseCaptor.getValue();
+		
+		assertThat(response.getStatus(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
+		
+		verify(channelFuture).addListener(futureListenerCaptor.capture());
+		
+		assertThat(futureListenerCaptor.getValue(), is(ChannelFutureListener.CLOSE));
+	}
+	
+	@Test
+	public void testExceptionCaughtCausesException() throws Exception {
+		
+		RuntimeException second = new RuntimeException();
+		
+		given(ctx.writeAndFlush(any())).willThrow(second);
+		
+		Throwable t = new Throwable();
+		handler.exceptionCaught(ctx, t);
+		
+		verify(logger).error(anyString(), eq(t));
+		verify(logger).error(anyString(), eq(second));
+	}
+	
+	@Test
+	public void testBasicOperation() throws Exception { 
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
@@ -152,8 +292,6 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testHandover() throws Exception {
 		
-		JJEngineHttpHandler handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker, logger);
-		
 		//when
 		handler.handleHttpRequest(httpRequest4, httpResponse);
 		executors.executor.runUntilIdle();
@@ -163,5 +301,27 @@ public class JJEngineHttpHandlerTest {
 		verify(servable3).isMatchingRequest(httpRequest4);
 		
 		verify(requestProcessor3).process();
+	}
+	
+	@Test
+	public void testNotFound() throws Exception {
+		
+		handler.handleHttpRequest(httpRequest5, httpResponse);
+		executors.executor.runUntilIdle();
+		
+		verify(httpResponse).sendNotFound();
+	}
+	
+	@Test
+	public void testErrorDuringProcessing() throws Exception {
+		
+		IOException ioe = new IOException();
+		
+		doThrow(ioe).when(requestProcessor1).process();
+		
+		handler.handleHttpRequest(httpRequest1, httpResponse);
+		executors.executor.runUntilIdle();
+		
+		verify(httpResponse).error(ioe);
 	}
 }
