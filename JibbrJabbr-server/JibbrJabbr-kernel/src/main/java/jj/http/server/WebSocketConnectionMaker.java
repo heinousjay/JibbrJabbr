@@ -22,7 +22,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
@@ -128,18 +127,5 @@ class WebSocketConnectionMaker {
 				}
 			}
 		});
-	}
-	
-	private boolean isWebSocketURI(final FullHttpRequest request) {
-		URIMatch uriMatch = new URIMatch(request.getUri());
-		return "socket".equals(uriMatch.extension) && uriMatch.sha1 != null;
-	}
-	
-	boolean isWebSocketRequest(final FullHttpRequest request) {
-		
-		return HttpMethod.GET.equals(request.getMethod()) &&
-			HttpHeaders.Values.UPGRADE.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.CONNECTION)) &&
-			HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.UPGRADE)) &&
-			isWebSocketURI(request);
 	}
 }

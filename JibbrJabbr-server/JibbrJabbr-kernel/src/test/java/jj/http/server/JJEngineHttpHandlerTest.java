@@ -77,6 +77,7 @@ public class JJEngineHttpHandlerTest {
 	@Captor ArgumentCaptor<Module> moduleCaptor;
 	@Captor ArgumentCaptor<FullHttpResponse> responseCaptor;
 	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
+	@Mock WebSocketUriChecker webSocketUriChecker;
 	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
 	MockJJExecutors executors;
@@ -132,7 +133,7 @@ public class JJEngineHttpHandlerTest {
 		resourceTypes.add(servable2);
 		resourceTypes.add(servable3);
 		
-		handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketConnectionMaker, logger);
+		handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketUriChecker, webSocketConnectionMaker, logger);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -161,7 +162,7 @@ public class JJEngineHttpHandlerTest {
 	public void testChannelRead0WebSocketRequest() throws Exception {
 		
 		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		given(webSocketConnectionMaker.isWebSocketRequest(fullHttpRequest)).willReturn(true);
+		given(webSocketUriChecker.isWebSocketRequest(fullHttpRequest)).willReturn(true);
 		
 		handler.channelRead0(ctx, fullHttpRequest);
 		
@@ -184,8 +185,8 @@ public class JJEngineHttpHandlerTest {
 		
 		module.configure(binder);
 		
-		verify(binder).bind(Channel.class);
-		verify(abb).toInstance(channel);
+		verify(binder).bind(ChannelHandlerContext.class);
+		verify(abb).toInstance(ctx);
 		verify(binder).bind(FullHttpRequest.class);
 		verify(abb).toInstance(fullHttpRequest);
 		verify(binder).bind(HttpRequest.class);

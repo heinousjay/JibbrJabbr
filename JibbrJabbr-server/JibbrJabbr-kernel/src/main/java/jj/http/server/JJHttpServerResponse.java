@@ -36,8 +36,8 @@ import jj.logging.AccessLogger;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultFileRegion;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -62,7 +62,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private final JJHttpServerRequest request;
 	
-	private final Channel channel;
+	private final ChannelHandlerContext ctx;
 	
 	private final Logger access;
 	
@@ -74,12 +74,12 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	@Inject
 	JJHttpServerResponse(
 		final JJHttpServerRequest request,
-		final Channel channel,
+		final ChannelHandlerContext ctx,
 		final @AccessLogger Logger access,
 		final ExecutionTrace trace
 	) {
 		this.request = request;
-		this.channel = channel;
+		this.ctx = ctx;
 		this.access = access;
 		this.trace = trace;
 		header(HttpHeaders.Names.SERVER, SERVER_NAME);
@@ -99,8 +99,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	public HttpResponse end() {
 		assertNotCommitted();
 		header(HttpHeaders.Names.DATE, new Date());
-		channel.write(response, maybeClose(channel.newPromise()));
-		channel.flush();
+		ctx.writeAndFlush(response, maybeClose(ctx.newPromise()));
 		markCommitted();
 		trace.end(request, this);
 		return this;
@@ -132,10 +131,9 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	 */
 	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
 		
-		channel.write(response);
-		channel.write(new DefaultFileRegion(resource.fileChannel(), 0, resource.size()));
-		channel.write(LastHttpContent.EMPTY_LAST_CONTENT, maybeClose(channel.newPromise()));
-		channel.flush();
+		ctx.write(response);
+		ctx.write(new DefaultFileRegion(resource.fileChannel(), 0, resource.size()));
+		ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT, maybeClose(ctx.newPromise()));
 		
 		markCommitted();
 		trace.end(request, this);

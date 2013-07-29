@@ -33,7 +33,7 @@ import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -61,7 +61,7 @@ public class JJHttpResponseTest {
 	
 	DefaultFullHttpRequest nettyRequest;
 	JJHttpServerRequest request;
-	@Mock Channel channel;
+	@Mock ChannelHandlerContext ctx;
 	@Mock ChannelPromise p;
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
@@ -70,12 +70,12 @@ public class JJHttpResponseTest {
 	@Before
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		request = new JJHttpServerRequest(nettyRequest, channel);
+		request = new JJHttpServerRequest(nettyRequest, ctx);
 		
-		response = new JJHttpServerResponse(request, channel, logger, trace);
+		response = new JJHttpServerResponse(request, ctx, logger, trace);
 		assertThat(response.charset(), is(UTF_8));
 		
-		given(channel.newPromise()).willReturn(p);
+		given(ctx.newPromise()).willReturn(p);
 	}
 
 	private void testCachedResource(Resource resource) throws IOException {
@@ -118,11 +118,10 @@ public class JJHttpResponseTest {
 	
 	private void verifyInlineResponse() {
 		
-		verify(channel).newPromise();
-		verify(channel).write(any(), eq(p));
-		verify(channel).flush();
+		verify(ctx).newPromise();
+		verify(ctx).writeAndFlush(any(), eq(p));
 		
-		verifyNoMoreInteractions(channel);
+		verifyNoMoreInteractions(ctx);
 	}
 	
 	@Test
@@ -184,14 +183,13 @@ public class JJHttpResponseTest {
 	}
 
 	private void verifyTransferredResponse() {
-		verify(channel).newPromise();
+		verify(ctx).newPromise();
 		// this verifies the response write, and the file region write
-		verify(channel, times(2)).write(any());
+		verify(ctx, times(2)).write(any());
 		// this verifies the LastHttpContent and the promise
-		verify(channel).write(anyObject(), eq(p));
-		verify(channel).flush();
+		verify(ctx).writeAndFlush(anyObject(), eq(p));
 		
-		verifyNoMoreInteractions(channel);
+		verifyNoMoreInteractions(ctx);
 	}
 	
 	@Test

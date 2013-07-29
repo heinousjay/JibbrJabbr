@@ -22,37 +22,26 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
-import jj.script.ScriptBundleFinder;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.google.inject.Injector;
-import com.google.inject.Module;
 
 /**
  * @author jason
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class WebSocketConnectionMakerTest {
+public class WebSocketUriCheckerTest {
 	
 	final String socketUri = "/1234567890123456789012345678901234567890/something.socket";
 	
-	WebSocketConnectionMaker wscm;
-	@Mock Injector parentInjector;
-	@Captor ArgumentCaptor<Module> moduleCaptor;
-	@Mock ScriptBundleFinder scriptBundleFinder;
+	WebSocketUriChecker wsuc;
 	FullHttpRequest request;
 	
 	@Before
 	public void before() {
-		wscm = new WebSocketConnectionMaker(parentInjector, scriptBundleFinder);
+		wsuc = new WebSocketUriChecker();
 	}
 
 	@Test
@@ -62,16 +51,15 @@ public class WebSocketConnectionMakerTest {
 		request.headers()
 			.add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.UPGRADE)
 			.add(HttpHeaders.Names.UPGRADE, HttpHeaders.Values.WEBSOCKET);
-		assertThat(wscm.isWebSocketRequest(request), is(true));
+		assertThat(wsuc.isWebSocketRequest(request), is(true));
 
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/some/uri");
 		request.headers()
 			.add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.UPGRADE)
 			.add(HttpHeaders.Names.UPGRADE, HttpHeaders.Values.WEBSOCKET);
-		assertThat(wscm.isWebSocketRequest(request), is(false));
+		assertThat(wsuc.isWebSocketRequest(request), is(false));
 		
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, socketUri);
-		assertThat(wscm.isWebSocketRequest(request), is(false));
+		assertThat(wsuc.isWebSocketRequest(request), is(false));
 	}
-
 }

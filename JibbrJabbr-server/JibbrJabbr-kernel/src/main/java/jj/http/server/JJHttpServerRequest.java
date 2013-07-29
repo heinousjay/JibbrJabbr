@@ -9,26 +9,25 @@ import jj.DateFormatHelper;
 import jj.http.AbstractHttpRequest;
 import jj.http.HttpRequest;
 
-
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 @Singleton
 class JJHttpServerRequest extends AbstractHttpRequest implements HttpRequest {
 	
-	protected final Channel channel;
+	protected final ChannelHandlerContext ctx;
 	
 	@Inject
-	JJHttpServerRequest(final FullHttpRequest request, final Channel channel) {
+	JJHttpServerRequest(final FullHttpRequest request, final ChannelHandlerContext ctx) {
 		super(request);
-		this.channel = channel;
+		this.ctx = ctx;
 	}
 
 	/**
 	 * @return
 	 */
 	public SocketAddress remoteAddress() {
-		return channel.remoteAddress();
+		return ctx.channel().remoteAddress();
 	}
 
 	/**

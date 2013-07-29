@@ -1,6 +1,5 @@
 package jj.http.server;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -46,6 +45,8 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final WebSocketConnectionMaker webSocketConnectionMaker;
 	
+	private final WebSocketUriChecker webSocketUriChecker;
+	
 	private final Logger logger;
 	
 	@Inject
@@ -54,6 +55,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final Set<Servable> resourceTypes,
 		final Injector parentInjector,
 		final ExecutionTrace trace,
+		final WebSocketUriChecker webSocketUriChecker,
 		final WebSocketConnectionMaker webSocketConnectionMaker,
 		final @EmergencyLogger Logger logger
 	) {
@@ -61,6 +63,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		this.resourceTypes = resourceTypes;
 		this.parentInjector = parentInjector;
 		this.trace = trace;
+		this.webSocketUriChecker = webSocketUriChecker;
 		this.webSocketConnectionMaker = webSocketConnectionMaker;
 		this.logger = logger;
 	}
@@ -77,8 +80,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		
 		return result.toArray(new Servable[result.size()]);
 	}
-	
-	
 
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
@@ -87,10 +88,11 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 			
 			@Override
 			protected void configure() {
-				bind(Channel.class).toInstance(ctx.channel());
+				bind(ChannelHandlerContext.class).toInstance(ctx);
 				bind(FullHttpRequest.class).toInstance(request);
 				bind(HttpRequest.class).to(JJHttpServerRequest.class);
 				bind(HttpResponse.class).to(JJHttpServerResponse.class);
+				//bind(WebSocketConnectionMaker.class);
 			}
 		});
 		
@@ -98,7 +100,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		
 			injector.getInstance(HttpResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
-		} else if (webSocketConnectionMaker.isWebSocketRequest(request)) {
+		} else if (webSocketUriChecker.isWebSocketRequest(request)) {
 		
 			webSocketConnectionMaker.handshakeWebsocket(ctx, request);
 			
