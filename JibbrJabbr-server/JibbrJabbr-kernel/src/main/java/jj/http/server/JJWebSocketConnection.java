@@ -1,7 +1,7 @@
 package jj.http.server;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
@@ -30,7 +30,7 @@ public class JJWebSocketConnection implements DataStore {
 	
 	private final ExecutionTrace trace;
 	
-	private final Channel channel;
+	private final ChannelHandlerContext ctx;
 	
 	private final AssociatedScriptBundle scriptBundle;
 	
@@ -47,15 +47,15 @@ public class JJWebSocketConnection implements DataStore {
 	@Inject
 	JJWebSocketConnection(
 		final ExecutionTrace trace,
-		final Channel channel,
+		final ChannelHandlerContext ctx,
 		final AssociatedScriptBundle scriptBundle
 	) {
 		this.trace = trace;
-		this.channel = channel;
+		this.ctx = ctx;
 		this.scriptBundle = scriptBundle;
 		description = String.format(
 			"WebSocket connection to %s started at %s",
-			channel.remoteAddress(),
+			ctx.channel().remoteAddress(),
 			DateFormatHelper.nowInBasicFormat()
 		);
 	}
@@ -131,11 +131,9 @@ public class JJWebSocketConnection implements DataStore {
 	
 	public void end() {
 		if (!messages.isEmpty()) {
-			markActivity();
 			String message = serialize();
 			trace.send(this, message);
-			channel.write(new TextWebSocketFrame(message));
-			channel.flush();
+			ctx.writeAndFlush(new TextWebSocketFrame(message));
 		}
 	}
 	
@@ -161,6 +159,6 @@ public class JJWebSocketConnection implements DataStore {
 	 * 
 	 */
 	public void close() {
-		channel.write(new CloseWebSocketFrame(1000, null)).addListener(ChannelFutureListener.CLOSE);
+		ctx.writeAndFlush(new CloseWebSocketFrame(1000, null)).addListener(ChannelFutureListener.CLOSE);
 	}
 }

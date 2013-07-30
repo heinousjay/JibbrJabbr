@@ -1,5 +1,7 @@
 package jj.http.server;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Singleton
-public class JJWebSocketHandler {
+class JJWebSocketHandler {
 	
 	private Logger log = LoggerFactory.getLogger(JJWebSocketHandler.class);
 	
@@ -65,7 +67,6 @@ public class JJWebSocketHandler {
 	}
 
 	public void messageReceived(JJWebSocketConnection connection, String msg) {
-		connection.markActivity();
 		trace.message(connection, msg);
 		boolean success = false;
 		
@@ -86,13 +87,13 @@ public class JJWebSocketHandler {
 		}
 	}
 
-	public void messageReceived(JJWebSocketConnection connection, byte[] msg) {
+	public void messageReceived(JJWebSocketConnection connection, ByteBuf byteBuf) {
 		// at some point this is going to become interesting,
 		// thinking about streaming bytes in for uploads...
-		log.info("receiving bytes, length is {}", msg.length);
+		log.info("receiving bytes, length is {}", byteBuf.readableBytes());
 	}
 
-	public void ponged(JJWebSocketConnection connection, byte[] msg) {
+	public void ponged(JJWebSocketConnection connection, ByteBuf byteBuf) {
 		
 	}
 }

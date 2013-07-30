@@ -43,8 +43,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final ExecutionTrace trace;
 	
-	private final WebSocketConnectionMaker webSocketConnectionMaker;
-	
 	private final WebSocketUriChecker webSocketUriChecker;
 	
 	private final Logger logger;
@@ -56,7 +54,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final Injector parentInjector,
 		final ExecutionTrace trace,
 		final WebSocketUriChecker webSocketUriChecker,
-		final WebSocketConnectionMaker webSocketConnectionMaker,
 		final @EmergencyLogger Logger logger
 	) {
 		this.executors = executors;
@@ -64,7 +61,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		this.parentInjector = parentInjector;
 		this.trace = trace;
 		this.webSocketUriChecker = webSocketUriChecker;
-		this.webSocketConnectionMaker = webSocketConnectionMaker;
 		this.logger = logger;
 	}
 	
@@ -92,7 +88,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 				bind(FullHttpRequest.class).toInstance(request);
 				bind(HttpRequest.class).to(JJHttpServerRequest.class);
 				bind(HttpResponse.class).to(JJHttpServerResponse.class);
-				//bind(WebSocketConnectionMaker.class);
+				bind(WebSocketConnectionMaker.class);
 			}
 		});
 		
@@ -101,8 +97,8 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 			injector.getInstance(HttpResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
 		} else if (webSocketUriChecker.isWebSocketRequest(request)) {
-		
-			webSocketConnectionMaker.handshakeWebsocket(ctx, request);
+			
+			injector.getInstance(WebSocketConnectionMaker.class).handshakeWebsocket();
 			
 		} else {
 			

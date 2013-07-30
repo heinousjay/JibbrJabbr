@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
+package jj.http.server;
 
-import jj.http.server.JJWebSocketHandler;
-
+import com.google.inject.AbstractModule;
 
 /**
  * @author jason
  *
  */
-class TestHandlerConnection  {
+class WebSocketFrameHandlerModule extends AbstractModule {
 
-	TestHandlerConnection(JJWebSocketHandler handler) {
-		System.out.println("ha");
+	@Override
+	protected void configure() {
+		// TODO Auto-generated method stub
+		
 	}
+
 }

@@ -16,7 +16,6 @@
 package jj.http.server;
 
 import static jj.http.server.HttpServerChannelInitializer.PipelineStages.*;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -52,16 +51,24 @@ class WebSocketConnectionMaker {
 	
 	private final ScriptBundleFinder scriptBundleFinder;
 	
+	private final ChannelHandlerContext ctx;
+	
+	private final FullHttpRequest request;
+	
 	@Inject
 	WebSocketConnectionMaker(
 		final Injector parentInjector,
-		final ScriptBundleFinder scriptBundleFinder
+		final ScriptBundleFinder scriptBundleFinder,
+		final ChannelHandlerContext ctx,
+		final FullHttpRequest request
 	) {
 		this.parentInjector = parentInjector;
 		this.scriptBundleFinder = scriptBundleFinder;
+		this.ctx = ctx;
+		this.request = request;
 	}
 	
-	void handshakeWebsocket(final ChannelHandlerContext ctx, final FullHttpRequest request) {
+	void handshakeWebsocket() {
 		// this may or may not always be right... but I also don't really care.
 		final String uri = 
 			HTTP_REPLACER.matcher(request.headers().get(HttpHeaders.Names.ORIGIN) + request.getUri()).replaceFirst("ws");
@@ -107,10 +114,8 @@ class WebSocketConnectionMaker {
 							@Override
 							protected void configure() {
 								bind(JJWebSocketConnection.class);
-								bind(Channel.class).toInstance(ctx.channel());
-								bind(FullHttpRequest.class).toInstance(request);
-								bind(WebSocketServerHandshaker.class).toInstance(handshaker);
 								bind(WebSocketFrameHandler.class);
+								bind(WebSocketServerHandshaker.class).toInstance(handshaker);
 								bind(AssociatedScriptBundle.class).toInstance(scriptBundle);
 							}
 						});

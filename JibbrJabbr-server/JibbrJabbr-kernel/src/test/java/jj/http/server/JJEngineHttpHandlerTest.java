@@ -133,15 +133,15 @@ public class JJEngineHttpHandlerTest {
 		resourceTypes.add(servable2);
 		resourceTypes.add(servable3);
 		
-		handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketUriChecker, webSocketConnectionMaker, logger);
+		handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketUriChecker, logger);
 	}
 
 	@SuppressWarnings("unchecked")
 	private void prepareInjectorStubbing() {
 		// little ugly, but sets up an injector that will return our mocks
-		given(ctx.channel()).willReturn(channel);
 		given(injector.getInstance(HttpRequest.class)).willReturn(httpRequest1);
 		given(injector.getInstance(HttpResponse.class)).willReturn(httpResponse);
+		given(injector.getInstance(WebSocketConnectionMaker.class)).willReturn(webSocketConnectionMaker);
 		given(injector.createChildInjector(any(Module.class))).willReturn(injector);
 		given(binder.bind(any(Class.class))).willReturn(abb);
 	}
@@ -164,9 +164,11 @@ public class JJEngineHttpHandlerTest {
 		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		given(webSocketUriChecker.isWebSocketRequest(fullHttpRequest)).willReturn(true);
 		
+		prepareInjectorStubbing();
+		
 		handler.channelRead0(ctx, fullHttpRequest);
 		
-		verify(webSocketConnectionMaker).handshakeWebsocket(ctx, fullHttpRequest);
+		verify(webSocketConnectionMaker).handshakeWebsocket();
 	}
 	
 	@Test
@@ -193,6 +195,7 @@ public class JJEngineHttpHandlerTest {
 		verify(abb).to(JJHttpServerRequest.class);
 		verify(binder).bind(HttpResponse.class);
 		verify(abb).to(JJHttpServerResponse.class);
+		verify(binder).bind(WebSocketConnectionMaker.class);
 	}
 	
 	@Test

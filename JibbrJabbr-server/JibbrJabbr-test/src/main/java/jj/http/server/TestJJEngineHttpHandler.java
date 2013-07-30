@@ -29,7 +29,6 @@ import jj.execution.JJExecutors;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
-import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.Servable;
 import jj.logging.EmergencyLogger;
 
@@ -52,10 +51,9 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 		final Injector injector,
 		final ExecutionTrace trace,
 		final WebSocketUriChecker webSocketUriChecker,
-		final WebSocketConnectionMaker webSocketConnectionMaker,
 		final @EmergencyLogger Logger logger
 	) {
-		super(executors, resourceTypes, injector, trace, webSocketUriChecker, webSocketConnectionMaker, logger);
+		super(executors, resourceTypes, injector, trace, webSocketUriChecker, logger);
 	}
 
 	@Override

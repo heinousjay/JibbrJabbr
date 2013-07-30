@@ -324,6 +324,12 @@ public class JJMessage {
 		return (Unbind)(type == Unbind ? message : null);
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return obj != null && obj instanceof JJMessage && toString().equals(obj.toString());
+	}
+	
+	@Override
 	public String toString() {
 		try {
 			return mapper.writeValueAsString(this);

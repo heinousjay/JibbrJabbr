@@ -31,6 +31,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 /**
+ * coordinates the management of websocket frames.
+ * 
  * @author jason
  *
  */
@@ -77,30 +79,35 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
 		
-		if (frame instanceof CloseWebSocketFrame) {
-			
-			handshaker.close(ctx.channel(), (CloseWebSocketFrame)frame.retain());
+		connection.markActivity();
 		
-		} else if (frame instanceof PingWebSocketFrame) {
-			ctx.writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
-			
-		} else if (frame instanceof PongWebSocketFrame) {
-				
-			handler.ponged(connection, frame.content().array());
-				
-		} else if (frame instanceof TextWebSocketFrame) {
+		// these are in order!
+		
+		if (frame instanceof TextWebSocketFrame) {
 			
 			String text = ((TextWebSocketFrame)frame).text();
 			if ("jj-hi".equals(text)) {
-				connection.markActivity();
 				ctx.writeAndFlush(new TextWebSocketFrame("jj-yo"));
 			} else {
 				handler.messageReceived(connection, text);
 			}
 			
+		} else if (frame instanceof PingWebSocketFrame) {
+			
+			ctx.writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
+			
+		} else if (frame instanceof PongWebSocketFrame) {
+				
+			handler.ponged(connection, frame.content().retain());
+				
 		} else if (frame instanceof BinaryWebSocketFrame) {
 			
-			handler.messageReceived(connection, frame.content().array());
+			handler.messageReceived(connection, frame.content().retain());
+			
+		} else if (frame instanceof CloseWebSocketFrame) {
+			
+			handshaker.close(ctx.channel(), (CloseWebSocketFrame)frame.retain());
+		
 		}
 	}
 }
