@@ -26,11 +26,6 @@ import java.util.List;
 public final class BootstrapClassLoader
 		extends ClassLoader{
 	
-	public interface ClassEmitter {
-		public String name();
-		public byte[] emit();
-	}
-	
 	private static final String JAR_GLOB = "*.jar";
 	private static final String CLASS_FILE_FORMAT = "/%s.class";
 	private static final String RESOURCE_FORMAT = "/%s";
@@ -52,13 +47,6 @@ public final class BootstrapClassLoader
 		// the kernel uses assertions all over the place to ensure the state is
 		// what we expect it to be
 		setDefaultAssertionStatus(true);
-	}
-	
-	public Class<?> loadClass(ClassEmitter emitter) {
-		byte[] bytes = emitter.emit();
-		Class<?> result = defineClass(emitter.name(), bytes, 0, bytes.length);
-		resolveClass(result);
-		return result;
 	}
 	
 	@Override

@@ -21,21 +21,18 @@ import java.nio.file.attribute.UserPrincipal;
 final class BootstrapInstaller {
 	
 	private static final String SYSTEM_BASE_PATH = "system";
-	private static final String LIB_PATH = "lib";
 	private static final String META_INF_PATH = "META-INF";
 	
 	final Path jarPath;
 	final Path basePath;
 	final Path systemPath;
-	final Path libPath;
 	
 	BootstrapInstaller(Path jjJarPath) {
 		
 		try {
 			jarPath = jjJarPath;
 			basePath = jjJarPath.getParent();
-			systemPath = basePath.resolve(SYSTEM_BASE_PATH);
-			libPath = Files.createDirectories(systemPath.resolve(LIB_PATH));
+			systemPath = Files.createDirectories(basePath.resolve(SYSTEM_BASE_PATH));
 			install();
 		} catch (Exception e) {
 			throw new IllegalStateException("Installation failed - jar at [" + jjJarPath + "] is corrupt?", e);
@@ -49,9 +46,7 @@ final class BootstrapInstaller {
 			// basic self installation
 			// - ensure the existence of the system directory and the system/lib
 			// - if necessary, copy the libs from inside the jar to the lib directory
-			//   for now, always do it. properly this would require version checks
-			//   maybe have Maven put the classpath entries in the manifest? that might work
-			//   since all the jars are named with versions
+			//   always copy out internal jars if this is a snapshot build.
 			
 			// whoever owns the installation directory is going to own
 			// everything we make - if we are running as root on unix
@@ -60,15 +55,23 @@ final class BootstrapInstaller {
 			// no one?  would that work?
 			UserPrincipal owner = Files.getOwner(jarPath);
 			
-			Files.setOwner(libPath.getParent(), owner);
-			Files.setOwner(libPath, owner);
+			Files.setOwner(systemPath.getParent(), owner);
+			Files.setOwner(systemPath, owner);
 			
-			try (DirectoryStream<Path> libDir = 
-				Files.newDirectoryStream(myJarFS.getPath(META_INF_PATH, LIB_PATH), "*.jar")) {
-				for (Path jarPath : libDir) {
-					Path jar = libPath.resolve(jarPath.getFileName().toString());
-					Files.copy(jarPath, jar, COPY_ATTRIBUTES, REPLACE_EXISTING);
-					Files.setOwner(jar, owner);
+			try (DirectoryStream<Path> systemDir = 
+				Files.newDirectoryStream(myJarFS.getPath(META_INF_PATH, SYSTEM_BASE_PATH), "*.jar")) {
+				for (Path storedPath : systemDir) {
+					
+					String fileName = storedPath.getFileName().toString();
+					
+					Path installedPath = systemPath.resolve(fileName);
+					
+					if (fileName.startsWith(Version.name) && Version.snapshot) {
+						Files.copy(storedPath, installedPath, COPY_ATTRIBUTES, REPLACE_EXISTING);
+					} else if (!Files.exists(installedPath)){
+						Files.copy(storedPath, installedPath, COPY_ATTRIBUTES);
+					}
+					Files.setOwner(installedPath, owner);
 				}
 			}
 		}

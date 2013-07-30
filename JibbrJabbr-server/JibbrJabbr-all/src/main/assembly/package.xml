@@ -32,7 +32,7 @@
 			</unpackOptions>
 		</dependencySet>
 		<dependencySet>
-			<outputDirectory>/META-INF/lib</outputDirectory>
+			<outputDirectory>/META-INF/system</outputDirectory>
 			<excludes>
 				<exclude>${project.groupId}:JibbrJabbr-bootstrapper</exclude>
 			</excludes>

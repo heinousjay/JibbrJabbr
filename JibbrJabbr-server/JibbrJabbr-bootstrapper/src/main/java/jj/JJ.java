@@ -16,9 +16,12 @@
 package jj;
 
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,7 +149,7 @@ public final class JJ {
 	
 	public JJ() {
 		if (initialized) {
-			throw new IllegalStateException("Already run once.");
+			throw new AssertionError("Already run once.");
 		}
 		
 //		for (String key : System.getProperties().stringPropertyNames()) {
@@ -156,7 +159,7 @@ public final class JJ {
 	
 	private JJ(boolean internal) {
 		if (daemonStart) {
-			throw new IllegalStateException("Main called under a daemon");
+			throw new AssertionError("Main called under a daemon");
 		}
 	}
 	
@@ -198,10 +201,11 @@ public final class JJ {
 		initialized = true;
 		if (myJarPath != null) {
 			
+			System.out.println("Checking installation");
 			installer = new BootstrapInstaller(myJarPath);
 			if (processBootstrapArgs(args) && !daemonStart) return this;
 
-			mainClass = new BootstrapClassLoader(installer.libPath).loadClass(JJ_MAIN_CLASS);
+			mainClass = new BootstrapClassLoader(installer.systemPath).loadClass(JJ_MAIN_CLASS);
 			
 		} else {
 			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
@@ -214,9 +218,32 @@ public final class JJ {
 			
 			return this;
 		}
-		mainInstance = mainClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
+		
+		makeMain(args);
 		
 		return this;
+	}
+	
+	private void makeMain(String[] args) throws Exception {
+		// counts a ticker on the console while it starts
+		final CountDownLatch latch = new CountDownLatch(1);
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				System.out.print("Starting up, one moment please...");
+				try {
+					while(!latch.await(500, MILLISECONDS)) {
+						System.out.print('.');
+					}
+				} catch (InterruptedException e) {}
+				System.out.println();
+			}
+		}).start();
+		
+		mainInstance = mainClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
+		
+		latch.countDown();
 	}
 
 	public void start() throws Exception {
