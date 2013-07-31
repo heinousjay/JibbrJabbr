@@ -10,9 +10,9 @@ import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptStackElement;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jj.engine.EngineAPI;
+import jj.logging.EmergencyLogger;
 
 /**
  * Coordinates processing a continuable script, returning the 
@@ -23,19 +23,23 @@ import jj.engine.EngineAPI;
 @Singleton
 class ContinuationCoordinator {
 	
-	private final Logger log = LoggerFactory.getLogger(ContinuationCoordinator.class);
+	private interface ContinuationExecution extends Runnable {}
+	
+	private final Logger log;
 
-	private final EngineAPI rhinoObjectCreator;
+	private final EngineAPI engineAPI;
 	
 	private final CurrentScriptContext currentScriptContext;
 	
 	@Inject
 	ContinuationCoordinator(
-		final EngineAPI rhinoObjectCreator,
-		final CurrentScriptContext currentScriptContext
+		final EngineAPI engineAPI,
+		final CurrentScriptContext currentScriptContext,
+		final @EmergencyLogger Logger log
 	) {
-		this.rhinoObjectCreator = rhinoObjectCreator;
+		this.engineAPI = engineAPI;
 		this.currentScriptContext = currentScriptContext;
+		this.log = log;
 	}
 	
 	private void log(final RhinoException re) {
@@ -56,28 +60,15 @@ class ContinuationCoordinator {
 		log.error("unexpected problem during script execution {}", scriptBundle);
 		log.error("", e);
 	} 
-	/**
-	 * initial execution of a script
-	 * @param scriptBundle
-	 * @return true if completed, false if continued
-	 */
-	ContinuationState execute(ScriptBundle scriptBundle) {
-		
-		assert (scriptBundle != null) : "cannot execute without a script bundle";
-		
-		log.trace("executing {}", scriptBundle);
-		
-		ScriptableObject.putConstProperty(scriptBundle.scope(), "scriptKey", scriptBundle.sha1());
+	
+	private ContinuationState execute(final ContinuationExecution execution, final ScriptBundle scriptBundle) {
 		try {
-			rhinoObjectCreator.context().executeScriptWithContinuations(
-				scriptBundle.script(), 
-				scriptBundle.scope()
-			);
+			execution.run();
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
 		} catch (RhinoException re) {
 			log(re);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			log(e, scriptBundle);
 		} finally {
 			Context.exit();
@@ -86,60 +77,78 @@ class ContinuationCoordinator {
 	}
 	
 	/**
-	 * function execution within the context of an html associated script
+	 * initial execution of a script, either associated to a document, or a required module
+	 * @param scriptBundle
+	 * @return true if completed, false if continued
+	 */
+	ContinuationState execute(final ScriptBundle scriptBundle) {
+		
+		assert (scriptBundle != null) : "cannot execute without a script bundle";
+		
+		ScriptableObject.putConstProperty(scriptBundle.scope(), "scriptKey", scriptBundle.sha1());
+		
+		return execute(new ContinuationExecution() {
+			
+			@Override
+			public void run() {
+				engineAPI.context().executeScriptWithContinuations(scriptBundle.script(), scriptBundle.scope());
+			}
+		}, scriptBundle);
+	}
+	
+	/**
+	 * function execution within the context of script associated to a document
 	 * @param scriptBundle
 	 * @param functionName
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(AssociatedScriptBundle scriptBundle, Callable function, Object...args) {
+	ContinuationState execute(final AssociatedScriptBundle scriptBundle, final Callable function, final Object...args) {
 		
 		assert (scriptBundle != null) : "cannot execute without a script bundle";
+		
 		if (function != null) {
+
+			return execute(new ContinuationExecution() {
+				
+				@Override
+				public void run() {
+					engineAPI.context().callFunctionWithContinuations(function, scriptBundle.scope(), args);
+				}
+			}, scriptBundle);
 			
-			
-			try {
-				rhinoObjectCreator.context().callFunctionWithContinuations(function, scriptBundle.scope(), args);
-			} catch (ContinuationPending continuation) {
-				return extractContinuationState(continuation);
-			} catch (RhinoException re) {
-				log(re);
-			} catch (Exception e) {
-				log(e, scriptBundle);
-			} finally {
-				Context.exit();
-			}	
-		} else {
-			log.warn("ignoring attempt to execute nonexistent function in context of {}", scriptBundle);
 		}
 		
+		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptBundle);
+		log.error("helpful stacktrace", new Exception());
 		return null;
 	}
 	
 	/**
-	 * Resumes a continuation for the current context.
+	 * Resumes a continuation that was previously saved from an execution in this class
 	 * @param pendingKey
 	 * @param scriptBundle
 	 * @param result
 	 * @return
 	 */
 	ContinuationState resumeContinuation(final String pendingKey, final ScriptBundle scriptBundle, final Object result) {
+		
+		assert (scriptBundle != null) : "cannot resume without a script bundle";
+		
 		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
-		assert (continuation != null) : ("attempting to resume a non-existent continuation at " + pendingKey + " in " + scriptBundle);
-		
-		log.trace("resuming continuation in {} with key {} and result {}", scriptBundle, pendingKey, result);
-		
-		try {
-			rhinoObjectCreator.context().resumeContinuation(continuation.getContinuation(), scriptBundle.scope(), result);
-		} catch (ContinuationPending nextContinuation) {
-			return extractContinuationState(nextContinuation);
-		} catch (RhinoException re) {
-			log(re);
-		} catch (Exception e) {
-			log(e, scriptBundle);
-		} finally {
-			Context.exit();
+		if (continuation != null) {
+
+			return execute(new ContinuationExecution() {
+				
+				@Override
+				public void run() {
+					engineAPI.context().resumeContinuation(continuation.getContinuation(), scriptBundle.scope(), result);
+				}
+			}, scriptBundle);
 		}
+		
+		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptBundle, pendingKey);
+		log.error("helpful stacktrace", new Exception());
 		return null;
 	}
 	
@@ -147,8 +156,7 @@ class ContinuationCoordinator {
 		
 		final ContinuationState continuationState = (ContinuationState)continuation.getApplicationState();
 		assert (continuationState != null) : "continuation captured with no state";
-
-		log.trace("script continuation captured, {}", continuationState);
+		
 		return continuationState;
 	}
 }
