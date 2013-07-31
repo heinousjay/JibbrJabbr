@@ -5,19 +5,24 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 
 import jj.execution.ExecutionTrace;
 import jj.execution.JJExecutors;
@@ -34,6 +39,8 @@ import jj.logging.EmergencyLogger;
  *
  */
 public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+	
+	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
 	
 	private final JJExecutors executors;
 	
@@ -89,6 +96,13 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 				bind(HttpRequest.class).to(JJHttpServerRequest.class);
 				bind(HttpResponse.class).to(JJHttpServerResponse.class);
 				bind(WebSocketConnectionMaker.class);
+				bind(WebSocketFrameHandlerCreator.class);
+			}
+			
+			@Provides
+			protected WebSocketServerHandshakerFactory provideHandshaker() {
+				String uri = HTTP_REPLACER.matcher(request.headers().get(HttpHeaders.Names.ORIGIN) + request.getUri()).replaceFirst("ws");
+				return new WebSocketServerHandshakerFactory(uri, null, false);
 			}
 		});
 		

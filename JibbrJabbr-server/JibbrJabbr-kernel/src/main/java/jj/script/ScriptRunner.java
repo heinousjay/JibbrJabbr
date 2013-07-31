@@ -114,21 +114,22 @@ public class ScriptRunner {
 		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle(); 
 		Callable ready = scriptBundle.getFunction(READY_FUNCTION_KEY);
 		if (ready == null) {
-			// TODO smarter exception here!
-			throw new IllegalStateException("document script is defined with no ready function.  it won't work.");
-		}
-		log.trace("starting ready function execution");
-		
-		context.documentRequestProcessor().startingReadyFunction();
-		final ContinuationState continuationState = 
-				continuationCoordinator.execute(scriptBundle, scriptBundle.getFunction(READY_FUNCTION_KEY));
-		
-		if (continuationState == null) {
-			log.trace("ready function execution - completed, serving document");
+			log.trace("no ready function found for this document. responding.");
 			context.documentRequestProcessor().respond();
 		} else {
-			log.trace("ready function execution - continuation, storing execution state");
-			processContinuationState(continuationState);
+			log.trace("starting ready function execution");
+			
+			context.documentRequestProcessor().startingReadyFunction();
+			final ContinuationState continuationState = 
+					continuationCoordinator.execute(scriptBundle, scriptBundle.getFunction(READY_FUNCTION_KEY));
+			
+			if (continuationState == null) {
+				log.trace("ready function execution - completed, serving document");
+				context.documentRequestProcessor().respond();
+			} else {
+				log.trace("ready function execution - continuation, storing execution state");
+				processContinuationState(continuationState);
+			}
 		}
 	}
 

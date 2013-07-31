@@ -1,6 +1,7 @@
 package jj.http.server.servable.document;
 
 
+import static jj.AnswerWithSelf.ANSWER_WITH_SELF;
 import static jj.execution.MockJJExecutors.ThreadType.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
@@ -18,7 +19,6 @@ import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
 import jj.resource.HtmlResource;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jsoup.Jsoup;
@@ -45,7 +45,7 @@ public class DocumentRequestProcessorTest {
 	@Mock Logger access;
 	
 	@Mock HttpRequest httpRequest;
-	@Mock HttpResponse httpResponse;
+	HttpResponse httpResponse;
 	
 	int filterCalls;
 	
@@ -91,11 +91,8 @@ public class DocumentRequestProcessorTest {
 		
 		when(httpRequest.uri()).thenReturn("/");
 		
-		// convenient to use, anyway
-		given(httpResponse.header(anyString(), anyString())).willReturn(httpResponse);
-		given(httpResponse.header(anyString(), any(Long.class))).willReturn(httpResponse);
-		given(httpResponse.content(any(ByteBuf.class))).willReturn(httpResponse);
-		given(httpResponse.end()).willReturn(httpResponse);
+		// auto-stubbing the builder pattern
+		httpResponse = mock(HttpResponse.class, ANSWER_WITH_SELF);
 	}
 
 	@Test

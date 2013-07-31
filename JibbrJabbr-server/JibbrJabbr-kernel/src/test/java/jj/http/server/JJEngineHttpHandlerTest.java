@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -196,6 +197,9 @@ public class JJEngineHttpHandlerTest {
 		verify(binder).bind(HttpResponse.class);
 		verify(abb).to(JJHttpServerResponse.class);
 		verify(binder).bind(WebSocketConnectionMaker.class);
+		verify(binder).bind(WebSocketFrameHandlerCreator.class);
+		
+		verifyNoMoreInteractions(binder, abb);
 	}
 	
 	@Test

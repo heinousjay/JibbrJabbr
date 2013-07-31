@@ -46,6 +46,7 @@ public class JJWebSocketHandlerTest {
 	@Mock ExecutionTrace trace;
 	@Mock WebSocketMessageProcessor wsmp1;
 	@Mock WebSocketMessageProcessor wsmp2;
+	@Mock WebSocketMessageProcessor wsmp3;
 	Set<WebSocketMessageProcessor> messageProcessors;
 	
 	@Before
@@ -55,9 +56,11 @@ public class JJWebSocketHandlerTest {
 		messageProcessors = new HashSet<>();
 		messageProcessors.add(wsmp1);
 		messageProcessors.add(wsmp2);
+		messageProcessors.add(wsmp3);
 		
 		given(wsmp1.type()).willReturn(Type.Result);
 		given(wsmp2.type()).willReturn(Type.Event);
+		given(wsmp3.type()).willReturn(Type.Element);
 		
 		wsh = new JJWebSocketHandler(executors, trace, messageProcessors);
 	}
@@ -74,6 +77,18 @@ public class JJWebSocketHandlerTest {
 		wsh.closed(connection);
 		verify(trace).end(connection);
 		verify(executors.scriptRunner).submit(connection, HostEvent.clientDisconnected, connection);
+	}
+	
+	@Test
+	public void testGibberishIgnored() {
+		
+		String gibberish = "this is not a message the handler can handle.";
+		wsh.messageReceived(connection, gibberish);
+		
+		verify(trace).message(connection, gibberish);
+		verify(wsmp1, never()).handle(eq(connection), any(JJMessage.class));
+		verify(wsmp2, never()).handle(eq(connection), any(JJMessage.class));
+		verify(wsmp3, never()).handle(eq(connection), any(JJMessage.class));
 	}
 	
 	@Test

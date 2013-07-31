@@ -16,7 +16,6 @@
 package jj.http.server;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.buffer.ByteBuf;
@@ -59,6 +58,7 @@ public class WebSocketFrameHandlerTest {
 	ChannelFuture future;
 	
 	@Mock TextWebSocketFrame textFrame;
+	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
 	@Mock BinaryWebSocketFrame binaryFrame;
 	@Mock PingWebSocketFrame pingFrame;
 	ByteBuf byteBuf;
@@ -101,6 +101,19 @@ public class WebSocketFrameHandlerTest {
 	}
 	
 	@Test
+	public void testHeartbeatTextFrame() throws Exception {
+		
+		given(textFrame.text()).willReturn("jj-hi");
+		
+		wsfh.channelRead0(ctx, textFrame);
+		
+		verify(connection).markActivity();
+		verifyZeroInteractions(handler);
+		verify(ctx).writeAndFlush(textFrameCaptor.capture());
+		assertThat(textFrameCaptor.getValue().text(), is("jj-yo"));
+	}
+	
+	@Test
 	public void testPingFrame() throws Exception {
 		
 		given(pingFrame.content()).willReturn(byteBuf);
@@ -122,6 +135,17 @@ public class WebSocketFrameHandlerTest {
 		
 		verify(connection).markActivity();
 		verify(handler).ponged(connection, byteBuf);
+	}
+	
+	@Test
+	public void testBinaryFrame() throws Exception {
+		
+		given(binaryFrame.content()).willReturn(byteBuf);
+		
+		wsfh.channelRead0(ctx, binaryFrame);
+		
+		verify(connection).markActivity();
+		verify(handler).messageReceived(connection, byteBuf);
 	}
 	
 	@Test

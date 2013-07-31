@@ -43,6 +43,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ import org.slf4j.Logger;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JJHttpResponseTest {
+public class JJHttpServerResponseTest {
 	
 	final String sha1 = "this is not really a sha";
 	final String mime = "this is not really a mime";
@@ -61,7 +62,7 @@ public class JJHttpResponseTest {
 	
 	DefaultFullHttpRequest nettyRequest;
 	JJHttpServerRequest request;
-	@Mock ChannelHandlerContext ctx;
+	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock ChannelPromise p;
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
@@ -218,6 +219,29 @@ public class JJHttpResponseTest {
 		
 		testUncachedNotModifiedResource(givenATransferableResource());
 		verifyInlineResponse();
+	}
+	
+	@Test
+	public void testAccessLog() throws IOException {
+		
+		// given
+		given(logger.isInfoEnabled()).willReturn(true);
+		given(logger.isTraceEnabled()).willReturn(true);
+		String host = "hostname";
+		request.header(HttpHeaders.Names.HOST, host);
+		String location = "home";
+		byte[] bytes = "this is the contents".getBytes(UTF_8);
+		long length = 100L;
+		
+		
+		response.status(HttpResponseStatus.FOUND)
+			.header(HttpHeaders.Names.ACCEPT_RANGES, HttpHeaders.Values.BYTES)
+			.header(HttpHeaders.Names.LOCATION, location)
+			.header(HttpHeaders.Names.CONTENT_LENGTH, length)
+			.content(bytes)
+			.end();
+		
+		
 	}
 
 }

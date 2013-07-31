@@ -13,20 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.execution;
 
-import com.google.inject.AbstractModule;
+import java.lang.Thread.UncaughtExceptionHandler;
 
 /**
  * @author jason
  *
  */
-class WebSocketFrameHandlerModule extends AbstractModule {
+public class MockJJNioEventLoopGroup extends JJNioEventLoopGroup {
 
-	@Override
-	protected void configure() {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * @param uncaughtExceptionHandler
+	 */
+	public MockJJNioEventLoopGroup() {
+		super(new UncaughtExceptionHandler() {
+			
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				e.printStackTrace();
+				throw new AssertionError(e);
+			}
+		});
 	}
 
 }

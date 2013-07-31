@@ -19,14 +19,17 @@ import static jj.http.server.HttpServerChannelInitializer.PipelineStages.*;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.HttpHeaders.Names;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
-
-import java.util.regex.Pattern;
+import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -35,9 +38,6 @@ import jj.script.AssociatedScriptBundle;
 import jj.script.ScriptBundleFinder;
 import jj.uri.URIMatch;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
-
 /**
  * @author jason
  *
@@ -45,9 +45,7 @@ import com.google.inject.Injector;
 @Singleton
 class WebSocketConnectionMaker {
 	
-	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
-	
-	private final Injector parentInjector;
+	private final WebSocketFrameHandlerCreator handlerCreator;
 	
 	private final ScriptBundleFinder scriptBundleFinder;
 	
@@ -55,28 +53,29 @@ class WebSocketConnectionMaker {
 	
 	private final FullHttpRequest request;
 	
+	private final WebSocketServerHandshakerFactory handshakerFactory;
+	
 	@Inject
 	WebSocketConnectionMaker(
-		final Injector parentInjector,
+		final WebSocketFrameHandlerCreator handlerCreator,
 		final ScriptBundleFinder scriptBundleFinder,
 		final ChannelHandlerContext ctx,
-		final FullHttpRequest request
+		final FullHttpRequest request,
+		final WebSocketServerHandshakerFactory handshakerFactory
 	) {
-		this.parentInjector = parentInjector;
+		this.handlerCreator = handlerCreator;
 		this.scriptBundleFinder = scriptBundleFinder;
 		this.ctx = ctx;
 		this.request = request;
+		this.handshakerFactory = handshakerFactory;
 	}
 	
 	void handshakeWebsocket() {
-		// this may or may not always be right... but I also don't really care.
-		final String uri = 
-			HTTP_REPLACER.matcher(request.headers().get(HttpHeaders.Names.ORIGIN) + request.getUri()).replaceFirst("ws");
-		
-		WebSocketServerHandshakerFactory handshakerFactory = new WebSocketServerHandshakerFactory(uri, null, false);
 		final WebSocketServerHandshaker handshaker = handshakerFactory.newHandshaker(request);
 		if (handshaker == null) {
-			WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+			HttpResponse res = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UPGRADE_REQUIRED);
+	        res.headers().set(Names.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue());
+	        ctx.writeAndFlush(res).addListener(ChannelFutureListener.CLOSE);
 		} else {
 			doHandshake(ctx, request, handshaker);
 		}
@@ -98,37 +97,27 @@ class WebSocketConnectionMaker {
 					
 					if (scriptBundle == null) {
 						
-						ctx.channel().writeAndFlush(new TextWebSocketFrame("jj-reload"))
+						ctx.writeAndFlush(new TextWebSocketFrame("jj-reload"))
 							.addListener(new ChannelFutureListener() {
 								
 								@Override
 								public void operationComplete(ChannelFuture future) throws Exception {
-									handshaker.close(ctx.channel(), new CloseWebSocketFrame(1000, null));
+									ctx.writeAndFlush(new CloseWebSocketFrame(1000, null)).addListener(CLOSE);
 								}
 							});
 						
 						
 					} else {
-					
-						Injector injector = parentInjector.createChildInjector(new AbstractModule() {
-							@Override
-							protected void configure() {
-								bind(JJWebSocketConnection.class);
-								bind(WebSocketFrameHandler.class);
-								bind(WebSocketServerHandshaker.class).toInstance(handshaker);
-								bind(AssociatedScriptBundle.class).toInstance(scriptBundle);
-							}
-						});
 						
 						ctx.pipeline().replace(
 							JJEngine.toString(),
 							JJWebsocketHandler.toString(),
-							injector.getInstance(WebSocketFrameHandler.class)
+							handlerCreator.createHandler(handshaker, scriptBundle)
 						);
 					}
 					
 				} else {
-					ctx.channel().close();
+					ctx.close();
 				}
 			}
 		});

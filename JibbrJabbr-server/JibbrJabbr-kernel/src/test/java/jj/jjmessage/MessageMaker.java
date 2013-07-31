@@ -21,7 +21,7 @@ import jj.jjmessage.JJMessage;
 import jj.jjmessage.Result;
 
 /**
- * Helper to create messages for other tests
+ * Helper to create inbound messages for tests
  * 
  * @author jason
  *
