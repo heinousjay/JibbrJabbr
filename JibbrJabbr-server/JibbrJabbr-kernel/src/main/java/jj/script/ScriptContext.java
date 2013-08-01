@@ -23,13 +23,13 @@ class ScriptContext {
 	
 	ScriptContext(
 		final ScriptContext parent,
-		final ModuleScriptBundle moduleScriptBundle,
-		final RequiredModule requiredModule
+		final RequiredModule requiredModule,
+		final ModuleScriptBundle moduleScriptBundle
 	) {
 		this.type = ModuleInitialization;
 		this.parent = parent;
-		this.moduleScriptBundle = moduleScriptBundle;
 		this.requiredModule = requiredModule;
+		this.moduleScriptBundle = moduleScriptBundle;
 
 		this.associatedScriptBundle = null;
 		this.connection = null;
@@ -68,7 +68,7 @@ class ScriptContext {
 		final ScriptContext parent,
 		final DocumentRequestProcessor documentRequestProcessor
 	) {
-		this.type = HttpRequest;
+		this.type = DocumentRequest;
 		this.parent = parent;
 		this.documentRequestProcessor = documentRequestProcessor;
 		this.associatedScriptBundle = documentRequestProcessor.associatedScriptBundle();

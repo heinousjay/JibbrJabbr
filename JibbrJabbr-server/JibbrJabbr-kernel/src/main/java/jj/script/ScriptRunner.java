@@ -258,7 +258,7 @@ public class ScriptRunner {
 			public void run() {
 				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
 				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
-				context.initialize(scriptBundle, requiredModule);
+				context.initialize(requiredModule, scriptBundle);
 				try {
 					moduleInitialExecution(requiredModule);
 				} finally {
@@ -361,7 +361,7 @@ public class ScriptRunner {
 		
 		switch (context.type()) {
 		
-		case HttpRequest:
+		case DocumentRequest:
 			switch (context.documentRequestProcessor().state()) {
 			case InitialExecution:
 				resumeHttpRequestInitialExecution(pendingKey, result);

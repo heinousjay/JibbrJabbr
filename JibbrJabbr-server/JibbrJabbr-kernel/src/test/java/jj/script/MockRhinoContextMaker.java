@@ -15,27 +15,18 @@
  */
 package jj.script;
 
+import static org.mockito.Mockito.mock;
+
 /**
- * 
- * details the manner in which this script context was initialized
- * 
  * @author jason
  *
  */
-public enum ScriptContextType {
+public class MockRhinoContextMaker extends RhinoContextMaker {
 	
-	/** this script context was started by WebSocket activity */
-	WebSocket,
-	
-	/** this script context was started by an HTTP request for a document */
-	DocumentRequest,
-	
-	/** 
-	 * some internal execution started this context, such as a
-	 * timer or an internal event
-	 */
-	InternalExecution,
-	
-	/** this script context was started by module initialization */
-	ModuleInitialization
+	public final RhinoContext context = mock(RhinoContext.class);
+
+	@Override
+	public RhinoContext context() {
+		return context;
+	}
 }

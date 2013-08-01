@@ -111,7 +111,7 @@ public class ScriptRunnerTest {
 
 		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
 		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
-		given(currentScriptContext.type()).willReturn(ScriptContextType.HttpRequest);
+		given(currentScriptContext.type()).willReturn(ScriptContextType.DocumentRequest);
 	}
 	
 	@Test
@@ -388,7 +388,7 @@ public class ScriptRunnerTest {
 		verify(continuationCoordinator).execute(moduleScriptBundle);
 		
 		// given
-		given(currentScriptContext.type()).willReturn(ScriptContextType.HttpRequest);
+		given(currentScriptContext.type()).willReturn(ScriptContextType.DocumentRequest);
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
 		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.Uninitialized);

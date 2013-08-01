@@ -1,15 +1,18 @@
 package jj.script;
 
+import java.io.Closeable;
+
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.DataStore;
 import jj.jjmessage.JJMessage;
+import jj.script.RhinoContextMaker.RhinoContext;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 
 import org.jsoup.nodes.Document;
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Singleton
-public class CurrentScriptContext {
+public class CurrentScriptContext implements Closeable {
 	
 	private final Logger log = LoggerFactory.getLogger(CurrentScriptContext.class);
 	
@@ -30,7 +33,14 @@ public class CurrentScriptContext {
 	 * maintains a per-thread nestable context that the ScriptRunner et al can use
 	 * to keep track of what it's working for
 	 */
-	private static final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
+	private final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
+	
+	private final RhinoContextMaker rhinoContextMaker;
+	
+	@Inject
+	CurrentScriptContext(final RhinoContextMaker rhinoContextMaker) {
+		this.rhinoContextMaker = rhinoContextMaker;
+	}
 	
 	public ScriptContextType type() {
 		return currentContext.get().type;
@@ -74,20 +84,24 @@ public class CurrentScriptContext {
 		return currentContext.get().documentRequestProcessor.document();
 	}
 	
-	public void initialize(final ModuleScriptBundle moduleScriptBundle, final RequiredModule requiredModule) {
-		currentContext.set(new ScriptContext(currentContext.get(), moduleScriptBundle, requiredModule));
+	public ScriptContext initialize(final RequiredModule requiredModule, final ModuleScriptBundle moduleScriptBundle) {
+		currentContext.set(new ScriptContext(currentContext.get(), requiredModule, moduleScriptBundle));
+		return currentContext.get();
 	}
 	
-	public void initialize(final AssociatedScriptBundle associatedScriptBundle) {
+	public ScriptContext initialize(final AssociatedScriptBundle associatedScriptBundle) {
 		currentContext.set(new ScriptContext(currentContext.get(), associatedScriptBundle));
+		return currentContext.get();
 	}
 	
-	public void initialize(final JJWebSocketConnection connection) {
+	public ScriptContext initialize(final JJWebSocketConnection connection) {
 		currentContext.set(new ScriptContext(currentContext.get(), connection));
+		return currentContext.get();
 	}
 	
-	public void initialize(final DocumentRequestProcessor documentRequestProcessor) {
+	public ScriptContext initialize(final DocumentRequestProcessor documentRequestProcessor) {
 		currentContext.set(new ScriptContext(currentContext.get(), documentRequestProcessor));
+		return currentContext.get();
 	}
 	
 	ScriptContext save() {
@@ -102,7 +116,21 @@ public class CurrentScriptContext {
 	private static final String PENDING_KEY = "pending continuation [%s]";
 
 	private Object onBehalfOf() {
-		return connection() != null ? connection() : httpRequest();
+		switch (type()) {
+		case DocumentRequest:
+			return documentRequestProcessor();
+		
+		case InternalExecution:
+			return associatedScriptBundle();
+			
+		case ModuleInitialization:
+			return moduleScriptBundle();
+			
+		case WebSocket:
+			return connection();
+		}
+		
+		throw new AssertionError();
 	}
 
 	private void addPendingContinuation(
@@ -118,7 +146,7 @@ public class CurrentScriptContext {
 			log.error("new pending : {}", continuationPending);
 			throw new AssertionError("more than one continuation pending for a connection.");
 		}
-		
+		log.trace("storing a continuation under key {} for  {}", key, onBehalfOf());
 		dataStore.data(pendingKey, continuationPending);
 	}
 
@@ -177,14 +205,14 @@ public class CurrentScriptContext {
 	 * @return
 	 */
 	private ContinuationPending prepareContinuation(String pendingId, ContinuationState continuationState) {
-		Context context = Context.enter();
-		try {
+		
+		try(RhinoContext context = rhinoContextMaker.context()) {
 			ContinuationPending continuation = context.captureContinuation();
 			continuation.setApplicationState(continuationState);
 			
 			switch(type()) {
-			case HttpRequest:
-				addPendingContinuation(httpRequest(), pendingId, continuation);
+			case DocumentRequest:
+				addPendingContinuation(documentRequestProcessor(), pendingId, continuation);
 				break;
 			
 			case WebSocket:
@@ -202,16 +230,14 @@ public class CurrentScriptContext {
 			return continuation;
 		} catch (Exception e) {
 			throw new AssertionError("could not capture a continuation", e);
-		} finally {
-			Context.exit();
 		}
 	}
 	
 	public ContinuationPending pendingContinuation(String key) {
 		
 		switch(type()) {
-		case HttpRequest:
-			return pendingContinuation(httpRequest(), key);
+		case DocumentRequest:
+			return pendingContinuation(documentRequestProcessor(), key);
 		
 		case WebSocket:
 			return pendingContinuation(connection(), key);
@@ -220,7 +246,7 @@ public class CurrentScriptContext {
 			return pendingContinuation(requiredModule(), key);
 			
 		default:
-			throw new AssertionError("pending continuation request but it doesn't exist");
+			throw new AssertionError("looking for a pending continuation in a context without ");
 		}
 	}
 	
@@ -230,5 +256,10 @@ public class CurrentScriptContext {
 			connection().end();
 		}
 		currentContext.set(currentContext.get().parent);
+	}
+
+	@Override
+	public void close() {
+		end();
 	}
 }
