@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- 
+this is totally normal HTML5, there's no special
+template language.
+-->
+<html>
+	<head>
+		<!-- all of your resources must be UTF-8 -->
+		<meta charset="UTF-8">
+		<!-- 
+		i18n is accomplished by reading in a properties file
+		with the same base name (so /index.properties, in 
+		this case) and looking for the keys as the value of
+		data-i18n attributes in this document, then 
+		substituting the value in as the content. this also
+		works with attributes, example incoming
+		 -->
+		<title data-i18n="title">TITLE GOES HERE</title>
+		<link rel="stylesheet" type="text/css" href="/style.css"/>
+		<link rel="stylesheet" type="text/css" href="/jquery.fancybox.css"/>
+	</head>
+	<body>
+		<div id="container">
+		
+			<h1 id="welcome" data-i18n="welcome">WELCOME MESSAGE GOES HERE</h1>
+			
+			<section id="topic-holder"><div><span data-i18n="topic">TOPIC</span> <span id="topic"></span></div></section>
+			
+			<section id="left-pane">
+				<div id="chatbox"></div>
+				
+				<input id="userInput" type="text" maxlength="100">
+				<button id="button1" data-i18n="button">BUTTON TEXT GOES HERE</button>
+			</section>
+			<section id="right-pane">
+				<div id="users"></div>
+			</section>
+			<div style="clear:both;"></div>
+		</div>
+
+		<script type="text/javascript" src="/jquery.scrollTo-1.4.3.1-min.js"></script>
+		<script type="text/javascript" src="/jquery.color.min.js"></script>
+		<script type="text/javascript" src="/jquery.fancybox.js"></script>
+	</body>
+</html>
