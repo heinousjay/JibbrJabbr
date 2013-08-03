@@ -24,15 +24,12 @@ import jj.engine.RestServiceFunction;
 
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-@RunWith(MockitoJUnitRunner.class)
 public class RestServiceFunctionTest extends AbstractEngineApiTest {
 
 	@Mock RestCallProvider restCallProvider;
@@ -48,6 +45,7 @@ public class RestServiceFunctionTest extends AbstractEngineApiTest {
 		// when
 		basicExecution(host);
 		
+		// then
 		verify(restCallProvider).createRestCall(any(RestCallOptions.class));
 		
 	}

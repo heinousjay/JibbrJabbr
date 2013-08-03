@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

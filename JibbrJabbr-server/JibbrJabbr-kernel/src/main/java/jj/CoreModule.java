@@ -23,10 +23,7 @@ import jj.execution.ExecutionModule;
 import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
-import jj.http.client.ClientModule;
-import jj.http.server.HttpServerModule;
-import jj.http.server.servable.ServableModule;
-import jj.http.server.servable.document.DocumentModule;
+import jj.http.HttpModule;
 
 /**
  * @author jason
@@ -80,14 +77,12 @@ public class CoreModule extends JJModule {
 		bind(String[].class).toInstance(args);
 		
 		// and install our little pieces
-		install(new ClientModule());
-		install(new DocumentModule());
+
 		install(new ExecutionModule());
 		install(new HostApiModule());
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
-		install(new ServableModule());
-		install(new HttpServerModule(isTest));
+		install(new HttpModule(isTest));
 	}
 
 }

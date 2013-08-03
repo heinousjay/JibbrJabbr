@@ -1,6 +1,9 @@
 package jj.http.server;
 
 import jj.JJModule;
+import jj.http.server.servable.ServableModule;
+import jj.http.server.servable.document.DocumentModule;
+
 import com.google.inject.multibindings.Multibinder;
 
 public class HttpServerModule extends JJModule {
@@ -25,5 +28,8 @@ public class HttpServerModule extends JJModule {
 		messageProcessors.addBinding().to(EventMessageProcessor.class);
 		messageProcessors.addBinding().to(ResultMessageProcessor.class);
 		messageProcessors.addBinding().to(ElementMessageProcessor.class);
+		
+		install(new ServableModule());
+		install(new DocumentModule());
 	}
 }

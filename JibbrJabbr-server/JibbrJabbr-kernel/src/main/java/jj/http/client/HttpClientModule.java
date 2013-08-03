@@ -21,7 +21,7 @@ import jj.JJModule;
  * @author jason
  *
  */
-public class ClientModule extends JJModule {
+public class HttpClientModule extends JJModule {
 	
 	@Override
 	protected void configure() {

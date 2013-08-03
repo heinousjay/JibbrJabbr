@@ -16,6 +16,7 @@
 package jj.engine;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -25,12 +26,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import jj.CoreModule;
 import jj.JJ;
 import jj.engine.ContributesScript;
 import jj.engine.EngineAPI;
 import jj.engine.EngineAPIImpl;
 import jj.engine.HostObject;
 
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
@@ -43,9 +47,15 @@ import org.mozilla.javascript.Scriptable;
  * @author jason
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 abstract class AbstractEngineApiTest {
 	
-	private static final String RHINO_UNIT = "rhinoUnitUtil.js";
+	static {
+		// to get the context settings correct
+		mock(CoreModule.class);
+	}
+	
+	private static final String RHINO_UNIT = "jasmine.js";
 	
 	private final String rhinoUnit() throws Exception {
 		Path me = Paths.get(JJ.uri(AbstractEngineApiTest.class));
@@ -59,7 +69,7 @@ abstract class AbstractEngineApiTest {
 		@Override
 		public String script() {
 			try {
-				return rhinoUnit();
+				return "var setTimeout = function(func) {func();};var clearTimeout = function() {};var setInterval = function() {};var clearInterval = function() {};" + rhinoUnit();
 			} catch (Exception e) {
 				throw new AssertionError("tests are not in order!", e);
 			}
