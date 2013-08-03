@@ -25,7 +25,7 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
-public class CssResource implements LoadedResource {
+public class CssResource extends AbstractResource implements LoadedResource {
 	
 	protected final String baseName;
 	protected final Path path;

@@ -35,5 +35,4 @@ public class AssetResource extends AbstractFileResource implements LoadedResourc
 	public ByteBuf bytes() {
 		return byteBuffer;
 	}
-
 }

@@ -79,12 +79,23 @@ class ResourceFinderImpl implements ResourceFinder {
 		log.trace("result {}", result);
 		return result;
 	}
+	
+	@IOThread
+	@Override
+	public  <T extends Resource> T loadResource(
+		final Class<T> resourceClass,
+		String baseName,
+		Object... args
+	) {
+		return loadResource(resourceClass, null, baseName, args);
+	}
 
 	@SuppressWarnings("unchecked")
 	@IOThread
 	@Override
 	public  <T extends Resource> T loadResource(
 		final Class<T> resourceClass,
+		final Resource parent,
 		String baseName,
 		Object... args
 	) {
@@ -107,7 +118,7 @@ class ResourceFinderImpl implements ResourceFinder {
 					// we set up a file watch on it for background reloads
 					resourceWatchService.watch(resource);
 				}
-			} else if (result.needsReplacing()) {
+			} else if (((AbstractResource)result).needsReplacing()) {
 				log.trace("replacing {} at {}", resourceClass.getSimpleName(), path);
 				if (!resourceCache.replace(pathUri, result, resourceCreator.create(baseName, args))){
 					log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceClass.getSimpleName(), path);

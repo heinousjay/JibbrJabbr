@@ -9,7 +9,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
-
 import jj.SHA1Helper;
 import jj.execution.IOThread;
 
@@ -21,7 +20,7 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
-public abstract class AbstractFileResource implements Resource {
+public abstract class AbstractFileResource extends AbstractResource {
 	
 	// beyond this, we don't keep bytes
 	private static final long MAX_IN_MEMORY_SIZE  = 1000000;
@@ -56,6 +55,8 @@ public abstract class AbstractFileResource implements Resource {
 		if (!Files.isRegularFile(path)) {
 			throw new NoSuchFileException(path.toString());
 		}
+		
+		
 		size = Files.size(path);
 		boolean large = size > MAX_IN_MEMORY_SIZE;
 		
@@ -121,8 +122,9 @@ public abstract class AbstractFileResource implements Resource {
 		return new Date(lastModified.toMillis());
 	}
 	
+	@Override
 	@IOThread
-	public boolean needsReplacing() throws IOException {
+	boolean needsReplacing() throws IOException {
 		return lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}
 	

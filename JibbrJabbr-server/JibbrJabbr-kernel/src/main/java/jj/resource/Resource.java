@@ -1,11 +1,8 @@
 package jj.resource;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
-
-import jj.execution.IOThread;
 
 /**
  * represents some resource loaded from the file system
@@ -32,14 +29,6 @@ public interface Resource {
 	 * @return
 	 */
 	Path path();
-	
-	/**
-	 * indicates if the resource is out of date
-	 * @return
-	 * @throws IOException
-	 */
-	@IOThread
-	boolean needsReplacing() throws IOException;
 	
 	/**
 	 * time this resource was last modified
