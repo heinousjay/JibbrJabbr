@@ -24,23 +24,37 @@ import java.net.URI;
 class ResourceCacheKey {
 	
 	private final URI uri;
+	private final String toString;
+	private final int hashCode;
 
-	ResourceCacheKey(final URI uri) {
+	ResourceCacheKey(final Class<? extends Resource> type, final URI uri) {
 		this.uri = uri;
+		this.toString = type.getSimpleName().toString() + " at " + uri.toString();
+		this.hashCode = toString.hashCode();
 	}
 	
 	@Override
 	public int hashCode() {
-		return uri.hashCode();
+		return hashCode;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof ResourceCacheKey && uri.equals(((ResourceCacheKey)obj).uri);
+		return toString.equals(String.valueOf(obj));
+	}
+	
+	/**
+	 * retrieves the uri stored in this cache key.  used in
+	 * ResourceBase in the test hierarchy, but this is strictly
+	 * an implementation detail.  it just makes the resource tests
+	 * easier to write
+	 */
+	URI uri() {
+		return uri;
 	}
 	
 	@Override
 	public String toString() {
-		return uri.toString();
+		return toString;
 	}
 }

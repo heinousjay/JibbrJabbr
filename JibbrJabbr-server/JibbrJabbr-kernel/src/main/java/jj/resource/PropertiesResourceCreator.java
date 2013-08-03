@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 
 @Singleton
-class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
+class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResource> {
 
 	private final Path basePath;
 	
@@ -28,18 +28,14 @@ class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
 		return true;
 	}
 
-	private Path toPath(String baseName, Object... args) {
-		return basePath.resolve(baseName + ".properties");
-	}
-	
 	@Override
-	public ResourceCacheKey cacheKey(String baseName, Object... args) {
-		return new ResourceCacheKey(toPath(baseName).toUri());
+	Path path(String baseName, Object... args) {
+		return basePath.resolve(baseName + ".properties");
 	}
 
 	@Override
 	public PropertiesResource create(String baseName, Object... args) throws IOException {
-		return new PropertiesResource(cacheKey(baseName), toPath(baseName), baseName);
+		return new PropertiesResource(cacheKey(baseName), path(baseName), baseName);
 	}
 
 }

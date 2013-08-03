@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 
 @Singleton
-class HtmlResourceCreator implements ResourceCreator<HtmlResource>{
+class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	
 	private final Path basePath;
 	
@@ -28,17 +28,13 @@ class HtmlResourceCreator implements ResourceCreator<HtmlResource>{
 		return true;
 	}
 	
-	private Path toPath(final String baseName, Object...args) {
+	@Override
+	Path path(final String baseName, Object...args) {
 		return basePath.resolve(baseName + ".html");
 	}
 	
 	@Override
-	public ResourceCacheKey cacheKey(String baseName, Object... args) {
-		return new ResourceCacheKey(toPath(baseName).toUri());
-	}
-	
-	@Override
 	public HtmlResource create(final String baseName, final Object...args) throws IOException {
-		return new HtmlResource(cacheKey(baseName), baseName, toPath(baseName));
+		return new HtmlResource(cacheKey(baseName), baseName, path(baseName));
 	}
 }

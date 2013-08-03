@@ -108,11 +108,10 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 								// it'll get reloaded if it gets recreated
 								// later and someone wants it
 								log.info("removing {}", path);
-								resourceCache.remove(path.toUri());
+								resourceCache.removeAllByUri(path.toUri());
 							
 							} else if (kind == ENTRY_MODIFY) {
-								final Resource resource = resourceCache.get(path.toUri());
-								if (resource != null) {
+								for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
 									// this thread is only to handle the
 									// WatchEvents
 									executors.ioExecutor().submit(
@@ -146,7 +145,10 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 					watchKey.reset();
 				}
 			// this is the quit signal
-			} catch(ClosedWatchServiceException | InterruptedException e) {}
+			} catch (ClosedWatchServiceException | InterruptedException e) {
+			} catch (Exception other) {
+				log.error("Exception thrown in watch service", other);
+			}
 		}
 	};
 }

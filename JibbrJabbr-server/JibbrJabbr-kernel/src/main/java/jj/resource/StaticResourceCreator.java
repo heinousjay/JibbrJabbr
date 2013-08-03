@@ -28,7 +28,7 @@ import jj.configuration.Configuration;
  *
  */
 @Singleton
-class StaticResourceCreator implements ResourceCreator<StaticResource> {
+class StaticResourceCreator extends AbstractResourceCreator<StaticResource> {
 
 	private final Path basePath;
 
@@ -47,18 +47,14 @@ class StaticResourceCreator implements ResourceCreator<StaticResource> {
 		return true;
 	}
 
-	private Path toPath(String baseName, Object... args) {
-		return basePath.resolve(baseName);
-	}
-	
 	@Override
-	public ResourceCacheKey cacheKey(String baseName, Object... args) {
-		return new ResourceCacheKey(toPath(baseName).toUri());
+	Path path(String baseName, Object... args) {
+		return basePath.resolve(baseName);
 	}
 
 	@Override
 	public StaticResource create(String baseName, Object... args) throws IOException {
-		StaticResource s = new StaticResource(cacheKey(baseName), toPath(baseName), baseName);
+		StaticResource s = new StaticResource(cacheKey(baseName), path(baseName), baseName);
 		return s;
 	}
 

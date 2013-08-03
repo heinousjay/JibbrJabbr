@@ -33,9 +33,10 @@ public class ResourceModule extends JJModule {
 	protected void configure() {
 		
 		addServerListenerBinding().to(AssetResourcePreloader.class);
+		addServerListenerBinding().to(ResourceCache.class);
 		
-		Multibinder<ResourceCreator<?>> resourceCreators = 
-			Multibinder.newSetBinder(binder(), new TypeLiteral<ResourceCreator<?>>() {});
+		Multibinder<ResourceCreator<? extends Resource>> resourceCreators = 
+			Multibinder.newSetBinder(binder(), new TypeLiteral<ResourceCreator<? extends Resource>>() {});
 		resourceCreators.addBinding().to(AssetResourceCreator.class);
 		resourceCreators.addBinding().to(CssResourceCreator.class);
 		resourceCreators.addBinding().to(HtmlResourceCreator.class);

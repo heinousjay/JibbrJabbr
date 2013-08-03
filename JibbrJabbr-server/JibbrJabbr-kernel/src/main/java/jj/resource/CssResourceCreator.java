@@ -32,7 +32,7 @@ import jj.configuration.Configuration;
  *
  */
 @Singleton
-class CssResourceCreator implements ResourceCreator<CssResource> {
+class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	
 	private static final Pattern DOT_CSS = Pattern.compile("\\.css$");
 	private static final Pattern DOT_LESS = Pattern.compile("\\.less$");
@@ -66,7 +66,8 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 	/**
 	 * takes one parameter, if Boolean.TRUE then this tries to load a .less file
 	 */
-	private Path toPath(final String baseName, Object... args) {
+	@Override
+	Path path(final String baseName, Object... args) {
 		
 		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
 			return configuration.basePath().resolve(toLess(baseName));
@@ -74,16 +75,11 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 		}
 		return configuration.basePath().resolve(baseName);
 	}
-	
-	@Override
-	public ResourceCacheKey cacheKey(String baseName, Object... args) {
-		return new ResourceCacheKey(toPath(baseName, args).toUri());
-	}
 
 	@Override
 	public CssResource create(String baseName, Object... args) throws IOException {
 		boolean less = args.length == 1 && Boolean.TRUE.equals(args[0]);
-		CssResource resource = new CssResource(cacheKey(baseName, args), baseName, toPath(baseName, args), less);
+		CssResource resource = new CssResource(cacheKey(baseName, args), baseName, path(baseName, args), less);
 		
 		if (less) {
 			String processed = fixUrls(lessProcessor.process(toLess(baseName)));

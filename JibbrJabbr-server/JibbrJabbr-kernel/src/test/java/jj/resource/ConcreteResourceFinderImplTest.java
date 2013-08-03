@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import jj.execution.DevNullExecutionTraceImpl;
 import jj.execution.JJExecutors;
 
 import org.junit.Before;
@@ -28,37 +29,41 @@ public class ConcreteResourceFinderImplTest extends ResourceBase {
 	
 	@Mock JJExecutors executors;
 	
+	ResourceFinderImpl rfi;
+	
 	@Before
 	public void before() throws Exception {
 		
-		resourceCache = new ResourceCache();
-		
 		resourceCreators = new HashSet<>();
+		resourceCreators.add(new AssetResourceCreator());
+		resourceCreators.add(new CssResourceCreator(configuration, new LessProcessor(configuration, new DevNullExecutionTraceImpl())));
 		resourceCreators.add(new HtmlResourceCreator(configuration));
+		resourceCreators.add(new PropertiesResourceCreator(configuration));
 		resourceCreators.add(new ScriptResourceCreator(configuration));
 		resourceCreators.add(new StaticResourceCreator(configuration));
 		
+		resourceCache = new ResourceCache(resourceCreators);
 		
+		rfi = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
+		
+		given(executors.isIOThread()).willReturn(true);
 	}
 	
 	@Test
 	public void test() throws IOException {
 		
-		// given 
-		ResourceFinderImpl toTest = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
-		
 		// when
-		HtmlResource result1 = toTest.findResource(HtmlResource.class, "internal/no-worky");
+		HtmlResource result1 = rfi.findResource(HtmlResource.class, "internal/no-worky");
 		
 		given(executors.isIOThread()).willReturn(true);
-		ScriptResource result2 = toTest.loadResource(ScriptResource.class, "index", ScriptResourceType.Server);
+		ScriptResource result2 = rfi.loadResource(ScriptResource.class, "index", ScriptResourceType.Server);
 		
 		given(executors.isIOThread()).willReturn(false);
-		ScriptResource result3 = toTest.findResource(ScriptResource.class, "index", ScriptResourceType.Server);
+		ScriptResource result3 = rfi.findResource(ScriptResource.class, "index", ScriptResourceType.Server);
 		
 		// loading again with no changes should result in no changes
 		given(executors.isIOThread()).willReturn(true);
-		ScriptResource result4 = toTest.loadResource(ScriptResource.class, "index", ScriptResourceType.Server);
+		ScriptResource result4 = rfi.loadResource(ScriptResource.class, "index", ScriptResourceType.Server);
 		
 		// then
 		assertThat(result1, is(nullValue()));
@@ -77,27 +82,38 @@ public class ConcreteResourceFinderImplTest extends ResourceBase {
 	}
 	
 	@Test
-	public void staticResources() throws IOException {
+	public void testMultipleResourceForOneFile() throws IOException {
+		// this test is to verify that we can load the same file as
+		// multiple resource implementations
 		
-		//given
-		given(executors.isIOThread()).willReturn(true);
-		ResourceFinderImpl toTest = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
 		
+		StaticResource sr = rfi.loadResource(StaticResource.class, "index.html");
+		HtmlResource hr = rfi.loadResource(HtmlResource.class, "index");
+		
+		assertThat(sr, is(notNullValue()));
+		assertThat(hr, is(notNullValue()));
+		
+		// they should be the same thing
+		assertThat(hr.sha1(), is(sr.sha1()));
+	}
+	
+	@Test
+	public void testStaticResources() throws IOException {
 		
 		// when
-		StaticResource resource1 = toTest.findResource(StaticResource.class, "index.html");
+		StaticResource resource1 = rfi.findResource(StaticResource.class, "index.html");
 		
 		// then
 		assertThat(resource1, is(nullValue()));
 		
 		// when
-		StaticResource resource2 = toTest.loadResource(StaticResource.class, "index.html");
+		StaticResource resource2 = rfi.loadResource(StaticResource.class, "index.html");
 		
 		// then
 		assertThat(resource2, is(notNullValue()));
 		
 		// when
-		StaticResource resource3 = toTest.loadResource(StaticResource.class, "index.html");
+		StaticResource resource3 = rfi.loadResource(StaticResource.class, "index.html");
 		
 		// then
 		assertThat(resource3, is(notNullValue()));

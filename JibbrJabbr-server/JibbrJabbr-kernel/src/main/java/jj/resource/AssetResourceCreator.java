@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import jj.JJ;
 
 @Singleton
-class AssetResourceCreator implements ResourceCreator<AssetResource> {
+class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	
 	static final Path myJar = JJ.jarForClass(AssetResourceCreator.class);
 	
@@ -51,7 +51,7 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	}
 
 	@Override
-	public ResourceCacheKey cacheKey(String baseName, Object... args) {
+	Path path(String baseName, Object... args) {
 		Path result = null;
 		if (basePath != null) {
 			result = basePath.resolve(baseName);
@@ -63,7 +63,7 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 				log.error("", e);
 			}
 		}
-		return new ResourceCacheKey(result.toUri());
+		return result;
 	}
 
 	@Override

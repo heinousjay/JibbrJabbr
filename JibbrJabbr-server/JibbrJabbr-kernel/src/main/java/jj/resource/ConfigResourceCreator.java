@@ -24,7 +24,7 @@ import jj.configuration.Configuration;
  * @author jason
  *
  */
-class ConfigResourceCreator implements ResourceCreator<ConfigResource> {
+class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
 	private final Configuration configuration;
 	
@@ -41,19 +41,15 @@ class ConfigResourceCreator implements ResourceCreator<ConfigResource> {
 	public boolean canLoad(String name, Object... args) {
 		return ConfigResource.CONFIG_JS.equals(name);
 	}
-
-	@Override
-	public ResourceCacheKey cacheKey(String baseName, Object...args) {
-		return new ResourceCacheKey(toPath(baseName, args).toUri()); 
-	}
 	
-	private Path toPath(String baseName, Object... args) {
+	@Override
+	Path path(String baseName, Object... args) {
 		return canLoad(baseName) ? configuration.basePath().resolve(baseName) : null;
 	}
 
 	@Override
 	public ConfigResource create(String baseName, Object... args) throws IOException {
-		return new ConfigResource(cacheKey(baseName), toPath(baseName));
+		return new ConfigResource(cacheKey(baseName), path(baseName));
 	}
 
 }

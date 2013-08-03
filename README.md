@@ -4,6 +4,8 @@ JibbrJabbr
 An experiment in Java HTTP server concepts.
 -------------------------------------------
 
+[![Build Status](https://travis-ci.org/heinousjay/JibbrJabbr.png?branch=master)](https://travis-ci.org/heinousjay/JibbrJabbr)
+
 Requires [JDK 7](http://openjdk.java.net/install/index.html)
 and [Maven 3](http://maven.apache.org).
 
@@ -19,9 +21,10 @@ and browse to
 
 There is a partial chat sample living in JibbrJabbr-server/JibbrJabbr-kernel/src/test/resources/ you can use to explore.
 
-The capabilities of the system are currently very limited.  There 
+The capabilities of the system are currently limited.  There 
 is a notion of modules as defined in the commonjs modules spec,
-so you can include a script using require('./whatever')
+so you can include a script using require('./whatever').  You can
+subscribe to events from the server
 
 There is a basic jQuery-like API for document manipulations.
 
@@ -35,4 +38,4 @@ If you try running the tests and you're getting weird errors, make sure you've e
 Owes a spiritual debt to [webbit](https://github.com/webbit/webbit).  Owes debts of a different
 nature to [Guice](https://code.google.com/p/google-guice/), [Netty](https://github.com/netty/netty),
 [Rhino](https://github.com/mozilla/rhino), [jsoup](https://github.com/jhy/jsoup), and 
-[jQuery](https://github.com/jquery/jquery).
+[jQuery](https://github.com/jquery/jquery)

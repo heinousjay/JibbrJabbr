@@ -29,7 +29,7 @@ class ResourceFinderImpl implements ResourceFinder {
 
 	private final ResourceCache resourceCache;
 	
-	private final Map<Class<?>, ResourceCreator<?>> resourceCreators;
+	private final Map<Class<?>, ResourceCreator<? extends Resource>> resourceCreators;
 	
 	private final ResourceWatchService resourceWatchService;
 	
@@ -38,7 +38,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
-		final Set<ResourceCreator<?>> resourceCreators,
+		final Set<ResourceCreator<? extends Resource>> resourceCreators,
 		final ResourceWatchService resourceWatchService,
 		final JJExecutors executors
 	) {
@@ -50,10 +50,10 @@ class ResourceFinderImpl implements ResourceFinder {
 	
 	// goddam, java generics get ugly sometimes
 	private 
-	Map<Class<?>, ResourceCreator<?>> 
-	makeResourceCreatorsMap(final Set<ResourceCreator<?>> resourceCreators) {
-		Map<Class<?>, ResourceCreator<?>> result = new HashMap<>();
-		for (ResourceCreator<?> resourceCreator : resourceCreators) {
+	Map<Class<?>, ResourceCreator<? extends Resource>> 
+	makeResourceCreatorsMap(final Set<ResourceCreator<? extends Resource>> resourceCreators) {
+		Map<Class<?>, ResourceCreator<? extends Resource>> result = new HashMap<>();
+		for (ResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
 			result.put(resourceCreator.type(), resourceCreator);
 		}
 		return Collections.unmodifiableMap(result);
