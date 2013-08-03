@@ -35,7 +35,8 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	protected long size;
 	protected String sha1;
 	
-	CssResource(final String baseName, final Path path, final boolean less) throws IOException {
+	CssResource(final ResourceCacheKey cacheKey, final String baseName, final Path path, final boolean less) throws IOException {
+		super(cacheKey);
 		this.baseName = baseName;
 		this.path = path;
 		this.less = less;

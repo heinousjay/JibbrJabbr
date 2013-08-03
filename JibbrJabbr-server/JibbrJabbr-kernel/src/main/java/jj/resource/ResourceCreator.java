@@ -1,7 +1,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * represents the ability to create a resource given a baseName and
@@ -26,17 +25,12 @@ interface ResourceCreator<T extends Resource> {
 	 * @return
 	 */
 	boolean canLoad(final String name, final Object...args);
-	
+
 	/**
-	 * convert the given basename and set of arguments into a path.  this
-	 * path is used to key the resulting resource in the cache, and is the
-	 * key the file watcher uses to notify of a reload, so your create method
-	 * should be using this method to do its job
-	 * @param baseName
-	 * @param args
+	 * Produce a cache key for given resource
 	 * @return
 	 */
-	Path toPath(final String baseName, final Object...args);
+	ResourceCacheKey cacheKey(final String baseName, final Object...args);
 	
 	/**
 	 * create the given resource

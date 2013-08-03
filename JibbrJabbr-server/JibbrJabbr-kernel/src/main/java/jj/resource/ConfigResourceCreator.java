@@ -43,13 +43,17 @@ class ConfigResourceCreator implements ResourceCreator<ConfigResource> {
 	}
 
 	@Override
-	public Path toPath(String baseName, Object... args) {
+	public ResourceCacheKey cacheKey(String baseName, Object...args) {
+		return new ResourceCacheKey(toPath(baseName, args).toUri()); 
+	}
+	
+	private Path toPath(String baseName, Object... args) {
 		return canLoad(baseName) ? configuration.basePath().resolve(baseName) : null;
 	}
 
 	@Override
 	public ConfigResource create(String baseName, Object... args) throws IOException {
-		return new ConfigResource(toPath(baseName));
+		return new ConfigResource(cacheKey(baseName), toPath(baseName));
 	}
 
 }

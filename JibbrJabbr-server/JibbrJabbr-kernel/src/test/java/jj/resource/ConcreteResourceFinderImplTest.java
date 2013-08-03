@@ -16,9 +16,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 /**
- * this test is fairly concrete and not so much "unit" but
- * as it deals with the file system it needs to be, by
- * necessity.  i don't consider this a problem.
+ * this test is fairly concrete on purpose
  * @author jason
  *
  */

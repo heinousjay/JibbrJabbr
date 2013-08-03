@@ -17,11 +17,12 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	
 	@IOThread
 	ScriptResource(
+		final ResourceCacheKey cacheKey,
 		final ScriptResourceType type,
 		final Path path,
 		final String baseName
 	) throws IOException {
-		super(baseName, path);
+		super(cacheKey, baseName, path);
 		this.type = type;
 		// our URI has our sha1 in it to allow for far-future caching
 		uri = sha1 + "/" + baseName + type.suffix();

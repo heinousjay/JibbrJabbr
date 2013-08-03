@@ -28,13 +28,17 @@ class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 		return true;
 	}
 
-	@Override
-	public Path toPath(String baseName, Object... args) {
+	private Path toPath(String baseName, Object... args) {
 		if (args.length != 1 || !(args[0] instanceof ScriptResourceType)) {
 			throw new IllegalArgumentException("expected ScriptResourceType but got " + (args.length > 0 ? args[0] : " null"));
 		}
 		ScriptResourceType type = (ScriptResourceType)args[0];
 		return basePath.resolve(baseName + type.suffix());
+	}
+	
+	@Override
+	public ResourceCacheKey cacheKey(String baseName, Object... args) {
+		return new ResourceCacheKey(toPath(baseName, args).toUri());
 	}
 
 	@Override
@@ -44,7 +48,7 @@ class ScriptResourceCreator implements ResourceCreator<ScriptResource> {
 		}
 		Path path = toPath(baseName, args);
 		ScriptResourceType type = (ScriptResourceType)args[0];
-		return new ScriptResource(type, path, baseName);
+		return new ScriptResource(cacheKey(baseName, args), type, path, baseName);
 	}
 
 }

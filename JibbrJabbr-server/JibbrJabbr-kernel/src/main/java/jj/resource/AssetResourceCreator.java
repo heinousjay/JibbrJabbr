@@ -51,7 +51,7 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 	}
 
 	@Override
-	public Path toPath(String baseName, Object... args) {
+	public ResourceCacheKey cacheKey(String baseName, Object... args) {
 		Path result = null;
 		if (basePath != null) {
 			result = basePath.resolve(baseName);
@@ -63,16 +63,16 @@ class AssetResourceCreator implements ResourceCreator<AssetResource> {
 				log.error("", e);
 			}
 		}
-		return result;
+		return new ResourceCacheKey(result.toUri());
 	}
 
 	@Override
 	public AssetResource create(String baseName, Object... args) throws IOException {
 		if (myJar == null) {
-			return new AssetResource(basePath, baseName);
+			return new AssetResource(cacheKey(baseName), basePath, baseName);
 		} else {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(myJar, null)) {
-				return new AssetResource(myJarFS.getPath("/jj/assets"), baseName);
+				return new AssetResource(cacheKey(baseName), myJarFS.getPath("/jj/assets"), baseName);
 			}
 		}
 		

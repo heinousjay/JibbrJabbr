@@ -1,9 +1,7 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +73,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		Object... args
 	) {
 		log.trace("checking in resource cache for {} at {}", resourceClass.getSimpleName(), baseName);
-		T result = (T)resourceCache.get(resourceCreators.get(resourceClass).toPath(baseName, args).toUri());
+		T result = (T)resourceCache.get(resourceCreators.get(resourceClass).cacheKey(baseName, args));
 		log.trace("result {}", result);
 		return result;
 	}
@@ -106,30 +104,29 @@ class ResourceFinderImpl implements ResourceFinder {
 		
 		T result = null;
 		
-		Path path = resourceCreator.toPath(baseName, args);
-		URI pathUri = path.toUri();
+		ResourceCacheKey cacheKey = resourceCreator.cacheKey(baseName, args);
 		try {
-			result = resourceClass.cast(resourceCache.get(pathUri));
+			result = resourceClass.cast(resourceCache.get(cacheKey));
 			if (result == null) {
-				log.trace("loading {} at {}", resourceClass.getSimpleName(), path);
+				log.trace("loading {} at {}", resourceClass.getSimpleName(), cacheKey);
 				Resource resource = resourceCreator.create(baseName, args);
-				if (resourceCache.putIfAbsent(pathUri, resource) == null) {
+				if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
 					// if this was the first time we put this in the cache,
 					// we set up a file watch on it for background reloads
 					resourceWatchService.watch(resource);
 				}
 			} else if (((AbstractResource)result).needsReplacing()) {
-				log.trace("replacing {} at {}", resourceClass.getSimpleName(), path);
-				if (!resourceCache.replace(pathUri, result, resourceCreator.create(baseName, args))){
-					log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceClass.getSimpleName(), path);
+				log.trace("replacing {} at {}", resourceClass.getSimpleName(), cacheKey);
+				if (!resourceCache.replace(cacheKey, result, resourceCreator.create(baseName, args))){
+					log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceClass.getSimpleName(), cacheKey);
 				}
 			}
-			result = resourceClass.cast(resourceCache.get(pathUri));
+			result = resourceClass.cast(resourceCache.get(cacheKey));
 		
 		} catch (NullPointerException | NoSuchFileException | ClassCastException cce) {
-			log.trace("couldn't find {} at {}", resourceClass.getSimpleName(), path);
+			log.trace("couldn't find {} at {}", resourceClass.getSimpleName(), cacheKey);
 		} catch (IOException ioe) {
-			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), path);
+			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), cacheKey);
 			log.error("", ioe);
 		}
 		

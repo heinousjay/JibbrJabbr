@@ -1,7 +1,5 @@
 package jj.engine;
 
-import static org.junit.Assert.*;
-
 import java.util.Collections;
 import java.util.Map;
 

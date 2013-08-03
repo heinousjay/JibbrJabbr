@@ -17,8 +17,8 @@ public class AssetResource extends AbstractFileResource implements LoadedResourc
 	public static final String FAVICON_ICO = "favicon.ico";
 	private final String mime;
 	
-	AssetResource(final Path basePath, final String baseName) throws IOException {
-		super(baseName, basePath.resolve(baseName));
+	AssetResource(final ResourceCacheKey cacheKey, final Path basePath, final String baseName) throws IOException {
+		super(cacheKey, baseName, basePath.resolve(baseName));
 		mime = MimeTypes.get(baseName);
 	}
 

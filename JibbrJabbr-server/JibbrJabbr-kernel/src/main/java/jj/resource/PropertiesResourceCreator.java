@@ -28,14 +28,18 @@ class PropertiesResourceCreator implements ResourceCreator<PropertiesResource> {
 		return true;
 	}
 
-	@Override
-	public Path toPath(String baseName, Object... args) {
+	private Path toPath(String baseName, Object... args) {
 		return basePath.resolve(baseName + ".properties");
+	}
+	
+	@Override
+	public ResourceCacheKey cacheKey(String baseName, Object... args) {
+		return new ResourceCacheKey(toPath(baseName).toUri());
 	}
 
 	@Override
 	public PropertiesResource create(String baseName, Object... args) throws IOException {
-		return new PropertiesResource(basePath, baseName);
+		return new PropertiesResource(cacheKey(baseName), toPath(baseName), baseName);
 	}
 
 }

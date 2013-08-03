@@ -47,14 +47,18 @@ class StaticResourceCreator implements ResourceCreator<StaticResource> {
 		return true;
 	}
 
-	@Override
-	public Path toPath(String baseName, Object... args) {
+	private Path toPath(String baseName, Object... args) {
 		return basePath.resolve(baseName);
+	}
+	
+	@Override
+	public ResourceCacheKey cacheKey(String baseName, Object... args) {
+		return new ResourceCacheKey(toPath(baseName).toUri());
 	}
 
 	@Override
 	public StaticResource create(String baseName, Object... args) throws IOException {
-		StaticResource s = new StaticResource(basePath, baseName);
+		StaticResource s = new StaticResource(cacheKey(baseName), toPath(baseName), baseName);
 		return s;
 	}
 

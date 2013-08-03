@@ -28,13 +28,17 @@ class HtmlResourceCreator implements ResourceCreator<HtmlResource>{
 		return true;
 	}
 	
-	@Override
-	public Path toPath(final String name, Object...args) {
-		return basePath.resolve(name + ".html");
+	private Path toPath(final String baseName, Object...args) {
+		return basePath.resolve(baseName + ".html");
 	}
 	
 	@Override
-	public HtmlResource create(final String name, final Object...args) throws IOException {
-		return new HtmlResource(name, toPath(name));
+	public ResourceCacheKey cacheKey(String baseName, Object... args) {
+		return new ResourceCacheKey(toPath(baseName).toUri());
+	}
+	
+	@Override
+	public HtmlResource create(final String baseName, final Object...args) throws IOException {
+		return new HtmlResource(cacheKey(baseName), baseName, toPath(baseName));
 	}
 }

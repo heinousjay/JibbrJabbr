@@ -1,6 +1,5 @@
 package jj.resource;
 
-import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
@@ -15,7 +14,7 @@ import jj.execution.IOExecutor;
  *
  */
 @Singleton
-class ResourceCache extends ConcurrentHashMap<URI, Resource> {
+class ResourceCache extends ConcurrentHashMap<ResourceCacheKey, Resource> {
 
 	private static final long serialVersionUID = 1L;
 

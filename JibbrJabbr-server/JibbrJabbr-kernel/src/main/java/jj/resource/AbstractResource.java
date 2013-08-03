@@ -16,8 +16,8 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
+import jj.execution.IOThread;
 
 /**
  * internal helper for manipulating a resource.  ALL RESOURCES
@@ -28,8 +28,23 @@ import java.util.List;
  */
 abstract class AbstractResource implements Resource {
 	
-	Resource loadedBy;
-	final List<Resource> loaded = new ArrayList<>(0);
+	private final ResourceCacheKey cacheKey;
 	
+	AbstractResource(final ResourceCacheKey cacheKey) {
+		this.cacheKey = cacheKey;
+	}
+	
+	@IOThread
 	abstract boolean needsReplacing() throws IOException;
+	
+	/**
+	 * Register a dependency on another resource.  This means that
+	 * when an update to a dependency is detected, the dependent will
+	 * be rebuilt, even if it has no changes of its own
+	 * 
+	 * @param dependency
+	 */
+	public void dependsOn(Resource dependency) {
+		
+	}
 }

@@ -15,40 +15,32 @@
  */
 package jj.resource;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.io.IOException;
-import java.nio.file.Path;
+import java.net.URI;
 
 /**
  * @author jason
  *
  */
-public class ConfigResource extends AbstractFileResource {
-
-	static final String CONFIG_JS = "config.js";
+class ResourceCacheKey {
 	
-	/**
-	 * @param baseName
-	 * @param path
-	 * @throws IOException
-	 */
-	ConfigResource(final ResourceCacheKey cacheKey, final Path path) throws IOException {
-		super(cacheKey, CONFIG_JS, path);
-	}
+	private final URI uri;
 
-	@Override
-	public String uri() {
-		// no serving this!
-		return "/";
-	}
-
-	@Override
-	public String mime() {
-		return MimeTypes.getDefault();
+	ResourceCacheKey(final URI uri) {
+		this.uri = uri;
 	}
 	
-	public String script() {
-		return byteBuffer.toString(UTF_8);
+	@Override
+	public int hashCode() {
+		return uri.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof ResourceCacheKey && uri.equals(((ResourceCacheKey)obj).uri);
+	}
+	
+	@Override
+	public String toString() {
+		return uri.toString();
 	}
 }

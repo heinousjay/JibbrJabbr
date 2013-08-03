@@ -51,10 +51,11 @@ public class HtmlResource extends AbstractFileResource {
 	 */
 	@IOThread
 	HtmlResource(
+		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path
 	) throws IOException {
-		super(baseName, path);
+		super(cacheKey, baseName, path);
 		this.uri = baseName;
 		String html = byteBuffer.toString(UTF_8);
 		this.document = Parser.htmlParser().parseInput(html, baseName);

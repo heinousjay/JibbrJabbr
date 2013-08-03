@@ -40,22 +40,25 @@ public abstract class AbstractFileResource extends AbstractResource {
 	
 	@IOThread
 	AbstractFileResource(
+		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path
 	) throws IOException {
-		this(baseName, path, true);
+		this(cacheKey, baseName, path, true);
 	}
 	
 	@IOThread
 	AbstractFileResource(
+		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path,
 		final boolean keepBytes
 	) throws IOException {
+		super(cacheKey);
+		
 		if (!Files.isRegularFile(path)) {
 			throw new NoSuchFileException(path.toString());
 		}
-		
 		
 		size = Files.size(path);
 		boolean large = size > MAX_IN_MEMORY_SIZE;

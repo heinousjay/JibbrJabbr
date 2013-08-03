@@ -19,16 +19,16 @@ public interface Resource {
 	String baseName();
 	
 	/**
+	 * The path of the resource
+	 * @return
+	 */
+	Path path();
+	
+	/**
 	 * the arguments used to create this resource
 	 * @return
 	 */
 	Object[] creationArgs();
-	
-	/**
-	 * the path to this resource in the file system
-	 * @return
-	 */
-	Path path();
 	
 	/**
 	 * time this resource was last modified

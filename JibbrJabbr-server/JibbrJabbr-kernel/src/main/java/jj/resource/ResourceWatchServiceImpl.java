@@ -54,7 +54,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 	@Override
 	public void watch(Resource resource) throws IOException {
 		
-		final Path directory = resource.path().getParent();
+		final Path directory = ((AbstractResource)resource).path().getParent();
 		if (directory.getFileSystem() == FileSystems.getDefault()) {
 			log.trace("registering for watch service: {}", resource);
 			directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);

@@ -61,12 +61,12 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 			DOT_LESS.matcher(name).find() :
 			DOT_CSS.matcher(name).find();
 	}
-
+	
+	
 	/**
 	 * takes one parameter, if Boolean.TRUE then this tries to load a .less file
 	 */
-	@Override
-	public Path toPath(final String baseName, Object... args) {
+	private Path toPath(final String baseName, Object... args) {
 		
 		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
 			return configuration.basePath().resolve(toLess(baseName));
@@ -74,11 +74,16 @@ class CssResourceCreator implements ResourceCreator<CssResource> {
 		}
 		return configuration.basePath().resolve(baseName);
 	}
+	
+	@Override
+	public ResourceCacheKey cacheKey(String baseName, Object... args) {
+		return new ResourceCacheKey(toPath(baseName, args).toUri());
+	}
 
 	@Override
 	public CssResource create(String baseName, Object... args) throws IOException {
 		boolean less = args.length == 1 && Boolean.TRUE.equals(args[0]);
-		CssResource resource = new CssResource(baseName, toPath(baseName, args), less);
+		CssResource resource = new CssResource(cacheKey(baseName, args), baseName, toPath(baseName, args), less);
 		
 		if (less) {
 			String processed = fixUrls(lessProcessor.process(toLess(baseName)));

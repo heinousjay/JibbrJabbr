@@ -9,8 +9,6 @@ import java.nio.file.Path;
 import java.util.PropertyResourceBundle;
 
 public class PropertiesResource extends AbstractFileResource {
-
-	private static final String DOT_PROPERTIES = ".properties";
 	
 	private final String uri;
 	private PropertyResourceBundle properties;
@@ -23,13 +21,11 @@ public class PropertiesResource extends AbstractFileResource {
 	 * @throws IOException
 	 */
 	PropertiesResource(
-		final Path basePath,
+		final ResourceCacheKey cacheKey,
+		final Path path,
 		final String baseName
 	) throws IOException {
-		super(baseName, basePath.resolve(baseName + DOT_PROPERTIES));
-		
-		String relative = basePath.relativize(path).toString();
-		relative = relative.substring(0, relative.lastIndexOf(DOT_PROPERTIES));
+		super(cacheKey, baseName, path);
 		
 		uri = sha1 + "/" + baseName;
 		

@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,7 +55,9 @@ public abstract class ResourceBase {
 		final ResourceCreator<T> toTest,
 		Object...args
 	) throws Exception {
-		final Path path = toTest.toPath(baseName, args);
+		
+		// well this is weirdly ugly haha
+		final Path path = Paths.get(URI.create(toTest.cacheKey(baseName, args).toString()));
 		
 		assertTrue(baseName + " does not exist", Files.exists(path));
 		

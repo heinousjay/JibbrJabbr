@@ -35,8 +35,8 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	 * @param path
 	 * @throws IOException
 	 */
-	StaticResource(final Path basePath, final String baseName) throws IOException {
-		super(baseName, basePath.resolve(baseName), false);
+	StaticResource(final ResourceCacheKey cacheKey, final Path path, final String baseName) throws IOException {
+		super(cacheKey, baseName, path, false);
 		mime = MimeTypes.get(baseName);
 	}
 

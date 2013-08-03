@@ -19,10 +19,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.JJ;
 import jj.engine.EngineAPI;
 import jj.resource.ScriptResource;
 
@@ -83,11 +81,10 @@ public class ScriptBundleCreatorTest {
 		final String moduleIdentifier = "helpers/messages";
 		
 		// doesn't really matter what our path is
-		Path path = Paths.get(JJ.uri(ScriptBundleCreatorTest.class));
 		
 		// for now, this serves as a basic test of the module API
 		given(moduleScriptResource.script()).willReturn("var id = module.id; exports.hi = function() { return id };");
-		given(moduleScriptResource.path()).willReturn(path);
+		given(moduleScriptResource.path()).willReturn(Paths.get("/"));
 		
 		// when
 		ModuleScriptBundle result = scriptBundleCreator.createScriptBundle(moduleScriptResource, moduleIdentifier, baseName);
