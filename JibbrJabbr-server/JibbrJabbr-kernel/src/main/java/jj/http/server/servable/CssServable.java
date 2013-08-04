@@ -50,7 +50,6 @@ class CssServable extends Servable {
 		
 		RequestProcessor result = null;
 		if (resource != null && isServablePath(resource.path())) {
-			
 			result = makeStandardRequestProcessor(request, response, match, resource);
 		}
 		return result;

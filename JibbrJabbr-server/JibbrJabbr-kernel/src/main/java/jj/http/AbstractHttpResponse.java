@@ -16,7 +16,6 @@
 package jj.http;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -39,7 +38,7 @@ import jj.resource.TransferableResource;
  * @author jason
  *
  */
-public abstract class AbstractHttpResponse  implements HttpResponse {
+public abstract class AbstractHttpResponse implements HttpResponse {
 
 	public static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
 	protected final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
@@ -150,7 +149,7 @@ public abstract class AbstractHttpResponse  implements HttpResponse {
 	@Override
 	public HttpResponse content(final ByteBuf buffer) {
 		assertNotCommitted();
-		response.content().writeBytes(Unpooled.wrappedBuffer(buffer));
+		response.content().writeBytes(buffer);
 		return this;
 	}
 

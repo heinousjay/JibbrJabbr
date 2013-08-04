@@ -64,14 +64,29 @@ public class ResourceWatchServiceImplTest {
 		
 		given(executors.ioExecutor()).willReturn(Executors.newFixedThreadPool(2));
 	}
+	
+	private void touch(Path path) throws Exception {
+		FileTime originalFileTime = Files.getLastModifiedTime(path);
+		FileTime newFileTime;
+		do {
+			newFileTime = FileTime.fromMillis(System.currentTimeMillis());
+		} while (newFileTime.compareTo(originalFileTime) < 1);
+		
+		Files.setLastModifiedTime(path, newFileTime);
+	}
 
 	@Test
-	public void test() throws Exception {
-		
-		Path indexPath = configuration.basePath().resolve("index.html");
+	public void testReplacement() throws Exception {
 		
 		StaticResourceCreator src = new StaticResourceCreator(configuration);
 		StaticResource sr = src.create("index.html");
+		StaticResource sr1 = src.create("url_replacement_output.txt");
+		StaticResource sr2 = src.create("sox-icon.png");
+		StaticResource sr3 = src.create("replacement.css");
+		StaticResource sr4 = src.create("images/rox-icon.png");
+		sr1.dependsOn(sr2);
+		sr3.dependsOn(sr1);
+		sr4.dependsOn(sr1);
 		HtmlResourceCreator hrc = new HtmlResourceCreator(configuration);
 		HtmlResource hr = hrc.create("index");
 		
@@ -81,8 +96,12 @@ public class ResourceWatchServiceImplTest {
 		
 		resourceCache = new ResourceCache(resourceCreators);
 		
-		resourceCache.put(src.cacheKey("index.html"), sr);
-		resourceCache.put(hrc.cacheKey("index"), hr);
+		resourceCache.put(sr.cacheKey(), sr);
+		resourceCache.put(hr.cacheKey(), hr);
+		resourceCache.put(sr1.cacheKey(), sr1);
+		resourceCache.put(sr2.cacheKey(), sr2);
+		resourceCache.put(sr3.cacheKey(), sr3);
+		resourceCache.put(sr4.cacheKey(), sr4);
 		int fileCount = resourceCache.size();
 		
 		rwsi = new ResourceWatchServiceImpl(resourceCache, resourceFinder, executors);
@@ -92,17 +111,13 @@ public class ResourceWatchServiceImplTest {
 			rwsi.watch(sr);
 			rwsi.watch(hr);
 			
-			FileTime originalFileTime = Files.getLastModifiedTime(indexPath);
-			FileTime newFileTime;
-			do {
-				newFileTime = FileTime.fromMillis(System.currentTimeMillis());
-			} while (newFileTime.compareTo(originalFileTime) < 1);
-			
-			Files.setLastModifiedTime(indexPath, newFileTime);
+			touch(sr.path());
+			touch(sr2.path());
 			
 			// we need to give it 10+ seconds on the mac.  stupid mac
 			// but if there's a watch implementation that notifies quickly,
-			// this should trip immediately
+			// this should trip immediately.  like on the linux build server,
+			// seems to work there.  so i'm happy
 			if (!setUpLatch(fileCount).await(11, SECONDS)) {
 				fail("timed out before notified");
 			}
@@ -113,6 +128,10 @@ public class ResourceWatchServiceImplTest {
 		
 		verify(resourceFinder).loadResource(StaticResource.class, "index.html");
 		verify(resourceFinder).loadResource(HtmlResource.class, "index");
+		verify(resourceFinder).loadResource(StaticResource.class, "url_replacement_output.txt");
+		verify(resourceFinder).loadResource(StaticResource.class, "sox-icon.png");
+		verify(resourceFinder).loadResource(StaticResource.class, "replacement.css");
+		verify(resourceFinder).loadResource(StaticResource.class, "images/rox-icon.png");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -130,5 +149,4 @@ public class ResourceWatchServiceImplTest {
 		});
 		return latch;
 	}
-
 }

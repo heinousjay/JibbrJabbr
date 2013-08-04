@@ -34,7 +34,6 @@ import jj.resource.TransferableResource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
@@ -63,7 +62,6 @@ public class JJHttpServerResponseTest {
 	DefaultFullHttpRequest nettyRequest;
 	JJHttpServerRequest request;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
-	@Mock ChannelPromise p;
 	@Mock Logger logger;
 	@Mock ExecutionTrace trace;
 	JJHttpServerResponse response;
@@ -75,8 +73,6 @@ public class JJHttpServerResponseTest {
 		
 		response = new JJHttpServerResponse(request, ctx, logger, trace);
 		assertThat(response.charset(), is(UTF_8));
-		
-		given(ctx.newPromise()).willReturn(p);
 	}
 
 	private void testCachedResource(Resource resource) throws IOException {
@@ -119,8 +115,7 @@ public class JJHttpServerResponseTest {
 	
 	private void verifyInlineResponse() {
 		
-		verify(ctx).newPromise();
-		verify(ctx).writeAndFlush(any(), eq(p));
+		verify(ctx).writeAndFlush(any());
 		
 		verifyNoMoreInteractions(ctx);
 	}
@@ -184,11 +179,11 @@ public class JJHttpServerResponseTest {
 	}
 
 	private void verifyTransferredResponse() {
-		verify(ctx).newPromise();
+
 		// this verifies the response write, and the file region write
 		verify(ctx, times(2)).write(any());
-		// this verifies the LastHttpContent and the promise
-		verify(ctx).writeAndFlush(anyObject(), eq(p));
+		// this verifies the LastHttpContent
+		verify(ctx).writeAndFlush(anyObject());
 		
 		verifyNoMoreInteractions(ctx);
 	}

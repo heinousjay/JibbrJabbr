@@ -83,6 +83,35 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 			return true;
 		}
 		
+		private void reload(final AbstractResource resource) {
+			executors.ioExecutor().submit(
+				new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
+				
+					@Override
+					protected boolean ignoreInExecutionTrace() {
+						return true;
+					}
+
+					@Override
+					public void run() {
+						log.info("reloading {}", resource);
+						resourceFinder.loadResource(
+							resource.getClass(),
+							resource.baseName(),
+							resource.creationArgs()
+						);
+						for (AbstractResource ar : resource.dependents()) {
+							if (resourceCache.remove(ar.cacheKey(), ar)) {
+								reload(ar);
+							} else {
+								log.info("couldn't trigger reload of {}", ar);
+							}
+						}
+					}
+				}
+			);
+		}
+		
 		@Override
 		public void run() {
 			try {
@@ -114,25 +143,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 								for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
 									// this thread is only to handle the
 									// WatchEvents
-									executors.ioExecutor().submit(
-										new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
-										
-											@Override
-											protected boolean ignoreInExecutionTrace() {
-												return true;
-											}
-		
-											@Override
-											public void run() {
-												log.info("reloading {}",path);
-												resourceFinder.loadResource(
-													resource.getClass(),
-													resource.baseName(),
-													((AbstractResource)resource).creationArgs()
-												);
-											}
-										}
-									);
+									reload((AbstractResource)resource);
 								}
 							}
 						}

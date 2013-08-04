@@ -36,9 +36,9 @@ import jj.logging.AccessLogger;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultFileRegion;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -85,21 +85,21 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		header(HttpHeaders.Names.SERVER, SERVER_NAME);
 	}
 	
-	private ChannelPromise maybeClose(final ChannelPromise p) {
+	private ChannelFuture maybeClose(final ChannelFuture f) {
 		if (!HttpHeaders.isKeepAlive(request.request())) {
-			p.addListener(ChannelFutureListener.CLOSE);
+			f.addListener(ChannelFutureListener.CLOSE);
 		}
 		
 		log();
 		
-		return p;
+		return f;
 	}
 	
 	@Override
 	public HttpResponse end() {
 		assertNotCommitted();
 		header(HttpHeaders.Names.DATE, new Date());
-		ctx.writeAndFlush(response, maybeClose(ctx.newPromise()));
+		maybeClose(ctx.writeAndFlush(response));
 		markCommitted();
 		trace.end(request, this);
 		return this;
@@ -133,7 +133,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		
 		ctx.write(response);
 		ctx.write(new DefaultFileRegion(resource.fileChannel(), 0, resource.size()));
-		ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT, maybeClose(ctx.newPromise()));
+		maybeClose(ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT));
 		
 		markCommitted();
 		trace.end(request, this);

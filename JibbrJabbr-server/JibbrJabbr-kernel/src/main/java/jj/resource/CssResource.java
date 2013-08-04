@@ -32,7 +32,6 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	private final boolean less;
 	protected final FileTime lastModified;
 	protected final ByteBuf byteBuffer;
-	protected long size;
 	private String sha1;
 	private String uri;
 	private String toString;
@@ -42,9 +41,8 @@ public class CssResource extends AbstractResource implements LoadedResource {
 		this.baseName = baseName;
 		this.path = path;
 		this.less = less;
-		this.size = Files.size(this.path);
 		this.lastModified = Files.getLastModifiedTime(this.path);
-		this.byteBuffer = Unpooled.buffer((int)this.size);
+		this.byteBuffer = Unpooled.buffer((int)Files.size(this.path));
 		if (!less) {
 			this.byteBuffer.writeBytes(Files.readAllBytes(this.path));
 			this.sha1 = SHA1Helper.keyFor(this.byteBuffer);
@@ -63,7 +61,7 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	
 	@Override
 	public ByteBuf bytes() {
-		return byteBuffer;
+		return Unpooled.wrappedBuffer(byteBuffer);
 	}
 
 	@Override

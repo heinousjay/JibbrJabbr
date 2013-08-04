@@ -18,6 +18,8 @@ package jj.http.server.servable.document;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.resource.CssResource;
+import jj.resource.Resource;
 import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
 import jj.uri.URIMatch;
@@ -49,16 +51,24 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 		return true;
 	}
 	
+	private Resource loadResource(final URIMatch uriMatch) {
+		Class<? extends Resource> type = "css".equals(uriMatch.extension) ? CssResource.class : StaticResource.class;
+		return resourceFinder.loadResource(type, uriMatch.baseName);
+	}
+	
 	private String massageURL(final String url) {
-		String path = url.substring(URI_PREPEND.length());
-		URIMatch uriMatch = new URIMatch(path);
-		if (!uriMatch.versioned && uriMatch.baseName != null && !"css".equals(uriMatch.extension)) {
-			StaticResource resource = resourceFinder.loadResource(StaticResource.class, uriMatch.baseName);
-			if (resource != null && uriMatch.sha1 == null) {
-				return resource.uri();
+		if (url.startsWith(URI_PREPEND)) {
+			String path = url.substring(URI_PREPEND.length());
+			URIMatch uriMatch = new URIMatch(path);
+			if (!uriMatch.versioned && uriMatch.baseName != null) {
+				Resource resource = loadResource(uriMatch);
+				if (resource != null && uriMatch.sha1 == null) {
+					return resource.uri();
+				}
 			}
+			return path;
 		}
-		return path;
+		return url;
 	}
 
 	@Override

@@ -80,7 +80,7 @@ public class CssResourceCreatorTest extends ResourceBase {
 		given(resourceFinder.loadResource(StaticResource.class, SOX_ICON)).willReturn(sox);
 		
 		// when
-		CssResource css = crc.create("jj/resource/empty.css");
+		CssResource css = crc.create("jj/resource/replacement.css");
 		
 		// then
 		assertThat(css, is(notNullValue()));

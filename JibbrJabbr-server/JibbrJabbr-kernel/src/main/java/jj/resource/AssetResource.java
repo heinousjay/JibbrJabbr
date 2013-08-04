@@ -1,6 +1,7 @@
 package jj.resource;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,6 +34,6 @@ public class AssetResource extends AbstractFileResource implements LoadedResourc
 	}
 	
 	public ByteBuf bytes() {
-		return byteBuffer;
+		return Unpooled.wrappedBuffer(byteBuffer);
 	}
 }

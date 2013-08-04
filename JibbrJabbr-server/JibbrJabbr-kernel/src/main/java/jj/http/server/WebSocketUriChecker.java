@@ -36,10 +36,15 @@ class WebSocketUriChecker {
 		return SOCKET.equals(uriMatch.extension) && uriMatch.sha1 != null;
 	}
 	
+	private boolean isUpgradeRequest(final FullHttpRequest request) {
+		return request.headers().contains(HttpHeaders.Names.CONNECTION) &&
+			request.headers().get(HttpHeaders.Names.CONNECTION).toLowerCase().contains(HttpHeaders.Values.UPGRADE.toLowerCase());
+	}
+	
 	boolean isWebSocketRequest(final FullHttpRequest request) {
 		
 		return HttpMethod.GET.equals(request.getMethod()) &&
-			HttpHeaders.Values.UPGRADE.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.CONNECTION)) &&
+			isUpgradeRequest(request) &&
 			HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.UPGRADE)) &&
 			isWebSocketURI(request);
 	}

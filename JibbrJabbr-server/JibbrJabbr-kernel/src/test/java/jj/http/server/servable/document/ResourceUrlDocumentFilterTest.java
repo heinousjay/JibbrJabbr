@@ -15,16 +15,21 @@
  */
 package jj.http.server.servable.document;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.ResourceUrlDocumentFilter;
+import jj.resource.CssResource;
 import jj.resource.ResourceFinder;
+import jj.resource.StaticResource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -39,20 +44,44 @@ public class ResourceUrlDocumentFilterTest {
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	Document document;
 	
+	@Mock CssResource cssResource;
+	@Mock StaticResource staticResource;
+	
+	@InjectMocks ResourceUrlDocumentFilter filter;
+	
 	@Before
 	public void before() {
-		document = Jsoup.parse("<a href='style.css'>style</a>");
+		document = Jsoup.parse("<a href='style.css'><img src='style.gif'/></a>");
 		given(documentRequestProcessor.document()).willReturn(document);
-		
 	}
 	
 	@Test
 	public void test() {
-		ResourceUrlDocumentFilter underTest = new ResourceUrlDocumentFilter(resourceFinder);
+		
+		String uri1 = "uri1";
+		String uri2 = "uri2";
+		
+		given(resourceFinder.loadResource(CssResource.class, "style.css")).willReturn(cssResource);
+		given(cssResource.uri()).willReturn(uri1);
+		given(resourceFinder.loadResource(StaticResource.class, "style.gif")).willReturn(staticResource);
+		given(staticResource.uri()).willReturn(uri2);
+		
 		given(documentRequestProcessor.uri()).willReturn("/");
-		underTest.filter(documentRequestProcessor);
-		given(documentRequestProcessor.uri()).willReturn("/files");
-		underTest.filter(documentRequestProcessor);
+		filter.filter(documentRequestProcessor);
+		
+		assertThat(document.select("a").attr("href"), is(uri1));
+		assertThat(document.select("img").attr("src"), is(uri2));
+	}
+	
+	@Test
+	public void test2() {
+		
+		document.select("img").attr("src", "../style.gif");
+		given(documentRequestProcessor.uri()).willReturn("/files/");
+		filter.filter(documentRequestProcessor);
+		
+		assertThat(document.select("a").attr("href"), is("/files/style.css"));
+		assertThat(document.select("img").attr("src"), is("/style.gif"));
 	}
 	
 }

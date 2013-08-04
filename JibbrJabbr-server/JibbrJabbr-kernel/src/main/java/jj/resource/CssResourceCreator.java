@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import jj.SHA1Helper;
 import jj.configuration.Configuration;
 import jj.logging.EmergencyLogger;
+import jj.uri.URIMatch;
 
 /**
  * @author jason
@@ -148,7 +149,11 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 				
 				if (dependency != null) {
 					resource.dependsOn(dependency);
-					replacement = dependency.uri();
+					URIMatch uriMatch = new URIMatch("/" + baseName);
+					if (!uriMatch.versioned) {
+						// we only want to replace uris that weren't already versioned
+						replacement = dependency.uri();
+					}
 				} else {
 					logger.warn("CSS file {} references {} (as {}), which does not exist", resource.baseName(), baseName, matcher.group());
 				}

@@ -3,6 +3,7 @@ package jj.resource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -49,7 +50,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	
 	@Override
 	public ByteBuf bytes() {
-		return byteBuffer;
+		return Unpooled.wrappedBuffer(byteBuffer);
 	}
 	
 	@Override

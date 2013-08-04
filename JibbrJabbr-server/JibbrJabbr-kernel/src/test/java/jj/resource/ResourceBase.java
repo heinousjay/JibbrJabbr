@@ -19,6 +19,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,6 +76,15 @@ public abstract class ResourceBase {
 		
 		if (!(resource1 instanceof CssResource)) { 
 			assertThat(resource1.sha1(), is(SHA1Helper.keyFor(bytes))); 
+		}
+		
+		if (resource1 instanceof LoadedResource) {
+			ByteBuf buf = ((LoadedResource)resource1).bytes();
+			buf.readBytes(Unpooled.buffer(buf.readableBytes()));
+			// this test is to ensure that all buffers are wrapped before returning
+			// since this has caught me out twice now
+			assertThat(((LoadedResource)resource1).bytes().readableBytes(), greaterThan(0));
+			
 		}
 		
 		return resource1;
