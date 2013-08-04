@@ -10,7 +10,6 @@ import java.util.PropertyResourceBundle;
 
 public class PropertiesResource extends AbstractFileResource {
 	
-	private final String uri;
 	private PropertyResourceBundle properties;
 	
 	/**
@@ -27,8 +26,6 @@ public class PropertiesResource extends AbstractFileResource {
 	) throws IOException {
 		super(cacheKey, baseName, path);
 		
-		uri = sha1 + "/" + baseName;
-		
 		properties =
 			new PropertyResourceBundle(new StringReader(byteBuffer.toString(UTF_8)));
 	}
@@ -37,11 +34,6 @@ public class PropertiesResource extends AbstractFileResource {
 		return properties;
 	}
 	
-	@Override
-	public String uri() {
-		return uri;
-	}
-
 	@Override
 	public String mime() {
 		return "text/plain; charset=UTF-8";

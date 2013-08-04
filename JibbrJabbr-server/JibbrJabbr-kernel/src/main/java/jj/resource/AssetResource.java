@@ -24,11 +24,6 @@ public class AssetResource extends AbstractFileResource implements LoadedResourc
 	}
 
 	@Override
-	public String uri() {
-		return "/" + sha1 + "/" + baseName;
-	}
-
-	@Override
 	public String mime() {
 		return mime;
 	}

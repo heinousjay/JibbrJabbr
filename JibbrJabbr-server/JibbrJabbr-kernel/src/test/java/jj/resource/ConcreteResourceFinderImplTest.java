@@ -6,6 +6,10 @@ import static org.mockito.BDDMockito.*;
 
 
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -126,6 +130,18 @@ public class ConcreteResourceFinderImplTest extends ResourceBase {
 		assertThat(resource2, is(sameInstance(resource3)));
 		assertThat(resource2.size(), is(resource3.size()));
 		
+	}
+	
+	@Test
+	public void loadBigFile() throws IOException {
+		String fileName = "big.fella";
+		Path bigFella = configuration.basePath().resolve(fileName);
+		try (SeekableByteChannel channel = Files.newByteChannel(bigFella, StandardOpenOption.CREATE_NEW, StandardOpenOption.SPARSE)) {
+			
+		} finally {
+			Files.deleteIfExists(bigFella);
+			
+		}
 	}
 
 }

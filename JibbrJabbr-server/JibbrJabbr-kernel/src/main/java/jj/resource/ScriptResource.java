@@ -13,7 +13,6 @@ import jj.execution.IOThread;
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	
 	private final ScriptResourceType type;
-	private final String uri;
 	private final String script;
 	
 	@IOThread
@@ -25,8 +24,6 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	) throws IOException {
 		super(cacheKey, baseName, path);
 		this.type = type;
-		// our URI has our sha1 in it to allow for far-future caching
-		uri = sha1 + "/" + baseName + type.suffix();
 		script = byteBuffer.toString(UTF_8);
 	}
 	
@@ -36,7 +33,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	
 	@Override
 	public String uri() {
-		return uri;
+		return super.uri() + type.suffix();
 	}
 	
 	public String script() {

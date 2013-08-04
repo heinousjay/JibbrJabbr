@@ -24,19 +24,19 @@ public abstract class AbstractFileResource extends AbstractResource {
 	
 	// beyond this, we don't keep bytes
 	private static final long MAX_IN_MEMORY_SIZE  = 1000000;
-	// beyond this, we don't read the SHA
+	// beyond this, we don't read the SHA inside here
 	private static final long MAX_READ_AND_DIGEST = 10000000;
 
 	private static final Object[] EMPTY_ARGS = {};
 	
 	protected final String baseName;
-	protected final String sha1;
 	protected final Path path;
 	protected final FileTime lastModified;
 	protected final long size;
 	protected final ByteBuf byteBuffer;
 	
-	private final String toString;
+	private String toString;
+	private String sha1;
 	
 	@IOThread
 	AbstractFileResource(
@@ -96,6 +96,17 @@ public abstract class AbstractFileResource extends AbstractResource {
 	}
 
 	@Override
+	public String uri() {
+		String sha = sha1();
+		StringBuilder sb = new StringBuilder("/");
+		if (sha != null) {
+			sb.append(sha).append("/");
+		}
+		
+		return sb.append(baseName).toString();
+	}
+
+	@Override
 	public String sha1() {
 		return sha1;
 	}
@@ -130,8 +141,6 @@ public abstract class AbstractFileResource extends AbstractResource {
 	Object[] creationArgs() {
 		return EMPTY_ARGS;
 	}
-	
-	public abstract String mime();
 	
 	@Override
 	public final String toString() {

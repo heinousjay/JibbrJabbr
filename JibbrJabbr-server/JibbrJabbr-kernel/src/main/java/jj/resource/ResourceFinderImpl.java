@@ -83,23 +83,12 @@ class ResourceFinderImpl implements ResourceFinder {
 		log.trace("result {}", result);
 		return result;
 	}
-	
-	@IOThread
-	@Override
-	public  <T extends Resource> T loadResource(
-		final Class<T> resourceClass,
-		String baseName,
-		Object... args
-	) {
-		return loadResource(resourceClass, null, baseName, args);
-	}
 
 	@SuppressWarnings("unchecked")
 	@IOThread
 	@Override
 	public  <T extends Resource> T loadResource(
 		final Class<T> resourceClass,
-		final Resource parent,
 		String baseName,
 		Object... args
 	) {
@@ -114,18 +103,9 @@ class ResourceFinderImpl implements ResourceFinder {
 		try {
 			result = resourceClass.cast(resourceCache.get(cacheKey));
 			if (result == null) {
-				log.trace("loading {} at {}", resourceClass.getSimpleName(), cacheKey);
-				Resource resource = resourceCreator.create(baseName, args);
-				if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
-					// if this was the first time we put this in the cache,
-					// we set up a file watch on it for background reloads
-					resourceWatchService.watch(resource);
-				}
+				createResource(baseName, resourceCreator, cacheKey, args);
 			} else if (((AbstractResource)result).needsReplacing()) {
-				log.trace("replacing {} at {}", resourceClass.getSimpleName(), cacheKey);
-				if (!resourceCache.replace(cacheKey, result, resourceCreator.create(baseName, args))){
-					log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceClass.getSimpleName(), cacheKey);
-				}
+				replaceResource(baseName, resourceCreator, result, cacheKey, args);
 			}
 			result = resourceClass.cast(resourceCache.get(cacheKey));
 		
@@ -137,5 +117,38 @@ class ResourceFinderImpl implements ResourceFinder {
 		}
 		
 		return result;
+	}
+
+	private <T extends Resource> void replaceResource(
+		String baseName,
+		ResourceCreator<T> resourceCreator,
+		T result,
+		ResourceCacheKey cacheKey,
+		Object... args
+	) throws IOException {
+		
+		log.trace("replacing {} at {}", resourceCreator.type().getSimpleName(), cacheKey);
+		
+		if (!resourceCache.replace(cacheKey, result, resourceCreator.create(baseName, args))){
+			log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceCreator.type().getSimpleName(), cacheKey);
+		}
+	}
+
+	private <T extends Resource> void createResource(
+		String baseName,
+		ResourceCreator<T> resourceCreator,
+		ResourceCacheKey cacheKey,
+		Object... args
+	) throws IOException {
+		
+		log.trace("loading {} at {}", resourceCreator.type().getSimpleName(), cacheKey);
+		
+		Resource resource = resourceCreator.create(baseName, args);
+		if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
+			// if this was the first time we put this in the cache,
+			// we set up a file watch on it for background reloads
+			resourceWatchService.watch(resource);
+			
+		}
 	}
 }

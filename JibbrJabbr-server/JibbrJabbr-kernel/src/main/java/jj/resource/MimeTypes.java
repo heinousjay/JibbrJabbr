@@ -39,6 +39,7 @@ public class MimeTypes {
 		mimeTypesMaker.put("js", "application/javascript; charset=UTF-8");
 		mimeTypesMaker.put("css", "text/css; charset=UTF-8");
 		mimeTypesMaker.put("txt", "text/plain; charset=UTF-8");
+		mimeTypesMaker.put("sha1", "text/plain; charset=UTF-8");
 		mimeTypesMaker.put("csv", "text/csv; charset=UTF-8");
 		mimeTypesMaker.put("xml", "text/xml; charset=UTF-8");
 		mimeTypesMaker.put("xhtml", "application/xhtml+xml; charset=UTF-8");
