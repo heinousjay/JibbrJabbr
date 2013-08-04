@@ -46,12 +46,13 @@ public class ResourceUrlDocumentFilterTest {
 	
 	@Mock CssResource cssResource;
 	@Mock StaticResource staticResource;
+	@Mock StaticResource staticResource2;
 	
 	@InjectMocks ResourceUrlDocumentFilter filter;
 	
 	@Before
 	public void before() {
-		document = Jsoup.parse("<a href='style.css'><img src='style.gif'/></a>");
+		document = Jsoup.parse("<a href='style.css'><img src='style.gif'/></a><link href='thing-1.2.0.gif'/>");
 		given(documentRequestProcessor.document()).willReturn(document);
 	}
 	
@@ -65,12 +66,15 @@ public class ResourceUrlDocumentFilterTest {
 		given(cssResource.uri()).willReturn(uri1);
 		given(resourceFinder.loadResource(StaticResource.class, "style.gif")).willReturn(staticResource);
 		given(staticResource.uri()).willReturn(uri2);
+		given(resourceFinder.loadResource(StaticResource.class, "thing-1.2.0.gif")).willReturn(staticResource2);
+		given(staticResource2.uri()).willReturn("gibberish");
 		
 		given(documentRequestProcessor.uri()).willReturn("/");
 		filter.filter(documentRequestProcessor);
 		
 		assertThat(document.select("a").attr("href"), is(uri1));
 		assertThat(document.select("img").attr("src"), is(uri2));
+		assertThat(document.select("link").attr("href"), is("/thing-1.2.0.gif"));
 	}
 	
 	@Test
@@ -82,6 +86,7 @@ public class ResourceUrlDocumentFilterTest {
 		
 		assertThat(document.select("a").attr("href"), is("/files/style.css"));
 		assertThat(document.select("img").attr("src"), is("/style.gif"));
+		assertThat(document.select("link").attr("href"), is("/files/thing-1.2.0.gif"));
 	}
 	
 }

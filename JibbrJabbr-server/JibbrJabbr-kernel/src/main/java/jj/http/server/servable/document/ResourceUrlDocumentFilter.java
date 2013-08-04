@@ -52,6 +52,8 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	}
 	
 	private Resource loadResource(final URIMatch uriMatch) {
+		// TODO account for less resources
+		// the loading logic will need to be centralized somewhere, it's going to get spread around
 		Class<? extends Resource> type = "css".equals(uriMatch.extension) ? CssResource.class : StaticResource.class;
 		return resourceFinder.loadResource(type, uriMatch.baseName);
 	}
