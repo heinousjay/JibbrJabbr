@@ -16,6 +16,9 @@
 package jj.resource;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import jj.execution.IOThread;
 
@@ -29,6 +32,7 @@ import jj.execution.IOThread;
 abstract class AbstractResource implements Resource {
 	
 	private final ResourceCacheKey cacheKey;
+	private final Set<AbstractResource> dependents = new HashSet<>();
 	
 	AbstractResource(final ResourceCacheKey cacheKey) {
 		this.cacheKey = cacheKey;
@@ -38,13 +42,21 @@ abstract class AbstractResource implements Resource {
 	abstract boolean needsReplacing() throws IOException;
 	
 	/**
-	 * Register a dependency on another resource.  This means that
-	 * when an update to a dependency is detected, the dependent will
-	 * be rebuilt, even if it has no changes of its own
-	 * 
-	 * @param dependency
+	 * the arguments used to create this resource
+	 * @return
 	 */
+	abstract Object[] creationArgs();
+	
+	@Override
 	public void dependsOn(Resource dependency) {
-		
+		((AbstractResource)dependency).dependents.add(this);
+	}
+	
+	Set<AbstractResource> dependents() {
+		return Collections.unmodifiableSet(dependents);
+	}
+	
+	ResourceCacheKey cacheKey() {
+		return cacheKey;
 	}
 }

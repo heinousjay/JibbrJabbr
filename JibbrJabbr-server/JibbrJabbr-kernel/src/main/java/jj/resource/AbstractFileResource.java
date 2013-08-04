@@ -91,11 +91,6 @@ public abstract class AbstractFileResource extends AbstractResource {
 	}
 	
 	@Override
-	public Object[] creationArgs() {
-		return EMPTY_ARGS;
-	}
-	
-	@Override
 	public String baseName() {
 		return baseName;
 	}
@@ -129,6 +124,11 @@ public abstract class AbstractFileResource extends AbstractResource {
 	@IOThread
 	boolean needsReplacing() throws IOException {
 		return lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
+	}
+	
+	@Override
+	Object[] creationArgs() {
+		return EMPTY_ARGS;
 	}
 	
 	public abstract String mime();

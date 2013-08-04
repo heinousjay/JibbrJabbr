@@ -34,11 +34,6 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	}
 	
 	@Override
-	public Object[] creationArgs() {
-		return new Object[] { type };
-	};
-	
-	@Override
 	public String uri() {
 		return uri;
 	}
@@ -56,4 +51,9 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	public ByteBuf bytes() {
 		return byteBuffer;
 	}
+	
+	@Override
+	Object[] creationArgs() {
+		return new Object[] { type };
+	};
 }

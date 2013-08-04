@@ -62,7 +62,13 @@ class ResourceFinderImpl implements ResourceFinder {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Resource> T findResource(T resource) {
-		return resource == null ? null : (T)findResource(resource.getClass(), resource.baseName(), resource.creationArgs());
+		return resource == null ? 
+			null : 
+			(T)findResource(
+				resource.getClass(),
+				resource.baseName(),
+				((AbstractResource)resource).creationArgs()
+			);
 	}
 
 	@SuppressWarnings("unchecked")

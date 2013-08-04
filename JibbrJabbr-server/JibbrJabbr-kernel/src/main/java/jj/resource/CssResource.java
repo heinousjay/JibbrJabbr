@@ -33,7 +33,9 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	protected final FileTime lastModified;
 	protected final ByteBuf byteBuffer;
 	protected long size;
-	protected String sha1;
+	private String sha1;
+	private String uri;
+	private String toString;
 	
 	CssResource(final ResourceCacheKey cacheKey, final String baseName, final Path path, final boolean less) throws IOException {
 		super(cacheKey);
@@ -51,7 +53,7 @@ public class CssResource extends AbstractResource implements LoadedResource {
 
 	@Override
 	public String uri() {
-		return sha1() + "/" + baseName;
+		return uri;
 	}
 
 	@Override
@@ -72,11 +74,6 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	private static final Object[] LESS_ARG = new Object[] {Boolean.TRUE};
 
 	@Override
-	public Object[] creationArgs() {
-		return less ? LESS_ARG : null;
-	}
-
-	@Override
 	public Path path() {
 		return path;
 	}
@@ -90,11 +87,6 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	public Date lastModifiedDate() {
 		return new Date(lastModified.toMillis());
 	}
-	
-	@IOThread
-	public boolean needsReplacing() throws IOException {
-		return lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
-	}
 
 	@Override
 	public FileTime lastModified() {
@@ -104,5 +96,27 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	@Override
 	public String sha1() {
 		return sha1;
+	}
+	
+	@Override
+	public String toString() {
+		return toString;
+	}
+	
+	CssResource sha1(String sha1) {
+		this.sha1 = sha1;
+		uri = "/" + sha1 + "/" + baseName;
+		toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+		return this;
+	}
+	
+	@IOThread
+	boolean needsReplacing() throws IOException {
+		return lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
+	}
+
+	@Override
+	Object[] creationArgs() {
+		return less ? LESS_ARG : null;
 	}
 }

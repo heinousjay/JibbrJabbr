@@ -30,6 +30,7 @@ import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 
 import jj.configuration.Configuration;
 import jj.execution.ExecutionTrace;
@@ -104,9 +105,8 @@ class LessProcessor {
 				return new String(Files.readAllBytes(basePath.resolve(resourceName)), UTF_8);
 			} catch (IOException io) {
 				trace.errorLoadingLessResource(resourceName, io);
+				return Undefined.instance;
 			}
-			
-			return Scriptable.NOT_FOUND;
 		}
 	}
 

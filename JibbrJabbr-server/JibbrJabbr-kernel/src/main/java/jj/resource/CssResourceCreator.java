@@ -19,6 +19,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -37,13 +38,23 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private static final Pattern DOT_CSS = Pattern.compile("\\.css$");
 	private static final Pattern DOT_LESS = Pattern.compile("\\.less$");
 	
+	private static final Pattern IMPORT = Pattern.compile("@import\\s+(['\"])(.+?)\\1");
+	private static final Pattern URL = Pattern.compile("url\\((['\"])?(.+?)\\1?\\)");
+	private static final Pattern ABSOLUTE = Pattern.compile("^(?:https?:)?//");
+	
 	private final Configuration configuration;
 	private final LessProcessor lessProcessor;
+	private final ResourceFinder resourceFinder;
 	
 	@Inject
-	CssResourceCreator(final Configuration configuration, final LessProcessor lessProcessor) {
+	CssResourceCreator(
+		final Configuration configuration,
+		final LessProcessor lessProcessor,
+		final ResourceFinder resourceFinder
+	) {
 		this.configuration = configuration;
 		this.lessProcessor = lessProcessor;
+		this.resourceFinder = resourceFinder;
 	}
 
 	@Override
@@ -81,21 +92,64 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 		boolean less = args.length == 1 && Boolean.TRUE.equals(args[0]);
 		CssResource resource = new CssResource(cacheKey(baseName, args), baseName, path(baseName, args), less);
 		
-		if (less) {
-			String processed = fixUrls(lessProcessor.process(toLess(baseName)));
-			
-			byte[] bytes = processed.getBytes(UTF_8);
-			resource.byteBuffer.clear().writeBytes(bytes);
-			resource.sha1 = SHA1Helper.keyFor(resource.byteBuffer);
-		} else {
-			
-		}
+		String processed = fixUris(
+			less ? lessProcessor.process(toLess(baseName)) : resource.byteBuffer.toString(UTF_8),
+			resource
+		);
+		resource.byteBuffer.clear().writeBytes(processed.getBytes(UTF_8));
+		resource.sha1(SHA1Helper.keyFor(resource.byteBuffer));
 		
 		return resource;
 	}
 	
-	private String fixUrls(String css) {
-		return css;
+	private String fixUris(final String css, final CssResource resource) {
+		
+		return fixUrls(fixImports(css, resource), resource);
 	}
-
+	
+	private String fixUrls(final String css, final CssResource resource) {
+		return doReplacement(css, resource, URL, "url($1", "$1)", StaticResource.class);
+	}
+	
+	private String fixImports(final String css, final CssResource resource) {
+		return doReplacement(css, resource, IMPORT, "@import $1", "$1", CssResource.class);
+	}
+	
+	private String doReplacement(
+		final String css,
+		final CssResource resource,
+		final Pattern pattern,
+		final String prefix,
+		final String suffix,
+		final Class<? extends Resource> type
+	) {
+		// yuck.  the API was never updated
+		StringBuffer sb = new StringBuffer();
+		
+		Matcher matcher = pattern.matcher(css);
+		while (matcher.find()) {
+			String replacement = matcher.group(2);
+			if (!ABSOLUTE.matcher(replacement).matches()) {
+				
+				String baseName;
+				if (replacement.startsWith("/")) {
+					baseName = replacement.substring(1);
+				} else {
+					baseName = configuration.basePath().relativize(resource.path().resolveSibling(replacement)).normalize().toString();
+				
+				}
+				AbstractResource dependency = (AbstractResource)resourceFinder.loadResource(type, baseName);
+				
+				if (dependency != null) {
+					resource.dependsOn(dependency);
+					replacement = dependency.uri();
+				}
+				
+				matcher.appendReplacement(sb, prefix + replacement + suffix);
+			}
+		}
+		matcher.appendTail(sb);
+		
+		return sb.toString();
+	}
 }

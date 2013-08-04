@@ -25,12 +25,6 @@ public interface Resource {
 	Path path();
 	
 	/**
-	 * the arguments used to create this resource
-	 * @return
-	 */
-	Object[] creationArgs();
-	
-	/**
 	 * time this resource was last modified
 	 * @return
 	 */
@@ -70,4 +64,13 @@ public interface Resource {
 	 * @return
 	 */
 	String mime();
+
+	/**
+	 * Register a dependency on another resource.  This means that
+	 * when an update to a dependency is detected, the dependent will
+	 * be reloaded, even if it has no changes of its own
+	 * 
+	 * @param dependency
+	 */
+	void dependsOn(Resource dependency);
 }

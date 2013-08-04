@@ -36,7 +36,11 @@ public class ConcreteResourceFinderImplTest extends ResourceBase {
 		
 		resourceCreators = new HashSet<>();
 		resourceCreators.add(new AssetResourceCreator());
-		resourceCreators.add(new CssResourceCreator(configuration, new LessProcessor(configuration, new DevNullExecutionTraceImpl())));
+		resourceCreators.add(new CssResourceCreator(
+			configuration, 
+			new LessProcessor(configuration, new DevNullExecutionTraceImpl()),
+			mock(ResourceFinder.class) // doesn't matter for the purposes of this test
+		));
 		resourceCreators.add(new HtmlResourceCreator(configuration));
 		resourceCreators.add(new PropertiesResourceCreator(configuration));
 		resourceCreators.add(new ScriptResourceCreator(configuration));

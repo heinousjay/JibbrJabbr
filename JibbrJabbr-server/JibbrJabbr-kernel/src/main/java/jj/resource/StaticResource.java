@@ -29,6 +29,7 @@ import jj.execution.IOThread;
 public class StaticResource extends AbstractFileResource implements TransferableResource {
 
 	private final String mime;
+	private final String uri;
 	
 	/**
 	 * @param baseName
@@ -38,11 +39,12 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	StaticResource(final ResourceCacheKey cacheKey, final Path path, final String baseName) throws IOException {
 		super(cacheKey, baseName, path, false);
 		mime = MimeTypes.get(baseName);
+		uri = "/" + sha1 + "/" + baseName;
 	}
 
 	@Override
 	public String uri() {
-		return "/" + sha1 + "/" + baseName;
+		return uri;
 	}
 
 	@Override

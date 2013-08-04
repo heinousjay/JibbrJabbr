@@ -128,7 +128,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 												resourceFinder.loadResource(
 													resource.getClass(),
 													resource.baseName(),
-													resource.creationArgs()
+													((AbstractResource)resource).creationArgs()
 												);
 											}
 										}
