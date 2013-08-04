@@ -25,8 +25,11 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+
 import jj.SHA1Helper;
 import jj.configuration.Configuration;
+import jj.logging.EmergencyLogger;
 
 /**
  * @author jason
@@ -45,16 +48,19 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private final Configuration configuration;
 	private final LessProcessor lessProcessor;
 	private final ResourceFinder resourceFinder;
+	private final Logger logger;
 	
 	@Inject
 	CssResourceCreator(
 		final Configuration configuration,
 		final LessProcessor lessProcessor,
-		final ResourceFinder resourceFinder
+		final ResourceFinder resourceFinder,
+		final @EmergencyLogger Logger logger
 	) {
 		this.configuration = configuration;
 		this.lessProcessor = lessProcessor;
 		this.resourceFinder = resourceFinder;
+		this.logger = logger;
 	}
 
 	@Override
@@ -129,7 +135,7 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 		Matcher matcher = pattern.matcher(css);
 		while (matcher.find()) {
 			String replacement = matcher.group(2);
-			if (!ABSOLUTE.matcher(replacement).matches()) {
+			if (!ABSOLUTE.matcher(replacement).find()) {
 				
 				String baseName;
 				if (replacement.startsWith("/")) {
@@ -143,6 +149,8 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 				if (dependency != null) {
 					resource.dependsOn(dependency);
 					replacement = dependency.uri();
+				} else {
+					logger.warn("CSS file {} references {} (as {}), which does not exist", resource.baseName(), baseName, matcher.group());
 				}
 				
 				matcher.appendReplacement(sb, prefix + replacement + suffix);

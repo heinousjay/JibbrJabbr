@@ -26,6 +26,7 @@ import jj.execution.ExecutionTrace;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -39,13 +40,14 @@ public class CssResourceCreatorTest extends ResourceBase {
 	
 	LessProcessor lessProcessor;
 	@Mock ResourceFinder resourceFinder;
+	@Mock Logger logger;
 	
 	CssResourceCreator crc;
 	
 	@Before
 	public void before() throws Exception {
 		lessProcessor = spy(new LessProcessor(configuration, mock(ExecutionTrace.class)));
-		crc = new CssResourceCreator(configuration, lessProcessor, resourceFinder);
+		crc = new CssResourceCreator(configuration, lessProcessor, resourceFinder, logger);
 	}
 
 	@Test
@@ -95,5 +97,7 @@ public class CssResourceCreatorTest extends ResourceBase {
 		// System.out.println(css.bytes.toString(UTF_8));
 		
 		assertThat(bytes, is(Files.readAllBytes(test.path().resolveSibling("url_replacement_output.txt"))));
+		
+		verify(logger).warn(anyString(), eq(css.baseName()), eq("jj/resource/not-found-thing.jpg"), eq("url(not-found-thing.jpg)"));
 	}
 }

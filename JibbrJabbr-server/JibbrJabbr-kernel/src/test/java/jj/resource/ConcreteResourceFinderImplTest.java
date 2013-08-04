@@ -15,6 +15,7 @@ import jj.execution.JJExecutors;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.slf4j.Logger;
 
 /**
  * this test is fairly concrete on purpose
@@ -39,7 +40,8 @@ public class ConcreteResourceFinderImplTest extends ResourceBase {
 		resourceCreators.add(new CssResourceCreator(
 			configuration, 
 			new LessProcessor(configuration, new DevNullExecutionTraceImpl()),
-			mock(ResourceFinder.class) // doesn't matter for the purposes of this test
+			mock(ResourceFinder.class), // doesn't matter for the purposes of this test
+			mock(Logger.class) // doesn't matter for the purposes of this test
 		));
 		resourceCreators.add(new HtmlResourceCreator(configuration));
 		resourceCreators.add(new PropertiesResourceCreator(configuration));
