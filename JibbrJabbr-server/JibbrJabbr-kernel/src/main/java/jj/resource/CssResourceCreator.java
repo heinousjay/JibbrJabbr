@@ -119,6 +119,7 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	}
 	
 	private String fixImports(final String css, final CssResource resource) {
+		// TODO account for less resources
 		return doReplacement(css, resource, IMPORT, "@import $1", "$1", CssResource.class);
 	}
 	
@@ -153,6 +154,9 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 					if (!uriMatch.versioned) {
 						// we only want to replace uris that weren't already versioned
 						replacement = dependency.uri();
+					} else {
+						// replace with the absolute path
+						replacement = "/" + baseName;
 					}
 				} else {
 					logger.warn("CSS file {} references {} (as {}), which does not exist", resource.baseName(), baseName, matcher.group());

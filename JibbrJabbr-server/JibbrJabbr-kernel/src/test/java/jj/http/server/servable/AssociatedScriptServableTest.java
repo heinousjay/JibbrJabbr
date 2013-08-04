@@ -71,11 +71,11 @@ public class AssociatedScriptServableTest extends ServableTestBase {
 	@Test
 	public void testIsMatchingRequest() {
 		configureMatch("/" + SHA1 + "/index.js", false);
-		assertThat(as.isMatchingRequest(request), is(true));
+		assertThat(as.isMatchingRequest(match), is(true));
 		configureMatch("/" + SHA1 + "/index.shared.js", false);
-		assertThat(as.isMatchingRequest(request), is(true));
+		assertThat(as.isMatchingRequest(match), is(true));
 		configureMatch("/" + SHA1 + "/index.server.js", false);
-		assertThat(as.isMatchingRequest(request), is(false));
+		assertThat(as.isMatchingRequest(match), is(false));
 	}
 
 	@Test

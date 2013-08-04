@@ -13,9 +13,9 @@ import jj.resource.ResourceFinder;
 import jj.uri.URIMatch;
 
 @Singleton
-class CssServable extends Servable {
+class CssServable extends Servable<CssResource> {
 	
-	private static final String CSS = ".css";
+	private static final String CSS = "css";
 	
 	private final ResourceFinder resourceFinder;
 	
@@ -29,9 +29,18 @@ class CssServable extends Servable {
 	}
 
 	@Override
-	public boolean isMatchingRequest(final HttpRequest request) {
-		// match everything that ends in .css
-		return request.uri().endsWith(CSS);
+	public boolean isMatchingRequest(final URIMatch uriMatch) {
+		return CSS.equals(uriMatch.extension);
+	}
+	
+	@Override
+	public CssResource loadResource(final URIMatch match) {
+		CssResource resource = resourceFinder.loadResource(CssResource.class, match.baseName, true);
+		if (resource == null) {
+			resource = resourceFinder.loadResource(CssResource.class, match.baseName);
+		}
+		
+		return resource;
 	}
 
 	@Override
@@ -40,18 +49,20 @@ class CssServable extends Servable {
 		final HttpResponse response
 	) throws IOException {
 		
-		final URIMatch match = new URIMatch(request.uri());
+		final URIMatch match = request.uriMatch();
 		
 		// try less first
-		CssResource resource = resourceFinder.loadResource(CssResource.class, match.baseName, true);
-		if (resource == null) {
-			resource = resourceFinder.loadResource(CssResource.class, match.baseName);
-		}
+		CssResource resource = loadResource(match);
 		
 		RequestProcessor result = null;
 		if (resource != null && isServablePath(resource.path())) {
 			result = makeStandardRequestProcessor(request, response, match, resource);
 		}
 		return result;
+	}
+
+	@Override
+	public Class<CssResource> type() {
+		return CssResource.class;
 	}
 }

@@ -25,7 +25,7 @@ import jj.http.HttpResponse;
  *
  */
 @Singleton
-class AssociatedScriptServable extends Servable {
+class AssociatedScriptServable extends Servable<ScriptResource> {
 	
 	private final ScriptBundleFinder finder;
 
@@ -47,24 +47,9 @@ class AssociatedScriptServable extends Servable {
 	
 	private static final Pattern TYPE_PATTERN = Pattern.compile("(.+?)(?:\\.(server|shared))?\\.js");
 	
-	private ScriptResource resourceFromRequest(HttpRequest httpRequest) {
-		ScriptResource result = null;
-		URIMatch uriMatch = httpRequest.uriMatch();
-		Matcher typeMatcher = TYPE_PATTERN.matcher(uriMatch.baseName);
-		if (uriMatch.sha1 != null && typeMatcher.matches()) {
-			
-			AssociatedScriptBundle scriptBundle = finder.forURIMatch(uriMatch);
-			if (scriptBundle != null) {
-				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
-			}
-		}
-		
-		return result;
-	}
-
 	@Override
-	public boolean isMatchingRequest(final HttpRequest request) {
-		return resourceFromRequest(request) != null;
+	public boolean isMatchingRequest(final URIMatch uriMatch) {
+		return loadResource(uriMatch) != null;
 	}
 
 	@Override
@@ -72,7 +57,7 @@ class AssociatedScriptServable extends Servable {
 		final HttpRequest request,
 		final HttpResponse response
 	) throws IOException {
-		final ScriptResource script = resourceFromRequest(request);
+		final ScriptResource script = loadResource(request.uriMatch());
 		
 		return script == null ? null : new RequestProcessor() {
 			
@@ -90,5 +75,25 @@ class AssociatedScriptServable extends Servable {
 				}
 			}
 		};
+	}
+
+	@Override
+	public ScriptResource loadResource(final URIMatch match) {
+		ScriptResource result = null;
+		Matcher typeMatcher = TYPE_PATTERN.matcher(match.baseName);
+		if (match.sha1 != null && typeMatcher.matches()) {
+			
+			AssociatedScriptBundle scriptBundle = finder.forURIMatch(match);
+			if (scriptBundle != null) {
+				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
+			}
+		}
+		
+		return result;
+	}
+
+	@Override
+	public Class<ScriptResource> type() {
+		return ScriptResource.class;
 	}
 }

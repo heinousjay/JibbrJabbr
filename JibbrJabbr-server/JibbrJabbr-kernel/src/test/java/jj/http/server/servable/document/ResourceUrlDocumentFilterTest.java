@@ -18,18 +18,19 @@ package jj.http.server.servable.document;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
+import jj.http.server.MockServablesRule;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.ResourceUrlDocumentFilter;
+import jj.resource.AssetResource;
 import jj.resource.CssResource;
-import jj.resource.ResourceFinder;
 import jj.resource.StaticResource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -39,42 +40,48 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceUrlDocumentFilterTest {
+	
+	@Rule
+	public MockServablesRule m = new MockServablesRule();
 
-	@Mock ResourceFinder resourceFinder;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	Document document;
 	
 	@Mock CssResource cssResource;
 	@Mock StaticResource staticResource;
-	@Mock StaticResource staticResource2;
+	@Mock AssetResource assetResource;
 	
-	@InjectMocks ResourceUrlDocumentFilter filter;
+	ResourceUrlDocumentFilter filter;
 	
 	@Before
 	public void before() {
-		document = Jsoup.parse("<a href='style.css'><img src='style.gif'/></a><link href='thing-1.2.0.gif'/>");
+		document = Jsoup.parse(
+			"<a href='" + m.cssUri.baseName + "'>" +
+				"<img src='" + m.staticUri.baseName + "'/>" +
+			"</a><link href='" + m.assetUri.baseName + "'/>");
 		given(documentRequestProcessor.document()).willReturn(document);
+		
+		filter = new ResourceUrlDocumentFilter(m.servables);
 	}
 	
 	@Test
 	public void test() {
 		
-		String uri1 = "uri1";
-		String uri2 = "uri2";
+		given(m.servables.loadResource(m.cssUri)).willReturn(cssResource);
+		given(cssResource.uri()).willReturn("/substitutesha" + m.cssUri.uri);
 		
-		given(resourceFinder.loadResource(CssResource.class, "style.css")).willReturn(cssResource);
-		given(cssResource.uri()).willReturn(uri1);
-		given(resourceFinder.loadResource(StaticResource.class, "style.gif")).willReturn(staticResource);
-		given(staticResource.uri()).willReturn(uri2);
-		given(resourceFinder.loadResource(StaticResource.class, "thing-1.2.0.gif")).willReturn(staticResource2);
-		given(staticResource2.uri()).willReturn("gibberish");
+		given(m.servables.loadResource(m.assetUri)).willReturn(assetResource);
+		given(assetResource.uri()).willReturn("/substitutesha" + m.assetUri.uri);
+		
+		given(m.servables.loadResource(m.staticUri)).willReturn(staticResource);
+		given(staticResource.uri()).willReturn("/substitutesha" + m.staticUri.uri);
 		
 		given(documentRequestProcessor.uri()).willReturn("/");
 		filter.filter(documentRequestProcessor);
 		
-		assertThat(document.select("a").attr("href"), is(uri1));
-		assertThat(document.select("img").attr("src"), is(uri2));
-		assertThat(document.select("link").attr("href"), is("/thing-1.2.0.gif"));
+		assertThat(document.select("a").attr("href"), is("/substitutesha" + m.cssUri.uri));
+		assertThat(document.select("img").attr("src"), is("/substitutesha" + m.staticUri.uri));
+		assertThat(document.select("link").attr("href"), is(m.assetUri.uri));
 	}
 	
 	@Test

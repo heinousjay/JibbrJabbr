@@ -28,4 +28,14 @@ public class StringUtils {
 	public static boolean isEmpty(String in) {
 		return in == null || in.isEmpty();
 	}
+
+	/**
+	 * Null safe equality check
+	 * @param uri
+	 * @param uri2
+	 * @return
+	 */
+	public static boolean equals(String uri, String uri2) {
+		return (uri == uri2) || (uri != null && uri.equals(uri2));
+	}
 }

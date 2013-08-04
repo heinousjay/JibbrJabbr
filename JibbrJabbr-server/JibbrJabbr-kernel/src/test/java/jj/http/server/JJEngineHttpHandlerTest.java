@@ -32,9 +32,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import jj.execution.ExecutionTrace;
 import jj.execution.MockJJExecutors;
 import jj.http.HttpRequest;
@@ -43,9 +40,8 @@ import jj.http.server.JJEngineHttpHandler;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
-import jj.http.server.servable.Servable;
-
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -81,9 +77,6 @@ public class JJEngineHttpHandlerTest {
 	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
 	MockJJExecutors executors;
-	@Mock Servable servable1;
-	@Mock Servable servable2;
-	@Mock Servable servable3;
 
 	@Mock JJHttpServerRequest httpRequest1;
 	@Mock JJHttpServerRequest httpRequest2;
@@ -96,44 +89,29 @@ public class JJEngineHttpHandlerTest {
 	@Mock RequestProcessor requestProcessor1;
 	@Mock RequestProcessor requestProcessor2;
 	@Mock RequestProcessor requestProcessor3;
-	Set<Servable> resourceTypes;
 	
 	JJEngineHttpHandler handler;
+	
+	@Rule
+	public MockServablesRule servables = new MockServablesRule();
 	
 	//given
 	@Before
 	public void before() throws Exception {
 		executors = new MockJJExecutors();
 		
-		given(servable1.isMatchingRequest(httpRequest1)).willReturn(true);
-		given(servable1.isMatchingRequest(httpRequest2)).willReturn(false);
-		given(servable1.isMatchingRequest(httpRequest3)).willReturn(false);
-		given(servable1.isMatchingRequest(httpRequest4)).willReturn(false);
-		given(servable3.isMatchingRequest(httpRequest5)).willReturn(false);
-		given(servable1.makeRequestProcessor(httpRequest1, httpResponse)).willReturn(requestProcessor1);
+		given(httpRequest1.uriMatch()).willReturn(servables.staticUri);
+		given(httpRequest2.uriMatch()).willReturn(servables.assetUri);
+		given(httpRequest3.uriMatch()).willReturn(servables.cssUri);
+		given(httpRequest4.uriMatch()).willReturn(servables.uri4);
+		given(httpRequest5.uriMatch()).willReturn(servables.uri5);
 		
-		given(servable2.isMatchingRequest(httpRequest1)).willReturn(false);
-		given(servable2.isMatchingRequest(httpRequest2)).willReturn(true);
-		given(servable2.isMatchingRequest(httpRequest3)).willReturn(false);
-		given(servable2.isMatchingRequest(httpRequest4)).willReturn(true);
-		given(servable3.isMatchingRequest(httpRequest5)).willReturn(false);
-		given(servable2.makeRequestProcessor(httpRequest2, httpResponse)).willReturn(requestProcessor2);
-		given(servable2.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(null);
+		given(servables.staticServable.makeRequestProcessor(httpRequest1, httpResponse)).willReturn(requestProcessor1);
+		given(servables.assetServable.makeRequestProcessor(httpRequest2, httpResponse)).willReturn(requestProcessor2);
+		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
+		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
-		given(servable3.isMatchingRequest(httpRequest1)).willReturn(false);
-		given(servable3.isMatchingRequest(httpRequest2)).willReturn(false);
-		given(servable3.isMatchingRequest(httpRequest3)).willReturn(true);
-		given(servable3.isMatchingRequest(httpRequest4)).willReturn(true);
-		given(servable3.isMatchingRequest(httpRequest5)).willReturn(true);
-		given(servable3.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
-		given(servable3.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
-		
-		resourceTypes = new LinkedHashSet<>();
-		resourceTypes.add(servable1);
-		resourceTypes.add(servable2);
-		resourceTypes.add(servable3);
-		
-		handler = new JJEngineHttpHandler(executors, resourceTypes, injector, trace, webSocketUriChecker, logger);
+		handler = new JJEngineHttpHandler(executors, servables.servables, injector, trace, webSocketUriChecker, logger);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -255,7 +233,6 @@ public class JJEngineHttpHandlerTest {
 		executors.executor.runUntilIdle();
 		
 		//then
-		verify(servable1).isMatchingRequest(httpRequest1);
 		verify(requestProcessor1).process();
 		
 		//when
@@ -263,7 +240,6 @@ public class JJEngineHttpHandlerTest {
 		executors.executor.runUntilIdle();
 		
 		//then
-		verify(servable2).isMatchingRequest(httpRequest2);
 		verify(requestProcessor2).process();
 		
 		//when
@@ -271,7 +247,6 @@ public class JJEngineHttpHandlerTest {
 		executors.executor.runUntilIdle();
 		
 		//then
-		verify(servable3).isMatchingRequest(httpRequest3);
 		verify(requestProcessor3).process();
 		
 		//when
@@ -304,9 +279,6 @@ public class JJEngineHttpHandlerTest {
 		executors.executor.runUntilIdle();
 		
 		//then
-		verify(servable2).isMatchingRequest(httpRequest4);
-		verify(servable3).isMatchingRequest(httpRequest4);
-		
 		verify(requestProcessor3).process();
 	}
 	

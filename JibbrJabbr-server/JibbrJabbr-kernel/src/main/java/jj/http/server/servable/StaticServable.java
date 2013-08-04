@@ -32,7 +32,7 @@ import jj.http.HttpResponse;
  *
  */
 @Singleton
-public class StaticServable extends Servable {
+public class StaticServable extends Servable<StaticResource> {
 
 	private final ResourceFinder resourceFinder;
 	
@@ -52,7 +52,7 @@ public class StaticServable extends Servable {
 	 * we always (potentially) match
 	 */
 	@Override
-	public boolean isMatchingRequest(final HttpRequest httpRequest) {
+	public boolean isMatchingRequest(final URIMatch uriMatch) {
 		return true;
 	}
 
@@ -62,13 +62,23 @@ public class StaticServable extends Servable {
 		final HttpResponse response
 	) throws IOException {
 		final URIMatch match = new URIMatch(request.uri());
-		final StaticResource resource = resourceFinder.loadResource(StaticResource.class, match.baseName);
+		final StaticResource resource = loadResource(match);
 		if (resource != null && isServablePath(resource.path())) {
 			return makeStandardRequestProcessor(request, response, match, resource);
 		}
 		
 		return null;
 		
+	}
+
+	@Override
+	public StaticResource loadResource(URIMatch match) {
+		return resourceFinder.loadResource(StaticResource.class, match.baseName);
+	}
+
+	@Override
+	public Class<StaticResource> type() {
+		return StaticResource.class;
 	}
 
 }

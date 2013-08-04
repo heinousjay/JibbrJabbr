@@ -21,6 +21,8 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import jj.resource.HtmlResource;
+import jj.uri.URIMatch;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -50,23 +52,15 @@ public class DocumentServableTest extends ServableTestBase {
 	@Test
 	public void testIsMatchingRequest() throws Exception {
 		
-		given(request.uri()).willReturn("/");
-		assertThat(ds.isMatchingRequest(request), is(true));
-		given(request.uri()).willReturn("/index");
-		assertThat(ds.isMatchingRequest(request), is(true));
-		given(request.uri()).willReturn("/index.html");
-		assertThat(ds.isMatchingRequest(request), is(true));
-		given(request.uri()).willReturn("/index/");
-		assertThat(ds.isMatchingRequest(request), is(true));
-		given(request.uri()).willReturn("/../");
-		assertThat(ds.isMatchingRequest(request), is(true));
+		assertThat(ds.isMatchingRequest(new URIMatch("/")), is(true));
+		assertThat(ds.isMatchingRequest(new URIMatch("/index")), is(true));
+		assertThat(ds.isMatchingRequest(new URIMatch("/index.html")), is(true));
+		assertThat(ds.isMatchingRequest(new URIMatch("/index/")), is(true));
+		assertThat(ds.isMatchingRequest(new URIMatch("/../")), is(true));
 		
-		given(request.uri()).willReturn("/index.css");
-		assertThat(ds.isMatchingRequest(request), is(false));
-		given(request.uri()).willReturn("/index.whatever");
-		assertThat(ds.isMatchingRequest(request), is(false));
-		given(request.uri()).willReturn("/index.html/bller.iller");
-		assertThat(ds.isMatchingRequest(request), is(false));
+		assertThat(ds.isMatchingRequest(new URIMatch("/index.css")), is(false));
+		assertThat(ds.isMatchingRequest(new URIMatch("/index.whatever")), is(false));
+		assertThat(ds.isMatchingRequest(new URIMatch("/index.html/bller.iller")), is(false));
 	}
 	
 

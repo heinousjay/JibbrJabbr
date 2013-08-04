@@ -8,6 +8,8 @@ import java.io.IOException;
 import jj.http.server.servable.CssServable;
 import jj.http.server.servable.RequestProcessor;
 import jj.resource.CssResource;
+import jj.uri.URIMatch;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -29,12 +31,12 @@ public class CssServableTest extends ServableTestBase{
 	public void testBasicOperation() throws IOException {
 		
 		// given
-		given(request.uri()).willReturn("/style.css");
+		given(request.uriMatch()).willReturn(new URIMatch("/style.css"));
 		given(resourceFinder.loadResource(CssResource.class, "style.css", true)).willReturn(cssResource);
 		given(cssResource.path()).willReturn(basePath.resolve("style.css"));
 		
 		// then
-		assertThat(cs.isMatchingRequest(request), is(true));
+		assertThat(cs.isMatchingRequest(request.uriMatch()), is(true));
 		
 		// when
 		RequestProcessor requestProcessor = cs.makeRequestProcessor(request, response);
@@ -46,7 +48,7 @@ public class CssServableTest extends ServableTestBase{
 	@Test
 	public void testOutsideApplicationIsRejected() throws Exception {
 		
-		given(request.uri()).willReturn("/../not-servable/style.css");
+		given(request.uriMatch()).willReturn(new URIMatch("/../not-servable/style.css"));
 		
 		RequestProcessor rp = cs.makeRequestProcessor(request, response);
 		

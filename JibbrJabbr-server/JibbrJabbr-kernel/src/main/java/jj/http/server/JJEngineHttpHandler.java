@@ -11,9 +11,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -31,7 +29,9 @@ import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
+import jj.http.server.servable.Servables;
 import jj.logging.EmergencyLogger;
+import jj.resource.Resource;
 
 /**
  * Acts as the bridge from netty into our core.
@@ -44,7 +44,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final JJExecutors executors;
 	
-	private final Set<Servable> resourceTypes;
+	private final Servables servables;
 	
 	private final Injector parentInjector;
 	
@@ -57,31 +57,18 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	@Inject
 	JJEngineHttpHandler( 
 		final JJExecutors executors,
-		final Set<Servable> resourceTypes,
+		final Servables servables,
 		final Injector parentInjector,
 		final ExecutionTrace trace,
 		final WebSocketUriChecker webSocketUriChecker,
 		final @EmergencyLogger Logger logger
 	) {
 		this.executors = executors;
-		this.resourceTypes = resourceTypes;
+		this.servables = servables;
 		this.parentInjector = parentInjector;
 		this.trace = trace;
 		this.webSocketUriChecker = webSocketUriChecker;
 		this.logger = logger;
-	}
-	
-	private Servable[] findMatchingServables(final HttpRequest request) {
-		
-		List<Servable> result = new ArrayList<>();
-		
-		for (final Servable type : resourceTypes) {
-			if (type.isMatchingRequest(request)) {
-				result.add(type);
-			}
-		}
-		
-		return result.toArray(new Servable[result.size()]);
 	}
 
 	@Override
@@ -141,15 +128,15 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		trace.start(request, response);
 		
 		// figure out if there's something for us to do
-		final Servable[] servables = findMatchingServables(request);
+		final List<Servable<? extends Resource>> list = servables.findMatchingServables(request.uriMatch());
 		
-		assert (servables.length > 0) : "no servables found - something is misconfigured";
+		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
 		executors.ioExecutor().submit(new JJRunnable("JJEngine core processing") {
 			@Override
 			public void run() {
 				try {
 					boolean found = false;
-					for (Servable servable : servables) {
+					for (Servable<? extends Resource> servable : list) {
 						RequestProcessor requestProcessor = servable.makeRequestProcessor(request, response);
 						if (requestProcessor != null) {
 							requestProcessor.process();

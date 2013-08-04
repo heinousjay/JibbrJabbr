@@ -13,7 +13,7 @@ import jj.http.HttpResponse;
 
 
 @Singleton
-class AssetServable extends Servable {
+class AssetServable extends Servable<AssetResource> {
 	
 	private final ResourceFinder resourceFinder;
 	
@@ -24,10 +24,7 @@ class AssetServable extends Servable {
 	}
 	
 	@Override
-	public boolean isMatchingRequest(HttpRequest httpRequest) {
-		// if the baseName exists in the cache, we happy
-		URIMatch match = new URIMatch(httpRequest.uri());
-		
+	public boolean isMatchingRequest(final URIMatch match) {
 		return resourceFinder.findResource(AssetResource.class, match.baseName) != null;
 	}
 
@@ -37,10 +34,19 @@ class AssetServable extends Servable {
 		final HttpResponse response
 	) throws IOException {
 		
-		final URIMatch match = new URIMatch(request.uri());
-		final AssetResource asset = resourceFinder.findResource(AssetResource.class, match.baseName);
-
+		final URIMatch match = request.uriMatch();
+		final AssetResource asset = loadResource(match);
 		return asset == null ? null : makeStandardRequestProcessor(request, response, match, asset);
+	}
+
+	@Override
+	public AssetResource loadResource(URIMatch match) {
+		return resourceFinder.findResource(AssetResource.class, match.baseName);
+	}
+
+	@Override
+	public Class<AssetResource> type() {
+		return AssetResource.class;
 	}
 
 }

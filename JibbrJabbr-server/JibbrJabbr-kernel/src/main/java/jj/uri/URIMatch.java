@@ -18,6 +18,8 @@ package jj.uri;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jj.StringUtils;
+
 
 /**
  * Simple immutable carrier of a match against a URI, potentially preceded by
@@ -43,6 +45,7 @@ public class URIMatch {
 	private static final Pattern URI_PATTERN = Pattern.compile("^/(?:([\\da-f]{40})/)?(.*?)(?:\\.([^.]+))?$");
 	private static final Pattern VERSION_PATTERN = Pattern.compile("-\\d+(?:[.]\\d+)*(?:[.-]?(?:alpha|beta|pre))?(?:(?:[.-](?:min|pack))?$|/)");
 
+	public final String uri;
 	public final String sha1;
 	public final String name;
 	public final String extension;
@@ -50,6 +53,7 @@ public class URIMatch {
 	public final boolean versioned;
 	
 	public URIMatch(final String uri) {
+		this.uri = uri;
 		Matcher matcher = URI_PATTERN.matcher(uri);
 		String shaCandidate = null;
 		String nameCandidate = null;
@@ -64,5 +68,10 @@ public class URIMatch {
 		extension = extensionCandidate;
 		baseName = name == null ? null : name + (extensionCandidate == null ? "" : "." + extensionCandidate);
 		versioned = sha1 != null || (nameCandidate != null && VERSION_PATTERN.matcher(nameCandidate).find());
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return other != null && other instanceof URIMatch && StringUtils.equals(((URIMatch)other).uri, uri);
 	}
 }

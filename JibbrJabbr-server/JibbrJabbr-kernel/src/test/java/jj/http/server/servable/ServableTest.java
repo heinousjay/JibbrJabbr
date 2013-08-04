@@ -47,7 +47,7 @@ public class ServableTest extends ServableTestBase {
 	static final String MIME = "mime";
 	static final long LENGTH = 100L;
 	
-	static final class ServableImpl extends Servable {
+	static final class ServableImpl extends Servable<Resource> {
 
 		/**
 		 * @param configuration
@@ -57,7 +57,7 @@ public class ServableTest extends ServableTestBase {
 		}
 
 		@Override
-		public boolean isMatchingRequest(HttpRequest httpRequest) {
+		public boolean isMatchingRequest(URIMatch uriMatch) {
 			return false;
 		}
 
@@ -65,6 +65,16 @@ public class ServableTest extends ServableTestBase {
 		@IOThread
 		public RequestProcessor makeRequestProcessor(HttpRequest request, HttpResponse response) throws IOException {
 			return null;
+		}
+
+		@Override
+		public Resource loadResource(URIMatch match) {
+			return null;
+		}
+
+		@Override
+		public Class<Resource> type() {
+			return Resource.class;
 		}
 		
 	}

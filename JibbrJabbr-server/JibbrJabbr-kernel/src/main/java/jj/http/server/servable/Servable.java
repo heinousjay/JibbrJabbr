@@ -14,7 +14,7 @@ import jj.uri.URIMatch;
 
 import io.netty.handler.codec.http.HttpHeaders;
 
-public abstract class Servable {
+public abstract class Servable<T extends Resource> {
 	
 	protected final Path basePath;
 	
@@ -44,7 +44,9 @@ public abstract class Servable {
 	 * @param httpRequest
 	 * @return
 	 */
-	public abstract boolean isMatchingRequest(final HttpRequest httpRequest);
+	public abstract boolean isMatchingRequest(final URIMatch uriMatch);
+	
+	public abstract Class<T> type();
 	
 	@IOThread
 	public abstract RequestProcessor makeRequestProcessor(
@@ -107,5 +109,11 @@ public abstract class Servable {
 			
 		};
 	}
+
+	/**
+	 * @param match
+	 * @return
+	 */
+	public abstract T loadResource(URIMatch match);
 
 }

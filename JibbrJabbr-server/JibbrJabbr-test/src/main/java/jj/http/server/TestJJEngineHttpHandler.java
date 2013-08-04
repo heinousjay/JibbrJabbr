@@ -15,8 +15,6 @@
  */
 package jj.http.server;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -29,7 +27,7 @@ import jj.execution.JJExecutors;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
-import jj.http.server.servable.Servable;
+import jj.http.server.servable.Servables;
 import jj.logging.EmergencyLogger;
 
 /**
@@ -47,13 +45,13 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 	@Inject
 	TestJJEngineHttpHandler(
 		final JJExecutors executors,
-		final Set<Servable> resourceTypes,
+		final Servables servables,
 		final Injector injector,
 		final ExecutionTrace trace,
 		final WebSocketUriChecker webSocketUriChecker,
 		final @EmergencyLogger Logger logger
 	) {
-		super(executors, resourceTypes, injector, trace, webSocketUriChecker, logger);
+		super(executors, servables, injector, trace, webSocketUriChecker, logger);
 	}
 
 	@Override

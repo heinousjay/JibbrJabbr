@@ -20,7 +20,7 @@ import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 
 @Singleton
-class DocumentServable extends Servable {
+class DocumentServable extends Servable<HtmlResource> {
 	
 	public static final String SLASH = "/";
 	public static final String DOT = ".";
@@ -43,10 +43,10 @@ class DocumentServable extends Servable {
 	}
 	
 	@Override
-	public boolean isMatchingRequest(final HttpRequest request) {
-		return request.uri().endsWith(DOT_HTML) ||
-			request.uri().endsWith(SLASH) ||
-			request.uri().lastIndexOf(DOT) <= request.uri().lastIndexOf(SLASH);
+	public boolean isMatchingRequest(final URIMatch uriMatch) {
+		return HTML.equals(uriMatch.extension) ||
+			uriMatch.uri.endsWith(SLASH) ||
+			uriMatch.uri.lastIndexOf(DOT) <= uriMatch.uri.lastIndexOf(SLASH);
 	}
 	
 	private Path toPath(final HttpRequest request) {
@@ -101,7 +101,7 @@ class DocumentServable extends Servable {
 			
 			String baseName = toBaseName(path);
 			
-			final HtmlResource htmlResource = resourceFinder.loadResource(HtmlResource.class, baseName);
+			final HtmlResource htmlResource = loadResource(new URIMatch("/" + baseName));
 			
 			if (htmlResource != null) {
 			
@@ -121,5 +121,15 @@ class DocumentServable extends Servable {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public HtmlResource loadResource(URIMatch match) {
+		return resourceFinder.loadResource(HtmlResource.class, match.baseName);
+	}
+
+	@Override
+	public Class<HtmlResource> type() {
+		return HtmlResource.class;
 	}
 }

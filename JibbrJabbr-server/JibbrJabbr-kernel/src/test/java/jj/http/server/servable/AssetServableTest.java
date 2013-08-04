@@ -19,6 +19,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.resource.AssetResource;
+import jj.uri.URIMatch;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -29,8 +31,8 @@ import org.mockito.Mock;
  */
 public class AssetServableTest extends ServableTestBase {
 	
-	String uri1 = "uri1.asset";
-	String uri2 = "uri2.asset";
+	URIMatch uri1 = new URIMatch("/uri1.asset");
+	URIMatch uri2 = new URIMatch("/uri2.asset");
 
 	@Mock AssetResource resource;
 	
@@ -39,26 +41,24 @@ public class AssetServableTest extends ServableTestBase {
 	@Before
 	public void before() {
 		as = new AssetServable(configuration, resourceFinder);
-		given(resourceFinder.findResource(AssetResource.class, uri1)).willReturn(resource);
+		given(resourceFinder.findResource(AssetResource.class, uri1.baseName)).willReturn(resource);
 	}
 	
 	@Test
 	public void testIsMatchingRequest() {
 		
-		given(request.uri()).willReturn("/" + uri1);
-		assertThat(as.isMatchingRequest(request), is(true));
+		assertThat(as.isMatchingRequest(uri1), is(true));
 		
-		given(request.uri()).willReturn("/" + uri2);
-		assertThat(as.isMatchingRequest(request), is(false));
+		assertThat(as.isMatchingRequest(uri2), is(false));
 	}
 
 	@Test
 	public void testMakeRequestProcessor() throws Exception {
 
-		given(request.uri()).willReturn("/" + uri1);
+		given(request.uriMatch()).willReturn(uri1);
 		assertThat(as.makeRequestProcessor(request, response), is(notNullValue()));
 
-		given(request.uri()).willReturn("/" + uri2);
+		given(request.uriMatch()).willReturn(uri2);
 		assertThat(as.makeRequestProcessor(request, response), is(nullValue()));
 		
 	}

@@ -18,10 +18,8 @@ package jj.http.server.servable.document;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.CssResource;
+import jj.http.server.servable.Servables;
 import jj.resource.Resource;
-import jj.resource.ResourceFinder;
-import jj.resource.StaticResource;
 import jj.uri.URIMatch;
 
 import org.jsoup.nodes.Element;
@@ -39,11 +37,11 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	private static final String SRC = "src";
 	private static final String SELECTOR = "[" + HREF + "],[" + SRC + "]";
 	
-	private final ResourceFinder resourceFinder;
+	private final Servables servables;
 	
 	@Inject
-	ResourceUrlDocumentFilter(final ResourceFinder resourceFinder) {
-		this.resourceFinder = resourceFinder;
+	ResourceUrlDocumentFilter(final Servables servables) {
+		this.servables = servables;
 	}
 
 	@Override
@@ -51,19 +49,12 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 		return true;
 	}
 	
-	private Resource loadResource(final URIMatch uriMatch) {
-		// TODO account for less resources
-		// the loading logic will need to be centralized somewhere, it's going to get spread around
-		Class<? extends Resource> type = "css".equals(uriMatch.extension) ? CssResource.class : StaticResource.class;
-		return resourceFinder.loadResource(type, uriMatch.baseName);
-	}
-	
 	private String massageURL(final String url) {
 		if (url.startsWith(URI_PREPEND)) {
 			String path = url.substring(URI_PREPEND.length());
 			URIMatch uriMatch = new URIMatch(path);
 			if (!uriMatch.versioned && uriMatch.baseName != null) {
-				Resource resource = loadResource(uriMatch);
+				Resource resource = servables.loadResource(uriMatch);
 				if (resource != null && uriMatch.sha1 == null) {
 					return resource.uri();
 				}
@@ -76,7 +67,7 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	@Override
 	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
 		documentRequestProcessor.document().setBaseUri(URI_PREPEND + documentRequestProcessor.uri());
-		for(Element el : documentRequestProcessor.document().select(SELECTOR)) {
+		for (Element el : documentRequestProcessor.document().select(SELECTOR)) {
 			if (el.hasAttr(HREF)) {
 				el.attr(HREF, massageURL(el.absUrl(HREF)));
 			}
