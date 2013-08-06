@@ -101,11 +101,8 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 							resource.creationArgs()
 						);
 						for (AbstractResource ar : resource.dependents()) {
-							if (resourceCache.remove(ar.cacheKey(), ar)) {
-								reload(ar);
-							} else {
-								log.info("couldn't trigger reload of {}", ar);
-							}
+							ar.markObselete();
+							reload(ar);
 						}
 					}
 				}

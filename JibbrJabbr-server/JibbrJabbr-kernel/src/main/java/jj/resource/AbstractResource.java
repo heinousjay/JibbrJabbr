@@ -33,6 +33,7 @@ abstract class AbstractResource implements Resource {
 	
 	private final ResourceCacheKey cacheKey;
 	private final Set<AbstractResource> dependents = new HashSet<>();
+	private volatile boolean obselete = false;
 	
 	AbstractResource(final ResourceCacheKey cacheKey) {
 		this.cacheKey = cacheKey;
@@ -40,6 +41,14 @@ abstract class AbstractResource implements Resource {
 	
 	@IOThread
 	abstract boolean needsReplacing() throws IOException;
+	
+	final boolean isObselete() throws IOException {
+		return obselete || needsReplacing();
+	}
+	
+	final void markObselete() {
+		obselete = true;
+	}
 	
 	/**
 	 * the arguments used to create this resource
