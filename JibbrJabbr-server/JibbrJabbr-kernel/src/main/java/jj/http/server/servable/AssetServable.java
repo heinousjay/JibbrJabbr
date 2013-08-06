@@ -25,7 +25,7 @@ class AssetServable extends Servable<AssetResource> {
 	
 	@Override
 	public boolean isMatchingRequest(final URIMatch match) {
-		return resourceFinder.findResource(AssetResource.class, match.baseName) != null;
+		return AssetResource.ASSETS.contains(match.baseName);
 	}
 
 	@Override
@@ -41,7 +41,7 @@ class AssetServable extends Servable<AssetResource> {
 
 	@Override
 	public AssetResource loadResource(URIMatch match) {
-		return resourceFinder.findResource(AssetResource.class, match.baseName);
+		return resourceFinder.loadResource(AssetResource.class, match.baseName);
 	}
 
 	@Override

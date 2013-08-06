@@ -32,7 +32,6 @@ public class ResourceModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addServerListenerBinding().to(AssetResourcePreloader.class);
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
 		addServerListenerBinding().to(ResourceCacheImpl.class);
 		

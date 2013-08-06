@@ -24,11 +24,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import jj.configuration.Configuration;
 import jj.execution.JJExecutors;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +53,7 @@ public class ResourceWatchServiceImplTest {
 	
 	ResourceCacheImpl resourceCache;
 	@Mock ResourceFinder resourceFinder;
+	ExecutorService executorService;
 	@Mock JJExecutors executors;
 	
 	ResourceWatchServiceImpl rwsi;
@@ -60,7 +63,13 @@ public class ResourceWatchServiceImplTest {
 		
 		given(configuration.basePath()).willReturn(Paths.get(getClass().getResource("index.html").toURI()).getParent());
 		
-		given(executors.ioExecutor()).willReturn(Executors.newFixedThreadPool(2));
+		executorService = Executors.newFixedThreadPool(2);
+		given(executors.ioExecutor()).willReturn(executorService);
+	}
+	
+	@After
+	public void after() throws Exception {
+		executorService.shutdownNow();
 	}
 	
 	private void touch(Path path) throws Exception {

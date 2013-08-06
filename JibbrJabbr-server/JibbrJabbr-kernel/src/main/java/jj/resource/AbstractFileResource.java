@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -134,7 +135,7 @@ public abstract class AbstractFileResource extends AbstractResource {
 	@Override
 	@IOThread
 	boolean needsReplacing() throws IOException {
-		return lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
+		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}
 	
 	@Override

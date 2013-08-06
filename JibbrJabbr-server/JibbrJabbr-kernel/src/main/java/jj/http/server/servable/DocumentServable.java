@@ -10,6 +10,7 @@ import com.google.inject.Injector;
 
 import jj.configuration.Configuration;
 import jj.execution.IOThread;
+import jj.resource.AssetResource;
 import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
@@ -78,13 +79,15 @@ class DocumentServable extends Servable<HtmlResource> {
 		return baseName;
 	}
 	
-	private void ensureScriptPreload(final String baseName) {
+	private void preloadResources(final String baseName) {
 		// since we're in the IO thread already and we might need this stuff soon, as a small
 		// optimization to avoid jumping right back into the I/O thread after dispatching this
 		// into the script thread, we just "prime the pump"
 		resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
 		resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
 		resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
+		resourceFinder.loadResource(AssetResource.class, AssetResource.JJ_JS);
+		resourceFinder.loadResource(AssetResource.class, AssetResource.JQUERY_JS);
 	}
 	
 	@Override
@@ -105,7 +108,7 @@ class DocumentServable extends Servable<HtmlResource> {
 			
 			if (htmlResource != null) {
 			
-				ensureScriptPreload(baseName);
+				preloadResources(baseName);
 				
 				result = parentInjector.createChildInjector(new AbstractModule() {
 					

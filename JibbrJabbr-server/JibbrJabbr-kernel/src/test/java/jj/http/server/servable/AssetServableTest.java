@@ -31,7 +31,7 @@ import org.mockito.Mock;
  */
 public class AssetServableTest extends ServableTestBase {
 	
-	URIMatch uri1 = new URIMatch("/uri1.asset");
+	URIMatch uri1 = new URIMatch("/jj.js");
 	URIMatch uri2 = new URIMatch("/uri2.asset");
 
 	@Mock AssetResource resource;
@@ -41,7 +41,7 @@ public class AssetServableTest extends ServableTestBase {
 	@Before
 	public void before() {
 		as = new AssetServable(configuration, resourceFinder);
-		given(resourceFinder.findResource(AssetResource.class, uri1.baseName)).willReturn(resource);
+		given(resourceFinder.loadResource(AssetResource.class, uri1.baseName)).willReturn(resource);
 	}
 	
 	@Test
