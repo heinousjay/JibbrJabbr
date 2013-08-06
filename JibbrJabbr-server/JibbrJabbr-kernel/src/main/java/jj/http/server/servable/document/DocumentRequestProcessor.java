@@ -129,9 +129,13 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	 */
 	@ScriptThread
 	public void respond() {
-		assert executors.isScriptThreadFor(baseName()) : "must be called in a script thread for " + baseName();
 		
-		executeFilters(makeFilterList(filters, false));
+		assert executors.isScriptThreadFor(baseName()) : "must be called in a script thread for " + baseName();
+		try {
+			executeFilters(makeFilterList(filters, false));
+		} catch (Exception e) {
+			httpResponse.error(e);
+		}
 		
 		final FilterList ioFilters = makeFilterList(filters, true);
 		
@@ -142,8 +146,14 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 				
 				@Override
 				public void run() {
-					executeFilters(ioFilters);
-					writeResponse();
+					try {
+						
+						executeFilters(ioFilters);
+						writeResponse();
+						
+					} catch (Exception e) {
+						httpResponse.error(e);
+					}
 				}
 			});
 		}
@@ -161,18 +171,13 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 		// and it gets REALLY ANNOYING
 		document.outputSettings().prettyPrint(false).indentAmount(0);
 		byte[] bytes = document.toString().getBytes(UTF_8);
-		try {
-			httpResponse
-				.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
-				// clients shouldn't cache these responses at all
-				.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-				.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
-				.content(bytes)
-				.end();
-			
-		} catch (Exception e) {
-			httpResponse.error(e);
-		}
+		httpResponse
+			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
+			// clients shouldn't cache these responses at all
+			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
+			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+			.content(bytes)
+			.end();
 	}
 	
 	@Override

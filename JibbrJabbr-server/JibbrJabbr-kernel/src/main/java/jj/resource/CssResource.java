@@ -9,6 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.SHA1Helper;
 import jj.execution.IOThread;
 
@@ -25,6 +28,7 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
+@Singleton
 public class CssResource extends AbstractResource implements LoadedResource {
 	
 	protected final String baseName;
@@ -36,6 +40,7 @@ public class CssResource extends AbstractResource implements LoadedResource {
 	private String uri;
 	private String toString;
 	
+	@Inject
 	CssResource(final ResourceCacheKey cacheKey, final String baseName, final Path path, final boolean less) throws IOException {
 		super(cacheKey);
 		this.baseName = baseName;

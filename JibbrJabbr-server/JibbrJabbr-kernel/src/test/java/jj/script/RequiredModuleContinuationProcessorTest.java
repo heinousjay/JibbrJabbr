@@ -78,7 +78,7 @@ public class RequiredModuleContinuationProcessorTest {
 	public void testFirstRequireOfModule() {
 		
 		// given
-		given(finder.loadResource(ScriptResource.class, module, ScriptResourceType.Module)).willReturn(scriptResource);
+		given(finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
 		
 		// when
 		processor.process(continuationState);
@@ -106,7 +106,7 @@ public class RequiredModuleContinuationProcessorTest {
 		Scriptable exports = mock(Scriptable.class);
 		
 		given(scriptBundle.exports()).willReturn(exports);
-		given(finder.findResource(ScriptResource.class, module, ScriptResourceType.Module)).willReturn(scriptResource);
+		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
 		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptBundle);
 		given(scriptBundle.sha1()).willReturn("");
 		given(scriptResource.sha1()).willReturn("");
@@ -122,7 +122,7 @@ public class RequiredModuleContinuationProcessorTest {
 	public void testRequireOfObseleteModule() {
 		
 		// given
-		given(finder.findResource(ScriptResource.class, module, ScriptResourceType.Module)).willReturn(scriptResource);
+		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
 		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptBundle);
 		given(scriptBundle.sha1()).willReturn("sha1");
 		given(scriptResource.sha1()).willReturn("sha2");

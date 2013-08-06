@@ -15,24 +15,31 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class AssetResourceCreatorTest extends ResourceBase {
-
-	@Test
-	public void test() throws Exception {
-		AssetResourceCreator toTest = new AssetResourceCreator();
-		
-		AssetResource jjJs = testFileResource("jj.js", toTest);
-		
-		assertThat(jjJs, is(notNullValue()));
+public class AssetResourceCreatorTest extends ResourceBase<AssetResource, AssetResourceCreator> {
+	
+	@Override
+	protected String baseName() {
+		return AssetResource.JJ_JS;
 	}
-
+	
+	@Override
+	protected Path path() {
+		return AssetResourceCreator.basePath;
+	}
+	
+	@Override
+	protected AssetResource resource() throws Exception {
+		return new AssetResource(cacheKey(), path(), baseName());
+	}
+	
+	@Override
+	protected AssetResourceCreator toTest() {
+		return new AssetResourceCreator(instanceModuleCreator);
+	}
 }

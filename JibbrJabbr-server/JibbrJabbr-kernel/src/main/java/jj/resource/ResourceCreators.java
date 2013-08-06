@@ -15,11 +15,9 @@
  */
 package jj.resource;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.io.IOException;
-import java.nio.file.Path;
-
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -28,32 +26,25 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-public class ConfigResource extends AbstractFileResource {
-
-	static final String CONFIG_JS = "config.js";
+class ResourceCreators implements Iterable<ResourceCreator<? extends Resource>> {
 	
+	private final Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreators;
+
 	/**
-	 * @param baseName
-	 * @param path
-	 * @throws IOException
+	 * 
 	 */
 	@Inject
-	ConfigResource(final ResourceCacheKey cacheKey, final Path path) throws IOException {
-		super(cacheKey, CONFIG_JS, path);
-	}
-
-	@Override
-	public String uri() {
-		// no serving this!
-		return "/";
-	}
-
-	@Override
-	public String mime() {
-		return MimeTypes.getDefault();
+	ResourceCreators(final Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreators) {
+		this.resourceCreators = Collections.unmodifiableMap(resourceCreators);
 	}
 	
-	public String script() {
-		return byteBuffer.toString(UTF_8);
+	public <T extends Resource> ResourceCreator<? extends Resource> get(final Class<T> type) {
+		return resourceCreators.get(type);
 	}
+
+	@Override
+	public Iterator<ResourceCreator<? extends Resource>> iterator() {
+		return resourceCreators.values().iterator();
+	}
+
 }

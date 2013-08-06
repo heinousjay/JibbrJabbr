@@ -7,6 +7,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -39,6 +40,13 @@ class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	
 	private final Logger log = LoggerFactory.getLogger(AssetResourceCreator.class);
 	
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	
+	@Inject
+	AssetResourceCreator(final ResourceInstanceModuleCreator instanceModuleCreator) {
+		this.instanceModuleCreator = instanceModuleCreator;
+	}
+	
 	@Override
 	public Class<AssetResource> type() {
 		return AssetResource.class;
@@ -69,13 +77,11 @@ class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	@Override
 	public AssetResource create(String baseName, Object... args) throws IOException {
 		if (myJar == null) {
-			return new AssetResource(cacheKey(baseName), basePath, baseName);
+			return instanceModuleCreator.createResource(AssetResource.class, cacheKey(basePath.resolve(baseName).toUri()), baseName, basePath);
 		} else {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(myJar, null)) {
-				return new AssetResource(cacheKey(baseName), myJarFS.getPath("/jj/assets"), baseName);
+				return instanceModuleCreator.createResource(AssetResource.class, cacheKey(baseName), baseName, myJarFS.getPath("/jj/assets"));
 			}
 		}
-		
 	}
-
 }

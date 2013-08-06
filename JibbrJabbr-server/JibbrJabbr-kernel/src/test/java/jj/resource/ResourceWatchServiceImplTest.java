@@ -23,8 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
@@ -51,7 +49,7 @@ public class ResourceWatchServiceImplTest {
 	
 	@Mock Configuration configuration;
 	
-	ResourceCache resourceCache;
+	ResourceCacheImpl resourceCache;
 	@Mock ResourceFinder resourceFinder;
 	@Mock JJExecutors executors;
 	
@@ -74,27 +72,27 @@ public class ResourceWatchServiceImplTest {
 		
 		Files.setLastModifiedTime(path, newFileTime);
 	}
+	
+	private StaticResource make(StaticResourceCreator src, String name) throws Exception {
+		return new StaticResource(src.cacheKey(name), configuration.basePath().resolve(name), name);
+	}
 
 	@Test
 	public void testReplacement() throws Exception {
 		
-		StaticResourceCreator src = new StaticResourceCreator(configuration);
-		StaticResource sr = src.create("index.html");
-		StaticResource sr1 = src.create("url_replacement_output.txt");
-		StaticResource sr2 = src.create("sox-icon.png");
-		StaticResource sr3 = src.create("replacement.css");
-		StaticResource sr4 = src.create("images/rox-icon.png");
+
+		resourceCache = new ResourceCacheImpl(MockResourceCreators.realized(configuration));
+		
+		StaticResource sr = make(MockResourceCreators.src, "index.html");
+		StaticResource sr1 = make(MockResourceCreators.src, "url_replacement_output.txt");
+		StaticResource sr2 = make(MockResourceCreators.src, "sox-icon.png");
+		StaticResource sr3 = make(MockResourceCreators.src, "replacement.css");
+		StaticResource sr4 = make(MockResourceCreators.src, "images/rox-icon.png");
 		sr1.dependsOn(sr2);
 		sr3.dependsOn(sr1);
 		sr4.dependsOn(sr1);
-		HtmlResourceCreator hrc = new HtmlResourceCreator(configuration);
-		HtmlResource hr = hrc.create("index");
-		
-		Set<ResourceCreator<? extends Resource>> resourceCreators = new HashSet<>();
-		resourceCreators.add(src);
-		resourceCreators.add(hrc);
-		
-		resourceCache = new ResourceCache(resourceCreators);
+		String name = "index";
+		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, configuration.basePath().resolve(name + ".html"));
 		
 		resourceCache.put(sr.cacheKey(), sr);
 		resourceCache.put(hr.cacheKey(), hr);

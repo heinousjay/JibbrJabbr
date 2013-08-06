@@ -42,23 +42,28 @@ public class HttpServerTest {
 	}
 	
 	@Test
-	public void test() throws Exception {
-		// for now, just proving it will start and stop is enough.
-		// later, configuration will come into play.
-		// and possibly verify it accepts connections
-		
-		try {
-			httpServer.start();
-		} finally {
-			httpServer.stop();
-		}
+	public void test1() throws Exception {
 
 		try {
 			httpServer.start();
 		} finally {
 			httpServer.stop();
 		}
-		
+	}
+	
+	@Test
+	public void test2() throws Exception {
+
+		try {
+			httpServer.start();
+		} finally {
+			httpServer.stop();
+		}
+	}
+	
+	@Test
+	public void test3() throws Exception {
+
 		try {
 			httpServer.start();
 		} finally {

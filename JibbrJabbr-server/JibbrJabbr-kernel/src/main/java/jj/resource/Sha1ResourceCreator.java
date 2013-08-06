@@ -31,10 +31,15 @@ import jj.configuration.Configuration;
 class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 
 	private final Configuration configuration;
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
 	
 	@Inject
-	Sha1ResourceCreator(final Configuration configuration) {
+	Sha1ResourceCreator(
+		final Configuration configuration,
+		final ResourceInstanceModuleCreator instanceModuleCreator
+	) {
 		this.configuration = configuration;
+		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
 	@Override
@@ -49,7 +54,7 @@ class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 
 	@Override
 	public Sha1Resource create(String baseName, Object... args) throws IOException {
-		return new Sha1Resource(cacheKey(baseName), baseName, path(baseName));
+		return instanceModuleCreator.createResource(Sha1Resource.class, cacheKey(baseName), baseName, path(baseName));
 	}
 
 	@Override

@@ -11,11 +11,16 @@ import jj.configuration.Configuration;
 @Singleton
 class ScriptResourceCreator extends AbstractResourceCreator<ScriptResource> {
 
-	private final Path basePath;
+	private final Configuration configuration;
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
 	
 	@Inject
-	ScriptResourceCreator(final Configuration configuration) {
-		this.basePath = configuration.basePath();
+	ScriptResourceCreator(
+		final Configuration configuration,
+		final ResourceInstanceModuleCreator instanceModuleCreator
+	) {
+		this.configuration = configuration;
+		this.instanceModuleCreator = instanceModuleCreator;
 	}
 	
 	@Override
@@ -30,21 +35,12 @@ class ScriptResourceCreator extends AbstractResourceCreator<ScriptResource> {
 
 	@Override
 	Path path(String baseName, Object... args) {
-		if (args.length != 1 || !(args[0] instanceof ScriptResourceType)) {
-			throw new IllegalArgumentException("expected ScriptResourceType but got " + (args.length > 0 ? args[0] : " null"));
-		}
-		ScriptResourceType type = (ScriptResourceType)args[0];
-		return basePath.resolve(baseName + type.suffix());
+		return configuration.basePath().resolve(baseName);
 	}
 
 	@Override
 	public ScriptResource create(String baseName, Object... args) throws IOException {
-		if (args.length != 1 || !(args[0] instanceof ScriptResourceType)) {
-			throw new IllegalArgumentException();
-		}
-		Path path = path(baseName, args);
-		ScriptResourceType type = (ScriptResourceType)args[0];
-		return new ScriptResource(cacheKey(baseName, args), type, path, baseName);
+		return instanceModuleCreator.createResource(ScriptResource.class, cacheKey(baseName), baseName, path(baseName));
 	}
 
 }

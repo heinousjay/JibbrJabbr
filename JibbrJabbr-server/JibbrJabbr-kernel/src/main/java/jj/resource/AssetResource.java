@@ -6,11 +6,15 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * jj internal assets
  * @author jason
  *
  */
+@Singleton
 public class AssetResource extends AbstractFileResource implements LoadedResource {
 	
 	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
@@ -18,6 +22,7 @@ public class AssetResource extends AbstractFileResource implements LoadedResourc
 	public static final String FAVICON_ICO = "favicon.ico";
 	private final String mime;
 	
+	@Inject
 	AssetResource(final ResourceCacheKey cacheKey, final Path basePath, final String baseName) throws IOException {
 		super(cacheKey, baseName, basePath.resolve(baseName));
 		mime = MimeTypes.get(baseName);

@@ -30,11 +30,16 @@ import jj.configuration.Configuration;
 @Singleton
 class StaticResourceCreator extends AbstractResourceCreator<StaticResource> {
 
-	private final Path basePath;
+	private final Configuration configuration;
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
 
 	@Inject
-	StaticResourceCreator(final Configuration configuration) {
-		this.basePath = configuration.basePath();
+	StaticResourceCreator(
+		final Configuration configuration,
+		final ResourceInstanceModuleCreator instanceModuleCreator
+	) {
+		this.configuration = configuration;
+		this.instanceModuleCreator = instanceModuleCreator;
 	}
 	
 	@Override
@@ -49,13 +54,12 @@ class StaticResourceCreator extends AbstractResourceCreator<StaticResource> {
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return basePath.resolve(baseName);
+		return configuration.basePath().resolve(baseName);
 	}
 
 	@Override
 	public StaticResource create(String baseName, Object... args) throws IOException {
-		StaticResource s = new StaticResource(cacheKey(baseName), path(baseName), baseName);
-		return s;
+		return instanceModuleCreator.createResource(StaticResource.class, cacheKey(baseName), baseName, path(baseName));
 	}
 
 }

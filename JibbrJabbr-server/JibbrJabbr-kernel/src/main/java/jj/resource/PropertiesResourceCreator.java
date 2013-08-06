@@ -11,11 +11,16 @@ import jj.configuration.Configuration;
 @Singleton
 class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResource> {
 
-	private final Path basePath;
+	private final Configuration configuration;
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
 	
 	@Inject
-	PropertiesResourceCreator(final Configuration configuration) {
-		this.basePath = configuration.basePath();
+	PropertiesResourceCreator(
+		final Configuration configuration, 
+		final ResourceInstanceModuleCreator instanceModuleCreator
+	) {
+		this.configuration = configuration;
+		this.instanceModuleCreator = instanceModuleCreator;
 	}
 	
 	@Override
@@ -30,12 +35,12 @@ class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResour
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return basePath.resolve(baseName + ".properties");
+		return configuration.basePath().resolve(baseName + ".properties");
 	}
 
 	@Override
 	public PropertiesResource create(String baseName, Object... args) throws IOException {
-		return new PropertiesResource(cacheKey(baseName), path(baseName), baseName);
+		return instanceModuleCreator.createResource(PropertiesResource.class, cacheKey(baseName), baseName, path(baseName));
 	}
 
 }

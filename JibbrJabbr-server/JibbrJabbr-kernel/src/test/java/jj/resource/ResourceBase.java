@@ -24,54 +24,98 @@ import io.netty.buffer.Unpooled;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import jj.SHA1Helper;
-import jj.configuration.Configuration;
-
+import org.hamcrest.Matchers;
 import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.mockito.BDDMockito;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
 /**
  * base test for resource testing
  * @author jason
  *
  */
-@RunWith(MockitoJUnitRunner.class)
-public abstract class ResourceBase {
+public abstract class ResourceBase<U extends Resource, T extends ResourceCreator<U>> extends RealResourceBase {
 	
-	Path basePath;
-	@Mock Configuration configuration;
+	ResourceInstanceModuleCreator instanceModuleCreator;
+	@Mock Injector injector;
+	
+	U resource;
+	
+	T toTest;
+	
+	protected Object[] args() {
+		return AbstractFileResource.EMPTY_ARGS;
+	}
+	
+	protected ResourceCacheKey cacheKey() {
+		return toTest.cacheKey(baseName(), args());
+	}
+	
+	protected abstract String baseName();
+	
+	protected abstract Path path();
+	
+	protected abstract U resource() throws Exception;
+	
+	protected abstract T toTest();
+	
+	protected void before() throws Exception {}
+
+	@SuppressWarnings("unchecked")
+	protected void configureInjector(U resource) {
+		given(injector.getInstance(BDDMockito.any(Class.class))).willReturn(resource);
+	}
 	
 	@Before
 	public final void setup() throws Exception {
-		basePath = Paths.get(ResourceBase.class.getResource("/config.js").toURI()).getParent();
-		given(configuration.basePath()).willReturn(basePath);
+		
+		before();
+		
+		instanceModuleCreator = new ResourceInstanceModuleCreator(injector);
+		
+		toTest = toTest();
+		
+		resource = resource();
+		
+		given(injector.createChildInjector(BDDMockito.any(Module.class))).willReturn(injector);
+		configureInjector(resource);
+	}
+	
+	@Test
+	public void test() throws Exception {
+		
+		U created = toTest.create(baseName(), args()); 
+		
+		testFileResource(created);
+		
+		assertThat(created, is(resource));
+		
+		resourceAssertions();
+	}
+	
+	protected void resourceAssertions() throws Exception {
+		
 	}
 		
 
-	protected <T extends Resource> T testFileResource(
-		final String baseName,
-		final ResourceCreator<T> toTest,
-		Object...args
-	) throws Exception {
+	protected void testFileResource(final Resource resource1) throws Exception {
 		
 		// well this is weirdly ugly haha
-		final Path path = Paths.get(toTest.cacheKey(baseName, args).uri());
+		final Path path = resource1.path();
 		
-		assertTrue(baseName + " does not exist", Files.exists(path));
-		
-		T resource1 = toTest.create(baseName, args);
+		assertTrue(resource1.baseName() + " does not exist", Files.exists(path));
 		
 		assertThat(resource1, is(instanceOf(AbstractResource.class)));
 		 
 		final byte[] bytes = Files.readAllBytes(path);
 		assertThat(resource1, is(notNullValue()));
-		assertThat(resource1.baseName(), is(baseName));
+		assertThat(resource1.baseName(), is(notNullValue()));
+		assertThat(resource1.baseName(), not(Matchers.startsWith("/")));
 		assertThat(resource1.lastModified(), is(Files.getLastModifiedTime(path)));
-		assertThat(resource1.path(), is(path));
 		assertThat(((AbstractResource)resource1).needsReplacing(), is(false));
 		
 		if (!(resource1 instanceof CssResource)) { 
@@ -84,9 +128,6 @@ public abstract class ResourceBase {
 			// this test is to ensure that all buffers are wrapped before returning
 			// since this has caught me out twice now
 			assertThat(((LoadedResource)resource1).bytes().readableBytes(), greaterThan(0));
-			
 		}
-		
-		return resource1;
 	}
 }

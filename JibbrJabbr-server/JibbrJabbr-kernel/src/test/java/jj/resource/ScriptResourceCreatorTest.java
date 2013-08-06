@@ -15,23 +15,32 @@
  */
 package jj.resource;
 
-import org.junit.Test;
+import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class ScriptResourceCreatorTest extends ResourceBase {
+public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, ScriptResourceCreator> {
 
-	@Test
-	public void test() throws Exception {
-		doTest("index", ScriptResourceType.Client);
-		doTest("index", ScriptResourceType.Server);
-		doTest("index", ScriptResourceType.Shared);
+	@Override
+	protected String baseName() {
+		return ScriptResourceType.Client.suffix("index");
 	}
-	
-	private void doTest(final String baseName, final ScriptResourceType type) throws Exception {
-		testFileResource(baseName, new ScriptResourceCreator(configuration), type);
+
+	@Override
+	protected Path path() {
+		return basePath.resolve(baseName());
+	}
+
+	@Override
+	protected ScriptResource resource() throws Exception {
+		return new ScriptResource(cacheKey(), path(), baseName());
+	}
+
+	@Override
+	protected ScriptResourceCreator toTest() {
+		return new ScriptResourceCreator(configuration, instanceModuleCreator);
 	}
 
 }

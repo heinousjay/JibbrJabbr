@@ -2,11 +2,6 @@ package jj.resource;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -29,7 +24,7 @@ class ResourceFinderImpl implements ResourceFinder {
 
 	private final ResourceCache resourceCache;
 	
-	private final Map<Class<?>, ResourceCreator<? extends Resource>> resourceCreators;
+	private final ResourceCreators resourceCreators;
 	
 	private final ResourceWatchService resourceWatchService;
 	
@@ -38,25 +33,14 @@ class ResourceFinderImpl implements ResourceFinder {
 	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
-		final Set<ResourceCreator<? extends Resource>> resourceCreators,
+		final ResourceCreators resourceCreators,
 		final ResourceWatchService resourceWatchService,
 		final JJExecutors executors
 	) {
 		this.resourceCache = resourceCache;
-		this.resourceCreators = makeResourceCreatorsMap(resourceCreators);
+		this.resourceCreators = resourceCreators;
 		this.resourceWatchService = resourceWatchService;
 		this.executors = executors;
-	}
-	
-	// goddam, java generics get ugly sometimes
-	private 
-	Map<Class<?>, ResourceCreator<? extends Resource>> 
-	makeResourceCreatorsMap(final Set<ResourceCreator<? extends Resource>> resourceCreators) {
-		Map<Class<?>, ResourceCreator<? extends Resource>> result = new HashMap<>();
-		for (ResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
-			result.put(resourceCreator.type(), resourceCreator);
-		}
-		return Collections.unmodifiableMap(result);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -95,8 +79,8 @@ class ResourceFinderImpl implements ResourceFinder {
 		assert executors.isIOThread() : "Can only call loadResource from an I/O thread";
 		
 		ResourceCreator<T> resourceCreator = (ResourceCreator<T>)resourceCreators.get(resourceClass);
-		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
 		
+		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
 		T result = null;
 		
 		ResourceCacheKey cacheKey = resourceCreator.cacheKey(baseName, args);

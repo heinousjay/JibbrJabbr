@@ -18,6 +18,7 @@ package jj.resource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,18 +51,21 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private final LessProcessor lessProcessor;
 	private final ResourceFinder resourceFinder;
 	private final Logger logger;
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
 	
 	@Inject
 	CssResourceCreator(
 		final Configuration configuration,
 		final LessProcessor lessProcessor,
 		final ResourceFinder resourceFinder,
-		final @EmergencyLogger Logger logger
+		final @EmergencyLogger Logger logger,
+		final ResourceInstanceModuleCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.lessProcessor = lessProcessor;
 		this.resourceFinder = resourceFinder;
 		this.logger = logger;
+		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
 	@Override
@@ -97,15 +101,25 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	@Override
 	public CssResource create(String baseName, Object... args) throws IOException {
 		boolean less = args.length == 1 && Boolean.TRUE.equals(args[0]);
-		CssResource resource = new CssResource(cacheKey(baseName, args), baseName, path(baseName, args), less);
 		
-		String processed = fixUris(
-			less ? lessProcessor.process(toLess(baseName)) : resource.byteBuffer.toString(UTF_8),
-			resource
-		);
-		resource.byteBuffer.clear().writeBytes(processed.getBytes(UTF_8));
-		resource.sha1(SHA1Helper.keyFor(resource.byteBuffer));
+		CssResource resource = null;
+		if (Files.exists(path(baseName, less))) {
 		
+			resource = instanceModuleCreator.createResource(
+				CssResource.class,
+				cacheKey(baseName, less),
+				baseName,
+				path(baseName, less),
+				less
+			);
+			
+			String processed = fixUris(
+				less ? lessProcessor.process(toLess(baseName)) : resource.byteBuffer.toString(UTF_8),
+				resource
+			);
+			resource.byteBuffer.clear().writeBytes(processed.getBytes(UTF_8));
+			resource.sha1(SHA1Helper.keyFor(resource.byteBuffer));
+		}
 		return resource;
 	}
 	

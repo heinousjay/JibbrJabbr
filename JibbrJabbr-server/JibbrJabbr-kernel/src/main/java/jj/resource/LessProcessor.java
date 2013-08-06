@@ -21,7 +21,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -91,10 +90,10 @@ class LessProcessor {
 		
 		private static final long serialVersionUID = -1L;
 		
-		private final Path basePath;
+		private final Configuration configuration;
 		
-		ReadFileFunction(final Path basePath) {
-			this.basePath = basePath;
+		ReadFileFunction(final Configuration configuration) {
+			this.configuration = configuration;
 		}
 		
 		@Override
@@ -102,11 +101,11 @@ class LessProcessor {
 			String resourceName = String.valueOf(args[0]);
 			try {
 				trace.loadLessResource(resourceName);
-				return new String(Files.readAllBytes(basePath.resolve(resourceName)), UTF_8);
+				return new String(Files.readAllBytes(configuration.basePath().resolve(resourceName)), UTF_8);
 			} catch (IOException io) {
 				trace.errorLoadingLessResource(resourceName, io);
-				return Undefined.instance;
 			}
+			return Undefined.instance;
 		}
 	}
 
@@ -148,7 +147,7 @@ class LessProcessor {
 		Context context = context();
 		try {
 			ScriptableObject global = context.initStandardObjects(null, true);
-			global.defineProperty("readFile", new ReadFileFunction(configuration.basePath()), ScriptableObject.EMPTY);
+			global.defineProperty("readFile", new ReadFileFunction(configuration), ScriptableObject.EMPTY);
 			global.defineProperty("name", new NameFunction(), ScriptableObject.EMPTY);
 			global.defineProperty("lessOptions", new LessOptionsFunction(), ScriptableObject.EMPTY);
 			context.evaluateString(global, lessScript(), SCRIPT_NAME, 1, null);

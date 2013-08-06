@@ -58,7 +58,7 @@ public class ScriptBundleHelperTest {
 		String baseName = "index";
 		String moduleIdentifier = "helpers/linkify";
 		
-		given(finder.findResource(ScriptResource.class, moduleIdentifier, ScriptResourceType.Module)).willReturn(scriptResource);
+		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(moduleIdentifier))).willReturn(scriptResource);
 		given(creator.createScriptBundle(scriptResource, moduleIdentifier, baseName)).willReturn(moduleScriptBundle);
 		
 		ScriptBundleHelper underTest = new ScriptBundleHelper(finder, scriptBundles, creator, executors);
@@ -73,7 +73,7 @@ public class ScriptBundleHelperTest {
 		String baseName = "chat/index";
 		String moduleIdentifier = "helpers/linkify";
 		
-		given(finder.findResource(ScriptResource.class, "chat/helpers/linkify", ScriptResourceType.Module)).willReturn(scriptResource);
+		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix("chat/helpers/linkify"))).willReturn(scriptResource);
 		given(creator.createScriptBundle(scriptResource, moduleIdentifier, baseName)).willReturn(moduleScriptBundle);
 		
 		ScriptBundleHelper underTest = new ScriptBundleHelper(finder, scriptBundles, creator, executors);
@@ -87,9 +87,9 @@ public class ScriptBundleHelperTest {
 	public void testFindAssociatedScriptBundle() {
 		String baseName = "index";
 		
-		given(finder.findResource(ScriptResource.class, "index", ScriptResourceType.Client)).willReturn(scriptResource1);
-		given(finder.findResource(ScriptResource.class, "index", ScriptResourceType.Shared)).willReturn(null);
-		given(finder.findResource(ScriptResource.class, "index", ScriptResourceType.Server)).willReturn(scriptResource2);
+		given(finder.findResource(ScriptResource.class, ScriptResourceType.Client.suffix("index"))).willReturn(scriptResource1);
+		given(finder.findResource(ScriptResource.class, ScriptResourceType.Shared.suffix("index"))).willReturn(null);
+		given(finder.findResource(ScriptResource.class, ScriptResourceType.Server.suffix("index"))).willReturn(scriptResource2);
 		
 		given(creator.createScriptBundle(scriptResource1, null, scriptResource2, baseName)).willReturn(associatedScriptBundle);
 		

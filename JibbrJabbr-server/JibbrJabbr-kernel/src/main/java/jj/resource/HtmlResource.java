@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 
-import jj.execution.IOThread;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
@@ -21,6 +22,7 @@ import org.jsoup.select.NodeVisitor;
  * @author jason
  *
  */
+@Singleton
 public class HtmlResource extends AbstractFileResource {
 
 	private final String uri;
@@ -49,7 +51,7 @@ public class HtmlResource extends AbstractFileResource {
 	 * @param path The filesystem Path to this resource
 	 * @throws IOException
 	 */
-	@IOThread
+	@Inject
 	HtmlResource(
 		final ResourceCacheKey cacheKey,
 		final String baseName,

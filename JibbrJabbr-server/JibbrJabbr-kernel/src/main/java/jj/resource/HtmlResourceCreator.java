@@ -11,11 +11,16 @@ import jj.configuration.Configuration;
 @Singleton
 class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	
-	private final Path basePath;
+	private final Configuration configuration;
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
 	
 	@Inject
-	HtmlResourceCreator(final Configuration configuration) {
-		this.basePath = configuration.basePath();
+	HtmlResourceCreator(
+		final Configuration configuration,
+		final ResourceInstanceModuleCreator instanceModuleCreator
+	) {
+		this.configuration = configuration;
+		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
 	@Override
@@ -30,11 +35,11 @@ class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	
 	@Override
 	Path path(final String baseName, Object...args) {
-		return basePath.resolve(baseName + ".html");
+		return configuration.basePath().resolve(baseName + ".html");
 	}
 	
 	@Override
 	public HtmlResource create(final String baseName, final Object...args) throws IOException {
-		return new HtmlResource(cacheKey(baseName), baseName, path(baseName));
+		return instanceModuleCreator.createResource(HtmlResource.class, cacheKey(baseName), baseName, path(baseName));
 	}
 }

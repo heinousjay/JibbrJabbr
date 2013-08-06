@@ -70,4 +70,8 @@ public class Configuration {
 	public boolean debugClient() {
 		return false;
 	}
+	
+	public boolean isSystemRunning() {
+		return true;
+	}
 }

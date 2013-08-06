@@ -20,12 +20,16 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.execution.IOThread;
 
 /**
  * @author jason
  *
  */
+@Singleton
 public class StaticResource extends AbstractFileResource implements TransferableResource {
 
 	private final String mime;
@@ -35,6 +39,7 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	 * @param path
 	 * @throws IOException
 	 */
+	@Inject
 	StaticResource(final ResourceCacheKey cacheKey, final Path path, final String baseName) throws IOException {
 		super(cacheKey, baseName, path, false);
 		mime = MimeTypes.get(baseName);

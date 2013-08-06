@@ -5,7 +5,7 @@ import java.io.IOException;
 import jj.JJModule;
 
 import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.MapBinder;
 
 
 public class ResourceModule extends JJModule {
@@ -33,17 +33,22 @@ public class ResourceModule extends JJModule {
 	protected void configure() {
 		
 		addServerListenerBinding().to(AssetResourcePreloader.class);
-		addServerListenerBinding().to(ResourceCache.class);
+		bind(ResourceCache.class).to(ResourceCacheImpl.class);
+		addServerListenerBinding().to(ResourceCacheImpl.class);
 		
-		Multibinder<ResourceCreator<? extends Resource>> resourceCreators = 
-			Multibinder.newSetBinder(binder(), new TypeLiteral<ResourceCreator<? extends Resource>>() {});
-		resourceCreators.addBinding().to(AssetResourceCreator.class);
-		resourceCreators.addBinding().to(CssResourceCreator.class);
-		resourceCreators.addBinding().to(HtmlResourceCreator.class);
-		resourceCreators.addBinding().to(ScriptResourceCreator.class);
-		resourceCreators.addBinding().to(Sha1ResourceCreator.class);
-		resourceCreators.addBinding().to(StaticResourceCreator.class);
-		resourceCreators.addBinding().to(PropertiesResourceCreator.class);
+		MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> mapbinder = 
+			MapBinder.newMapBinder(
+				binder(),
+				new TypeLiteral<Class<? extends Resource>>() {},
+				new TypeLiteral<ResourceCreator<? extends Resource>>() {}
+			);
+		mapbinder.addBinding(AssetResource.class).to(AssetResourceCreator.class);
+		mapbinder.addBinding(CssResource.class).to(CssResourceCreator.class);
+		mapbinder.addBinding(HtmlResource.class).to(HtmlResourceCreator.class);
+		mapbinder.addBinding(ScriptResource.class).to(ScriptResourceCreator.class);
+		mapbinder.addBinding(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		mapbinder.addBinding(StaticResource.class).to(StaticResourceCreator.class);
+		mapbinder.addBinding(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		
 		
 		// these guys love each other but it's easier to manage the implementation

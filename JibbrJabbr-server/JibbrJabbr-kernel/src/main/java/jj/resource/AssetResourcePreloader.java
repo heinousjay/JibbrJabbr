@@ -45,6 +45,8 @@ class AssetResourcePreloader implements JJServerListener {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(AssetResourceCreator.myJar, null)) {
 				doWalk(myJarFS.getPath("/jj/assets"));
 			}
+		} else {
+			log.warn("couldn't find any internal assets!");
 		}
 		
 		log.debug("preload complete");
@@ -70,7 +72,11 @@ class AssetResourcePreloader implements JJServerListener {
 					
 					@Override
 					public void run() {
-						finder.loadResource(AssetResource.class, baseName);
+						try {
+							finder.loadResource(AssetResource.class, baseName);
+						} catch (Exception e) {
+							log.error("error preloading assets", e);
+						}
 					}
 				});
 				return FileVisitResult.CONTINUE;

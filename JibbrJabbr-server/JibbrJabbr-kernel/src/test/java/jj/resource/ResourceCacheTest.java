@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashSet;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.Before;
@@ -30,40 +30,36 @@ import org.junit.Test;
  * @author jason
  *
  */
-public class ResourceCacheTest extends ResourceBase {
+public class ResourceCacheTest extends RealResourceBase {
 	
-	ResourceCache rc;
-	StaticResourceCreator src;
-	HtmlResourceCreator hrc;
-	
+	ResourceCacheImpl rc;
 	
 	@Before
 	public void before() {
-		src = new StaticResourceCreator(configuration);
-		hrc = new HtmlResourceCreator(configuration);
-		HashSet<ResourceCreator<? extends Resource>> resourceCreators = new HashSet<>();
-		resourceCreators.add(src);
-		resourceCreators.add(hrc);
-		rc = new ResourceCache(resourceCreators);
+		rc = new ResourceCacheImpl(MockResourceCreators.realized(configuration));
 	}
 
 	@Test
 	public void testOperationsByUri() throws IOException {
-		StaticResource sr = src.create("index.html");
-		HtmlResource hr = hrc.create("index");
+		String name = "index.html";
+		Path path = basePath.resolve(name);
+		StaticResource sr = new StaticResource(MockResourceCreators.src.cacheKey(name), path, name);
+		name = "index";
+		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, path);
 		
-		rc.put(src.cacheKey("index.html"), sr);
-		rc.put(hrc.cacheKey("index"), hr);
+		rc.put(sr.cacheKey(), sr);
+		rc.put(hr.cacheKey(), hr);
 		
-		URI uri = basePath.resolve("index.html").toUri();
+		URI uri = path.toUri();
 		
 		List<Resource> resources = rc.findAllByUri(uri);
 		
 		assertThat(resources.size(), is(2));
 		assertThat(resources, containsInAnyOrder((Resource)sr, (Resource)hr));
 		
-		StaticResource sr2 = src.create("blank.gif");
-		rc.put(src.cacheKey("blank.gif"), sr2);
+		name = "blank.gif";
+		StaticResource sr2 = new StaticResource(MockResourceCreators.src.cacheKey(name), path, name);
+		rc.put(sr2.cacheKey(), sr2);
 		rc.removeAllByUri(uri);
 		
 		assertThat(rc.size(), is(1));

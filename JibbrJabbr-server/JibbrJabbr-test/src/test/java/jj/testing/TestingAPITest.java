@@ -147,8 +147,8 @@ public class TestingAPITest {
 			final TestHttpClient client = app.get(request.uri);
 			try {
 				
-				assertThat(client.status(), is(HttpResponseStatus.OK));
-				assertThat(request.uri, client.contentBytes(), is(request.bytes));
+				assertThat(i + ":" + request.uri, client.status(), is(HttpResponseStatus.OK));
+				assertThat(i + ":" + request.uri, client.contentBytes(), is(request.bytes));
 			} catch (Exception e) {
 				System.err.print(new StringBuilder()
 					.append(request.uri).append(System.lineSeparator())

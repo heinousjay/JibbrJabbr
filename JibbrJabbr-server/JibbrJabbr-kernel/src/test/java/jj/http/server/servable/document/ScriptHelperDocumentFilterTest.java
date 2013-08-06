@@ -55,9 +55,9 @@ public class ScriptHelperDocumentFilterTest {
 	@Before
 	public void before() {
 		
-		scriptUri = "index/blahblahblah";
-		socketUri = "socketURI";
-		webSocketUri = "ws://localhost:8080/" + socketUri;
+		scriptUri = "/" + JJ_SHA + "/index/blahblahblah";
+		socketUri = scriptUri + ".socket";
+		webSocketUri = "ws://localhost:8080" + socketUri;
 		
 		when(associatedScriptBundle.toUri()).thenReturn(scriptUri);
 		when(associatedScriptBundle.toSocketUri()).thenReturn(socketUri);
@@ -93,9 +93,6 @@ public class ScriptHelperDocumentFilterTest {
 		// given
 		given(associatedScriptBundle.clientScriptResource()).willReturn(scriptResource);
 		given(associatedScriptBundle.sharedScriptResource()).willReturn(scriptResource);
-		given(scriptResource.type())
-			.willReturn(ScriptResourceType.Shared)
-			.willReturn(ScriptResourceType.Client);
 		
 		// when
 		filter.filter(documentRequestProcessor);
@@ -105,8 +102,8 @@ public class ScriptHelperDocumentFilterTest {
 		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
-		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(1));
-		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(1));
+		assertThat(document.select("script[src=" + ScriptResourceType.Client.suffix(scriptUri)+ "]").size(), is(1));
+		assertThat(document.select("script[src=" + ScriptResourceType.Shared.suffix(scriptUri) + "]").size(), is(1));
 	}
 	
 	@Test
@@ -114,7 +111,6 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// given
 		given(associatedScriptBundle.clientScriptResource()).willReturn(scriptResource);
-		given(scriptResource.type()).willReturn(ScriptResourceType.Client);
 		
 		// when
 		filter.filter(documentRequestProcessor);
@@ -124,8 +120,8 @@ public class ScriptHelperDocumentFilterTest {
 		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
-		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(1));
-		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(0));
+		assertThat(document.select("script[src=" + ScriptResourceType.Client.suffix(scriptUri)+ "]").size(), is(1));
+		assertThat(document.select("script[src=" + ScriptResourceType.Shared.suffix(scriptUri) + "]").size(), is(0));
 	}
 	
 	@Test
@@ -133,7 +129,6 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// given
 		given(associatedScriptBundle.sharedScriptResource()).willReturn(scriptResource);
-		given(scriptResource.type()).willReturn(ScriptResourceType.Shared);
 		
 		//when
 		filter.filter(documentRequestProcessor);
@@ -143,8 +138,8 @@ public class ScriptHelperDocumentFilterTest {
 		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
-		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(0));
-		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(1));
+		assertThat(document.select("script[src=" + ScriptResourceType.Client.suffix(scriptUri)+ "]").size(), is(0));
+		assertThat(document.select("script[src=" + ScriptResourceType.Shared.suffix(scriptUri) + "]").size(), is(1));
 	}
 	
 	@Test
@@ -160,8 +155,8 @@ public class ScriptHelperDocumentFilterTest {
 		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
-		assertThat(document.select("script[src=/" + scriptUri + ".js]").size(), is(0));
-		assertThat(document.select("script[src=/" + scriptUri + ".shared.js]").size(), is(0));
+		assertThat(document.select("script[src=" + ScriptResourceType.Client.suffix(scriptUri)+ "]").size(), is(0));
+		assertThat(document.select("script[src=" + ScriptResourceType.Shared.suffix(scriptUri) + "]").size(), is(0));
 	}
 	
 	@Test

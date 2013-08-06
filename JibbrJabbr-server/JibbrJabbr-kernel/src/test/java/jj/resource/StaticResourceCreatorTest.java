@@ -15,53 +15,32 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-
-import org.junit.Test;
+import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class StaticResourceCreatorTest extends ResourceBase {
+public class StaticResourceCreatorTest extends ResourceBase<StaticResource, StaticResourceCreator> {
 
-	@Test
-	public void test() throws Exception {
-		
-		doTest("blank.gif");
-		doTest("README.txt");
-		doTest("helpers/jquery.fancybox-media.js");
-		
-		// this only works in test, since the class files in this directory
-		doTest("jj/resource/StaticResourceCreatorTest.class"); 
+	@Override
+	protected String baseName() {
+		return "helpers/jquery.fancybox-media.js";
 	}
-	
-	private void doTest(final String baseName) throws Exception {
-		StaticResource resource1 = testFileResource(baseName, new StaticResourceCreator(configuration));
-		assertThat(resource1, is(notNullValue()));
-		assertThat(resource1.mime(), is(MimeTypes.get(baseName)));
-		assertThat(resource1.size(), is(Files.size(resource1.path())));
+
+	@Override
+	protected Path path() {
+		return basePath.resolve(baseName());
 	}
-	
-	@Test
-	public void testFileNotFound() throws Exception {
-		// given
-		String baseName = "not/a/real/baseName";
-		StaticResourceCreator toTest = new StaticResourceCreator(configuration);
-		
-		// when
-		try {
-			toTest.create(baseName);
-			
-		// then
-			fail("should have thrown");
-		} catch (NoSuchFileException nsfe) {
-			
-		}
+
+	@Override
+	protected StaticResource resource() throws Exception {
+		return new StaticResource(cacheKey(), path(), baseName());
+	}
+
+	@Override
+	protected StaticResourceCreator toTest() {
+		return new StaticResourceCreator(configuration, instanceModuleCreator);
 	}
 
 }

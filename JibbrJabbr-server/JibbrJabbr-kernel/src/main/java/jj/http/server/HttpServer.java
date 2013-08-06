@@ -86,8 +86,8 @@ class HttpServer implements JJServerListener {
 	@Override
 	public void stop() {
 		assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
-		serverBootstrap.group().shutdownGracefully();
-		serverBootstrap.childGroup().shutdownGracefully();
+		serverBootstrap.group().shutdownGracefully().syncUninterruptibly();
+		serverBootstrap.childGroup().shutdownGracefully().syncUninterruptibly();
 		serverBootstrap = null;
 		logger.info("Server shut down");
 	}

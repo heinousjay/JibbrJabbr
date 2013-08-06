@@ -15,49 +15,32 @@
  */
 package jj.resource;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.given;
-
-import java.nio.file.Files;
+import static jj.resource.ConfigResource.CONFIG_JS;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import jj.configuration.Configuration;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ConfigResourceCreatorTest {
-	
-	Path basePath;
-	@Mock Configuration configuration;
-	
-	ConfigResourceCreator toTest;
-	
-	@Before
-	public void before() throws Exception {
-		basePath = Paths.get(ResourceBase.class.getResource("/config.js").toURI()).getParent();
-		given(configuration.basePath()).willReturn(basePath);
-		
-		toTest = new ConfigResourceCreator(configuration);
-	}
+public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, ConfigResourceCreator> {
 
-	@Test
-	public void testCreate() throws Exception {
-		
-		ConfigResource resource = toTest.create(ConfigResource.CONFIG_JS);
-		
-		assertThat(resource.script().getBytes(UTF_8), is(Files.readAllBytes(basePath.resolve(ConfigResource.CONFIG_JS))));
+	@Override
+	protected String baseName() {
+		return CONFIG_JS;
 	}
-
+	
+	@Override
+	protected Path path() {
+		return basePath.resolve(baseName());
+	}
+	
+	@Override
+	protected ConfigResource resource() throws Exception {
+		return new ConfigResource(cacheKey(), path());
+	}
+	
+	@Override
+	protected ConfigResourceCreator toTest() {
+		return new ConfigResourceCreator(configuration, instanceModuleCreator);
+	}
 }

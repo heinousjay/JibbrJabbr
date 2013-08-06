@@ -27,6 +27,13 @@ import java.nio.file.Files;
 public class TestAssetResourceCreator extends AssetResourceCreator {
 
 	
+	/**
+	 * @param instanceModuleCreator
+	 */
+	public TestAssetResourceCreator() {
+		super(null);
+	}
+
 	public byte[] toBytes(final String baseName) throws IOException {
 		if (myJar == null) {
 			return Files.readAllBytes(basePath.resolve(baseName));

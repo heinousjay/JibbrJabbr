@@ -1,26 +1,52 @@
+/*
+ *    Copyright 2012 Jason Miller
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package jj.resource;
 
+/**
+ * @author jason
+ *
+ */
 public enum ScriptResourceType {
-	Module {
-		public String suffix() {
-			return ".js";
-		}
-	},
 	Client {
-		public String suffix() {
-			return ".js";
+		@Override
+		public String suffix(String baseName)  {
+			return baseName + ".js";
 		}
 	},
+	
+	Module {
+		@Override
+		public String suffix(String baseName)  {
+			return baseName + ".js";
+		}
+	},
+	
 	Shared {
-		public String suffix() {
-			return ".shared.js";
+		@Override
+		public String suffix(String baseName) {
+			return baseName + ".shared.js";
 		}
 	},
+	
 	Server {
-		public String suffix() {
-			return ".server.js";
+		@Override
+		public String suffix(String baseName) {
+			return baseName + ".server.js";
 		}
 	};
 	
-	public abstract String suffix();
+	public abstract String suffix(final String baseName);
 }

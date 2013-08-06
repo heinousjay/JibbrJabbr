@@ -71,7 +71,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 				@Override
 				public void run() {
 					ScriptResource scriptResource = 
-						finder.loadResource(ScriptResource.class, path, ScriptResourceType.Module);
+						finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(path));
 					
 					// at this point do we need to check if we got scooped? inside
 					// the script thread makes more sense really, if we check here
@@ -120,7 +120,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		final RequiredModule requiredModule = continuationState.requiredModule();
 		
 		ScriptResource scriptResource = 
-			finder.findResource(ScriptResource.class, requiredModule.identifier(), ScriptResourceType.Module);
+			finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(requiredModule.identifier()));
 		
 		ModuleScriptBundle scriptBundle = 
 			scriptFinder.forBaseNameAndModuleIdentifier(context.baseName(), requiredModule.identifier());

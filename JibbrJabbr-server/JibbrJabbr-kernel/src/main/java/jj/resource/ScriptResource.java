@@ -8,32 +8,22 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import jj.execution.IOThread;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	
-	private final ScriptResourceType type;
 	private final String script;
 	
-	@IOThread
+	@Inject
 	ScriptResource(
 		final ResourceCacheKey cacheKey,
-		final ScriptResourceType type,
 		final Path path,
 		final String baseName
 	) throws IOException {
 		super(cacheKey, baseName, path);
-		this.type = type;
 		script = byteBuffer.toString(UTF_8);
-	}
-	
-	public ScriptResourceType type() {
-		return type;
-	}
-	
-	@Override
-	public String uri() {
-		return super.uri() + type.suffix();
 	}
 	
 	public String script() {
@@ -49,9 +39,4 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	public ByteBuf bytes() {
 		return Unpooled.wrappedBuffer(byteBuffer);
 	}
-	
-	@Override
-	Object[] creationArgs() {
-		return new Object[] { type };
-	};
 }

@@ -24,10 +24,14 @@ import java.nio.file.attribute.FileTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * @author jason
  *
  */
+@Singleton
 class Sha1Resource extends AbstractFileResource {
 	
 	private static final Pattern FORMAT = Pattern.compile("^([a-f\\d]{40})(-?\\d{1,14})$");
@@ -41,6 +45,7 @@ class Sha1Resource extends AbstractFileResource {
 	 * @param path
 	 * @throws IOException
 	 */
+	@Inject
 	Sha1Resource(ResourceCacheKey cacheKey, String baseName, Path path) throws IOException {
 		super(cacheKey, baseName, path);
 		Matcher matcher = FORMAT.matcher(byteBuffer.toString(UTF_8));

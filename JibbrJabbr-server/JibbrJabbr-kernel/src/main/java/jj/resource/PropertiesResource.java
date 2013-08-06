@@ -8,6 +8,10 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.PropertyResourceBundle;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class PropertiesResource extends AbstractFileResource {
 	
 	private PropertyResourceBundle properties;
@@ -19,6 +23,7 @@ public class PropertiesResource extends AbstractFileResource {
 	 * @param path the path to the properties file
 	 * @throws IOException
 	 */
+	@Inject
 	PropertiesResource(
 		final ResourceCacheKey cacheKey,
 		final Path path,

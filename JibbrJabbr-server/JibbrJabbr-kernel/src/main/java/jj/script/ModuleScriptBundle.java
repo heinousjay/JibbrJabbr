@@ -88,7 +88,7 @@ public class ModuleScriptBundle implements ScriptBundle {
 	
 	@Override
 	public String scriptName() {
-		return moduleIdentifier + ScriptResourceType.Module.suffix();
+		return ScriptResourceType.Module.suffix(moduleIdentifier);
 	}
 
 	@Override

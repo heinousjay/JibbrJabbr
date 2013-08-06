@@ -97,7 +97,7 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	
 	@Override
 	public String scriptName() {
-		return baseName + ScriptResourceType.Server.suffix();
+		return ScriptResourceType.Server.suffix(baseName);
 	}
 
 	public Callable getFunction(String name) {
@@ -149,7 +149,7 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	}
 
 	public String toUri() {
-		return sha1 + "/" + baseName;
+		return "/" + sha1 + "/" + baseName;
 	}
 
 	public String toSocketUri() {

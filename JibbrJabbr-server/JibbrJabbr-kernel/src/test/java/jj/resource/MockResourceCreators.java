@@ -15,25 +15,31 @@
  */
 package jj.resource;
 
-import java.net.URI;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+
+import jj.configuration.Configuration;
 
 /**
  * @author jason
  *
  */
-interface ResourceCache extends ConcurrentMap<ResourceCacheKey, Resource> {
+class MockResourceCreators {
+	
 
-	/**
-	 * @param uri
-	 * @return
-	 */
-	List<Resource> findAllByUri(URI uri);
+	static StaticResourceCreator src;
+	static HtmlResourceCreator hrc;
 
-	/**
-	 * @param uri
-	 */
-	void removeAllByUri(URI uri);
+	static ResourceCreators realized(Configuration configuration) {
+		src = new StaticResourceCreator(configuration, null);
+		hrc = new HtmlResourceCreator(configuration, null);
+		HashMap<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreators = new HashMap<>();
+		resourceCreators.put(src.type(), src);
+		resourceCreators.put(hrc.type(), hrc);
+		return new ResourceCreators(resourceCreators);
+	}
+	
+	private MockResourceCreators() {
+		
+	}
 
 }

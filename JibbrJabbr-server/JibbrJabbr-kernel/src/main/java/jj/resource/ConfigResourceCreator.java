@@ -27,9 +27,14 @@ import jj.configuration.Configuration;
 class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
 	private final Configuration configuration;
+	private final ResourceInstanceModuleCreator instanceModuleCreator;
 	
-	ConfigResourceCreator(final Configuration configuration) {
+	ConfigResourceCreator(
+		final Configuration configuration,
+		final ResourceInstanceModuleCreator instanceModuleCreator
+	) {
 		this.configuration = configuration;
+		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
 	@Override
@@ -49,7 +54,7 @@ class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 
 	@Override
 	public ConfigResource create(String baseName, Object... args) throws IOException {
-		return new ConfigResource(cacheKey(baseName), path(baseName));
+		return instanceModuleCreator.createResource(ConfigResource.class, cacheKey(baseName), baseName, path(baseName));
 	}
 
 }

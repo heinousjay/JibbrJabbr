@@ -82,9 +82,9 @@ class DocumentServable extends Servable<HtmlResource> {
 		// since we're in the IO thread already and we might need this stuff soon, as a small
 		// optimization to avoid jumping right back into the I/O thread after dispatching this
 		// into the script thread, we just "prime the pump"
-		resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Client);
-		resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Shared);
-		resourceFinder.loadResource(ScriptResource.class, baseName, ScriptResourceType.Server);
+		resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
+		resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
+		resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 	}
 	
 	@Override

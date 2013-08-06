@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.resource;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.given;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,32 +23,24 @@ import java.nio.file.Paths;
 import jj.configuration.Configuration;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-public class ConfigurationTest {
+@RunWith(MockitoJUnitRunner.class)
+public abstract class RealResourceBase {
 	
-	Path realPath;
+	Path basePath;
+	@Mock Configuration configuration;
 
-	@Before 
-	public void before() throws Exception {
-		realPath = Paths.get(ConfigurationTest.class.getResource("/index.html").toURI()).getParent();
-	}
-	
-	@Test
-	public void test() {
-		Configuration toTest = new Configuration(new String[] {realPath.toString()});
-		
-		assertThat(toTest.basePath(), is(realPath));
-	}
-	
-	@Test
-	public void testIsSystemRunning() {
-		assertThat(new Configuration(new String[] {realPath.toString()}).isSystemRunning(), is(true));
-		assertThat(mock(Configuration.class).isSystemRunning(), is(false));
+	@Before
+	public final void init() throws Exception {
+		basePath = Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
+		given(configuration.basePath()).willReturn(basePath);
 	}
 
 }

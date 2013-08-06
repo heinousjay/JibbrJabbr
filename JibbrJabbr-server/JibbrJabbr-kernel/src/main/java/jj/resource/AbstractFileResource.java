@@ -27,7 +27,7 @@ public abstract class AbstractFileResource extends AbstractResource {
 	// beyond this, we don't read the SHA inside here
 	private static final long MAX_READ_AND_DIGEST = 10000000;
 
-	private static final Object[] EMPTY_ARGS = {};
+	protected static final Object[] EMPTY_ARGS = {};
 	
 	protected final String baseName;
 	protected final Path path;

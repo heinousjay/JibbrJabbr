@@ -15,30 +15,33 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.*;
-
-import java.nio.file.Files;
-
-import org.junit.Test;
+import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class PropertiesResourceCreatorTest extends ResourceBase {
+public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResource, PropertiesResourceCreator> {
 
-	@Test
-	public void test() throws Exception {
-		doTest("index");
+	@Override
+	protected String baseName() {
+		return "index";
 	}
-	
-	private void doTest(final String baseName) throws Exception {
 
-		PropertiesResource resource1 = testFileResource(baseName, new PropertiesResourceCreator(configuration));
-		assertThat(resource1, is(notNullValue()));
-		assertThat(resource1.byteBuffer.readableBytes(), is(Files.readAllBytes(resource1.path).length));
+	@Override
+	protected Path path() {
+		return basePath.resolve(baseName() + ".properties");
 	}
+
+	@Override
+	protected PropertiesResource resource() throws Exception {
+		return new PropertiesResource(cacheKey(), path(), baseName());
+	}
+
+	@Override
+	protected PropertiesResourceCreator toTest() {
+		return new PropertiesResourceCreator(configuration, instanceModuleCreator);
+	}
+
 
 }

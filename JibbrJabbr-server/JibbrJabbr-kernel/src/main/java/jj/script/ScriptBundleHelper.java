@@ -55,19 +55,19 @@ class ScriptBundleHelper {
 	
 	private ScriptResource moduleScript(final String baseName, final String moduleIdentifier) {
 		String path = Paths.get(baseName).resolveSibling(moduleIdentifier).toString();
-		return finder.findResource(ScriptResource.class, path, ScriptResourceType.Module);
+		return finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(path));
 	}
 	
 	private ScriptResource clientScript(final String baseName) {
-		return finder.findResource(ScriptResource.class, baseName, ScriptResourceType.Client);
+		return finder.findResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
 	}
 	
 	private ScriptResource sharedScript(final String baseName) {
-		return finder.findResource(ScriptResource.class, baseName, ScriptResourceType.Shared);
+		return finder.findResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
 	}
 	
 	private ScriptResource serverScript(final String baseName) {
-		return finder.findResource(ScriptResource.class, baseName, ScriptResourceType.Server);
+		return finder.findResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 	}
 	
 	

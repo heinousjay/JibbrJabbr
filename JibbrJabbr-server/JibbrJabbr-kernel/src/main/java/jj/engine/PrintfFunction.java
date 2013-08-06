@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.resource.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
@@ -64,7 +65,7 @@ class PrintfFunction extends BaseFunction implements HostObject {
 				Arrays.asList(args).subList(1, args.length).toArray() :
 				EMPTY_ARGS;
 
-		LoggerFactory.getLogger(context.associatedScriptBundle().toUri() + ".server.js").debug(
+		LoggerFactory.getLogger(ScriptResourceType.Server.suffix(context.associatedScriptBundle().toUri())).debug(
 			String.format(String.valueOf(formatString), toFormat)
 		);
 		return Undefined.instance;

@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
+import jj.resource.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 import jj.script.AssociatedScriptBundle;
 
@@ -39,12 +39,6 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 		this.resourceFinder = resourceFinder;
 	}
 
-	private void addScript(Document document, AssociatedScriptBundle bundle, ScriptResource scriptResource) {
-		if (scriptResource != null) {
-			addScript(document, "/" + bundle.toUri() + scriptResource.type().suffix());
-		}
-	}
-
 	private Element makeScriptTag(Document document, String uri) {
 		return document
 			.createElement("script")
@@ -74,7 +68,6 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				(documentRequestProcessor.httpRequest().secure() ? "s" : "") + 
 				"://" + 
 				documentRequestProcessor.httpRequest().host() + 
-				"/" + 
 				scriptBundle.toSocketUri();
 			
 			Element jjScript = 
@@ -91,8 +84,12 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			addScript(documentRequestProcessor.document(), jjScript);
 			
 			// associated scripts
-			addScript(documentRequestProcessor.document(), scriptBundle, scriptBundle.sharedScriptResource());
-			addScript(documentRequestProcessor.document(), scriptBundle, scriptBundle.clientScriptResource());
+			if (scriptBundle.sharedScriptResource() != null) {
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptBundle.toUri()));
+			}
+			if (scriptBundle.clientScriptResource() != null) {
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptBundle.toUri()));
+			}
 		}
 	}
 
