@@ -15,13 +15,26 @@
  */
 package jj.resource;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.SHA1Helper;
 import jj.configuration.Configuration;
 
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -41,6 +54,39 @@ public abstract class RealResourceBase {
 	public final void init() throws Exception {
 		basePath = Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
 		given(configuration.basePath()).willReturn(basePath);
+	}
+
+	protected <T extends Resource> T testFileResource(final T resource) throws Exception {
+		
+		// well this is weirdly ugly haha
+		final Path path = resource.path();
+		
+		assertTrue(resource.baseName() + " does not exist", Files.exists(path));
+		
+		assertThat(resource, is(instanceOf(AbstractResource.class)));
+		 
+		final byte[] bytes = Files.readAllBytes(path);
+		assertThat(resource, is(notNullValue()));
+		assertThat(resource.baseName(), is(notNullValue()));
+		assertThat(resource.baseName(), not(Matchers.startsWith("/")));
+		assertThat(resource.lastModified(), is(Files.getLastModifiedTime(path)));
+		assertThat(((AbstractResource)resource).needsReplacing(), is(false));
+		
+		if (!(resource instanceof CssResource)) { 
+			// css bytes are complicated and tested in CssResourceCreatorTest
+			
+			assertThat(resource.sha1(), is(SHA1Helper.keyFor(bytes))); 
+			
+			if (resource instanceof LoadedResource) {
+				ByteBuf buf = ((LoadedResource)resource).bytes();
+				buf.readBytes(Unpooled.buffer(buf.readableBytes()));
+				// this test is to ensure that all buffers are wrapped before returning
+				// since this has caught me out twice now
+				assertThat(((LoadedResource)resource).bytes().readableBytes(), greaterThan(0));
+			}
+		}
+		
+		return resource;
 	}
 
 }

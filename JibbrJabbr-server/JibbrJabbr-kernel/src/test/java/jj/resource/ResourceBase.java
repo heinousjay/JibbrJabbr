@@ -19,13 +19,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import jj.SHA1Helper;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.BDDMockito;
@@ -99,35 +94,5 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 	
 	protected void resourceAssertions() throws Exception {
 		
-	}
-		
-
-	protected void testFileResource(final Resource resource1) throws Exception {
-		
-		// well this is weirdly ugly haha
-		final Path path = resource1.path();
-		
-		assertTrue(resource1.baseName() + " does not exist", Files.exists(path));
-		
-		assertThat(resource1, is(instanceOf(AbstractResource.class)));
-		 
-		final byte[] bytes = Files.readAllBytes(path);
-		assertThat(resource1, is(notNullValue()));
-		assertThat(resource1.baseName(), is(notNullValue()));
-		assertThat(resource1.baseName(), not(Matchers.startsWith("/")));
-		assertThat(resource1.lastModified(), is(Files.getLastModifiedTime(path)));
-		assertThat(((AbstractResource)resource1).needsReplacing(), is(false));
-		
-		if (!(resource1 instanceof CssResource)) { 
-			assertThat(resource1.sha1(), is(SHA1Helper.keyFor(bytes))); 
-		}
-		
-		if (resource1 instanceof LoadedResource) {
-			ByteBuf buf = ((LoadedResource)resource1).bytes();
-			buf.readBytes(Unpooled.buffer(buf.readableBytes()));
-			// this test is to ensure that all buffers are wrapped before returning
-			// since this has caught me out twice now
-			assertThat(((LoadedResource)resource1).bytes().readableBytes(), greaterThan(0));
-		}
 	}
 }

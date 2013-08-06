@@ -15,11 +15,9 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
 import java.nio.file.Path;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.inject.AbstractModule;
@@ -30,38 +28,72 @@ import com.google.inject.Guice;
  *
  */
 public class ResourceInstanceModuleCreatorTest extends RealResourceBase {
-
-	@Test
-	public void test() {
+	
+	ResourceInstanceModuleCreator rimc;
+	
+	@Before
+	public void before() {
 		
-		
-		ResourceInstanceModuleCreator rimc = new ResourceInstanceModuleCreator(Guice.createInjector(new AbstractModule() {
+		rimc = new ResourceInstanceModuleCreator(Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
-				// TODO Auto-generated method stub
+				
 				
 			}
 		}));
-		
-		String baseName = "index.html";
-		
+	}
+	
+	private <T extends Resource> T doCreate(Class<T> type, String baseName, Object...args) throws Exception {
 		Path path = basePath.resolve(baseName);
 		
-		ResourceCacheKey cacheKey = new ResourceCacheKey(StaticResource.class, path.toUri());
+		return doCreate(type, baseName, path, args);
+	}
+	
+	private <T extends Resource> T doCreate(Class<T> type, String baseName, Path path, Object...args) throws Exception {
+		ResourceCacheKey cacheKey = new ResourceCacheKey(type, path.toUri());
 		
-		StaticResource sr = rimc.createResource(StaticResource.class, cacheKey, baseName, path);
-		
-		assertThat(sr, is(notNullValue()));
-		
-		HtmlResource hr = rimc.createResource(HtmlResource.class, cacheKey, baseName, path);
-		
-		assertThat(hr, is(notNullValue()));
-		
-		CssResource cr = rimc.createResource(CssResource.class, cacheKey, "style.css", basePath.resolve("style.less"), true);
-		
-		assertThat(cr, is(notNullValue()));
-		assertThat(cr.path(), is(basePath.resolve("style.less")));
-		assertThat(cr.sha1(), is(nullValue()));
+		return testFileResource(rimc.createResource(type, cacheKey, baseName, path, args));
+	}
+	
+	@Test
+	public void testAssetResource() throws Exception {
+		doCreate(AssetResource.class, "jj.js", AssetResourceCreator.basePath);
+	}
+	
+	@Test
+	public void testConfigResource() throws Exception {
+		doCreate(ConfigResource.class, ConfigResource.CONFIG_JS);
+	}
+	
+	@Test
+	public void testCssResource() throws Exception {
+		doCreate(CssResource.class, "style.css", basePath.resolve("style.less"), true);
+		doCreate(CssResource.class, "style.css", basePath.resolve("jj/resource/test.css"));
+	}
+	
+	@Test
+	public void testHtmlResource() throws Exception {
+		doCreate(HtmlResource.class, "index.html");
+	}
+	
+	@Test
+	public void testPropertiesResource() throws Exception {
+		doCreate(PropertiesResource.class, "index.properties");
+	}
+	
+	@Test
+	public void testScriptResource() throws Exception {
+		doCreate(ScriptResource.class, "helpers.js");
+	}
+	
+	@Test
+	public void testSha1Resource() throws Exception {
+		doCreate(Sha1Resource.class, "not.real.test.sha1");
+	}
+
+	@Test
+	public void testStaticResource() throws Exception {
+		doCreate(StaticResource.class, "index.html");
 	}
 }
