@@ -50,25 +50,4 @@ public class HttpServerTest {
 			httpServer.stop();
 		}
 	}
-	
-	@Test
-	public void test2() throws Exception {
-
-		try {
-			httpServer.start();
-		} finally {
-			httpServer.stop();
-		}
-	}
-	
-	@Test
-	public void test3() throws Exception {
-
-		try {
-			httpServer.start();
-		} finally {
-			httpServer.stop();
-		}
-	}
-
 }
