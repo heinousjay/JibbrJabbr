@@ -83,7 +83,19 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 			return true;
 		}
 		
+		private void remove(final AbstractResource resource) {
+			log.info("removing {}", resource);
+			if (resourceCache.remove(resource.cacheKey(), resource)) {
+				for (AbstractResource dependent : resource.dependents()) {
+					reload(dependent);
+				}
+			}
+		}
+		
 		private void reload(final AbstractResource resource) {
+			// the resources are reloaded as a separate task so we don't clog up
+			// the reloader thread doing other work
+			resource.markObselete();
 			executors.ioExecutor().submit(
 				new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
 				
@@ -100,9 +112,8 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 							resource.baseName(),
 							resource.creationArgs()
 						);
-						for (AbstractResource ar : resource.dependents()) {
-							ar.markObselete();
-							reload(ar);
+						for (AbstractResource dependent : resource.dependents()) {
+							reload(dependent);
 						}
 					}
 				}
@@ -131,15 +142,12 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 							final Path path = directory.resolve(context);
 							
 							if (kind == ENTRY_DELETE) {
-								// it'll get reloaded if it gets recreated
-								// later and someone wants it
-								log.info("removing {}", path);
-								resourceCache.removeAllByUri(path.toUri());
+								for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
+									remove((AbstractResource)resource);
+								}
 							
 							} else if (kind == ENTRY_MODIFY) {
 								for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
-									// this thread is only to handle the
-									// WatchEvents
 									reload((AbstractResource)resource);
 								}
 							}

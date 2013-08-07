@@ -54,8 +54,7 @@ class ResourceFinderImpl implements ResourceFinder {
 				((AbstractResource)resource).creationArgs()
 			);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Override
 	public <T extends Resource> T findResource(
 		final Class<T> resourceClass,
@@ -63,12 +62,11 @@ class ResourceFinderImpl implements ResourceFinder {
 		Object... args
 	) {
 		log.trace("checking in resource cache for {} at {}", resourceClass.getSimpleName(), baseName);
-		T result = (T)resourceCache.get(resourceCreators.get(resourceClass).cacheKey(baseName, args));
+		T result = resourceClass.cast(resourceCache.get(resourceCreators.get(resourceClass).cacheKey(baseName, args)));
 		log.trace("result {}", result);
 		return result;
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@IOThread
 	@Override
 	public  <T extends Resource> T loadResource(
@@ -78,6 +76,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	) {
 		assert executors.isIOThread() : "Can only call loadResource from an I/O thread";
 		
+		@SuppressWarnings("unchecked")
 		ResourceCreator<T> resourceCreator = (ResourceCreator<T>)resourceCreators.get(resourceClass);
 		
 		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
@@ -127,7 +126,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		
 		log.trace("loading {} at {}", resourceCreator.type().getSimpleName(), cacheKey);
 		
-		Resource resource = resourceCreator.create(baseName, args);
+		T resource = resourceCreator.create(baseName, args);
 		if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
 			// if this was the first time we put this in the cache,
 			// we set up a file watch on it for background reloads

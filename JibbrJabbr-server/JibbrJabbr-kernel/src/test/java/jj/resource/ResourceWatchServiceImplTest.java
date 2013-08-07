@@ -15,13 +15,17 @@
  */
 package jj.resource;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +53,10 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceWatchServiceImplTest {
 	
+
+	String fileName = "gibberish.txt";
+	Path gibberish;
+	
 	@Mock Configuration configuration;
 	
 	ResourceCacheImpl resourceCache;
@@ -61,7 +69,15 @@ public class ResourceWatchServiceImplTest {
 	@Before
 	public void before() throws Exception {
 		
-		given(configuration.basePath()).willReturn(Paths.get(getClass().getResource("index.html").toURI()).getParent());
+		Path basePath = Paths.get(getClass().getResource("index.html").toURI()).getParent();
+		
+		gibberish = basePath.resolve(fileName);
+		
+		try (SeekableByteChannel channel = Files.newByteChannel(gibberish, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
+			channel.write(ByteBuffer.wrap(fileName.getBytes(UTF_8)));
+		}
+		
+		given(configuration.basePath()).willReturn(basePath);
 		
 		executorService = Executors.newFixedThreadPool(2);
 		given(executors.ioExecutor()).willReturn(executorService);
@@ -69,6 +85,11 @@ public class ResourceWatchServiceImplTest {
 	
 	@After
 	public void after() throws Exception {
+		
+		try {
+			Files.delete(gibberish);
+		} catch (Exception e) {}
+		
 		executorService.shutdownNow();
 	}
 	
@@ -86,11 +107,32 @@ public class ResourceWatchServiceImplTest {
 		return new StaticResource(src.cacheKey(name), configuration.basePath().resolve(name), name);
 	}
 
-	@Test
-	public void testReplacement() throws Exception {
+	@SuppressWarnings("unchecked")
+	private CountDownLatch setUpLatch(int fileCount) {
+		final CountDownLatch latch = new CountDownLatch(fileCount);
 		
+		given(resourceFinder.loadResource(any(Class.class), anyString(), anyVararg())).willAnswer(new Answer<Resource>() {
+
+			@Override
+			public Resource answer(InvocationOnMock invocation) throws Throwable {
+				latch.countDown();
+				return null;
+			}
+			
+		});
+		return latch;
+	}
+
+	@Test
+	public void test() throws Exception {
+		
+		// all done in one test because it takes 10 seconds per run on the mac
+		
+		// given
 
 		resourceCache = new ResourceCacheImpl(MockResourceCreators.realized(configuration));
+		
+		// set up for replacements
 		
 		StaticResource sr = make(MockResourceCreators.src, "index.html");
 		StaticResource sr1 = make(MockResourceCreators.src, "url_replacement_output.txt");
@@ -109,17 +151,42 @@ public class ResourceWatchServiceImplTest {
 		resourceCache.put(sr2.cacheKey(), sr2);
 		resourceCache.put(sr3.cacheKey(), sr3);
 		resourceCache.put(sr4.cacheKey(), sr4);
-		int fileCount = resourceCache.size();
+		
+		// set up for removal
+		
+		StaticResource sr1_1 = make(MockResourceCreators.src, fileName);
+		StaticResource sr1_2 = make(MockResourceCreators.src, "test.css");
+		StaticResource sr1_3 = make(MockResourceCreators.src, "test.less");
+		StaticResource sr1_4 = make(MockResourceCreators.src, "test2.less");
+		sr1_2.dependsOn(sr1_1);
+		sr1_3.dependsOn(sr1_2);
+		sr1_4.dependsOn(sr1_2);
+		resourceCache.put(sr1_1.cacheKey(), sr1_1);
+		resourceCache.put(sr1_2.cacheKey(), sr1_2);
+		resourceCache.put(sr1_3.cacheKey(), sr1_3);
+		resourceCache.put(sr1_4.cacheKey(), sr1_4);
+		
+		int fileCount = resourceCache.size() - 1;
 		
 		rwsi = new ResourceWatchServiceImpl(resourceCache, resourceFinder, executors);
 
+		// when 
 		rwsi.start();
 		try {
 			rwsi.watch(sr);
+			rwsi.watch(sr1);
+			rwsi.watch(sr2);
+			rwsi.watch(sr3);
+			rwsi.watch(sr4);
 			rwsi.watch(hr);
+			rwsi.watch(sr1_1);
+			rwsi.watch(sr1_2);
+			rwsi.watch(sr1_3);
+			rwsi.watch(sr1_4);
 			
 			touch(sr.path());
 			touch(sr2.path());
+			Files.delete(gibberish);
 			
 			// we need to give it 10+ seconds on the mac.  stupid mac
 			// but if there's a watch implementation that notifies quickly,
@@ -132,6 +199,17 @@ public class ResourceWatchServiceImplTest {
 		} finally {
 			rwsi.stop();
 		}
+
+		// then
+		
+		// replacement checks
+		
+		assertTrue(hr.isObselete());
+		assertTrue(sr.isObselete());
+		assertTrue(sr1.isObselete());
+		assertTrue(sr2.isObselete());
+		assertTrue(sr3.isObselete());
+		assertTrue(sr4.isObselete());
 		
 		verify(resourceFinder).loadResource(StaticResource.class, "index.html");
 		verify(resourceFinder).loadResource(HtmlResource.class, "index");
@@ -139,21 +217,17 @@ public class ResourceWatchServiceImplTest {
 		verify(resourceFinder).loadResource(StaticResource.class, "sox-icon.png");
 		verify(resourceFinder).loadResource(StaticResource.class, "replacement.css");
 		verify(resourceFinder).loadResource(StaticResource.class, "images/rox-icon.png");
-	}
-
-	@SuppressWarnings("unchecked")
-	private CountDownLatch setUpLatch(int fileCount) {
-		final CountDownLatch latch = new CountDownLatch(fileCount);
 		
-		given(resourceFinder.loadResource(any(Class.class), anyString(), anyVararg())).willAnswer(new Answer<Resource>() {
-
-			@Override
-			public Resource answer(InvocationOnMock invocation) throws Throwable {
-				latch.countDown();
-				return null;
-			}
-			
-		});
-		return latch;
+		// removal checks
+		
+		assertTrue(sr1_2.isObselete());
+		assertTrue(sr1_3.isObselete());
+		assertTrue(sr1_4.isObselete());
+		
+		verify(resourceFinder).loadResource(StaticResource.class, "test.css");
+		verify(resourceFinder).loadResource(StaticResource.class, "test.less");
+		verify(resourceFinder).loadResource(StaticResource.class, "test2.less");
+		
+		verifyNoMoreInteractions(resourceFinder);
 	}
 }

@@ -31,9 +31,4 @@ interface ResourceCache extends ConcurrentMap<ResourceCacheKey, Resource> {
 	 */
 	List<Resource> findAllByUri(URI uri);
 
-	/**
-	 * @param uri
-	 */
-	void removeAllByUri(URI uri);
-
 }

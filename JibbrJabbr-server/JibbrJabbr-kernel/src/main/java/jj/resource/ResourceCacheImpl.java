@@ -47,16 +47,6 @@ class ResourceCacheImpl extends ConcurrentHashMap<ResourceCacheKey, Resource> im
 		return Collections.unmodifiableList(result);
 	}
 
-	/**
-	 * @param uri
-	 */
-	@Override
-	public void removeAllByUri(URI uri) {
-		for (ResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
-			remove(resourceCreator.cacheKey(uri));
-		}
-	}
-
 	@Override
 	public void start() throws Exception {
 		// make sure we start fresh if we get restarted

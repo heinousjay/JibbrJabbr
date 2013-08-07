@@ -58,6 +58,8 @@ abstract class AbstractResource implements Resource {
 	
 	@Override
 	public void dependsOn(Resource dependency) {
+		assert dependency != null : "can not depend on null";
+		assert dependency != this : "can not depend on myself";
 		((AbstractResource)dependency).dependents.add(this);
 	}
 	

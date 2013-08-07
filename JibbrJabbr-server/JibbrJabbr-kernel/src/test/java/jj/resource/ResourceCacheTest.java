@@ -41,6 +41,8 @@ public class ResourceCacheTest extends RealResourceBase {
 
 	@Test
 	public void testOperationsByUri() throws IOException {
+		
+		// given
 		String name = "index.html";
 		Path path = basePath.resolve(name);
 		StaticResource sr = new StaticResource(MockResourceCreators.src.cacheKey(name), path, name);
@@ -52,18 +54,12 @@ public class ResourceCacheTest extends RealResourceBase {
 		
 		URI uri = path.toUri();
 		
+		// when
 		List<Resource> resources = rc.findAllByUri(uri);
 		
+		// then
 		assertThat(resources.size(), is(2));
 		assertThat(resources, containsInAnyOrder((Resource)sr, (Resource)hr));
-		
-		name = "blank.gif";
-		StaticResource sr2 = new StaticResource(MockResourceCreators.src.cacheKey(name), path, name);
-		rc.put(sr2.cacheKey(), sr2);
-		rc.removeAllByUri(uri);
-		
-		assertThat(rc.size(), is(1));
-		assertThat(rc.values(), contains((Resource)sr2));
 	}
 
 }
