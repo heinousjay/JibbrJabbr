@@ -53,18 +53,17 @@ public class WebSocketFrameHandlerTest {
 	@Mock WebSocketConnectionTracker connectionTracker;
 	@InjectMocks WebSocketFrameHandler wsfh;
 	
+	// don't mock things you don't own!
+	// unless, as in this case, the things you don't
+	// own won't work without talking to an actual resource
 	@Mock(answer=Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
+	
 	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
 	ChannelFuture future;
-	
-	@Mock TextWebSocketFrame textFrame;
-	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
-	@Mock BinaryWebSocketFrame binaryFrame;
-	@Mock PingWebSocketFrame pingFrame;
+
 	ByteBuf byteBuf;
+	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
 	@Captor ArgumentCaptor<PongWebSocketFrame> pongFrameCaptor;
-	@Mock PongWebSocketFrame pongFrame;
-	@Mock CloseWebSocketFrame closeFrame;
 	
 	@Before
 	public void before() {
@@ -92,7 +91,7 @@ public class WebSocketFrameHandlerTest {
 	public void testTextFrame() throws Exception {
 		
 		String text = "text";
-		given(textFrame.text()).willReturn(text);
+		TextWebSocketFrame textFrame = new TextWebSocketFrame(text);
 		
 		wsfh.channelRead0(ctx, textFrame);
 		
@@ -103,7 +102,7 @@ public class WebSocketFrameHandlerTest {
 	@Test
 	public void testHeartbeatTextFrame() throws Exception {
 		
-		given(textFrame.text()).willReturn("jj-hi");
+		TextWebSocketFrame textFrame = new TextWebSocketFrame("jj-hi");
 		
 		wsfh.channelRead0(ctx, textFrame);
 		
@@ -116,7 +115,7 @@ public class WebSocketFrameHandlerTest {
 	@Test
 	public void testPingFrame() throws Exception {
 		
-		given(pingFrame.content()).willReturn(byteBuf);
+		PingWebSocketFrame pingFrame = new PingWebSocketFrame(byteBuf);
 		
 		wsfh.channelRead0(ctx, pingFrame);
 		
@@ -129,7 +128,7 @@ public class WebSocketFrameHandlerTest {
 	@Test
 	public void testPongFrame() throws Exception {
 		
-		given(pongFrame.content()).willReturn(byteBuf);
+		PongWebSocketFrame pongFrame = new PongWebSocketFrame(byteBuf);
 		
 		wsfh.channelRead0(ctx, pongFrame);
 		
@@ -140,7 +139,7 @@ public class WebSocketFrameHandlerTest {
 	@Test
 	public void testBinaryFrame() throws Exception {
 		
-		given(binaryFrame.content()).willReturn(byteBuf);
+		BinaryWebSocketFrame binaryFrame = new BinaryWebSocketFrame(byteBuf);
 		
 		wsfh.channelRead0(ctx, binaryFrame);
 		
@@ -151,7 +150,7 @@ public class WebSocketFrameHandlerTest {
 	@Test
 	public void testCloseFrame() throws Exception {
 		
-		given(closeFrame.retain()).willReturn(closeFrame);
+		CloseWebSocketFrame closeFrame = new CloseWebSocketFrame(1000, "");
 		
 		wsfh.channelRead0(ctx, closeFrame);
 		
