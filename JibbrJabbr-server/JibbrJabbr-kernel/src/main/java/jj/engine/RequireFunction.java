@@ -96,8 +96,8 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 			
 			// well this is ridiculous but it works
 			moduleIdentifier =
-				configuration.basePath().relativize(
-					configuration.basePath().resolve(base).getParent().resolve(input).normalize()
+				configuration.appPath().relativize(
+					configuration.appPath().resolve(base).getParent().resolve(input).normalize()
 				).toString();
 			
 			// we allow modules outside the document root - after all, this is triggered internally

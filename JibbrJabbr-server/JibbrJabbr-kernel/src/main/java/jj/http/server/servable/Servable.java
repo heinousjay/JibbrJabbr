@@ -16,10 +16,10 @@ import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable<T extends Resource> {
 	
-	protected final Path basePath;
+	protected final Path appPath;
 	
 	protected Servable(final Configuration configuration) {
-		this.basePath = configuration.basePath();
+		this.appPath = configuration.appPath();
 	}
 	
 	/**
@@ -31,7 +31,7 @@ public abstract class Servable<T extends Resource> {
 	@IOThread
 	protected boolean isServablePath(final Path path) {
 		final Path normalized = path.normalize();
-		return Files.exists(normalized, LinkOption.NOFOLLOW_LINKS) && normalized.startsWith(basePath);
+		return Files.exists(normalized, LinkOption.NOFOLLOW_LINKS) && normalized.startsWith(appPath);
 	}
 	
 	/**

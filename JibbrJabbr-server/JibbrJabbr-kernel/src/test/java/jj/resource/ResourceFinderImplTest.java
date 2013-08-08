@@ -43,22 +43,22 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	
 	static class PathAnswer implements Answer<Path> {
 		
-		private final Path basePath;
+		private final Path appPath;
 		private final String bonus;
 		
-		PathAnswer(final Path basePath) {
-			this.basePath = basePath;
+		PathAnswer(final Path appPath) {
+			this.appPath = appPath;
 			bonus = null;
 		}
 		
-		PathAnswer(final Path basePath, final String bonus) {
-			this.basePath = basePath;
+		PathAnswer(final Path appPath, final String bonus) {
+			this.appPath = appPath;
 			this.bonus = bonus;
 		}
 
 		@Override
 		public Path answer(InvocationOnMock invocation) throws Throwable {
-			return basePath.resolve(String.valueOf(invocation.getArguments()[0]) + (bonus == null ? "" : bonus));
+			return appPath.resolve(String.valueOf(invocation.getArguments()[0]) + (bonus == null ? "" : bonus));
 		}
 	};
 	
@@ -70,10 +70,10 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		given(scriptResourceCreator.type()).willReturn(ScriptResource.class);
 		given(staticResourceCreator.type()).willReturn(StaticResource.class);
 		
-		given(assetResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(AssetResourceCreator.basePath));
-		given(htmlResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(basePath, ".html"));
-		given(scriptResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(basePath));
-		given(staticResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(basePath));
+		given(assetResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(AssetResourceCreator.appPath));
+		given(htmlResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath, ".html"));
+		given(scriptResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath));
+		given(staticResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath));
 		
 		Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreatorsMap = new HashMap<>();
 		resourceCreatorsMap.put(AssetResource.class, assetResourceCreator);
@@ -177,7 +177,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	//@Test
 	public void loadBigFile() throws IOException {
 		String fileName = "big.fella";
-		Path bigFella = configuration.basePath().resolve(fileName);
+		Path bigFella = configuration.appPath().resolve(fileName);
 		try (SeekableByteChannel channel = Files.newByteChannel(bigFella, WRITE, CREATE_NEW, SPARSE)) {
 			
 			

@@ -54,7 +54,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	}
 	
 	protected Path path(String baseName) {
-		return basePath.resolve(baseName);
+		return appPath.resolve(baseName);
 	}
 	
 	@Override

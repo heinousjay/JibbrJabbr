@@ -79,7 +79,8 @@ class LogConfigurator implements JJServerListener {
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
 		// just play with this!
-		executionLogging();
+		infoAll();
+		nettyLogger(DEBUG);
 		
 		return asyncAppender;
 	}

@@ -59,7 +59,7 @@ class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return configuration.basePath().resolve(baseName);
+		return configuration.appPath().resolve(baseName);
 	}
 
 }

@@ -30,7 +30,7 @@ public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, Scri
 
 	@Override
 	protected Path path() {
-		return basePath.resolve(baseName());
+		return appPath.resolve(baseName());
 	}
 
 	@Override

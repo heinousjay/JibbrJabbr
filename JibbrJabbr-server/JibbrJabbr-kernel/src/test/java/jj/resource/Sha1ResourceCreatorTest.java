@@ -23,7 +23,7 @@ public class Sha1ResourceCreatorTest extends ResourceBase<Sha1Resource, Sha1Reso
 
 	@Override
 	protected Path path() {
-		return basePath.resolve(baseName());
+		return appPath.resolve(baseName());
 	}
 
 	@Override

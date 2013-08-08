@@ -30,7 +30,7 @@ public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResour
 
 	@Override
 	protected Path path() {
-		return basePath.resolve(baseName() + ".properties");
+		return appPath.resolve(baseName() + ".properties");
 	}
 
 	@Override

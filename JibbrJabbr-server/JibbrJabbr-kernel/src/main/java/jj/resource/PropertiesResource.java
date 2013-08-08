@@ -19,7 +19,7 @@ public class PropertiesResource extends AbstractFileResource {
 	/**
 	 * 
 	 * @param baseUri the base URI of the server
-	 * @param basePath the base path of the server
+	 * @param appPath the base path of the server
 	 * @param path the path to the properties file
 	 * @throws IOException
 	 */

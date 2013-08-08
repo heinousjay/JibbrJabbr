@@ -38,7 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class ServableTestBase {
 	
-	Path basePath = Paths.get(JJ.uri(ServableTestBase.class)).getParent();
+	Path appPath = Paths.get(JJ.uri(ServableTestBase.class)).getParent();
 	
 	@Mock Configuration configuration;
 	@Mock ResourceFinder resourceFinder;
@@ -48,7 +48,7 @@ public abstract class ServableTestBase {
 	
 	@Before
 	public void baseBefore() {
-		given(configuration.basePath()).willReturn(basePath);
+		given(configuration.appPath()).willReturn(appPath);
 	}
 
 }

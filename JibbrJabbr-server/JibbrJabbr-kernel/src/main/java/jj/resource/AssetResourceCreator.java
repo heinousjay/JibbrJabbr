@@ -21,7 +21,7 @@ class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	static final Path myJar = JJ.jarForClass(AssetResourceCreator.class);
 	
 	// our assets should be here
-	static final Path basePath;
+	static final Path appPath;
 	
 	static {
 		// just walking along to our assets directory
@@ -35,7 +35,7 @@ class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 		} catch (Exception e) {
 			throw new AssertionError("couldn't locate internal assets, altering the jar?");
 		}
-		basePath = attempt;
+		appPath = attempt;
 	}
 	
 	private final Logger log = LoggerFactory.getLogger(AssetResourceCreator.class);
@@ -61,8 +61,8 @@ class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	@Override
 	Path path(String baseName, Object... args) {
 		Path result = null;
-		if (basePath != null) {
-			result = basePath.resolve(baseName);
+		if (appPath != null) {
+			result = appPath.resolve(baseName);
 		} else {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(myJar, null)) {
 				result = myJarFS.getPath("/jj/assets/").resolve(baseName);
@@ -77,7 +77,7 @@ class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	@Override
 	public AssetResource create(String baseName, Object... args) throws IOException {
 		if (myJar == null) {
-			return instanceModuleCreator.createResource(AssetResource.class, cacheKey(basePath.resolve(baseName).toUri()), baseName, basePath);
+			return instanceModuleCreator.createResource(AssetResource.class, cacheKey(appPath.resolve(baseName).toUri()), baseName, appPath);
 		} else {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(myJar, null)) {
 				return instanceModuleCreator.createResource(AssetResource.class, cacheKey(baseName), baseName, myJarFS.getPath("/jj/assets"));

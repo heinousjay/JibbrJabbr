@@ -42,8 +42,8 @@ public class AssetResource extends AbstractFileResource implements LoadedResourc
 	private final String mime;
 	
 	@Inject
-	AssetResource(final ResourceCacheKey cacheKey, final Path basePath, final String baseName) throws IOException {
-		super(cacheKey, baseName, basePath.resolve(baseName));
+	AssetResource(final ResourceCacheKey cacheKey, final Path appPath, final String baseName) throws IOException {
+		super(cacheKey, baseName, appPath.resolve(baseName));
 		mime = MimeTypes.get(baseName);
 	}
 

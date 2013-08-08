@@ -69,7 +69,7 @@ public class TestingAPITest {
 
 	private static final String ANIMAL = "/animal";
 	
-	private static final String basePath;
+	private static final String appPath;
 	private static final Path indexHtmlRenderedPath;
 	private static final Path animalHtmlRenderedPath;
 	
@@ -79,15 +79,15 @@ public class TestingAPITest {
 	public static final VerifiableRequest[] assets;
 	
 	private static VerifiableRequest makeResourceRequest(String name) throws Exception {
-		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(basePath, name)));
+		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(appPath, name)));
 	}
 	
 	static {
 		try {
 			// well it's ugly, but it's portable
-			basePath = Paths.get(JJ.uri(TestingAPITest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
-			indexHtmlRenderedPath = Paths.get(basePath, INDEX_HTML_RENDERED);
-			animalHtmlRenderedPath = Paths.get(basePath, ANIMAL_HTML_RENDERED);
+			appPath = Paths.get(JJ.uri(TestingAPITest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
+			indexHtmlRenderedPath = Paths.get(appPath, INDEX_HTML_RENDERED);
+			animalHtmlRenderedPath = Paths.get(appPath, ANIMAL_HTML_RENDERED);
 			
 			List<VerifiableRequest> work = new ArrayList<>();
 			work.add(makeResourceRequest("0.txt"));
@@ -130,7 +130,7 @@ public class TestingAPITest {
 	}
 	
 	@Rule
-	public JJAppTest app = new JJAppTest(basePath);
+	public JJAppTest app = new JJAppTest(appPath);
 	
 	static interface Namer {
 		String name(int i);

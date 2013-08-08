@@ -87,25 +87,21 @@ abstract class AbstractEngineApiTest {
 
 		@Override
 		public boolean constant() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean readonly() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean permanent() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean dontenum() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 	}

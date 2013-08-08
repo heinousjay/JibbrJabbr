@@ -47,13 +47,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class RealResourceBase {
 	
-	Path basePath;
+	Path appPath;
 	@Mock Configuration configuration;
 
 	@Before
 	public final void init() throws Exception {
-		basePath = Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
-		given(configuration.basePath()).willReturn(basePath);
+		appPath = Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
+		given(configuration.appPath()).willReturn(appPath);
 	}
 
 	protected <T extends Resource> T testFileResource(final T resource) throws Exception {

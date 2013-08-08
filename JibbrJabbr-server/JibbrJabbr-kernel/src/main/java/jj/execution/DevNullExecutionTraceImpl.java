@@ -29,85 +29,71 @@ public class DevNullExecutionTraceImpl implements ExecutionTrace {
 
 	@Override
 	public void preparingTask(JJTask<?> task) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void startingTask(JJTask<?> task) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void taskCompletedSuccessfully(JJTask<?> task) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void taskCompletedWithError(JJTask<?> task, Throwable error) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void start(HttpRequest request, HttpResponse response) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void end(HttpRequest request, HttpResponse response) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void start(JJWebSocketConnection connection) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void end(JJWebSocketConnection connection) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void message(JJWebSocketConnection connection, String message) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void send(JJWebSocketConnection connection, String message) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void startLessProcessing(String baseName) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void loadLessResource(String resourceName) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void finishLessProcessing(String baseName) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void errorLoadingLessResource(String resourceName, IOException io) {
-		// TODO Auto-generated method stub
 		
 	}
 

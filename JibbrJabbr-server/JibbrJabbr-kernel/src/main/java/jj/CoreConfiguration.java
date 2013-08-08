@@ -13,34 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj;
 
+import jj.configuration.Argument;
 import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class StaticResourceCreatorTest extends ResourceBase<StaticResource, StaticResourceCreator> {
+public interface CoreConfiguration {
 
-	@Override
-	protected String baseName() {
-		return "helpers/jquery.fancybox-media.js";
-	}
-
-	@Override
-	protected Path path() {
-		return appPath.resolve(baseName());
-	}
-
-	@Override
-	protected StaticResource resource() throws Exception {
-		return new StaticResource(cacheKey(), path(), baseName());
-	}
-
-	@Override
-	protected StaticResourceCreator toTest() {
-		return new StaticResourceCreator(configuration, instanceModuleCreator);
-	}
-
+	@Argument("app")
+	Path appPath();
 }

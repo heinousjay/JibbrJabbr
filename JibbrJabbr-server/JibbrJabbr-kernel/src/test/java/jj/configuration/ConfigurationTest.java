@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
 import org.junit.Before;
@@ -34,22 +35,34 @@ import org.junit.Test;
 public class ConfigurationTest {
 	
 	Path realPath;
+	Configuration toTest;
 
 	@Before 
 	public void before() throws Exception {
-		realPath = Paths.get(ConfigurationTest.class.getResource("/index.html").toURI()).getParent();
+		realPath = Paths.get(getClass().getResource("/index.html").toURI()).getParent();
+		toTest = new Configuration(new String[] {realPath.toString()});
 	}
 	
 	@Test
 	public void test() {
-		Configuration toTest = new Configuration(new String[] {realPath.toString()});
 		
-		assertThat(toTest.basePath(), is(realPath));
+		
+		assertThat(toTest.appPath(), is(realPath));
+	}
+	
+	@Test
+	public void testRetrieveConfigurationInstances() throws Exception {
+		CoreConfiguration instance = toTest.get(CoreConfiguration.class);
+		
+		assertThat(instance, is(notNullValue()));
+		System.out.println(instance.getClass().getName());
+		
+		assertThat(instance.appPath(), is(realPath));
 	}
 	
 	@Test
 	public void testIsSystemRunning() {
-		assertThat(new Configuration(new String[] {realPath.toString()}).isSystemRunning(), is(true));
+		assertThat(toTest.isSystemRunning(), is(true));
 		assertThat(mock(Configuration.class).isSystemRunning(), is(false));
 	}
 

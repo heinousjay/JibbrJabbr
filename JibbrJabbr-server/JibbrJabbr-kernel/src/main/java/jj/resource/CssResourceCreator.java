@@ -92,10 +92,10 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	Path path(final String baseName, Object... args) {
 		
 		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
-			return configuration.basePath().resolve(toLess(baseName));
+			return configuration.appPath().resolve(toLess(baseName));
 			
 		}
-		return configuration.basePath().resolve(baseName);
+		return configuration.appPath().resolve(baseName);
 	}
 
 	@Override
@@ -157,7 +157,7 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 				if (replacement.startsWith("/")) {
 					baseName = replacement.substring(1);
 				} else {
-					baseName = configuration.basePath().relativize(resource.path().resolveSibling(replacement)).normalize().toString();
+					baseName = configuration.appPath().relativize(resource.path().resolveSibling(replacement)).normalize().toString();
 				
 				}
 				AbstractResource dependency = (AbstractResource)resourceFinder.loadResource(type, baseName);

@@ -56,13 +56,13 @@ class DocumentServable extends Servable<HtmlResource> {
 		String uri = match.baseName;
 		
 		if (uri.endsWith(DOT_HTML)) {
-			result = basePath.resolve(uri).normalize();
+			result = appPath.resolve(uri).normalize();
 		} else if (uri.endsWith(SLASH)) {
-			result = basePath.resolve(uri).resolve(INDEX).normalize();
+			result = appPath.resolve(uri).resolve(INDEX).normalize();
 		} else if ("".equals(uri)) {
-			result = basePath.resolve(INDEX);
+			result = appPath.resolve(INDEX);
 		} else {
-			result = basePath.resolve(uri + DOT_HTML).normalize();
+			result = appPath.resolve(uri + DOT_HTML).normalize();
 		}
 		
 		if (!isServablePath(result)) {
@@ -73,7 +73,7 @@ class DocumentServable extends Servable<HtmlResource> {
 	}
 	
 	private String toBaseName(final Path path) {
-		Path realPath = basePath.relativize(path);
+		Path realPath = appPath.relativize(path);
 		String baseName = realPath.toString();
 		baseName = baseName.substring(0, baseName.length() - DOT_HTML.length());
 		return baseName;

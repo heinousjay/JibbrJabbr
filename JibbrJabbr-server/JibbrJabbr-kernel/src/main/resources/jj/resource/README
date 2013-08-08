@@ -1,7 +1,7 @@
 less script must be modified to update - the environment detection should be hardcoded to the rhino case.  it is
 designed to find the rhino shell stuff, and we really only define the few pieces we need:
 
-readFile = function to read a file by name, relative to basePath
+readFile = function to read a file by name, relative to appPath
 
 print = output a string to the log
 

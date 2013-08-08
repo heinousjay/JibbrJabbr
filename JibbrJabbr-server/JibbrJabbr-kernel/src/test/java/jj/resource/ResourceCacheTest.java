@@ -44,7 +44,7 @@ public class ResourceCacheTest extends RealResourceBase {
 		
 		// given
 		String name = "index.html";
-		Path path = basePath.resolve(name);
+		Path path = appPath.resolve(name);
 		StaticResource sr = new StaticResource(MockResourceCreators.src.cacheKey(name), path, name);
 		name = "index";
 		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, path);

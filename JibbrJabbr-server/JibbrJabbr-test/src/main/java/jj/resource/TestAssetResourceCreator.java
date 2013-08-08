@@ -36,7 +36,7 @@ public class TestAssetResourceCreator extends AssetResourceCreator {
 
 	public byte[] toBytes(final String baseName) throws IOException {
 		if (myJar == null) {
-			return Files.readAllBytes(basePath.resolve(baseName));
+			return Files.readAllBytes(appPath.resolve(baseName));
 		} else {
 			try (FileSystem myJarFS = FileSystems.newFileSystem(myJar, null)) {
 				return Files.readAllBytes(myJarFS.getPath("/jj/assets", baseName));

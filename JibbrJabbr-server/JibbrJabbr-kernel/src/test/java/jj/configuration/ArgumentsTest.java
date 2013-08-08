@@ -13,34 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.configuration;
 
-import java.nio.file.Path;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public class StaticResourceCreatorTest extends ResourceBase<StaticResource, StaticResourceCreator> {
+public class ArgumentsTest {
 
-	@Override
-	protected String baseName() {
-		return "helpers/jquery.fancybox-media.js";
+	@Test
+	public void test() {
+		Arguments a = new Arguments(new String[] {"jay=king","ball=fancy"});
+		
+		assertThat(a.get("jay"), is("king"));
+		assertThat(a.get("ball"), is("fancy"));
 	}
-
-	@Override
-	protected Path path() {
-		return appPath.resolve(baseName());
-	}
-
-	@Override
-	protected StaticResource resource() throws Exception {
-		return new StaticResource(cacheKey(), path(), baseName());
-	}
-
-	@Override
-	protected StaticResourceCreator toTest() {
-		return new StaticResourceCreator(configuration, instanceModuleCreator);
+	
+	@Test
+	public void testError() {
+		try {
+			new Arguments(new String[] {"error= awesome"});
+			fail("should have thrown");
+		} catch (Exception e) {
+			assertThat(e.getMessage(), is("all arguments must be name=value pairs (error= awesome)"));
+		}
 	}
 
 }

@@ -54,7 +54,7 @@ class StaticResourceCreator extends AbstractResourceCreator<StaticResource> {
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return configuration.basePath().resolve(baseName);
+		return configuration.appPath().resolve(baseName);
 	}
 
 	@Override

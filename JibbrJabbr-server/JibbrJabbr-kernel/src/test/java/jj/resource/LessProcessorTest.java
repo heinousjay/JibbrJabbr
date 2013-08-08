@@ -44,16 +44,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class LessProcessorTest {
 
 	LessProcessor underTest;
-	Path basePath;
+	Path appPath;
 	String testCss;
 	@Mock Configuration configuration;
 	@Mock ExecutionTrace trace;
 	
 	@Before
 	public void before() throws IOException {
-		basePath = Paths.get(JJ.uri(LessProcessorTest.class)).getParent();
-		testCss = new String(Files.readAllBytes(basePath.resolve("test.css")), UTF_8);
-		given(configuration.basePath()).willReturn(basePath);
+		appPath = Paths.get(JJ.uri(LessProcessorTest.class)).getParent();
+		testCss = new String(Files.readAllBytes(appPath.resolve("test.css")), UTF_8);
+		given(configuration.appPath()).willReturn(appPath);
 		underTest = new LessProcessor(configuration, trace);
 	}
 	

@@ -25,6 +25,7 @@ import jj.resource.TransferableResource;
 /**
  * @author jason
  *
+ * TODO this hierarchy needs a bit of a wash
  */
 public class JJHttpClientResponse extends AbstractHttpResponse {
 

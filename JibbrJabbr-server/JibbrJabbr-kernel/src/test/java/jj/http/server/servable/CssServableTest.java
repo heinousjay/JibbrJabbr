@@ -33,7 +33,7 @@ public class CssServableTest extends ServableTestBase{
 		// given
 		given(request.uriMatch()).willReturn(new URIMatch("/style.css"));
 		given(resourceFinder.loadResource(CssResource.class, "style.css", true)).willReturn(cssResource);
-		given(cssResource.path()).willReturn(basePath.resolve("style.css"));
+		given(cssResource.path()).willReturn(appPath.resolve("style.css"));
 		
 		// then
 		assertThat(cs.isMatchingRequest(request.uriMatch()), is(true));

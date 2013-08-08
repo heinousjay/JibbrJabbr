@@ -101,7 +101,7 @@ class LessProcessor {
 			String resourceName = String.valueOf(args[0]);
 			try {
 				trace.loadLessResource(resourceName);
-				return new String(Files.readAllBytes(configuration.basePath().resolve(resourceName)), UTF_8);
+				return new String(Files.readAllBytes(configuration.appPath().resolve(resourceName)), UTF_8);
 			} catch (IOException io) {
 				trace.errorLoadingLessResource(resourceName, io);
 			}

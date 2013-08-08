@@ -38,12 +38,12 @@ import com.google.inject.Stage;
  */
 public class JJAppTest implements TestRule {
 	
-	private final String basePath;
+	private final String appPath;
 	
 	private Injector injector;
 	
-	public JJAppTest(final String basePath) {
-		this.basePath = basePath;
+	public JJAppTest(final String appPath) {
+		this.appPath = appPath;
 	}
 	
 	@Override
@@ -60,7 +60,7 @@ public class JJAppTest implements TestRule {
 				// treat jj. just like java. in that it will be off limits?  is this smart? it's
 				// probably better to start restrictive and loosen if needed.  ModuleListener interface
 				// to get a call on start-up
-				injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(basePath, description));
+				injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(appPath, description));
 				
 				try {
 					System.out.println("============================================================");

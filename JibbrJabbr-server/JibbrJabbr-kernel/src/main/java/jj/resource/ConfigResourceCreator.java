@@ -49,7 +49,7 @@ class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
 	@Override
 	Path path(String baseName, Object... args) {
-		return canLoad(baseName) ? configuration.basePath().resolve(baseName) : null;
+		return canLoad(baseName) ? configuration.appPath().resolve(baseName) : null;
 	}
 
 	@Override

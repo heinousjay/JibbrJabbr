@@ -69,15 +69,15 @@ public class ResourceWatchServiceImplTest {
 	@Before
 	public void before() throws Exception {
 		
-		Path basePath = Paths.get(getClass().getResource("index.html").toURI()).getParent();
+		Path appPath = Paths.get(getClass().getResource("index.html").toURI()).getParent();
 		
-		gibberish = basePath.resolve(fileName);
+		gibberish = appPath.resolve(fileName);
 		
 		try (SeekableByteChannel channel = Files.newByteChannel(gibberish, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
 			channel.write(ByteBuffer.wrap(fileName.getBytes(UTF_8)));
 		}
 		
-		given(configuration.basePath()).willReturn(basePath);
+		given(configuration.appPath()).willReturn(appPath);
 		
 		executorService = Executors.newFixedThreadPool(2);
 		given(executors.ioExecutor()).willReturn(executorService);
@@ -104,7 +104,7 @@ public class ResourceWatchServiceImplTest {
 	}
 	
 	private StaticResource make(StaticResourceCreator src, String name) throws Exception {
-		return new StaticResource(src.cacheKey(name), configuration.basePath().resolve(name), name);
+		return new StaticResource(src.cacheKey(name), configuration.appPath().resolve(name), name);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -143,7 +143,7 @@ public class ResourceWatchServiceImplTest {
 		sr3.dependsOn(sr1);
 		sr4.dependsOn(sr1);
 		String name = "index";
-		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, configuration.basePath().resolve(name + ".html"));
+		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
 		
 		resourceCache.put(sr.cacheKey(), sr);
 		resourceCache.put(hr.cacheKey(), hr);

@@ -33,11 +33,11 @@ import jj.JJModule;
  */
 class TestModule extends JJModule {
 	
-	private final String basePath;
+	private final String appPath;
 	private final Description description;
 	
-	TestModule(final String basePath, final Description description) {
-		this.basePath = basePath;
+	TestModule(final String appPath, final Description description) {
+		this.appPath = appPath;
 		this.description = description;
 	}
 
@@ -52,6 +52,6 @@ class TestModule extends JJModule {
 		
 		bind(Channel.class).toInstance(mock(Channel.class));
 		
-		install(new CoreModule(new String[]{basePath}, true));
+		install(new CoreModule(new String[]{appPath}, true));
 	}
 }

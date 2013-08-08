@@ -51,7 +51,7 @@ public class StaticServableTest extends ServableTestBase {
 		
 		given(request.uri()).willReturn("/" + ZERO_TXT);
 		given(resourceFinder.loadResource(StaticResource.class, ZERO_TXT)).willReturn(resource);
-		given(resource.path()).willReturn(basePath.resolve(ZERO_TXT));
+		given(resource.path()).willReturn(appPath.resolve(ZERO_TXT));
 		
 		RequestProcessor rp = ss.makeRequestProcessor(request, response);
 		
@@ -63,7 +63,7 @@ public class StaticServableTest extends ServableTestBase {
 		
 		given(request.uri()).willReturn("/" + NOT_ZERO_TXT);
 		given(resourceFinder.loadResource(StaticResource.class, NOT_ZERO_TXT)).willReturn(resource);
-		given(resource.path()).willReturn(basePath.resolve(NOT_ZERO_TXT));
+		given(resource.path()).willReturn(appPath.resolve(NOT_ZERO_TXT));
 		
 		RequestProcessor rp = ss.makeRequestProcessor(request, response);
 		

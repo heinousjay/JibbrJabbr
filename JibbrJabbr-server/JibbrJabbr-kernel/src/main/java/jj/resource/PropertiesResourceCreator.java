@@ -35,7 +35,7 @@ class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResour
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return configuration.basePath().resolve(baseName + ".properties");
+		return configuration.appPath().resolve(baseName + ".properties");
 	}
 
 	@Override

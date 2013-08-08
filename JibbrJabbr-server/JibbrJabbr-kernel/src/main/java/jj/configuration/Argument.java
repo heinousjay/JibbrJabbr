@@ -13,34 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.configuration;
 
-import java.nio.file.Path;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Annotates a method in a configuration interface that should draw its value from
+ * a command line argument by the given name like <br>
+ * {@code
+ * name=value
+ * }
+ * 
  * @author jason
  *
  */
-public class StaticResourceCreatorTest extends ResourceBase<StaticResource, StaticResourceCreator> {
-
-	@Override
-	protected String baseName() {
-		return "helpers/jquery.fancybox-media.js";
-	}
-
-	@Override
-	protected Path path() {
-		return appPath.resolve(baseName());
-	}
-
-	@Override
-	protected StaticResource resource() throws Exception {
-		return new StaticResource(cacheKey(), path(), baseName());
-	}
-
-	@Override
-	protected StaticResourceCreator toTest() {
-		return new StaticResourceCreator(configuration, instanceModuleCreator);
-	}
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Documented
+public @interface Argument {
+	String value();
 }

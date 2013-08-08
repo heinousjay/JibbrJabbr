@@ -91,8 +91,8 @@ public class ServableTest extends ServableTestBase {
 	@Test
 	public void testIsServablePath() {
 		
-		assertThat(si.isServablePath(basePath.resolve("index.html")), is(true));
-		assertThat(si.isServablePath(basePath.resolve("../not-servable/index.html")), is(false));
+		assertThat(si.isServablePath(appPath.resolve("index.html")), is(true));
+		assertThat(si.isServablePath(appPath.resolve("../not-servable/index.html")), is(false));
 		
 	}
 	

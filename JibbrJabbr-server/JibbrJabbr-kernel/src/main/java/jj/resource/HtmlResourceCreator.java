@@ -35,7 +35,7 @@ class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	
 	@Override
 	Path path(final String baseName, Object...args) {
-		return configuration.basePath().resolve(baseName + ".html");
+		return configuration.appPath().resolve(baseName + ".html");
 	}
 	
 	@Override

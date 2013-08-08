@@ -11,7 +11,7 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 	
 	@Override
 	protected Path path() {
-		return basePath.resolve(baseName() + ".html");
+		return appPath.resolve(baseName() + ".html");
 	}
 	
 	@Override

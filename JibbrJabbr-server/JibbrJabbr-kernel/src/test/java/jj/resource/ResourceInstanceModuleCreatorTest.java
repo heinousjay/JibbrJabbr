@@ -45,7 +45,7 @@ public class ResourceInstanceModuleCreatorTest extends RealResourceBase {
 	}
 	
 	private <T extends Resource> T doCreate(Class<T> type, String baseName, Object...args) throws Exception {
-		Path path = basePath.resolve(baseName);
+		Path path = appPath.resolve(baseName);
 		
 		return doCreate(type, baseName, path, args);
 	}
@@ -58,7 +58,7 @@ public class ResourceInstanceModuleCreatorTest extends RealResourceBase {
 	
 	@Test
 	public void testAssetResource() throws Exception {
-		doCreate(AssetResource.class, "jj.js", AssetResourceCreator.basePath);
+		doCreate(AssetResource.class, "jj.js", AssetResourceCreator.appPath);
 	}
 	
 	@Test
@@ -68,8 +68,8 @@ public class ResourceInstanceModuleCreatorTest extends RealResourceBase {
 	
 	@Test
 	public void testCssResource() throws Exception {
-		doCreate(CssResource.class, "style.css", basePath.resolve("style.less"), true);
-		doCreate(CssResource.class, "style.css", basePath.resolve("jj/resource/test.css"));
+		doCreate(CssResource.class, "style.css", appPath.resolve("style.less"), true);
+		doCreate(CssResource.class, "style.css", appPath.resolve("jj/resource/test.css"));
 	}
 	
 	@Test
