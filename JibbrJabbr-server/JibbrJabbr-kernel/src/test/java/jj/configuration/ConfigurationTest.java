@@ -49,6 +49,17 @@ public class ConfigurationTest {
 		boolean bool();
 	}
 	
+	public interface DefaultTestInterface {
+		
+		@Argument("false")
+		@Default("false")
+		boolean falseBool();
+		
+		@Argument("true")
+		@Default("true")
+		boolean trueBool();
+	}
+	
 	Path realPath;
 	Configuration toTest;
 
@@ -81,6 +92,18 @@ public class ConfigurationTest {
 		assertThat(instance.path(), is(realPath));
 		
 		assertThat(instance.bool(), is(true));
+	}
+	
+	@Test
+	public void testDefaultValue() throws Exception {
+		toTest = new Configuration(makeInjector(new String[] {}));
+		
+		DefaultTestInterface instance = toTest.get(DefaultTestInterface.class);
+		
+		assertThat(instance, is(notNullValue()));
+		
+		assertThat(instance.falseBool(), is(false));
+		assertThat(instance.trueBool(), is(true));
 	}
 	
 	@Test

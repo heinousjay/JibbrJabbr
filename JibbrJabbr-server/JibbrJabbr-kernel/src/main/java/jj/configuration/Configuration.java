@@ -105,11 +105,15 @@ public class Configuration {
 			CtMethod newMethod = CtNewMethod.copy(method, result, null);
 			System.out.println(newMethod);
 			Argument argumentAnnotation = (Argument)method.getAnnotation(Argument.class);
+			Default defaultAnnotation = (Default)method.getAnnotation(Default.class);
 			if (argumentAnnotation != null) {
+				String defaultValue = defaultAnnotation != null ? "\"" + defaultAnnotation.value() + "\"" : null;
 				String body = 
 					"return ($r)readArgument(\"" +
 					argumentAnnotation.value() +
 					"\"," +
+					defaultValue +
+					"," +
 					method.getReturnType().getName() +
 					".class);";
 				System.out.println(body);

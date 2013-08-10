@@ -16,11 +16,11 @@
 package jj.conversion;
 
 /**
- * 
+ * Implement this to create a one-way conversion
  * @author jason
  *
- * @param <From>
- * @param <To>
+ * @param <From> The incoming type
+ * @param <To> The outgoing type
  */
 interface Converter<From, To> {
 

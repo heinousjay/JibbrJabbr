@@ -36,7 +36,15 @@ abstract class AbstractConfiguration {
 	}
 	
 	
-	protected <T> T readArgument(String name, Class<T> resultClass) {
-		return converters.convert(arguments.get(name), resultClass);
+	protected <T> T readArgument(String name, String defaultValue, Class<T> resultClass) {
+		String value = arguments.get(name);
+		if (value == null) {
+			value = defaultValue;
+		}
+		if (value != null) {
+			return converters.convert(value, resultClass);
+		}
+		
+		return null;
 	}
 }

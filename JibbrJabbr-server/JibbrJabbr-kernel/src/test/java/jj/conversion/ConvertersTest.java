@@ -51,8 +51,10 @@ public class ConvertersTest {
 	@Test
 	public void testFromStringToBoolean() {
 		assertTrue(converters.convert("true", Boolean.class));
+		assertFalse(converters.convert("false", Boolean.class));
 		assertFalse(converters.convert("", Boolean.class));
 		assertTrue(converters.convert("true", Boolean.TYPE));
+		assertFalse(converters.convert("false", Boolean.TYPE));
 		assertFalse(converters.convert("", Boolean.TYPE));
 	}
 
