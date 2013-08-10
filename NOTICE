@@ -65,3 +65,14 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ======================================================================
+
+depends on Mozilla Rhino (https://github.com/mozilla/rhino) under the
+terms of the MPL 2.0 license as detailed in the included file 
+MPL.2.0-license.txt
+
+====================================================================
+
+depends on Javassist (http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/)
+under under the Apache License 2.0 as detailed in the LICENSE file.
+
+====================================================================
