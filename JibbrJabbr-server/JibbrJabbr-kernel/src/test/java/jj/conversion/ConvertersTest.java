@@ -38,6 +38,26 @@ public class ConvertersTest {
 	public void before() {
 		converters = new Converters();
 	}
+	
+	@Test
+	public void testAssertions() {
+		
+		boolean threw = false;
+		try {
+			converters.convert(this, Object.class);
+		} catch (AssertionError ae) {
+			threw = true;
+		}
+		assertTrue("should have thrown", threw);
+		
+		threw = false;
+		try {
+			converters.convert("", getClass());
+		} catch (AssertionError ae) {
+			threw = true;
+		}
+		assertTrue("should have thrown", threw);
+	}
 
 	@Test
 	public void testFromStringToPath() {
