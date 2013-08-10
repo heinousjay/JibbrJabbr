@@ -5,17 +5,51 @@
 	<artifactId>JibbrJabbr</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	
 	<name>JibbrJabbr master</name>
 	<url>http://jibbrjabbr.com</url>
+	<description>
+		Event-driven http server with a (kinda sweet and getting sweeter) JavaScript API
+	</description>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>https://github.com/heinousjay/JibbrJabbr.git</connection>
+		<developerConnection>scm:git:git@github.com:heinousjay/JibbrJabbr.git</developerConnection>
+		<url>https://github.com/heinousjay/JibbrJabbr</url>
+	</scm>
+	
+	<developers>
+		<developer>
+			<id>heinousjay</id>
+			<name>Jason Miller</name>
+			<email>jibbrjabbr@heinousjay.com</email>
+			<url>http://heinousjay.com</url>
+			<roles>
+				<role>project lead</role>
+			</roles>
+			<timezone>-5</timezone>
+		</developer>
+	</developers>
+	
 	<properties>
 		<friendlyname>JibbrJabbr</friendlyname>
 		<jj.project.basedir>${project.basedir}</jj.project.basedir>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
 	<modules>
 		<module>JibbrJabbr-server</module>
 		<module>JibbrJabbr-site</module>
 	</modules>
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -28,4 +62,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 </project>
