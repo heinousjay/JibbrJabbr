@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
 /**
@@ -54,7 +55,7 @@ class StaticResourceCreator extends AbstractResourceCreator<StaticResource> {
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return configuration.appPath().resolve(baseName);
+		return configuration.get(CoreConfiguration.class).appPath().resolve(baseName);
 	}
 
 	@Override

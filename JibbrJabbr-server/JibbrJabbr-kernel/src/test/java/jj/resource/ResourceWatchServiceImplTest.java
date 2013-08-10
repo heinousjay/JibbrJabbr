@@ -31,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 import jj.execution.JJExecutors;
 
@@ -57,6 +58,7 @@ public class ResourceWatchServiceImplTest {
 	String fileName = "gibberish.txt";
 	Path gibberish;
 	
+	@Mock CoreConfiguration coreConfiguration;
 	@Mock Configuration configuration;
 	
 	ResourceCacheImpl resourceCache;
@@ -77,7 +79,8 @@ public class ResourceWatchServiceImplTest {
 			channel.write(ByteBuffer.wrap(fileName.getBytes(UTF_8)));
 		}
 		
-		given(configuration.appPath()).willReturn(appPath);
+		given(configuration.get(CoreConfiguration.class)).willReturn(coreConfiguration);
+		given(coreConfiguration.appPath()).willReturn(appPath);
 		
 		executorService = Executors.newFixedThreadPool(2);
 		given(executors.ioExecutor()).willReturn(executorService);
@@ -104,7 +107,7 @@ public class ResourceWatchServiceImplTest {
 	}
 	
 	private StaticResource make(StaticResourceCreator src, String name) throws Exception {
-		return new StaticResource(src.cacheKey(name), configuration.appPath().resolve(name), name);
+		return new StaticResource(src.cacheKey(name), coreConfiguration.appPath().resolve(name), name);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -143,7 +146,7 @@ public class ResourceWatchServiceImplTest {
 		sr3.dependsOn(sr1);
 		sr4.dependsOn(sr1);
 		String name = "index";
-		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
+		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, coreConfiguration.appPath().resolve(name + ".html"));
 		
 		resourceCache.put(sr.cacheKey(), sr);
 		resourceCache.put(hr.cacheKey(), hr);

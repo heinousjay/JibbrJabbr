@@ -13,29 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
-
-import jj.configuration.Argument;
-import jj.configuration.Default;
-
-import java.nio.file.Path;
+package jj.conversion;
 
 /**
  * @author jason
  *
  */
-public interface CoreConfiguration {
+public class FromStringToBoolean implements Converter<String, Boolean> {
 
-	@Argument("app")
-	Path appPath();
-	
+	@Override
+	public Boolean convert(String in) {
+		return Boolean.valueOf(in);
+	}
 
-	/**
-	 * Flag indicating that the client should be in debug mode, which
-	 * will log internal info to the script console
-	 * @return
-	 */
-	@Argument("debug")
-	@Default("false")
-	boolean debugClient();
 }

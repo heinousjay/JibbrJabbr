@@ -22,11 +22,14 @@ import static org.mockito.Mockito.mock;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * @author jason
@@ -34,34 +37,65 @@ import org.junit.Test;
  */
 public class ConfigurationTest {
 	
+	static final String PATH_ARG = "pathArg";
+	static final String BOOL_ARG = "boolArg";
+	
+	public interface ConfigurationTestInterface {
+		
+		@Argument(PATH_ARG)
+		Path path();
+		
+		@Argument(BOOL_ARG)
+		boolean bool();
+	}
+	
 	Path realPath;
 	Configuration toTest;
 
 	@Before 
 	public void before() throws Exception {
 		realPath = Paths.get(getClass().getResource("/index.html").toURI()).getParent();
-		toTest = new Configuration(new String[] {realPath.toString()});
 	}
 	
-	@Test
-	public void test() {
-		
-		
-		assertThat(toTest.appPath(), is(realPath));
+	private Injector makeInjector(final String[] args) {
+		return Guice.createInjector(new AbstractModule() {
+			
+			@Override
+			protected void configure() {
+				bind(String[].class).toInstance(args);
+			}
+		});
 	}
 	
 	@Test
 	public void testRetrieveConfigurationInstances() throws Exception {
-		CoreConfiguration instance = toTest.get(CoreConfiguration.class);
+		toTest = new Configuration(makeInjector(new String[] {
+			PATH_ARG + "=" + realPath.toString(),
+			BOOL_ARG + "=true"
+		}));
+		
+		ConfigurationTestInterface instance = toTest.get(ConfigurationTestInterface.class);
 		
 		assertThat(instance, is(notNullValue()));
-		System.out.println(instance.getClass().getName());
 		
-		assertThat(instance.appPath(), is(realPath));
+		assertThat(instance.path(), is(realPath));
+		
+		assertThat(instance.bool(), is(true));
 	}
 	
 	@Test
-	public void testIsSystemRunning() {
+	public void testConfigurationObjectInstanceIsTheSame() throws Exception {
+		toTest = new Configuration(makeInjector(new String[] {}));
+		
+		ConfigurationTestInterface instance1 = toTest.get(ConfigurationTestInterface.class);
+		ConfigurationTestInterface instance2 = toTest.get(ConfigurationTestInterface.class);
+		
+		assertThat(instance1, is(sameInstance(instance2)));
+	}
+	
+	@Test
+	public void testIsSystemRunning() throws Exception {
+		toTest = new Configuration(null);
 		assertThat(toTest.isSystemRunning(), is(true));
 		assertThat(mock(Configuration.class).isSystemRunning(), is(false));
 	}

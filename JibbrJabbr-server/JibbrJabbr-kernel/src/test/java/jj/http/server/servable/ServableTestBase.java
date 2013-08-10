@@ -20,6 +20,7 @@ import static org.mockito.BDDMockito.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.CoreConfiguration;
 import jj.JJ;
 import jj.configuration.Configuration;
 import jj.http.HttpRequest;
@@ -40,6 +41,7 @@ public abstract class ServableTestBase {
 	
 	Path appPath = Paths.get(JJ.uri(ServableTestBase.class)).getParent();
 	
+	@Mock CoreConfiguration coreConfiguration;
 	@Mock Configuration configuration;
 	@Mock ResourceFinder resourceFinder;
 	
@@ -48,7 +50,8 @@ public abstract class ServableTestBase {
 	
 	@Before
 	public void baseBefore() {
-		given(configuration.appPath()).willReturn(appPath);
+		given(configuration.get(CoreConfiguration.class)).willReturn(coreConfiguration);
+		given(coreConfiguration.appPath()).willReturn(appPath);
 	}
 
 }

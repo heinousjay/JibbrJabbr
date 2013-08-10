@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
 @Singleton
@@ -35,7 +36,7 @@ class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResour
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return configuration.appPath().resolve(baseName + ".properties");
+		return configuration.get(CoreConfiguration.class).appPath().resolve(baseName + ".properties");
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
+import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 import jj.execution.ExecutionTrace;
 
@@ -101,7 +102,7 @@ class LessProcessor {
 			String resourceName = String.valueOf(args[0]);
 			try {
 				trace.loadLessResource(resourceName);
-				return new String(Files.readAllBytes(configuration.appPath().resolve(resourceName)), UTF_8);
+				return new String(Files.readAllBytes(configuration.get(CoreConfiguration.class).appPath().resolve(resourceName)), UTF_8);
 			} catch (IOException io) {
 				trace.errorLoadingLessResource(resourceName, io);
 			}

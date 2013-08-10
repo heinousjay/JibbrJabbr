@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.CoreConfiguration;
 import jj.SHA1Helper;
 import jj.configuration.Configuration;
 
@@ -49,11 +50,13 @@ public abstract class RealResourceBase {
 	
 	Path appPath;
 	@Mock Configuration configuration;
+	@Mock CoreConfiguration coreConfiguration;
 
 	@Before
 	public final void init() throws Exception {
 		appPath = Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
-		given(configuration.appPath()).willReturn(appPath);
+		given(configuration.get(CoreConfiguration.class)).willReturn(coreConfiguration);
+		given(coreConfiguration.appPath()).willReturn(appPath);
 	}
 
 	protected <T extends Resource> T testFileResource(final T resource) throws Exception {

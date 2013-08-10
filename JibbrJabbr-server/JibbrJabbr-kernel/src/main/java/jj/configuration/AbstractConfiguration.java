@@ -15,6 +15,8 @@
  */
 package jj.configuration;
 
+import jj.conversion.Converters;
+
 /**
  * @author jason
  *
@@ -23,12 +25,18 @@ abstract class AbstractConfiguration {
 	
 	private final Arguments arguments;
 	
-	protected AbstractConfiguration(final Arguments arguments) {
+	private final Converters converters;
+	
+	protected AbstractConfiguration(
+		final Arguments arguments,
+		final Converters converters
+	) {
 		this.arguments = arguments;
+		this.converters = converters;
 	}
 	
 	
-	protected String readArgument(String name) {
-		return arguments.get(name);
+	protected <T> T readArgument(String name, Class<T> resultClass) {
+		return converters.convert(arguments.get(name), resultClass);
 	}
 }

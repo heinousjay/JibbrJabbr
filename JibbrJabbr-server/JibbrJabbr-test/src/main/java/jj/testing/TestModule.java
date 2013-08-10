@@ -52,6 +52,6 @@ class TestModule extends JJModule {
 		
 		bind(Channel.class).toInstance(mock(Channel.class));
 		
-		install(new CoreModule(new String[]{appPath}, true));
+		install(new CoreModule(new String[]{"app=" + appPath}, true));
 	}
 }

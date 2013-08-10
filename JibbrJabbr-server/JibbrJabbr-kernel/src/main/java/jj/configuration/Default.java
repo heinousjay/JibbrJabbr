@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.configuration;
 
-import jj.configuration.Argument;
-import jj.configuration.Default;
-
-import java.nio.file.Path;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Provides a default value for a configuration property that
+ * takes its value from an argument.  The value is converted.
+ * 
  * @author jason
  *
  */
-public interface CoreConfiguration {
-
-	@Argument("app")
-	Path appPath();
-	
-
-	/**
-	 * Flag indicating that the client should be in debug mode, which
-	 * will log internal info to the script console
-	 * @return
-	 */
-	@Argument("debug")
-	@Default("false")
-	boolean debugClient();
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Documented
+public @interface Default {
+	String value();
 }

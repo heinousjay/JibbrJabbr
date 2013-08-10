@@ -80,7 +80,6 @@ class LogConfigurator implements JJServerListener {
 		
 		// just play with this!
 		infoAll();
-		nettyLogger(DEBUG);
 		
 		return asyncAppender;
 	}

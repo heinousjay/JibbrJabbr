@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
+import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 import jj.execution.IOThread;
 import jj.http.HttpRequest;
@@ -16,10 +17,14 @@ import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable<T extends Resource> {
 	
-	protected final Path appPath;
+	protected final Configuration configuration;
 	
 	protected Servable(final Configuration configuration) {
-		this.appPath = configuration.appPath();
+		this.configuration = configuration;
+	}
+	
+	protected Path appPath() {
+		return configuration.get(CoreConfiguration.class).appPath();
 	}
 	
 	/**
@@ -31,7 +36,7 @@ public abstract class Servable<T extends Resource> {
 	@IOThread
 	protected boolean isServablePath(final Path path) {
 		final Path normalized = path.normalize();
-		return Files.exists(normalized, LinkOption.NOFOLLOW_LINKS) && normalized.startsWith(appPath);
+		return Files.exists(normalized, LinkOption.NOFOLLOW_LINKS) && normalized.startsWith(appPath());
 	}
 	
 	/**

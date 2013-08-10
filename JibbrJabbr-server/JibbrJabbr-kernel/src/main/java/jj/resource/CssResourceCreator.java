@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 
+import jj.CoreConfiguration;
 import jj.SHA1Helper;
 import jj.configuration.Configuration;
 import jj.logging.EmergencyLogger;
@@ -84,7 +85,6 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 			DOT_CSS.matcher(name).find();
 	}
 	
-	
 	/**
 	 * takes one parameter, if Boolean.TRUE then this tries to load a .less file
 	 */
@@ -92,10 +92,10 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	Path path(final String baseName, Object... args) {
 		
 		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
-			return configuration.appPath().resolve(toLess(baseName));
+			return configuration.get(CoreConfiguration.class).appPath().resolve(toLess(baseName));
 			
 		}
-		return configuration.appPath().resolve(baseName);
+		return configuration.get(CoreConfiguration.class).appPath().resolve(baseName);
 	}
 
 	@Override
@@ -157,7 +157,13 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 				if (replacement.startsWith("/")) {
 					baseName = replacement.substring(1);
 				} else {
-					baseName = configuration.appPath().relativize(resource.path().resolveSibling(replacement)).normalize().toString();
+					baseName = 
+						configuration
+							.get(CoreConfiguration.class)
+							.appPath()
+							.relativize(resource.path().resolveSibling(replacement))
+							.normalize()
+							.toString();
 				
 				}
 				AbstractResource dependency = (AbstractResource)resourceFinder.loadResource(type, baseName);

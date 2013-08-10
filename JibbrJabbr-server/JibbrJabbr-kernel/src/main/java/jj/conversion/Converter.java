@@ -13,29 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
-
-import jj.configuration.Argument;
-import jj.configuration.Default;
-
-import java.nio.file.Path;
+package jj.conversion;
 
 /**
+ * 
  * @author jason
  *
+ * @param <From>
+ * @param <To>
  */
-public interface CoreConfiguration {
+interface Converter<From, To> {
 
-	@Argument("app")
-	Path appPath();
-	
-
-	/**
-	 * Flag indicating that the client should be in debug mode, which
-	 * will log internal info to the script console
-	 * @return
-	 */
-	@Argument("debug")
-	@Default("false")
-	boolean debugClient();
+	To convert(From in);
 }

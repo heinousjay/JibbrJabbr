@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
+import jj.CoreConfiguration;
 import jj.execution.JJExecutors;
 import org.junit.Before;
 import org.junit.Test;
@@ -177,7 +179,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	//@Test
 	public void loadBigFile() throws IOException {
 		String fileName = "big.fella";
-		Path bigFella = configuration.appPath().resolve(fileName);
+		Path bigFella = configuration.get(CoreConfiguration.class).appPath().resolve(fileName);
 		try (SeekableByteChannel channel = Files.newByteChannel(bigFella, WRITE, CREATE_NEW, SPARSE)) {
 			
 			

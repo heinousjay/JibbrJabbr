@@ -20,16 +20,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * @author jason
  *
  */
+@Singleton
 class Arguments {
 	
 	private static final Pattern SPLITTER = Pattern.compile("(?<=[^\\s])=(?=[^\\s])");
 	
 	private final Map<String, String> arguments;
 
+	@Inject
 	Arguments(final String[] arguments) {
 		this.arguments = readArguments(arguments);
 	}
@@ -54,5 +59,10 @@ class Arguments {
 	
 	String get(final String name) {
 		return arguments.get(name);
+	}
+	
+	@Override
+	public String toString() {
+		return arguments.toString();
 	}
 }
