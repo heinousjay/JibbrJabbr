@@ -96,8 +96,6 @@ public class ConfigurationTest {
 		
 		ConfigurationTestInterface instance = toTest.get(ConfigurationTestInterface.class);
 		
-		System.out.println(instance);
-		
 		assertThat(instance, is(notNullValue()));
 		
 		assertThat(instance.path(), is(realPath));

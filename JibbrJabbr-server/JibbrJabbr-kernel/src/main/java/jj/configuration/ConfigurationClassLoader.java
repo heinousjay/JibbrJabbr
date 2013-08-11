@@ -37,6 +37,10 @@ import javax.inject.Singleton;
 @Singleton
 class ConfigurationClassLoader extends ClassLoader {
 	
+	private static final String SINGLETON_ANNOTATION = "javax.inject.Singleton";
+	private static final String INJECT_ANNOTATION = "javax.inject.Inject";
+	private static final String NAME_FORMAT = "%sGeneratedImplementationFor%s%s";
+
 	static {
 		registerAsParallelCapable();
 	}
@@ -46,19 +50,17 @@ class ConfigurationClassLoader extends ClassLoader {
 	private final CtClass abstractConfiguration = classPool.get(ConfigurationObjectBase.class.getName());
 	
 	@Inject
-	ConfigurationClassLoader() throws Exception {
-		
-	}
+	ConfigurationClassLoader() throws Exception {}
 
 	Class<?> makeClassFor(Class<?> configurationClass) throws Exception {
 
 		CtClass resultInterface = classPool.get(configurationClass.getName());
 		
-		final String name = 
-			configurationClass.getName() +
-			"$Generated" +
-			configurationClass.getSimpleName() +
-			Integer.toHexString(configurationClass.hashCode());
+		final String name = String.format(NAME_FORMAT,
+			Configuration.class.getName(),
+			configurationClass.getSimpleName(),
+			Integer.toHexString(configurationClass.hashCode())
+		);
 		
 		if (classPool.getOrNull(name) == null) {
 			CtClass result = classPool.makeClass(name, abstractConfiguration);
@@ -84,13 +86,13 @@ class ConfigurationClassLoader extends ClassLoader {
 		
 		// @Inject
 		AnnotationsAttribute attribute = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-		Annotation annotation = new Annotation("javax.inject.Inject", constpool);
+		Annotation annotation = new Annotation(INJECT_ANNOTATION, constpool);
 		attribute.addAnnotation(annotation);
 		ctor.getMethodInfo().addAttribute(attribute);
 		
 		// @Singleton (just in case!)
 		attribute = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-		annotation = new Annotation("javax.inject.Singleton", constpool);
+		annotation = new Annotation(SINGLETON_ANNOTATION, constpool);
 		attribute.addAnnotation(annotation);
 		ccFile.addAttribute(attribute);
 		
