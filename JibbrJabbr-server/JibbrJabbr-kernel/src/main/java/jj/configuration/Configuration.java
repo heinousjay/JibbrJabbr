@@ -42,9 +42,11 @@ public class Configuration {
 		if (configurationInstance == null) {
 			try {
 				configurationInstance = injector.getInstance(classLoader.makeClassFor(configurationClass));
-				configurationInterfaceToImplementation.putIfAbsent(configurationClass, configurationInstance);
+				if (configurationInstance != null) {
+					configurationInterfaceToImplementation.put(configurationClass, configurationInstance);
+				}
 			} catch (Exception e) {
-				
+				throw new AssertionError(e);
 			}
 		}
 		

@@ -48,7 +48,6 @@ public abstract class ConfigurationObjectBase {
 		this.resourceFinder =resourceFinder;
 	}
 	
-	
 	protected <T> T readArgument(String name, String defaultValue, Class<T> resultClass) {
 		String value = arguments.get(name);
 		if (value == null) {

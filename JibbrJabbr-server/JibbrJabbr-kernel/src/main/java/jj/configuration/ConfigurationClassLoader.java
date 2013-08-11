@@ -54,14 +54,23 @@ class ConfigurationClassLoader extends ClassLoader {
 
 		CtClass resultInterface = classPool.get(configurationClass.getName());
 		
-		String name = configurationClass.getName() + "$Generated$" + configurationClass.getSimpleName();
-		CtClass result = classPool.makeClass(name, abstractConfiguration);
+		final String name = 
+			configurationClass.getName() +
+			"$Generated" +
+			configurationClass.getSimpleName() +
+			Integer.toHexString(configurationClass.hashCode());
 		
-		prepareForInjection(result);
-		implement(result, resultInterface);
-		
-		byte[] b = result.toBytecode();
-		return defineClass(name, b, 0, b.length);
+		if (classPool.getOrNull(name) == null) {
+			CtClass result = classPool.makeClass(name, abstractConfiguration);
+			
+			prepareForInjection(result);
+			implement(result, resultInterface);
+			
+			byte[] b = result.toBytecode();
+			return defineClass(name, b, 0, b.length);
+		} else {
+			return null;
+		}
 		
 	}
 	
