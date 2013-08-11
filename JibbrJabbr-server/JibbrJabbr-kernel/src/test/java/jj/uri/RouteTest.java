@@ -47,7 +47,6 @@ public class RouteTest {
 	@Test
 	public void test() {
 		Route chat = new Route("/chat/{room}/");
-		System.out.println(chat);
 		assertThat(chat.matches("/chat/room/"), is(true));
 		assertThat(chat.matches("/chat/room"), is(false));
 		
