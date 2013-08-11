@@ -16,23 +16,36 @@
 package jj.configuration;
 
 import jj.conversion.Converters;
+import jj.resource.ResourceFinder;
 
 /**
+ * <p>
+ * mediates between the generated configuration object
+ * and the rest of the system.
+ * </p>
+ * <p>
+ * has to be public so the internal classloader can see it,
+ * but nothing should descend from this class statically
+ * </p>
  * @author jason
  *
  */
-abstract class AbstractConfiguration {
+public abstract class ConfigurationObjectBase {
 	
 	private final Arguments arguments;
 	
 	private final Converters converters;
 	
-	protected AbstractConfiguration(
+	private final ResourceFinder resourceFinder;
+	
+	protected ConfigurationObjectBase(
 		final Arguments arguments,
-		final Converters converters
+		final Converters converters,
+		final ResourceFinder resourceFinder
 	) {
 		this.arguments = arguments;
 		this.converters = converters;
+		this.resourceFinder =resourceFinder;
 	}
 	
 	

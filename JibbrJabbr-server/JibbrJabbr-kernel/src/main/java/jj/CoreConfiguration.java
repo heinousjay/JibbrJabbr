@@ -33,6 +33,8 @@ public interface CoreConfiguration {
 	/**
 	 * Flag indicating that the client should be in debug mode, which
 	 * will log internal info to the script console
+	 * 
+	 * TODO move this to a more appropriate configuration
 	 * @return
 	 */
 	@Argument("debug")

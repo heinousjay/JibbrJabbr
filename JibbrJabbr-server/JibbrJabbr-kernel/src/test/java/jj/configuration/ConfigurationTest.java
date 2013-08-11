@@ -23,9 +23,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.configuration.Configuration;
+import jj.resource.ResourceFinder;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -35,6 +39,7 @@ import com.google.inject.Injector;
  * @author jason
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ConfigurationTest {
 	
 	static final String PATH_ARG = "pathArg";
@@ -62,9 +67,12 @@ public class ConfigurationTest {
 	
 	Path realPath;
 	Configuration toTest;
+	ConfigurationClassLoader classLoader;
+	@Mock ResourceFinder resourceFinder;
 
 	@Before 
 	public void before() throws Exception {
+		classLoader = new ConfigurationClassLoader();
 		realPath = Paths.get(getClass().getResource("/index.html").toURI()).getParent();
 	}
 	
@@ -74,13 +82,14 @@ public class ConfigurationTest {
 			@Override
 			protected void configure() {
 				bind(String[].class).toInstance(args);
+				bind(ResourceFinder.class).toInstance(resourceFinder);
 			}
 		});
 	}
 	
 	@Test
 	public void testRetrieveConfigurationInstances() throws Exception {
-		toTest = new Configuration(makeInjector(new String[] {
+		toTest = new Configuration(classLoader, makeInjector(new String[] {
 			PATH_ARG + "=" + realPath.toString(),
 			BOOL_ARG + "=true"
 		}));
@@ -96,7 +105,7 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testDefaultValue() throws Exception {
-		toTest = new Configuration(makeInjector(new String[] {}));
+		toTest = new Configuration(classLoader, makeInjector(new String[] {}));
 		
 		DefaultTestInterface instance = toTest.get(DefaultTestInterface.class);
 		
@@ -108,7 +117,7 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testConfigurationObjectInstanceIsTheSame() throws Exception {
-		toTest = new Configuration(makeInjector(new String[] {}));
+		toTest = new Configuration(classLoader, makeInjector(new String[] {}));
 		
 		ConfigurationTestInterface instance1 = toTest.get(ConfigurationTestInterface.class);
 		ConfigurationTestInterface instance2 = toTest.get(ConfigurationTestInterface.class);
@@ -118,7 +127,7 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testIsSystemRunning() throws Exception {
-		toTest = new Configuration(null);
+		toTest = new Configuration(null, null);
 		assertThat(toTest.isSystemRunning(), is(true));
 		assertThat(mock(Configuration.class).isSystemRunning(), is(false));
 	}
