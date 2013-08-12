@@ -30,7 +30,7 @@ import jj.resource.ResourceFinder;
 
 /**
  * ensures that the configuration file for the application
- * is available to the system
+ * is available to the system.
  * 
  * @author jason
  *
@@ -62,6 +62,9 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 			}
 		});
 		
+		// 3 seconds is kinda arbitrary but really
+		// if it takes any kind of time at all,
+		// we're hosed
 		if (!latch.await(3, SECONDS)) {
 			throw new AssertionError("timed out loading the configuration");
 		}
@@ -69,6 +72,10 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 
 	@Override
 	public Priority startPriority() {
+		// needs to run before anything else, since
+		// any other component may need configuring
+		// and we don't want to flip-flop into IO
+		// threads
 		return Priority.Highest;
 	}
 }
