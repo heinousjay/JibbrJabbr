@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 @Singleton
 public class ConfigResource extends AbstractFileResource {
 
-	static final String CONFIG_JS = "config.js";
+	public static final String CONFIG_JS = "config.js";
 	
 	/**
 	 * @param baseName

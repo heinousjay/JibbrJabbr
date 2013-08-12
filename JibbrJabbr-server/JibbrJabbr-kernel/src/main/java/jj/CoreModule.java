@@ -18,6 +18,7 @@ package jj;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 
+import jj.configuration.ConfigurationModule;
 import jj.engine.HostApiModule;
 import jj.execution.ExecutionModule;
 import jj.logging.LoggingModule;
@@ -70,19 +71,19 @@ public class CoreModule extends JJModule {
 	@Override
 	protected void configure() {
 		
+		// bind up the command line args
+		bind(String[].class).toInstance(args);
+		
 		// we need the logging module to configure our async logger before we do anything that might log
 		install(new LoggingModule(isTest));
 		
-		// you want the command line args?  HAVE AT EM
-		bind(String[].class).toInstance(args);
-		
 		// and install our little pieces
-
+		install(new ConfigurationModule());
 		install(new ExecutionModule());
 		install(new HostApiModule());
+		install(new HttpModule(isTest));
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
-		install(new HttpModule(isTest));
 	}
 
 }

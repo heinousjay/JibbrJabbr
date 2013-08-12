@@ -18,6 +18,9 @@ package jj.resource;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
@@ -25,11 +28,13 @@ import jj.configuration.Configuration;
  * @author jason
  *
  */
+@Singleton
 class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
 	private final Configuration configuration;
 	private final ResourceInstanceModuleCreator instanceModuleCreator;
 	
+	@Inject
 	ConfigResourceCreator(
 		final Configuration configuration,
 		final ResourceInstanceModuleCreator instanceModuleCreator

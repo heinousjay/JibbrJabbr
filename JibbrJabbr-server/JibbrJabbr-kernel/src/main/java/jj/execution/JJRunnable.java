@@ -21,7 +21,7 @@ public abstract class JJRunnable implements Runnable {
 	public void run() {
 		try {
 			doRun();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new AssertionError("exception travelled to JJRunnable! BAD", e);
 		}

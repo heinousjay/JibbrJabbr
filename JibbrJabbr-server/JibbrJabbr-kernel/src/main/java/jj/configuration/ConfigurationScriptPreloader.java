@@ -15,26 +15,34 @@
  */
 package jj.configuration;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.util.concurrent.CountDownLatch;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.JJServerStartupListener;
 import jj.execution.JJExecutors;
+import jj.execution.JJRunnable;
+import jj.resource.ConfigResource;
 import jj.resource.ResourceFinder;
 
-import org.mozilla.javascript.Context;
-
 /**
+ * ensures that the configuration file for the application
+ * is available to the system
+ * 
  * @author jason
  *
  */
 @Singleton
-class ConfigurationScriptRunner {
+class ConfigurationScriptPreloader implements JJServerStartupListener {
 	
 	private final JJExecutors executors;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
-	ConfigurationScriptRunner(
+	ConfigurationScriptPreloader(
 		final JJExecutors executors,
 		final ResourceFinder resourceFinder
 	) {
@@ -42,12 +50,25 @@ class ConfigurationScriptRunner {
 		this.resourceFinder = resourceFinder;
 	}
 
-	Context context() {
-		Context context = Context.enter();
-		// always in interpreter mode for continuation support
-		context.setOptimizationLevel(-1);
-		// this should be configurable? maybe not
-		context.setLanguageVersion(Context.VERSION_1_8);
-		return context;
+	@Override
+	public void start() throws Exception {
+		final CountDownLatch latch = new CountDownLatch(1);
+		executors.ioExecutor().submit(new JJRunnable("preloading configuration script") {
+			
+			@Override
+			public void doRun() {
+				resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+				latch.countDown();
+			}
+		});
+		
+		if (!latch.await(3, SECONDS)) {
+			throw new AssertionError("timed out loading the configuration");
+		}
+	}
+
+	@Override
+	public Priority startPriority() {
+		return Priority.Highest;
 	}
 }

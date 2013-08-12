@@ -45,6 +45,11 @@ public class TestListener implements JJServerStartupListener, JJServerShutdownLi
 	public void start() throws Exception {
 		testRunnerLogger.info("{} - test start", description);
 	}
+	
+	@Override
+	public Priority startPriority() {
+		return Priority.NearHighest;
+	}
 
 	@Override
 	public void stop() {

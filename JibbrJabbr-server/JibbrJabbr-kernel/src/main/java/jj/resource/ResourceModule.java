@@ -29,19 +29,20 @@ public class ResourceModule extends JJModule {
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
 		addShutdownListenerBinding().to(ResourceCacheImpl.class);
 		
-		MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> mapbinder = 
+		MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreatorBinder = 
 			MapBinder.newMapBinder(
 				binder(),
 				new TypeLiteral<Class<? extends Resource>>() {},
 				new TypeLiteral<ResourceCreator<? extends Resource>>() {}
 			);
-		mapbinder.addBinding(AssetResource.class).to(AssetResourceCreator.class);
-		mapbinder.addBinding(CssResource.class).to(CssResourceCreator.class);
-		mapbinder.addBinding(HtmlResource.class).to(HtmlResourceCreator.class);
-		mapbinder.addBinding(ScriptResource.class).to(ScriptResourceCreator.class);
-		mapbinder.addBinding(Sha1Resource.class).to(Sha1ResourceCreator.class);
-		mapbinder.addBinding(StaticResource.class).to(StaticResourceCreator.class);
-		mapbinder.addBinding(PropertiesResource.class).to(PropertiesResourceCreator.class);
+		resourceCreatorBinder.addBinding(AssetResource.class).to(AssetResourceCreator.class);
+		resourceCreatorBinder.addBinding(ConfigResource.class).to(ConfigResourceCreator.class);
+		resourceCreatorBinder.addBinding(CssResource.class).to(CssResourceCreator.class);
+		resourceCreatorBinder.addBinding(HtmlResource.class).to(HtmlResourceCreator.class);
+		resourceCreatorBinder.addBinding(ScriptResource.class).to(ScriptResourceCreator.class);
+		resourceCreatorBinder.addBinding(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		resourceCreatorBinder.addBinding(StaticResource.class).to(StaticResourceCreator.class);
+		resourceCreatorBinder.addBinding(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		
 		
 		// these guys love each other but it's easier to manage the implementation
