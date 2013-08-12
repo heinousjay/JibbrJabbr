@@ -12,7 +12,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJServerListener;
+import jj.JJServerStartupListener;
 import jj.execution.JJNioEventLoopGroup;
 import jj.script.AssociatedScriptBundle;
 
@@ -22,7 +22,7 @@ import jj.script.AssociatedScriptBundle;
  *
  */
 @Singleton
-public class WebSocketConnectionTracker implements JJServerListener {
+public class WebSocketConnectionTracker implements JJServerStartupListener {
 	
 	private final Logger log = LoggerFactory.getLogger(WebSocketConnectionTracker.class);
 	
@@ -64,12 +64,9 @@ public class WebSocketConnectionTracker implements JJServerListener {
 		this.eventLoopGroup = eventLoopGroup;
 	}
 	
+	@Override
 	public void start() {
 		eventLoopGroup.scheduleAtFixedRate(new ActivityChecker(), 5, 5, SECONDS);
-	}
-	
-	public void stop() {
-		// nothing to do, really.  it's going to shut down anyway
 	}
 	
 	void addConnection(JJWebSocketConnection connection) {

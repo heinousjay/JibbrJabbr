@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerListener;
+import jj.JJServerShutdownListener;
 
 
 /**
@@ -37,7 +37,7 @@ import jj.JJServerListener;
  *
  */
 @Singleton
-public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerListener {
+public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdownListener {
 	
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
 	
@@ -105,11 +105,6 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 		System.err.println("something asked for a callable");
 		new Exception().printStackTrace();
 		return task;
-	}
-
-	@Override
-	public void start() throws Exception {
-		// nothing
 	}
 
 	@Override

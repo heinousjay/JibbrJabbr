@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerListener;
+import jj.JJServerShutdownListener;
 
 /**
  * You should almost certainly not depend on this class.  depend on
@@ -22,7 +22,7 @@ import jj.JJServerListener;
  *
  */
 @Singleton
-public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
+public class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownListener {
 	
 	public static boolean isIOThread() {
 		return flag.get() != null;
@@ -81,11 +81,6 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerListener {
 	@Override
 	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
 		return new JJTask<>(runnable, value);
-	}
-
-	@Override
-	public void start() throws Exception {
-		// nothing to do
 	}
 
 	@Override

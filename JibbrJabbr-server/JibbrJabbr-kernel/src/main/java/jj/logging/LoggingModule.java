@@ -44,7 +44,7 @@ public class LoggingModule extends JJModule {
 		
 		// this gets instantiated before anything might write to a log
 		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
-		addServerListenerBinding().to(LogConfigurator.class);
+		addShutdownListenerBinding().to(LogConfigurator.class);
 		
 	}
 	

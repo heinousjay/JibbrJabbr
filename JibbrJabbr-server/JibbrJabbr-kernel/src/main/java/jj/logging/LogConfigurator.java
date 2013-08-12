@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 import javax.inject.Singleton;
 
-import jj.JJServerListener;
+import jj.JJServerShutdownListener;
 
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ import ch.qos.logback.core.Appender;
  *
  */
 @Singleton
-class LogConfigurator implements JJServerListener {
+class LogConfigurator implements JJServerShutdownListener {
 	
 	private static final String NETTY_LOGGER = "io.netty";
 	
@@ -128,11 +128,6 @@ class LogConfigurator implements JJServerListener {
 	
 	protected void traceAll() {
 		logger.setLevel(Level.TRACE); // start from clean
-	}
-	
-	@Override
-	public void start() throws Exception {
-		
 	}
 
 	@Override

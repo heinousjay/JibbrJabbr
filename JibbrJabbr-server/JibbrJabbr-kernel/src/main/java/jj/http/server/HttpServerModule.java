@@ -18,10 +18,11 @@ public class HttpServerModule extends JJModule {
 	protected void configure() {
 		
 		if (!isTest) {
-			addServerListenerBinding().to(HttpServer.class);
+			addStartupListenerBinding().to(HttpServer.class);
+			addShutdownListenerBinding().to(HttpServer.class);
 		}
 		
-		addServerListenerBinding().to(WebSocketConnectionTracker.class);
+		addStartupListenerBinding().to(WebSocketConnectionTracker.class);
 		
 		Multibinder<WebSocketMessageProcessor> messageProcessors = Multibinder.newSetBinder(binder(), WebSocketMessageProcessor.class);
 		

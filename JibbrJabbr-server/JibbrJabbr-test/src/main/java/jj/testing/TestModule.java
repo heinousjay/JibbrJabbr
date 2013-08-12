@@ -44,7 +44,8 @@ class TestModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addServerListenerBinding().to(TestListener.class);
+		addStartupListenerBinding().to(TestListener.class);
+		addShutdownListenerBinding().to(TestListener.class);
 		
 		bind(Description.class).toInstance(description);
 		

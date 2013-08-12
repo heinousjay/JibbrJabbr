@@ -28,7 +28,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJServerListener;
+import jj.JJServerShutdownListener;
+import jj.JJServerStartupListener;
 import jj.configuration.Configuration;
 import jj.execution.JJNioEventLoopGroup;
 
@@ -37,7 +38,7 @@ import jj.execution.JJNioEventLoopGroup;
  *
  */
 @Singleton
-class HttpServer implements JJServerListener {
+class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 	
 	private static final ThreadFactory threadFactory = new ThreadFactory() {
 		

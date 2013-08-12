@@ -13,12 +13,6 @@ public class ResourceModule extends JJModule {
 	static final class TestWatchService implements ResourceWatchService {
 
 		@Override
-		public void start() throws Exception {}
-
-		@Override
-		public void stop() {}
-
-		@Override
 		public void watch(Resource resource) throws IOException {}
 		
 	}
@@ -33,7 +27,7 @@ public class ResourceModule extends JJModule {
 	protected void configure() {
 		
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
-		addServerListenerBinding().to(ResourceCacheImpl.class);
+		addStartupListenerBinding().to(ResourceCacheImpl.class);
 		
 		MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> mapbinder = 
 			MapBinder.newMapBinder(
@@ -57,7 +51,8 @@ public class ResourceModule extends JJModule {
 		
 		if (!isTest) {
 			bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
-			addServerListenerBinding().to(ResourceWatchService.class);
+			addStartupListenerBinding().to(ResourceWatchServiceImpl.class);
+			addShutdownListenerBinding().to(ResourceWatchServiceImpl.class);
 		} else {
 			bind(ResourceWatchService.class).to(TestWatchService.class);
 		}

@@ -25,13 +25,21 @@ import com.google.inject.multibindings.Multibinder;
  */
 public abstract class JJModule extends AbstractModule {
 	
-	private Multibinder<JJServerListener> serverListeners;
+	private Multibinder<JJServerStartupListener> startupListeners;
+	private Multibinder<JJServerShutdownListener> shutdownListeners;
 
-	protected LinkedBindingBuilder<JJServerListener> addServerListenerBinding() {
-		if (serverListeners == null) {
-			serverListeners =  Multibinder.newSetBinder(binder(), JJServerListener.class);
+	protected LinkedBindingBuilder<JJServerStartupListener> addStartupListenerBinding() {
+		if (startupListeners == null) {
+			startupListeners =  Multibinder.newSetBinder(binder(), JJServerStartupListener.class);
 		}
-		return serverListeners.addBinding();
+		return startupListeners.addBinding();
+	}
+
+	protected LinkedBindingBuilder<JJServerShutdownListener> addShutdownListenerBinding() {
+		if (shutdownListeners == null) {
+			shutdownListeners =  Multibinder.newSetBinder(binder(), JJServerShutdownListener.class);
+		}
+		return shutdownListeners.addBinding();
 	}
 
 }

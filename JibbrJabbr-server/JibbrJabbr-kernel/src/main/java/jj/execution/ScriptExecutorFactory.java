@@ -13,14 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerListener;
+import jj.JJServerShutdownListener;
 
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class ScriptExecutorFactory implements JJServerListener {
+public class ScriptExecutorFactory implements JJServerShutdownListener {
 	
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
 	
@@ -102,11 +102,6 @@ public class ScriptExecutorFactory implements JJServerListener {
 	public boolean isScriptThreadFor(String baseName) {
 		// TODO if this gets smart about handing out scripts take this into account
 		return flag.get() != null;
-	}
-
-	@Override
-	public void start() throws Exception {
-		// nothing to do, nothing to do
 	}
 
 	@Override

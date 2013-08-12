@@ -13,25 +13,28 @@ public class JJServerLifecycle {
 
 	private final Logger log = LoggerFactory.getLogger(JJServerLifecycle.class);
 	
-	private final Set<JJServerListener> listeners;
+	private final Set<JJServerStartupListener> startupListeners;
+	private final Set<JJServerShutdownListener> shutdownListeners;
 	
 	@Inject
 	JJServerLifecycle(
-		final Set<JJServerListener> listeners
+		final Set<JJServerStartupListener> startupListeners,
+		final Set<JJServerShutdownListener> shutdownListeners
 	) {
-		this.listeners = listeners;
+		this.startupListeners = startupListeners;
+		this.shutdownListeners = shutdownListeners;
 	}
 	
 	public void start() throws Exception {
 		log.info("starting the server");
-		for (JJServerListener start: listeners) {
+		for (JJServerStartupListener start: startupListeners) {
 			start.start();
 		}
 	}
 	
 	public void stop() {
 		log.info("stopping the server");
-		for (JJServerListener stop: listeners) {
+		for (JJServerShutdownListener stop: shutdownListeners) {
 			try {
 				stop.stop();
 			} catch (Throwable t) {

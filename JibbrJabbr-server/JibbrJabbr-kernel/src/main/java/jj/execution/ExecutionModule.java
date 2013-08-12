@@ -28,9 +28,9 @@ public class ExecutionModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addServerListenerBinding().to(IOExecutor.class);
-		addServerListenerBinding().to(ScriptExecutorFactory.class);
-		addServerListenerBinding().to(ClientExecutor.class);
+		addShutdownListenerBinding().to(IOExecutor.class);
+		addShutdownListenerBinding().to(ScriptExecutorFactory.class);
+		addShutdownListenerBinding().to(ClientExecutor.class);
 
 		
 		// for now.  this will have different installations in different

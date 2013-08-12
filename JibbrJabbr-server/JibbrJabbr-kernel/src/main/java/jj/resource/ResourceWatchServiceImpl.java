@@ -18,6 +18,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.JJServerShutdownListener;
+import jj.JJServerStartupListener;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 
@@ -27,7 +29,7 @@ import jj.execution.JJRunnable;
  *
  */
 @Singleton
-class ResourceWatchServiceImpl implements ResourceWatchService {
+class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupListener, JJServerShutdownListener {
 	
 	private final Logger log = LoggerFactory.getLogger(ResourceWatchServiceImpl.class);
 	
@@ -61,10 +63,12 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 		}
 	}
 	
+	@Override
 	public void start() {
 		executors.ioExecutor().submit(loop);
 	}
 	
+	@Override
 	public void stop() {
 		try {
 			watcher.close();

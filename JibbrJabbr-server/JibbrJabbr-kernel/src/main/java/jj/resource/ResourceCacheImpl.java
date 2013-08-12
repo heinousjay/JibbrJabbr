@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerListener;
+import jj.JJServerStartupListener;
 import jj.execution.IOExecutor;
 
 /**
@@ -19,7 +19,7 @@ import jj.execution.IOExecutor;
  *
  */
 @Singleton
-class ResourceCacheImpl extends ConcurrentHashMap<ResourceCacheKey, Resource> implements JJServerListener, ResourceCache {
+class ResourceCacheImpl extends ConcurrentHashMap<ResourceCacheKey, Resource> implements JJServerStartupListener, ResourceCache {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -51,10 +51,5 @@ class ResourceCacheImpl extends ConcurrentHashMap<ResourceCacheKey, Resource> im
 	public void start() throws Exception {
 		// make sure we start fresh if we get restarted
 		clear();
-	}
-
-	@Override
-	public void stop() {
-		// nothing to do
 	}
 }

@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
-
-import java.io.IOException;
-
-import jj.JJServerStartupListener;
+package jj;
 
 /**
  * @author jason
  *
  */
-interface ResourceWatchService {
+public interface JJServerShutdownListener {
 
-	void watch(Resource resource) throws IOException;
-
+	void stop();
 }

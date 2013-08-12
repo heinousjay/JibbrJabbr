@@ -21,7 +21,8 @@ import javax.inject.Singleton;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 
-import jj.JJServerListener;
+import jj.JJServerShutdownListener;
+import jj.JJServerStartupListener;
 import jj.logging.TestRunnerLogger;
 
 /**
@@ -29,7 +30,7 @@ import jj.logging.TestRunnerLogger;
  *
  */
 @Singleton
-public class TestListener implements JJServerListener {
+public class TestListener implements JJServerStartupListener, JJServerShutdownListener {
 	
 	private final Logger testRunnerLogger;
 	private final Description description;
