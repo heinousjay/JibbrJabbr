@@ -83,6 +83,12 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 		serverBootstrap.bind(8080).sync();
 		logger.info("Server started");
 	}
+	
+	@Override
+	public Priority startPriority() {
+		// we want to start last, everything else should be running first
+		return Priority.Lowest;
+	}
 
 	@Override
 	public void stop() {

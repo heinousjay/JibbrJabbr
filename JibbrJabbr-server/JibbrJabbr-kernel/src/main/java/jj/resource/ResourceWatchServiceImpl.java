@@ -69,6 +69,11 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	}
 	
 	@Override
+	public Priority startPriority() {
+		return Priority.NearHighest;
+	}
+	
+	@Override
 	public void stop() {
 		try {
 			watcher.close();

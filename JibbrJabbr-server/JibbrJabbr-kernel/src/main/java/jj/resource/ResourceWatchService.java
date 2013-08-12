@@ -17,8 +17,6 @@ package jj.resource;
 
 import java.io.IOException;
 
-import jj.JJServerStartupListener;
-
 /**
  * @author jason
  *

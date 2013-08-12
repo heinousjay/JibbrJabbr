@@ -27,7 +27,7 @@ public class ResourceModule extends JJModule {
 	protected void configure() {
 		
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
-		addStartupListenerBinding().to(ResourceCacheImpl.class);
+		addShutdownListenerBinding().to(ResourceCacheImpl.class);
 		
 		MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> mapbinder = 
 			MapBinder.newMapBinder(

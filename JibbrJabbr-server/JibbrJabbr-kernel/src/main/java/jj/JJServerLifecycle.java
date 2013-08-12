@@ -1,5 +1,8 @@
 package jj;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -27,7 +30,15 @@ public class JJServerLifecycle {
 	
 	public void start() throws Exception {
 		log.info("starting the server");
-		for (JJServerStartupListener start: startupListeners) {
+		ArrayList<JJServerStartupListener> listeners = new ArrayList<>(startupListeners);
+		Collections.sort(listeners, new Comparator<JJServerStartupListener>() {
+
+			@Override
+			public int compare(JJServerStartupListener l1, JJServerStartupListener l2) {
+				return l1.startPriority().compareTo(l2.startPriority());
+			}
+		});
+		for (JJServerStartupListener start: listeners) {
 			start.start();
 		}
 	}

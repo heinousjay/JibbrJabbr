@@ -7,6 +7,16 @@ package jj;
  *
  */
 public interface JJServerStartupListener {
+	
+	public enum Priority {
+		Highest,
+		NearHighest,
+		Middle,
+		NearLowest,
+		Lowest
+	}
 
 	void start() throws Exception;
+	
+	Priority startPriority();
 }

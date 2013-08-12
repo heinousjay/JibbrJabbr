@@ -69,6 +69,11 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		eventLoopGroup.scheduleAtFixedRate(new ActivityChecker(), 5, 5, SECONDS);
 	}
 	
+	@Override
+	public Priority startPriority() {
+		return Priority.Lowest;
+	}
+	
 	void addConnection(JJWebSocketConnection connection) {
 		
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
