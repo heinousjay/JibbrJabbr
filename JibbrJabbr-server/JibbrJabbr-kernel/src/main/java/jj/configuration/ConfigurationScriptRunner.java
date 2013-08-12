@@ -15,16 +15,34 @@
  */
 package jj.configuration;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.execution.JJExecutors;
+import jj.resource.ResourceFinder;
+
 import org.mozilla.javascript.Context;
 
 /**
  * @author jason
  *
  */
-public class ConfigurationRunner {
+@Singleton
+class ConfigurationScriptRunner {
+	
+	private final JJExecutors executors;
+	private final ResourceFinder resourceFinder;
+	
+	@Inject
+	ConfigurationScriptRunner(
+		final JJExecutors executors,
+		final ResourceFinder resourceFinder
+	) {
+		this.executors = executors;
+		this.resourceFinder = resourceFinder;
+	}
 
-
-	public Context context() {
+	Context context() {
 		Context context = Context.enter();
 		// always in interpreter mode for continuation support
 		context.setOptimizationLevel(-1);
