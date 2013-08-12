@@ -48,6 +48,10 @@ class LessProcessor {
 	private static final String SCRIPT_NAME = "less-1.4.0.rhino.js";
 	
 	private static String lessScript() throws IOException {
+		
+		// TODO, load from the resource system, which in turn means
+		// TODO, abstract script running duties to some other object
+		
 		try (BufferedReader reader = 
 			new BufferedReader(new InputStreamReader(LessProcessor.class.getResourceAsStream(SCRIPT_NAME), UTF_8))) {
 			

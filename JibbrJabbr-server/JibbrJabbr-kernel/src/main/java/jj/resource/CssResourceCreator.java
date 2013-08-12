@@ -133,7 +133,8 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	}
 	
 	private String fixImports(final String css, final CssResource resource) {
-		// TODO account for less resources
+		// TODO account for less resources (not sure what i meant by this - i think i already did?)
+		// TODO write a test that ensures we are accounting for less resources, if that isn't already happening
 		return doReplacement(css, resource, IMPORT, "@import $1", "$1", CssResource.class);
 	}
 	
