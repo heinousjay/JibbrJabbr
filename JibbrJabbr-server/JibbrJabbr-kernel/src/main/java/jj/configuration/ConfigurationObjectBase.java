@@ -19,14 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javassist.CtMethod;
-
 import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-
 import jj.conversion.Converters;
+import jj.resource.ConfigResource;
 import jj.resource.ResourceFinder;
 import jj.script.RhinoContext;
 import jj.script.RhinoContextMaker;
@@ -94,6 +90,16 @@ public abstract class ConfigurationObjectBase {
 		}
 		
 		return null;
+	}
+	
+	private void runScriptFunction() {
+		ConfigResource config = resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+		if (config != null && function.get() != config.functions().get(name())) {
+			try (RhinoContext context = contextMaker.context()) {
+				Function function = config.functions().get(name());
+				context.callFunction(function, config.global(), config.global(), new Object[] {scriptObject});
+			}
+		}
 	}
 	
 	protected final <T> T readScriptValue(String name, String defaultValue, Class<T> resultClass) {

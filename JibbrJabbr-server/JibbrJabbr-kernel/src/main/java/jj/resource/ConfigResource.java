@@ -43,6 +43,8 @@ public class ConfigResource extends AbstractFileResource {
 
 	public static final String CONFIG_JS = "config.js";
 	
+	private final Scriptable global;
+	
 	private final Map<String, Function> configFunctions;
 	
 	/**
@@ -55,13 +57,13 @@ public class ConfigResource extends AbstractFileResource {
 		final RhinoContextMaker contextMaker,
 		final ResourceCacheKey cacheKey,
 		final Path path
-	) throws IOException {
+	) {
 		super(cacheKey, CONFIG_JS, path);
 		try (RhinoContext context = contextMaker.context()) {
 			
-			Scriptable scope = context.initStandardObjects();
-			Function configurationFunction = context.compileFunction(scope, script(), path.normalize().toString());
-			Object mapCandidate = context.callFunction(configurationFunction, scope, scope);
+			global = context.initStandardObjects();
+			Function configurationFunction = context.compileFunction(global, script(), path.normalize().toString());
+			Object mapCandidate = context.callFunction(configurationFunction, global, global);
 			
 			if (!(mapCandidate instanceof Map)) {
 				throw new ResourceNotViableException(path, "configuration function did not return the right object");
@@ -101,6 +103,10 @@ public class ConfigResource extends AbstractFileResource {
 	
 	public final Map<String, Function> functions() {
 		return configFunctions;
+	}
+	
+	public Scriptable global() {
+		return global;
 	}
 	
 	private String script() {

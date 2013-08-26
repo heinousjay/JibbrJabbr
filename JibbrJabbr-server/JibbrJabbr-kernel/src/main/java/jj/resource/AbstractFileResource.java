@@ -48,7 +48,7 @@ public abstract class AbstractFileResource extends AbstractResource {
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path
-	) throws IOException {
+	) {
 		this(cacheKey, baseName, path, true);
 	}
 	
