@@ -15,6 +15,8 @@
  */
 package jj.configuration;
 
+import java.util.HashSet;
+
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -62,18 +64,17 @@ class ConfigurationClassLoader extends ClassLoader {
 			Integer.toHexString(configurationClass.hashCode())
 		);
 		
-		if (classPool.getOrNull(name) == null) {
-			CtClass result = classPool.makeClass(name, abstractConfiguration);
-			
-			prepareForInjection(result);
-			implement(result, resultInterface);
-			
-			byte[] b = result.toBytecode();
-			return defineClass(name, b, 0, b.length);
-		} else {
-			return null;
-		}
+		CtClass result = classPool.makeClass(name, abstractConfiguration);
 		
+		prepareForInjection(result);
+		implement(result, resultInterface);
+		
+		byte[] b = result.toBytecode();
+		
+		// no need to keep these around
+		result.detach();
+		
+		return defineClass(name, b, 0, b.length);
 	}
 	
 	private void prepareForInjection(final CtClass result) throws CannotCompileException {
@@ -100,13 +101,14 @@ class ConfigurationClassLoader extends ClassLoader {
 	
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {
 		
+		HashSet<String> scriptMethodNames = new HashSet<>();
 		result.addInterface(resultInterface);
 		for (CtMethod method : resultInterface.getDeclaredMethods()) {
 			CtMethod newMethod = CtNewMethod.copy(method, result, null);
 			Argument argumentAnnotation = (Argument)method.getAnnotation(Argument.class);
 			Default defaultAnnotation = (Default)method.getAnnotation(Default.class);
+			String defaultValue = defaultAnnotation != null ? "\"" + defaultAnnotation.value() + "\"" : null;
 			if (argumentAnnotation != null) {
-				String defaultValue = defaultAnnotation != null ? "\"" + defaultAnnotation.value() + "\"" : null;
 				String body = 
 					"return ($r)readArgument(\"" +
 					argumentAnnotation.value() +
@@ -116,8 +118,51 @@ class ConfigurationClassLoader extends ClassLoader {
 					method.getReturnType().getName() +
 					".class);";
 				newMethod.setBody(body);
+			} else { // it's assumed to come from script
+				scriptMethodNames.add(newMethod.getName());
+				String body = 
+					"return ($r)readScriptValue(\"" +
+					newMethod.getName() +
+					"\"," +
+					defaultValue +
+					"," +
+					method.getReturnType().getName() +
+					".class);";
+				newMethod.setBody(body);
 			}
 			result.addMethod(newMethod);
 		}
+		
+		createConfigureScriptObjectMethod(result, scriptMethodNames);
+	}
+	/*
+	 * makes a function that looks like this
+	 * 
+	 * protected org.mozilla.javascript.Scriptable configureScriptObject() {
+	 * 	org.mozilla.javascript.NativeObject nativeObject = org.mozilla.javascript.new NativeObject();
+	 * 	<loop over method names>
+	 * 	org.mozilla.javascript.ScriptableObject.putConstProperty(nativeObject, name, configurationFunction(name);
+	 * 	</loop>
+	 * 	return nativeObject;
+	 * }
+	 * 
+	 */
+
+	private void createConfigureScriptObjectMethod(final CtClass result, HashSet<String> scriptMethodNames) throws Exception {
+		
+		StringBuilder newMethod = 
+			new StringBuilder("protected org.mozilla.javascript.Scriptable configureScriptObject() {")
+			.append("org.mozilla.javascript.NativeObject nativeObject = new org.mozilla.javascript.NativeObject();");
+		
+		for (String name : scriptMethodNames) {
+			newMethod.append("org.mozilla.javascript.ScriptableObject.putConstProperty(nativeObject,\"")
+				.append(name)
+				.append("\",configurationFunction(\"")
+				.append(name)
+				.append("\"));");
+		}
+		
+		newMethod.append("return nativeObject;}");
+		result.addMethod(CtNewMethod.make(newMethod.toString(), result));
 	}
 }

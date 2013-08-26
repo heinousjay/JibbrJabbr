@@ -13,12 +13,12 @@ import jj.configuration.Configuration;
 class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResource> {
 
 	private final Configuration configuration;
-	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	PropertiesResourceCreator(
 		final Configuration configuration, 
-		final ResourceInstanceModuleCreator instanceModuleCreator
+		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.instanceModuleCreator = instanceModuleCreator;

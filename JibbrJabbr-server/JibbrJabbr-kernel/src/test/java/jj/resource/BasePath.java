@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.resource;
 
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.mozilla.javascript.Context;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
- * source of rhino contexts.  wrapped for testability
+ * lil static object to encapsulate the base path for testing
+ * 
  * @author jason
  *
  */
-@Singleton
-public class RhinoContextMaker {
-	
-	@Inject
-	RhinoContextMaker() {}
+class BasePath {
 
-	public RhinoContext context() {
-		return new RhinoContext(Context.enter());
+	static Path appPath() throws Exception {
+		return Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
 	}
 }

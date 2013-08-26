@@ -13,12 +13,12 @@ import jj.configuration.Configuration;
 class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	
 	private final Configuration configuration;
-	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	HtmlResourceCreator(
 		final Configuration configuration,
-		final ResourceInstanceModuleCreator instanceModuleCreator
+		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.instanceModuleCreator = instanceModuleCreator;

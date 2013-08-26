@@ -40,10 +40,10 @@ class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	
 	private final Logger log = LoggerFactory.getLogger(AssetResourceCreator.class);
 	
-	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
-	AssetResourceCreator(final ResourceInstanceModuleCreator instanceModuleCreator) {
+	AssetResourceCreator(final ResourceInstanceCreator instanceModuleCreator) {
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 	

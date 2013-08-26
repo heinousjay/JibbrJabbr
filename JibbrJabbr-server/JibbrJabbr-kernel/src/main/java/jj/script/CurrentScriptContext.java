@@ -7,7 +7,6 @@ import javax.inject.Singleton;
 
 import jj.DataStore;
 import jj.jjmessage.JJMessage;
-import jj.script.RhinoContextMaker.RhinoContext;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;

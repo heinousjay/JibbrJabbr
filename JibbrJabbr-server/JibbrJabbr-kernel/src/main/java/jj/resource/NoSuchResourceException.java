@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.resource;
 
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.mozilla.javascript.Context;
+import java.nio.file.Path;
 
 /**
- * source of rhino contexts.  wrapped for testability
  * @author jason
  *
  */
-@Singleton
-public class RhinoContextMaker {
-	
-	@Inject
-	RhinoContextMaker() {}
+public class NoSuchResourceException extends ResourceNotViableException {
 
-	public RhinoContext context() {
-		return new RhinoContext(Context.enter());
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6215686822327315451L;
+
+	/**
+	 * @param resourcePath
+	 * @param cause
+	 */
+	public NoSuchResourceException(Path resourcePath) {
+		super(resourcePath);
 	}
+
 }

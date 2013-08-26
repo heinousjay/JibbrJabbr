@@ -19,9 +19,20 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Scriptable;
+
+import jj.script.RhinoContext;
+import jj.script.RhinoContextMaker;
+import jj.script.Util;
 
 /**
  * @author jason
@@ -32,14 +43,49 @@ public class ConfigResource extends AbstractFileResource {
 
 	public static final String CONFIG_JS = "config.js";
 	
+	private final Map<String, Function> configFunctions;
+	
 	/**
 	 * @param baseName
 	 * @param path
 	 * @throws IOException
 	 */
 	@Inject
-	ConfigResource(final ResourceCacheKey cacheKey, final Path path) throws IOException {
+	ConfigResource(
+		final RhinoContextMaker contextMaker,
+		final ResourceCacheKey cacheKey,
+		final Path path
+	) throws IOException {
 		super(cacheKey, CONFIG_JS, path);
+		try (RhinoContext context = contextMaker.context()) {
+			
+			Scriptable scope = context.initStandardObjects();
+			Function configurationFunction = context.compileFunction(scope, script(), path.normalize().toString());
+			Object mapCandidate = context.callFunction(configurationFunction, scope, scope);
+			
+			if (!(mapCandidate instanceof Map)) {
+				throw new ResourceNotViableException(path, "configuration function did not return the right object");
+			}
+			
+			configFunctions = castAndVerify(mapCandidate);
+		} catch (RhinoException re) {
+			throw new ResourceNotViableException(path, re);
+		}
+		
+	}
+	
+	private Map<String, Function> castAndVerify(Object mapIn) {
+		@SuppressWarnings("rawtypes")
+		Map map = (Map)mapIn;
+		Map<String, Function> configFunctions = new HashMap<>();
+		for (Object keyObj : map.keySet()) {
+			String key = Util.toJavaString(keyObj);
+			if (key.isEmpty()) throw new ResourceNotViableException(path, "bad key");
+			Object valueObj = map.get(keyObj);
+			if (!(valueObj instanceof Function)) throw new ResourceNotViableException(path, "not a function");
+			configFunctions.put(key, (Function)valueObj);
+		}
+		return Collections.unmodifiableMap(configFunctions);
 	}
 
 	@Override
@@ -53,7 +99,11 @@ public class ConfigResource extends AbstractFileResource {
 		return MimeTypes.getDefault();
 	}
 	
-	public String script() {
+	public final Map<String, Function> functions() {
+		return configFunctions;
+	}
+	
+	private String script() {
 		return byteBuffer.toString(UTF_8);
 	}
 }

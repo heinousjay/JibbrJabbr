@@ -15,39 +15,22 @@
  */
 package jj.resource;
 
-import static jj.resource.ConfigResource.CONFIG_JS;
 import java.nio.file.Path;
 
 import jj.script.RealRhinoContextMaker;
 
 /**
+ * Spits out the ConfigResource for testing
+ * 
  * @author jason
  *
  */
-public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, ConfigResourceCreator> {
+public class ConfigResourceMaker {
 
-	@Override
-	protected String baseName() {
-		return CONFIG_JS;
-	}
-	
-	@Override
-	protected Path path() {
-		return appPath.resolve(baseName());
-	}
-	
-	@Override
-	protected ConfigResource resource() throws Exception {
-		return new ConfigResource(new RealRhinoContextMaker(), cacheKey(), path());
-	}
-	
-	@Override
-	protected void resourceAssertions(ConfigResource resource) throws Exception {
-		System.out.println(resource.functions());
-	}
-	
-	@Override
-	protected ConfigResourceCreator toTest() {
-		return new ConfigResourceCreator(configuration, instanceModuleCreator);
+	public static ConfigResource configResource() throws Exception {
+		
+		Path path = BasePath.appPath().resolve(ConfigResource.CONFIG_JS);
+		
+		return new ConfigResource(new RealRhinoContextMaker(), new ResourceCacheKey(ConfigResource.class, path.toUri()), path);
 	}
 }

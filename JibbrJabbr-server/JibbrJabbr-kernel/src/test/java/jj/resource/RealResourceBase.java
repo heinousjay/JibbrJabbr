@@ -29,7 +29,6 @@ import io.netty.buffer.Unpooled;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import jj.CoreConfiguration;
 import jj.SHA1Helper;
@@ -40,6 +39,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -51,10 +51,11 @@ public abstract class RealResourceBase {
 	Path appPath;
 	@Mock Configuration configuration;
 	@Mock CoreConfiguration coreConfiguration;
+	@Mock Logger logger;
 
 	@Before
 	public final void init() throws Exception {
-		appPath = Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
+		appPath = BasePath.appPath();
 		given(configuration.get(CoreConfiguration.class)).willReturn(coreConfiguration);
 		given(coreConfiguration.appPath()).willReturn(appPath);
 	}

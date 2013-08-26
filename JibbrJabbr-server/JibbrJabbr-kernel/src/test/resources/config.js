@@ -1,8 +1,9 @@
 /*
  * configures the application. everything should be inside a function
- * named configure, which the system will call when it's ready to rock.
- * configure should return an object which maps subsystem names to 
- * functions that configure that subsystem.  The function will be called
+ * to be called by the system.
+ * 
+ * the function must return an object which maps subsystem names to 
+ * functions that configure said subsystem.  The function will be called
  * as the subsystem starts
  */
 
@@ -15,19 +16,19 @@ function configure() {
 			// these are the defaults
 			
 			// SO_KEEPALIVE
-			socket.keepAlive(true);
+			socket.keepAlive(true)
 			// TCP_NODELAY
-			socket.tcpNoDelay(true);
+				.tcpNoDelay(true)
 			// SO_BACKLOG
-			socket.backlog(1024);
+				.backlog(1024)
 			// SO_TIMEOUT
-			socket.timeout(10000);
+				.timeout(10000)
 			// SO_REUSEADDR
-			socket.reuseAddress(true);
+				.reuseAddress(true)
 			// SO_SNDBUF
-			socket.sendBufferSize(65536);
+				.sendBufferSize(65536)
 			// SO_RCVBUF
-			socket.receiveBufferSize(65536);
+				.receiveBufferSize(65536);
 			
 			// and bind it to interfaces and/or ports
 			// if you're on a unix system, you can't
@@ -36,7 +37,7 @@ function configure() {
 			// recommend binding to a high port and
 			// up nginx as a proxy
 			socket.bind(8080);
-			socket.bind("192.168.1.11", 8090);
+			socket.bind('192.168.1.11', 8090);
 		},
 		
 		// configures the application server 

@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
-
+package jj.configuration;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.mozilla.javascript.Context;
+import javassist.ClassPool;
 
 /**
- * source of rhino contexts.  wrapped for testability
  * @author jason
  *
  */
 @Singleton
-public class RhinoContextMaker {
+class ConfigurationClassPool extends ClassPool {
 	
 	@Inject
-	RhinoContextMaker() {}
-
-	public RhinoContext context() {
-		return new RhinoContext(Context.enter());
+	ConfigurationClassPool() {
+		super(true);
 	}
 }

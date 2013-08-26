@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
 import jj.SHA1Helper;
@@ -27,6 +28,9 @@ public abstract class AbstractFileResource extends AbstractResource {
 	private static final long MAX_IN_MEMORY_SIZE  = 1000000;
 	// beyond this, we don't read the SHA inside here
 	private static final long MAX_READ_AND_DIGEST = 10000000;
+	
+	private static final String TOO_LARGE_ASSERTION_ERROR =
+		AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_IN_MEMORY_SIZE + " bytes";
 
 	protected static final Object[] EMPTY_ARGS = {};
 	
@@ -54,36 +58,48 @@ public abstract class AbstractFileResource extends AbstractResource {
 		final String baseName,
 		final Path path,
 		final boolean keepBytes
-	) throws IOException {
+	) {
 		super(cacheKey);
 		
-		if (!Files.isRegularFile(path)) {
-			throw new NoSuchFileException(path.toString());
-		}
+		try {
 		
-		size = Files.size(path);
-		boolean large = size > MAX_IN_MEMORY_SIZE;
-		
-		if (large && keepBytes) {
-			throw new IOException(AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_IN_MEMORY_SIZE + " bytes");
-		}
-		
-		this.baseName = baseName;
-		this.path = path;
-		this.lastModified = Files.getLastModifiedTime(this.path);
-		
-		if (keepBytes) {
-			byteBuffer = readAllBytes(path);
-			sha1 = SHA1Helper.keyFor(byteBuffer);
-			toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
-		} else if (size <= MAX_READ_AND_DIGEST) {
-			byteBuffer = null;
-			sha1 = SHA1Helper.keyFor(path);
-			toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
-		} else {
-			byteBuffer = null;
-			sha1 = null;
-			toString =  getClass().getSimpleName() + " (large) at " + path;
+			BasicFileAttributes attributes;
+			
+			try {
+				attributes = Files.readAttributes(path, BasicFileAttributes.class);
+			} catch (NoSuchFileException nsfe) {
+				throw new NoSuchResourceException(path);
+			}
+			
+			if (!attributes.isRegularFile()) {
+				throw new NoSuchResourceException(path);
+			}
+			
+			size = attributes.size();
+			boolean large = size > MAX_IN_MEMORY_SIZE;
+			
+			assert !(large && keepBytes) : TOO_LARGE_ASSERTION_ERROR;
+			
+			this.baseName = baseName;
+			this.path = path;
+			this.lastModified = attributes.lastModifiedTime();
+			
+			if (keepBytes) {
+				byteBuffer = readAllBytes(path);
+				sha1 = SHA1Helper.keyFor(byteBuffer);
+				toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+			} else if (size <= MAX_READ_AND_DIGEST) {
+				byteBuffer = null;
+				sha1 = SHA1Helper.keyFor(path);
+				toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+			} else {
+				byteBuffer = null;
+				sha1 = null;
+				toString =  getClass().getSimpleName() + " (large) at " + path;
+			}
+			
+		} catch (IOException ioe) {
+			throw new ResourceNotViableException(path, ioe);
 		}
 	}
 	

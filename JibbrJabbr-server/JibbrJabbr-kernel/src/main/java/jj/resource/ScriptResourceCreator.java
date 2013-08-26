@@ -13,12 +13,12 @@ import jj.configuration.Configuration;
 class ScriptResourceCreator extends AbstractResourceCreator<ScriptResource> {
 
 	private final Configuration configuration;
-	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	ScriptResourceCreator(
 		final Configuration configuration,
-		final ResourceInstanceModuleCreator instanceModuleCreator
+		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.instanceModuleCreator = instanceModuleCreator;

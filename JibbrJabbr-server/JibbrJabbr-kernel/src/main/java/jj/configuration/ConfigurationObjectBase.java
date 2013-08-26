@@ -15,8 +15,21 @@
  */
 package jj.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javassist.CtMethod;
+
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+
 import jj.conversion.Converters;
 import jj.resource.ResourceFinder;
+import jj.script.RhinoContext;
+import jj.script.RhinoContextMaker;
 
 /**
  * <p>
@@ -36,20 +49,55 @@ public abstract class ConfigurationObjectBase {
 	
 	private final Converters converters;
 	
+	protected final Map<String, Object> values = new HashMap<>();
+	
+	private final Scriptable scriptObject;
+	
 	private final ResourceFinder resourceFinder;
+	
+	private final RhinoContextMaker contextMaker;
+	
+	private final AtomicReference<Function> function = new AtomicReference<>();
 	
 	protected ConfigurationObjectBase(
 		final Arguments arguments,
 		final Converters converters,
-		final ResourceFinder resourceFinder
+		final ResourceFinder resourceFinder,
+		final RhinoContextMaker rhinoContextMaker
 	) {
 		this.arguments = arguments;
 		this.converters = converters;
-		this.resourceFinder =resourceFinder;
+		this.resourceFinder = resourceFinder;
+		this.contextMaker = rhinoContextMaker;
+		this.scriptObject = configureScriptObject();
 	}
 	
-	protected <T> T readArgument(String name, String defaultValue, Class<T> resultClass) {
+	final String name() {
+		String base = getClass().getSimpleName().replace("Configuration", "");
+		return base.substring(0, 1).toLowerCase() + base.substring(1);
+	}
+	
+	
+	protected abstract Scriptable configureScriptObject();
+	
+	protected final Function configurationFunction(String name) {
+		return new ConfigurationFunction(values, name);
+	}
+	
+	protected final <T> T readArgument(String name, String defaultValue, Class<T> resultClass) {
 		String value = arguments.get(name);
+		if (value == null) {
+			value = defaultValue;
+		}
+		if (value != null) {
+			return converters.convert(value, resultClass);
+		}
+		
+		return null;
+	}
+	
+	protected final <T> T readScriptValue(String name, String defaultValue, Class<T> resultClass) {
+		Object value = values.get(name);
 		if (value == null) {
 			value = defaultValue;
 		}

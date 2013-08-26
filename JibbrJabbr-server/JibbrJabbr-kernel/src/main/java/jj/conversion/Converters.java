@@ -62,7 +62,7 @@ public class Converters {
 	private final Map<Class<?>, Map<Class<?>, Converter<?, ?>>> converters = new HashMap<>();
 	
 	@Inject
-	Converters() {
+	public Converters() {
 		register(new FromStringToPath());
 		register(new FromStringToBoolean());
 	}

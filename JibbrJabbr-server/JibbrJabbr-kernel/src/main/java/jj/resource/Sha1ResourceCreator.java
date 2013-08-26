@@ -32,12 +32,12 @@ import jj.configuration.Configuration;
 class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 
 	private final Configuration configuration;
-	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	Sha1ResourceCreator(
 		final Configuration configuration,
-		final ResourceInstanceModuleCreator instanceModuleCreator
+		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.instanceModuleCreator = instanceModuleCreator;

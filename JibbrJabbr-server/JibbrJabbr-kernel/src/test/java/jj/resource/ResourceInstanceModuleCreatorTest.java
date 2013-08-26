@@ -29,19 +29,19 @@ import com.google.inject.Guice;
  */
 public class ResourceInstanceModuleCreatorTest extends RealResourceBase {
 	
-	ResourceInstanceModuleCreator rimc;
+	ResourceInstanceCreator rimc;
 	
 	@Before
 	public void before() {
 		
-		rimc = new ResourceInstanceModuleCreator(Guice.createInjector(new AbstractModule() {
+		rimc = new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
 				
 				
 			}
-		}));
+		}), logger);
 	}
 	
 	private <T extends Resource> T doCreate(Class<T> type, String baseName, Object...args) throws Exception {

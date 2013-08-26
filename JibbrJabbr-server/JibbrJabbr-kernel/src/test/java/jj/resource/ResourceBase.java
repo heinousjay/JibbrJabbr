@@ -15,7 +15,7 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -23,8 +23,8 @@ import static org.mockito.BDDMockito.*;
 import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
+
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
@@ -35,7 +35,8 @@ import com.google.inject.Module;
  */
 public abstract class ResourceBase<U extends Resource, T extends ResourceCreator<U>> extends RealResourceBase {
 	
-	ResourceInstanceModuleCreator instanceModuleCreator;
+	
+	ResourceInstanceCreator instanceModuleCreator;
 	@Mock Injector injector;
 	
 	U resource;
@@ -62,7 +63,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 
 	@SuppressWarnings("unchecked")
 	protected void configureInjector(U resource) {
-		given(injector.getInstance(BDDMockito.any(Class.class))).willReturn(resource);
+		given(injector.getInstance(any(Class.class))).willReturn(resource);
 	}
 	
 	@Before
@@ -70,13 +71,13 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		before();
 		
-		instanceModuleCreator = new ResourceInstanceModuleCreator(injector);
+		instanceModuleCreator = new ResourceInstanceCreator(injector, logger);
 		
 		toTest = toTest();
 		
 		resource = resource();
 		
-		given(injector.createChildInjector(BDDMockito.any(Module.class))).willReturn(injector);
+		given(injector.createChildInjector(any(Module.class))).willReturn(injector);
 		configureInjector(resource);
 	}
 	
@@ -89,10 +90,12 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		assertThat(created, is(resource));
 		
-		resourceAssertions();
+		resourceAssertions(created);
+		
+		verify(logger, never()).error(anyString(), any(ResourceNotViableException.class));
 	}
 	
-	protected void resourceAssertions() throws Exception {
+	protected void resourceAssertions(U resource) throws Exception {
 		
 	}
 }

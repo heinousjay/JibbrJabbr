@@ -15,24 +15,33 @@
  */
 package jj.script;
 
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
- * source of rhino contexts.  wrapped for testability
  * @author jason
  *
  */
-@Singleton
-public class RhinoContextMaker {
+public class Util {
 	
-	@Inject
-	RhinoContextMaker() {}
-
-	public RhinoContext context() {
-		return new RhinoContext(Context.enter());
+	private Util() {}
+	
+	public static String toJavaString(final Object fromScript) {
+		try {
+			return (String)Context.jsToJava(fromScript, String.class);
+		} catch (EvaluatorException e) {
+			return "";
+		}
 	}
+	
+	public static boolean toJavaBoolean(final Scriptable options, final String key) {
+		try {
+			return (boolean)Context.jsToJava(ScriptableObject.getProperty(options, key), Boolean.TYPE);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 }

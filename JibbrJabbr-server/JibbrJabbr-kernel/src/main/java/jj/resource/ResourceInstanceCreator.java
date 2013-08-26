@@ -15,11 +15,14 @@
  */
 package jj.resource;
 
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+
+import jj.logging.EmergencyLogger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -33,9 +36,11 @@ import com.google.inject.Injector;
  *
  */
 @Singleton
-class ResourceInstanceModuleCreator {
+class ResourceInstanceCreator {
 
 	private final Injector parentInjector;
+	
+	private final Logger logger;
 	
 	private final class ResourceInstanceModule extends AbstractModule {
 
@@ -80,8 +85,12 @@ class ResourceInstanceModuleCreator {
 	}
 	
 	@Inject
-	ResourceInstanceModuleCreator(final Injector parentInjector) {
+	ResourceInstanceCreator(
+		final Injector parentInjector,
+		final @EmergencyLogger Logger logger
+	) {
 		this.parentInjector = parentInjector;
+		this.logger = logger;
 	}
 	
 	<T extends Resource> T createResource(
@@ -92,14 +101,35 @@ class ResourceInstanceModuleCreator {
 		final Object...args
 	) {
 		try {
-			return parentInjector.createChildInjector(
-				new ResourceInstanceModule(type, cacheKey, baseName, path, args)
-			).getInstance(type);
-		} catch (CreationException ce) {
-			if (ce.getCause().getClass() == NoSuchFileException.class) {
-				return null;
+			
+			try {
+				
+				return parentInjector.createChildInjector(
+					new ResourceInstanceModule(type, cacheKey, baseName, path, args)
+				).getInstance(type);
+				
+			} catch (CreationException ce) {
+				
+				throw ce.getCause();
 			}
-			throw new AssertionError(ce.getCause());
+			
+		} catch (NoSuchResourceException nsre) {
+			
+			// don't bother logging
+			return null;
+			
+		} catch (ResourceNotViableException rnve) {
+			
+			logger.error("", rnve);
+			return null;
+			
+		} catch (Exception e) {
+			
+			throw new AssertionError("unexpected exception creating a resource", e);
+			
+		} catch (Throwable t) {
+			
+			throw (Error)t;
 		}
 	}
 }

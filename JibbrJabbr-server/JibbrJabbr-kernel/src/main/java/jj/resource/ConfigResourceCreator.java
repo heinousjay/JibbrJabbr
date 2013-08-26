@@ -32,12 +32,12 @@ import jj.configuration.Configuration;
 class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
 	private final Configuration configuration;
-	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	ConfigResourceCreator(
 		final Configuration configuration,
-		final ResourceInstanceModuleCreator instanceModuleCreator
+		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.instanceModuleCreator = instanceModuleCreator;

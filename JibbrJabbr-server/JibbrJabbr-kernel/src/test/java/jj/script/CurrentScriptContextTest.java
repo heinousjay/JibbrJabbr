@@ -23,7 +23,6 @@ import jj.http.client.JJHttpClientRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
-import jj.script.RhinoContextMaker.RhinoContext;
 
 import org.junit.Before;
 import org.junit.Test;

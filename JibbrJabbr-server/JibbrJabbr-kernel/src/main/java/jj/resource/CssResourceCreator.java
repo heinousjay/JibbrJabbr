@@ -52,7 +52,7 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private final LessProcessor lessProcessor;
 	private final ResourceFinder resourceFinder;
 	private final Logger logger;
-	private final ResourceInstanceModuleCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	CssResourceCreator(
@@ -60,7 +60,7 @@ class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 		final LessProcessor lessProcessor,
 		final ResourceFinder resourceFinder,
 		final @EmergencyLogger Logger logger,
-		final ResourceInstanceModuleCreator instanceModuleCreator
+		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.lessProcessor = lessProcessor;

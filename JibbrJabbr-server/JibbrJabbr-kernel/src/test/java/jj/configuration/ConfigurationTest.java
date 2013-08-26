@@ -63,6 +63,10 @@ public class ConfigurationTest {
 		@Argument("true")
 		@Default("true")
 		boolean trueBool();
+		
+		String scriptString();
+		
+		boolean scriptBoolean();
 	}
 	
 	Path realPath;

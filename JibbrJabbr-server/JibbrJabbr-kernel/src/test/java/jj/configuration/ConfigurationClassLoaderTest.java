@@ -20,20 +20,18 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-/**
- * @author jason
- *
- */
 public class ConfigurationClassLoaderTest {
 	
-	public interface Interface1 {}
+	public interface Interface1 {
+		
+		String something();
+	}
 
 	@Test
 	public void test() throws Exception {
 		ConfigurationClassLoader ccl = new ConfigurationClassLoader();
 		
 		assertThat(ccl.makeClassFor(Interface1.class), is(notNullValue()));
-		assertThat(ccl.makeClassFor(Interface1.class), is(nullValue()));
 	}
 
 }

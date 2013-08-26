@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.configuration;
 
+import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 
-/**
- * source of rhino contexts.  wrapped for testability
- * @author jason
- *
- */
-@Singleton
-public class RhinoContextMaker {
+class ConfigurationFunction extends BaseFunction {
+
+	private static final long serialVersionUID = -6111536701353048922L;
 	
-	@Inject
-	RhinoContextMaker() {}
+	private final Map<String, Object> values;
+	private final String name;
 
-	public RhinoContext context() {
-		return new RhinoContext(Context.enter());
+	ConfigurationFunction(final Map<String, Object> values, final String name) {
+		this.values = values;
+		this.name = name;
+	}
+	
+	@Override
+	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+		return values.put(name, args);
 	}
 }

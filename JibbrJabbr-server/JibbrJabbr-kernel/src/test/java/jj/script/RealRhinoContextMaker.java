@@ -15,24 +15,14 @@
  */
 package jj.script;
 
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.mozilla.javascript.Context;
-
 /**
- * source of rhino contexts.  wrapped for testability
  * @author jason
  *
  */
-@Singleton
-public class RhinoContextMaker {
-	
-	@Inject
-	RhinoContextMaker() {}
+public class RealRhinoContextMaker extends RhinoContextMaker {
 
-	public RhinoContext context() {
-		return new RhinoContext(Context.enter());
+	public RealRhinoContextMaker() {
+		super();
 	}
+
 }
