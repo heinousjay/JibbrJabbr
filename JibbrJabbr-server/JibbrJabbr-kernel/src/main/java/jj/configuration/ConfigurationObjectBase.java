@@ -45,7 +45,7 @@ public abstract class ConfigurationObjectBase {
 	
 	private final Converters converters;
 	
-	protected final Map<String, Object> values = new HashMap<>();
+	protected final Map<String, Object[]> values = new HashMap<>();
 	
 	private final Scriptable scriptObject;
 	
@@ -92,7 +92,7 @@ public abstract class ConfigurationObjectBase {
 		return null;
 	}
 	
-	private void runScriptFunction() {
+	void runScriptFunction() {
 		ConfigResource config = resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS);
 		if (config != null && function.get() != config.functions().get(name())) {
 			try (RhinoContext context = contextMaker.context()) {
@@ -103,7 +103,7 @@ public abstract class ConfigurationObjectBase {
 	}
 	
 	protected final <T> T readScriptValue(String name, String defaultValue, Class<T> resultClass) {
-		Object value = values.get(name);
+		Object value = values.get(name)[0];
 		if (value == null) {
 			value = defaultValue;
 		}

@@ -19,7 +19,10 @@ package jj.script;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.logging.EmergencyLogger;
+
 import org.mozilla.javascript.Context;
+import org.slf4j.Logger;
 
 /**
  * source of rhino contexts.  wrapped for testability
@@ -29,10 +32,14 @@ import org.mozilla.javascript.Context;
 @Singleton
 public class RhinoContextMaker {
 	
+	private final Logger logger;
+
 	@Inject
-	RhinoContextMaker() {}
+	RhinoContextMaker(final @EmergencyLogger Logger logger) {
+		this.logger = logger;
+	}
 
 	public RhinoContext context() {
-		return new RhinoContext(Context.enter());
+		return new RhinoContext(Context.enter(), logger);
 	}
 }

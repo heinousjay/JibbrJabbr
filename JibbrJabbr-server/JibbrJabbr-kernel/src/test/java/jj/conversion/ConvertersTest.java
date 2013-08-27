@@ -44,19 +44,36 @@ public class ConvertersTest {
 		
 		boolean threw = false;
 		try {
-			converters.convert(this, Object.class);
-		} catch (AssertionError ae) {
-			threw = true;
-		}
-		assertTrue("should have thrown", threw);
-		
-		threw = false;
-		try {
 			converters.convert("", getClass());
 		} catch (AssertionError ae) {
 			threw = true;
 		}
 		assertTrue("should have thrown", threw);
+	}
+	
+	@Test
+	public void testIdentity() {
+		assertThat(converters.convert((Object)this, Object.class), is((Object)this));
+		assertThat(converters.convert(this, ConvertersTest.class), is(this));
+		assertThat(converters.convert("", String.class), is(""));
+		assertThat(converters.convert(true, Boolean.TYPE), is(true));
+		assertThat(converters.convert(false, Boolean.TYPE), is(false));
+		assertThat(converters.convert(true, Boolean.class), is(true));
+		assertThat(converters.convert(false, Boolean.class), is(false));
+		assertThat(converters.convert('a', Character.class), is('a'));
+		assertThat(converters.convert('a', Character.TYPE), is('a'));
+		assertThat(converters.convert((byte)1, Byte.class), is((byte)1));
+		assertThat(converters.convert((byte)1, Byte.TYPE), is((byte)1));
+		assertThat(converters.convert((short)1, Short.class), is((short)1));
+		assertThat(converters.convert((short)1, Short.TYPE), is((short)1));
+		assertThat(converters.convert(1, Integer.class), is(1));
+		assertThat(converters.convert(1, Integer.TYPE), is(1));
+		assertThat(converters.convert(1L, Long.class), is(1L));
+		assertThat(converters.convert(1L, Long.TYPE), is(1L));
+		assertThat(converters.convert(1.0f, Float.class), is(1.0f));
+		assertThat(converters.convert(1.0f, Float.TYPE), is(1.0f));
+		assertThat(converters.convert(1.0, Double.class), is(1.0));
+		assertThat(converters.convert(1.0, Double.TYPE), is(1.0));
 	}
 
 	@Test

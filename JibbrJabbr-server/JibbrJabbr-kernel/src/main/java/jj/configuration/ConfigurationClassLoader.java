@@ -54,7 +54,8 @@ class ConfigurationClassLoader extends ClassLoader {
 	@Inject
 	ConfigurationClassLoader() throws Exception {}
 
-	Class<?> makeClassFor(Class<?> configurationClass) throws Exception {
+	@SuppressWarnings("unchecked")
+	Class<? extends ConfigurationObjectBase> makeClassFor(Class<?> configurationClass) throws Exception {
 
 		CtClass resultInterface = classPool.get(configurationClass.getName());
 		
@@ -74,7 +75,7 @@ class ConfigurationClassLoader extends ClassLoader {
 		// no need to keep these around
 		result.detach();
 		
-		return defineClass(name, b, 0, b.length);
+		return (Class<? extends ConfigurationObjectBase>)defineClass(name, b, 0, b.length);
 	}
 	
 	private void prepareForInjection(final CtClass result) throws CannotCompileException {

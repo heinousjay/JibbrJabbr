@@ -17,7 +17,7 @@ import com.google.inject.Injector;
 @Singleton
 public class Configuration {
 	
-	private final ConcurrentMap<Class<?>, Object> configurationInterfaceToImplementation =
+	private final ConcurrentMap<Class<?>, ConfigurationObjectBase> configurationInterfaceToImplementation =
 		PlatformDependent.newConcurrentHashMap();
 	
 	private final ConfigurationClassLoader classLoader;
@@ -38,7 +38,7 @@ public class Configuration {
 		// maybe i loosen this to abstract class for mix-in purposes?
 		assert configurationClass.isInterface() : "configuration class must be an interface";
 		
-		Object configurationInstance = configurationInterfaceToImplementation.get(configurationClass);
+		ConfigurationObjectBase configurationInstance = configurationInterfaceToImplementation.get(configurationClass);
 		if (configurationInstance == null) {
 			try {
 				configurationInstance = injector.getInstance(classLoader.makeClassFor(configurationClass));
@@ -49,6 +49,8 @@ public class Configuration {
 				throw new AssertionError(e);
 			}
 		}
+		
+		configurationInstance.runScriptFunction();
 		
 		return configurationClass.cast(configurationInstance);
 	}

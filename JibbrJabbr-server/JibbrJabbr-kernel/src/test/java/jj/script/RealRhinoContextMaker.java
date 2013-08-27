@@ -15,6 +15,8 @@
  */
 package jj.script;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * @author jason
  *
@@ -22,7 +24,7 @@ package jj.script;
 public class RealRhinoContextMaker extends RhinoContextMaker {
 
 	public RealRhinoContextMaker() {
-		super();
+		super(LoggerFactory.getLogger("logger"));
 	}
 
 }

@@ -17,13 +17,22 @@ package jj.script;
 
 import static org.mockito.Mockito.mock;
 
+import org.slf4j.Logger;
+
 /**
  * @author jason
  *
  */
 public class MockRhinoContextMaker extends RhinoContextMaker {
-	
+
+
 	public final RhinoContext context = mock(RhinoContext.class);
+	/**
+	 * @param logger
+	 */
+	MockRhinoContextMaker() {
+		super(mock(Logger.class));
+	}
 
 	@Override
 	public RhinoContext context() {

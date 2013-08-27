@@ -25,16 +25,17 @@ class ConfigurationFunction extends BaseFunction {
 
 	private static final long serialVersionUID = -6111536701353048922L;
 	
-	private final Map<String, Object> values;
+	private final Map<String, Object[]> values;
 	private final String name;
 
-	ConfigurationFunction(final Map<String, Object> values, final String name) {
+	ConfigurationFunction(final Map<String, Object[]> values, final String name) {
 		this.values = values;
 		this.name = name;
 	}
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		return values.put(name, args);
+		values.put(name, args);
+		return thisObj;
 	}
 }

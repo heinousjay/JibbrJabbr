@@ -29,7 +29,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * @author jason
@@ -44,6 +46,8 @@ public class ConfigurationObjectBaseTest {
 	Converters converters = new Converters();
 	@Mock ResourceFinder resourceFinder;
 	
+	// we do this a weird way internally to exhaust the point
+	
 	class HttpServerSocketConfiguration extends ConfigurationObjectBase {
 
 		HttpServerSocketConfiguration() {
@@ -52,14 +56,26 @@ public class ConfigurationObjectBaseTest {
 
 		@Override
 		protected Scriptable configureScriptObject() {
-			// TODO Auto-generated method stub
-			return null;
+			NativeObject nativeObject = new NativeObject();
+			ScriptableObject.putConstProperty(nativeObject, "keepAlive", configurationFunction("keepAlive"));
+			ScriptableObject.putConstProperty(nativeObject, "tcpNoDelay", configurationFunction("tcpNoDelay"));
+			ScriptableObject.putConstProperty(nativeObject, "backlog", configurationFunction("backlog"));
+			ScriptableObject.putConstProperty(nativeObject, "timeout", configurationFunction("timeout"));
+			ScriptableObject.putConstProperty(nativeObject, "reuseAddress", configurationFunction("reuseAddress"));
+			ScriptableObject.putConstProperty(nativeObject, "sendBufferSize", configurationFunction("sendBufferSize"));
+			ScriptableObject.putConstProperty(nativeObject, "receiveBufferSize", configurationFunction("receiveBufferSize"));
+			
+
+			ScriptableObject.putConstProperty(nativeObject, "bind", configurationFunction("bind"));
+			
+			return nativeObject;
 		}
+		
+		
 	}
 	
 	@Before
 	public void before() throws Exception {
-
 		
 		ConfigResource resource = ConfigResourceMaker.configResource();
 		
@@ -67,11 +83,21 @@ public class ConfigurationObjectBaseTest {
 	}
 
 	@Test
-	public void testName() {
+	public void test() {
 		
 		ConfigurationObjectBase toTest = new HttpServerSocketConfiguration();
 		
 		assertThat(toTest.name(), is("httpServerSocket"));
+		
+		toTest.runScriptFunction();
+		
+		assertThat(toTest.readScriptValue("keepAlive", null, Boolean.TYPE), is(true));
+		assertThat(toTest.readScriptValue("tcpNoDelay", null, Boolean.TYPE), is(true));
+		assertThat(toTest.readScriptValue("backlog", null, Integer.TYPE), is(1024));
+		assertThat(toTest.readScriptValue("timeout", null, Integer.TYPE), is(10000));
+		assertThat(toTest.readScriptValue("reuseAddress", null, Boolean.TYPE), is(true));
+		assertThat(toTest.readScriptValue("sendBufferSize", null, Integer.TYPE), is(65536));
+		assertThat(toTest.readScriptValue("receiveBufferSize", null, Integer.TYPE), is(65536));
 	}
 
 }

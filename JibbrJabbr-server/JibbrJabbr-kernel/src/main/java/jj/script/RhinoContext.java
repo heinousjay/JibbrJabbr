@@ -17,18 +17,25 @@ package jj.script;
 
 import java.io.Closeable;
 
+import jj.logging.EmergencyLogger;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
+import org.slf4j.Logger;
 
 public class RhinoContext implements Closeable {
 
 	private final Context context;
 	private boolean closed = false;
 	
-	RhinoContext(final Context context) {
+	private final Logger logger;
+	
+	RhinoContext(final Context context, final @EmergencyLogger Logger logger) {
 		this.context = context;
+		this.logger = logger;
 	}
 	
 	private void assertNotClosed() {
@@ -63,6 +70,11 @@ public class RhinoContext implements Closeable {
 	 */
 	public Object callFunction(Function configurationFunction, Scriptable scope, Scriptable thisObj, Object...args) {
 		assertNotClosed();
-		return configurationFunction.call(context, scope, thisObj, args);
+		try {
+			return configurationFunction.call(context, scope, thisObj, args);
+		} catch (EcmaError ecma) {
+			logger.error("script error executing a function\n{}\n{}", ecma.getMessage(), ecma.getScriptStackTrace());
+			throw ecma;
+		}
 	}
 }

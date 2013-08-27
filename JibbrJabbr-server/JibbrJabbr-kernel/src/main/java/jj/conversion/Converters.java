@@ -45,16 +45,21 @@ public class Converters {
 	
 	static {
 		Map<Class<?>, Class<?>> builder = new HashMap<>();
-		builder.put(Boolean.class, Boolean.TYPE);
-		builder.put(Integer.class, Integer.TYPE);
-		// and so on
+		builder.put(Boolean.class,   Boolean.TYPE);
+		builder.put(Character.class, Character.TYPE);
+		builder.put(Byte.class,      Byte.TYPE);
+		builder.put(Short.class,     Short.TYPE);
+		builder.put(Integer.class,   Integer.TYPE);
+		builder.put(Long.class,      Long.TYPE);
+		builder.put(Float.class,     Float.TYPE);
+		builder.put(Double.class,    Double.TYPE);
 		
 		wrappersToPrimitives = Collections.unmodifiableMap(builder);
 		
 		builder = new HashMap<>();
-		builder.put(Boolean.TYPE, Boolean.class);
-		builder.put(Integer.TYPE, Integer.class);
-		// and so on
+		for (Class<?> wrapper : wrappersToPrimitives.keySet()) {
+			builder.put(wrappersToPrimitives.get(wrapper), wrapper);
+		}
 		
 		primitivesToWrappers = Collections.unmodifiableMap(builder);
 	}
@@ -101,6 +106,12 @@ public class Converters {
 		converters.get(fromClass).put(toClass, converter);
 	}
 	
+	// java makes you do weird shit to avoid warnings sometimes
+	@SuppressWarnings("unchecked")
+	private <To> To cast(Object in) {
+		return (To)in;
+	}
+	
 	/**
 	 * <p>
 	 * Converts an incoming value to the desire Class, according to
@@ -119,9 +130,16 @@ public class Converters {
 	public <From, To> To convert(From from, Class<To> to) {
 		
 		Class<?> fromClass = from.getClass();
+		
+		if (to.isAssignableFrom(fromClass) ||
+			to.isPrimitive() && primitivesToWrappers.get(to).isAssignableFrom(fromClass)) {
+			return cast(from);
+		}
+		
+		
 		Map<Class<?>, Converter<?, ?>> fromConverters = converters.get(fromClass);
 		
-		assert (fromConverters != null) : "don't know how to convert from " + fromClass; 
+		assert (fromConverters != null) : "don't know how to convert from " + fromClass;
 		
 		@SuppressWarnings("unchecked")
 		Converter<From, To> converter = (Converter<From, To>)fromConverters.get(to);
