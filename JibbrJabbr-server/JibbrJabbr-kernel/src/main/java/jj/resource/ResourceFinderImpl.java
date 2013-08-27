@@ -1,7 +1,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -92,11 +91,9 @@ class ResourceFinderImpl implements ResourceFinder {
 			}
 			result = resourceClass.cast(resourceCache.get(cacheKey));
 		
-		} catch (NullPointerException | NoSuchFileException | ClassCastException cce) {
-			log.trace("couldn't find {} at {}", resourceClass.getSimpleName(), cacheKey);
-		} catch (IOException ioe) {
+		} catch (Exception e) {
 			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), cacheKey);
-			log.error("", ioe);
+			log.error("", e);
 		}
 		
 		return result;

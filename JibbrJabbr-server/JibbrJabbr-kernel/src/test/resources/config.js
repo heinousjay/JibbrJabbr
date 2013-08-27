@@ -47,6 +47,10 @@ function configure() {
 			http.route(GET, "/chat/{room=lobby}").to("/chat/index");
 		},
 		
+		fails: function(fails) {
+			fails.fail();
+		},
+		
 		scriptTestInterface: function(config) {
 			config.something(true);
 		}

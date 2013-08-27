@@ -114,7 +114,7 @@ class ResourceInstanceCreator {
 				
 				if (cause instanceof ResourceNotViableException) throw cause;
 				
-				throw new AssertionError(ce);
+				throw ce;
 			}
 			
 		} catch (NoSuchResourceException nsre) {

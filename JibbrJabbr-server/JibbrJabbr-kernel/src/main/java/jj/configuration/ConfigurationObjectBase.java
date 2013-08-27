@@ -53,6 +53,8 @@ public abstract class ConfigurationObjectBase {
 	
 	private final AtomicReference<Function> function = new AtomicReference<>();
 	
+	private final String name;
+	
 	protected final RhinoContextMaker contextMaker;
 	
 	protected final Map<String, Object[]> values = new HashMap<>();
@@ -69,11 +71,15 @@ public abstract class ConfigurationObjectBase {
 		this.contextMaker = rhinoContextMaker;
 		// special case, the core configuration CANNOT have script
 		this.scriptObject = (this instanceof CoreConfiguration) ? null : configureScriptObject(configResource().global());
+		
+		Class<?>[] interfaces = getClass().getInterfaces();
+		assert interfaces.length == 1 : "there can be only one! (interface per configuration object)";
+		String base = interfaces[0].getSimpleName().replace("Configuration", "");
+		name = base.substring(0, 1).toLowerCase() + base.substring(1);
 	}
 	
 	final String name() {
-		String base = getClass().getSimpleName().replace("Configuration", "");
-		return base.substring(0, 1).toLowerCase() + base.substring(1);
+		return name;
 	}
 	
 	

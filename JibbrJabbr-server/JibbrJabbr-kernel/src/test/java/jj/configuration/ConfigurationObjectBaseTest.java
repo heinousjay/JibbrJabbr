@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -48,10 +47,11 @@ public class ConfigurationObjectBaseTest {
 	@Mock ResourceFinder resourceFinder;
 	
 	// we do this a weird way internally to exhaust the point
+	interface HttpServerSocketConfiguration {}
 	
-	class HttpServerSocketConfiguration extends ConfigurationObjectBase {
+	class HttpServerSocketConfigurationObject extends ConfigurationObjectBase implements HttpServerSocketConfiguration {
 
-		HttpServerSocketConfiguration() {
+		HttpServerSocketConfigurationObject() {
 			super(arguments, converters, resourceFinder, new RealRhinoContextMaker());
 		}
 
@@ -90,7 +90,7 @@ public class ConfigurationObjectBaseTest {
 	@Test
 	public void test() {
 		
-		ConfigurationObjectBase toTest = new HttpServerSocketConfiguration();
+		ConfigurationObjectBase toTest = new HttpServerSocketConfigurationObject();
 		
 		assertThat(toTest.name(), is("httpServerSocket"));
 		

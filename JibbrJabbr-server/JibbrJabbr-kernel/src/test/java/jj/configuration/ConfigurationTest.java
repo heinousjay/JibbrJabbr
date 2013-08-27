@@ -17,8 +17,7 @@ package jj.configuration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,11 +28,13 @@ import jj.resource.ConfigResource;
 import jj.resource.ConfigResourceMaker;
 import jj.resource.ResourceFinder;
 
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.EcmaError;
 import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
@@ -70,6 +71,8 @@ public class ConfigurationTest {
 		boolean trueBool();
 	}
 	
+	public interface Fails {}
+	
 	Path realPath;
 	Configuration toTest;
 	ConfigurationClassLoader classLoader;
@@ -96,6 +99,10 @@ public class ConfigurationTest {
 		});
 	}
 	
+	private Configuration config() throws Exception {
+		return new Configuration(classLoader, makeInjector(new String[] {}));
+	}
+	
 	@Test
 	public void testRetrieveConfigurationInstances() throws Exception {
 		toTest = new Configuration(classLoader, makeInjector(new String[] {
@@ -114,7 +121,7 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testDefaultValue() throws Exception {
-		toTest = new Configuration(classLoader, makeInjector(new String[] {}));
+		toTest = config();
 		
 		DefaultTestInterface instance = toTest.get(DefaultTestInterface.class);
 		
@@ -126,12 +133,28 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testConfigurationObjectInstanceIsTheSame() throws Exception {
-		toTest = new Configuration(classLoader, makeInjector(new String[] {}));
+		toTest = config();
 		
 		ConfigurationTestInterface instance1 = toTest.get(ConfigurationTestInterface.class);
 		ConfigurationTestInterface instance2 = toTest.get(ConfigurationTestInterface.class);
 		
 		assertThat(instance1, is(sameInstance(instance2)));
+	}
+	
+	@Test
+	public void testErrorIsLogged() throws Exception {
+		toTest = config();
+		
+		EcmaError error = null;
+		try {
+			toTest.get(Fails.class);
+			fail("should have failed");
+		} catch (EcmaError e) {
+			error = e;
+		}
+		assertThat(error, is(notNullValue()));
+		assertThat(error.getMessage(), Matchers.startsWith("TypeError: Cannot find function fail in object [object Object]."));
+		verify(logger).error(anyString(), eq(error.getMessage()), eq(error.getScriptStackTrace()));
 	}
 	
 	@Test
