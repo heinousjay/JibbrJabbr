@@ -18,6 +18,7 @@ package jj.configuration;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
+import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 import jj.resource.ConfigResource;
 import jj.resource.ConfigResourceMaker;
@@ -43,7 +44,7 @@ import org.mozilla.javascript.ScriptableObject;
 public class ConfigurationObjectBaseTest {
 	
 	Arguments arguments = new Arguments(new String[0]);
-	Converters converters = new Converters();
+	Converters converters = new Converters(ConverterSetMaker.converters());
 	@Mock ResourceFinder resourceFinder;
 	
 	// we do this a weird way internally to exhaust the point

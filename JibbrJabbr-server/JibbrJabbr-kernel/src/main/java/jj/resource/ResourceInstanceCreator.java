@@ -29,8 +29,7 @@ import com.google.inject.CreationException;
 import com.google.inject.Injector;
 
 /**
- * By my convention, this would be the resource creator... which
- * I do not want it to be
+ * Handles instantiating Resource instances with full injection and common error handling.
  * 
  * @author jason
  *

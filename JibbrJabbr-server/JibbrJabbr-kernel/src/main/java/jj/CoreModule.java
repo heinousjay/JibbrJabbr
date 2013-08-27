@@ -19,6 +19,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 
 import jj.configuration.ConfigurationModule;
+import jj.conversion.ConversionModule;
 import jj.engine.HostApiModule;
 import jj.execution.ExecutionModule;
 import jj.logging.LoggingModule;
@@ -67,6 +68,7 @@ public class CoreModule extends JJModule {
 		
 		// and install our little pieces
 		install(new ConfigurationModule());
+		install(new ConversionModule());
 		install(new ExecutionModule());
 		install(new HostApiModule());
 		install(new HttpModule(isTest));

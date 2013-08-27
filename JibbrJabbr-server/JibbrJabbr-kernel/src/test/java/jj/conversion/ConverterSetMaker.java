@@ -15,14 +15,19 @@
  */
 package jj.conversion;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Implement this to create a one-way conversion
  * @author jason
  *
- * @param <From> The incoming type
- * @param <To> The outgoing type
  */
-public interface Converter<From, To> {
+public class ConverterSetMaker {
 
-	To convert(From in);
+	public static Set<Converter<?, ?>> converters() {
+		HashSet<Converter<?, ?>> output = new HashSet<>();
+		output.add(new FromStringToBoolean());
+		output.add(new FromStringToPath());
+		return output;
+	}
 }

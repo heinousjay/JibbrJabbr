@@ -36,7 +36,7 @@ public class ConvertersTest {
 	
 	@Before
 	public void before() {
-		converters = new Converters();
+		converters = new Converters(ConverterSetMaker.converters());
 	}
 	
 	@Test

@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -67,9 +68,10 @@ public class Converters {
 	private final Map<Class<?>, Map<Class<?>, Converter<?, ?>>> converters = new HashMap<>();
 	
 	@Inject
-	public Converters() {
-		register(new FromStringToPath());
-		register(new FromStringToBoolean());
+	public Converters(final Set<Converter<?, ?>> converters) {
+		for (Converter<?, ?> converter : converters) {
+			register(converter);
+		}
 	}
 	
 	private void register(Converter<?, ?> converter) {
@@ -118,6 +120,8 @@ public class Converters {
 	 * the runtime type of the from parameter and the specified class
 	 * of the to parameter.
 	 * </p>
+	 * 
+	 * <p>Identity conversions always work, so converting without needing to is just fine</p>
 	 * 
 	 * <p>
 	 * Throws {@link AssertionError}s if the type cannot be handled since

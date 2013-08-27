@@ -15,14 +15,19 @@
  */
 package jj.conversion;
 
+import jj.JJModule;
+
 /**
- * Implement this to create a one-way conversion
  * @author jason
  *
- * @param <From> The incoming type
- * @param <To> The outgoing type
  */
-public interface Converter<From, To> {
+public class ConversionModule extends JJModule {
 
-	To convert(From in);
+	@Override
+	protected void configure() {
+		addConverterBinding().to(FromStringToBoolean.class);
+		addConverterBinding().to(FromStringToPath.class);
+		
+	}
+
 }

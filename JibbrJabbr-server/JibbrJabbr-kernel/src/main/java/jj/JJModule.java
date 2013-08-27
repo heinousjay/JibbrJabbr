@@ -15,7 +15,10 @@
  */
 package jj;
 
+import jj.conversion.Converter;
+
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 
@@ -27,6 +30,7 @@ public abstract class JJModule extends AbstractModule {
 	
 	private Multibinder<JJServerStartupListener> startupListeners;
 	private Multibinder<JJServerShutdownListener> shutdownListeners;
+	private Multibinder<Converter<?, ?>> converters;
 
 	protected LinkedBindingBuilder<JJServerStartupListener> addStartupListenerBinding() {
 		if (startupListeners == null) {
@@ -40,6 +44,13 @@ public abstract class JJModule extends AbstractModule {
 			shutdownListeners =  Multibinder.newSetBinder(binder(), JJServerShutdownListener.class);
 		}
 		return shutdownListeners.addBinding();
+	}
+	
+	protected LinkedBindingBuilder<Converter<?, ?>> addConverterBinding() {
+		if (converters == null) {
+			converters = Multibinder.newSetBinder(binder(), new TypeLiteral<Converter<?, ?>>() {});
+		}
+		return converters.addBinding();
 	}
 
 }

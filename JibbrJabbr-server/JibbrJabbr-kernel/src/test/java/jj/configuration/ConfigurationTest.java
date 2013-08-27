@@ -21,8 +21,11 @@ import static org.mockito.BDDMockito.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
 import jj.configuration.Configuration;
+import jj.conversion.Converter;
+import jj.conversion.ConverterSetMaker;
 import jj.logging.EmergencyLogger;
 import jj.resource.ConfigResource;
 import jj.resource.ConfigResourceMaker;
@@ -40,6 +43,7 @@ import org.slf4j.Logger;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.TypeLiteral;
 
 /**
  * @author jason
@@ -94,6 +98,7 @@ public class ConfigurationTest {
 			protected void configure() {
 				bind(String[].class).toInstance(args);
 				bind(ResourceFinder.class).toInstance(resourceFinder);
+				bind(new TypeLiteral<Set<Converter<?, ?>>>() {}).toInstance(ConverterSetMaker.converters());
 				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
 			}
 		});
