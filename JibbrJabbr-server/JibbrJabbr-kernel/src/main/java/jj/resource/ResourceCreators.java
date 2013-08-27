@@ -38,8 +38,13 @@ class ResourceCreators implements Iterable<ResourceCreator<? extends Resource>> 
 		this.resourceCreators = Collections.unmodifiableMap(resourceCreators);
 	}
 	
-	public <T extends Resource> ResourceCreator<? extends Resource> get(final Class<T> type) {
-		return resourceCreators.get(type);
+	public <T extends Resource> ResourceCreator<T> get(final Class<T> type) {
+
+		@SuppressWarnings("unchecked")
+		ResourceCreator<T> result = (ResourceCreator<T>)resourceCreators.get(type);
+		assert(result.type() == type);
+		
+		return result;
 	}
 
 	@Override

@@ -75,8 +75,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	) {
 		assert executors.isIOThread() : "Can only call loadResource from an I/O thread";
 		
-		@SuppressWarnings("unchecked")
-		ResourceCreator<T> resourceCreator = (ResourceCreator<T>)resourceCreators.get(resourceClass);
+		ResourceCreator<T> resourceCreator = resourceCreators.get(resourceClass);
 		
 		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
 		T result = null;

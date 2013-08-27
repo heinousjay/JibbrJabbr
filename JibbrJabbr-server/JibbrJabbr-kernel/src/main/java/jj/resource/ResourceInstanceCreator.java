@@ -66,7 +66,6 @@ class ResourceInstanceCreator {
 					new AbstractModule() {
 						@Override
 						protected void configure() {
-							// bind up all the resource classes
 							bind(type);
 							bind(ResourceCacheKey.class).toInstance(cacheKey);
 							bind(String.class).toInstance(baseName);
