@@ -23,6 +23,7 @@ import jj.resource.ConfigResource;
 import jj.resource.ConfigResourceMaker;
 import jj.resource.ResourceFinder;
 import jj.script.RealRhinoContextMaker;
+import jj.script.RhinoContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,20 +56,24 @@ public class ConfigurationObjectBaseTest {
 		}
 
 		@Override
-		protected Scriptable configureScriptObject() {
-			NativeObject nativeObject = new NativeObject();
-			ScriptableObject.putConstProperty(nativeObject, "keepAlive", configurationFunction("keepAlive"));
-			ScriptableObject.putConstProperty(nativeObject, "tcpNoDelay", configurationFunction("tcpNoDelay"));
-			ScriptableObject.putConstProperty(nativeObject, "backlog", configurationFunction("backlog"));
-			ScriptableObject.putConstProperty(nativeObject, "timeout", configurationFunction("timeout"));
-			ScriptableObject.putConstProperty(nativeObject, "reuseAddress", configurationFunction("reuseAddress"));
-			ScriptableObject.putConstProperty(nativeObject, "sendBufferSize", configurationFunction("sendBufferSize"));
-			ScriptableObject.putConstProperty(nativeObject, "receiveBufferSize", configurationFunction("receiveBufferSize"));
+		protected Scriptable configureScriptObject(Scriptable scope) {
+			try (RhinoContext context = contextMaker.context()) {
 			
-
-			ScriptableObject.putConstProperty(nativeObject, "bind", configurationFunction("bind"));
-			
-			return nativeObject;
+				Scriptable nativeObject = context.newObject(scope);
+				ScriptableObject.putConstProperty(nativeObject, "keepAlive", configurationFunction("keepAlive"));
+				ScriptableObject.putConstProperty(nativeObject, "tcpNoDelay", configurationFunction("tcpNoDelay"));
+				ScriptableObject.putConstProperty(nativeObject, "backlog", configurationFunction("backlog"));
+				ScriptableObject.putConstProperty(nativeObject, "timeout", configurationFunction("timeout"));
+				ScriptableObject.putConstProperty(nativeObject, "reuseAddress", configurationFunction("reuseAddress"));
+				ScriptableObject.putConstProperty(nativeObject, "sendBufferSize", configurationFunction("sendBufferSize"));
+				ScriptableObject.putConstProperty(nativeObject, "receiveBufferSize", configurationFunction("receiveBufferSize"));
+				
+				
+				// ehhhhh
+				ScriptableObject.putConstProperty(nativeObject, "bind", configurationFunction("bind"));
+				
+				return nativeObject;
+			}
 		}
 		
 		

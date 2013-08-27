@@ -17,6 +17,7 @@ package jj.configuration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Path;
@@ -24,6 +25,8 @@ import java.nio.file.Paths;
 
 import jj.configuration.Configuration;
 import jj.logging.EmergencyLogger;
+import jj.resource.ConfigResource;
+import jj.resource.ConfigResourceMaker;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;
@@ -65,10 +68,6 @@ public class ConfigurationTest {
 		@Argument("true")
 		@Default("true")
 		boolean trueBool();
-		
-		String scriptString();
-		
-		boolean scriptBoolean();
 	}
 	
 	Path realPath;
@@ -81,6 +80,8 @@ public class ConfigurationTest {
 	public void before() throws Exception {
 		classLoader = new ConfigurationClassLoader();
 		realPath = Paths.get(getClass().getResource("/index.html").toURI()).getParent();
+		
+		given(resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS)).willReturn(ConfigResourceMaker.configResource());
 	}
 	
 	private Injector makeInjector(final String[] args) {

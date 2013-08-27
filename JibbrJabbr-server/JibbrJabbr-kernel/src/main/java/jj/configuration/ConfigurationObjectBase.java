@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
+
+import jj.CoreConfiguration;
 import jj.conversion.Converters;
 import jj.resource.ConfigResource;
 import jj.resource.ResourceFinder;
@@ -45,15 +47,15 @@ public abstract class ConfigurationObjectBase {
 	
 	private final Converters converters;
 	
-	protected final Map<String, Object[]> values = new HashMap<>();
-	
 	private final Scriptable scriptObject;
 	
 	private final ResourceFinder resourceFinder;
 	
-	private final RhinoContextMaker contextMaker;
-	
 	private final AtomicReference<Function> function = new AtomicReference<>();
+	
+	protected final RhinoContextMaker contextMaker;
+	
+	protected final Map<String, Object[]> values = new HashMap<>();
 	
 	protected ConfigurationObjectBase(
 		final Arguments arguments,
@@ -65,7 +67,8 @@ public abstract class ConfigurationObjectBase {
 		this.converters = converters;
 		this.resourceFinder = resourceFinder;
 		this.contextMaker = rhinoContextMaker;
-		this.scriptObject = configureScriptObject();
+		// special case, the core configuration CANNOT have script
+		this.scriptObject = (this instanceof CoreConfiguration) ? null : configureScriptObject(configResource().global());
 	}
 	
 	final String name() {
@@ -74,10 +77,14 @@ public abstract class ConfigurationObjectBase {
 	}
 	
 	
-	protected abstract Scriptable configureScriptObject();
+	protected abstract Scriptable configureScriptObject(Scriptable scope);
 	
 	protected final Function configurationFunction(String name) {
 		return new ConfigurationFunction(values, name);
+	}
+	
+	protected final ConfigResource configResource() {
+		return resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS);
 	}
 	
 	protected final <T> T readArgument(String name, String defaultValue, Class<T> resultClass) {
@@ -93,7 +100,8 @@ public abstract class ConfigurationObjectBase {
 	}
 	
 	void runScriptFunction() {
-		ConfigResource config = resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+		
+		ConfigResource config = configResource();
 		if (config != null && function.get() != config.functions().get(name())) {
 			try (RhinoContext context = contextMaker.context()) {
 				Function function = config.functions().get(name());

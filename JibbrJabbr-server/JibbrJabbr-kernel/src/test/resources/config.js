@@ -28,7 +28,7 @@ function configure() {
 			// SO_SNDBUF
 				.sendBufferSize(65536)
 			// SO_RCVBUF
-				.receiveBufferSize(65536);
+				.receiveBufferSize(65536)
 			
 			// and bind it to interfaces and/or ports
 			// if you're on a unix system, you can't
@@ -36,15 +36,19 @@ function configure() {
 			// as root... which i don't recommend.  i do
 			// recommend binding to a high port and
 			// up nginx as a proxy
-			socket.bind(8080);
-			socket.bind('192.168.1.11', 8090);
+				.bind(8080)
+				.bind('192.168.1.11', 8090);
 		},
 		
 		// configures the application server 
 		http: function(http) {
-			// NO IDEA how this will work.  yet.
+			
 			http.redirect(GET, "/chat").to("/chat/");
 			http.route(GET, "/chat/{room=lobby}").to("/chat/index");
+		},
+		
+		scriptTestInterface: function(config) {
+			config.something(true);
 		}
 	}
 }

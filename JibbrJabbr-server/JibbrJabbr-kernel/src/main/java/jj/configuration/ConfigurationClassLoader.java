@@ -136,34 +136,24 @@ class ConfigurationClassLoader extends ClassLoader {
 		
 		createConfigureScriptObjectMethod(result, scriptMethodNames);
 	}
-	/*
-	 * makes a function that looks like this
-	 * 
-	 * protected org.mozilla.javascript.Scriptable configureScriptObject() {
-	 * 	org.mozilla.javascript.NativeObject nativeObject = org.mozilla.javascript.new NativeObject();
-	 * 	<loop over method names>
-	 * 	org.mozilla.javascript.ScriptableObject.putConstProperty(nativeObject, name, configurationFunction(name);
-	 * 	</loop>
-	 * 	return nativeObject;
-	 * }
-	 * 
-	 */
 
 	private void createConfigureScriptObjectMethod(final CtClass result, HashSet<String> scriptMethodNames) throws Exception {
 		
 		StringBuilder newMethod = 
-			new StringBuilder("protected org.mozilla.javascript.Scriptable configureScriptObject() {")
-			.append("org.mozilla.javascript.NativeObject nativeObject = new org.mozilla.javascript.NativeObject();");
+			new StringBuilder("protected org.mozilla.javascript.Scriptable configureScriptObject(org.mozilla.javascript.Scriptable scope) {")
+			.append("org.mozilla.javascript.Scriptable result = null;")
+			.append("jj.script.RhinoContext context = contextMaker.context();")
+			.append("try {result = context.newObject(scope);} finally {context.close();}");
 		
 		for (String name : scriptMethodNames) {
-			newMethod.append("org.mozilla.javascript.ScriptableObject.putConstProperty(nativeObject,\"")
+			newMethod.append("org.mozilla.javascript.ScriptableObject.putConstProperty(result,\"")
 				.append(name)
 				.append("\",configurationFunction(\"")
 				.append(name)
 				.append("\"));");
 		}
 		
-		newMethod.append("return nativeObject;}");
+		newMethod.append("return result;}");
 		result.addMethod(CtNewMethod.make(newMethod.toString(), result));
 	}
 }

@@ -21,8 +21,8 @@ import jj.logging.EmergencyLogger;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
-import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.slf4j.Logger;
 
@@ -58,9 +58,19 @@ public class RhinoContext implements Closeable {
 		return context.initStandardObjects();
 	}
 	
+	public Scriptable newObject(Scriptable scope) {
+		assertNotClosed();
+		return context.newObject(scope);
+	}
+	
 	public Function compileFunction(final Scriptable scope, final String source, final String sourceName) {
 		assertNotClosed();
-		return context.compileFunction(scope, source, sourceName, 1, null);
+		try {
+			return context.compileFunction(scope, source, sourceName, 1, null);
+		} catch (RhinoException re) {
+			logger.error("script error compiling a function\n{}", re.getMessage());
+			throw re;
+		}
 	}
 
 	/**
@@ -72,9 +82,9 @@ public class RhinoContext implements Closeable {
 		assertNotClosed();
 		try {
 			return configurationFunction.call(context, scope, thisObj, args);
-		} catch (EcmaError ecma) {
-			logger.error("script error executing a function\n{}\n{}", ecma.getMessage(), ecma.getScriptStackTrace());
-			throw ecma;
+		} catch (RhinoException re) {
+			logger.error("script error executing a function\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			throw re;
 		}
 	}
 }
