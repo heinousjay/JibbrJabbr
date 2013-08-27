@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.CoreConfiguration;
+
 import com.google.inject.Injector;
 
 /**
@@ -49,8 +51,12 @@ public class Configuration {
 				throw new AssertionError(e);
 			}
 		}
-		
-		configurationInstance.runScriptFunction();
+		// special case, the core configuration has no scripted properties
+		// in fact, i'm moving the app path back inside, i think, and maybe killing
+		// the argument thing?  i don't know
+		if (!CoreConfiguration.class.isAssignableFrom(configurationClass)) {
+			configurationInstance.runScriptFunction();
+		}
 		
 		return configurationClass.cast(configurationInstance);
 	}

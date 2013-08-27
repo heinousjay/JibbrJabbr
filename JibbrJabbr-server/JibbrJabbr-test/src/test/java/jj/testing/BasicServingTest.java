@@ -46,7 +46,7 @@ import org.junit.Test;
  * @author jason
  *
  */
-public class TestingAPITest {
+public class BasicServingTest {
 	
 	public static class VerifiableRequest {
 		
@@ -85,7 +85,7 @@ public class TestingAPITest {
 	static {
 		try {
 			// well it's ugly, but it's portable
-			appPath = Paths.get(JJ.uri(TestingAPITest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
+			appPath = Paths.get(JJ.uri(BasicServingTest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
 			indexHtmlRenderedPath = Paths.get(appPath, INDEX_HTML_RENDERED);
 			animalHtmlRenderedPath = Paths.get(appPath, ANIMAL_HTML_RENDERED);
 			
@@ -100,7 +100,7 @@ public class TestingAPITest {
 			work.add(makeResourceRequest("7.txt"));
 			work.add(makeResourceRequest("8.txt"));
 			work.add(makeResourceRequest("9.txt"));
-		
+			Collections.shuffle(work);
 			statics = work.toArray(new VerifiableRequest[work.size()]);
 			
 			work = new ArrayList<>();
@@ -211,6 +211,7 @@ public class TestingAPITest {
 		Collections.addAll(requests, statics);
 		Collections.addAll(requests, stylesheets);
 		Collections.addAll(requests, assets);
+		Collections.shuffle(requests);
 		return requests.toArray(new VerifiableRequest[requests.size()]);
 	}
 	

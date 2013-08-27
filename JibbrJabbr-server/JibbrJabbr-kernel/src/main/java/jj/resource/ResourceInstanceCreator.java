@@ -110,6 +110,10 @@ class ResourceInstanceCreator {
 				
 			} catch (CreationException ce) {
 				
+				Throwable cause = ce.getCause();
+				
+				if (cause instanceof ResourceNotViableException) throw cause;
+				
 				throw new AssertionError(ce);
 			}
 			
