@@ -110,7 +110,7 @@ class ResourceInstanceCreator {
 				
 			} catch (CreationException ce) {
 				
-				throw ce.getCause();
+				throw new AssertionError(ce);
 			}
 			
 		} catch (NoSuchResourceException nsre) {

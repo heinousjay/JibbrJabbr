@@ -42,6 +42,7 @@ function configure() {
 		
 		// configures the application server 
 		http: function(http) {
+			// NO IDEA how this will work.  yet.
 			http.redirect(GET, "/chat").to("/chat/");
 			http.route(GET, "/chat/{room=lobby}").to("/chat/index");
 		}

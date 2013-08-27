@@ -17,8 +17,11 @@ package jj.resource;
 
 import java.nio.file.Path;
 
+import jj.logging.EmergencyLogger;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -27,7 +30,7 @@ import com.google.inject.Guice;
  * @author jason
  *
  */
-public class ResourceInstanceModuleCreatorTest extends RealResourceBase {
+public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	ResourceInstanceCreator rimc;
 	
@@ -38,8 +41,7 @@ public class ResourceInstanceModuleCreatorTest extends RealResourceBase {
 			
 			@Override
 			protected void configure() {
-				
-				
+				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
 			}
 		}), logger);
 	}

@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.configuration.Configuration;
+import jj.logging.EmergencyLogger;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -73,6 +75,7 @@ public class ConfigurationTest {
 	Configuration toTest;
 	ConfigurationClassLoader classLoader;
 	@Mock ResourceFinder resourceFinder;
+	@Mock Logger logger;
 
 	@Before 
 	public void before() throws Exception {
@@ -87,6 +90,7 @@ public class ConfigurationTest {
 			protected void configure() {
 				bind(String[].class).toInstance(args);
 				bind(ResourceFinder.class).toInstance(resourceFinder);
+				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
 			}
 		});
 	}
