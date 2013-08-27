@@ -3,17 +3,11 @@ package jj.resource;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static java.nio.file.StandardOpenOption.*;
-
-
 import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.CoreConfiguration;
 import jj.execution.JJExecutors;
 import org.junit.Before;
 import org.junit.Test;
@@ -130,6 +124,25 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	}
 	
 	@Test
+	public void testObseleteResourceIsReloaded() throws IOException {
+		
+		StaticResource mockStaticResource1 = mock(StaticResource.class);
+		StaticResource mockStaticResource2 = mock(StaticResource.class);
+		given(staticResourceCreator.create(eq("index.html"), anyVararg())).willReturn(mockStaticResource1, mockStaticResource2);
+		
+		StaticResource sr1 = rfi.loadResource(StaticResource.class, "index.html");
+		StaticResource sr2 = rfi.loadResource(StaticResource.class, "index.html");
+		
+		given(mockStaticResource1.isObselete()).willReturn(true);
+		
+		StaticResource sr3 = rfi.loadResource(StaticResource.class, "index.html");
+		
+		assertThat(sr1, is(mockStaticResource1));
+		assertThat(sr2, is(mockStaticResource1));
+		assertThat(sr3, is(mockStaticResource2));
+	}
+	
+	@Test
 	public void testMultipleResourceForOneFile() throws IOException {
 		
 		// given
@@ -175,19 +188,4 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		assertThat(resource2.size(), is(resource3.size()));
 		
 	}
-	
-	//@Test
-	public void loadBigFile() throws IOException {
-		String fileName = "big.fella";
-		Path bigFella = configuration.get(CoreConfiguration.class).appPath().resolve(fileName);
-		try (SeekableByteChannel channel = Files.newByteChannel(bigFella, WRITE, CREATE_NEW, SPARSE)) {
-			
-			
-			
-		} finally {
-			Files.deleteIfExists(bigFella);
-			
-		}
-	}
-
 }

@@ -42,48 +42,6 @@ class ResourceInstanceCreator {
 	
 	private final Logger logger;
 	
-	private final class ResourceInstanceModule extends AbstractModule {
-
-		private final Class<? extends Resource> type;
-		private final ResourceCacheKey cacheKey;
-		private final String baseName;
-		private final Path path;
-		private final Object[] args;
-		
-		ResourceInstanceModule(
-			final Class<? extends Resource> type,
-			final ResourceCacheKey cacheKey,
-			final String baseName,
-			final Path path,
-			final Object[] args
-		) {
-			this.type = type;
-			this.cacheKey = cacheKey;
-			this.baseName = baseName;
-			this.path = path;
-			this.args = args;
-		}
-		
-		@Override
-		protected void configure() {
-			// bind up all the resource classes
-			bind(type);
-			bind(ResourceCacheKey.class).toInstance(cacheKey);
-			bind(String.class).toInstance(baseName);
-			bind(Path.class).toInstance(path);
-			
-			for (Object arg : args) {
-				bindInstance(arg.getClass(), arg);
-			}
-		}
-		
-		@SuppressWarnings("unchecked")
-		private <T> void bindInstance(Class<T> type, Object instance) {
-			bind(type).toInstance((T)instance);
-		}
-		
-	}
-	
 	@Inject
 	ResourceInstanceCreator(
 		final Injector parentInjector,
@@ -105,7 +63,25 @@ class ResourceInstanceCreator {
 			try {
 				
 				return parentInjector.createChildInjector(
-					new ResourceInstanceModule(type, cacheKey, baseName, path, args)
+					new AbstractModule() {
+						@Override
+						protected void configure() {
+							// bind up all the resource classes
+							bind(type);
+							bind(ResourceCacheKey.class).toInstance(cacheKey);
+							bind(String.class).toInstance(baseName);
+							bind(Path.class).toInstance(path);
+							
+							for (Object arg : args) {
+								bindInstance(arg.getClass(), arg);
+							}
+						}
+						
+						@SuppressWarnings("unchecked")
+						private <V> void bindInstance(Class<V> type, Object instance) {
+							bind(type).toInstance((V)instance);
+						}
+					}
 				).getInstance(type);
 				
 			} catch (CreationException ce) {
@@ -119,7 +95,7 @@ class ResourceInstanceCreator {
 			
 		} catch (NoSuchResourceException nsre) {
 			
-			// don't bother logging
+			// don't bother logging this, it's just a "not found"
 			return null;
 			
 		} catch (ResourceNotViableException rnve) {
