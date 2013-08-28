@@ -150,13 +150,13 @@ public class ConfigurationTest {
 	}
 	
 	@Test
-	public void testConfigurationObjectInstanceIsTheSame() throws Exception {
+	public void testConfigurationObjectInstanceIsNotTheSame() throws Exception {
 		toTest = config();
 		
 		ConfigurationTestInterface instance1 = toTest.get(ConfigurationTestInterface.class);
 		ConfigurationTestInterface instance2 = toTest.get(ConfigurationTestInterface.class);
 		
-		assertThat(instance1, is(sameInstance(instance2)));
+		assertThat(instance1, is(not(sameInstance(instance2))));
 	}
 	
 	@Test

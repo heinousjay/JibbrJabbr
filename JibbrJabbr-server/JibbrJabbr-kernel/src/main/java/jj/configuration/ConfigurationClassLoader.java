@@ -92,12 +92,13 @@ class ConfigurationClassLoader extends ClassLoader {
 		attribute.addAnnotation(annotation);
 		ctor.getMethodInfo().addAttribute(attribute);
 		
+		/*
 		// @Singleton (just in case!)
 		attribute = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
 		annotation = new Annotation(SINGLETON_ANNOTATION, constpool);
 		attribute.addAnnotation(annotation);
 		ccFile.addAttribute(attribute);
-		
+		*/
 	}
 	
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {

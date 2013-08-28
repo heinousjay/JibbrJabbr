@@ -105,7 +105,7 @@ public abstract class ConfigurationObjectBase {
 	void runScriptFunction() {
 		
 		ConfigResource config = configResource();
-		if (config != null) {
+		if (config != null && config.functions().containsKey(name())) {
 			try (RhinoContext context = contextMaker.context()) {
 				Function function = config.functions().get(name());
 				context.callFunction(function, config.global(), config.global(), new Object[] {scriptObject});

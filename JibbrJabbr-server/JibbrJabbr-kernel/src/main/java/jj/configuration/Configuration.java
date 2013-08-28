@@ -19,7 +19,7 @@ import com.google.inject.Injector;
 @Singleton
 public class Configuration {
 	
-	private final ConcurrentMap<Class<?>, ConfigurationObjectBase> configurationInterfaceToImplementation =
+	private final ConcurrentMap<Class<?>, Class<? extends ConfigurationObjectBase>> configurationInterfaceToImplementation =
 		PlatformDependent.newConcurrentHashMap();
 	
 	private final ConfigurationClassLoader classLoader;
@@ -35,30 +35,31 @@ public class Configuration {
 		this.injector = injector;
 	}
 	
-	public <T> T get(final Class<T> configurationClass) {
-		assert configurationClass != null : "configuration class cannot be null";
+	public <T> T get(final Class<T> configurationInterface) {
+		assert configurationInterface != null : "configuration class cannot be null";
 		// maybe i loosen this to abstract class for mix-in purposes?
-		assert configurationClass.isInterface() : "configuration class must be an interface";
+		assert configurationInterface.isInterface() : "configuration class must be an interface";
 		
-		ConfigurationObjectBase configurationInstance = configurationInterfaceToImplementation.get(configurationClass);
-		if (configurationInstance == null) {
+		Class<? extends ConfigurationObjectBase> configurationImplementation = configurationInterfaceToImplementation.get(configurationInterface);
+		if (configurationImplementation == null) {
 			try {
-				configurationInstance = injector.getInstance(classLoader.makeClassFor(configurationClass));
-				if (configurationInstance != null) {
-					configurationInterfaceToImplementation.put(configurationClass, configurationInstance);
-				}
+				configurationImplementation = classLoader.makeClassFor(configurationInterface);
+				configurationInterfaceToImplementation.putIfAbsent(configurationInterface, configurationImplementation);
+			} catch (LinkageError le) {
+				configurationImplementation = configurationInterfaceToImplementation.get(configurationInterface);
+				assert (configurationImplementation != null) : "something is screwy in the configuration maker";
 			} catch (Exception e) {
 				throw new AssertionError(e);
 			}
 		}
-		// special case, the core configuration has no scripted properties
-		// in fact, i'm moving the app path back inside, i think, and maybe killing
-		// the argument thing?  i don't know
-		if (!CoreConfiguration.class.isAssignableFrom(configurationClass)) {
+		
+		ConfigurationObjectBase configurationInstance = injector.getInstance(configurationImplementation);
+		// special case, the core configuration does not support scripted properties
+		if (configurationInstance != null && !CoreConfiguration.class.isAssignableFrom(configurationInterface)) {
 			configurationInstance.runScriptFunction();
 		}
 		
-		return configurationClass.cast(configurationInstance);
+		return configurationInterface.cast(configurationInstance);
 	}
 	
 	public boolean isSystemRunning() {
