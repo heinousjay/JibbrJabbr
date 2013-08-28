@@ -10,7 +10,6 @@ import javax.inject.Singleton;
 
 import jj.conversion.Converters;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
 /**
@@ -70,20 +69,10 @@ public class Configuration {
 			}
 		}
 		
-		@SuppressWarnings("unchecked")
-		final Class<? extends T> implClass = (Class<? extends T>)configurationImplementation;
-		//
-		T configurationInstance = injector.createChildInjector(new AbstractModule() {
-			
-			@Override
-			protected void configure() {
-				bind(configurationInterface).to(implClass);
-			}
-		}).getInstance(configurationInterface);
+		ConfigurationObjectBase configurationInstance = injector.getInstance(configurationImplementation);
 
-		// special case, the core configuration does not support scripted properties
 		if (configurationInstance != null) {
-			configurationImplementation.cast(configurationInstance).runScriptFunction();
+			configurationInstance.runScriptFunction();
 		}
 		
 		return configurationInterface.cast(configurationInstance);
