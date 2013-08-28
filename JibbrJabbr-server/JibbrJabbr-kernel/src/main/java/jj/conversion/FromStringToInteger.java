@@ -13,31 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
-
-import jj.configuration.Argument;
-import jj.configuration.Default;
-
-import java.nio.file.Path;
+package jj.conversion;
 
 /**
  * @author jason
  *
  */
-public interface CoreConfiguration {
+public class FromStringToInteger implements Converter<String, Integer> {
 
-	@Argument("app")
-	Path appPath();
-	
+	@Override
+	public Integer convert(String in) {
+		try {
+			return Integer.decode(in);
+		} catch (NumberFormatException nfe) {
+			return null;
+		}
+	}
 
-	/**
-	 * Flag indicating that the client should be in debug mode, which
-	 * will log internal info to the script console
-	 * 
-	 * TODO move this to a more appropriate configuration
-	 * @return
-	 */
-	@Argument("debug")
-	@Default("false")
-	boolean debugClient();
 }

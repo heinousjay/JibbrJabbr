@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 import jj.execution.IOThread;
 import jj.http.HttpRequest;
@@ -24,7 +23,7 @@ public abstract class Servable<T extends Resource> {
 	}
 	
 	protected Path appPath() {
-		return configuration.get(CoreConfiguration.class).appPath();
+		return configuration.appPath();
 	}
 	
 	/**

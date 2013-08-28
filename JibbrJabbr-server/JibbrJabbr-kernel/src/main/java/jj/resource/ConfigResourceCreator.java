@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
 /**
@@ -55,7 +54,7 @@ class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
 	@Override
 	Path path(String baseName, Object... args) {
-		return canLoad(baseName) ? configuration.get(CoreConfiguration.class).appPath().resolve(baseName) : null;
+		return canLoad(baseName) ? configuration.appPath().resolve(baseName) : null;
 	}
 
 	@Override

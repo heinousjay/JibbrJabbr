@@ -21,7 +21,7 @@ import jj.configuration.Default;
  * @author jason
  *
  */
-interface HttpServerSocketConfiguration {
+public interface HttpServerSocketConfiguration {
 
 	@Default("true")
 	boolean keepAlive();

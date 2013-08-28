@@ -18,7 +18,6 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.script.CurrentScriptContext;
@@ -97,8 +96,8 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 			
 			// well this is ridiculous but it works
 			moduleIdentifier =
-				configuration.get(CoreConfiguration.class).appPath().relativize(
-					configuration.get(CoreConfiguration.class).appPath().resolve(base).getParent().resolve(input).normalize()
+				configuration.appPath().relativize(
+					configuration.appPath().resolve(base).getParent().resolve(input).normalize()
 				).toString();
 			
 			// we allow modules outside the document root - after all, this is triggered internally

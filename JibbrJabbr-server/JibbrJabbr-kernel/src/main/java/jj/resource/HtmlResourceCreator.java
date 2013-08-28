@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
 @Singleton
@@ -36,7 +35,7 @@ class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	
 	@Override
 	Path path(final String baseName, Object...args) {
-		return configuration.get(CoreConfiguration.class).appPath().resolve(baseName + ".html");
+		return configuration.appPath().resolve(baseName + ".html");
 	}
 	
 	@Override

@@ -123,7 +123,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		log.trace("loading {} at {}", resourceCreator.type().getSimpleName(), cacheKey);
 		
 		T resource = resourceCreator.create(baseName, args);
-		if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
+		if (resource != null && resourceCache.putIfAbsent(cacheKey, resource) == null) {
 			// if this was the first time we put this in the cache,
 			// we set up a file watch on it for background reloads
 			resourceWatchService.watch(resource);

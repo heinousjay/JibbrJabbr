@@ -21,7 +21,6 @@ import java.util.Map;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
-import jj.CoreConfiguration;
 import jj.conversion.Converters;
 import jj.resource.ConfigResource;
 import jj.resource.ResourceFinder;
@@ -66,8 +65,10 @@ public abstract class ConfigurationObjectBase {
 		this.converters = converters;
 		this.resourceFinder = resourceFinder;
 		this.contextMaker = rhinoContextMaker;
+		
+		ConfigResource configResource = configResource();
 		// special case, the core configuration CANNOT have script
-		this.scriptObject = (this instanceof CoreConfiguration) ? null : configureScriptObject(configResource().global());
+		this.scriptObject = configResource == null ? null : configureScriptObject(configResource.global());
 		
 		Class<?>[] interfaces = getClass().getInterfaces();
 		assert interfaces.length == 1 : "there can be only one! (interface per configuration object)";
@@ -114,7 +115,7 @@ public abstract class ConfigurationObjectBase {
 	}
 	
 	protected final <T> T readScriptValue(String name, String defaultValue, Class<T> resultClass) {
-		Object value = values.get(name)[0];
+		Object value = readFirstValue(values.get(name));
 		if (value == null) {
 			value = defaultValue;
 		}
@@ -123,5 +124,9 @@ public abstract class ConfigurationObjectBase {
 		}
 		
 		return null;
+	}
+	
+	private Object readFirstValue(Object[] in) {
+		return in != null && in.length > 0 ? in[0] : null;
 	}
 }

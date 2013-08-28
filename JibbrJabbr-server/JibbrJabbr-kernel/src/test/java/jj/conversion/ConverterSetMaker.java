@@ -28,6 +28,7 @@ public class ConverterSetMaker {
 		HashSet<Converter<?, ?>> output = new HashSet<>();
 		output.add(new FromStringToBoolean());
 		output.add(new FromStringToPath());
+		output.add(new FromStringToInteger());
 		return output;
 	}
 }

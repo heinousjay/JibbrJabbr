@@ -95,4 +95,8 @@ public class ConvertersTest {
 		assertFalse(converters.convert("", Boolean.TYPE));
 	}
 
+	@Test
+	public void testFromStringToInteger() {
+		assertThat(converters.convert("1", int.class), is(1));
+	}
 }

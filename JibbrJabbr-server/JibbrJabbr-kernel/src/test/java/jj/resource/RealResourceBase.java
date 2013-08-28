@@ -30,7 +30,6 @@ import io.netty.buffer.Unpooled;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import jj.CoreConfiguration;
 import jj.SHA1Helper;
 import jj.configuration.Configuration;
 
@@ -50,14 +49,12 @@ public abstract class RealResourceBase {
 	
 	Path appPath;
 	@Mock Configuration configuration;
-	@Mock CoreConfiguration coreConfiguration;
 	@Mock Logger logger;
 
 	@Before
 	public final void init() throws Exception {
 		appPath = BasePath.appPath();
-		given(configuration.get(CoreConfiguration.class)).willReturn(coreConfiguration);
-		given(coreConfiguration.appPath()).willReturn(appPath);
+		given(configuration.appPath()).willReturn(appPath);
 	}
 
 	protected <T extends Resource> T testFileResource(final T resource) throws Exception {

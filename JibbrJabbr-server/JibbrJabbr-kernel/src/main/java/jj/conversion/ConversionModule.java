@@ -27,6 +27,7 @@ public class ConversionModule extends JJModule {
 	protected void configure() {
 		addConverterBinding().to(FromStringToBoolean.class);
 		addConverterBinding().to(FromStringToPath.class);
+		addConverterBinding().to(FromStringToInteger.class);
 		
 	}
 

@@ -70,6 +70,8 @@ public class ConfigResource extends AbstractFileResource {
 			}
 			
 			configFunctions = castAndVerify(mapCandidate);
+		} catch (IllegalArgumentException iae) {
+			throw new ResourceNotViableException(path, CONFIG_JS + " is expected to be a function.");
 		} catch (RhinoException re) {
 			throw new ResourceNotViableException(path, re);
 		}

@@ -26,6 +26,7 @@ import java.util.Set;
 import jj.configuration.Configuration;
 import jj.conversion.Converter;
 import jj.conversion.ConverterSetMaker;
+import jj.conversion.Converters;
 import jj.logging.EmergencyLogger;
 import jj.resource.ConfigResource;
 import jj.resource.ConfigResourceMaker;
@@ -93,6 +94,7 @@ public class ConfigurationTest {
 	Path realPath;
 	Configuration toTest;
 	ConfigurationClassLoader classLoader;
+	Converters converters = new Converters(ConverterSetMaker.converters());
 	@Mock ResourceFinder resourceFinder;
 	@Mock Logger logger;
 
@@ -118,15 +120,20 @@ public class ConfigurationTest {
 	}
 	
 	private Configuration config() throws Exception {
-		return new Configuration(classLoader, makeInjector(new String[] {}));
+		return config(new String[0]);
+	}
+	
+	private Configuration config(String[] args) throws Exception {
+		
+		return new Configuration(new Arguments(args), converters, classLoader, makeInjector(args));
 	}
 	
 	@Test
 	public void testRetrieveConfigurationInstances() throws Exception {
-		toTest = new Configuration(classLoader, makeInjector(new String[] {
+		toTest = config(new String[] {
 			PATH_ARG + "=" + realPath.toString(),
 			BOOL_ARG + "=true"
-		}));
+		});
 		
 		ConfigurationTestInterface instance = toTest.get(ConfigurationTestInterface.class);
 		
@@ -192,7 +199,7 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testIsSystemRunning() throws Exception {
-		toTest = new Configuration(null, null);
+		toTest = config();
 		assertThat(toTest.isSystemRunning(), is(true));
 		assertThat(mock(Configuration.class).isSystemRunning(), is(false));
 	}

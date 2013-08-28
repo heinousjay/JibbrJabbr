@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 
 @Singleton
@@ -36,7 +35,7 @@ class ScriptResourceCreator extends AbstractResourceCreator<ScriptResource> {
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return configuration.get(CoreConfiguration.class).appPath().resolve(baseName);
+		return configuration.appPath().resolve(baseName);
 	}
 
 	@Override

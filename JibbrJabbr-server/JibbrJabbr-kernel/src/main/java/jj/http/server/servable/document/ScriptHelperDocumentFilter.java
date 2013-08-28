@@ -4,7 +4,6 @@ import static jj.resource.AssetResource.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
@@ -79,9 +78,11 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 					"data-jj-startup-messages", 
 					context.documentRequestProcessor().startupJJMessages().toString()
 				);
+			/* TODO this goes into a different configuration
 			if (configuration.get(CoreConfiguration.class).debugClient()) {
 				jjScript.attr("data-jj-debug", "true");
 			}
+			*/
 			addScript(documentRequestProcessor.document(), jjScript);
 			
 			// associated scripts

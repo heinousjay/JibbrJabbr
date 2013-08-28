@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-import jj.CoreConfiguration;
 import jj.configuration.Configuration;
 import jj.http.HttpRequest;
 import jj.http.server.servable.document.DocumentRequestProcessor;
@@ -40,7 +39,6 @@ public class ScriptHelperDocumentFilterTest {
 	String scriptUri;
 	String socketUri;
 	String webSocketUri;
-	@Mock CoreConfiguration coreConfiguration;
 	@Mock Configuration configuration;
 	@Mock AssociatedScriptBundle associatedScriptBundle;
 	@Mock CurrentScriptContext context;
@@ -85,9 +83,6 @@ public class ScriptHelperDocumentFilterTest {
 		
 		when(jjJs.sha1()).thenReturn(JJ_SHA);
 		when(jjJs.uri()).thenReturn(JJ_URI);
-		
-		given(coreConfiguration.debugClient()).willReturn(true);
-		given(configuration.get(CoreConfiguration.class)).willReturn(coreConfiguration);
 		
 		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
 	}

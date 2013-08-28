@@ -39,7 +39,6 @@ import javax.inject.Singleton;
 @Singleton
 class ConfigurationClassLoader extends ClassLoader {
 	
-	private static final String SINGLETON_ANNOTATION = "javax.inject.Singleton";
 	private static final String INJECT_ANNOTATION = "javax.inject.Inject";
 	private static final String NAME_FORMAT = "%sGeneratedImplementationFor%s%s";
 
@@ -91,14 +90,6 @@ class ConfigurationClassLoader extends ClassLoader {
 		Annotation annotation = new Annotation(INJECT_ANNOTATION, constpool);
 		attribute.addAnnotation(annotation);
 		ctor.getMethodInfo().addAttribute(attribute);
-		
-		/*
-		// @Singleton (just in case!)
-		attribute = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-		annotation = new Annotation(SINGLETON_ANNOTATION, constpool);
-		attribute.addAnnotation(annotation);
-		ccFile.addAttribute(attribute);
-		*/
 	}
 	
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {

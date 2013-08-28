@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.CoreConfiguration;
 import jj.JJ;
 import jj.configuration.Configuration;
 import jj.execution.ExecutionTrace;
@@ -47,7 +46,6 @@ public class LessProcessorTest {
 	LessProcessor underTest;
 	Path appPath;
 	String testCss;
-	@Mock CoreConfiguration coreConfiguration;
 	@Mock Configuration configuration;
 	@Mock ExecutionTrace trace;
 	
@@ -55,8 +53,7 @@ public class LessProcessorTest {
 	public void before() throws IOException {
 		appPath = Paths.get(JJ.uri(LessProcessorTest.class)).getParent();
 		testCss = new String(Files.readAllBytes(appPath.resolve("test.css")), UTF_8);
-		given(configuration.get(CoreConfiguration.class)).willReturn(coreConfiguration);
-		given(coreConfiguration.appPath()).willReturn(appPath);
+		given(configuration.appPath()).willReturn(appPath);
 		underTest = new LessProcessor(configuration, trace);
 	}
 	
