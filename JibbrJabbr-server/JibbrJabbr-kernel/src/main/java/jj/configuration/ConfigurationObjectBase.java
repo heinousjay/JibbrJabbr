@@ -67,7 +67,7 @@ public abstract class ConfigurationObjectBase {
 		this.contextMaker = rhinoContextMaker;
 		
 		ConfigResource configResource = configResource();
-		// special case, the core configuration CANNOT have script
+		
 		this.scriptObject = configResource == null ? null : configureScriptObject(configResource.global());
 		
 		Class<?>[] interfaces = getClass().getInterfaces();
@@ -104,13 +104,14 @@ public abstract class ConfigurationObjectBase {
 	}
 	
 	void runScriptFunction() {
-		
 		ConfigResource config = configResource();
 		if (config != null && config.functions().containsKey(name())) {
 			try (RhinoContext context = contextMaker.context()) {
 				Function function = config.functions().get(name());
 				context.callFunction(function, config.global(), config.global(), new Object[] {scriptObject});
 			}
+		} else {
+			// TODO log it, i think?
 		}
 	}
 	
