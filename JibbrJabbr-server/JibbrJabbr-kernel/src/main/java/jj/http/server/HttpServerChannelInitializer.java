@@ -48,7 +48,9 @@ class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 	private final Provider<JJEngineHttpHandler> engineProvider;
 	
 	@Inject
-	public HttpServerChannelInitializer(final Provider<JJEngineHttpHandler> engineProvider) {
+	public HttpServerChannelInitializer(
+		final Provider<JJEngineHttpHandler> engineProvider
+	) {
 		this.engineProvider = engineProvider;
 	}
 

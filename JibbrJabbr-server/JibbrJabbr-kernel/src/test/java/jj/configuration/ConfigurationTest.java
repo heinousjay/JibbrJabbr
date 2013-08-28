@@ -77,6 +77,19 @@ public class ConfigurationTest {
 	
 	public interface Fails {}
 	
+	public interface HttpServerSocketConfiguration {
+		boolean keepAlive();
+		boolean tcpNoDelay();
+		int backlog();
+		int timeout();
+		boolean reuseAddress();
+		int sendBufferSize();
+		int receiveBufferSize();
+		
+		// just for now!
+		boolean bind();
+	}
+	
 	Path realPath;
 	Configuration toTest;
 	ConfigurationClassLoader classLoader;
@@ -160,6 +173,21 @@ public class ConfigurationTest {
 		assertThat(error, is(notNullValue()));
 		assertThat(error.getMessage(), Matchers.startsWith("TypeError: Cannot find function fail in object [object Object]."));
 		verify(logger).error(anyString(), eq(error.getMessage()), eq(error.getScriptStackTrace()));
+	}
+	
+	@Test
+	public void testConfigurationObject() throws Exception {
+		toTest = config();
+		
+		HttpServerSocketConfiguration config = toTest.get(HttpServerSocketConfiguration.class);
+		assertThat(config.keepAlive(), is(true));
+		assertThat(config.reuseAddress(), is(true));
+		assertThat(config.tcpNoDelay(), is(true));
+		assertThat(config.backlog(), is(1024));
+		assertThat(config.timeout(), is(10000));
+		assertThat(config.sendBufferSize(), is(65536));
+		assertThat(config.receiveBufferSize(), is(65536));
+		
 	}
 	
 	@Test

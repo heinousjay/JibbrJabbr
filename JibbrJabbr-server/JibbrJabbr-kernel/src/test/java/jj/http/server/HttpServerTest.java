@@ -15,6 +15,7 @@
  */
 package jj.http.server;
 
+import static org.mockito.BDDMockito.given;
 import jj.configuration.Configuration;
 import jj.execution.MockJJNioEventLoopGroup;
 
@@ -33,11 +34,50 @@ public class HttpServerTest {
 
 	@Mock HttpServerChannelInitializer initializer;
 	@Mock Configuration configuration;
+	HttpServerSocketConfiguration config = new HttpServerSocketConfiguration() {
+		
+		@Override
+		public int timeout() {
+			return 10000;
+		}
+		
+		@Override
+		public boolean tcpNoDelay() {
+			return true;
+		}
+		
+		@Override
+		public int sendBufferSize() {
+			return 65536;
+		}
+		
+		@Override
+		public boolean reuseAddress() {
+			return true;
+		}
+		
+		@Override
+		public int receiveBufferSize() {
+			return 65536;
+		}
+		
+		@Override
+		public boolean keepAlive() {
+			return true;
+		}
+		
+		@Override
+		public int backlog() {
+			return 12;
+		}
+	};
 	
 	HttpServer httpServer;
 	
 	@Before
 	public void before() {
+		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
+		
 		httpServer = new HttpServer(new MockJJNioEventLoopGroup(), initializer, configuration);
 	}
 	

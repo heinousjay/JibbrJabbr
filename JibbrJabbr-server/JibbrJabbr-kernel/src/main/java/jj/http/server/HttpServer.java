@@ -19,6 +19,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
@@ -57,6 +58,8 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 	
 	private final HttpServerChannelInitializer initializer;
 	
+	private final Configuration configuration;
+	
 	private ServerBootstrap serverBootstrap;
 	
 	@Inject
@@ -67,19 +70,32 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 	) {
 		this.ioEventLoopGroup = ioEventLoopGroup;
 		this.initializer = initializer;
+		this.configuration = configuration;
 	}
 	
 	private ServerBootstrap serverBootstrap() {
+		
+		HttpServerSocketConfiguration config = configuration.get(HttpServerSocketConfiguration.class);
+		
 		return new ServerBootstrap()
 			.group(new NioEventLoopGroup(1, threadFactory), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
-			.childHandler(initializer);
+			.childHandler(initializer)
+			.option(ChannelOption.SO_KEEPALIVE, config.keepAlive())
+			.option(ChannelOption.SO_REUSEADDR, config.reuseAddress())
+			.option(ChannelOption.TCP_NODELAY, config.tcpNoDelay())
+			.option(ChannelOption.SO_TIMEOUT, config.timeout())
+			.option(ChannelOption.SO_BACKLOG, config.backlog())
+			.option(ChannelOption.SO_RCVBUF, config.receiveBufferSize())
+			.option(ChannelOption.SO_SNDBUF, config.sendBufferSize());
 	}
 	
 	@Override
 	public void start() throws Exception {
 		assert (serverBootstrap == null) : "cannot start an already started server";
+		
 		serverBootstrap = serverBootstrap();
+		
 		serverBootstrap.bind(8080).sync();
 		logger.info("Server started");
 	}

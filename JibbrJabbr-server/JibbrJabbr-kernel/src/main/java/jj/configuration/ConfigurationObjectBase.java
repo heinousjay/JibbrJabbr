@@ -17,7 +17,6 @@ package jj.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
@@ -50,8 +49,6 @@ public abstract class ConfigurationObjectBase {
 	private final Scriptable scriptObject;
 	
 	private final ResourceFinder resourceFinder;
-	
-	private final AtomicReference<Function> function = new AtomicReference<>();
 	
 	private final String name;
 	
@@ -108,7 +105,7 @@ public abstract class ConfigurationObjectBase {
 	void runScriptFunction() {
 		
 		ConfigResource config = configResource();
-		if (config != null && function.get() != config.functions().get(name())) {
+		if (config != null) {
 			try (RhinoContext context = contextMaker.context()) {
 				Function function = config.functions().get(name());
 				context.callFunction(function, config.global(), config.global(), new Object[] {scriptObject});
