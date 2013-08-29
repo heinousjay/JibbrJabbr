@@ -33,6 +33,8 @@ import java.util.concurrent.Executors;
 
 import jj.configuration.Configuration;
 import jj.execution.JJExecutors;
+import jj.http.server.servable.document.DocumentConfiguration;
+import jj.http.server.servable.document.MockDocumentConfiguration;
 
 import org.junit.After;
 import org.junit.Before;
@@ -78,6 +80,7 @@ public class ResourceWatchServiceImplTest {
 		}
 		
 		given(configuration.appPath()).willReturn(appPath);
+		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
 		
 		executorService = Executors.newFixedThreadPool(2);
 		given(executors.ioExecutor()).willReturn(executorService);
@@ -143,7 +146,7 @@ public class ResourceWatchServiceImplTest {
 		sr3.dependsOn(sr1);
 		sr4.dependsOn(sr1);
 		String name = "index";
-		HtmlResource hr = new HtmlResource(MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
+		HtmlResource hr = new HtmlResource(configuration, MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
 		
 		resourceCache.put(sr.cacheKey(), sr);
 		resourceCache.put(hr.cacheKey(), hr);

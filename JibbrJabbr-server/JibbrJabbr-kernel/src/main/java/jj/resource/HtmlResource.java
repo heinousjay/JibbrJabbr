@@ -9,9 +9,13 @@ import java.util.HashSet;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.Configuration;
+import jj.http.server.servable.document.DocumentConfiguration;
+
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
+import org.jsoup.parser.ParseError;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
@@ -53,18 +57,33 @@ public class HtmlResource extends AbstractFileResource {
 	 */
 	@Inject
 	HtmlResource(
+		final Configuration configuration,
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path
 	) throws IOException {
 		super(cacheKey, baseName, path);
+		
+		DocumentConfiguration config = configuration.get(DocumentConfiguration.class);
+		
 		this.uri = baseName;
 		String html = byteBuffer.toString(UTF_8);
-		this.document = Parser.htmlParser().parseInput(html, baseName);
-		CommentNodeFinder commentNodeFinder = new CommentNodeFinder();
-		new NodeTraversor(commentNodeFinder).traverse(document);
-		for (Comment comment : commentNodeFinder.comments) {
-			comment.remove();
+		
+		Parser parser = Parser.htmlParser().setTrackErrors(config.showParsingErrors() ? Integer.MAX_VALUE : 0);
+		
+		this.document = parser.parseInput(html, baseName);
+		
+		for (ParseError pe : parser.getErrors()) {
+			// conceptually, parse errors should be communicated
+		}
+		parser.getErrors().clear();
+		
+		if (config.removeComments()) {
+			CommentNodeFinder commentNodeFinder = new CommentNodeFinder();
+			new NodeTraversor(commentNodeFinder).traverse(document);
+			for (Comment comment : commentNodeFinder.comments) {
+				comment.remove();
+			}
 		}
 	}
 	

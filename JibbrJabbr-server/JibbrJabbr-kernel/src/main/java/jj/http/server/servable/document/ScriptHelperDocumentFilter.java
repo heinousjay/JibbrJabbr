@@ -78,11 +78,11 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 					"data-jj-startup-messages", 
 					context.documentRequestProcessor().startupJJMessages().toString()
 				);
-			/* TODO this goes into a different configuration
-			if (configuration.get(CoreConfiguration.class).debugClient()) {
+			
+			if (configuration.get(DocumentConfiguration.class).clientDebug()) {
 				jjScript.attr("data-jj-debug", "true");
 			}
-			*/
+			
 			addScript(documentRequestProcessor.document(), jjScript);
 			
 			// associated scripts

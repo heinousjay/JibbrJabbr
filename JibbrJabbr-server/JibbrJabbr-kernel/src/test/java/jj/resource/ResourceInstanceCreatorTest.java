@@ -17,6 +17,7 @@ package jj.resource;
 
 import java.nio.file.Path;
 
+import jj.configuration.Configuration;
 import jj.logging.EmergencyLogger;
 
 import org.junit.Before;
@@ -41,6 +42,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 			
 			@Override
 			protected void configure() {
+				bind(Configuration.class).toInstance(configuration);
 				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
 			}
 		}), logger);

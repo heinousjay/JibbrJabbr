@@ -84,6 +84,8 @@ public class ScriptHelperDocumentFilterTest {
 		when(jjJs.sha1()).thenReturn(JJ_SHA);
 		when(jjJs.uri()).thenReturn(JJ_URI);
 		
+		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
+		
 		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
 	}
 	

@@ -16,7 +16,7 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 	
 	@Override
 	protected HtmlResource resource() throws Exception {
-		return new HtmlResource(cacheKey(), baseName(), path());
+		return new HtmlResource(configuration, cacheKey(), baseName(), path());
 	}
 	
 	@Override
