@@ -187,8 +187,7 @@ public class Converters {
 		
 		Object value = converter.convert(from);
 		
-		@SuppressWarnings("unchecked")
-		To result = primitivesToWrappers.containsKey(to) ? (To)primitivesToWrappers.get(to).cast(value) : to.cast(value);
+		To result = cast(primitivesToWrappers.containsKey(to) ? primitivesToWrappers.get(to).cast(value) : value);
 		return result;
 	}
 	
