@@ -37,7 +37,7 @@ function configure() {
 			// recommend binding to a high port and
 			// up nginx as a proxy
 				.bind(8080)
-				.bind('192.168.1.11', 8090);
+				.bind('localhost', 8090);
 		},
 		
 		// configures the application server 
@@ -45,6 +45,12 @@ function configure() {
 			
 			http.redirect(GET, "/chat").to("/chat/");
 			http.route(GET, "/chat/{room=lobby}").to("/chat/index");
+		},
+		
+		document: function(doc) {
+			doc.showParsingErrors(false)
+				.removeComments(true)
+				.clientDebug(false);
 		},
 		
 		fails: function(fails) {

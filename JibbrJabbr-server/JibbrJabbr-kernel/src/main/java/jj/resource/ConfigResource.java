@@ -41,7 +41,21 @@ import jj.script.Util;
 @Singleton
 public class ConfigResource extends AbstractFileResource {
 
+	private static final String BAD_RETURN = "configuration function did not return the right object";
+	private static final String BAD_RETURN_NOINIT = "configuration function did not return the right object. RESTART THE SERVER.";
+
 	public static final String CONFIG_JS = "config.js";
+
+	private static final String DID_NOT_EXECUTE = CONFIG_JS + " did not execute.";
+	private static final String DID_NOT_EXECUTE_NO_INIT = CONFIG_JS + " did not execute. RESTART THE SERVER.";
+
+	private static final String DID_NOT_COMPILE = CONFIG_JS + " did not compile.";
+	private static final String DID_NOT_COMPILE_NO_INIT = CONFIG_JS + " did not compile. RESTART THE SERVER.";
+	
+	private static final String NOT_A_FUNCTION = "%s is expected to be a function.";
+	private static final String NOT_A_FUNCTION_NO_INIT = "%s is expected to be a function. RESTART THE SERVER.";
+	
+	private static boolean initialized = false;
 	
 	private final Scriptable global;
 	
@@ -59,23 +73,32 @@ public class ConfigResource extends AbstractFileResource {
 		final Path path
 	) {
 		super(cacheKey, CONFIG_JS, path);
+		Function configurationFunction;
 		try (RhinoContext context = contextMaker.context()) {
 			
 			global = context.initStandardObjects();
-			Function configurationFunction = context.compileFunction(global, script(), path.normalize().toString());
-			Object mapCandidate = context.callFunction(configurationFunction, global, global);
+			configurationFunction = context.compileFunction(global, script(), path.normalize().toString());
 			
-			if (!(mapCandidate instanceof Map)) {
-				throw new ResourceNotViableException(path, "configuration function did not return the right object");
-			}
-			
-			configFunctions = castAndVerify(mapCandidate);
 		} catch (IllegalArgumentException iae) {
-			throw new ResourceNotViableException(path, CONFIG_JS + " is expected to be a function.");
+			throw new ResourceNotViableException(path, String.format(initialized ? NOT_A_FUNCTION : NOT_A_FUNCTION_NO_INIT, CONFIG_JS));
 		} catch (RhinoException re) {
-			throw new ResourceNotViableException(path, re);
+			throw new ResourceNotViableException(path, initialized ? DID_NOT_COMPILE : DID_NOT_COMPILE_NO_INIT);
 		}
 		
+		Object mapCandidate;
+		try (RhinoContext context = contextMaker.context()) {
+			mapCandidate = context.callFunction(configurationFunction, global, global);
+		} catch (RhinoException re) {
+			throw new ResourceNotViableException(path, initialized ? DID_NOT_EXECUTE : DID_NOT_EXECUTE_NO_INIT);
+		}
+		
+		if (!(mapCandidate instanceof Map)) {
+			throw new ResourceNotViableException(path, initialized ? BAD_RETURN : BAD_RETURN_NOINIT);
+		}
+		
+		configFunctions = castAndVerify(mapCandidate);
+		
+		initialized = true;
 	}
 	
 	private Map<String, Function> castAndVerify(Object mapIn) {
@@ -86,7 +109,10 @@ public class ConfigResource extends AbstractFileResource {
 			String key = Util.toJavaString(keyObj);
 			if (key.isEmpty()) throw new ResourceNotViableException(path, "bad key");
 			Object valueObj = map.get(keyObj);
-			if (!(valueObj instanceof Function)) throw new ResourceNotViableException(path, "not a function");
+			if (!(valueObj instanceof Function)) {
+				
+				throw new ResourceNotViableException(path, String.format(initialized ? NOT_A_FUNCTION : NOT_A_FUNCTION_NO_INIT, key));
+			}
 			configFunctions.put(key, (Function)valueObj);
 		}
 		return Collections.unmodifiableMap(configFunctions);

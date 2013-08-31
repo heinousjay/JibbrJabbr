@@ -75,11 +75,11 @@ class LogConfigurator implements JJServerShutdownListener {
 		// logs events specifically related to running inside a JJAppTest
 		testLogger(OFF);
 		
-		// make sure netty logs to our log
-		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-		
 		// just play with this!
 		infoAll();
+		
+		// and make sure netty logs to our log
+		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
 		return asyncAppender;
 	}

@@ -16,6 +16,7 @@
 package jj.http.server;
 
 import jj.configuration.Default;
+import jj.configuration.Method;
 
 /**
  * @author jason
@@ -43,4 +44,7 @@ public interface HttpServerSocketConfiguration {
 	
 	@Default("65536")
 	int receiveBufferSize();
+	
+	@Method(allArgs = true, name = "bind")
+	Binding[] bindings();
 }

@@ -70,6 +70,24 @@ public class HttpServerTest {
 		public int backlog() {
 			return 12;
 		}
+		
+		@Override
+		public Binding[] bindings() {
+			return new Binding[] {
+				new Binding() {
+
+					@Override
+					public int port() {
+						return 8080;
+					}
+
+					@Override
+					public String host() {
+						return null;
+					}
+				}
+			};
+		}
 	};
 	
 	HttpServer httpServer;
@@ -86,6 +104,9 @@ public class HttpServerTest {
 
 		try {
 			httpServer.start();
+			
+			// try to connect to 8080 and 8090 to prove it worked
+			
 		} finally {
 			httpServer.stop();
 		}

@@ -22,6 +22,8 @@ public class HttpServerModule extends JJModule {
 			addShutdownListenerBinding().to(HttpServer.class);
 		}
 		
+		addConverterBinding().to(FromObjectArrayToBinding.class);
+		
 		addStartupListenerBinding().to(WebSocketConnectionTracker.class);
 		
 		Multibinder<WebSocketMessageProcessor> messageProcessors = Multibinder.newSetBinder(binder(), WebSocketMessageProcessor.class);

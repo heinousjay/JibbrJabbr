@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
+import jj.http.server.Binding;
 import jj.resource.ConfigResource;
 import jj.resource.ConfigResourceMaker;
 import jj.resource.ResourceFinder;
@@ -43,7 +44,6 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationObjectBaseTest {
 	
-	Arguments arguments = new Arguments(new String[0]);
 	Converters converters = new Converters(ConverterSetMaker.converters());
 	@Mock ResourceFinder resourceFinder;
 	
@@ -53,7 +53,7 @@ public class ConfigurationObjectBaseTest {
 	class HttpServerSocketConfigurationObject extends ConfigurationObjectBase implements HttpServerSocketConfiguration {
 
 		HttpServerSocketConfigurationObject() {
-			super(arguments, converters, resourceFinder, new RealRhinoContextMaker());
+			super(ConfigurationObjectBaseTest.this.converters, resourceFinder, new RealRhinoContextMaker());
 		}
 
 		@Override
@@ -61,22 +61,60 @@ public class ConfigurationObjectBaseTest {
 			try (RhinoContext context = contextMaker.context()) {
 			
 				Scriptable nativeObject = context.newObject(scope);
-				ScriptableObject.putConstProperty(nativeObject, "keepAlive", configurationFunction("keepAlive"));
-				ScriptableObject.putConstProperty(nativeObject, "tcpNoDelay", configurationFunction("tcpNoDelay"));
-				ScriptableObject.putConstProperty(nativeObject, "backlog", configurationFunction("backlog"));
-				ScriptableObject.putConstProperty(nativeObject, "timeout", configurationFunction("timeout"));
-				ScriptableObject.putConstProperty(nativeObject, "reuseAddress", configurationFunction("reuseAddress"));
-				ScriptableObject.putConstProperty(nativeObject, "sendBufferSize", configurationFunction("sendBufferSize"));
-				ScriptableObject.putConstProperty(nativeObject, "receiveBufferSize", configurationFunction("receiveBufferSize"));
+				ScriptableObject.putConstProperty(nativeObject, "keepAlive", 
+					configurationFunction("keepAlive", Boolean.TYPE, false, null));
+				ScriptableObject.putConstProperty(nativeObject, "tcpNoDelay", 
+					configurationFunction("tcpNoDelay", Boolean.TYPE, false, null));
+				ScriptableObject.putConstProperty(nativeObject, "backlog", 
+					configurationFunction("backlog", Integer.TYPE, false, null));
+				ScriptableObject.putConstProperty(nativeObject, "timeout", 
+					configurationFunction("timeout", Integer.TYPE, false, null));
+				ScriptableObject.putConstProperty(nativeObject, "reuseAddress", 
+					configurationFunction("reuseAddress", Boolean.TYPE, false,  null));
+				ScriptableObject.putConstProperty(nativeObject, "sendBufferSize", 
+					configurationFunction("sendBufferSize", Integer.TYPE, false, null));
+				ScriptableObject.putConstProperty(nativeObject, "receiveBufferSize", 
+					configurationFunction("receiveBufferSize", Integer.TYPE, false, null));
 				
 				
 				// ehhhhh
-				ScriptableObject.putConstProperty(nativeObject, "bind", configurationFunction("bind"));
+				ScriptableObject.putConstProperty(nativeObject, "bind", 
+					configurationFunction("binding", Binding.class, true, null));
 				
 				return nativeObject;
 			}
 		}
 		
+		@Override
+		protected void setDefaults() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		public boolean keepAlive() {
+			return (boolean)values.get("keepAlive");
+		}
+		public boolean tcpNoDelay() {
+			return (boolean)values.get("tcpNoDelay");
+		}
+		public boolean reuseAddress() {
+			return (boolean)values.get("reuseAddress");
+		}
+		public int backlog() {
+			return (int)values.get("backlog");
+		}
+		public int timeout() {
+			return (int)values.get("timeout");
+		}
+		public int sendBufferSize() {
+			return (int)values.get("sendBufferSize");
+		}
+		public int receiveBufferSize() {
+			return (int)values.get("receiveBufferSize");
+		}
+		public Binding binding() {
+			return (Binding)values.get("binding");
+		}
 		
 	}
 	
@@ -91,19 +129,19 @@ public class ConfigurationObjectBaseTest {
 	@Test
 	public void test() {
 		
-		ConfigurationObjectBase toTest = new HttpServerSocketConfigurationObject();
+		HttpServerSocketConfigurationObject toTest = new HttpServerSocketConfigurationObject();
 		
 		assertThat(toTest.name(), is("httpServerSocket"));
 		
 		toTest.runScriptFunction();
 		
-		assertThat(toTest.readScriptValue("keepAlive", null, Boolean.TYPE), is(true));
-		assertThat(toTest.readScriptValue("tcpNoDelay", null, Boolean.TYPE), is(true));
-		assertThat(toTest.readScriptValue("backlog", null, Integer.TYPE), is(1024));
-		assertThat(toTest.readScriptValue("timeout", null, Integer.TYPE), is(10000));
-		assertThat(toTest.readScriptValue("reuseAddress", null, Boolean.TYPE), is(true));
-		assertThat(toTest.readScriptValue("sendBufferSize", null, Integer.TYPE), is(65536));
-		assertThat(toTest.readScriptValue("receiveBufferSize", null, Integer.TYPE), is(65536));
+		assertThat(toTest.keepAlive(), is(true));
+		assertThat(toTest.tcpNoDelay(), is(true));
+		assertThat(toTest.backlog(), is(1024));
+		assertThat(toTest.timeout(), is(10000));
+		assertThat(toTest.reuseAddress(), is(true));
+		assertThat(toTest.sendBufferSize(), is(65536));
+		assertThat(toTest.receiveBufferSize(), is(65536));
 	}
 
 }

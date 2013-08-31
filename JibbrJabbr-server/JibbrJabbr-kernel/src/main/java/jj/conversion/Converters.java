@@ -43,6 +43,7 @@ public class Converters {
 	
 	private static final Map<Class<?>, Class<?>> wrappersToPrimitives;
 	private static final Map<Class<?>, Class<?>> primitivesToWrappers;
+	private static final Map<Class<?>, Object> primitiveDefaults;
 	
 	static {
 		Map<Class<?>, Class<?>> builder = new HashMap<>();
@@ -63,6 +64,18 @@ public class Converters {
 		}
 		
 		primitivesToWrappers = Collections.unmodifiableMap(builder);
+		
+		Map<Class<?>, Object> builder2 = new HashMap<>();
+		builder2.put(Boolean.TYPE,   false);
+		builder2.put(Character.TYPE, (char)0);
+		builder2.put(Byte.TYPE,      (byte)0);
+		builder2.put(Short.TYPE,     (short)0);
+		builder2.put(Integer.TYPE,   0);
+		builder2.put(Long.TYPE,      0L);
+		builder2.put(Float.TYPE,     0F);
+		builder2.put(Double.TYPE,    0.0);
+		
+		primitiveDefaults = Collections.unmodifiableMap(builder2);
 	}
 
 	private final Map<Class<?>, Map<Class<?>, Converter<?, ?>>> converters = new HashMap<>();
@@ -132,6 +145,13 @@ public class Converters {
 	 * @return
 	 */
 	public <From, To> To convert(From from, Class<To> to) {
+		
+		if (from == null) {
+			if (primitiveDefaults.containsKey(to)) {
+				return (To)primitiveDefaults.get(to);
+			}
+			return null;
+		}
 		
 		Class<?> fromClass = from.getClass();
 		

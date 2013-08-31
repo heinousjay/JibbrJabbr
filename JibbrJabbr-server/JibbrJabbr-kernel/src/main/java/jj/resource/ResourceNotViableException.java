@@ -63,13 +63,22 @@ public class ResourceNotViableException extends RuntimeException {
 		
 		setStackTrace(list.toArray(new StackTraceElement[list.size()]));
 	}
+	
+	public final boolean discard;
 
 	public ResourceNotViableException(Path resourcePath) {
 		super(resourcePath.toAbsolutePath().toString());
+		discard = false;
 	}
 
 	public ResourceNotViableException(Path resourcePath, String additionalMessage) {
 		super(String.format("resource at %s could not be loaded because %s", resourcePath.toAbsolutePath().toString(), additionalMessage));
+		discard = false;
+	}
+	
+	public ResourceNotViableException(Path resourcePath, String additionalMessage, boolean discard) {
+		super(String.format("resource at %s could not be loaded because %s", resourcePath.toAbsolutePath().toString(), additionalMessage));
+		this.discard = discard;
 	}
 	
 	/**
@@ -78,5 +87,6 @@ public class ResourceNotViableException extends RuntimeException {
 	 */
 	public ResourceNotViableException(Path resourcePath, Throwable cause) {
 		super(resourcePath.toAbsolutePath().toString(), cause);
+		discard = false;
 	}
 }

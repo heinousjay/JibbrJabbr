@@ -16,6 +16,9 @@
 package jj.resource;
 
 import static jj.resource.ConfigResource.CONFIG_JS;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
 import java.nio.file.Path;
 
 import jj.script.RealRhinoContextMaker;
@@ -43,7 +46,7 @@ public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, Conf
 	
 	@Override
 	protected void resourceAssertions(ConfigResource resource) throws Exception {
-		System.out.println(resource.functions());
+		assertThat(resource.functions().keySet(), containsInAnyOrder("fails", "http", "scriptTestInterface", "httpServerSocket", "document"));
 	}
 	
 	@Override

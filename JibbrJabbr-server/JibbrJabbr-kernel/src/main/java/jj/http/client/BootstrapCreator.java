@@ -33,8 +33,6 @@ public class BootstrapCreator {
 	
 	private PlaintextChannelInitializer plaintextInitializer;
 	
-	private SecureChannelInitializer secureInitializer;
-	
 	public Bootstrap plaintextHttpBootstrap() {
 		
 		return new Bootstrap()
@@ -42,7 +40,6 @@ public class BootstrapCreator {
 			.group(eventLoopGroup)
 			.localAddress(localAddress)
 			.handler(plaintextInitializer);
-		
 	}
 	
 	

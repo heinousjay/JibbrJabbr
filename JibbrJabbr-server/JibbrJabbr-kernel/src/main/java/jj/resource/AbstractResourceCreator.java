@@ -22,7 +22,7 @@ import java.nio.file.Path;
  * @author jason
  *
  */
-abstract class AbstractResourceCreator<T extends Resource> implements ResourceCreator<T> {
+abstract class AbstractResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
 
 	abstract Path path(final String baseName, final Object...args);
 	

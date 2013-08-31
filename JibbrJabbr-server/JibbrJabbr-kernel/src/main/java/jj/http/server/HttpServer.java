@@ -15,6 +15,8 @@
  */
 package jj.http.server;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
+import jj.StringUtils;
 import jj.configuration.Configuration;
 import jj.execution.JJNioEventLoopGroup;
 
@@ -73,12 +76,31 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 		this.configuration = configuration;
 	}
 	
-	private ServerBootstrap serverBootstrap() {
+	@Override
+	public void start() throws Exception {
+		
+		assert (serverBootstrap == null) : "cannot start an already started server";
 		
 		HttpServerSocketConfiguration config = configuration.get(HttpServerSocketConfiguration.class);
 		
-		return new ServerBootstrap()
-			.group(new NioEventLoopGroup(1, threadFactory), ioEventLoopGroup)
+		Binding[] bindings = config.bindings();
+		if (bindings.length == 0) bindings = new Binding[] {
+			new Binding() {
+				
+				@Override
+				public int port() {
+					return 8080;
+				}
+				
+				@Override
+				public String host() {
+					return null;
+				}
+			}
+		};
+		
+		serverBootstrap =  new ServerBootstrap()
+			.group(new NioEventLoopGroup(bindings.length, threadFactory), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(initializer)
 			.option(ChannelOption.SO_KEEPALIVE, config.keepAlive())
@@ -88,15 +110,26 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 			.option(ChannelOption.SO_BACKLOG, config.backlog())
 			.option(ChannelOption.SO_RCVBUF, config.receiveBufferSize())
 			.option(ChannelOption.SO_SNDBUF, config.sendBufferSize());
-	}
-	
-	@Override
-	public void start() throws Exception {
-		assert (serverBootstrap == null) : "cannot start an already started server";
 		
-		serverBootstrap = serverBootstrap();
+		try {
+			for (Binding binding : bindings) {
+				
+				String host = binding.host();
+				int port = binding.port();
+				
+				if (!StringUtils.isEmpty(host)) {
+					logger.info("Binding to {}:{}", host, port);
+					serverBootstrap.bind(host, port).sync();
+				} else {
+					logger.info("Binding to {}", port);
+					serverBootstrap.bind(port).sync();
+				}
+			}
+		} catch (Exception e) {
+			serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
+			throw e;
+		}
 		
-		serverBootstrap.bind(8080).sync();
 		logger.info("Server started");
 	}
 	
@@ -109,7 +142,7 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 	@Override
 	public void stop() {
 		assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
-		serverBootstrap.group().shutdownGracefully();
+		serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
 		serverBootstrap.childGroup().shutdownGracefully();
 		serverBootstrap = null;
 		logger.info("Server shut down");

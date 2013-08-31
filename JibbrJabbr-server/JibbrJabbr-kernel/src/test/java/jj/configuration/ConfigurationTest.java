@@ -27,6 +27,8 @@ import jj.configuration.Configuration;
 import jj.conversion.Converter;
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
+import jj.http.server.HttpServerSocketConfiguration;
+import jj.http.server.servable.document.DocumentConfiguration;
 import jj.logging.EmergencyLogger;
 import jj.resource.ConfigResource;
 import jj.resource.ConfigResourceMaker;
@@ -53,56 +55,40 @@ import com.google.inject.TypeLiteral;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationTest {
 	
-	static final String PATH_ARG = "pathArg";
-	static final String BOOL_ARG = "boolArg";
-	
-	public interface ConfigurationTestInterface {
-		
-		@Argument(PATH_ARG)
-		Path path();
-		
-		@Argument(BOOL_ARG)
-		boolean bool();
-	}
-	
-	public interface DefaultTestInterface {
-		
-		@Argument("false")
-		@Default("false")
-		boolean falseBool();
-		
-		@Argument("true")
-		@Default("true")
-		boolean trueBool();
-	}
-	
 	public interface Fails {}
 	
-	public interface HttpServerSocketConfiguration {
-		boolean keepAlive();
-		boolean tcpNoDelay();
-		int backlog();
-		int timeout();
-		boolean reuseAddress();
-		int sendBufferSize();
-		int receiveBufferSize();
+	public interface NotAConfiguration {
 		
-		// just for now!
-		boolean bind();
+		char otherThing();
+		byte something();
+		short zero();
+		boolean one();
+		int two();
+		long three();
+		float four();
+		double five();
+		Object six();
 	}
 	
+	
 	Path realPath;
+	String argument;
 	Configuration toTest;
 	ConfigurationClassLoader classLoader;
-	Converters converters = new Converters(ConverterSetMaker.converters());
+	Set<Converter<?, ?>> converterSet;
+	Converters converters;
 	@Mock ResourceFinder resourceFinder;
 	@Mock Logger logger;
 
 	@Before 
 	public void before() throws Exception {
-		classLoader = new ConfigurationClassLoader();
-		realPath = Paths.get(getClass().getResource("/index.html").toURI()).getParent();
+
+		converterSet = ConverterSetMaker.converters();
+		converters = new Converters(converterSet);
 		
+		classLoader = new ConfigurationClassLoader();
+		realPath = Paths.get(getClass().getResource("/index.html").toURI()).getParent().toAbsolutePath();
+		argument = "app=" + realPath.toString();
 		given(resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS)).willReturn(ConfigResourceMaker.configResource());
 	}
 	
@@ -113,7 +99,7 @@ public class ConfigurationTest {
 			protected void configure() {
 				bind(String[].class).toInstance(args);
 				bind(ResourceFinder.class).toInstance(resourceFinder);
-				bind(new TypeLiteral<Set<Converter<?, ?>>>() {}).toInstance(ConverterSetMaker.converters());
+				bind(new TypeLiteral<Set<Converter<?, ?>>>() {}).toInstance(converterSet);
 				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
 			}
 		});
@@ -129,39 +115,20 @@ public class ConfigurationTest {
 	}
 	
 	@Test
-	public void testRetrieveConfigurationInstances() throws Exception {
-		toTest = config(new String[] {
-			PATH_ARG + "=" + realPath.toString(),
-			BOOL_ARG + "=true"
+	public void testAppPath() throws Exception {
+		toTest = config(new String[]{
+			argument
 		});
 		
-		ConfigurationTestInterface instance = toTest.get(ConfigurationTestInterface.class);
-		
-		assertThat(instance, is(notNullValue()));
-		
-		assertThat(instance.path(), is(realPath));
-		
-		assertThat(instance.bool(), is(true));
-	}
-	
-	@Test
-	public void testDefaultValue() throws Exception {
-		toTest = config();
-		
-		DefaultTestInterface instance = toTest.get(DefaultTestInterface.class);
-		
-		assertThat(instance, is(notNullValue()));
-		
-		assertThat(instance.falseBool(), is(false));
-		assertThat(instance.trueBool(), is(true));
+		assertThat(toTest.appPath(), is(realPath));
 	}
 	
 	@Test
 	public void testConfigurationObjectInstanceIsNotTheSame() throws Exception {
 		toTest = config();
 		
-		ConfigurationTestInterface instance1 = toTest.get(ConfigurationTestInterface.class);
-		ConfigurationTestInterface instance2 = toTest.get(ConfigurationTestInterface.class);
+		HttpServerSocketConfiguration instance1 = toTest.get(HttpServerSocketConfiguration.class);
+		HttpServerSocketConfiguration instance2 = toTest.get(HttpServerSocketConfiguration.class);
 		
 		assertThat(instance1, is(not(sameInstance(instance2))));
 	}
@@ -194,7 +161,21 @@ public class ConfigurationTest {
 		assertThat(config.timeout(), is(10000));
 		assertThat(config.sendBufferSize(), is(65536));
 		assertThat(config.receiveBufferSize(), is(65536));
+		assertThat(config.bindings(), is(notNullValue()));
+		assertThat(config.bindings().length, is(2));
+		assertThat(config.bindings()[0].host(), is(nullValue()));
+		assertThat(config.bindings()[0].port(), is(8080));
+		assertThat(config.bindings()[1].host(), is("localhost"));
+		assertThat(config.bindings()[1].port(), is(8090));
 		
+		DocumentConfiguration docConfig = toTest.get(DocumentConfiguration.class);
+		assertThat(docConfig.clientDebug(), is(false));
+		assertThat(docConfig.removeComments(), is(true));
+		assertThat(docConfig.showParsingErrors(), is(false));
+		
+		NotAConfiguration notAConfig = toTest.get(NotAConfiguration.class);
+		assertThat(notAConfig.one(), is(false));
+		assertThat(notAConfig.two(), is(0));
 	}
 	
 	@Test

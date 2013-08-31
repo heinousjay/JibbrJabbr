@@ -41,9 +41,7 @@ import jj.script.RhinoContextMaker;
  */
 public abstract class ConfigurationObjectBase {
 	
-	private final Arguments arguments;
-	
-	private final Converters converters;
+	protected final Converters converters;
 	
 	private final Scriptable scriptObject;
 	
@@ -53,15 +51,13 @@ public abstract class ConfigurationObjectBase {
 	
 	protected final RhinoContextMaker contextMaker;
 	
-	protected final Map<String, Object[]> values = new HashMap<>();
+	protected final Map<String, Object> values = new HashMap<>();
 	
 	protected ConfigurationObjectBase(
-		final Arguments arguments,
 		final Converters converters,
 		final ResourceFinder resourceFinder,
 		final RhinoContextMaker rhinoContextMaker
 	) {
-		this.arguments = arguments;
 		this.converters = converters;
 		this.resourceFinder = resourceFinder;
 		this.contextMaker = rhinoContextMaker;
@@ -83,24 +79,14 @@ public abstract class ConfigurationObjectBase {
 	
 	protected abstract Scriptable configureScriptObject(Scriptable scope);
 	
-	protected final Function configurationFunction(String name) {
-		return new ConfigurationFunction(values, name);
+	protected abstract void setDefaults();
+	
+	protected final Function configurationFunction(String name, Class<?> returnType, boolean allArgs, String defaultValue) {
+		return new ConfigurationFunction(converters, values, name, returnType, allArgs, defaultValue);
 	}
 	
 	protected final ConfigResource configResource() {
 		return resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS);
-	}
-	
-	protected final <T> T readArgument(String name, String defaultValue, Class<T> resultClass) {
-		String value = arguments.get(name);
-		if (value == null) {
-			value = defaultValue;
-		}
-		if (value != null) {
-			return converters.convert(value, resultClass);
-		}
-		
-		return null;
 	}
 	
 	void runScriptFunction() {
@@ -111,23 +97,7 @@ public abstract class ConfigurationObjectBase {
 				context.callFunction(function, config.global(), config.global(), new Object[] {scriptObject});
 			}
 		} else {
-			// TODO log it, i think?
+			setDefaults();
 		}
-	}
-	
-	protected final <T> T readScriptValue(String name, String defaultValue, Class<T> resultClass) {
-		Object value = readFirstValue(values.get(name));
-		if (value == null) {
-			value = defaultValue;
-		}
-		if (value != null) {
-			return converters.convert(value, resultClass);
-		}
-		
-		return null;
-	}
-	
-	private Object readFirstValue(Object[] in) {
-		return in != null && in.length > 0 ? in[0] : null;
 	}
 }

@@ -15,7 +15,11 @@
  */
 package jj.configuration;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -32,6 +36,8 @@ import javassist.bytecode.annotation.Annotation;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.StringUtils;
+
 /**
  * @author jason
  * 
@@ -41,9 +47,22 @@ class ConfigurationClassLoader extends ClassLoader {
 	
 	private static final String INJECT_ANNOTATION = "javax.inject.Inject";
 	private static final String NAME_FORMAT = "%sGeneratedImplementationFor%s%s";
-
+	private static final Map<String, String> primitiveDefaults;
+	
 	static {
 		registerAsParallelCapable();
+		
+		Map<String, String> builder = new HashMap<>();
+		builder.put("boolean", "false");
+		builder.put("char", "(char)0");
+		builder.put("byte", "(byte)0");
+		builder.put("short", "(short)0");
+		builder.put("int", "(int)0");
+		builder.put("long", "(long)0");
+		builder.put("float", "(float)0");
+		builder.put("double", "(double)0");
+		
+		primitiveDefaults = Collections.unmodifiableMap(builder);
 	}
 	
 	private final ClassPool classPool = new ClassPool(true);
@@ -94,42 +113,82 @@ class ConfigurationClassLoader extends ClassLoader {
 	
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {
 		
-		HashSet<String> scriptMethodNames = new HashSet<>();
+		List<String> scriptProps = new ArrayList<>();
+		List<String> defaults = new ArrayList<>();
 		result.addInterface(resultInterface);
 		for (CtMethod method : resultInterface.getDeclaredMethods()) {
 			CtMethod newMethod = CtNewMethod.copy(method, result, null);
-			Argument argumentAnnotation = (Argument)method.getAnnotation(Argument.class);
+			Method methodAnnotation = (Method)method.getAnnotation(Method.class);
+			boolean allArgs = methodAnnotation != null && methodAnnotation.allArgs();
+			
 			Default defaultAnnotation = (Default)method.getAnnotation(Default.class);
 			String defaultValue = defaultAnnotation != null ? "\"" + defaultAnnotation.value() + "\"" : null;
-			if (argumentAnnotation != null) {
-				String body = 
-					"return ($r)readArgument(\"" +
-					argumentAnnotation.value() +
-					"\"," +
-					defaultValue +
-					"," +
-					method.getReturnType().getName() +
-					".class);";
-				newMethod.setBody(body);
-			} else { // it's assumed to come from script
-				scriptMethodNames.add(newMethod.getName());
-				String body = 
-					"return ($r)readScriptValue(\"" +
-					newMethod.getName() +
-					"\"," +
-					defaultValue +
-					"," +
-					method.getReturnType().getName() +
-					".class);";
-				newMethod.setBody(body);
+			
+			String name = newMethod.getName();
+			String functionName = methodAnnotation != null && !StringUtils.isEmpty(methodAnnotation.name()) ?
+				methodAnnotation.name() : name;
+			
+			scriptProps.add(new StringBuilder()
+				.append("org.mozilla.javascript.ScriptableObject.putConstProperty(result,\"")
+				.append(functionName)
+				.append("\",configurationFunction(\"")
+				.append(name)
+				.append("\", ")
+				.append(newMethod.getReturnType().getName())
+				.append(".class, ")
+				.append(allArgs)
+				.append(",")
+				.append(defaultValue)
+				.append("));").toString()
+			);
+			
+			defaults.add(new StringBuilder()
+				.append("values.put(\"")
+				.append(name)
+				.append("\", converters.convert(")
+				.append(defaultValue)
+				.append(",")
+				.append(newMethod.getReturnType().getName())
+				.append(".class));")
+				.toString()
+			);
+			
+			CtClass returnType = newMethod.getReturnType();
+			
+			if (returnType.isArray()) {
+				newMethod.setBody(
+					"{ java.util.ArrayList list = (java.util.ArrayList)values.get(\"" + name +"\");"+
+					"if (list == null) { return new " + returnType.getComponentType().getName() + "[0]; }" +
+					"return ($r)list.toArray(new " + returnType.getComponentType().getName() + "[list.size()]); }" 
+				);
+			} else if (returnType.isPrimitive()) {
+				newMethod.setBody("{ Object value = values.get(\"" + name + "\");" +
+					"if (value == null) { return "  + primitiveDefaults.get(returnType.getName()) + "; }" +
+					"return ($r)value;}"
+				);
+			} else {
+				newMethod.setBody("return ($r)values.get(\"" + name + "\");");
 			}
+			
 			result.addMethod(newMethod);
 		}
 		
-		createConfigureScriptObjectMethod(result, scriptMethodNames);
+		createConfigureScriptObjectMethod(result, scriptProps);
+		createSetDefaultsMethod(result, defaults);
+	}
+	
+	private void createSetDefaultsMethod(final CtClass result, final List<String> defaults) throws Exception {
+		StringBuilder newMethod = new StringBuilder("protected void setDefaults() {");
+
+		for (String defaultSetting : defaults) {
+			newMethod.append(defaultSetting);
+		}
+		
+		newMethod.append("}");
+		result.addMethod(CtNewMethod.make(newMethod.toString(), result));
 	}
 
-	private void createConfigureScriptObjectMethod(final CtClass result, HashSet<String> scriptMethodNames) throws Exception {
+	private void createConfigureScriptObjectMethod(final CtClass result, final List<String> scriptProps) throws Exception {
 		
 		StringBuilder newMethod = 
 			new StringBuilder("protected org.mozilla.javascript.Scriptable configureScriptObject(org.mozilla.javascript.Scriptable scope) {")
@@ -137,12 +196,8 @@ class ConfigurationClassLoader extends ClassLoader {
 			.append("jj.script.RhinoContext context = contextMaker.context();")
 			.append("try {result = context.newObject(scope);} finally {context.close();}");
 		
-		for (String name : scriptMethodNames) {
-			newMethod.append("org.mozilla.javascript.ScriptableObject.putConstProperty(result,\"")
-				.append(name)
-				.append("\",configurationFunction(\"")
-				.append(name)
-				.append("\"));");
+		for (String prop : scriptProps) {
+			newMethod.append(prop);
 		}
 		
 		newMethod.append("return result;}");

@@ -15,20 +15,22 @@
  */
 package jj.configuration;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import javassist.ClassPool;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Annotates a method in a configuration interface that needs configuration
+ * to produce its script method.
  * @author jason
  *
  */
-@Singleton
-class ConfigurationClassPool extends ClassPool {
-	
-	@Inject
-	ConfigurationClassPool() {
-		super(true);
-	}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Documented
+public @interface Method {
+	String name() default "";
+	boolean allArgs() default false;
 }

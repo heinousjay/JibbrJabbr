@@ -15,7 +15,10 @@
  */
 package jj.configuration;
 
+import java.util.ArrayList;
 import java.util.Map;
+
+import jj.conversion.Converters;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -25,17 +28,60 @@ class ConfigurationFunction extends BaseFunction {
 
 	private static final long serialVersionUID = -6111536701353048922L;
 	
-	private final Map<String, Object[]> values;
+	private final Converters converters;
+	private final Map<String, Object> values;
 	private final String name;
+	private final Class<?> returnType;
+	private final boolean allArgs;
+	private final String defaultValue;
 
-	ConfigurationFunction(final Map<String, Object[]> values, final String name) {
+	ConfigurationFunction(
+		final Converters converters,
+		final Map<String, Object> values,
+		final String name,
+		final Class<?> returnType,
+		final boolean allArgs,
+		final String defaultValue
+	) {
+		this.converters = converters;
 		this.values = values;
 		this.name = name;
+		this.returnType = returnType;
+		this.allArgs = allArgs;
+		this.defaultValue = defaultValue;
 	}
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		values.put(name, args);
+		
+		if (returnType.isArray()) {
+			storeVector(args);
+		} else {
+			storeScalar(args);
+		}
+		
+		
 		return thisObj;
 	}
+	
+	private void storeScalar(Object[] args) {
+		values.put(name, getValue(args, returnType));
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void storeVector(Object[] args) {
+		if (!values.containsKey(name)) {
+			values.put(name, new ArrayList<>());
+		}
+		((ArrayList<Object>)values.get(name)).add(getValue(args, returnType.getComponentType()));
+	}
+
+	private Object getValue(Object[] args, Class<?> type) {
+		Object value = converters.convert(allArgs ? args : args[0], type);
+		if (value == null && defaultValue != null) {
+			value = converters.convert(defaultValue, returnType);
+		}
+		return value;
+	}
+	
 }

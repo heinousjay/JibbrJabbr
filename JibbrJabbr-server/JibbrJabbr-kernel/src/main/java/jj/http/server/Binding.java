@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.http.server;
+
 /**
- * Facilities for dealing with exceptions.
- * 
  * @author jason
  *
  */
-package jj.exception;
+public interface Binding {
+
+	public int port();
+	
+	public String host();
+}

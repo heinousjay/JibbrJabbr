@@ -76,6 +76,7 @@ public class HtmlResource extends AbstractFileResource {
 		for (ParseError pe : parser.getErrors()) {
 			// conceptually, parse errors should be communicated
 		}
+		
 		parser.getErrors().clear();
 		
 		if (config.removeComments()) {

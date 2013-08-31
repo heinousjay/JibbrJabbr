@@ -108,7 +108,8 @@ class ResourceFinderImpl implements ResourceFinder {
 		
 		log.trace("replacing {} at {}", resourceCreator.type().getSimpleName(), cacheKey);
 		
-		if (!resourceCache.replace(cacheKey, result, resourceCreator.create(baseName, args))){
+		T resource = resourceCreator.create(baseName, args);
+		if (resource != null && !resourceCache.replace(cacheKey, result, resource)){
 			log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceCreator.type().getSimpleName(), cacheKey);
 		}
 	}
