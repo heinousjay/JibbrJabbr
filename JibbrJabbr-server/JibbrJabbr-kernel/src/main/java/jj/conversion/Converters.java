@@ -75,6 +75,13 @@ public class Converters {
 		builder2.put(Float.TYPE,     0F);
 		builder2.put(Double.TYPE,    0.0);
 		
+		Map<Class<?>, Object> builder3 = new HashMap<>();
+		for (Class<?> type : builder2.keySet()) {
+			builder3.put(primitivesToWrappers.get(type), builder2.get(type));
+		}
+		
+		builder2.putAll(builder3);
+		
 		primitiveDefaults = Collections.unmodifiableMap(builder2);
 	}
 
@@ -148,7 +155,7 @@ public class Converters {
 		
 		if (from == null) {
 			if (primitiveDefaults.containsKey(to)) {
-				return (To)primitiveDefaults.get(to);
+				return cast(primitiveDefaults.get(to));
 			}
 			return null;
 		}
@@ -160,8 +167,11 @@ public class Converters {
 			return cast(from);
 		}
 		
-		
 		Map<Class<?>, Converter<?, ?>> fromConverters = converters.get(fromClass);
+		
+		if (fromConverters == null && to == String.class) {
+			return cast(String.valueOf(from));
+		}
 		
 		assert (fromConverters != null) : "don't know how to convert from " + fromClass;
 		

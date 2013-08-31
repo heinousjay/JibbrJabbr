@@ -75,6 +75,12 @@ public class ConvertersTest {
 		assertThat(converters.convert(1.0, Double.class), is(1.0));
 		assertThat(converters.convert(1.0, Double.TYPE), is(1.0));
 	}
+	
+	@Test
+	public void testConvertToString() {
+		assertThat(converters.convert(1.0, String.class), is("1.0"));
+		assertThat(converters.convert(true, String.class), is("true"));
+	}
 
 	@Test
 	public void testFromStringToPath() {
