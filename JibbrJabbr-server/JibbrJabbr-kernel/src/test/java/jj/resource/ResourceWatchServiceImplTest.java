@@ -44,6 +44,7 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
 
 /**
  * this test is slightly concrete, on purpose
@@ -65,6 +66,7 @@ public class ResourceWatchServiceImplTest {
 	@Mock ResourceFinder resourceFinder;
 	ExecutorService executorService;
 	@Mock JJExecutors executors;
+	@Mock Logger logger;
 	
 	ResourceWatchServiceImpl rwsi;
 	
@@ -146,7 +148,7 @@ public class ResourceWatchServiceImplTest {
 		sr3.dependsOn(sr1);
 		sr4.dependsOn(sr1);
 		String name = "index";
-		HtmlResource hr = new HtmlResource(configuration, MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
+		HtmlResource hr = new HtmlResource(configuration, logger, MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
 		
 		resourceCache.put(sr.cacheKey(), sr);
 		resourceCache.put(hr.cacheKey(), hr);

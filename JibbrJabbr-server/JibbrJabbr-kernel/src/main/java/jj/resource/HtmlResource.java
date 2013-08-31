@@ -5,12 +5,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.http.server.servable.document.DocumentConfiguration;
+import jj.logging.EmergencyLogger;
 
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
@@ -19,6 +21,7 @@ import org.jsoup.parser.ParseError;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
+import org.slf4j.Logger;
 
 /**
  * An immutable collection of information about an
@@ -58,6 +61,7 @@ public class HtmlResource extends AbstractFileResource {
 	@Inject
 	HtmlResource(
 		final Configuration configuration,
+		final @EmergencyLogger Logger logger,
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path
@@ -73,11 +77,15 @@ public class HtmlResource extends AbstractFileResource {
 		
 		this.document = parser.parseInput(html, baseName);
 		
-		for (ParseError pe : parser.getErrors()) {
-			// conceptually, parse errors should be communicated
+		List<ParseError> errors = parser.getErrors();
+		if (!errors.isEmpty()) {
+			logger.warn("errors while parsing {}, your document may not behave as expected", path);
+			
+			for (ParseError pe : errors) {
+				logger.warn("{}", pe);
+			}
+			errors.clear();
 		}
-		
-		parser.getErrors().clear();
 		
 		if (config.removeComments()) {
 			CommentNodeFinder commentNodeFinder = new CommentNodeFinder();
