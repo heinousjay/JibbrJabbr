@@ -20,21 +20,16 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import jj.engine.EngineAPI;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ConstProperties;
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
-import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.slf4j.Logger;
@@ -55,15 +50,13 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock(extraInterfaces = {ConstProperties.class}) Scriptable scope;
 	
-	@Mock Context context;
+	RhinoContext context;
 	
 	@Mock Script script;
 	
 	@Mock ScriptBundle scriptBundle;
 	
 	@Mock AssociatedScriptBundle associatedScriptBundle;
-	
-	@Mock EngineAPI engineAPI;
 	
 	@Mock CurrentScriptContext currentScriptContext;
 	
@@ -73,34 +66,15 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Logger logger;
 	
-	@Captor ArgumentCaptor<StringBuilder> rhinoLogCaptor;
-	
 	@Captor ArgumentCaptor<String> logCaptor;
 	
 	@Mock Callable function;
 
-	@InjectMocks ContinuationCoordinator continuationCoordinator;
+	ContinuationCoordinator continuationCoordinator;
 	
 	final Object[] args = { new Object(), new Object() };
 	
-	final RhinoException rhinoException;
-	
-	final String rhinoExceptionString = "trouble executing a script\n============== BEGIN SCRIPT TRACE ==============\nmissing ; before statement (#1)\n==============  END SCRIPT TRACE  ==============\n";
-	
 	final String unexpectedExceptionString = "unexpected problem during script execution {}";
-	
-	public ContinuationCoordinatorTest() {
-		RhinoException caught = null;
-		Context context = Context.enter();
-		try {
-			context.evaluateString(context.initStandardObjects(), "not really javascript", "", 1, null);
-		} catch (RhinoException re) {
-			caught = re;
-		} finally {
-			Context.exit();
-		}
-		rhinoException = caught;
-	}
 	
 	@Before
 	public void before() {
@@ -113,11 +87,11 @@ public class ContinuationCoordinatorTest {
 		given(associatedScriptBundle.scope()).willReturn(scope);
 		given(associatedScriptBundle.sha1()).willReturn(sha1);
 		
-		given(engineAPI.context()).willReturn(context);
-		
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
-		Context.enter();
+		RhinoContextMaker contextMaker = new MockRhinoContextMaker();
+		context = contextMaker.context();
+		continuationCoordinator = new ContinuationCoordinator(contextMaker, currentScriptContext, logger);
 	}
 	
 	@Test
@@ -138,20 +112,6 @@ public class ContinuationCoordinatorTest {
 		ContinuationState result = continuationCoordinator.execute(scriptBundle);
 
 		assertThat(result, is(continuationState));
-	}
-	
-	@Test
-	public void testInitialExecutionWithRhinoException() {
-		
-		given(logger.isErrorEnabled()).willReturn(true);
-		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(rhinoException);
-		
-		continuationCoordinator.execute(scriptBundle);
-		
-		verify(logger).error(eq("{}"), rhinoLogCaptor.capture());
-		
-		assertThat(rhinoLogCaptor.getValue().toString(), is(rhinoExceptionString));
 	}
 	
 	@Test
@@ -187,20 +147,6 @@ public class ContinuationCoordinatorTest {
 		ContinuationState result = continuationCoordinator.execute(associatedScriptBundle, function, args);
 		
 		assertThat(result, is(continuationState));
-	}
-	
-	@Test
-	public void testFunctionExecutionWithRhinoException() {
-		
-		given(logger.isErrorEnabled()).willReturn(true);
-		
-		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(rhinoException);
-		
-		continuationCoordinator.execute(associatedScriptBundle, function);
-		
-		verify(logger).error(eq("{}"), rhinoLogCaptor.capture());
-		
-		assertThat(rhinoLogCaptor.getValue().toString(), is(rhinoExceptionString));
 	}
 	
 	@Test
@@ -240,22 +186,6 @@ public class ContinuationCoordinatorTest {
 		ContinuationState result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptBundle, args);
 		
 		assertThat(result, is(continuationState));
-	}
-	
-	@Test
-	public void testContinuationResumptionWithRhinoException() {
-		
-		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
-		
-		given(logger.isErrorEnabled()).willReturn(true);
-		
-		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(rhinoException);
-		
-		continuationCoordinator.resumeContinuation(pendingKey, associatedScriptBundle, args);
-		
-		verify(logger).error(eq("{}"), rhinoLogCaptor.capture());
-		
-		assertThat(rhinoLogCaptor.getValue().toString(), is(rhinoExceptionString));
 	}
 	
 	@Test

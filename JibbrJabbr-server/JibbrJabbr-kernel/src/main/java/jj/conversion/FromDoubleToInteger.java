@@ -15,24 +15,15 @@
  */
 package jj.conversion;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jj.http.server.FromObjectArrayToBinding;
-
 /**
  * @author jason
  *
  */
-public class ConverterSetMaker {
+public class FromDoubleToInteger implements Converter<Double, Integer> {
 
-	public static Set<Converter<?, ?>> converters() {
-		HashSet<Converter<?, ?>> output = new HashSet<>();
-		output.add(new FromStringToBoolean());
-		output.add(new FromStringToPath());
-		output.add(new FromStringToInteger());
-		output.add(new FromDoubleToInteger());
-		output.add(new FromObjectArrayToBinding());
-		return output;
+	@Override
+	public Integer convert(Double in) {
+		return new Integer(in.intValue());
 	}
+
 }

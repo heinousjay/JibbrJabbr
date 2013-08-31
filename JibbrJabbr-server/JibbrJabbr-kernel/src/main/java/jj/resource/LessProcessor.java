@@ -33,6 +33,8 @@ import org.mozilla.javascript.Undefined;
 
 import jj.configuration.Configuration;
 import jj.execution.ExecutionTrace;
+import jj.script.RhinoContext;
+import jj.script.RhinoContextMaker;
 
 /**
  * accepts a path that represents a less source file,
@@ -116,56 +118,53 @@ class LessProcessor {
 	private final ScriptableObject global;
 	private final Configuration configuration;
 	private final ExecutionTrace trace;
+	private final RhinoContextMaker contextMaker;
 	
 	@Inject
 	LessProcessor(
 		final Configuration configuration,
-		final ExecutionTrace trace
+		final ExecutionTrace trace,
+		final RhinoContextMaker contextMaker
 	) throws IOException {
 		this.configuration = configuration;
+		this.contextMaker = contextMaker;
 		global = makeGlobal();
 		this.trace = trace;
 	}
 	
 	String process(final String baseName) {
 		
-		Context context = context();
-		try {
+		try (RhinoContext context = context(contextMaker.context())) {
 			trace.startLessProcessing(baseName);
 			Scriptable local = context.newObject(global);
 			local.setPrototype(global);
 		    local.setParentScope(null);
-			Object result = context.evaluateString(local, "runLess('" + baseName + "');", baseName, 1, null);
+			Object result = context.evaluateString(local, "runLess('" + baseName + "');", baseName);
 			if (result == Scriptable.NOT_FOUND) {
 				return null;
 			}
 			return String.valueOf(result);
 		} finally {
-			Context.exit();
 			NameFunction.name.set(null);
 			trace.finishLessProcessing(baseName);
 		}
 	}
 	
 	private ScriptableObject makeGlobal() throws IOException {
-		Context context = context();
-		try {
-			ScriptableObject global = context.initStandardObjects(null, true);
+		
+		try (RhinoContext context = context(contextMaker.context())) {
+			ScriptableObject global = context.initStandardObjects(true);
 			global.defineProperty("readFile", new ReadFileFunction(configuration), ScriptableObject.EMPTY);
 			global.defineProperty("name", new NameFunction(), ScriptableObject.EMPTY);
 			global.defineProperty("lessOptions", new LessOptionsFunction(), ScriptableObject.EMPTY);
-			context.evaluateString(global, lessScript(), SCRIPT_NAME, 1, null);
+			context.evaluateString(global, lessScript(), SCRIPT_NAME);
 			global.sealObject();
 			return global;
-		} finally {
-			Context.exit();
 		}
 	}
 	
-	private Context context() {
-		Context context = Context.enter();
+	private RhinoContext context(RhinoContext context) {
 		context.setOptimizationLevel(0);
-		context.setLanguageVersion(Context.VERSION_1_8);
 		return context;
 	}
 }

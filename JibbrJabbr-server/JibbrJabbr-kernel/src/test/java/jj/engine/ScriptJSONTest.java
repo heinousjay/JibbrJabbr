@@ -1,11 +1,12 @@
 package jj.engine;
 
-import java.util.Collections;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Map;
 
-import jj.engine.EngineAPIImpl;
-import jj.engine.HostObject;
 import jj.engine.ScriptJSON;
+import jj.script.RealRhinoContextMaker;
 
 import org.junit.Test;
 
@@ -13,14 +14,16 @@ public class ScriptJSONTest {
 	
 	private static final String TEST_STRING = "{\"form\":\"{\\\"userName\\\":\\\"jaybird\\\"}\"}";
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void test() {
-		EngineAPIImpl rhinoObjectCreator = new EngineAPIImpl(Collections.<HostObject>emptySet());
 		
-		ScriptJSON underTest = new ScriptJSON(rhinoObjectCreator);
+		ScriptJSON underTest = new ScriptJSON(new RealRhinoContextMaker());
 		
 		Map<String, Object> map = (Map<String, Object>)underTest.parse(TEST_STRING);
-		underTest.parse(String.valueOf(map.get("form")));
+		map = (Map<String, Object>)underTest.parse(String.valueOf(map.get("form")));
+		
+		assertThat((String)map.get("userName"), is("jaybird"));
 	}
 
 }

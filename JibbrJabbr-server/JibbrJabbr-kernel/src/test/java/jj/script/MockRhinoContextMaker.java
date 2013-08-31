@@ -17,6 +17,7 @@ package jj.script;
 
 import static org.mockito.Mockito.mock;
 
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 /**
@@ -27,6 +28,8 @@ public class MockRhinoContextMaker extends RhinoContextMaker {
 
 
 	public final RhinoContext context = mock(RhinoContext.class);
+	
+	public final ScriptableObject generalScope = mock(ScriptableObject.class);
 	/**
 	 * @param logger
 	 */
@@ -37,5 +40,10 @@ public class MockRhinoContextMaker extends RhinoContextMaker {
 	@Override
 	public RhinoContext context() {
 		return context;
+	}
+	
+	@Override
+	public ScriptableObject generalScope() {
+		return generalScope;
 	}
 }

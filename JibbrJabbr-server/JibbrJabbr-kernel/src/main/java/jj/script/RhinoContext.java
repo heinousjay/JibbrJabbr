@@ -19,11 +19,14 @@ import java.io.Closeable;
 
 import jj.logging.EmergencyLogger;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 public class RhinoContext implements Closeable {
@@ -36,6 +39,9 @@ public class RhinoContext implements Closeable {
 	RhinoContext(final Context context, final @EmergencyLogger Logger logger) {
 		this.context = context;
 		this.logger = logger;
+		
+		context.setLanguageVersion(Context.VERSION_1_8);
+		context.setOptimizationLevel(-1);
 	}
 	
 	private void assertNotClosed() {
@@ -53,9 +59,14 @@ public class RhinoContext implements Closeable {
 		return context.captureContinuation();
 	}
 	
-	public Scriptable initStandardObjects() {
+	public ScriptableObject initStandardObjects() {
 		assertNotClosed();
 		return context.initStandardObjects();
+	}
+
+	public ScriptableObject initStandardObjects(boolean sealed) {
+		assertNotClosed();
+		return context.initStandardObjects(null, sealed);
 	}
 	
 	public Scriptable newObject(Scriptable scope) {
@@ -67,6 +78,23 @@ public class RhinoContext implements Closeable {
 		assertNotClosed();
 		try {
 			return context.compileFunction(scope, source, sourceName, 1, null);
+		} catch (RhinoException re) {
+			logger.error("script error compiling a function\n{}", re.getMessage());
+			throw re;
+		}
+	}
+
+	/**
+	 * @param script
+	 * @param string
+	 * @param i
+	 * @param object
+	 * @return
+	 */
+	public Script compileString(final String source, final String sourceName) {
+		assertNotClosed();
+		try {
+			return context.compileString(source, sourceName, 1, null);
 		} catch (RhinoException re) {
 			logger.error("script error compiling a function\n{}", re.getMessage());
 			throw re;
@@ -86,5 +114,75 @@ public class RhinoContext implements Closeable {
 			logger.error("script error executing a function\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
 			throw re;
 		}
+	}
+
+	/**
+	 * @param global
+	 * @param script
+	 * @param scriptName
+	 * @param i
+	 * @param object
+	 */
+	public Object evaluateString(Scriptable scope, String source, String sourceName) {
+		assertNotClosed();
+		try {
+			return context.evaluateString(scope, source, sourceName, 1, null);
+		} catch (RhinoException re) {
+			logger.error("script error evaluating a string\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			throw re;
+		}
+	}
+
+	/**
+	 * @param script
+	 * @param scope
+	 */
+	public Object executeScriptWithContinuations(Script script, Scriptable scope) {
+		assertNotClosed();
+		try {
+			return context.executeScriptWithContinuations(script, scope);
+		} catch (RhinoException re) {
+			logger.error("script error during execution\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			throw re;
+		}
+	}
+
+	/**
+	 * @param function
+	 * @param scope
+	 * @param args
+	 */
+	public Object callFunctionWithContinuations(Callable function, Scriptable scope, Object[] args) {
+		assertNotClosed();
+		try {
+			return context.callFunctionWithContinuations(function, scope, args);
+		} catch (RhinoException re) {
+			logger.error("script error during function execution execution\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			throw re;
+		}
+	}
+
+	/**
+	 * @param continuation
+	 * @param scope
+	 * @param result
+	 * @return 
+	 */
+	public Object resumeContinuation(Object continuation, Scriptable scope, Object result) {
+		assertNotClosed();
+		try {
+			return context.resumeContinuation(continuation, scope, result);
+		} catch (RhinoException re) {
+			logger.error("script error resuming a continuation\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			throw re;
+		}
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setOptimizationLevel(int i) {
+		assertNotClosed();
+		context.setOptimizationLevel(i);
 	}
 }

@@ -25,12 +25,12 @@ public class FromObjectArrayToBinding implements Converter<Object[], Binding> {
 
 	@Override
 	public Binding convert(final Object[] in) {
-		if (in.length == 2 && (in[0] instanceof String) && (in[1] instanceof Integer)) {
+		if (in.length == 2 && (in[0] instanceof String) && (in[1] instanceof Number)) {
 			return new Binding() {
 				
 				@Override
 				public int port() {
-					return (Integer)in[1];
+					return ((Number)in[1]).intValue();
 				}
 				
 				@Override
@@ -38,12 +38,12 @@ public class FromObjectArrayToBinding implements Converter<Object[], Binding> {
 					return (String)in[0];
 				}
 			};
-		} else if (in.length == 1 && (in[0] instanceof Integer)) {
+		} else if (in.length == 1 && (in[0] instanceof Number)) {
 			return new Binding() {
 				
 				@Override
 				public int port() {
-					return (Integer)in[0];
+					return ((Number)in[0]).intValue();
 				}
 				
 				@Override

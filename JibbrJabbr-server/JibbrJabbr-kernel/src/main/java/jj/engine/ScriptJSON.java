@@ -4,7 +4,8 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.mozilla.javascript.Context;
+import jj.script.RhinoContext;
+import jj.script.RhinoContextMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +22,12 @@ import org.slf4j.LoggerFactory;
 public class ScriptJSON {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptJSON.class);
-
-	private final EngineAPI rhinoObjectCreator;
+	
+	private final RhinoContextMaker contextMaker;
 	
 	@Inject
-	public ScriptJSON(final EngineAPI rhinoObjectCreator) {
-		this.rhinoObjectCreator = rhinoObjectCreator;
+	public ScriptJSON(final RhinoContextMaker contextMaker) {
+		this.contextMaker = contextMaker;
 	}
 	
 	private String emptyOrInput(final String input) {
@@ -36,21 +37,13 @@ public class ScriptJSON {
 	public Object parse(final String input) {
 		// need to do some serious quote replacement
 		String escaped = emptyOrInput(input).trim().replace("'", "\\'").replace("\"", "\\\"");
-		Context context = rhinoObjectCreator.context();
-		try {
-			return context.evaluateString(
-				rhinoObjectCreator.global(),
-				"JSON.parse('" + escaped + "');",
-				"ScriptJSON.parse",
-				0,
-				null
-			);
+		
+		try (RhinoContext context = contextMaker.context()) {
+			return context.evaluateString(contextMaker.generalScope(), "JSON.parse('" + escaped + "');", "ScriptJSON.parse");
 		} catch (Exception e) {
-			log.warn("couldn't parse {}", input);
+			log.warn("couldn't JSON.parse {}", input);
 			log.warn("", e);
 			return null;
-		} finally {
-			Context.exit();
 		}
 	}
 }

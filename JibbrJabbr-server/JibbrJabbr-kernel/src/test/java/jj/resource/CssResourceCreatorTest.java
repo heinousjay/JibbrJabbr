@@ -24,6 +24,7 @@ import java.nio.file.Path;
 
 import jj.SHA1Helper;
 import jj.execution.ExecutionTrace;
+import jj.script.RealRhinoContextMaker;
 
 import org.junit.Test;
 import org.mockito.Mock;
@@ -76,7 +77,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	@Mock Logger logger;
 	
 	protected void before() throws Exception {
-		lessProcessor = spy(new LessProcessor(configuration, mock(ExecutionTrace.class)));
+		lessProcessor = spy(new LessProcessor(configuration, mock(ExecutionTrace.class), new RealRhinoContextMaker()));
 	}
 
 	@Test

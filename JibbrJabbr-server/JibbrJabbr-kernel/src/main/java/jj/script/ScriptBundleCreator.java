@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -32,11 +31,14 @@ class ScriptBundleCreator {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptBundleCreator.class);
 	
-	private final EngineAPI rhinoObjectCreator;
+	private final EngineAPI engineAPI;
+	
+	private final RhinoContextMaker contextMaker;
 	
 	@Inject
-	ScriptBundleCreator(final EngineAPI rhinoObjectCreator) {
-		this.rhinoObjectCreator = rhinoObjectCreator;
+	ScriptBundleCreator(final EngineAPI engineAPI, final RhinoContextMaker contextMaker) {
+		this.engineAPI = engineAPI;
+		this.contextMaker = contextMaker;
 	}
 	
 	/**
@@ -61,11 +63,9 @@ class ScriptBundleCreator {
 		
 		Scriptable local = createLocalScope(moduleIdentifier);
 		Scriptable exports;
-		try {
-			exports = rhinoObjectCreator.context().newObject(local);
+		try (RhinoContext context = contextMaker.context()){
+			exports = context.newObject(local);
 			ScriptableObject.defineProperty(local, EXPORTS, exports, ScriptableObject.CONST);
-		} finally {
-			Context.exit();
 		}
 		
 		Script script = compile(local, scriptResource);
@@ -160,10 +160,9 @@ class ScriptBundleCreator {
 	}
 	
 	private Scriptable createLocalScope(final String moduleIdentifier) {
-		Context context = rhinoObjectCreator.context();
-		try { 
-			Scriptable local = context.newObject(rhinoObjectCreator.global());
-			local.setPrototype(rhinoObjectCreator.global());
+		try (RhinoContext context = contextMaker.context()) {
+			Scriptable local = context.newObject(engineAPI.global());
+			local.setPrototype(engineAPI.global());
 		    local.setParentScope(null);
 		    
 		    // setting up the 'module' property as described in 
@@ -176,8 +175,6 @@ class ScriptBundleCreator {
 		    ScriptableObject.defineProperty(local, "module", module, ScriptableObject.CONST);
 		    
 		    return local;
-		} finally {
-			Context.exit();
 		}
 	}
 	
@@ -199,48 +196,31 @@ class ScriptBundleCreator {
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource
 	) {
-		Context context = rhinoObjectCreator.context();
-		try {
+		try (RhinoContext context = contextMaker.context()) {
 			
 			if (sharedScriptResource != null) {
-				try {
-					log.trace("evaluating shared script");
-					
-					context.evaluateString(
-						local, 
-						sharedScriptResource.script(),
-						sharedScriptResource.path().toString(),
-						1,
-						null
-					);
-				} catch (Exception e) {
-					log.error("couldn't evaluate {}", sharedScriptResource.path());
-					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
-				}
+				context.evaluateString(
+					local, 
+					sharedScriptResource.script(),
+					sharedScriptResource.path().toString()
+				);
 			}
 			
 			if (clientScriptResource != null) {
 				try {
 					log.trace("evaluating client stub");
 					
-					context.evaluateString(local, clientStub, "client stub for " + serverScriptResource.path(), 1, null);
-				} catch (Exception e) {
+					context.evaluateString(local, clientStub, "client stub for " + serverScriptResource.path());
+				} catch (RuntimeException e) {
 					log.error("couldn't evaluate the client stub (follows), check function definitions in {}", clientScriptResource.path());
 					log.error("\n{}", clientStub);
-					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+					throw e;
 				}
 			}
 		    
 	    	log.trace("compiling server script");
-	    	return context.compileString(
-	    		serverScriptResource.script(),
-	    		serverScriptResource.path().toString(),
-	    		1,
-	    		null
-	    	);
+	    	return context.compileString(serverScriptResource.script(), serverScriptResource.path().toString());
 		    
-		} finally {
-			Context.exit();
 		}
 	}
 	
@@ -250,13 +230,9 @@ class ScriptBundleCreator {
 		final ScriptResource scriptResource
 	) {
 		
-		Context context = rhinoObjectCreator.context();
-		
-		try {
+		try (RhinoContext context = contextMaker.context()) {
 			log.trace("compiling module script");
-			return context.compileString(scriptResource.script(), scriptResource.path().toString(), 1, null);
-		} finally {
-			Context.exit();
+			return context.compileString(scriptResource.script(), scriptResource.path().toString());
 		}
 	}
 }

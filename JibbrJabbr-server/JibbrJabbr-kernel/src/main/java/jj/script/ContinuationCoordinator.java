@@ -4,14 +4,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
-import org.mozilla.javascript.RhinoException;
-import org.mozilla.javascript.ScriptStackElement;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
-import jj.engine.EngineAPI;
 import jj.logging.EmergencyLogger;
 
 /**
@@ -23,37 +19,25 @@ import jj.logging.EmergencyLogger;
 @Singleton
 class ContinuationCoordinator {
 	
-	private interface ContinuationExecution extends Runnable {}
+	private interface ContinuationExecution {
+		void run(RhinoContext context);
+	}
 	
 	private final Logger log;
-
-	private final EngineAPI engineAPI;
+	
+	private final RhinoContextMaker contextMaker;
 	
 	private final CurrentScriptContext currentScriptContext;
 	
 	@Inject
 	ContinuationCoordinator(
-		final EngineAPI engineAPI,
+		final RhinoContextMaker contextMaker,
 		final CurrentScriptContext currentScriptContext,
 		final @EmergencyLogger Logger log
 	) {
-		this.engineAPI = engineAPI;
+		this.contextMaker = contextMaker;
 		this.currentScriptContext = currentScriptContext;
 		this.log = log;
-	}
-	
-	private void log(final RhinoException re) {
-		if (log.isErrorEnabled()) {
-			StringBuilder sb = new StringBuilder("trouble executing a script")
-				.append(re.sourceName())
-				.append("\n============== BEGIN SCRIPT TRACE ==============\n")
-				.append(re.getMessage());
-			for (ScriptStackElement sse : re.getScriptStack()) {
-				sb.append('\n').append(sse);
-			}
-			sb.append("\n==============  END SCRIPT TRACE  ==============\n");
-			log.error("{}", sb);
-		}
 	}
 	
 	private void log(final Exception e, final ScriptBundle scriptBundle) {
@@ -62,16 +46,12 @@ class ContinuationCoordinator {
 	} 
 	
 	private ContinuationState execute(final ContinuationExecution execution, final ScriptBundle scriptBundle) {
-		try {
-			execution.run();
+		try (RhinoContext context = contextMaker.context()){
+			execution.run(context);
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
-		} catch (RhinoException re) {
-			log(re);
 		} catch (RuntimeException e) {
 			log(e, scriptBundle);
-		} finally {
-			Context.exit();
 		}
 		return null;
 	}
@@ -90,8 +70,8 @@ class ContinuationCoordinator {
 		return execute(new ContinuationExecution() {
 			
 			@Override
-			public void run() {
-				engineAPI.context().executeScriptWithContinuations(scriptBundle.script(), scriptBundle.scope());
+			public void run(RhinoContext context) {
+				context.executeScriptWithContinuations(scriptBundle.script(), scriptBundle.scope());
 			}
 		}, scriptBundle);
 	}
@@ -112,8 +92,8 @@ class ContinuationCoordinator {
 			return execute(new ContinuationExecution() {
 				
 				@Override
-				public void run() {
-					engineAPI.context().callFunctionWithContinuations(function, scriptBundle.scope(), args);
+				public void run(RhinoContext context) {
+					context.callFunctionWithContinuations(function, scriptBundle.scope(), args);
 				}
 			}, scriptBundle);
 			
@@ -141,8 +121,8 @@ class ContinuationCoordinator {
 			return execute(new ContinuationExecution() {
 				
 				@Override
-				public void run() {
-					engineAPI.context().resumeContinuation(continuation.getContinuation(), scriptBundle.scope(), result);
+				public void run(RhinoContext context) {
+					context.resumeContinuation(continuation.getContinuation(), scriptBundle.scope(), result);
 				}
 			}, scriptBundle);
 		}

@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import jj.logging.EmergencyLogger;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 /**
@@ -33,13 +34,26 @@ import org.slf4j.Logger;
 public class RhinoContextMaker {
 	
 	private final Logger logger;
+	
+	private final ScriptableObject generalScope;
 
 	@Inject
 	RhinoContextMaker(final @EmergencyLogger Logger logger) {
 		this.logger = logger;
+		try (RhinoContext context = new RhinoContext(Context.enter(), logger)) {
+			generalScope = context.initStandardObjects(true);
+		}
 	}
 
 	public RhinoContext context() {
 		return new RhinoContext(Context.enter(), logger);
+	}
+	
+	/**
+	 * A sealed empty global scope that can be used for throwaway executions
+	 * @return
+	 */
+	public ScriptableObject generalScope() {
+		return generalScope;
 	}
 }

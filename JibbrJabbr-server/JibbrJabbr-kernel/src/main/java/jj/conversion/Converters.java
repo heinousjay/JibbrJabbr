@@ -173,10 +173,15 @@ public class Converters {
 			return cast(String.valueOf(from));
 		}
 		
-		assert (fromConverters != null) : "don't know how to convert from " + fromClass;
+		assert (fromConverters != null) : "don't know how to convert from " + fromClass + " to " + to;
 		
 		@SuppressWarnings("unchecked")
 		Converter<From, To> converter = (Converter<From, To>)fromConverters.get(to);
+		
+		if (converter == null && to == String.class) {
+			return cast(String.valueOf(from));
+		}
+		
 		
 		assert (converter != null) : "don't know how to convert " + fromClass + " to " + to;
 		

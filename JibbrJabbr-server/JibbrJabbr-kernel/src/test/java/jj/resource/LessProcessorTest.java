@@ -29,6 +29,7 @@ import jj.JJ;
 import jj.configuration.Configuration;
 import jj.execution.ExecutionTrace;
 import jj.resource.LessProcessor;
+import jj.script.RealRhinoContextMaker;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +55,7 @@ public class LessProcessorTest {
 		appPath = Paths.get(JJ.uri(LessProcessorTest.class)).getParent();
 		testCss = new String(Files.readAllBytes(appPath.resolve("test.css")), UTF_8);
 		given(configuration.appPath()).willReturn(appPath);
-		underTest = new LessProcessor(configuration, trace);
+		underTest = new LessProcessor(configuration, trace, new RealRhinoContextMaker());
 	}
 	
 	@Test

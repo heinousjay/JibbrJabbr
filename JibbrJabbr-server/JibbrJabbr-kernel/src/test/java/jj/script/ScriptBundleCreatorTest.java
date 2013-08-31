@@ -28,11 +28,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-import org.mozilla.javascript.Callable;
-import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
@@ -46,7 +43,9 @@ public class ScriptBundleCreatorTest {
 	
 	@Mock ScriptResource moduleScriptResource;
 	
-	@Mock EngineAPI rhinoObjectCreator;
+	RhinoContextMaker contextMaker;
+	
+	@Mock EngineAPI engineAPI;
 	
 	ScriptBundleCreator scriptBundleCreator;
 	
@@ -57,21 +56,13 @@ public class ScriptBundleCreatorTest {
 		
 		baseName = "chat/index";
 		
-		global = Context.enter().initStandardObjects();
-		Context.exit();
+		contextMaker = new RealRhinoContextMaker();
 		
+		global = contextMaker.generalScope();
 		
-		given(rhinoObjectCreator.context()).will(new Answer<Context>() {
-
-			@Override
-			public Context answer(InvocationOnMock invocation) throws Throwable {
-				return Context.enter();
-			}
-		});
+		given(engineAPI.global()).willReturn(global);
 		
-		given(rhinoObjectCreator.global()).willReturn(global);
-		
-		scriptBundleCreator = new ScriptBundleCreator(rhinoObjectCreator);
+		scriptBundleCreator = new ScriptBundleCreator(engineAPI, contextMaker);
 	}
 
 	@Test
@@ -97,23 +88,18 @@ public class ScriptBundleCreatorTest {
 		// we execute the script - seemingly not related to this test
 		// but it verifies we put the exports and module objects in
 		// the right place, which is a responsibility of the creator
-		Context cx = Context.enter();
-		try {
-			result.script().exec(cx, result.scope());
-		} finally {
-			Context.exit();
+		try (RhinoContext cx = new RealRhinoContextMaker().context()) {
+			cx.executeScriptWithContinuations(result.script(), result.scope());
 		}
 		
 		// then
 		Object hi = result.exports().get("hi", result.exports());
-		assertTrue(hi instanceof Callable);
-		Callable hiFunc = (Callable)hi;
+		assertTrue(hi instanceof Function);
+		Function hiFunc = (Function)hi;
 		Object moduleId;
-		cx = Context.enter();
-		try {
-			moduleId = hiFunc.call(cx, global, global, new Object[0]);
-		} finally {
-			Context.exit();
+		
+		try (RhinoContext cx = new RealRhinoContextMaker().context()) {
+			moduleId = cx.callFunction(hiFunc, global, global);
 		}
 		
 		assertEquals(moduleIdentifier, moduleId);

@@ -5,7 +5,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.mozilla.javascript.Context;
+import jj.script.RhinoContext;
+import jj.script.RhinoContextMaker;
+
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
@@ -24,40 +26,27 @@ class EngineAPIImpl implements EngineAPI {
 	private final Logger log = LoggerFactory.getLogger(EngineAPIImpl.class);
 	
 	@Inject
-	EngineAPIImpl(final Set<HostObject> hostObjects) {
-		Context context = context();
-		try {
+	EngineAPIImpl(final RhinoContextMaker contextMaker, final Set<HostObject> hostObjects) {
+		try (RhinoContext context = contextMaker.context()) {
 			global = initializeGlobalScope(context, hostObjects);
-		} finally {
-			Context.exit();
 		}
 	}
-
-	public Context context() {
-		Context context = Context.enter();
-		// always in interpreter mode for continuation support
-		context.setOptimizationLevel(-1);
-		// this should be configurable? maybe not
-		context.setLanguageVersion(Context.VERSION_1_8);
-		return context;
-	}
-
+	
+	@Override
 	public ScriptableObject global() {
 		return global;
 	}
 	
-	private ScriptableObject initializeGlobalScope(final Context context, final Set<HostObject> hostObjects) {
-		final ScriptableObject global = context.initStandardObjects(null, true);
+	private ScriptableObject initializeGlobalScope(final RhinoContext context, final Set<HostObject> hostObjects) {
+		final ScriptableObject global = context.initStandardObjects(true);
 		// make sure all the Rhino objects are available
-		context.evaluateString(global , "RegExp; getClass; java; Packages; JavaAdapter;", "lazyLoad", 0, null);
+		context.evaluateString(global , "RegExp; getClass; java; Packages; JavaAdapter;", "lazyLoad");
 		
-		context.evaluateString(global, "var global=this;", "jj-internal", 0, null);
+		context.evaluateString(global, "var global=this;", "jj-internal");
 		context.evaluateString(
-			global, 
-			"global['" + PROP_CONVERT_ARGS + "'] = function(args){var out = [];Array.forEach(args,function(arg){out.push(arg);});return JSON.stringify(out);}", 
-			"jj-internal", 
-			0, 
-			null
+			global,
+			"global['" + PROP_CONVERT_ARGS + "'] = function(args){var out = [];Array.forEach(args,function(arg){out.push(arg);});return JSON.stringify(out);}",
+			"jj-internal"
 		);
 		
 		
@@ -76,7 +65,7 @@ class EngineAPIImpl implements EngineAPI {
 			if (hostObject instanceof ContributesScript) {
 				final String script = ((ContributesScript)hostObject).script();
 				try {
-					context.evaluateString(global, script, hostObject.name(), 1, null);
+					context.evaluateString(global, script, hostObject.name());
 				} catch (RhinoException re) {
 					log.error("trouble evaluating host object {} script {}", hostObject.getClass().getName(), script);
 					log.error("received exception", re);
