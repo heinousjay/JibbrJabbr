@@ -147,8 +147,8 @@ public class BasicServingTest {
 			final TestHttpClient client = app.get(request.uri);
 			try {
 				
-				assertThat(i + ":" + request.uri, client.status(), is(HttpResponseStatus.OK));
-				assertThat(i + ":" + request.uri, client.contentBytes(), is(request.bytes));
+				assertThat(client.status(), is(HttpResponseStatus.OK));
+				assertThat(new String(client.contentBytes(), UTF_8), is(new String(request.bytes, UTF_8)));
 			} catch (Exception e) {
 				System.err.print(new StringBuilder()
 					.append(request.uri).append(System.lineSeparator())
@@ -163,14 +163,14 @@ public class BasicServingTest {
 	@Ignore
 	@Test
 	public void writeDocumentBytes_notATest() throws Exception {
-		TestHttpClient client = app.get(ANIMAL);
+		TestHttpClient client = app.get(INDEX);
 		
 		byte[] bytes = client.contentBytes();
 		String string = client.contentsString();
 		System.out.println(string);
 		assertThat(string, is(new String(bytes, UTF_8)));
 		
-		Files.write(animalHtmlRenderedPath, bytes);
+		Files.write(indexHtmlRenderedPath, bytes);
 	}
 	
 	private void runBasicStressTest(final int total , final VerifiableRequest[] toRun) throws Exception {
