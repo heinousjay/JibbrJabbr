@@ -51,7 +51,9 @@ abstract class AbstractResource implements Resource {
 	}
 	
 	/**
-	 * the arguments used to create this resource
+	 * the arguments used to create this resource. only available to the package
+	 * because arrays are inherently mutable and Resources should be immutable to
+	 * the outside world
 	 * @return
 	 */
 	abstract Object[] creationArgs();
