@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * @author jason
  *
  */
-@Retention(RetentionPolicy.RUNTIME)
+//@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @Documented
 public @interface Default {

@@ -73,7 +73,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	@Test
 	public void testCssResource() throws Exception {
 		doCreate(CssResource.class, "style.css", appPath.resolve("style.less"), true);
-		doCreate(CssResource.class, "style.css", appPath.resolve("jj/resource/test.css"));
+		doCreate(CssResource.class, "style.css", appPath.resolve("../jj/resource/test.css"));
 	}
 	
 	@Test
@@ -94,6 +94,11 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	@Test
 	public void testSha1Resource() throws Exception {
 		doCreate(Sha1Resource.class, "not.real.test.sha1");
+	}
+	
+	@Test
+	public void testSpecResource() throws Exception {
+		doCreate(SpecResource.class, "its_a_spec.js", appPath.resolveSibling("specs").resolve("its_a_spec.js"));
 	}
 
 	@Test

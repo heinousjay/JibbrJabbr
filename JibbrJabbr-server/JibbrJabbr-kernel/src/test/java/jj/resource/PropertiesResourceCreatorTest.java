@@ -40,7 +40,7 @@ public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResour
 
 	@Override
 	protected PropertiesResourceCreator toTest() {
-		return new PropertiesResourceCreator(configuration, instanceModuleCreator);
+		return new PropertiesResourceCreator(configuration, creator);
 	}
 
 

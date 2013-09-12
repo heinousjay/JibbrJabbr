@@ -168,8 +168,8 @@ jQuery(function($) {
 	
 	if (('WebSocket' in window) &&
 		('localStorage' in window) &&
-		('JSON' in window)) 
-	{
+		('JSON' in window)
+	) {
 
 		// our api goes here!
 		window.$j = {};

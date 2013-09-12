@@ -20,9 +20,9 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Set;
 
+import jj.BasePath;
 import jj.configuration.Configuration;
 import jj.conversion.Converter;
 import jj.conversion.ConverterSetMaker;
@@ -87,7 +87,7 @@ public class ConfigurationTest {
 		converters = new Converters(converterSet);
 		
 		classLoader = new ConfigurationClassLoader();
-		realPath = Paths.get(getClass().getResource("/index.html").toURI()).getParent().toAbsolutePath();
+		realPath = BasePath.appPath();
 		argument = "app=" + realPath.toString();
 		given(resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS)).willReturn(ConfigResourceMaker.configResource());
 	}

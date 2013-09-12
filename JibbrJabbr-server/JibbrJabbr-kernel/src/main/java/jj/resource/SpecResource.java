@@ -15,18 +15,32 @@
  */
 package jj.resource;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import javax.inject.Inject;
 
 /**
- * lil static object to encapsulate the base path for testing
- * 
  * @author jason
  *
  */
-class BasePath {
+public class SpecResource extends AbstractFileResource {
 
-	static Path appPath() throws Exception {
-		return Paths.get(RealResourceBase.class.getResource("/config.js").toURI()).getParent();
+	private final String script;
+	
+	@Inject
+	SpecResource(final ResourceCacheKey cacheKey, final String baseName, final Path path) {
+		super(cacheKey, baseName, path);
+		script = byteBuffer.toString(UTF_8);
+	}
+
+	@Override
+	public String mime() {
+		return MimeTypes.get(".js");
+	}
+	
+	public String script() {
+		return script;
 	}
 }

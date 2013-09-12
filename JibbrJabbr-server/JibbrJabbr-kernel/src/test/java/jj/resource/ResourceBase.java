@@ -36,7 +36,7 @@ import com.google.inject.Module;
 public abstract class ResourceBase<U extends Resource, T extends ResourceCreator<U>> extends RealResourceBase {
 	
 	
-	ResourceInstanceCreator instanceModuleCreator;
+	ResourceInstanceCreator creator;
 	@Mock Injector injector;
 	
 	U resource;
@@ -71,7 +71,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		before();
 		
-		instanceModuleCreator = new ResourceInstanceCreator(injector, logger);
+		creator = new ResourceInstanceCreator(injector, logger);
 		
 		toTest = toTest();
 		

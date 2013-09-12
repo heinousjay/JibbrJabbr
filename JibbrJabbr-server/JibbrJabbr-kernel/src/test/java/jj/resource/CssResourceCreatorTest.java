@@ -36,13 +36,13 @@ import org.slf4j.Logger;
  */
 public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourceCreator> {
 	
-	private static final String BOX_ICON = "jj/images/box-icon.png";
-	private static final String ROX_ICON = "jj/resource/images/rox-icon.png";
-	private static final String SOX_ICON = "jj/resource/sox-icon.png";
+	private static final String BOX_ICON = "../jj/images/box-icon.png";
+	private static final String ROX_ICON = "../jj/resource/images/rox-icon.png";
+	private static final String SOX_ICON = "../jj/resource/sox-icon.png";
 	
 	@Override
 	protected String baseName() {
-		return "jj/resource/test.css";
+		return "../jj/resource/test.css";
 	}
 	
 	protected ResourceCacheKey cacheKey(String baseName) {
@@ -69,7 +69,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	
 	@Override
 	protected CssResourceCreator toTest() {
-		return new CssResourceCreator(configuration, lessProcessor, resourceFinder, logger, instanceModuleCreator);
+		return new CssResourceCreator(configuration, lessProcessor, resourceFinder, logger, creator);
 	}
 	
 	LessProcessor lessProcessor;
@@ -107,7 +107,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		
 		given(resourceFinder.loadResource(CssResource.class, baseName())).willReturn(testResource);
 		
-		StaticResourceCreator src = new StaticResourceCreator(configuration, instanceModuleCreator);
+		StaticResourceCreator src = new StaticResourceCreator(configuration, creator);
 		StaticResource box = make(src, BOX_ICON);
 		StaticResource rox = make(src, ROX_ICON);
 		StaticResource sox = make(src, SOX_ICON);
@@ -115,7 +115,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		given(resourceFinder.loadResource(StaticResource.class, ROX_ICON)).willReturn(rox);
 		given(resourceFinder.loadResource(StaticResource.class, SOX_ICON)).willReturn(sox);
 		
-		String replacement = "jj/resource/replacement.css";
+		String replacement = "../jj/resource/replacement.css";
 		
 		configureInjector(resource(replacement));
 		
@@ -134,10 +134,10 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		css.bytes().readBytes(bytes);
 		
 		// if this starts failing, maybe a dependency changed, so check the output
-		// System.out.println(css.bytes().toString(UTF_8));
+		// System.out.println(css.bytes().toString(java.nio.charset.StandardCharsets.UTF_8));
 		
 		assertThat(bytes, is(Files.readAllBytes(testResource.path().resolveSibling("url_replacement_output.txt"))));
 		
-		verify(logger).warn(anyString(), eq(css.baseName()), eq("jj/resource/not-found-thing.jpg"), eq("url(not-found-thing.jpg)"));
+		verify(logger).warn(anyString(), eq(css.baseName()), eq("../jj/resource/not-found-thing.jpg"), eq("url(not-found-thing.jpg)"));
 	}
 }

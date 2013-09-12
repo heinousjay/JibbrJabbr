@@ -55,6 +55,8 @@ public class EventConfiguringTypeListenerTest {
 		System.gc();
 		// it needs some small amount of time
 		Thread.sleep(200);
+		// verify the listeners are all unregistered so
+		// we aren't leaking memory
 		assertThat(pub.listenerMap.get(Event.class), is(empty()));
 	}
 	
@@ -97,6 +99,10 @@ public class EventConfiguringTypeListenerTest {
 		assertThat(childSub.heard, is(2));
 		assertThat(sub.heard, is(4));
 		assertThat(sub2.heard, is(1));
+		
+		// we should have three listeners registered at this point,
+		// and after they go out of scope we should have none
+		assertThat(pub.listenerMap.get(Event.class).size(), is(3));
 		
 		return pub;
 	}

@@ -13,36 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.event;
+package jj;
 
-import java.util.Map;
-import java.util.Set;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import javax.inject.Singleton;
+import jj.resource.RealResourceBase;
 
 /**
- * really just the way to hook the event listeners 
+ * lil static object to encapsulate the base path for testing
  * 
  * @author jason
  *
  */
-@Singleton
-class EventManager implements Publisher {
-	
-	private Map<Class<?>, Set<Invoker>> listenerMap;
-	
-	void listenerMap(Map<Class<?>, Set<Invoker>> listenerMap) {
-		this.listenerMap = listenerMap;
-	}
-	
-	@Override
-	public void publish(final Object event) {
-		for (Class<?> clazz : listenerMap.keySet()) {
-			if (clazz.isAssignableFrom(event.getClass())) {
-				for (Invoker invoker : listenerMap.get(clazz)) {
-					invoker.invoke(event);
-				}
-			}
-		}
+public class BasePath {
+
+	public static Path appPath() throws Exception {
+		return Paths.get(RealResourceBase.class.getResource("/app/config.js").toURI()).getParent();
 	}
 }

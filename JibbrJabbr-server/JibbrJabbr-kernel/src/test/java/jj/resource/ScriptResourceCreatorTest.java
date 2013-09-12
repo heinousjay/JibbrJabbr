@@ -40,7 +40,7 @@ public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, Scri
 
 	@Override
 	protected ScriptResourceCreator toTest() {
-		return new ScriptResourceCreator(configuration, instanceModuleCreator);
+		return new ScriptResourceCreator(configuration, creator);
 	}
 
 }

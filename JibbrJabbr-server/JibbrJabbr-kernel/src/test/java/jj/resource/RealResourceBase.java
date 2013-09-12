@@ -30,6 +30,7 @@ import io.netty.buffer.Unpooled;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import jj.BasePath;
 import jj.SHA1Helper;
 import jj.configuration.Configuration;
 import jj.http.server.servable.document.DocumentConfiguration;

@@ -40,7 +40,7 @@ public class StaticResourceCreatorTest extends ResourceBase<StaticResource, Stat
 
 	@Override
 	protected StaticResourceCreator toTest() {
-		return new StaticResourceCreator(configuration, instanceModuleCreator);
+		return new StaticResourceCreator(configuration, creator);
 	}
 
 }

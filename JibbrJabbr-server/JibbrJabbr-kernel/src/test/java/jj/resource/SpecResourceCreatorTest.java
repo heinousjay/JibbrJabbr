@@ -15,31 +15,41 @@
  */
 package jj.resource;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class AssetResourceCreatorTest extends ResourceBase<AssetResource, AssetResourceCreator> {
-	
+public class SpecResourceCreatorTest extends ResourceBase<SpecResource, SpecResourceCreator>{
+
 	@Override
 	protected String baseName() {
-		return AssetResource.JJ_JS;
+		return "its_a_spec.js";
 	}
-	
+
 	@Override
 	protected Path path() {
-		return AssetResourceCreator.appPath;
+		return appPath.resolveSibling("specs").resolve(baseName());
 	}
-	
+
 	@Override
-	protected AssetResource resource() throws Exception {
-		return new AssetResource(cacheKey(), path(), baseName());
+	protected SpecResource resource() throws Exception {
+		return new SpecResource(cacheKey(), baseName(), path());
 	}
-	
+
 	@Override
-	protected AssetResourceCreator toTest() {
-		return new AssetResourceCreator(creator);
+	protected SpecResourceCreator toTest() {
+		return new SpecResourceCreator(configuration, creator);
+	}
+
+	@Override
+	protected void resourceAssertions(SpecResource resource) throws Exception {
+		assertThat(resource.script().getBytes(UTF_8),  is(Files.readAllBytes(path())));
 	}
 }

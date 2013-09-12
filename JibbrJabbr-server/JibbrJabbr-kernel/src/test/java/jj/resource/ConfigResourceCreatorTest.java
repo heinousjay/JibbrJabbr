@@ -51,6 +51,6 @@ public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, Conf
 	
 	@Override
 	protected ConfigResourceCreator toTest() {
-		return new ConfigResourceCreator(configuration, instanceModuleCreator);
+		return new ConfigResourceCreator(configuration, creator);
 	}
 }

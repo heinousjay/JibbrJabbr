@@ -52,6 +52,8 @@ import com.google.inject.spi.TypeListener;
  *     can publish events to them
  * </ul> 
  * 
+ * That's a little light on the details but substantially correct.
+ * 
  * @author jason
  *
  */
@@ -63,6 +65,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 	private final ConcurrentMap<WeakReference<Object>, Invoker> cleanupMap = PlatformDependent.newConcurrentHashMap();
 	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
+	
 	private final ClassPool classPool = ClassPool.getDefault();
 	private final CtClass invokerClass;
 	private final CtMethod invokeMethod;
@@ -86,7 +89,8 @@ class EventConfiguringTypeListener implements TypeListener {
 							}
 						}
 					} catch (Exception e) {
-						System.err.println("unusual failure!!");
+						// this shouldn't happen
+						System.err.println("failure cleaning up references to event listeners!");
 						e.printStackTrace();
 					}
 				}
@@ -94,6 +98,7 @@ class EventConfiguringTypeListener implements TypeListener {
 			queueCleaner.setDaemon(true);
 			queueCleaner.start();
 		} catch (NotFoundException e) {
+			// this can't happen
 			throw new AssertionError(e);
 		}
 	}

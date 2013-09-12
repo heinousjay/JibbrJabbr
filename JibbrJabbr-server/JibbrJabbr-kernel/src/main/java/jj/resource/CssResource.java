@@ -61,7 +61,7 @@ public class CssResource extends AbstractResource implements LoadedResource {
 
 	@Override
 	public String mime() {
-		return "text/css; charset=UTF-8";
+		return MimeTypes.get(".css");
 	}
 	
 	@Override

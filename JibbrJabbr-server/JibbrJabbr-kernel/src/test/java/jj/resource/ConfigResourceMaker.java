@@ -17,6 +17,7 @@ package jj.resource;
 
 import java.nio.file.Path;
 
+import jj.BasePath;
 import jj.script.RealRhinoContextMaker;
 
 /**
