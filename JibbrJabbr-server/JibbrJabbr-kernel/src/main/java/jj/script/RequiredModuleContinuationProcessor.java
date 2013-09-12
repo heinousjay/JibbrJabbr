@@ -26,6 +26,7 @@ import jj.execution.JJRunnable;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
+import jj.resource.SpecResource;
 
 /**
  * @author jason
@@ -72,6 +73,9 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 				public void run() {
 					ScriptResource scriptResource = 
 						finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(path));
+					
+					// make sure the associated spec, if any, is also loaded
+					finder.loadResource(SpecResource.class, ScriptResourceType.Module.suffix(path));
 					
 					// at this point do we need to check if we got scooped? inside
 					// the script thread makes more sense really, if we check here

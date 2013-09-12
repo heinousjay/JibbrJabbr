@@ -147,6 +147,8 @@ public class ResourceWatchServiceImplTest {
 		sr1.dependsOn(sr2);
 		sr3.dependsOn(sr1);
 		sr4.dependsOn(sr1);
+		// and test circular dependency
+		sr1.dependsOn(sr4);
 		String name = "index";
 		HtmlResource hr = new HtmlResource(configuration, logger, MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
 		
@@ -166,6 +168,8 @@ public class ResourceWatchServiceImplTest {
 		sr1_2.dependsOn(sr1_1);
 		sr1_3.dependsOn(sr1_2);
 		sr1_4.dependsOn(sr1_2);
+		// and test circular dependency
+		sr1_1.dependsOn(sr1_4);
 		resourceCache.put(sr1_1.cacheKey(), sr1_1);
 		resourceCache.put(sr1_2.cacheKey(), sr1_2);
 		resourceCache.put(sr1_3.cacheKey(), sr1_3);

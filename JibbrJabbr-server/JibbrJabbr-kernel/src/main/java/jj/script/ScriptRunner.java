@@ -19,6 +19,7 @@ import jj.execution.ScriptExecutorFactory;
 import jj.execution.ScriptThread;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.jasmine.SpecRunner;
 
 /**
  * DO NOT DEPEND ON THIS CLASS, DEPEND ON {@link JJExecutors}
@@ -48,13 +49,16 @@ public class ScriptRunner {
 	
 	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
 	
+	private final SpecRunner specRunner;
+	
 	@Inject
 	ScriptRunner(
 		final ScriptBundleHelper scriptBundleHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
 		final ScriptExecutorFactory scriptExecutorFactory,
-		final Set<ContinuationProcessor> continuationProcessors
+		final Set<ContinuationProcessor> continuationProcessors,
+		final SpecRunner specRunner
 	) {
 		
 		// this class has a lot of dependencies, but it does
@@ -65,6 +69,7 @@ public class ScriptRunner {
 		this.context = context;
 		this.scriptExecutorFactory = scriptExecutorFactory;
 		this.continuationProcessors = makeContinuationProcessors(continuationProcessors);
+		this.specRunner = specRunner;
 	}
 	
 	private Map<ContinuationType, ContinuationProcessor> makeContinuationProcessors(final Set<ContinuationProcessor> continuationProcessors) {
@@ -261,6 +266,10 @@ public class ScriptRunner {
 				context.initialize(requiredModule, scriptBundle);
 				try {
 					moduleInitialExecution(requiredModule);
+					
+					// if successful, run the spec
+					specRunner.runSpecFor(scriptBundle.scriptResource());
+					
 				} finally {
 					context.end();
 				}

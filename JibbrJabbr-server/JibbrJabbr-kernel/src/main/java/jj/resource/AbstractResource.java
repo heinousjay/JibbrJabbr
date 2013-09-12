@@ -33,7 +33,7 @@ abstract class AbstractResource implements Resource {
 	
 	private final ResourceCacheKey cacheKey;
 	private final Set<AbstractResource> dependents = new HashSet<>();
-	private volatile boolean obselete = false;
+	private volatile boolean alive = true;
 	
 	AbstractResource(final ResourceCacheKey cacheKey) {
 		this.cacheKey = cacheKey;
@@ -42,12 +42,8 @@ abstract class AbstractResource implements Resource {
 	@IOThread
 	abstract boolean needsReplacing() throws IOException;
 	
-	final boolean isObselete() throws IOException {
-		return obselete || needsReplacing();
-	}
-	
-	final void markObselete() {
-		obselete = true;
+	boolean isObselete() throws IOException {
+		return !alive || needsReplacing();
 	}
 	
 	/**
@@ -60,6 +56,7 @@ abstract class AbstractResource implements Resource {
 	
 	@Override
 	public void dependsOn(Resource dependency) {
+		assert alive : "cannot depend, i am dead " + toString();
 		assert dependency != null : "can not depend on null";
 		assert dependency != this : "can not depend on myself";
 		((AbstractResource)dependency).dependents.add(this);
@@ -67,6 +64,14 @@ abstract class AbstractResource implements Resource {
 	
 	Set<AbstractResource> dependents() {
 		return Collections.unmodifiableSet(dependents);
+	}
+	
+	boolean alive() {
+		return alive;
+	}
+	
+	void kill() {
+		alive = false;
 	}
 	
 	ResourceCacheKey cacheKey() {

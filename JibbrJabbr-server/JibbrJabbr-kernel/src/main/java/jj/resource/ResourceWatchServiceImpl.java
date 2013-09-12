@@ -95,6 +95,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		private void remove(final AbstractResource resource) {
 			log.info("removing {}", resource);
 			if (resourceCache.remove(resource.cacheKey(), resource)) {
+				resource.kill();
 				for (AbstractResource dependent : resource.dependents()) {
 					reload(dependent);
 				}
@@ -104,7 +105,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		private void reload(final AbstractResource resource) {
 			// the resources are reloaded as a separate task so we don't clog up
 			// the reloader thread doing other work
-			resource.markObselete();
+			resource.kill();
 			executors.ioExecutor().submit(
 				new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
 				
@@ -122,7 +123,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 							resource.creationArgs()
 						);
 						for (AbstractResource dependent : resource.dependents()) {
-							reload(dependent);
+							if (dependent.alive()) reload(dependent);
 						}
 					}
 				}
