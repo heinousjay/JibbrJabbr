@@ -24,6 +24,7 @@ import java.util.Set;
 import jj.event.help.ChildSub;
 import jj.event.help.Event;
 import jj.event.help.EventSub;
+import jj.event.help.IEvent;
 import jj.event.help.Sub;
 
 import org.junit.Test;
@@ -59,16 +60,28 @@ public class EventSystemTest {
 		EventManagerChild pub = impl();
 		System.gc();
 		// it needs some small amount of time
-		Thread.sleep(200);
+		Thread.sleep(100);
 		// verify the listeners are all unregistered so
-		// we aren't leaking memory
+		// we aren't leaking memory, but we should still have
+		// sets for the event types
+		assertThat(pub.listenerMap.size(), is(3));
+		assertThat(pub.listenerMap.get(IEvent.class), is(empty()));
 		assertThat(pub.listenerMap.get(Event.class), is(empty()));
+		assertThat(pub.listenerMap.get(EventSub.class), is(empty()));
+		
+		// and publishing should not cause any exceptions at this point
+		pub.publish(new EventSub());
 	}
 	
 	private EventManagerChild impl() {
 		// given
 		Injector injector = Guice.createInjector(new EventModule());
 		EventManagerChild pub = injector.getInstance(EventManagerChild.class);
+		
+		// publishing with nothing listening is fine
+		pub.publish(new EventSub());
+		
+		
 		Sub sub = injector.getInstance(Sub.class);
 		
 		// when
@@ -92,8 +105,8 @@ public class EventSystemTest {
 		
 		// then
 		assertThat(childSub.heard, is(1));
-		assertThat(sub.heard, is(3));
 		assertThat(childSub.heard2, is(0));
+		assertThat(sub.heard, is(3));
 		
 		// given
 		Sub sub2 = injector.getInstance(Sub.class);
@@ -107,9 +120,15 @@ public class EventSystemTest {
 		assertThat(sub.heard, is(4));
 		assertThat(sub2.heard, is(1));
 		
-		// we should have three listeners registered at this point,
+		// we should have four listeners registered at this point,
 		// and after they go out of scope we should have none
-		assertThat(pub.listenerMap.get(Event.class).size(), is(3));
+		assertThat(pub.listenerMap.size(), is(3));
+		assertThat(pub.listenerMap.get(IEvent.class).size(), is(2));
+		assertThat(pub.listenerMap.get(Event.class).size(), is(1));
+		assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
+		
+		
+		//System.out.println(pub.listenerMap);
 		
 		return pub;
 	}

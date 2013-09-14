@@ -35,14 +35,22 @@ class EventManager implements Publisher {
 		this.listenerMap = listenerMap;
 	}
 	
-	@Override
-	public void publish(final Object event) {
-		for (Class<?> clazz : listenerMap.keySet()) {
-			if (clazz.isAssignableFrom(event.getClass())) {
+	private void invoke(final Object event, final Class<?> clazz) {
+		if (clazz != null && clazz != Object.class) {
+			if (listenerMap.containsKey(clazz)) {
 				for (Invoker invoker : listenerMap.get(clazz)) {
 					invoker.invoke(event);
 				}
 			}
+			for (Class<?> iface : clazz.getInterfaces()) {
+				invoke(event, iface);
+			}
+			invoke(event, clazz.getSuperclass());
 		}
+	}
+	
+	@Override
+	public void publish(final Object event) {
+		invoke(event, event.getClass());
 	}
 }

@@ -15,6 +15,10 @@
  */
 package jj.event.help;
 
-public class Event implements IEvent {
-	
+/**
+ * @author jason
+ *
+ */
+public interface IEvent {
+
 }
