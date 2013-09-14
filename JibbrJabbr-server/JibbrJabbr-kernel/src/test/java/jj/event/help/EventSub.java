@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.event;
+package jj.event.help;
 
 /**
- * The API into the generated listener invoking instances.
- * Implementing this statically doesn't do anything in this system.
  * @author jason
  *
  */
-public interface Invoker {
-	void invoke(Object arg);
+public class EventSub extends Event {
+
 }

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import jj.event.help.ChildSub;
 import jj.event.help.Event;
+import jj.event.help.EventSub;
 import jj.event.help.Sub;
 
 import org.junit.Test;
@@ -32,10 +33,14 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 /**
+ * doesn't really make sense to test the event stuff in isolation,
+ * since that'll just get mixed up in wild details.  test that it
+ * dispatches as desired and be happy
+ * 
  * @author jason
  *
  */
-public class EventConfiguringTypeListenerTest {
+public class EventSystemTest {
 	
 	public static class EventManagerChild extends EventManager {
 		Map<Class<?>, Set<Invoker>> listenerMap;
@@ -88,15 +93,17 @@ public class EventConfiguringTypeListenerTest {
 		// then
 		assertThat(childSub.heard, is(1));
 		assertThat(sub.heard, is(3));
+		assertThat(childSub.heard2, is(0));
 		
 		// given
 		Sub sub2 = injector.getInstance(Sub.class);
 		
 		// when
-		pub.publish(new Event());
+		pub.publish(new EventSub());
 		
 		// then
 		assertThat(childSub.heard, is(2));
+		assertThat(childSub.heard2, is(1));
 		assertThat(sub.heard, is(4));
 		assertThat(sub2.heard, is(1));
 		

@@ -24,8 +24,21 @@ public class ChildSub {
 	
 	public int heard = 0;
 	
+	public int heard2 = 0;
+	
+	@Listener
+	static void dontListen(Event event) {
+		throw new AssertionError();
+	}
+	
 	@Listener
 	void listen(Event event) {
 		++heard;
+	}
+	
+	@Listener
+	Object listen2(EventSub eventSub) {
+		++heard2;
+		return null;
 	}
 }

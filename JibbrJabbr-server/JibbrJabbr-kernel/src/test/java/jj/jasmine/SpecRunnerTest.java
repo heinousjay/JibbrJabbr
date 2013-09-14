@@ -31,8 +31,6 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author jason
  *
  */
-
-
 @RunWith(MockitoJUnitRunner.class)
 public class SpecRunnerTest {
 	
@@ -51,6 +49,8 @@ public class SpecRunnerTest {
 		
 		specRunner.runSpecFor(scriptResource);
 		
+		// need to be dependent upon each other so that changes to either cause
+		// things to get reloaded
 		verify(scriptResource).dependsOn(specResource);
 		verify(specResource).dependsOn(scriptResource);
 	}
