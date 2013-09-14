@@ -53,7 +53,7 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 						new JJRunnable("REST response with id [" + restRequest.id() + "]") {
 							
 							@Override
-							public void run() {
+							public void doRun() {
 								context.restore(scriptContext);
 								try {
 									executors

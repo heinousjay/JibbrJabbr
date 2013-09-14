@@ -32,8 +32,8 @@ import jj.execution.IOThread;
 abstract class AbstractResource implements Resource {
 	
 	private final ResourceCacheKey cacheKey;
-	private final Set<AbstractResource> dependents = new HashSet<>();
-	private volatile boolean alive = true;
+	final Set<AbstractResource> dependents = new HashSet<>();
+	volatile boolean alive = true;
 	
 	AbstractResource(final ResourceCacheKey cacheKey) {
 		this.cacheKey = cacheKey;
@@ -53,14 +53,6 @@ abstract class AbstractResource implements Resource {
 	 * @return
 	 */
 	abstract Object[] creationArgs();
-	
-	@Override
-	public void dependsOn(Resource dependency) {
-		assert alive : "cannot depend, i am dead " + toString();
-		assert dependency != null : "can not depend on null";
-		assert dependency != this : "can not depend on myself";
-		((AbstractResource)dependency).dependents.add(this);
-	}
 	
 	Set<AbstractResource> dependents() {
 		return Collections.unmodifiableSet(dependents);

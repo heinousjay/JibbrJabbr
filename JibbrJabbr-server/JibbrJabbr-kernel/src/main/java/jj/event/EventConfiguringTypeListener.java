@@ -41,6 +41,7 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 /**
+ * <p>
  * The heart of the event system.  Basically,
  * <ul>
  * <li>All bindings are introspected for a Subscriber annotation
@@ -53,12 +54,82 @@ import com.google.inject.spi.TypeListener;
  * </ul> 
  * 
  * That's a little light on the details but substantially correct.
- * 
+ * </p>
  * @author jason
  *
  */
 class EventConfiguringTypeListener implements TypeListener {
 	
+	/**
+	 * Cleans up invoker instances when their subject being invoked
+	 * is eligible for garbage collection
+	 * 
+	 * @author jason
+	 *
+	 */
+	private final class ListenerCleaner implements Runnable {
+		@Override
+		public void run() {
+			try {
+				while (true) {
+					Reference<?> reference = invokerInstanceQueue.remove();
+					Invoker instance = cleanupMap.remove(reference);
+					if (instance != null) {
+						for (Set<Invoker> invokerSet : invokers.values()) {
+							invokerSet.remove(instance);
+						}
+					}
+				}
+			} catch (Exception e) {
+				// this shouldn't happen
+				System.err.println("failure cleaning up references to event listeners!");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Wires event listeners to the publisher when an instance is being injected.
+	 * @author jason
+	 *
+	 * @param <I>
+	 */
+	private final class EventWiringInjectionListener<I> implements InjectionListener<I> {
+		@Override
+		public void afterInjection(I injectee) {
+			
+			if (injectee instanceof EventManager) {
+				// share state with the publisher
+				((EventManager)injectee).listenerMap(invokers);
+			} else if (subscribers.containsKey(injectee.getClass().getName())) {
+				// create an invoker class so we aren't doing this reflectively
+				for (CtMethod invoked : subscribers.get(injectee.getClass().getName())) {
+					
+					String className =
+						invoked.getDeclaringClass().getPackageName() +
+						".InvokerFor" +
+							invoked.getDeclaringClass().getSimpleName() +
+						"$" + invoked.getName() +
+						"$" + Integer.toHexString(invoked.hashCode());
+					
+					try {
+						
+						Class<?> clazz = invokerClasses.containsKey(className) ?
+							invokerClasses.get(className) :
+							makeInvokerClass(className, injectee, invoked);
+						
+						WeakReference<Object> reference = new WeakReference<Object>(injectee, invokerInstanceQueue);
+						Invoker invoker = (Invoker)clazz.getConstructor(WeakReference.class).newInstance(reference);
+						cleanupMap.put(reference, invoker);
+						invokers.get(Class.forName(invoked.getParameterTypes()[0].getName())).add(invoker);
+					} catch (Exception e) {
+						throw new AssertionError(e);
+					}
+				}
+			}
+		}
+	}
+
 	private final ConcurrentMap<String, List<CtMethod>> subscribers = PlatformDependent.newConcurrentHashMap();
 	private final ConcurrentMap<String, Class<?>> invokerClasses = PlatformDependent.newConcurrentHashMap();
 	private final ConcurrentMap<Class<?>, Set<Invoker>> invokers = PlatformDependent.newConcurrentHashMap();
@@ -74,27 +145,7 @@ class EventConfiguringTypeListener implements TypeListener {
 		try {
 			invokerClass = classPool.get("jj.event.Invoker");
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
-			Thread queueCleaner = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						while (true) {
-							Reference<?> reference = invokerInstanceQueue.remove();
-							Invoker instance = cleanupMap.remove(reference);
-							if (instance != null) {
-								for (Set<Invoker> invokerSet : invokers.values()) {
-									invokerSet.remove(instance);
-								}
-							}
-						}
-					} catch (Exception e) {
-						// this shouldn't happen
-						System.err.println("failure cleaning up references to event listeners!");
-						e.printStackTrace();
-					}
-				}
-			}, "Event System cleanup");
+			Thread queueCleaner = new Thread(new ListenerCleaner(), "Event System cleanup");
 			queueCleaner.setDaemon(true);
 			queueCleaner.start();
 		} catch (NotFoundException e) {
@@ -131,40 +182,7 @@ class EventConfiguringTypeListener implements TypeListener {
 			throw new AssertionError(type.toString(), e);
 		}
 		
-		encounter.register(new InjectionListener<I>() {
-
-			@Override
-			public void afterInjection(I injectee) {
-				
-				if (injectee instanceof EventManager) {
-					((EventManager)injectee).listenerMap(invokers);
-				} else if (subscribers.containsKey(injectee.getClass().getName())) {
-					for (CtMethod invoked : subscribers.get(injectee.getClass().getName())) {
-						
-						String className =
-							invoked.getDeclaringClass().getPackageName() +
-							".InvokerFor" +
-								invoked.getDeclaringClass().getSimpleName() +
-							"$" + invoked.getName() +
-							"$" + Integer.toHexString(invoked.hashCode());
-						
-						try {
-							
-							Class<?> clazz = invokerClasses.containsKey(className) ?
-								invokerClasses.get(className) :
-								makeInvokerClass(className, injectee, invoked);
-							
-							WeakReference<Object> reference = new WeakReference<Object>(injectee, invokerInstanceQueue);
-							Invoker invoker = (Invoker)clazz.getConstructor(WeakReference.class).newInstance(reference);
-							cleanupMap.put(reference, invoker);
-							invokers.get(Class.forName(invoked.getParameterTypes()[0].getName())).add(invoker);
-						} catch (Exception e) {
-							throw new AssertionError(e);
-						}
-					}
-				}
-			}
-		});
+		encounter.register(new EventWiringInjectionListener<I>());
 	}
 
 	private Class<?> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {

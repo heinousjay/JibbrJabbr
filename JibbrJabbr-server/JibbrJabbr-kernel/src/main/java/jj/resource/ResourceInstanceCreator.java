@@ -27,6 +27,7 @@ import jj.logging.EmergencyLogger;
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Injector;
+import com.google.inject.ProvisionException;
 
 /**
  * Handles instantiating Resource instances with full injection and common error handling.
@@ -82,7 +83,7 @@ class ResourceInstanceCreator {
 					}
 				).getInstance(type);
 				
-			} catch (CreationException ce) {
+			} catch (ProvisionException | CreationException ce) {
 				
 				Throwable cause = ce.getCause();
 				

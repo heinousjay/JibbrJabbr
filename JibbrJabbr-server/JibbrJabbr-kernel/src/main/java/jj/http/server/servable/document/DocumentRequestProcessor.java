@@ -145,7 +145,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 			executors.ioExecutor().submit(new JJRunnable("Document filtering requiring I/O") {
 				
 				@Override
-				public void run() {
+				public void doRun() {
 					try {
 						
 						executeFilters(ioFilters);

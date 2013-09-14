@@ -22,7 +22,7 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
-public abstract class AbstractFileResource extends AbstractResource {
+public abstract class AbstractFileResource extends AbstractResourceBase {
 	
 	// beyond this, we don't keep bytes
 	private static final long MAX_IN_MEMORY_SIZE  = 1000000;
@@ -160,7 +160,7 @@ public abstract class AbstractFileResource extends AbstractResource {
 	}
 	
 	@Override
-	public final String toString() {
+	public String toString() {
 		return toString;
 	}
 }

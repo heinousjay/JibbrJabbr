@@ -133,7 +133,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
 		executors.ioExecutor().submit(new JJRunnable("JJEngine core processing") {
 			@Override
-			public void run() {
+			public void doRun() {
 				try {
 					boolean found = false;
 					for (Servable<? extends Resource> servable : list) {

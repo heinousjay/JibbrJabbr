@@ -22,6 +22,8 @@ import jj.http.HttpResponse;
 import jj.http.server.JJWebSocketConnection;
 
 /**
+ * REPLACE THIS with events
+ * 
  * @author jason
  *
  */

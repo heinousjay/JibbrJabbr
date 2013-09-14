@@ -70,12 +70,9 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 			new JJRunnable("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
 			
 				@Override
-				public void run() {
+				public void doRun() {
 					ScriptResource scriptResource = 
 						finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(path));
-					
-					// make sure the associated spec, if any, is also loaded
-					finder.loadResource(SpecResource.class, ScriptResourceType.Module.suffix(path));
 					
 					// at this point do we need to check if we got scooped? inside
 					// the script thread makes more sense really, if we check here
@@ -86,6 +83,8 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 					// time, no biggy
 					
 					if (scriptResource != null) {
+						// make sure the associated spec, if any, is also loaded
+						finder.loadResource(SpecResource.class, scriptResource.baseName());
 						executors.scriptRunner().submit(requiredModule);
 					} else {
 						resumeContinuationAfterError(requiredModule, baseName, new RequiredModuleException(requiredModule.identifier()));
@@ -105,7 +104,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 			new JJRunnable("required module " + require.identifier() + " error result in [" + baseName + "]") {
 			
 				@Override
-				public void run() {
+				public void doRun() {
 					
 					context.restore(require.parentContext());
 					

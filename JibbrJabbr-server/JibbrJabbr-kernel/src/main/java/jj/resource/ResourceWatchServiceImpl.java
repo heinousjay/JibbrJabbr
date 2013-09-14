@@ -115,7 +115,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 					}
 
 					@Override
-					public void run() {
+					public void doRun() {
 						log.info("reloading {}", resource);
 						resourceFinder.loadResource(
 							resource.getClass(),
@@ -131,7 +131,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		}
 		
 		@Override
-		public void run() {
+		public void doRun() {
 			try {
 				// we're a daemon thread, run till we can't run no more
 				// or get interrupted, whichever comes first

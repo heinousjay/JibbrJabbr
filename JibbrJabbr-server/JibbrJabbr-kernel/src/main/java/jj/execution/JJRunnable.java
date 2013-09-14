@@ -18,7 +18,7 @@ public abstract class JJRunnable implements Runnable {
 	}
 	
 	@Override
-	public void run() {
+	public final void run() {
 		try {
 			doRun();
 		} catch (Throwable e) {

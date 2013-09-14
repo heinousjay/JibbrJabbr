@@ -18,6 +18,9 @@ package jj.jasmine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.SpecResource;
@@ -28,6 +31,8 @@ import jj.resource.SpecResource;
  */
 @Singleton
 public class SpecRunner {
+	
+	private final Logger logger = LoggerFactory.getLogger(SpecRunner.class);
 
 	private final ResourceFinder resourceFinder;
 	
@@ -40,7 +45,7 @@ public class SpecRunner {
 	}
 	
 	/**
-	 * It is assumed that the spec is already loaded before this is called
+	 * It is assumed that the spec is loaded when the original script is loaded
 	 * @param scriptResource
 	 */
 	public void runSpecFor(final ScriptResource scriptResource) {
@@ -48,8 +53,13 @@ public class SpecRunner {
 		SpecResource specResource = resourceFinder.findResource(SpecResource.class, scriptResource.baseName());
 		
 		if (specResource != null) {
+			
+			// make them depend on each other so updates will cause mutual destruction
+			
 			scriptResource.dependsOn(specResource);
 			specResource.dependsOn(scriptResource);
+			
+			logger.info("running a spec!");
 		}
 		
 	}

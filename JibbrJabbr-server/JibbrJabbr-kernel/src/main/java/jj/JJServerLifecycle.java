@@ -30,6 +30,7 @@ public class JJServerLifecycle {
 	
 	public void start() throws Exception {
 		log.info("starting the server");
+		// can't do this in the constructor because Guice gets unhappy about that.
 		ArrayList<JJServerStartupListener> listeners = new ArrayList<>(startupListeners);
 		Collections.sort(listeners, new Comparator<JJServerStartupListener>() {
 
@@ -38,18 +39,18 @@ public class JJServerLifecycle {
 				return l1.startPriority().compareTo(l2.startPriority());
 			}
 		});
-		for (JJServerStartupListener start: listeners) {
-			start.start();
+		for (JJServerStartupListener listener: listeners) {
+			listener.start();
 		}
 	}
 	
 	public void stop() {
 		log.info("stopping the server");
-		for (JJServerShutdownListener stop: shutdownListeners) {
+		for (JJServerShutdownListener listener: shutdownListeners) {
 			try {
-				stop.stop();
+				listener.stop();
 			} catch (Throwable t) {
-				log.error("{} threw on stop, ignoring", stop);
+				log.error("{} threw on stop, ignoring", listener);
 				log.error("", t);
 			}
 		}

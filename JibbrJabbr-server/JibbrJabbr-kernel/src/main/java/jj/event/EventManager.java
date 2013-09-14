@@ -21,7 +21,7 @@ import java.util.Set;
 import javax.inject.Singleton;
 
 /**
- * really just the way to hook the event listeners 
+ * Inject the Publisher to publish events.
  * 
  * @author jason
  *

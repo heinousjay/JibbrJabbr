@@ -42,6 +42,9 @@ class ResourceCreators implements Iterable<ResourceCreator<? extends Resource>> 
 
 		@SuppressWarnings("unchecked")
 		ResourceCreator<T> result = (ResourceCreator<T>)resourceCreators.get(type);
+		
+		assert(result != null) : "don't have a script creator that can make " + type;
+		
 		assert(result.type() == type);
 		
 		return result;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * manages scheduling, execution, and tracking of tasks in the system
+ * manages scheduling, execution, and tracking of tasks in the system.
  * 
  * @author jason
  *

@@ -21,7 +21,9 @@ import java.lang.annotation.Target;
 /**
  * Marks a method as an event listener.  The method
  * must take a single parameter, which is the event
- * type
+ * type.  The listener can be any access except private.
+ * It can return anything at all (including void),
+ * but the event system will disregard it.
  * 
  * @author jason
  *

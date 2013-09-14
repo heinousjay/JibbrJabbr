@@ -29,7 +29,7 @@ import jj.execution.IOThread;
  *
  */
 @Singleton
-public class CssResource extends AbstractResource implements LoadedResource {
+public class CssResource extends AbstractResourceBase implements LoadedResource {
 	
 	protected final String baseName;
 	protected final Path path;

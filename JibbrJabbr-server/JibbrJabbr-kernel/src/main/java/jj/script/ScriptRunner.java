@@ -163,7 +163,7 @@ public class ScriptRunner {
 		submit(baseName, new JJRunnable("document request [" + documentRequestProcessor + "]") {
 
 			@Override
-			public void run() {
+			public void doRun() {
 				
 				log.trace("preparing to execute document request {}", baseName);
 				
@@ -241,7 +241,7 @@ public class ScriptRunner {
 		submit(scriptBundle.baseName(), new JJRunnable("module parent resumption") {
 
 			@Override
-			public void run() {
+			public void doRun() {
 				log.debug("resuming module parent with exports");
 				context.restore(requiredModule.parentContext());
 				try {
@@ -260,7 +260,7 @@ public class ScriptRunner {
 		submit(baseName, new JJRunnable("module script initialization for [" + identifier + "]") {
 			
 			@Override
-			public void run() {
+			public void doRun() {
 				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
 				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
 				context.initialize(requiredModule, scriptBundle);
@@ -285,7 +285,7 @@ public class ScriptRunner {
 		submit(connection.baseName(), new JJRunnable("resuming continuation on [" + connection + "]") {
 			
 			@Override
-			public void run() {
+			public void doRun() {
 				context.initialize(connection);
 				try {
 					resumeContinuation(pendingKey, result);
@@ -315,7 +315,7 @@ public class ScriptRunner {
 		submit(connection.baseName(), new JJRunnable("host event on WebSocket connection") {
 
 			@Override
-			public void run() {
+			public void doRun() {
 				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
 				AssociatedScriptBundle bundle = connection.associatedScriptBundle();

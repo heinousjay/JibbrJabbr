@@ -41,6 +41,7 @@ public class ResourceModule extends JJModule {
 		resourceCreatorBinder.addBinding(HtmlResource.class).to(HtmlResourceCreator.class);
 		resourceCreatorBinder.addBinding(ScriptResource.class).to(ScriptResourceCreator.class);
 		resourceCreatorBinder.addBinding(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		resourceCreatorBinder.addBinding(SpecResource.class).to(SpecResourceCreator.class);
 		resourceCreatorBinder.addBinding(StaticResource.class).to(StaticResourceCreator.class);
 		resourceCreatorBinder.addBinding(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		

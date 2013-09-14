@@ -16,6 +16,9 @@
 package jj.event;
 
 /**
+ * Inject this to publish events.  Event objects can be literally anything.
+ * They should probably be immutable in most circumstances but it's not
+ * at all required.
  * @author jason
  *
  */
