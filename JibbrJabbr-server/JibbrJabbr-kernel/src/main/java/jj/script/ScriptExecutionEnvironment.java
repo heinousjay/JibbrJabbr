@@ -22,12 +22,25 @@ import org.mozilla.javascript.Scriptable;
  * @author jason
  *
  */
-public interface ScriptBundle {
+public interface ScriptExecutionEnvironment {
 
+	/**
+	 * The execution scope for the script
+	 * @return
+	 */
 	Scriptable scope();
 
+	/**
+	 * The script
+	 * @return
+	 */
 	Script script();
-
+	
+	/**
+	 * unique ID for the script, based on the resources that
+	 * compose the execution environment
+	 * @return
+	 */
 	String sha1();
 	
 	String scriptName();

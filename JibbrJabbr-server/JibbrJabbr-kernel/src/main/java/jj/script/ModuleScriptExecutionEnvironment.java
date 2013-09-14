@@ -22,7 +22,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
 /**
- * script bundle that represents the result of
+ * script execution environment that represents the result of
  * a require() call inside the script host.
  * these probably need to be keyed by the baseName +
  * the path the module, i'm pretty sure i want
@@ -30,7 +30,7 @@ import org.mozilla.javascript.Scriptable;
  * @author jason
  *
  */
-public class ModuleScriptBundle implements ScriptBundle {
+public class ModuleScriptExecutionEnvironment implements ScriptExecutionEnvironment {
 	
 	public static String makeKey(final String baseName, final String moduleIdentifier) {
 		return baseName + ":" + moduleIdentifier;
@@ -46,7 +46,7 @@ public class ModuleScriptBundle implements ScriptBundle {
 	private boolean initialized = false;
 	private boolean initializing = false;
 	
-	ModuleScriptBundle(
+	ModuleScriptExecutionEnvironment(
 		final ScriptResource scriptResource,
 		final Scriptable local,
 		final Script script,
@@ -123,7 +123,7 @@ public class ModuleScriptBundle implements ScriptBundle {
 	}
 	
 	public String toString() {
-		return new StringBuilder(ModuleScriptBundle.class.getName())
+		return new StringBuilder(ModuleScriptExecutionEnvironment.class.getName())
 			.append("[")
 			.append(baseName).append("/").append(scriptName())
 			.append("@").append(sha1())

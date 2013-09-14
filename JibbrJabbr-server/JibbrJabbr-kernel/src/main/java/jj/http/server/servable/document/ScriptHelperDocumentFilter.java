@@ -9,7 +9,7 @@ import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResourceType;
 import jj.script.CurrentScriptContext;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -56,8 +56,8 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	@Override
 	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
-		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle();
-		if (scriptBundle != null) {
+		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.associatedScriptExecutionEnvironment();
+		if (scriptExecutionEnvironment != null) {
 			
 			// internal version of jquery
 			// it's versioned already, so no need for sha-ing
@@ -68,7 +68,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				(documentRequestProcessor.httpRequest().secure() ? "s" : "") + 
 				"://" + 
 				documentRequestProcessor.httpRequest().host() + 
-				scriptBundle.toSocketUri();
+				scriptExecutionEnvironment.toSocketUri();
 			
 			Element jjScript = 
 				makeScriptTag(documentRequestProcessor.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())
@@ -86,11 +86,11 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			addScript(documentRequestProcessor.document(), jjScript);
 			
 			// associated scripts
-			if (scriptBundle.sharedScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptBundle.toUri()));
+			if (scriptExecutionEnvironment.sharedScriptResource() != null) {
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptExecutionEnvironment.toUri()));
 			}
-			if (scriptBundle.clientScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptBundle.toUri()));
+			if (scriptExecutionEnvironment.clientScriptResource() != null) {
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptExecutionEnvironment.toUri()));
 			}
 		}
 	}

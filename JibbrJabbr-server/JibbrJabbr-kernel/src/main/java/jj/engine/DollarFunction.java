@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 import jj.SelectorFormatException;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 import jj.script.ScriptRunner;
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.BaseFunction;
@@ -81,10 +81,10 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle();
+		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.associatedScriptExecutionEnvironment();
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
-			scriptBundle.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);
+			scriptExecutionEnvironment.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);
 			return this; 
 		}
 		
@@ -102,7 +102,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		
 		// warn that we are being called with something we don't recognize. see ConsString
 		// comments above for the argument why :D
-		log.warn("called with unrecognized argument set executing {}", scriptBundle.toUri());
+		log.warn("called with unrecognized argument set executing {}", scriptExecutionEnvironment.toUri());
 		for (Object arg : args) {
 			log.warn("{} of type {}", arg, arg == null ? "<null>" : arg.getClass());
 		}

@@ -39,7 +39,7 @@ public class ScriptRunner {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptRunner.class);
 	
-	private final ScriptBundleHelper scriptBundleHelper;
+	private final ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper;
 	
 	private final ContinuationCoordinator continuationCoordinator;
 	
@@ -53,7 +53,7 @@ public class ScriptRunner {
 	
 	@Inject
 	ScriptRunner(
-		final ScriptBundleHelper scriptBundleHelper,
+		final ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
 		final ScriptExecutorFactory scriptExecutorFactory,
@@ -64,7 +64,7 @@ public class ScriptRunner {
 		// this class has a lot of dependencies, but it does
 		// a very complicated job
 		
-		this.scriptBundleHelper = scriptBundleHelper;
+		this.scriptExecutionEnvironmentHelper = scriptExecutionEnvironmentHelper;
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
 		this.scriptExecutorFactory = scriptExecutorFactory;
@@ -85,10 +85,10 @@ public class ScriptRunner {
 		log.trace("performing initial execution of a document request");
 		context.documentRequestProcessor().startingInitialExecution();
 		final ContinuationState continuationState = 
-				continuationCoordinator.execute(context.associatedScriptBundle());
+				continuationCoordinator.execute(context.associatedScriptExecutionEnvironment());
 		
 		if (continuationState == null) {
-			context.associatedScriptBundle().initialized(true);
+			context.associatedScriptExecutionEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
@@ -99,13 +99,13 @@ public class ScriptRunner {
 
 	@ScriptThread
 	private void resumeHttpRequestInitialExecution(String pendingKey, Object result) {
-		log.trace("resuming initial execution of a script bundle");
+		log.trace("resuming initial execution of a script execution environment");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
+				continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result);
 		
 		if (continuationState == null) {
-			context.scriptBundle().initialized(true);
+			context.scriptExecutionEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
@@ -116,8 +116,8 @@ public class ScriptRunner {
 	
 	@ScriptThread
 	private void executeReadyFunction() {
-		AssociatedScriptBundle scriptBundle = context.associatedScriptBundle(); 
-		Callable ready = scriptBundle.getFunction(READY_FUNCTION_KEY);
+		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.associatedScriptExecutionEnvironment(); 
+		Callable ready = scriptExecutionEnvironment.getFunction(READY_FUNCTION_KEY);
 		if (ready == null) {
 			log.trace("no ready function found for this document. responding.");
 			context.documentRequestProcessor().respond();
@@ -126,7 +126,7 @@ public class ScriptRunner {
 			
 			context.documentRequestProcessor().startingReadyFunction();
 			final ContinuationState continuationState = 
-					continuationCoordinator.execute(scriptBundle, scriptBundle.getFunction(READY_FUNCTION_KEY));
+					continuationCoordinator.execute(scriptExecutionEnvironment, scriptExecutionEnvironment.getFunction(READY_FUNCTION_KEY));
 			
 			if (continuationState == null) {
 				log.trace("ready function execution - completed, serving document");
@@ -140,10 +140,10 @@ public class ScriptRunner {
 
 	@ScriptThread
 	private void resumeReadyFunction(String pendingKey, Object result) {
-		log.trace("resuming ready function execution of a script bundle");
+		log.trace("resuming ready function execution of a script execution environment");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.associatedScriptBundle(), result);
+				continuationCoordinator.resumeContinuation(pendingKey, context.associatedScriptExecutionEnvironment(), result);
 		
 		if (continuationState == null) {
 			log.trace("ready function execution - completed, serving document");
@@ -167,8 +167,8 @@ public class ScriptRunner {
 				
 				log.trace("preparing to execute document request {}", baseName);
 				
-				AssociatedScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName);
-				if (scriptBundle == null) {
+				DocumentScriptExecutionEnvironment scriptExecutionEnvironment = scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName);
+				if (scriptExecutionEnvironment == null) {
 					try {
 						context.initialize(documentRequestProcessor);
 						log.trace("no script to execute for this request, responding");
@@ -178,14 +178,14 @@ public class ScriptRunner {
 					}
 				} else {
 					
-					documentRequestProcessor.associatedScriptBundle(scriptBundle);
+					documentRequestProcessor.associatedScriptExecutionEnvironment(scriptExecutionEnvironment);
 					
 					try {
 						context.initialize(documentRequestProcessor);
 						
-						if (scriptBundle.initialized()) {
+						if (scriptExecutionEnvironment.initialized()) {
 							executeReadyFunction();
-						} else if (scriptBundle.initializing()) {
+						} else if (scriptExecutionEnvironment.initializing()) {
 							// just run us again
 							submit(baseName, this);
 						} else {
@@ -205,10 +205,10 @@ public class ScriptRunner {
 		log.debug("performing initial execution of a required module");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.execute(context.moduleScriptBundle());
+				continuationCoordinator.execute(context.moduleScriptExecutionEnvironment());
 		
 		if (continuationState == null) {
-			context.moduleScriptBundle().initialized(true);
+			context.moduleScriptExecutionEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			resumeModuleParent();
 		} else {
@@ -222,10 +222,10 @@ public class ScriptRunner {
 		log.debug("resuming initial execution of a required module");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.scriptBundle(), result);
+				continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result);
 		
 		if (continuationState == null) {
-			context.scriptBundle().initialized(true);
+			context.scriptExecutionEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			resumeModuleParent();
 		} else {
@@ -236,16 +236,16 @@ public class ScriptRunner {
 	
 	private void resumeModuleParent() {
 		final RequiredModule requiredModule = context.requiredModule();
-		final ModuleScriptBundle scriptBundle = context.moduleScriptBundle();
+		final ModuleScriptExecutionEnvironment scriptExecutionEnvironment = context.moduleScriptExecutionEnvironment();
 		
-		submit(scriptBundle.baseName(), new JJRunnable("module parent resumption") {
+		submit(scriptExecutionEnvironment.baseName(), new JJRunnable("module parent resumption") {
 
 			@Override
 			public void doRun() {
 				log.debug("resuming module parent with exports");
 				context.restore(requiredModule.parentContext());
 				try {
-					restartAfterContinuation(requiredModule.pendingKey(), scriptBundle.exports());
+					restartAfterContinuation(requiredModule.pendingKey(), scriptExecutionEnvironment.exports());
 				} finally {
 					context.end();
 				}
@@ -261,14 +261,14 @@ public class ScriptRunner {
 			
 			@Override
 			public void doRun() {
-				ModuleScriptBundle scriptBundle = scriptBundleHelper.scriptBundleFor(baseName, identifier);
-				assert !scriptBundle.initialized(): "attempting to reinitialize a required module";
-				context.initialize(requiredModule, scriptBundle);
+				ModuleScriptExecutionEnvironment scriptExecutionEnvironment = scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName, identifier);
+				assert !scriptExecutionEnvironment.initialized(): "attempting to reinitialize a required module";
+				context.initialize(requiredModule, scriptExecutionEnvironment);
 				try {
 					moduleInitialExecution(requiredModule);
 					
 					// if successful, run the spec
-					specRunner.runSpecFor(scriptBundle.scriptResource());
+					specRunner.runSpecFor(scriptExecutionEnvironment.scriptResource());
 					
 				} finally {
 					context.end();
@@ -301,7 +301,7 @@ public class ScriptRunner {
 		processContinuationState(
 			continuationCoordinator.resumeContinuation(
 				pendingKey,
-				context.scriptBundle(),
+				context.scriptExecutionEnvironment(),
 				result
 			)
 		);
@@ -318,12 +318,12 @@ public class ScriptRunner {
 			public void doRun() {
 				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
-				AssociatedScriptBundle bundle = connection.associatedScriptBundle();
+				DocumentScriptExecutionEnvironment executionEnvironment = connection.associatedScriptExecutionEnvironment();
 				Callable function = connection.getFunction(event);
-				if (function == null) function = bundle.getFunction(event);
+				if (function == null) function = executionEnvironment.getFunction(event);
 				try {
 					processContinuationState(
-						continuationCoordinator.execute(bundle, function, args)
+						continuationCoordinator.execute(executionEnvironment, function, args)
 					);
 				} finally {
 					context.end();
@@ -364,7 +364,7 @@ public class ScriptRunner {
 	void restartAfterContinuation(String pendingKey, Object result) {
 		
 		assert scriptExecutorFactory.isScriptThread() : "attempting to restart a continuation from the wrong thread";
-		assert context.scriptBundle() != null : "attempting to restart a continuation without a script context in place";
+		assert context.scriptExecutionEnvironment() != null : "attempting to restart a continuation without a script context in place";
 		
 		log.trace("restarting a continuation at {} with {}", pendingKey, result);
 		

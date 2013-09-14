@@ -35,70 +35,70 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ScriptBundleHelperTest {
+public class ScriptExecutionEnvironmentHelperTest {
 	
 	@Mock ResourceFinder finder;
-	ScriptBundles scriptBundles;
-	@Mock ScriptBundleCreator creator;
+	ScriptExecutionEnvironments scriptExecutionEnvironments;
+	@Mock ScriptExecutionEnvironmentCreator creator;
 	MockJJExecutors executors;
 	@Mock ScriptResource scriptResource;
 	@Mock ScriptResource scriptResource1;
 	@Mock ScriptResource scriptResource2;
-	@Mock ModuleScriptBundle moduleScriptBundle;
-	@Mock AssociatedScriptBundle associatedScriptBundle;
+	@Mock ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment;
+	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	
 	@Before
 	public void before() {
-		scriptBundles = new ScriptBundles();
+		scriptExecutionEnvironments = new ScriptExecutionEnvironments();
 		executors = new MockJJExecutors();
 	}
 
 	@Test
-	public void testFindModuleScriptBundle() {
+	public void testFindModuleScriptExecutionEnvironment() {
 		String baseName = "index";
 		String moduleIdentifier = "helpers/linkify";
 		
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(moduleIdentifier))).willReturn(scriptResource);
-		given(creator.createScriptBundle(scriptResource, moduleIdentifier, baseName)).willReturn(moduleScriptBundle);
+		given(creator.createScriptExecutionEnvironment(scriptResource, moduleIdentifier, baseName)).willReturn(moduleScriptExecutionEnvironment);
 		
-		ScriptBundleHelper underTest = new ScriptBundleHelper(finder, scriptBundles, creator, executors);
+		ScriptExecutionEnvironmentHelper underTest = new ScriptExecutionEnvironmentHelper(finder, scriptExecutionEnvironments, creator, executors);
 		
-		ModuleScriptBundle result = underTest.scriptBundleFor(baseName, moduleIdentifier);
+		ModuleScriptExecutionEnvironment result = underTest.scriptExecutionEnvironmentFor(baseName, moduleIdentifier);
 		
-		assertThat(result, is(moduleScriptBundle));
+		assertThat(result, is(moduleScriptExecutionEnvironment));
 	}
 
 	@Test
-	public void testFindModuleScriptBundle2() {
+	public void testFindModuleScriptExecutionEnvironment2() {
 		String baseName = "chat/index";
 		String moduleIdentifier = "helpers/linkify";
 		
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix("chat/helpers/linkify"))).willReturn(scriptResource);
-		given(creator.createScriptBundle(scriptResource, moduleIdentifier, baseName)).willReturn(moduleScriptBundle);
+		given(creator.createScriptExecutionEnvironment(scriptResource, moduleIdentifier, baseName)).willReturn(moduleScriptExecutionEnvironment);
 		
-		ScriptBundleHelper underTest = new ScriptBundleHelper(finder, scriptBundles, creator, executors);
+		ScriptExecutionEnvironmentHelper underTest = new ScriptExecutionEnvironmentHelper(finder, scriptExecutionEnvironments, creator, executors);
 		
-		ModuleScriptBundle result = underTest.scriptBundleFor(baseName, moduleIdentifier);
+		ModuleScriptExecutionEnvironment result = underTest.scriptExecutionEnvironmentFor(baseName, moduleIdentifier);
 		
-		assertThat(result, is(moduleScriptBundle));
+		assertThat(result, is(moduleScriptExecutionEnvironment));
 	}
 	
 	@Test
-	public void testFindAssociatedScriptBundle() {
+	public void testFindAssociatedScriptExecutionEnvironment() {
 		String baseName = "index";
 		
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Client.suffix("index"))).willReturn(scriptResource1);
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Shared.suffix("index"))).willReturn(null);
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Server.suffix("index"))).willReturn(scriptResource2);
 		
-		given(creator.createScriptBundle(scriptResource1, null, scriptResource2, baseName)).willReturn(associatedScriptBundle);
+		given(creator.createScriptExecutionEnvironment(scriptResource1, null, scriptResource2, baseName)).willReturn(associatedScriptExecutionEnvironment);
 		
 		executors.addThreadTypes(ThreadType.ScriptThread, 10);
 		
-		ScriptBundleHelper underTest = new ScriptBundleHelper(finder, scriptBundles, creator, executors);
+		ScriptExecutionEnvironmentHelper underTest = new ScriptExecutionEnvironmentHelper(finder, scriptExecutionEnvironments, creator, executors);
 		
-		AssociatedScriptBundle result = underTest.scriptBundleFor(baseName);
+		DocumentScriptExecutionEnvironment result = underTest.scriptExecutionEnvironmentFor(baseName);
 		
-		assertThat(result, is(associatedScriptBundle));
+		assertThat(result, is(associatedScriptExecutionEnvironment));
 	}
 }

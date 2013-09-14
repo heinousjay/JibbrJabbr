@@ -16,7 +16,7 @@ import jj.resource.ScriptResourceType;
  * @author jason
  * 
  */
-public class AssociatedScriptBundle implements ScriptBundle {
+public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnvironment {
 
 	private final ScriptResource clientScriptResource;
 
@@ -42,7 +42,7 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	 */
 	private final HashMap<String, Callable> functions = new HashMap<>();
 
-	AssociatedScriptBundle(
+	DocumentScriptExecutionEnvironment(
 		final ScriptResource clientScriptResource,
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource,
@@ -140,8 +140,8 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	}
 
 	public boolean equals(Object other) {
-		return other instanceof AssociatedScriptBundle && 
-			((AssociatedScriptBundle)other).toUri().equals(toUri());
+		return other instanceof DocumentScriptExecutionEnvironment && 
+			((DocumentScriptExecutionEnvironment)other).toUri().equals(toUri());
 	}
 
 	public int hashCode() {
@@ -157,7 +157,7 @@ public class AssociatedScriptBundle implements ScriptBundle {
 	}
 	
 	public String toString() {
-		return new StringBuilder(AssociatedScriptBundle.class.getName())
+		return new StringBuilder(DocumentScriptExecutionEnvironment.class.getName())
 			.append("[")
 			.append(baseName).append("/").append(scriptName())
 			.append("@").append(sha1())

@@ -13,7 +13,7 @@ import javax.inject.Singleton;
 
 import jj.DataStore;
 import jj.resource.HtmlResource;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 import jj.execution.ScriptThread;
@@ -55,7 +55,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	
 	private ArrayList<JJMessage> messages; 
 	
-	private AssociatedScriptBundle associatedScriptBundle;
+	private DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	
 	private volatile DocumentRequestState state = DocumentRequestState.Uninitialized;
 
@@ -188,7 +188,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	
 	public DocumentRequestProcessor startingInitialExecution() {
 		state = DocumentRequestState.InitialExecution;
-		associatedScriptBundle().initializing(true);
+		associatedScriptExecutionEnvironment().initializing(true);
 		return this;
 	}
 	
@@ -225,12 +225,12 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	}
 	
 	
-	public AssociatedScriptBundle associatedScriptBundle() {
-		return associatedScriptBundle;
+	public DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment() {
+		return associatedScriptExecutionEnvironment;
 	}
 	
-	public DocumentRequestProcessor associatedScriptBundle(AssociatedScriptBundle associatedScriptBundle) {
-		this.associatedScriptBundle = associatedScriptBundle;
+	public DocumentRequestProcessor associatedScriptExecutionEnvironment(DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment) {
+		this.associatedScriptExecutionEnvironment = associatedScriptExecutionEnvironment;
 		return this;
 	}
 	

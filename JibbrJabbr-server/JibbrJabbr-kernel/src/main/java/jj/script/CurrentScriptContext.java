@@ -45,22 +45,22 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get().type;
 	}
 	
-	public ScriptBundle scriptBundle() {
-		return moduleScriptBundle() != null ?
-			moduleScriptBundle() :
-			associatedScriptBundle();
+	public ScriptExecutionEnvironment scriptExecutionEnvironment() {
+		return moduleScriptExecutionEnvironment() != null ?
+			moduleScriptExecutionEnvironment() :
+			associatedScriptExecutionEnvironment();
 	}
 	
-	public ModuleScriptBundle moduleScriptBundle() {
-		return currentContext.get().moduleScriptBundle;
+	public ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment() {
+		return currentContext.get().moduleScriptExecutionEnvironment;
 	}
 	
-	public AssociatedScriptBundle associatedScriptBundle() {
-		return currentContext.get().associatedScriptBundle;
+	public DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment() {
+		return currentContext.get().associatedScriptExecutionEnvironment;
 	}
 	
 	public String baseName() {
-		return scriptBundle().baseName();
+		return scriptExecutionEnvironment().baseName();
 	}
 	
 	RequiredModule requiredModule() {
@@ -83,13 +83,13 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get().documentRequestProcessor.document();
 	}
 	
-	public ScriptContext initialize(final RequiredModule requiredModule, final ModuleScriptBundle moduleScriptBundle) {
-		currentContext.set(new ScriptContext(currentContext.get(), requiredModule, moduleScriptBundle));
+	public ScriptContext initialize(final RequiredModule requiredModule, final ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment) {
+		currentContext.set(new ScriptContext(currentContext.get(), requiredModule, moduleScriptExecutionEnvironment));
 		return currentContext.get();
 	}
 	
-	public ScriptContext initialize(final AssociatedScriptBundle associatedScriptBundle) {
-		currentContext.set(new ScriptContext(currentContext.get(), associatedScriptBundle));
+	public ScriptContext initialize(final DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment) {
+		currentContext.set(new ScriptContext(currentContext.get(), associatedScriptExecutionEnvironment));
 		return currentContext.get();
 	}
 	
@@ -120,10 +120,10 @@ public class CurrentScriptContext implements Closeable {
 			return documentRequestProcessor();
 		
 		case InternalExecution:
-			return associatedScriptBundle();
+			return associatedScriptExecutionEnvironment();
 			
 		case ModuleInitialization:
-			return moduleScriptBundle();
+			return moduleScriptExecutionEnvironment();
 			
 		case WebSocket:
 			return connection();

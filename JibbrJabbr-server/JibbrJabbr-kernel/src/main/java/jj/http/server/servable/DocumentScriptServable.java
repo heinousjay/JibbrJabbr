@@ -11,8 +11,8 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.resource.ScriptResource;
-import jj.script.AssociatedScriptBundle;
-import jj.script.ScriptBundleFinder;
+import jj.script.DocumentScriptExecutionEnvironment;
+import jj.script.ScriptExecutionEnvironmentFinder;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -20,27 +20,27 @@ import jj.http.HttpResponse;
 /**
  * handles serving the scripts associated with a document
  * request.  A special SHA key is generated to version a
- * particular group of scripts according to a bundle.
+ * particular group of scripts according to an execution environment.
  * @author jason
  *
  */
 @Singleton
-class AssociatedScriptServable extends Servable<ScriptResource> {
+class DocumentScriptServable extends Servable<ScriptResource> {
 	
-	private final ScriptBundleFinder finder;
+	private final ScriptExecutionEnvironmentFinder finder;
 
 	@Inject
-	AssociatedScriptServable(final Configuration configuration, final ScriptBundleFinder finder) {
+	DocumentScriptServable(final Configuration configuration, final ScriptExecutionEnvironmentFinder finder) {
 		super(configuration);
 		this.finder = finder;
 	}
 	
-	private ScriptResource typeFromBundle(AssociatedScriptBundle bundle, String typeSpec) {
+	private ScriptResource typeFromExecutionEnvironment(DocumentScriptExecutionEnvironment executionEnvironment, String typeSpec) {
 		ScriptResource result = null;
 		if (typeSpec == null) {
-			result = bundle.clientScriptResource();
+			result = executionEnvironment.clientScriptResource();
 		} else if ("shared".equals(typeSpec)) {
-			result = bundle.sharedScriptResource();
+			result = executionEnvironment.sharedScriptResource();
 		} 
 		return result;
 	}
@@ -83,9 +83,9 @@ class AssociatedScriptServable extends Servable<ScriptResource> {
 		Matcher typeMatcher = TYPE_PATTERN.matcher(match.baseName);
 		if (match.sha1 != null && typeMatcher.matches()) {
 			
-			AssociatedScriptBundle scriptBundle = finder.forURIMatch(match);
-			if (scriptBundle != null) {
-				result = typeFromBundle(scriptBundle, typeMatcher.group(2));
+			DocumentScriptExecutionEnvironment scriptExecutionEnvironment = finder.forURIMatch(match);
+			if (scriptExecutionEnvironment != null) {
+				result = typeFromExecutionEnvironment(scriptExecutionEnvironment, typeMatcher.group(2));
 			}
 		}
 		

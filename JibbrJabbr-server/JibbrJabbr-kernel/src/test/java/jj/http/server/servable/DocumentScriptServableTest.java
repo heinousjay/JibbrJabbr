@@ -20,8 +20,8 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
 import jj.resource.ScriptResource;
-import jj.script.AssociatedScriptBundle;
-import jj.script.ScriptBundleFinder;
+import jj.script.DocumentScriptExecutionEnvironment;
+import jj.script.ScriptExecutionEnvironmentFinder;
 import jj.uri.URIMatch;
 
 import org.junit.Before;
@@ -32,13 +32,13 @@ import org.mockito.Mock;
  * @author jason
  *
  */
-public class AssociatedScriptServableTest extends ServableTestBase {
+public class DocumentScriptServableTest extends ServableTestBase {
 	
 	static final String SHA1 = "1234567890123456789012345678901234567890";
 
-	AssociatedScriptServable as;
-	@Mock ScriptBundleFinder finder;
-	@Mock AssociatedScriptBundle bundle;
+	DocumentScriptServable as;
+	@Mock ScriptExecutionEnvironmentFinder finder;
+	@Mock DocumentScriptExecutionEnvironment executionEnvironment;
 	@Mock ScriptResource scriptResource1;
 	@Mock ScriptResource scriptResource2;
 	@Mock ScriptResource scriptResource3;
@@ -46,10 +46,10 @@ public class AssociatedScriptServableTest extends ServableTestBase {
 	
 	@Before
 	public void before() {
-		as = new AssociatedScriptServable(configuration, finder);
-		given(bundle.clientScriptResource()).willReturn(scriptResource1);
-		given(bundle.sharedScriptResource()).willReturn(scriptResource2);
-		given(bundle.serverScriptResource()).willReturn(scriptResource3);
+		as = new DocumentScriptServable(configuration, finder);
+		given(executionEnvironment.clientScriptResource()).willReturn(scriptResource1);
+		given(executionEnvironment.sharedScriptResource()).willReturn(scriptResource2);
+		given(executionEnvironment.serverScriptResource()).willReturn(scriptResource3);
 		
 		given(scriptResource1.sha1()).willReturn(SHA1);
 		given(scriptResource2.sha1()).willReturn(SHA1);
@@ -60,7 +60,7 @@ public class AssociatedScriptServableTest extends ServableTestBase {
 	private void configureMatch(String uri, boolean withValidationHeader) {
 		match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(finder.forURIMatch(match)).willReturn(bundle);
+		given(finder.forURIMatch(match)).willReturn(executionEnvironment);
 		
 		if (withValidationHeader) {
 			given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);

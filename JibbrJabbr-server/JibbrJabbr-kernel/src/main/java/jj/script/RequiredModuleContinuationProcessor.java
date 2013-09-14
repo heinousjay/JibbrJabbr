@@ -41,14 +41,14 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final ResourceFinder finder;
 	
-	private final ScriptBundleFinder scriptFinder;
+	private final ScriptExecutionEnvironmentFinder scriptFinder;
 	
 	@Inject
 	RequiredModuleContinuationProcessor(
 		final CurrentScriptContext context,
 		final JJExecutors executors,
 		final ResourceFinder finder,
-		final ScriptBundleFinder scriptFinder
+		final ScriptExecutionEnvironmentFinder scriptFinder
 	) {
 		this.context = context;
 		this.executors = executors;
@@ -125,15 +125,15 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		ScriptResource scriptResource = 
 			finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(requiredModule.identifier()));
 		
-		ModuleScriptBundle scriptBundle = 
+		ModuleScriptExecutionEnvironment scriptExecutionEnvironment = 
 			scriptFinder.forBaseNameAndModuleIdentifier(context.baseName(), requiredModule.identifier());
 		
 		// decision 1: do we need i/o?
 		if (scriptResource == null) {
 			loadScript(requiredModule);
 		}	
-		// decision 2: do we need to reinitialize the bundle?
-		else if (!scriptResource.sha1().equals(scriptBundle.sha1())) {
+		// decision 2: do we need to reinitialize the execution environment?
+		else if (!scriptResource.sha1().equals(scriptExecutionEnvironment.sha1())) {
 			executors.scriptRunner().submit(requiredModule);
 		}
 		// otherwise, just restart with the exports, we're already
@@ -141,7 +141,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		else {
 			executors.scriptRunner().restartAfterContinuation(
 				requiredModule.pendingKey(),
-				scriptBundle.exports()
+				scriptExecutionEnvironment.exports()
 			);
 		}
 		

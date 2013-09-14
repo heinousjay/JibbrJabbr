@@ -54,9 +54,9 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Script script;
 	
-	@Mock ScriptBundle scriptBundle;
+	@Mock ScriptExecutionEnvironment scriptExecutionEnvironment;
 	
-	@Mock AssociatedScriptBundle associatedScriptBundle;
+	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	
 	@Mock CurrentScriptContext currentScriptContext;
 	
@@ -79,13 +79,13 @@ public class ContinuationCoordinatorTest {
 	@Before
 	public void before() {
 		
-		given(scriptBundle.script()).willReturn(script);
-		given(scriptBundle.scope()).willReturn(scope);
-		given(scriptBundle.sha1()).willReturn(sha1);
+		given(scriptExecutionEnvironment.script()).willReturn(script);
+		given(scriptExecutionEnvironment.scope()).willReturn(scope);
+		given(scriptExecutionEnvironment.sha1()).willReturn(sha1);
 		
-		given(associatedScriptBundle.script()).willReturn(script);
-		given(associatedScriptBundle.scope()).willReturn(scope);
-		given(associatedScriptBundle.sha1()).willReturn(sha1);
+		given(associatedScriptExecutionEnvironment.script()).willReturn(script);
+		given(associatedScriptExecutionEnvironment.scope()).willReturn(scope);
+		given(associatedScriptExecutionEnvironment.sha1()).willReturn(sha1);
 		
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
@@ -97,7 +97,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testInitialExecutionNoContinuation() {
 		
-		ContinuationState result = continuationCoordinator.execute(scriptBundle);
+		ContinuationState result = continuationCoordinator.execute(scriptExecutionEnvironment);
 		
 		verify((ConstProperties)scope).putConst("scriptKey", scope, sha1);
 		
@@ -109,7 +109,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
 		
-		ContinuationState result = continuationCoordinator.execute(scriptBundle);
+		ContinuationState result = continuationCoordinator.execute(scriptExecutionEnvironment);
 
 		assertThat(result, is(continuationState));
 	}
@@ -123,9 +123,9 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(e);
 		
-		continuationCoordinator.execute(scriptBundle);
+		continuationCoordinator.execute(scriptExecutionEnvironment);
 		
-		verify(logger).error(logCaptor.capture(), eq(scriptBundle));
+		verify(logger).error(logCaptor.capture(), eq(scriptExecutionEnvironment));
 		verify(logger).error("", e);
 		
 		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));
@@ -134,7 +134,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testFunctionExecutionNoContinuation() {
 		
-		ContinuationState result = continuationCoordinator.execute(associatedScriptBundle, function, args[0], args[1]);
+		ContinuationState result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args[0], args[1]);
 		
 		assertThat(result, is(nullValue()));
 	}
@@ -144,7 +144,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
 		
-		ContinuationState result = continuationCoordinator.execute(associatedScriptBundle, function, args);
+		ContinuationState result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args);
 		
 		assertThat(result, is(continuationState));
 	}
@@ -158,9 +158,9 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(e);
 		
-		continuationCoordinator.execute(associatedScriptBundle, function);
+		continuationCoordinator.execute(associatedScriptExecutionEnvironment, function);
 		
-		verify(logger).error(logCaptor.capture(), eq(associatedScriptBundle));
+		verify(logger).error(logCaptor.capture(), eq(associatedScriptExecutionEnvironment));
 		verify(logger).error("", e);
 		
 		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));
@@ -171,7 +171,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
 		
-		ContinuationState result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptBundle, args);
+		ContinuationState result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
 		
 		assertThat(result, is(nullValue()));
 	}
@@ -183,7 +183,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
 		
-		ContinuationState result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptBundle, args);
+		ContinuationState result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
 		
 		assertThat(result, is(continuationState));
 	}
@@ -199,9 +199,9 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(e);
 		
-		continuationCoordinator.resumeContinuation(pendingKey, associatedScriptBundle, args);
+		continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
 		
-		verify(logger).error(logCaptor.capture(), eq(associatedScriptBundle));
+		verify(logger).error(logCaptor.capture(), eq(associatedScriptExecutionEnvironment));
 		verify(logger).error("", e);
 		
 		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));

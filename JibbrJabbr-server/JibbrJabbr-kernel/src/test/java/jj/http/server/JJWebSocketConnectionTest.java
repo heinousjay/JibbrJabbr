@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 
 import jj.execution.ExecutionTrace;
 import jj.jjmessage.JJMessage;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
@@ -49,7 +49,7 @@ public class JJWebSocketConnectionTest {
 	
 	@Mock ExecutionTrace trace;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
-	@Mock AssociatedScriptBundle scriptBundle;
+	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
 	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
 	@Captor ArgumentCaptor<CloseWebSocketFrame> closeFrameCaptor;
 	JJWebSocketConnection connection;
@@ -62,7 +62,7 @@ public class JJWebSocketConnectionTest {
 		
 		given(ctx.channel().remoteAddress()).willReturn(InetSocketAddress.createUnresolved("localhost", 8080));
 		
-		connection = new JJWebSocketConnection(trace, ctx, scriptBundle);
+		connection = new JJWebSocketConnection(trace, ctx, scriptExecutionEnvironment);
 	}
 
 	@Test

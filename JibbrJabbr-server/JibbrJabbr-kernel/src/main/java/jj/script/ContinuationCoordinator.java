@@ -40,52 +40,52 @@ class ContinuationCoordinator {
 		this.log = log;
 	}
 	
-	private void log(final Exception e, final ScriptBundle scriptBundle) {
-		log.error("unexpected problem during script execution {}", scriptBundle);
+	private void log(final Exception e, final ScriptExecutionEnvironment scriptExecutionEnvironment) {
+		log.error("unexpected problem during script execution {}", scriptExecutionEnvironment);
 		log.error("", e);
 	} 
 	
-	private ContinuationState execute(final ContinuationExecution execution, final ScriptBundle scriptBundle) {
+	private ContinuationState execute(final ContinuationExecution execution, final ScriptExecutionEnvironment scriptExecutionEnvironment) {
 		try (RhinoContext context = contextMaker.context()){
 			execution.run(context);
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
 		} catch (RuntimeException e) {
-			log(e, scriptBundle);
+			log(e, scriptExecutionEnvironment);
 		}
 		return null;
 	}
 	
 	/**
 	 * initial execution of a script, either associated to a document, or a required module
-	 * @param scriptBundle
+	 * @param scriptExecutionEnvironment
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(final ScriptBundle scriptBundle) {
+	ContinuationState execute(final ScriptExecutionEnvironment scriptExecutionEnvironment) {
 		
-		assert (scriptBundle != null) : "cannot execute without a script bundle";
+		assert (scriptExecutionEnvironment != null) : "cannot execute without a script execution environment";
 		
-		ScriptableObject.putConstProperty(scriptBundle.scope(), "scriptKey", scriptBundle.sha1());
+		ScriptableObject.putConstProperty(scriptExecutionEnvironment.scope(), "scriptKey", scriptExecutionEnvironment.sha1());
 		
 		return execute(new ContinuationExecution() {
 			
 			@Override
 			public void run(RhinoContext context) {
-				context.executeScriptWithContinuations(scriptBundle.script(), scriptBundle.scope());
+				context.executeScriptWithContinuations(scriptExecutionEnvironment.script(), scriptExecutionEnvironment.scope());
 			}
-		}, scriptBundle);
+		}, scriptExecutionEnvironment);
 	}
 	
 	/**
 	 * function execution within the context of script associated to a document
-	 * @param scriptBundle
+	 * @param scriptExecutionEnvironment
 	 * @param functionName
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(final AssociatedScriptBundle scriptBundle, final Callable function, final Object...args) {
+	ContinuationState execute(final DocumentScriptExecutionEnvironment scriptExecutionEnvironment, final Callable function, final Object...args) {
 		
-		assert (scriptBundle != null) : "cannot execute without a script bundle";
+		assert (scriptExecutionEnvironment != null) : "cannot execute without a script execution environment";
 		
 		if (function != null) {
 
@@ -93,13 +93,13 @@ class ContinuationCoordinator {
 				
 				@Override
 				public void run(RhinoContext context) {
-					context.callFunctionWithContinuations(function, scriptBundle.scope(), args);
+					context.callFunctionWithContinuations(function, scriptExecutionEnvironment.scope(), args);
 				}
-			}, scriptBundle);
+			}, scriptExecutionEnvironment);
 			
 		}
 		
-		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptBundle);
+		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptExecutionEnvironment);
 		log.error("helpful stacktrace", new Exception());
 		return null;
 	}
@@ -107,13 +107,13 @@ class ContinuationCoordinator {
 	/**
 	 * Resumes a continuation that was previously saved from an execution in this class
 	 * @param pendingKey
-	 * @param scriptBundle
+	 * @param scriptExecutionEnvironment
 	 * @param result
 	 * @return
 	 */
-	ContinuationState resumeContinuation(final String pendingKey, final ScriptBundle scriptBundle, final Object result) {
+	ContinuationState resumeContinuation(final String pendingKey, final ScriptExecutionEnvironment scriptExecutionEnvironment, final Object result) {
 		
-		assert (scriptBundle != null) : "cannot resume without a script bundle";
+		assert (scriptExecutionEnvironment != null) : "cannot resume without a script execution environment";
 		
 		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
 		if (continuation != null) {
@@ -122,12 +122,12 @@ class ContinuationCoordinator {
 				
 				@Override
 				public void run(RhinoContext context) {
-					context.resumeContinuation(continuation.getContinuation(), scriptBundle.scope(), result);
+					context.resumeContinuation(continuation.getContinuation(), scriptExecutionEnvironment.scope(), result);
 				}
-			}, scriptBundle);
+			}, scriptExecutionEnvironment);
 		}
 		
-		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptBundle, pendingKey);
+		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptExecutionEnvironment, pendingKey);
 		log.error("helpful stacktrace", new Exception());
 		return null;
 	}

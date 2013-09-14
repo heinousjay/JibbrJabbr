@@ -34,8 +34,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.AssociatedScriptBundle;
-import jj.script.ScriptBundleFinder;
+import jj.script.DocumentScriptExecutionEnvironment;
+import jj.script.ScriptExecutionEnvironmentFinder;
 import jj.uri.URIMatch;
 
 /**
@@ -47,7 +47,7 @@ class WebSocketConnectionMaker {
 	
 	private final WebSocketFrameHandlerCreator handlerCreator;
 	
-	private final ScriptBundleFinder scriptBundleFinder;
+	private final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder;
 	
 	private final ChannelHandlerContext ctx;
 	
@@ -58,13 +58,13 @@ class WebSocketConnectionMaker {
 	@Inject
 	WebSocketConnectionMaker(
 		final WebSocketFrameHandlerCreator handlerCreator,
-		final ScriptBundleFinder scriptBundleFinder,
+		final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder,
 		final ChannelHandlerContext ctx,
 		final FullHttpRequest request,
 		final WebSocketServerHandshakerFactory handshakerFactory
 	) {
 		this.handlerCreator = handlerCreator;
-		this.scriptBundleFinder = scriptBundleFinder;
+		this.scriptExecutionEnvironmentFinder = scriptExecutionEnvironmentFinder;
 		this.ctx = ctx;
 		this.request = request;
 		this.handshakerFactory = handshakerFactory;
@@ -93,9 +93,9 @@ class WebSocketConnectionMaker {
 				if (future.isSuccess()) {
 					
 					URIMatch uriMatch = new URIMatch(request.getUri());
-					final AssociatedScriptBundle scriptBundle = scriptBundleFinder.forURIMatch(uriMatch);
+					final DocumentScriptExecutionEnvironment scriptExecutionEnvironment = scriptExecutionEnvironmentFinder.forURIMatch(uriMatch);
 					
-					if (scriptBundle == null) {
+					if (scriptExecutionEnvironment == null) {
 						
 						ctx.writeAndFlush(new TextWebSocketFrame("jj-reload"))
 							.addListener(new ChannelFutureListener() {
@@ -112,7 +112,7 @@ class WebSocketConnectionMaker {
 						ctx.pipeline().replace(
 							JJEngine.toString(),
 							JJWebsocketHandler.toString(),
-							handlerCreator.createHandler(handshaker, scriptBundle)
+							handlerCreator.createHandler(handshaker, scriptExecutionEnvironment)
 						);
 					}
 					

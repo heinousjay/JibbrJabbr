@@ -19,31 +19,30 @@ import jj.execution.ScriptThread;
 import jj.resource.ScriptResource;
 
 /**
- * responsible for creating a script bundle, which includes compiling the
- * script in the host environment
+ * The factory.
  * @author jason
  *
  */
 @Singleton
-class ScriptBundleCreator {
+class ScriptExecutionEnvironmentCreator {
 	
 	private static final String EXPORTS = "exports";
 	
-	private final Logger log = LoggerFactory.getLogger(ScriptBundleCreator.class);
+	private final Logger log = LoggerFactory.getLogger(ScriptExecutionEnvironmentCreator.class);
 	
 	private final EngineAPI engineAPI;
 	
 	private final RhinoContextMaker contextMaker;
 	
 	@Inject
-	ScriptBundleCreator(final EngineAPI engineAPI, final RhinoContextMaker contextMaker) {
+	ScriptExecutionEnvironmentCreator(final EngineAPI engineAPI, final RhinoContextMaker contextMaker) {
 		this.engineAPI = engineAPI;
 		this.contextMaker = contextMaker;
 	}
 	
 	/**
-	 * create a module script bundle named by the given moduleIdentifier and
-	 * associated solely to the associated script named by the given baseName
+	 * create a module script execution environment named by the given moduleIdentifier and
+	 * associated to a parent script execution environment named by the given baseName
 	 * 
 	 * @param scriptResource the loaded script resource
 	 * @param moduleIdentifier the resolved module identifier
@@ -52,13 +51,13 @@ class ScriptBundleCreator {
 	 * @return
 	 */
 	@ScriptThread
-	ModuleScriptBundle createScriptBundle(
+	ModuleScriptExecutionEnvironment createScriptExecutionEnvironment(
 		final ScriptResource scriptResource,
 		final String moduleIdentifier,
 		final String baseName
 	) {
 		
-		log.info("creating module script bundle for {} associated to {}", moduleIdentifier, baseName);
+		log.info("creating module script execution environment for {} associated to {}", moduleIdentifier, baseName);
 		log.trace("script is {}", scriptResource);
 		
 		Scriptable local = createLocalScope(moduleIdentifier);
@@ -68,24 +67,22 @@ class ScriptBundleCreator {
 			ScriptableObject.defineProperty(local, EXPORTS, exports, ScriptableObject.CONST);
 		}
 		
-		Script script = compile(local, scriptResource);
+		Script script = compile(scriptResource);
 		
 		
-		return new ModuleScriptBundle(scriptResource, local, script, exports, moduleIdentifier, baseName);
+		return new ModuleScriptExecutionEnvironment(scriptResource, local, script, exports, moduleIdentifier, baseName);
 	}
 	
 	@ScriptThread
-	AssociatedScriptBundle createScriptBundle(
+	DocumentScriptExecutionEnvironment createScriptExecutionEnvironment(
 		final ScriptResource clientScriptResource,
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource,
 		final String baseName
 	) {
-		if (serverScriptResource == null) {
-			throw new IllegalArgumentException("null server script, nothing to do!");
-		}
+		assert (serverScriptResource != null) : "null server script, nothing to do!";
 		
-		log.info("creating associated script bundle for {}", baseName);
+		log.info("creating document script execution environment for {}", baseName);
 		log.trace("client script is {}", clientScriptResource);
 		log.trace("shared script is {}", sharedScriptResource);
 		log.trace("server script is {}", serverScriptResource);
@@ -102,7 +99,7 @@ class ScriptBundleCreator {
 			serverScriptResource
 		);
 		
-		return new AssociatedScriptBundle(
+		return new DocumentScriptExecutionEnvironment(
 			clientScriptResource,
 			sharedScriptResource,
 			serverScriptResource,
@@ -179,8 +176,8 @@ class ScriptBundleCreator {
 	}
 	
 	/**
-	 * compiles a set of scripts into a bundle.  any exceptions are noted and rethrown to
-	 * the top-level handler for the thread
+	 * compiles a set of script resources into a script, using the conventions of document processing.
+	 * any exceptions are noted and rethrown to the top-level handler for the thread.
 	 * @param local
 	 * @param clientStub
 	 * @param clientScriptResource
@@ -224,9 +221,14 @@ class ScriptBundleCreator {
 		}
 	}
 	
+	/**
+	 * Compiles a script resource 
+	 * @param local
+	 * @param scriptResource
+	 * @return
+	 */
 	@ScriptThread
 	private Script compile(
-		final Scriptable local,
 		final ScriptResource scriptResource
 	) {
 		

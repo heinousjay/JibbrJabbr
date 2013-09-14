@@ -46,7 +46,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock ResourceFinder finder;
 	
-	@Mock ScriptBundleFinder scriptFinder;
+	@Mock ScriptExecutionEnvironmentFinder scriptFinder;
 	
 	@Mock ContinuationState continuationState;
 	
@@ -58,7 +58,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock ScriptResource scriptResource;
 	
-	@Mock ModuleScriptBundle scriptBundle;
+	@Mock ModuleScriptExecutionEnvironment scriptExecutionEnvironment;
 	
 	@Before
 	public void before() {
@@ -105,10 +105,10 @@ public class RequiredModuleContinuationProcessorTest {
 		// given
 		Scriptable exports = mock(Scriptable.class);
 		
-		given(scriptBundle.exports()).willReturn(exports);
+		given(scriptExecutionEnvironment.exports()).willReturn(exports);
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
-		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptBundle);
-		given(scriptBundle.sha1()).willReturn("");
+		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptExecutionEnvironment);
+		given(scriptExecutionEnvironment.sha1()).willReturn("");
 		given(scriptResource.sha1()).willReturn("");
 		
 		// when
@@ -123,8 +123,8 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		// given
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
-		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptBundle);
-		given(scriptBundle.sha1()).willReturn("sha1");
+		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptExecutionEnvironment);
+		given(scriptExecutionEnvironment.sha1()).willReturn("sha1");
 		given(scriptResource.sha1()).willReturn("sha2");
 		
 		// when

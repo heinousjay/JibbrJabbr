@@ -37,7 +37,7 @@ import org.mozilla.javascript.ScriptableObject;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ScriptBundleCreatorTest {
+public class ScriptExecutionEnvironmentCreatorTest {
 	
 	String baseName;
 	
@@ -47,7 +47,7 @@ public class ScriptBundleCreatorTest {
 	
 	@Mock EngineAPI engineAPI;
 	
-	ScriptBundleCreator scriptBundleCreator;
+	ScriptExecutionEnvironmentCreator scriptExecutionEnvironmentCreator;
 	
 	ScriptableObject global;
 	
@@ -62,11 +62,11 @@ public class ScriptBundleCreatorTest {
 		
 		given(engineAPI.global()).willReturn(global);
 		
-		scriptBundleCreator = new ScriptBundleCreator(engineAPI, contextMaker);
+		scriptExecutionEnvironmentCreator = new ScriptExecutionEnvironmentCreator(engineAPI, contextMaker);
 	}
 
 	@Test
-	public void testModuleBundleCreation() {
+	public void testModuleExecutionEnvironmentCreation() {
 		
 		// given
 		final String moduleIdentifier = "helpers/messages";
@@ -78,7 +78,7 @@ public class ScriptBundleCreatorTest {
 		given(moduleScriptResource.path()).willReturn(Paths.get("/"));
 		
 		// when
-		ModuleScriptBundle result = scriptBundleCreator.createScriptBundle(moduleScriptResource, moduleIdentifier, baseName);
+		ModuleScriptExecutionEnvironment result = scriptExecutionEnvironmentCreator.createScriptExecutionEnvironment(moduleScriptResource, moduleIdentifier, baseName);
 		
 		// then
 		assertThat(result, is(notNullValue()));

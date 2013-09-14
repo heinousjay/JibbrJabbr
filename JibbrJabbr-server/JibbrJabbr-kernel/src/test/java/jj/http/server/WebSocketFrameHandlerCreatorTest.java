@@ -18,7 +18,7 @@ package jj.http.server;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class WebSocketFrameHandlerCreatorTest {
 	@InjectMocks WebSocketFrameHandlerCreator wsfhc;
 	
 	@Mock WebSocketServerHandshaker handshaker;
-	@Mock AssociatedScriptBundle scriptBundle;
+	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
 	
 	@Mock WebSocketFrameHandler handler;
 	
@@ -64,7 +64,7 @@ public class WebSocketFrameHandlerCreatorTest {
 		given(binder.bind(any(Class.class))).willReturn(abb);
 		
 		// when
-		WebSocketFrameHandler result = wsfhc.createHandler(handshaker, scriptBundle);
+		WebSocketFrameHandler result = wsfhc.createHandler(handshaker, scriptExecutionEnvironment);
 		
 		// then
 		assertThat(result, is(handler));
@@ -80,8 +80,8 @@ public class WebSocketFrameHandlerCreatorTest {
 		verify(binder).bind(WebSocketFrameHandler.class);
 		verify(binder).bind(WebSocketServerHandshaker.class);
 		verify(abb).toInstance(handshaker);
-		verify(binder).bind(AssociatedScriptBundle.class);
-		verify(abb).toInstance(scriptBundle);
+		verify(binder).bind(DocumentScriptExecutionEnvironment.class);
+		verify(abb).toInstance(scriptExecutionEnvironment);
 		
 		verifyNoMoreInteractions(binder, abb);
 		

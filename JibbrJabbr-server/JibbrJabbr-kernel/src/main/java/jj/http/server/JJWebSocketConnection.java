@@ -19,7 +19,7 @@ import jj.DataStore;
 import jj.DateFormatHelper;
 import jj.execution.ExecutionTrace;
 import jj.jjmessage.JJMessage;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 
 @Singleton
 public class JJWebSocketConnection implements DataStore {
@@ -32,7 +32,7 @@ public class JJWebSocketConnection implements DataStore {
 	
 	private final ChannelHandlerContext ctx;
 	
-	private final AssociatedScriptBundle scriptBundle;
+	private final DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
 	
 	private final HashMap<String, Object> data = new HashMap<>();
 	
@@ -48,11 +48,11 @@ public class JJWebSocketConnection implements DataStore {
 	JJWebSocketConnection(
 		final ExecutionTrace trace,
 		final ChannelHandlerContext ctx,
-		final AssociatedScriptBundle scriptBundle
+		final DocumentScriptExecutionEnvironment scriptExecutionEnvironment
 	) {
 		this.trace = trace;
 		this.ctx = ctx;
-		this.scriptBundle = scriptBundle;
+		this.scriptExecutionEnvironment = scriptExecutionEnvironment;
 		description = String.format(
 			"WebSocket connection to %s started at %s",
 			ctx.channel().remoteAddress(),
@@ -106,11 +106,11 @@ public class JJWebSocketConnection implements DataStore {
 	}
 	
 	public String baseName() {
-		return associatedScriptBundle().baseName();
+		return associatedScriptExecutionEnvironment().baseName();
 	}
 	
-	public AssociatedScriptBundle associatedScriptBundle() {
-		return scriptBundle;
+	public DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment() {
+		return scriptExecutionEnvironment;
 	}
 	
 	public Map<String, Object> clientStorage() {

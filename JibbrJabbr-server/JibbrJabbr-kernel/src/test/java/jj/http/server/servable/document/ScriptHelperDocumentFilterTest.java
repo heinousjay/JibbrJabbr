@@ -19,7 +19,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.ScriptResourceType;
 import jj.script.CurrentScriptContext;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -40,7 +40,7 @@ public class ScriptHelperDocumentFilterTest {
 	String socketUri;
 	String webSocketUri;
 	@Mock Configuration configuration;
-	@Mock AssociatedScriptBundle associatedScriptBundle;
+	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	@Mock CurrentScriptContext context;
 	@Mock ScriptResource scriptResource;
 	@Mock HttpRequest httpRequest;
@@ -59,10 +59,10 @@ public class ScriptHelperDocumentFilterTest {
 		socketUri = scriptUri + ".socket";
 		webSocketUri = "ws://localhost:8080" + socketUri;
 		
-		when(associatedScriptBundle.toUri()).thenReturn(scriptUri);
-		when(associatedScriptBundle.toSocketUri()).thenReturn(socketUri);
+		when(associatedScriptExecutionEnvironment.toUri()).thenReturn(scriptUri);
+		when(associatedScriptExecutionEnvironment.toSocketUri()).thenReturn(socketUri);
 		
-		when(context.associatedScriptBundle()).thenReturn(associatedScriptBundle);
+		when(context.associatedScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
 		when(context.httpRequest()).thenReturn(httpRequest);
 		when(context.documentRequestProcessor()).thenReturn(documentRequestProcessor);
 		
@@ -93,8 +93,8 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientAndSharedScriptsAddedWhenPresent() {
 		
 		// given
-		given(associatedScriptBundle.clientScriptResource()).willReturn(scriptResource);
-		given(associatedScriptBundle.sharedScriptResource()).willReturn(scriptResource);
+		given(associatedScriptExecutionEnvironment.clientScriptResource()).willReturn(scriptResource);
+		given(associatedScriptExecutionEnvironment.sharedScriptResource()).willReturn(scriptResource);
 		
 		// when
 		filter.filter(documentRequestProcessor);
@@ -112,7 +112,7 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientScriptIsAddedWhenPresentAndSharedScriptIsAbsent() {
 		
 		// given
-		given(associatedScriptBundle.clientScriptResource()).willReturn(scriptResource);
+		given(associatedScriptExecutionEnvironment.clientScriptResource()).willReturn(scriptResource);
 		
 		// when
 		filter.filter(documentRequestProcessor);
@@ -130,7 +130,7 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientScriptIsAddedWhenAbsentAndSharedScriptIsPresent() {
 		
 		// given
-		given(associatedScriptBundle.sharedScriptResource()).willReturn(scriptResource);
+		given(associatedScriptExecutionEnvironment.sharedScriptResource()).willReturn(scriptResource);
 		
 		//when
 		filter.filter(documentRequestProcessor);

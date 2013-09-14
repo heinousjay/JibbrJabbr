@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJServerStartupListener;
 import jj.execution.JJNioEventLoopGroup;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 
 /**
  * 
@@ -53,7 +53,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		new ConcurrentHashMap<>(16, 0.75F, 2);
 	
 	private final 
-	ConcurrentHashMap<AssociatedScriptBundle, ConcurrentHashMap<JJWebSocketConnection, Boolean>> 
+	ConcurrentHashMap<DocumentScriptExecutionEnvironment, ConcurrentHashMap<JJWebSocketConnection, Boolean>> 
 	perScript =
 		new ConcurrentHashMap<>();
 		
@@ -79,14 +79,14 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
 		
 		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
-			perScript.get(connection.associatedScriptBundle());
+			perScript.get(connection.associatedScriptExecutionEnvironment());
 		
 		if (connectionSet == null) {
 			perScript.putIfAbsent(
-				connection.associatedScriptBundle(),
+				connection.associatedScriptExecutionEnvironment(),
 				new ConcurrentHashMap<JJWebSocketConnection, Boolean>(16, 0.75F, 2)
 			);
-			connectionSet = perScript.get(connection.associatedScriptBundle());
+			connectionSet = perScript.get(connection.associatedScriptExecutionEnvironment());
 		}
 		connectionSet.putIfAbsent(connection, Boolean.TRUE);
 	}
@@ -96,16 +96,16 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		allConnections.remove(connection);
 		
 		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
-			perScript.get(connection.associatedScriptBundle());
+			perScript.get(connection.associatedScriptExecutionEnvironment());
 		
 		assert (connectionSet != null) : "couldn't find a connection set to remove a connection.  impossible!";
 		
 		connectionSet.remove(connection);
 	}
 	
-	public Set<JJWebSocketConnection> forScript(AssociatedScriptBundle scriptBundle) {
+	public Set<JJWebSocketConnection> forScript(DocumentScriptExecutionEnvironment scriptExecutionEnvironment) {
 		
-		ConcurrentHashMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptBundle);		
+		ConcurrentHashMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptExecutionEnvironment);		
 		
 		return (connections != null) ?
 			Collections.unmodifiableSet(connections.keySet()) :

@@ -23,7 +23,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.Set;
 
 import jj.execution.JJNioEventLoopGroup;
-import jj.script.AssociatedScriptBundle;
+import jj.script.DocumentScriptExecutionEnvironment;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,60 +46,60 @@ public class WebSocketConnectionTrackerTest {
 	@Mock JJWebSocketConnection connection1;
 	@Mock JJWebSocketConnection connection2;
 	
-	@Mock AssociatedScriptBundle scriptBundle1;
-	@Mock AssociatedScriptBundle scriptBundle2;
+	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment1;
+	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment2;
 	
 	@Captor ArgumentCaptor<Runnable> activityTrackerCaptor;
 	
 	@Test
 	public void testConnectionManagement() {
 
-		given(connection1.associatedScriptBundle()).willReturn(scriptBundle1);
-		given(connection2.associatedScriptBundle()).willReturn(scriptBundle2);
+		given(connection1.associatedScriptExecutionEnvironment()).willReturn(scriptExecutionEnvironment1);
+		given(connection2.associatedScriptExecutionEnvironment()).willReturn(scriptExecutionEnvironment2);
 		
 		wsct.addConnection(connection1);
 		wsct.addConnection(connection2);
 		
-		Set<JJWebSocketConnection> set = wsct.forScript(scriptBundle1);
+		Set<JJWebSocketConnection> set = wsct.forScript(scriptExecutionEnvironment1);
 		assertThat(set.size(), is(1));
 		assertThat(set.contains(connection1), is(true));
 		
-		set = wsct.forScript(scriptBundle2);
+		set = wsct.forScript(scriptExecutionEnvironment2);
 		assertThat(set.size(), is(1));
 		assertThat(set.contains(connection2), is(true));
 		
 		wsct.removeConnection(connection1);
-		set = wsct.forScript(scriptBundle1);
+		set = wsct.forScript(scriptExecutionEnvironment1);
 		assertTrue(set.isEmpty());
 		
 		wsct.removeConnection(connection2);
-		set = wsct.forScript(scriptBundle2);
+		set = wsct.forScript(scriptExecutionEnvironment2);
 		assertTrue(set.isEmpty());
 	}
 	
 	@Test
 	public void testConnectionManagement2() {
 
-		given(connection1.associatedScriptBundle()).willReturn(scriptBundle1);
-		given(connection2.associatedScriptBundle()).willReturn(scriptBundle1);
+		given(connection1.associatedScriptExecutionEnvironment()).willReturn(scriptExecutionEnvironment1);
+		given(connection2.associatedScriptExecutionEnvironment()).willReturn(scriptExecutionEnvironment1);
 		
 		wsct.addConnection(connection1);
 		wsct.addConnection(connection2);
 		
-		Set<JJWebSocketConnection> set = wsct.forScript(scriptBundle1);
+		Set<JJWebSocketConnection> set = wsct.forScript(scriptExecutionEnvironment1);
 		assertThat(set.size(), is(2));
 		assertThat(set.contains(connection1), is(true));
 		assertThat(set.contains(connection2), is(true));
 		
-		set = wsct.forScript(scriptBundle2);
+		set = wsct.forScript(scriptExecutionEnvironment2);
 		assertTrue(set.isEmpty());
 	}
 	
 	@Test
 	public void testActivityTracking() {
 
-		given(connection1.associatedScriptBundle()).willReturn(scriptBundle1);
-		given(connection2.associatedScriptBundle()).willReturn(scriptBundle1);
+		given(connection1.associatedScriptExecutionEnvironment()).willReturn(scriptExecutionEnvironment1);
+		given(connection2.associatedScriptExecutionEnvironment()).willReturn(scriptExecutionEnvironment1);
 		
 		// given
 		wsct.addConnection(connection1);

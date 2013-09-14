@@ -47,10 +47,10 @@ public class CurrentScriptContextTest {
 
 	CurrentScriptContext currentScriptContext;
 	
-	@Mock AssociatedScriptBundle associatedScriptBundle;
+	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	@Mock JJWebSocketConnection connection;
-	@Mock ModuleScriptBundle moduleScriptBundle;
+	@Mock ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment;
 	@Mock RequiredModule requiredModule;
 	JJMessage jjMessage;
 	
@@ -66,10 +66,10 @@ public class CurrentScriptContextTest {
 	}
 	
 	@Test
-	public void testAssociatedScriptBundlePrepareContinuation() {
+	public void testAssociatedScriptExecutionEnvironmentPrepareContinuation() {
 		
 		// given
-		currentScriptContext.initialize(associatedScriptBundle);
+		currentScriptContext.initialize(associatedScriptExecutionEnvironment);
 		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
 		boolean failed = false;
 		
@@ -119,7 +119,7 @@ public class CurrentScriptContextTest {
 	public void testRequiredModulePrepareContinuation() {
 		
 		// given
-		currentScriptContext.initialize(requiredModule, moduleScriptBundle);
+		currentScriptContext.initialize(requiredModule, moduleScriptExecutionEnvironment);
 		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
 		jjMessage = JJMessage.makeRetrieve("key");
 		

@@ -34,13 +34,13 @@ public class ScriptRunnerTest {
 	
 	Document document;
 	
-	@Mock AssociatedScriptBundle associatedScriptBundle;
+	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	
-	@Mock ModuleScriptBundle moduleScriptBundle;
+	@Mock ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment;
 		
 	@Mock ScriptResource scriptResource;
 	
-	@Mock ScriptBundleHelper scriptBundleHelper;
+	@Mock ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper;
 	
 	@Mock ContinuationCoordinator continuationCoordinator;
 	
@@ -75,9 +75,9 @@ public class ScriptRunnerTest {
 	@Before
 	public void before() {
 		
-		when(scriptBundleHelper.scriptBundleFor(baseName)).thenReturn(associatedScriptBundle);
+		when(scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName)).thenReturn(associatedScriptExecutionEnvironment);
 		
-		when(currentScriptContext.associatedScriptBundle()).thenReturn(associatedScriptBundle);
+		when(currentScriptContext.associatedScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
 		
 		executor = new DeterministicScheduler();
 		when(scriptExecutorFactory.executorFor(baseName)).thenReturn(executor);
@@ -92,7 +92,7 @@ public class ScriptRunnerTest {
 		continuationProcessors.add(continuationProcessor3);
 		
 		scriptRunner = new ScriptRunner(
-			scriptBundleHelper,
+			scriptExecutionEnvironmentHelper,
 			continuationCoordinator,
 			currentScriptContext,
 			scriptExecutorFactory,
@@ -106,7 +106,7 @@ public class ScriptRunnerTest {
 		when(documentRequestProcessor.document()).thenReturn(document);
 		
 		
-		when(associatedScriptBundle.getFunction(ScriptRunner.READY_FUNCTION_KEY)).thenReturn(eventFunction);
+		when(associatedScriptExecutionEnvironment.getFunction(ScriptRunner.READY_FUNCTION_KEY)).thenReturn(eventFunction);
 		
 		httpRequestContext = new ScriptContext(null, documentRequestProcessor);
 	}
@@ -122,7 +122,7 @@ public class ScriptRunnerTest {
 	public void testDocumentWithNoScript() {
 		
 		// given
-		given(scriptBundleHelper.scriptBundleFor(baseName)).willReturn(null);
+		given(scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName)).willReturn(null);
 		givenADocumentRequest();
 		
 		// when
@@ -153,8 +153,8 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringInitialization() {
 		
 		// given
-		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
-		given(continuationCoordinator.execute(associatedScriptBundle)).willReturn(continuationState);
+		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment)).willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		givenADocumentRequest();
 		
@@ -183,11 +183,11 @@ public class ScriptRunnerTest {
 	public void testInitialDocumentRequestWithRESTContinuationDuringReadyFunction() {
 		
 		// given
-		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
-		given(continuationCoordinator.execute(associatedScriptBundle, eventFunction))
+		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction))
 			.willReturn(continuationState);
 		
-		given(continuationCoordinator.execute(associatedScriptBundle, eventFunction))
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction))
 			.willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
@@ -217,7 +217,7 @@ public class ScriptRunnerTest {
 
 		given(connection.baseName()).willReturn(baseName);
 		given(connection.getFunction(any(String.class))).willReturn(eventFunction);
-		given(connection.associatedScriptBundle()).willReturn(associatedScriptBundle);
+		given(connection.associatedScriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
 		given(currentScriptContext.connection()).willReturn(connection);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.WebSocket);
 		
@@ -234,7 +234,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(associatedScriptBundle, eventFunction, connection);
+		verify(continuationCoordinator).execute(associatedScriptExecutionEnvironment, eventFunction, connection);
 	}
 	
 	@Test
@@ -242,10 +242,10 @@ public class ScriptRunnerTest {
 		
 		// given
 		givenAWebSocketMessage();
-		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
+		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
-		given(continuationCoordinator.execute(associatedScriptBundle, eventFunction, connection)).willReturn(continuationState);
-		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction, connection)).willReturn(continuationState);
+		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any()))
 			.willReturn(continuationState)
 			.willReturn(null);
 		
@@ -254,7 +254,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(associatedScriptBundle, eventFunction, connection);
+		verify(continuationCoordinator).execute(associatedScriptExecutionEnvironment, eventFunction, connection);
 		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
@@ -264,7 +264,7 @@ public class ScriptRunnerTest {
 		scriptRunner.restartAfterContinuation(null, null);
 		
 		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptBundle)any(), any());
+		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any());
 	}
 	
 	@Test
@@ -273,7 +273,7 @@ public class ScriptRunnerTest {
 		// given 
 		givenAWebSocketMessage();
 		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
-		given(associatedScriptBundle.getFunction(eventName)).willReturn(eventFunction);
+		given(associatedScriptExecutionEnvironment.getFunction(eventName)).willReturn(eventFunction);
 		given(connection.getFunction(eventName)).willReturn(null);
 		
 		// when
@@ -281,13 +281,13 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(associatedScriptBundle, eventFunction);
+		verify(continuationCoordinator).execute(associatedScriptExecutionEnvironment, eventFunction);
 		verify(connection).getFunction(eventName);
-		verify(associatedScriptBundle).getFunction(eventName);
+		verify(associatedScriptExecutionEnvironment).getFunction(eventName);
 
 		//given
 		eventName = EventNameHelper.makeEventName("jason", "miller", "rocks");
-		given(associatedScriptBundle.getFunction(eventName)).willReturn(null);
+		given(associatedScriptExecutionEnvironment.getFunction(eventName)).willReturn(null);
 		given(connection.getFunction(eventName)).willReturn(eventFunction);
 		
 		// when
@@ -295,9 +295,9 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator, times(2)).execute(associatedScriptBundle, eventFunction);
+		verify(continuationCoordinator, times(2)).execute(associatedScriptExecutionEnvironment, eventFunction);
 		verify(connection).getFunction(eventName);
-		verify(associatedScriptBundle, never()).getFunction(eventName);
+		verify(associatedScriptExecutionEnvironment, never()).getFunction(eventName);
 		
 	}
 	
@@ -313,7 +313,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(associatedScriptBundle, eventFunction);
+		verify(continuationCoordinator).execute(associatedScriptExecutionEnvironment, eventFunction);
 	}
 	
 	@Test
@@ -321,13 +321,13 @@ public class ScriptRunnerTest {
 		
 		// given
 		givenAWebSocketMessage();
-		given(currentScriptContext.scriptBundle()).willReturn(associatedScriptBundle);
+		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
 		
 		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
 		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
-		given(continuationCoordinator.execute(associatedScriptBundle, eventFunction)).willReturn(continuationState);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction)).willReturn(continuationState);
 		
-		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptBundle)any(), any()))
+		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any()))
 			.willReturn(continuationState)
 			.willReturn(null);
 		
@@ -336,7 +336,7 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(associatedScriptBundle, eventFunction);
+		verify(continuationCoordinator).execute(associatedScriptExecutionEnvironment, eventFunction);
 		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
@@ -346,7 +346,7 @@ public class ScriptRunnerTest {
 		scriptRunner.restartAfterContinuation(null, null);
 		
 		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptBundle)any(), any());
+		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any());
 	}
 	
 	@Test
@@ -366,12 +366,12 @@ public class ScriptRunnerTest {
 	}
 	
 	private RequiredModule givenAModuleRequire() {
-		given(moduleScriptBundle.initialized()).willReturn(false);
-		given(moduleScriptBundle.baseName()).willReturn(baseName);
+		given(moduleScriptExecutionEnvironment.initialized()).willReturn(false);
+		given(moduleScriptExecutionEnvironment.baseName()).willReturn(baseName);
 		given(currentScriptContext.baseName()).willReturn(baseName);
-		given(currentScriptContext.scriptBundle()).willReturn(moduleScriptBundle);
-		given(currentScriptContext.moduleScriptBundle()).willReturn(moduleScriptBundle);
-		given(scriptBundleHelper.scriptBundleFor(baseName, "module")).willReturn(moduleScriptBundle);
+		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(moduleScriptExecutionEnvironment);
+		given(currentScriptContext.moduleScriptExecutionEnvironment()).willReturn(moduleScriptExecutionEnvironment);
+		given(scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName, "module")).willReturn(moduleScriptExecutionEnvironment);
 		
 		RequiredModule requiredModule = new RequiredModule("module", currentScriptContext);
 		given(currentScriptContext.requiredModule()).willReturn(requiredModule);
@@ -389,7 +389,7 @@ public class ScriptRunnerTest {
 		executor.runNextPendingCommand();
 		
 		// then
-		verify(continuationCoordinator).execute(moduleScriptBundle);
+		verify(continuationCoordinator).execute(moduleScriptExecutionEnvironment);
 		
 		// given
 		given(currentScriptContext.type()).willReturn(ScriptContextType.DocumentRequest);
@@ -401,8 +401,8 @@ public class ScriptRunnerTest {
 		executor.runUntilIdle();
 		
 		// then
-		verify(moduleScriptBundle).initialized(true);
-		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptBundle, null);
+		verify(moduleScriptExecutionEnvironment).initialized(true);
+		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptExecutionEnvironment, null);
 	}
 	
 	@Test
@@ -410,7 +410,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		RequiredModule module = givenAModuleRequire();
-		given(continuationCoordinator.execute(moduleScriptBundle)).willReturn(continuationState);
+		given(continuationCoordinator.execute(moduleScriptExecutionEnvironment)).willReturn(continuationState);
 		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
 		
 		// when
@@ -418,19 +418,19 @@ public class ScriptRunnerTest {
 		executor.runNextPendingCommand();
 		
 		// then
-		verify(continuationCoordinator).execute(moduleScriptBundle);
+		verify(continuationCoordinator).execute(moduleScriptExecutionEnvironment);
 		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.ModuleInitialization);
-		given(continuationCoordinator.execute(moduleScriptBundle)).willReturn(null);
+		given(continuationCoordinator.execute(moduleScriptExecutionEnvironment)).willReturn(null);
 		
 		// when
 		scriptRunner.restartAfterContinuation("blah", null);
 		executor.runNextPendingCommand();
 		
 		// then
-		verify(continuationCoordinator).resumeContinuation("blah", moduleScriptBundle, null);
+		verify(continuationCoordinator).resumeContinuation("blah", moduleScriptExecutionEnvironment, null);
 		
 		// given
 		given(currentScriptContext.httpRequest()).willReturn(httpRequest);

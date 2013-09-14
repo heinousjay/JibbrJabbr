@@ -16,7 +16,7 @@ public class ServableModule extends JJModule {
 		// DocumentServable is always first
 		servables.addBinding().to(DocumentServable.class);
 		
-		servables.addBinding().to(AssociatedScriptServable.class);
+		servables.addBinding().to(DocumentScriptServable.class);
 		
 		servables.addBinding().to(CssServable.class);
 		

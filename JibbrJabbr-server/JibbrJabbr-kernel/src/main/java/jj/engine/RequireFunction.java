@@ -21,9 +21,9 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.script.CurrentScriptContext;
-import jj.script.ModuleScriptBundle;
+import jj.script.ModuleScriptExecutionEnvironment;
 import jj.script.RequiredModule;
-import jj.script.ScriptBundleFinder;
+import jj.script.ScriptExecutionEnvironmentFinder;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -43,19 +43,19 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 	
 	private final Configuration configuration;
 	private final CurrentScriptContext context;
-	private final ScriptBundleFinder scriptBundleFinder;
+	private final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
 	RequireFunction(
 		final Configuration configuration,
 		final CurrentScriptContext context,
-		final ScriptBundleFinder scriptBundleFinder,
+		final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder,
 		final ResourceFinder resourceFinder
 	) {
 		this.configuration = configuration;
 		this.context = context;
-		this.scriptBundleFinder = scriptBundleFinder;
+		this.scriptExecutionEnvironmentFinder = scriptExecutionEnvironmentFinder;
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -88,7 +88,7 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 		String moduleIdentifier = null;
 		if (input.startsWith(".")) {
 			
-			Object obj = ScriptableObject.getProperty(context.scriptBundle().scope(), "module");
+			Object obj = ScriptableObject.getProperty(context.scriptExecutionEnvironment().scope(), "module");
 			assert obj instanceof Scriptable : "'module' can't be found in the current execution scope, something wasn't built correctly";
 			
 			Scriptable module = (Scriptable)obj;
@@ -114,21 +114,22 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 		
 		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]));
 		
-		ModuleScriptBundle scriptBundle = scriptBundleFinder.forBaseNameAndModuleIdentifier(context.baseName(), moduleIdentifier);
+		ModuleScriptExecutionEnvironment scriptExecutionEnvironment = 
+			scriptExecutionEnvironmentFinder.forBaseNameAndModuleIdentifier(context.baseName(), moduleIdentifier);
 		
-		// if we have an up-to-date script bundle, just return exports,
+		// if we have an up-to-date script execution environment, just return exports,
 		// otherwise we need a continuation to start processing it properly,
 		// mainly because if we don't do this as its own top call, then any
 		// continuation inside the module will fail because there will be the
 		// pending top call caused by this function.  continuations are like
 		// violence, any problem can be solved by using MOAR!
 		
-		if (scriptBundle == null || 
-			resourceFinder.findResource(scriptBundle.scriptResource()) != scriptBundle.scriptResource()) {
+		if (scriptExecutionEnvironment == null || 
+			resourceFinder.findResource(scriptExecutionEnvironment.scriptResource()) != scriptExecutionEnvironment.scriptResource()) {
 			throw context.prepareContinuation(new RequiredModule(moduleIdentifier, context));
 		}
 		
-		return scriptBundle.exports();
+		return scriptExecutionEnvironment.exports();
 	}
 	
 	@Override

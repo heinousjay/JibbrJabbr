@@ -33,8 +33,8 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
-import jj.script.AssociatedScriptBundle;
-import jj.script.ScriptBundleFinder;
+import jj.script.DocumentScriptExecutionEnvironment;
+import jj.script.ScriptExecutionEnvironmentFinder;
 import jj.uri.URIMatch;
 
 import org.junit.Test;
@@ -54,8 +54,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class WebSocketConnectionMakerTest {
 	
 	@Mock WebSocketFrameHandlerCreator handlerCreator;
-	@Mock ScriptBundleFinder scriptBundleFinder;
-	@Mock AssociatedScriptBundle scriptBundle;
+	@Mock ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder;
+	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
 	@Mock Channel channel;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock ChannelFuture channelFuture;
@@ -88,14 +88,14 @@ public class WebSocketConnectionMakerTest {
 		// given
 		String uri = "uri";
 		given(request.getUri()).willReturn(uri);
-		given(scriptBundleFinder.forURIMatch(any(URIMatch.class))).willReturn(scriptBundle);
+		given(scriptExecutionEnvironmentFinder.forURIMatch(any(URIMatch.class))).willReturn(scriptExecutionEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when
 		futureListenerCaptor.getValue().operationComplete(channelFuture);
 		
 		// then
-		verify(handlerCreator).createHandler(handshaker, scriptBundle);
+		verify(handlerCreator).createHandler(handshaker, scriptExecutionEnvironment);
 		verify(ctx.pipeline()).replace(eq(JJEngine.toString()), eq(JJWebsocketHandler.toString()), channelHandler.capture());
 	}
 	
@@ -119,7 +119,7 @@ public class WebSocketConnectionMakerTest {
 	}
 	
 	@Test
-	public void testObseleteScriptBundleConnection() throws Exception {
+	public void testObseleteScriptExecutionEnvironmentConnection() throws Exception {
 		
 		// given
 		given(ctx.channel()).willReturn(channel);
@@ -135,7 +135,7 @@ public class WebSocketConnectionMakerTest {
 		// given
 		String uri = "uri";
 		given(request.getUri()).willReturn(uri);
-		given(scriptBundleFinder.forURIMatch(any(URIMatch.class))).willReturn(null);
+		given(scriptExecutionEnvironmentFinder.forURIMatch(any(URIMatch.class))).willReturn(null);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when
