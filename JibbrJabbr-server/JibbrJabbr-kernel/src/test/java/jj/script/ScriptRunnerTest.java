@@ -2,8 +2,8 @@ package jj.script;
 
 import static org.mockito.BDDMockito.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import jj.engine.HostEvent;
 import jj.execution.ScriptExecutorFactory;
@@ -79,14 +79,10 @@ public class ScriptRunnerTest {
 		executor = new DeterministicScheduler();
 		when(scriptExecutorFactory.executorFor(baseName)).thenReturn(executor);
 		
-		when(continuationProcessor1.type()).thenReturn(ContinuationType.AsyncHttpRequest);
-		when(continuationProcessor2.type()).thenReturn(ContinuationType.JJMessage);
-		when(continuationProcessor3.type()).thenReturn(ContinuationType.RequiredModule);
-		
-		Set<ContinuationProcessor> continuationProcessors = new HashSet<>();
-		continuationProcessors.add(continuationProcessor1);
-		continuationProcessors.add(continuationProcessor2);
-		continuationProcessors.add(continuationProcessor3);
+		Map<ContinuationType, ContinuationProcessor> continuationProcessors = new HashMap<>();
+		continuationProcessors.put(ContinuationType.AsyncHttpRequest, continuationProcessor1);
+		continuationProcessors.put(ContinuationType.JJMessage, continuationProcessor2);
+		continuationProcessors.put(ContinuationType.RequiredModule, continuationProcessor3);
 		
 		scriptRunner = new ScriptRunner(
 			scriptExecutionEnvironmentHelper,

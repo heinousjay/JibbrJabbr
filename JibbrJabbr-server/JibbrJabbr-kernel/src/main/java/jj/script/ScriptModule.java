@@ -1,8 +1,10 @@
 package jj.script;
 
+import static jj.script.ContinuationType.*;
+
 import jj.JJModule;
 
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.MapBinder;
 
 
 public class ScriptModule extends JJModule {
@@ -10,11 +12,13 @@ public class ScriptModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		Multibinder<ContinuationProcessor> continuationProcessors = 
-			Multibinder.newSetBinder(binder(), ContinuationProcessor.class);
-		continuationProcessors.addBinding().to(JJMessageContinuationProcessor.class);
-		continuationProcessors.addBinding().to(RestRequestContinuationProcessor.class);
-		continuationProcessors.addBinding().to(RequiredModuleContinuationProcessor.class);
 		
+		
+		MapBinder<ContinuationType, ContinuationProcessor> processors =
+			MapBinder.newMapBinder(binder(), ContinuationType.class, ContinuationProcessor.class);
+		
+		processors.addBinding(AsyncHttpRequest).to(RestRequestContinuationProcessor.class);
+		processors.addBinding(JJMessage).to(JJMessageContinuationProcessor.class);
+		processors.addBinding(RequiredModule).to(RequiredModuleContinuationProcessor.class);
 	}
 }

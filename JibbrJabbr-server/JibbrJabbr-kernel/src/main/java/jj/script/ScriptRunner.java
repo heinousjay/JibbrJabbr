@@ -1,10 +1,6 @@
 package jj.script;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -54,7 +50,7 @@ public class ScriptRunner {
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
 		final ScriptExecutorFactory scriptExecutorFactory,
-		final Set<ContinuationProcessor> continuationProcessors
+		final Map<ContinuationType, ContinuationProcessor> continuationProcessors
 	) {
 		
 		// this class has a lot of dependencies, but it does
@@ -64,15 +60,7 @@ public class ScriptRunner {
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
 		this.scriptExecutorFactory = scriptExecutorFactory;
-		this.continuationProcessors = makeContinuationProcessors(continuationProcessors);
-	}
-	
-	private Map<ContinuationType, ContinuationProcessor> makeContinuationProcessors(final Set<ContinuationProcessor> continuationProcessors) {
-		Map<ContinuationType, ContinuationProcessor> result = new HashMap<>();
-		for (ContinuationProcessor processor : continuationProcessors) {
-			result.put(processor.type(), processor);
-		}
-		return Collections.unmodifiableMap(result);
+		this.continuationProcessors = continuationProcessors;
 	}
 	
 	@ScriptThread

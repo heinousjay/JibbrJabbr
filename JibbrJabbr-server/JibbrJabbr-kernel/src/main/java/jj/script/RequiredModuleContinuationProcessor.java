@@ -55,11 +55,6 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		this.finder = finder;
 		this.scriptFinder = scriptFinder;
 	}
-
-	@Override
-	public ContinuationType type() {
-		return ContinuationType.RequiredModule;
-	}
 	
 	private void loadScript(final RequiredModule requiredModule) {
 		

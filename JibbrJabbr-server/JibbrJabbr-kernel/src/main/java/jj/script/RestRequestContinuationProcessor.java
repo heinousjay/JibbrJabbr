@@ -33,11 +33,6 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 		this.httpClient = httpClient;
 		this.executors = executors;
 	}
-	
-	@Override
-	public ContinuationType type() {
-		return ContinuationType.AsyncHttpRequest;
-	}
 
 	@Override
 	public void process(final ContinuationState continuationState) {

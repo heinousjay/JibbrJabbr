@@ -19,11 +19,6 @@ class JJMessageContinuationProcessor implements ContinuationProcessor {
 	}
 
 	@Override
-	public ContinuationType type() {
-		return ContinuationType.JJMessage;
-	}
-
-	@Override
 	public void process(ContinuationState continuationState) {
 		// not a lot to do here, these can only happen in the context
 		// of a connected WebSocket client, we we just send the message
