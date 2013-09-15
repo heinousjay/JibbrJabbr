@@ -49,8 +49,7 @@ public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 
 	@Override
 	public boolean canLoad(String name, Object... args) {
-		Path basePath = basePath();
-		return basePath != null && name.endsWith(".js");
+		return name.endsWith(".js");
 	}
 
 	@Override
@@ -65,15 +64,11 @@ public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 
 	@Override
 	Path path(String baseName, Object... args) {
-		return canLoad(baseName) ? basePath().resolve(baseName) : null;
+		return basePath().resolve(baseName);
 	}
 	
 	private Path basePath() {
-		try {
-			return configuration.appPath().resolveSibling("specs").toRealPath();
-		} catch (IOException e) {
-			return null;
-		}
+		return configuration.appPath().resolveSibling("specs");
 	}
 
 }

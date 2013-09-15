@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import jj.engine.DoCallFunction;
 import jj.engine.DoInvokeFunction;
 import jj.engine.EngineAPI;
+import jj.event.Publisher;
 import jj.execution.ScriptThread;
 import jj.resource.ScriptResource;
 
@@ -30,12 +31,19 @@ class ScriptExecutionEnvironmentCreator {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptExecutionEnvironmentCreator.class);
 	
+	private final Publisher publisher;
+	
 	private final EngineAPI engineAPI;
 	
 	private final RhinoContextMaker contextMaker;
 	
 	@Inject
-	ScriptExecutionEnvironmentCreator(final EngineAPI engineAPI, final RhinoContextMaker contextMaker) {
+	ScriptExecutionEnvironmentCreator(
+		final Publisher publisher,
+		final EngineAPI engineAPI,
+		final RhinoContextMaker contextMaker
+	) {
+		this.publisher = publisher;
 		this.engineAPI = engineAPI;
 		this.contextMaker = contextMaker;
 	}
@@ -70,7 +78,7 @@ class ScriptExecutionEnvironmentCreator {
 		Script script = compile(scriptResource);
 		
 		
-		return new ModuleScriptExecutionEnvironment(scriptResource, local, script, exports, moduleIdentifier, baseName);
+		return new ModuleScriptExecutionEnvironment(publisher, scriptResource, local, script, exports, moduleIdentifier, baseName);
 	}
 	
 	@ScriptThread
@@ -100,6 +108,7 @@ class ScriptExecutionEnvironmentCreator {
 		);
 		
 		return new DocumentScriptExecutionEnvironment(
+			publisher,
 			clientScriptResource,
 			sharedScriptResource,
 			serverScriptResource,

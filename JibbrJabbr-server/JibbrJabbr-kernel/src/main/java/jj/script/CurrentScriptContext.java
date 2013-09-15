@@ -48,14 +48,14 @@ public class CurrentScriptContext implements Closeable {
 	public ScriptExecutionEnvironment scriptExecutionEnvironment() {
 		return moduleScriptExecutionEnvironment() != null ?
 			moduleScriptExecutionEnvironment() :
-			associatedScriptExecutionEnvironment();
+			documentScriptExecutionEnvironment();
 	}
 	
 	public ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment() {
 		return currentContext.get().moduleScriptExecutionEnvironment;
 	}
 	
-	public DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment() {
+	public DocumentScriptExecutionEnvironment documentScriptExecutionEnvironment() {
 		return currentContext.get().associatedScriptExecutionEnvironment;
 	}
 	
@@ -120,7 +120,7 @@ public class CurrentScriptContext implements Closeable {
 			return documentRequestProcessor();
 		
 		case InternalExecution:
-			return associatedScriptExecutionEnvironment();
+			return documentScriptExecutionEnvironment();
 			
 		case ModuleInitialization:
 			return moduleScriptExecutionEnvironment();

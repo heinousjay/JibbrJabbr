@@ -11,7 +11,6 @@ import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.DocumentRequestState;
-import jj.jasmine.SpecRunner;
 import jj.resource.ScriptResource;
 
 import org.jmock.lib.concurrent.DeterministicScheduler;
@@ -68,8 +67,6 @@ public class ScriptRunnerTest {
 	
 	@Mock ContinuationProcessor continuationProcessor3;
 	
-	@Mock SpecRunner specRunner;
-	
 	ScriptContext httpRequestContext;
 	
 	@Before
@@ -77,7 +74,7 @@ public class ScriptRunnerTest {
 		
 		when(scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName)).thenReturn(associatedScriptExecutionEnvironment);
 		
-		when(currentScriptContext.associatedScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
+		when(currentScriptContext.documentScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
 		
 		executor = new DeterministicScheduler();
 		when(scriptExecutorFactory.executorFor(baseName)).thenReturn(executor);
@@ -96,8 +93,7 @@ public class ScriptRunnerTest {
 			continuationCoordinator,
 			currentScriptContext,
 			scriptExecutorFactory,
-			continuationProcessors,
-			specRunner
+			continuationProcessors
 		);
 		
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");

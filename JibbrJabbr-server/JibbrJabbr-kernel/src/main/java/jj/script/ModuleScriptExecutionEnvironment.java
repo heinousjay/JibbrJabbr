@@ -15,8 +15,8 @@
  */
 package jj.script;
 
+import jj.event.Publisher;
 import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
 
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
@@ -30,7 +30,7 @@ import org.mozilla.javascript.Scriptable;
  * @author jason
  *
  */
-public class ModuleScriptExecutionEnvironment implements ScriptExecutionEnvironment {
+public class ModuleScriptExecutionEnvironment extends AbstractScriptExecutionEnvironment {
 	
 	public static String makeKey(final String baseName, final String moduleIdentifier) {
 		return baseName + ":" + moduleIdentifier;
@@ -43,10 +43,8 @@ public class ModuleScriptExecutionEnvironment implements ScriptExecutionEnvironm
 	private final String moduleIdentifier;
 	private final String baseName;
 	
-	private boolean initialized = false;
-	private boolean initializing = false;
-	
 	ModuleScriptExecutionEnvironment(
+		final Publisher publisher,
 		final ScriptResource scriptResource,
 		final Scriptable local,
 		final Script script,
@@ -54,6 +52,7 @@ public class ModuleScriptExecutionEnvironment implements ScriptExecutionEnvironm
 		final String moduleIdentifier,
 		final String baseName
 	) {
+		super(publisher);
 		this.scriptResource = scriptResource;
 		this.local = local;
 		this.script = script;
@@ -88,49 +87,14 @@ public class ModuleScriptExecutionEnvironment implements ScriptExecutionEnvironm
 	
 	@Override
 	public String scriptName() {
-		return ScriptResourceType.Module.suffix(moduleIdentifier);
+		return scriptResource.baseName();
 	}
 
-	@Override
-	public boolean initialized() {
-		return initialized;
-	}
-
-	@Override
-	public void initialized(boolean initialized) {
-		this.initialized = initialized || this.initialized;
-		if (this.initialized) initializing = false;
-	}
-	
-	@Override
-	public boolean initializing() {
-		return initializing;
-	}
-	
-	@Override
-	public void initializing(boolean initializing) {
-		if (!this.initialized) {
-			this.initializing = initializing || this.initializing;
-		}
-	}
-	
 	public Scriptable exports() {
 		return exports;
 	}
 	
 	public ScriptResource scriptResource() {
 		return scriptResource;
-	}
-	
-	public String toString() {
-		return new StringBuilder(ModuleScriptExecutionEnvironment.class.getName())
-			.append("[")
-			.append(baseName).append("/").append(scriptName())
-			.append("@").append(sha1())
-			.append("] {")
-			.append("initialized=").append(initialized)
-			.append(", initializing=").append(initializing)
-			.append("}")
-			.toString();
 	}
 }

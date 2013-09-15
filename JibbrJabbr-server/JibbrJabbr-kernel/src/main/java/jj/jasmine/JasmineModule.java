@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.jasmine;
 
-import java.net.URI;
-import java.nio.file.Path;
+import jj.JJModule;
 
 /**
  * @author jason
  *
  */
-abstract class AbstractResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
+public class JasmineModule extends JJModule {
 
-	abstract Path path(final String baseName, final Object...args);
-	
 	@Override
-	public final ResourceCacheKey cacheKey(String baseName, Object...args) {
-		return new ResourceCacheKey(type(), path(baseName, args).toUri());
+	protected void configure() {
+		addStartupListenerBinding().to(SpecRunner.class);
 	}
-	
-	@Override
-	public final ResourceCacheKey cacheKey(URI uri) {
-		return new ResourceCacheKey(type(), uri);
-	}
+
 }

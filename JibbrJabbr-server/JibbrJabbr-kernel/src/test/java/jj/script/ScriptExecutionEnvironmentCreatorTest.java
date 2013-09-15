@@ -22,6 +22,7 @@ import static org.mockito.BDDMockito.*;
 import java.nio.file.Paths;
 
 import jj.engine.EngineAPI;
+import jj.event.Publisher;
 import jj.resource.ScriptResource;
 
 import org.junit.Before;
@@ -45,6 +46,8 @@ public class ScriptExecutionEnvironmentCreatorTest {
 	
 	RhinoContextMaker contextMaker;
 	
+	@Mock Publisher publisher;
+	
 	@Mock EngineAPI engineAPI;
 	
 	ScriptExecutionEnvironmentCreator scriptExecutionEnvironmentCreator;
@@ -62,7 +65,7 @@ public class ScriptExecutionEnvironmentCreatorTest {
 		
 		given(engineAPI.global()).willReturn(global);
 		
-		scriptExecutionEnvironmentCreator = new ScriptExecutionEnvironmentCreator(engineAPI, contextMaker);
+		scriptExecutionEnvironmentCreator = new ScriptExecutionEnvironmentCreator(publisher, engineAPI, contextMaker);
 	}
 
 	@Test

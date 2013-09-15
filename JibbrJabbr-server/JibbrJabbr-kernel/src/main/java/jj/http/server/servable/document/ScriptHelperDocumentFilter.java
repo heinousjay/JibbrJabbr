@@ -56,7 +56,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	@Override
 	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
-		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.associatedScriptExecutionEnvironment();
+		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.documentScriptExecutionEnvironment();
 		if (scriptExecutionEnvironment != null) {
 			
 			// internal version of jquery

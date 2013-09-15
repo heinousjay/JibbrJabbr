@@ -62,7 +62,7 @@ public class ScriptHelperDocumentFilterTest {
 		when(associatedScriptExecutionEnvironment.toUri()).thenReturn(scriptUri);
 		when(associatedScriptExecutionEnvironment.toSocketUri()).thenReturn(socketUri);
 		
-		when(context.associatedScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
+		when(context.documentScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
 		when(context.httpRequest()).thenReturn(httpRequest);
 		when(context.documentRequestProcessor()).thenReturn(documentRequestProcessor);
 		

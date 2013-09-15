@@ -81,7 +81,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.associatedScriptExecutionEnvironment();
+		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.documentScriptExecutionEnvironment();
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
 			scriptExecutionEnvironment.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);

@@ -21,6 +21,10 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.JJServerStartupListener;
+import jj.event.Listener;
+import jj.event.Subscriber;
+import jj.execution.events.ExecutionEnvironmentInitialized;
 import jj.resource.ResourceFinder;
 import jj.resource.ScriptResource;
 import jj.resource.SpecResource;
@@ -30,7 +34,8 @@ import jj.resource.SpecResource;
  *
  */
 @Singleton
-public class SpecRunner {
+@Subscriber
+public class SpecRunner implements JJServerStartupListener {
 	
 	private final Logger logger = LoggerFactory.getLogger(SpecRunner.class);
 
@@ -48,9 +53,11 @@ public class SpecRunner {
 	 * It is assumed that the spec is loaded when the original script is loaded
 	 * @param scriptResource
 	 */
-	public void runSpecFor(final ScriptResource scriptResource) {
-		
-		SpecResource specResource = resourceFinder.findResource(SpecResource.class, scriptResource.baseName());
+	@Listener
+	void findAndExecuteSpec(final ExecutionEnvironmentInitialized event) {
+		String name = event.executionEnvironment().scriptName();
+		ScriptResource scriptResource = resourceFinder.findResource(ScriptResource.class, name);
+		SpecResource specResource = resourceFinder.findResource(SpecResource.class, name);
 		
 		if (specResource != null) {
 			
@@ -61,7 +68,17 @@ public class SpecRunner {
 			
 			logger.info("running a spec!");
 		}
-		
 	}
 
+	@Override
+	public void start() throws Exception {
+		// really just to make sure we get created, otherwise nothing
+		// talks to us :D
+	}
+
+	@Override
+	public Priority startPriority() {
+		// doesn't really matter
+		return Priority.NearHighest;
+	}
 }

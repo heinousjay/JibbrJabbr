@@ -33,6 +33,7 @@ public class CoreModuleTest {
 		Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0], false)).getInstance(JJServerLifecycle.class);
 	}
 	
+	
 	@Test
 	public void testTestBuild() {
 

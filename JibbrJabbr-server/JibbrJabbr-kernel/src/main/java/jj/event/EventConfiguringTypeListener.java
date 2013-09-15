@@ -186,6 +186,9 @@ class EventConfiguringTypeListener implements TypeListener {
 	}
 
 	private Class<?> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
+		// shortcut!
+		if (classPool.getOrNull(className) != null) return Class.forName(className);
+		
 		CtClass newClass = classPool.makeClass(className);
 		newClass.addInterface(invokerClass);
 		newClass.addField(CtField.make("private final java.lang.ref.WeakReference instance;", newClass));

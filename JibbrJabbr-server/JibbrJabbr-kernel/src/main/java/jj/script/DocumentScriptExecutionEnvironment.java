@@ -6,8 +6,8 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
 import jj.SHA1Helper;
+import jj.event.Publisher;
 import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
 
 /**
  * contains all of the information to execute a set of scripts associated with
@@ -16,7 +16,7 @@ import jj.resource.ScriptResourceType;
  * @author jason
  * 
  */
-public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnvironment {
+public class DocumentScriptExecutionEnvironment extends AbstractScriptExecutionEnvironment {
 
 	private final ScriptResource clientScriptResource;
 
@@ -32,10 +32,6 @@ public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnviro
 
 	private final String baseName;
 
-	private boolean initialized;
-	
-	private boolean initializing;
-
 	/**
 	 * the callable functions found in this script organized by some sort of
 	 * externally meaningful name
@@ -43,6 +39,7 @@ public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnviro
 	private final HashMap<String, Callable> functions = new HashMap<>();
 
 	DocumentScriptExecutionEnvironment(
+		final Publisher publisher,
 		final ScriptResource clientScriptResource,
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource,
@@ -50,6 +47,7 @@ public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnviro
 		final Script script,
 		final String baseName
 	) {
+		super(publisher);
 		this.clientScriptResource = clientScriptResource;
 		this.sharedScriptResource = sharedScriptResource;
 		this.serverScriptResource = serverScriptResource;
@@ -97,7 +95,7 @@ public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnviro
 	
 	@Override
 	public String scriptName() {
-		return ScriptResourceType.Server.suffix(baseName);
+		return serverScriptResource.baseName();
 	}
 
 	public Callable getFunction(String name) {
@@ -116,29 +114,6 @@ public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnviro
 		return (functions.get(name) == function) && (functions.remove(name) == function);
 	}
 
-	@Override
-	public boolean initialized() {
-		return initialized;
-	}
-
-	@Override
-	public void initialized(boolean initialized) {
-		this.initialized = initialized || this.initialized;
-		if (this.initialized) initializing = false;
-	}
-	
-	@Override
-	public boolean initializing() {
-		return initializing;
-	}
-	
-	@Override
-	public void initializing(boolean initializing) {
-		if (!this.initialized) {
-			this.initializing = initializing || this.initializing;
-		}
-	}
-
 	public boolean equals(Object other) {
 		return other instanceof DocumentScriptExecutionEnvironment && 
 			((DocumentScriptExecutionEnvironment)other).toUri().equals(toUri());
@@ -154,17 +129,5 @@ public class DocumentScriptExecutionEnvironment implements ScriptExecutionEnviro
 
 	public String toSocketUri() {
 		return toUri() + ".socket";
-	}
-	
-	public String toString() {
-		return new StringBuilder(DocumentScriptExecutionEnvironment.class.getName())
-			.append("[")
-			.append(baseName).append("/").append(scriptName())
-			.append("@").append(sha1())
-			.append("] {")
-			.append("initialized=").append(initialized)
-			.append(", initializing=").append(initializing)
-			.append("}")
-			.toString();
 	}
 }

@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
-
-import java.net.URI;
-import java.nio.file.Path;
+package jj.script;
 
 /**
  * @author jason
  *
  */
-abstract class AbstractResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
-
-	abstract Path path(final String baseName, final Object...args);
-	
-	@Override
-	public final ResourceCacheKey cacheKey(String baseName, Object...args) {
-		return new ResourceCacheKey(type(), path(baseName, args).toUri());
-	}
-	
-	@Override
-	public final ResourceCacheKey cacheKey(URI uri) {
-		return new ResourceCacheKey(type(), uri);
-	}
+enum ScriptExecutionState {
+	Unitialized,
+	Initializing,
+	Initialized
 }

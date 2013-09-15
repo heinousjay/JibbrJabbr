@@ -19,7 +19,6 @@ import jj.execution.ScriptExecutorFactory;
 import jj.execution.ScriptThread;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.jasmine.SpecRunner;
 
 /**
  * DO NOT DEPEND ON THIS CLASS, DEPEND ON {@link JJExecutors}
@@ -49,16 +48,13 @@ public class ScriptRunner {
 	
 	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
 	
-	private final SpecRunner specRunner;
-	
 	@Inject
 	ScriptRunner(
 		final ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
 		final ScriptExecutorFactory scriptExecutorFactory,
-		final Set<ContinuationProcessor> continuationProcessors,
-		final SpecRunner specRunner
+		final Set<ContinuationProcessor> continuationProcessors
 	) {
 		
 		// this class has a lot of dependencies, but it does
@@ -69,7 +65,6 @@ public class ScriptRunner {
 		this.context = context;
 		this.scriptExecutorFactory = scriptExecutorFactory;
 		this.continuationProcessors = makeContinuationProcessors(continuationProcessors);
-		this.specRunner = specRunner;
 	}
 	
 	private Map<ContinuationType, ContinuationProcessor> makeContinuationProcessors(final Set<ContinuationProcessor> continuationProcessors) {
@@ -85,10 +80,10 @@ public class ScriptRunner {
 		log.trace("performing initial execution of a document request");
 		context.documentRequestProcessor().startingInitialExecution();
 		final ContinuationState continuationState = 
-				continuationCoordinator.execute(context.associatedScriptExecutionEnvironment());
+				continuationCoordinator.execute(context.documentScriptExecutionEnvironment());
 		
 		if (continuationState == null) {
-			context.associatedScriptExecutionEnvironment().initialized(true);
+			context.documentScriptExecutionEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		} else {
@@ -116,7 +111,7 @@ public class ScriptRunner {
 	
 	@ScriptThread
 	private void executeReadyFunction() {
-		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.associatedScriptExecutionEnvironment(); 
+		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.documentScriptExecutionEnvironment(); 
 		Callable ready = scriptExecutionEnvironment.getFunction(READY_FUNCTION_KEY);
 		if (ready == null) {
 			log.trace("no ready function found for this document. responding.");
@@ -143,7 +138,7 @@ public class ScriptRunner {
 		log.trace("resuming ready function execution of a script execution environment");
 		
 		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.associatedScriptExecutionEnvironment(), result);
+				continuationCoordinator.resumeContinuation(pendingKey, context.documentScriptExecutionEnvironment(), result);
 		
 		if (continuationState == null) {
 			log.trace("ready function execution - completed, serving document");
@@ -210,7 +205,7 @@ public class ScriptRunner {
 		if (continuationState == null) {
 			context.moduleScriptExecutionEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
-			resumeModuleParent();
+			completeModuleInitialization();
 		} else {
 			log.debug("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
@@ -227,14 +222,14 @@ public class ScriptRunner {
 		if (continuationState == null) {
 			context.scriptExecutionEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
-			resumeModuleParent();
+			completeModuleInitialization();
 		} else {
 			log.debug("initial execution - continuation. storing execution state");
 			processContinuationState(continuationState);
 		}
 	}
 	
-	private void resumeModuleParent() {
+	private void completeModuleInitialization() {
 		final RequiredModule requiredModule = context.requiredModule();
 		final ModuleScriptExecutionEnvironment scriptExecutionEnvironment = context.moduleScriptExecutionEnvironment();
 		
@@ -261,15 +256,12 @@ public class ScriptRunner {
 			
 			@Override
 			public void doRun() {
-				ModuleScriptExecutionEnvironment scriptExecutionEnvironment = scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName, identifier);
+				ModuleScriptExecutionEnvironment scriptExecutionEnvironment = 
+					scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName, identifier);
 				assert !scriptExecutionEnvironment.initialized(): "attempting to reinitialize a required module";
 				context.initialize(requiredModule, scriptExecutionEnvironment);
 				try {
 					moduleInitialExecution(requiredModule);
-					
-					// if successful, run the spec
-					specRunner.runSpecFor(scriptExecutionEnvironment.scriptResource());
-					
 				} finally {
 					context.end();
 				}

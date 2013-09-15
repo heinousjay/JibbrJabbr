@@ -23,6 +23,7 @@ import jj.conversion.ConversionModule;
 import jj.engine.HostApiModule;
 import jj.event.EventModule;
 import jj.execution.ExecutionModule;
+import jj.jasmine.JasmineModule;
 import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
@@ -74,6 +75,7 @@ public class CoreModule extends JJModule {
 		install(new ExecutionModule());
 		install(new HostApiModule());
 		install(new HttpModule(isTest));
+		install(new JasmineModule());
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
 	}
