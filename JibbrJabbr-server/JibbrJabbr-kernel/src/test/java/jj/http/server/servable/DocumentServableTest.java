@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import jj.resource.HtmlResource;
+import jj.resource.html.HtmlResource;
 import jj.uri.URIMatch;
 
 import org.junit.Before;

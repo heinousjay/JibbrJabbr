@@ -17,7 +17,7 @@ import jj.execution.ScriptExecutorFactory;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
-import jj.resource.HtmlResource;
+import jj.resource.html.HtmlResource;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;

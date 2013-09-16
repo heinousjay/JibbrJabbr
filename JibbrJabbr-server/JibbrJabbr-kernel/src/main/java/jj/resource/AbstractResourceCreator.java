@@ -22,9 +22,9 @@ import java.nio.file.Path;
  * @author jason
  *
  */
-abstract class AbstractResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
+public abstract class AbstractResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
 
-	abstract Path path(final String baseName, final Object...args);
+	protected abstract Path path(final String baseName, final Object...args);
 	
 	@Override
 	public final ResourceCacheKey cacheKey(String baseName, Object...args) {

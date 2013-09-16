@@ -18,7 +18,7 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static jj.resource.AssetResource.*;
+import static jj.resource.asset.AssetResource.*;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.JJ;
-import jj.resource.TestAssetResourceCreator;
+import jj.resource.asset.TestAssetResourceCreator;
 
 import org.junit.Ignore;
 import org.junit.Rule;

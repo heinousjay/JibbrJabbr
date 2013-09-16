@@ -18,7 +18,7 @@ package jj.http.server.servable;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import jj.resource.AssetResource;
+import jj.resource.asset.AssetResource;
 import jj.uri.URIMatch;
 
 import org.junit.Before;

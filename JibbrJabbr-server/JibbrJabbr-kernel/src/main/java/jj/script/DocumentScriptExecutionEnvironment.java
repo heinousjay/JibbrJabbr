@@ -7,7 +7,7 @@ import org.mozilla.javascript.Scriptable;
 
 import jj.SHA1Helper;
 import jj.event.Publisher;
-import jj.resource.ScriptResource;
+import jj.resource.script.ScriptResource;
 
 /**
  * contains all of the information to execute a set of scripts associated with

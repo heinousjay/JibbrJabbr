@@ -8,7 +8,7 @@ package jj.resource;
  */
 public abstract class AbstractResourceBase extends AbstractResource {
 
-	AbstractResourceBase(ResourceCacheKey cacheKey) {
+	protected AbstractResourceBase(ResourceCacheKey cacheKey) {
 		super(cacheKey);
 	}
 	

@@ -1,13 +1,14 @@
 package jj.http.server.servable.document;
 
-import static jj.resource.AssetResource.*;
+import static jj.resource.asset.AssetResource.*;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResourceType;
+import jj.resource.asset.AssetResource;
+import jj.resource.script.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 import jj.script.DocumentScriptExecutionEnvironment;
 

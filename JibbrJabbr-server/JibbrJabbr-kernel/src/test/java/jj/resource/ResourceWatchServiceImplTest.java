@@ -27,6 +27,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +38,10 @@ import jj.configuration.Configuration;
 import jj.execution.JJExecutors;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
+import jj.resource.html.HtmlResource;
+import jj.resource.html.HtmlResourceMaker;
+import jj.resource.stat.ic.StaticResource;
+import jj.resource.stat.ic.StaticResourceMaker;
 
 import org.junit.After;
 import org.junit.Before;
@@ -53,6 +60,7 @@ import org.slf4j.Logger;
  * @author jason
  *
  */
+@SuppressWarnings("unused")
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceWatchServiceImplTest {
 	
@@ -61,6 +69,8 @@ public class ResourceWatchServiceImplTest {
 	Path gibberish;
 	
 	@Mock Configuration configuration;
+	
+	ResourceMaker resourceMaker;
 	
 	ResourceCacheImpl resourceCache;
 	@Mock ResourceFinder resourceFinder;
@@ -86,6 +96,14 @@ public class ResourceWatchServiceImplTest {
 		
 		executorService = Executors.newFixedThreadPool(2);
 		given(executors.ioExecutor()).willReturn(executorService);
+		
+		resourceMaker = new ResourceMaker(configuration);
+		
+		Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> map = new HashMap<>();
+		map.put(StaticResource.class, StaticResourceMaker.fake(configuration));
+		map.put(HtmlResource.class, HtmlResourceMaker.fake(configuration));
+		
+		resourceCache = new ResourceCacheImpl(new ResourceCreators(map));
 	}
 	
 	@After
@@ -106,10 +124,6 @@ public class ResourceWatchServiceImplTest {
 		} while (newFileTime.compareTo(originalFileTime) < 1);
 		
 		Files.setLastModifiedTime(path, newFileTime);
-	}
-	
-	private StaticResource make(StaticResourceCreator src, String name) throws Exception {
-		return new StaticResource(src.cacheKey(name), configuration.appPath().resolve(name), name);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -133,47 +147,43 @@ public class ResourceWatchServiceImplTest {
 		
 		// all done in one test because it takes 10 seconds per run on the mac
 		
-		// given
-
-		resourceCache = new ResourceCacheImpl(MockResourceCreators.realized(configuration));
-		
 		// set up for replacements
 		
-		StaticResource sr = make(MockResourceCreators.src, "index.html");
-		StaticResource sr1 = make(MockResourceCreators.src, "url_replacement_output.txt");
-		StaticResource sr2 = make(MockResourceCreators.src, "sox-icon.png");
-		StaticResource sr3 = make(MockResourceCreators.src, "replacement.css");
-		StaticResource sr4 = make(MockResourceCreators.src, "images/rox-icon.png");
+		StaticResource sr = resourceMaker.makeStatic("index.html");
+		StaticResource sr1 = resourceMaker.makeStatic("url_replacement_output.txt");
+		StaticResource sr2 = resourceMaker.makeStatic("sox-icon.png");
+		StaticResource sr3 = resourceMaker.makeStatic("replacement.css");
+		StaticResource sr4 = resourceMaker.makeStatic("images/rox-icon.png");
 		sr1.dependsOn(sr2);
 		sr3.dependsOn(sr1);
 		sr4.dependsOn(sr1);
 		// and test circular dependency
 		sr1.dependsOn(sr4);
 		String name = "index";
-		HtmlResource hr = new HtmlResource(configuration, logger, MockResourceCreators.hrc.cacheKey(name), name, configuration.appPath().resolve(name + ".html"));
+		HtmlResource hr = resourceMaker.makeHtml(name);
 		
-		resourceCache.put(sr.cacheKey(), sr);
-		resourceCache.put(hr.cacheKey(), hr);
-		resourceCache.put(sr1.cacheKey(), sr1);
-		resourceCache.put(sr2.cacheKey(), sr2);
-		resourceCache.put(sr3.cacheKey(), sr3);
-		resourceCache.put(sr4.cacheKey(), sr4);
+		resourceCache.putIfAbsent(((AbstractResource)sr).cacheKey(), sr);
+		resourceCache.putIfAbsent(((AbstractResource)hr).cacheKey(), hr);
+		resourceCache.putIfAbsent(((AbstractResource)sr1).cacheKey(), sr1);
+		resourceCache.putIfAbsent(((AbstractResource)sr2).cacheKey(), sr2);
+		resourceCache.putIfAbsent(((AbstractResource)sr3).cacheKey(), sr3);
+		resourceCache.putIfAbsent(((AbstractResource)sr4).cacheKey(), sr4);
 		
 		// set up for removal
 		
-		StaticResource sr1_1 = make(MockResourceCreators.src, fileName);
-		StaticResource sr1_2 = make(MockResourceCreators.src, "test.css");
-		StaticResource sr1_3 = make(MockResourceCreators.src, "test.less");
-		StaticResource sr1_4 = make(MockResourceCreators.src, "test2.less");
+		StaticResource sr1_1 = resourceMaker.makeStatic(fileName);
+		StaticResource sr1_2 = resourceMaker.makeStatic("test.css");
+		StaticResource sr1_3 = resourceMaker.makeStatic("test.less");
+		StaticResource sr1_4 = resourceMaker.makeStatic("test2.less");
 		sr1_2.dependsOn(sr1_1);
 		sr1_3.dependsOn(sr1_2);
 		sr1_4.dependsOn(sr1_2);
 		// and test circular dependency
 		sr1_1.dependsOn(sr1_4);
-		resourceCache.put(sr1_1.cacheKey(), sr1_1);
-		resourceCache.put(sr1_2.cacheKey(), sr1_2);
-		resourceCache.put(sr1_3.cacheKey(), sr1_3);
-		resourceCache.put(sr1_4.cacheKey(), sr1_4);
+		resourceCache.putIfAbsent(((AbstractResource)sr1_1).cacheKey(), sr1_1);
+		resourceCache.putIfAbsent(((AbstractResource)sr1_2).cacheKey(), sr1_2);
+		resourceCache.putIfAbsent(((AbstractResource)sr1_3).cacheKey(), sr1_3);
+		resourceCache.putIfAbsent(((AbstractResource)sr1_4).cacheKey(), sr1_4);
 		
 		int fileCount = resourceCache.size() - 1;
 		
@@ -213,12 +223,12 @@ public class ResourceWatchServiceImplTest {
 		
 		// replacement checks
 		
-		assertTrue(hr.isObselete());
-		assertTrue(sr.isObselete());
-		assertTrue(sr1.isObselete());
-		assertTrue(sr2.isObselete());
-		assertTrue(sr3.isObselete());
-		assertTrue(sr4.isObselete());
+		assertTrue(((AbstractResource)hr).isObselete());
+		assertTrue(((AbstractResource)sr).isObselete());
+		assertTrue(((AbstractResource)sr1).isObselete());
+		assertTrue(((AbstractResource)sr2).isObselete());
+		assertTrue(((AbstractResource)sr3).isObselete());
+		assertTrue(((AbstractResource)sr4).isObselete());
 		
 		verify(resourceFinder).loadResource(StaticResource.class, "index.html");
 		verify(resourceFinder).loadResource(HtmlResource.class, "index");
@@ -229,9 +239,9 @@ public class ResourceWatchServiceImplTest {
 		
 		// removal checks
 		
-		assertTrue(sr1_2.isObselete());
-		assertTrue(sr1_3.isObselete());
-		assertTrue(sr1_4.isObselete());
+		assertTrue(((AbstractResource)sr1_2).isObselete());
+		assertTrue(((AbstractResource)sr1_3).isObselete());
+		assertTrue(((AbstractResource)sr1_4).isObselete());
 		
 		verify(resourceFinder).loadResource(StaticResource.class, "test.css");
 		verify(resourceFinder).loadResource(StaticResource.class, "test.less");

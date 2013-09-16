@@ -10,11 +10,11 @@ import com.google.inject.Injector;
 
 import jj.configuration.Configuration;
 import jj.execution.IOThread;
-import jj.resource.AssetResource;
-import jj.resource.HtmlResource;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
+import jj.resource.asset.AssetResource;
+import jj.resource.html.HtmlResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;

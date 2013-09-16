@@ -21,8 +21,8 @@ import static org.mockito.BDDMockito.*;
 import jj.execution.MockJJExecutors;
 import jj.execution.MockJJExecutors.ThreadType;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
 
 import org.junit.Before;
 import org.junit.Test;

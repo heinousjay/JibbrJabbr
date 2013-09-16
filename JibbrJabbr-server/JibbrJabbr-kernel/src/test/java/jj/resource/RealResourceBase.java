@@ -35,6 +35,7 @@ import jj.SHA1Helper;
 import jj.configuration.Configuration;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
+import jj.resource.css.CssResource;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -50,9 +51,11 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class RealResourceBase {
 	
-	Path appPath;
-	@Mock Configuration configuration;
-	@Mock Logger logger;
+	protected Path appPath;
+	@Mock
+	protected Configuration configuration;
+	@Mock
+	protected Logger logger;
 
 	@Before
 	public final void init() throws Exception {

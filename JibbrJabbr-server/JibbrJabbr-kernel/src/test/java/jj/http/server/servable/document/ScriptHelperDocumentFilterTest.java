@@ -3,7 +3,7 @@ package jj.http.server.servable.document;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.resource.AssetResource.*;
+import static jj.resource.asset.AssetResource.*;
 
 import java.util.List;
 import java.util.Arrays;
@@ -14,10 +14,10 @@ import jj.http.HttpRequest;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.ScriptHelperDocumentFilter;
 import jj.jjmessage.JJMessage;
-import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
+import jj.resource.asset.AssetResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 import jj.script.DocumentScriptExecutionEnvironment;
 

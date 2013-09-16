@@ -24,9 +24,9 @@ import jj.engine.RequiredModuleException;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
-import jj.resource.SpecResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
+import jj.resource.spec.SpecResource;
 
 /**
  * @author jason

@@ -21,9 +21,9 @@ import static org.mockito.BDDMockito.given;
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 import jj.http.server.Binding;
-import jj.resource.ConfigResource;
-import jj.resource.ConfigResourceMaker;
 import jj.resource.ResourceFinder;
+import jj.resource.config.ConfigResource;
+import jj.resource.config.ConfigResourceMaker;
 import jj.script.RealRhinoContextMaker;
 import jj.script.RhinoContext;
 

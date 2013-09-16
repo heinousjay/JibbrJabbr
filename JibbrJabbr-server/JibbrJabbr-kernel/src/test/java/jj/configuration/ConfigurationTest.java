@@ -30,9 +30,9 @@ import jj.conversion.Converters;
 import jj.http.server.HttpServerSocketConfiguration;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.logging.EmergencyLogger;
-import jj.resource.ConfigResource;
-import jj.resource.ConfigResourceMaker;
 import jj.resource.ResourceFinder;
+import jj.resource.config.ConfigResource;
+import jj.resource.config.ConfigResourceMaker;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;

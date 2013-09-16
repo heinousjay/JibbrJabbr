@@ -5,8 +5,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.resource.AssetResource;
 import jj.resource.ResourceFinder;
+import jj.resource.asset.AssetResource;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;

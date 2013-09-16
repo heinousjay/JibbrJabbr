@@ -11,9 +11,10 @@ import java.util.PropertyResourceBundle;
 import jj.execution.JJExecutors;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.InlineMessagesDocumentFilter;
-import jj.resource.HtmlResource;
-import jj.resource.PropertiesResource;
 import jj.resource.ResourceFinder;
+import jj.resource.html.HtmlResource;
+import jj.resource.property.PropertiesResource;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;

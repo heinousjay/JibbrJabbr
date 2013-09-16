@@ -3,6 +3,24 @@ package jj.resource;
 import java.io.IOException;
 
 import jj.JJModule;
+import jj.resource.asset.AssetResource;
+import jj.resource.asset.AssetResourceCreator;
+import jj.resource.config.ConfigResource;
+import jj.resource.config.ConfigResourceCreator;
+import jj.resource.css.CssResource;
+import jj.resource.css.CssResourceCreator;
+import jj.resource.html.HtmlResource;
+import jj.resource.html.HtmlResourceCreator;
+import jj.resource.property.PropertiesResource;
+import jj.resource.property.PropertiesResourceCreator;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceCreator;
+import jj.resource.sha1.Sha1Resource;
+import jj.resource.sha1.Sha1ResourceCreator;
+import jj.resource.spec.SpecResource;
+import jj.resource.spec.SpecResourceCreator;
+import jj.resource.stat.ic.StaticResource;
+import jj.resource.stat.ic.StaticResourceCreator;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;

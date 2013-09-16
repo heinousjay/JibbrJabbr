@@ -2,9 +2,11 @@ package jj.http.server;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import io.netty.util.internal.PlatformDependent;
+
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,16 +48,16 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		
 	}
 
-	// using ConcurrentHashMap because while there will only ever be
+	// using ConcurrentMap because while there will only ever be
 	// one thread manipulating these structures, many threads could 
 	// end up reading them
-	private final ConcurrentHashMap<JJWebSocketConnection, Boolean> allConnections =
-		new ConcurrentHashMap<>(16, 0.75F, 2);
+	private final ConcurrentMap<JJWebSocketConnection, Boolean> allConnections =
+		PlatformDependent.newConcurrentHashMap(16, 0.75F, 2);
 	
 	private final 
-	ConcurrentHashMap<DocumentScriptExecutionEnvironment, ConcurrentHashMap<JJWebSocketConnection, Boolean>> 
+	ConcurrentMap<DocumentScriptExecutionEnvironment, ConcurrentMap<JJWebSocketConnection, Boolean>> 
 	perScript =
-		new ConcurrentHashMap<>();
+		PlatformDependent.newConcurrentHashMap();
 		
 	private final JJNioEventLoopGroup eventLoopGroup;
 	
@@ -78,13 +80,13 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
 		
-		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
+		ConcurrentMap<JJWebSocketConnection, Boolean> connectionSet = 
 			perScript.get(connection.associatedScriptExecutionEnvironment());
 		
 		if (connectionSet == null) {
 			perScript.putIfAbsent(
 				connection.associatedScriptExecutionEnvironment(),
-				new ConcurrentHashMap<JJWebSocketConnection, Boolean>(16, 0.75F, 2)
+				PlatformDependent.<JJWebSocketConnection, Boolean>newConcurrentHashMap(16, 0.75F, 2)
 			);
 			connectionSet = perScript.get(connection.associatedScriptExecutionEnvironment());
 		}
@@ -95,7 +97,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		
 		allConnections.remove(connection);
 		
-		ConcurrentHashMap<JJWebSocketConnection, Boolean> connectionSet = 
+		ConcurrentMap<JJWebSocketConnection, Boolean> connectionSet = 
 			perScript.get(connection.associatedScriptExecutionEnvironment());
 		
 		assert (connectionSet != null) : "couldn't find a connection set to remove a connection.  impossible!";
@@ -105,7 +107,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 	
 	public Set<JJWebSocketConnection> forScript(DocumentScriptExecutionEnvironment scriptExecutionEnvironment) {
 		
-		ConcurrentHashMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptExecutionEnvironment);		
+		ConcurrentMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptExecutionEnvironment);		
 		
 		return (connections != null) ?
 			Collections.unmodifiableSet(connections.keySet()) :

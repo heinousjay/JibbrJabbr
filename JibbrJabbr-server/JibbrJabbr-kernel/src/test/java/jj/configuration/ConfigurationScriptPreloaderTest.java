@@ -20,8 +20,8 @@ import static org.mockito.BDDMockito.*;
 import java.util.concurrent.Executors;
 
 import jj.execution.JJExecutors;
-import jj.resource.ConfigResource;
 import jj.resource.ResourceFinder;
+import jj.resource.config.ConfigResource;
 
 import org.junit.After;
 import org.junit.Before;

@@ -22,8 +22,8 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
 import jj.conversion.Converters;
-import jj.resource.ConfigResource;
 import jj.resource.ResourceFinder;
+import jj.resource.config.ConfigResource;
 import jj.script.RhinoContext;
 import jj.script.RhinoContextMaker;
 

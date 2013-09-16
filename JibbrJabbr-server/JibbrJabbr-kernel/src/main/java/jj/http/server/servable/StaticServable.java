@@ -22,7 +22,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
-import jj.resource.StaticResource;
+import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;

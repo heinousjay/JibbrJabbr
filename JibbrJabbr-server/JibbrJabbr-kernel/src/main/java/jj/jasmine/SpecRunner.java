@@ -26,8 +26,8 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.events.ExecutionEnvironmentInitialized;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.SpecResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.spec.SpecResource;
 
 /**
  * @author jason

@@ -36,12 +36,12 @@ import com.google.inject.Module;
 public abstract class ResourceBase<U extends Resource, T extends ResourceCreator<U>> extends RealResourceBase {
 	
 	
-	ResourceInstanceCreator creator;
+	protected ResourceInstanceCreator creator;
 	@Mock Injector injector;
 	
-	U resource;
+	protected U resource;
 	
-	T toTest;
+	protected T toTest;
 	
 	protected Object[] args() {
 		return AbstractFileResource.EMPTY_ARGS;

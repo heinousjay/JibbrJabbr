@@ -40,7 +40,7 @@ abstract class AbstractResource implements Resource {
 	}
 	
 	@IOThread
-	abstract boolean needsReplacing() throws IOException;
+	protected abstract boolean needsReplacing() throws IOException;
 	
 	boolean isObselete() throws IOException {
 		return !alive || needsReplacing();
@@ -52,7 +52,7 @@ abstract class AbstractResource implements Resource {
 	 * the outside world
 	 * @return
 	 */
-	abstract Object[] creationArgs();
+	protected abstract Object[] creationArgs();
 	
 	Set<AbstractResource> dependents() {
 		return Collections.unmodifiableSet(dependents);

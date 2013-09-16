@@ -23,10 +23,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jj.resource.AssetResource;
-import jj.resource.CssResource;
 import jj.resource.Resource;
-import jj.resource.StaticResource;
+import jj.resource.asset.AssetResource;
+import jj.resource.css.CssResource;
+import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 
 import org.junit.Before;

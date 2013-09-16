@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import jj.resource.StaticResource;
+import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;

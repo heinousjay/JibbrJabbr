@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.resource.ScriptResource;
+import jj.resource.script.ScriptResource;
 import jj.script.DocumentScriptExecutionEnvironment;
 import jj.script.ScriptExecutionEnvironmentFinder;
 import jj.uri.URIMatch;

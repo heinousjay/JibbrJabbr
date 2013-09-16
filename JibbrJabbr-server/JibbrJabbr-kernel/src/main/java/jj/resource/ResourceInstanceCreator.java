@@ -36,7 +36,7 @@ import com.google.inject.ProvisionException;
  *
  */
 @Singleton
-class ResourceInstanceCreator {
+public class ResourceInstanceCreator {
 
 	private final Injector parentInjector;
 	
@@ -51,7 +51,7 @@ class ResourceInstanceCreator {
 		this.logger = logger;
 	}
 	
-	<T extends Resource> T createResource(
+	public <T extends Resource> T createResource(
 		final Class<T> type,
 		final ResourceCacheKey cacheKey,
 		final String baseName,

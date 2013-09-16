@@ -17,43 +17,68 @@ package jj.resource;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+
+import jj.resource.html.HtmlResource;
+import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
+
+
+@RunWith(MockitoJUnitRunner.class)
 public class ResourceCacheTest extends RealResourceBase {
+	
+	URI uri = URI.create("/resource1");
+	
+	@Mock StaticResource sr;
+	
+	@Mock ResourceCreator<StaticResource> src;
+	
+	@Mock HtmlResource hr;
+	
+	@Mock ResourceCreator<HtmlResource> hrc;
+	
+	ResourceCacheKey sKey;
+	
+	ResourceCacheKey hKey;
 	
 	ResourceCacheImpl rc;
 	
 	@Before
 	public void before() {
-		rc = new ResourceCacheImpl(MockResourceCreators.realized(configuration));
+		
+		HashMap<Class<? extends Resource>, ResourceCreator<? extends Resource>> map = new HashMap<>();
+		map.put(StaticResource.class, src);
+		map.put(HtmlResource.class, hrc);
+		rc = new ResourceCacheImpl(new ResourceCreators(map));
+		
+		sKey = new ResourceCacheKey(StaticResource.class, uri);
+		hKey = new ResourceCacheKey(HtmlResource.class, uri);
+		
+		given(src.cacheKey(uri)).willReturn(sKey);
+		given(hrc.cacheKey(uri)).willReturn(hKey);
 	}
 
 	@Test
 	public void testOperationsByUri() throws IOException {
 		
 		// given
-		String name = "index.html";
-		Path path = appPath.resolve(name);
-		StaticResource sr = new StaticResource(MockResourceCreators.src.cacheKey(name), path, name);
-		name = "index";
-		HtmlResource hr = new HtmlResource(configuration, logger, MockResourceCreators.hrc.cacheKey(name), name, path);
-		
-		rc.put(sr.cacheKey(), sr);
-		rc.put(hr.cacheKey(), hr);
-		
-		URI uri = path.toUri();
-		
+		rc.putIfAbsent(sKey, sr);
+		rc.putIfAbsent(hKey, hr);
 		// when
 		List<Resource> resources = rc.findAllByUri(uri);
 		

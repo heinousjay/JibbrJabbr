@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.JJExecutors;
-import jj.resource.PropertiesResource;
 import jj.resource.ResourceFinder;
+import jj.resource.property.PropertiesResource;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Element;

@@ -19,8 +19,8 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.execution.events.ExecutionEnvironmentInitialized;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.SpecResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.spec.SpecResource;
 import jj.script.ScriptExecutionEnvironment;
 
 import org.junit.Test;

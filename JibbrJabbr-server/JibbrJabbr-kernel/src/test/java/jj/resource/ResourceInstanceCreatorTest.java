@@ -19,6 +19,16 @@ import java.nio.file.Path;
 
 import jj.configuration.Configuration;
 import jj.logging.EmergencyLogger;
+import jj.resource.asset.Asset;
+import jj.resource.asset.AssetResource;
+import jj.resource.config.ConfigResource;
+import jj.resource.css.CssResource;
+import jj.resource.html.HtmlResource;
+import jj.resource.property.PropertiesResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.sha1.Sha1Resource;
+import jj.resource.spec.SpecResource;
+import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,12 +43,8 @@ import com.google.inject.Guice;
  */
 public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
-	ResourceInstanceCreator rimc;
-	
-	@Before
-	public void before() {
-		
-		rimc = new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
+	public static ResourceInstanceCreator creator(final Configuration configuration, final Logger logger) {
+		return new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
@@ -46,6 +52,14 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
 			}
 		}), logger);
+	}
+	
+	ResourceInstanceCreator rimc;
+	
+	@Before
+	public void before() {
+		
+		rimc = creator(configuration, logger);
 	}
 	
 	private <T extends Resource> T doCreate(Class<T> type, String baseName, Object...args) throws Exception {
@@ -62,7 +76,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	@Test
 	public void testAssetResource() throws Exception {
-		doCreate(AssetResource.class, "jj.js", AssetResourceCreator.appPath);
+		doCreate(AssetResource.class, "jj.js", Asset.path);
 	}
 	
 	@Test

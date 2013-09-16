@@ -21,12 +21,12 @@ import java.net.URI;
  * @author jason
  *
  */
-class ResourceCacheKey {
+public class ResourceCacheKey {
 	
 	private final String toString;
 	private final int hashCode;
 
-	ResourceCacheKey(final Class<? extends Resource> type, final URI uri) {
+	public ResourceCacheKey(final Class<? extends Resource> type, final URI uri) {
 		this.toString = type.getSimpleName().toString() + " at " + uri.toString();
 		this.hashCode = toString.hashCode();
 	}

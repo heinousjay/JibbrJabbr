@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 import jj.JJServerStartupListener;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;
-import jj.resource.ConfigResource;
 import jj.resource.ResourceFinder;
+import jj.resource.config.ConfigResource;
 
 /**
  * ensures that the configuration file for the application

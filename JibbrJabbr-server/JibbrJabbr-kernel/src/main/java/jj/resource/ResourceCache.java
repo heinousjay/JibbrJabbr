@@ -17,18 +17,34 @@ package jj.resource;
 
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author jason
  *
  */
-interface ResourceCache extends ConcurrentMap<ResourceCacheKey, Resource> {
+interface ResourceCache {
 
 	/**
 	 * @param uri
 	 * @return
 	 */
 	List<Resource> findAllByUri(URI uri);
+
+	/**
+	 * @param cacheKey
+	 * @return
+	 */
+	Resource get(ResourceCacheKey cacheKey);
+	
+	Resource putIfAbsent(ResourceCacheKey cacheKey, Resource resource);
+
+	/**
+	 * @param cacheKey
+	 * @param resource
+	 * @return
+	 */
+	boolean remove(ResourceCacheKey cacheKey, Resource resource);
+	
+	boolean replace(ResourceCacheKey key, Resource oldValue, Resource newValue);
 
 }

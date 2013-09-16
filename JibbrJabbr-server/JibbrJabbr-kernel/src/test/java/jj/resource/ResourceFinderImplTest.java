@@ -9,6 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.execution.JJExecutors;
+import jj.resource.asset.Asset;
+import jj.resource.asset.AssetResource;
+import jj.resource.html.HtmlResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
+import jj.resource.stat.ic.StaticResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,10 +36,10 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	@Mock JJExecutors executors;
 	@Mock Logger logger;
 	
-	@Mock AssetResourceCreator assetResourceCreator;
-	@Mock HtmlResourceCreator htmlResourceCreator;
-	@Mock ScriptResourceCreator scriptResourceCreator;
-	@Mock StaticResourceCreator staticResourceCreator;
+	@Mock AbstractResourceCreator<AssetResource> assetResourceCreator;
+	@Mock AbstractResourceCreator<HtmlResource> htmlResourceCreator;
+	@Mock AbstractResourceCreator<ScriptResource> scriptResourceCreator;
+	@Mock AbstractResourceCreator<StaticResource> staticResourceCreator;
 	
 	ResourceFinder rfi;
 	
@@ -66,7 +72,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		given(scriptResourceCreator.type()).willReturn(ScriptResource.class);
 		given(staticResourceCreator.type()).willReturn(StaticResource.class);
 		
-		given(assetResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(AssetResourceCreator.appPath));
+		given(assetResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(Asset.path));
 		given(htmlResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath, ".html"));
 		given(scriptResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath));
 		given(staticResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath));
@@ -124,22 +130,23 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	}
 	
 	@Test
-	public void testObseleteResourceIsReloaded() throws IOException {
+	public void testObseleteResourceIsReloaded() throws Exception {
 		
-		StaticResource mockStaticResource1 = mock(StaticResource.class);
-		StaticResource mockStaticResource2 = mock(StaticResource.class);
-		given(staticResourceCreator.create(eq("index.html"), anyVararg())).willReturn(mockStaticResource1, mockStaticResource2);
+		ResourceMaker resourceMaker = new ResourceMaker(configuration);
+		
+		StaticResource staticResource1 = resourceMaker.makeStatic("index.html");
+		StaticResource staticResource2 = resourceMaker.makeStatic("index.html");
+		given(staticResourceCreator.create(eq("index.html"), anyVararg())).willReturn(staticResource1, staticResource2);
 		
 		StaticResource sr1 = rfi.loadResource(StaticResource.class, "index.html");
 		StaticResource sr2 = rfi.loadResource(StaticResource.class, "index.html");
-		
-		given(mockStaticResource1.isObselete()).willReturn(true);
+		((AbstractResource)staticResource1).kill();
 		
 		StaticResource sr3 = rfi.loadResource(StaticResource.class, "index.html");
 		
-		assertThat(sr1, is(mockStaticResource1));
-		assertThat(sr2, is(mockStaticResource1));
-		assertThat(sr3, is(mockStaticResource2));
+		assertThat(sr1, is(staticResource1));
+		assertThat(sr2, is(staticResource1));
+		assertThat(sr3, is(staticResource2));
 	}
 	
 	@Test

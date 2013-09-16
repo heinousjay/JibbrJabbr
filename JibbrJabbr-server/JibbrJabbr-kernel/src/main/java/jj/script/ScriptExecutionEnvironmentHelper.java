@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 import jj.execution.JJExecutors;
 import jj.execution.ScriptThread;
 import jj.resource.ResourceFinder;
-import jj.resource.ScriptResource;
-import jj.resource.ScriptResourceType;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
 
 /**
  * API for script execution environment maintenance

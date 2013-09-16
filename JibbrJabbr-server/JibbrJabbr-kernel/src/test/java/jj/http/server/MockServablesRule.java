@@ -21,10 +21,10 @@ import java.util.Arrays;
 
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
-import jj.resource.AssetResource;
-import jj.resource.CssResource;
 import jj.resource.Resource;
-import jj.resource.StaticResource;
+import jj.resource.asset.AssetResource;
+import jj.resource.css.CssResource;
+import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 
 import org.junit.rules.TestRule;

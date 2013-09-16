@@ -21,9 +21,9 @@ import static org.mockito.BDDMockito.*;
 import jj.http.server.MockServablesRule;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.ResourceUrlDocumentFilter;
-import jj.resource.AssetResource;
-import jj.resource.CssResource;
-import jj.resource.StaticResource;
+import jj.resource.asset.AssetResource;
+import jj.resource.css.CssResource;
+import jj.resource.stat.ic.StaticResource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

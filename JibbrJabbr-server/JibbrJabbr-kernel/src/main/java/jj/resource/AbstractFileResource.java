@@ -44,6 +44,7 @@ public abstract class AbstractFileResource extends AbstractResourceBase {
 	private String sha1;
 	
 	@IOThread
+	protected
 	AbstractFileResource(
 		final ResourceCacheKey cacheKey,
 		final String baseName,
@@ -53,6 +54,7 @@ public abstract class AbstractFileResource extends AbstractResourceBase {
 	}
 	
 	@IOThread
+	protected
 	AbstractFileResource(
 		final ResourceCacheKey cacheKey,
 		final String baseName,
@@ -150,12 +152,12 @@ public abstract class AbstractFileResource extends AbstractResourceBase {
 	
 	@Override
 	@IOThread
-	boolean needsReplacing() throws IOException {
+	protected boolean needsReplacing() throws IOException {
 		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}
 	
 	@Override
-	Object[] creationArgs() {
+	protected Object[] creationArgs() {
 		return EMPTY_ARGS;
 	}
 	
