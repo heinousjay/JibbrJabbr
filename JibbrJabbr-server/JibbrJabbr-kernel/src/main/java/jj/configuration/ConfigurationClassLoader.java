@@ -92,6 +92,7 @@ class ConfigurationClassLoader extends ClassLoader {
 		
 		// no need to keep these around
 		result.detach();
+		resultInterface.detach();
 		
 		return (Class<? extends ConfigurationObjectBase>)defineClass(name, b, 0, b.length);
 	}
@@ -128,13 +129,17 @@ class ConfigurationClassLoader extends ClassLoader {
 			String functionName = methodAnnotation != null && !StringUtils.isEmpty(methodAnnotation.name()) ?
 				methodAnnotation.name() : name;
 			
+			// these will generally be basic and repeated, so
+			// keeping them is okay
+			CtClass returnType = newMethod.getReturnType();
+			
 			scriptProps.add(new StringBuilder()
 				.append("org.mozilla.javascript.ScriptableObject.putConstProperty(result,\"")
 				.append(functionName)
 				.append("\",configurationFunction(\"")
 				.append(name)
 				.append("\", ")
-				.append(newMethod.getReturnType().getName())
+				.append(returnType.getName())
 				.append(".class, ")
 				.append(allArgs)
 				.append(",")
@@ -148,12 +153,10 @@ class ConfigurationClassLoader extends ClassLoader {
 				.append("\", converters.convert(")
 				.append(defaultValue)
 				.append(",")
-				.append(newMethod.getReturnType().getName())
+				.append(returnType.getName())
 				.append(".class));")
 				.toString()
 			);
-			
-			CtClass returnType = newMethod.getReturnType();
 			
 			if (returnType.isArray()) {
 				newMethod.setBody(

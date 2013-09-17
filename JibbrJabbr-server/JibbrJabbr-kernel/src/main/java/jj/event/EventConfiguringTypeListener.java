@@ -65,11 +65,23 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 	private final Logger logger = LoggerFactory.getLogger(EventConfiguringTypeListener.class);
 
+	/** mapped from subscriber class name -> the methodinfos for the listener methods of the class */
 	private final ConcurrentMap<String, List<MethodInfo>> subscribers = PlatformDependent.newConcurrentHashMap();
+	
+	/** 
+	 * mapped from the class name of an invoker to the invoker class.  wait, what? 
+	 * well it doesn't just rely on class.forname because it needs to keep track of
+	 * which classes have already been generated so the CtClass objects can be
+	 * cleaned up
+	 */
 	private final ConcurrentMap<String, Class<? extends Invoker>> invokerClasses = PlatformDependent.newConcurrentHashMap();
+	
+	/** mapped from the event type -> the set of listener invokers for that event */
 	private final ConcurrentMap<Class<?>, Set<Invoker>> invokers = PlatformDependent.newConcurrentHashMap();
 	
+	/** mapped from the weak reference to the instance invoked -> invoker */
 	private final ConcurrentMap<WeakReference<Object>, Invoker> cleanupMap = PlatformDependent.newConcurrentHashMap();
+	
 	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
 	
 	private final ClassPool classPool = ClassPool.getDefault();
@@ -90,7 +102,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	}
 	
 	/**
-	 * Cleans up invoker instances when their subject being invoked
+	 * Cleans up invoker instances when their object being invoked
 	 * is eligible for garbage collection
 	 * 
 	 * @author jason
