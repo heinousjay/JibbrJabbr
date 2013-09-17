@@ -1,6 +1,7 @@
 package jj.resource.property;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -34,9 +35,13 @@ public class PropertiesResourceCreator extends AbstractResourceCreator<Propertie
 	public boolean canLoad(String name, Object... args) {
 		return true;
 	}
-
+	
 	@Override
-	protected Path path(String baseName, Object... args) {
+	protected URI uri(String baseName, Object... args) {
+		return path(baseName).toUri();
+	}
+
+	private Path path(String baseName, Object... args) {
 		return configuration.appPath().resolve(baseName + ".properties");
 	}
 

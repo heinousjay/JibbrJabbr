@@ -16,6 +16,7 @@
 package jj.resource.sha1;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -58,9 +59,13 @@ public class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 	public Sha1Resource create(String baseName, Object... args) throws IOException {
 		return instanceModuleCreator.createResource(Sha1Resource.class, cacheKey(baseName), baseName, path(baseName));
 	}
-
+	
 	@Override
-	protected Path path(String baseName, Object... args) {
+	protected URI uri(String baseName, Object... args) {
+		return path(baseName).toUri();
+	}
+
+	private Path path(String baseName, Object... args) {
 		return configuration.appPath().resolve(baseName);
 	}
 

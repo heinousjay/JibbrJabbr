@@ -18,6 +18,7 @@ package jj.resource.css;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
@@ -89,11 +90,15 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 			DOT_CSS.matcher(name).find();
 	}
 	
+	@Override
+	protected URI uri(String baseName, Object... args) {
+		return path(baseName, args).toUri();
+	}
+	
 	/**
 	 * takes one parameter, if Boolean.TRUE then this tries to load a .less file
 	 */
-	@Override
-	protected Path path(final String baseName, Object... args) {
+	private Path path(final String baseName, Object... args) {
 		
 		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
 			return configuration.appPath().resolve(toLess(baseName));

@@ -16,7 +16,6 @@
 package jj.resource;
 
 import java.net.URI;
-import java.nio.file.Path;
 
 /**
  * @author jason
@@ -24,11 +23,13 @@ import java.nio.file.Path;
  */
 public abstract class AbstractResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
 
-	protected abstract Path path(final String baseName, final Object...args);
+	protected abstract URI uri(final String baseName, final Object...args);
+	
+	//protected abstract Path path(final String baseName, final Object...args);
 	
 	@Override
 	public final ResourceCacheKey cacheKey(String baseName, Object...args) {
-		return new ResourceCacheKey(type(), path(baseName, args).toUri());
+		return new ResourceCacheKey(type(), uri(baseName, args));
 	}
 	
 	@Override

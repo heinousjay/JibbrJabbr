@@ -16,6 +16,7 @@
 package jj.resource.spec;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -63,9 +64,13 @@ public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 			path(baseName)
 		);
 	}
-
+	
 	@Override
-	protected Path path(String baseName, Object... args) {
+	protected URI uri(String baseName, Object... args) {
+		return path(baseName).toUri();
+	}
+
+	private Path path(String baseName, Object... args) {
 		return basePath().resolve(baseName);
 	}
 	

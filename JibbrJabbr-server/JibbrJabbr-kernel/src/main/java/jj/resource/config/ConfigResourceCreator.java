@@ -16,6 +16,7 @@
 package jj.resource.config;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -55,7 +56,11 @@ public class ConfigResourceCreator extends AbstractResourceCreator<ConfigResourc
 	}
 	
 	@Override
-	protected Path path(String baseName, Object... args) {
+	protected URI uri(String baseName, Object... args) {
+		return path(baseName).toUri();
+	}
+	
+	private Path path(String baseName, Object... args) {
 		return canLoad(baseName) ? configuration.appPath().resolve(baseName) : null;
 	}
 

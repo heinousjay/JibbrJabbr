@@ -1,6 +1,7 @@
 package jj.resource.html;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -36,7 +37,11 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	}
 	
 	@Override
-	protected Path path(final String baseName, Object...args) {
+	protected URI uri(String baseName, Object... args) {
+		return path(baseName).toUri();
+	}
+	
+	private Path path(final String baseName, Object...args) {
 		return configuration.appPath().resolve(baseName + ".html");
 	}
 	

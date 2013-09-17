@@ -30,8 +30,6 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 	
 	private static final String TOO_LARGE_ASSERTION_ERROR =
 		AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_IN_MEMORY_SIZE + " bytes";
-
-	protected static final Object[] EMPTY_ARGS = {};
 	
 	protected final String baseName;
 	protected final Path path;
@@ -143,11 +141,6 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 	@IOThread
 	protected boolean needsReplacing() throws IOException {
 		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
-	}
-	
-	@Override
-	protected Object[] creationArgs() {
-		return EMPTY_ARGS;
 	}
 	
 	@Override

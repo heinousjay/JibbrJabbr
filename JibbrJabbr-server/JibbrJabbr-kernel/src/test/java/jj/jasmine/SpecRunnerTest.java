@@ -15,7 +15,6 @@
  */
 package jj.jasmine;
 
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.execution.events.ExecutionEnvironmentInitialized;
 import jj.resource.ResourceFinder;

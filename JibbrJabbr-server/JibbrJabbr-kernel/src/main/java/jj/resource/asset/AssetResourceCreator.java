@@ -59,9 +59,13 @@ public class AssetResourceCreator extends AbstractResourceCreator<AssetResource>
 		// we load whatever
 		return true;
 	}
-
+	
 	@Override
-	protected Path path(String baseName, Object... args) {
+	protected URI uri(String baseName, Object... args) {
+		return path(baseName).toUri();
+	}
+
+	private Path path(String baseName, Object... args) {
 		Path result = null;
 		if (appPath != null) {
 			result = appPath.resolve(baseName);

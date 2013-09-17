@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,24 +44,24 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	
 	ResourceFinder rfi;
 	
-	static class PathAnswer implements Answer<Path> {
+	static class URIAnswer implements Answer<URI> {
 		
 		private final Path appPath;
 		private final String bonus;
 		
-		PathAnswer(final Path appPath) {
+		URIAnswer(final Path appPath) {
 			this.appPath = appPath;
 			bonus = null;
 		}
 		
-		PathAnswer(final Path appPath, final String bonus) {
+		URIAnswer(final Path appPath, final String bonus) {
 			this.appPath = appPath;
 			this.bonus = bonus;
 		}
 
 		@Override
-		public Path answer(InvocationOnMock invocation) throws Throwable {
-			return appPath.resolve(String.valueOf(invocation.getArguments()[0]) + (bonus == null ? "" : bonus));
+		public URI answer(InvocationOnMock invocation) throws Throwable {
+			return appPath.resolve(String.valueOf(invocation.getArguments()[0]) + (bonus == null ? "" : bonus)).toUri();
 		}
 	};
 	
@@ -72,10 +73,10 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		given(scriptResourceCreator.type()).willReturn(ScriptResource.class);
 		given(staticResourceCreator.type()).willReturn(StaticResource.class);
 		
-		given(assetResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(Asset.path));
-		given(htmlResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath, ".html"));
-		given(scriptResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath));
-		given(staticResourceCreator.path(anyString(), anyVararg())).willAnswer(new PathAnswer(appPath));
+		given(assetResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(Asset.path));
+		given(htmlResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath, ".html"));
+		given(scriptResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath));
+		given(staticResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath));
 		
 		Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreatorsMap = new HashMap<>();
 		resourceCreatorsMap.put(AssetResource.class, assetResourceCreator);
