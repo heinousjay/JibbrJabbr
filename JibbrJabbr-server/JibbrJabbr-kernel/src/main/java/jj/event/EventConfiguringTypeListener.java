@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -60,6 +63,32 @@ import com.google.inject.spi.TypeListener;
  */
 class EventConfiguringTypeListener implements TypeListener {
 	
+	private final Logger logger = LoggerFactory.getLogger(EventConfiguringTypeListener.class);
+
+	private final ConcurrentMap<String, List<MethodInfo>> subscribers = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentMap<String, Class<? extends Invoker>> invokerClasses = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentMap<Class<?>, Set<Invoker>> invokers = PlatformDependent.newConcurrentHashMap();
+	
+	private final ConcurrentMap<WeakReference<Object>, Invoker> cleanupMap = PlatformDependent.newConcurrentHashMap();
+	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
+	
+	private final ClassPool classPool = ClassPool.getDefault();
+	private final CtClass invokerClass;
+	private final CtMethod invokeMethod;
+	
+	EventConfiguringTypeListener() {
+		try {
+			invokerClass = classPool.get("jj.event.Invoker");
+			invokeMethod = invokerClass.getDeclaredMethod("invoke");
+			Thread queueCleaner = new Thread(new ListenerCleaner(), "Event System cleanup");
+			queueCleaner.setDaemon(true);
+			queueCleaner.start();
+		} catch (NotFoundException e) {
+			// this can't happen
+			throw new AssertionError(e);
+		}
+	}
+	
 	/**
 	 * Cleans up invoker instances when their subject being invoked
 	 * is eligible for garbage collection
@@ -87,6 +116,25 @@ class EventConfiguringTypeListener implements TypeListener {
 			}
 		}
 	}
+	
+	private static final class MethodInfo {
+		
+		private final CtMethod method;
+		private final String className;
+		private final String parameterType;
+		
+		MethodInfo(final CtMethod method) throws Exception {
+			
+			this.method = method;
+			className = method.getDeclaringClass().getPackageName() +
+				".InvokerFor" +
+				method.getDeclaringClass().getSimpleName() +
+				"$" + method.getName() +
+				"$" + Integer.toHexString(method.hashCode());
+			// hanging onto event types is okay, they'll get reused
+			parameterType = method.getParameterTypes()[0].getName();
+		}
+	}
 
 	/**
 	 * Wires event listeners to the publisher when an instance is being injected.
@@ -98,41 +146,41 @@ class EventConfiguringTypeListener implements TypeListener {
 		@Override
 		public void afterInjection(I injectee) {
 			
+			String name = injectee.getClass().getName();
+			
 			if (injectee instanceof EventManager) {
 				// share state with the publisher
 				((EventManager)injectee).listenerMap(invokers);
-			} else if (subscribers.containsKey(injectee.getClass().getName())) {
+			} else if (subscribers.containsKey(name)) {
 				// create an invoker class so we aren't doing this reflectively
-				for (CtMethod invoked : subscribers.get(injectee.getClass().getName())) {
-					
-					String className =
-						invoked.getDeclaringClass().getPackageName() +
-						".InvokerFor" +
-							invoked.getDeclaringClass().getSimpleName() +
-						"$" + invoked.getName() +
-						"$" + Integer.toHexString(invoked.hashCode());
-					
+				boolean cleanUp = false;
+				for (MethodInfo invoked : subscribers.get(name)) {
+					cleanUp = cleanUp || !invokerClasses.containsKey(invoked.className);
 					try {
 						
-						Class<?> clazz = invokerClasses.containsKey(className) ?
-							invokerClasses.get(className) :
-							makeInvokerClass(className, injectee, invoked);
+						Class<? extends Invoker> clazz = invokerClasses.containsKey(invoked.className) ?
+							invokerClasses.get(invoked.className) :
+							makeInvokerClass(invoked.className, injectee, invoked.method);
 						
 						WeakReference<Object> reference = new WeakReference<Object>(injectee, invokerInstanceQueue);
-						Invoker invoker = (Invoker)clazz.getConstructor(WeakReference.class).newInstance(reference);
+						Invoker invoker = clazz.getConstructor(WeakReference.class).newInstance(reference);
 						cleanupMap.put(reference, invoker);
-						invokers.get(Class.forName(invoked.getParameterTypes()[0].getName())).add(invoker);
+						invokers.get(Class.forName(invoked.parameterType)).add(invoker);
 					} catch (Exception e) {
 						throw new AssertionError(e);
 					}
 				}
+				if (cleanUp) {
+					subscribers.get(name).get(0).method.getDeclaringClass().detach();
+				}
 			}
 		}
-		
-		private Class<?> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
+
+		@SuppressWarnings("unchecked")
+		private Class<? extends Invoker> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
 			// might be defined already
 			try {
-				return Class.forName(className);
+				return (Class<? extends Invoker>)Class.forName(className);
 			} catch (ClassNotFoundException e) {}
 			
 			CtClass newClass = classPool.makeClass(className);
@@ -163,37 +211,16 @@ class EventConfiguringTypeListener implements TypeListener {
 		}
 	}
 
-	private final ConcurrentMap<String, List<CtMethod>> subscribers = PlatformDependent.newConcurrentHashMap();
-	private final ConcurrentMap<String, Class<?>> invokerClasses = PlatformDependent.newConcurrentHashMap();
-	private final ConcurrentMap<Class<?>, Set<Invoker>> invokers = PlatformDependent.newConcurrentHashMap();
-	
-	private final ConcurrentMap<WeakReference<Object>, Invoker> cleanupMap = PlatformDependent.newConcurrentHashMap();
-	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
-	
-	private final ClassPool classPool = ClassPool.getDefault();
-	private final CtClass invokerClass;
-	private final CtMethod invokeMethod;
-	
-	EventConfiguringTypeListener() {
-		try {
-			invokerClass = classPool.get("jj.event.Invoker");
-			invokeMethod = invokerClass.getDeclaredMethod("invoke");
-			Thread queueCleaner = new Thread(new ListenerCleaner(), "Event System cleanup");
-			queueCleaner.setDaemon(true);
-			queueCleaner.start();
-		} catch (NotFoundException e) {
-			// this can't happen
-			throw new AssertionError(e);
-		}
-	}
-
 	@Override
 	public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+		
+		String name = type.toString();
+		
 		try {
-			CtClass clazz = classPool.get(type.toString());
+			final CtClass clazz = classPool.get(type.toString());
 			
 			if (clazz.hasAnnotation(Subscriber.class)) {
-				subscribers.put(type.toString(), new ArrayList<CtMethod>());
+				subscribers.put(name, new ArrayList<MethodInfo>());
 				for (CtMethod method : clazz.getMethods()) {
 					if (
 						// should be not static, have one parameter
@@ -202,11 +229,18 @@ class EventConfiguringTypeListener implements TypeListener {
 						!Modifier.isStatic(method.getModifiers()) &&
 						method.getParameterTypes().length == 1
 					) {
-						subscribers.get(type.toString()).add(method);
+						subscribers.get(name).add(new MethodInfo(method));
 						invokers.putIfAbsent(Class.forName(method.getParameterTypes()[0].getName()), new HashSet<Invoker>());
 					}
-				
 				}
+				
+				if (subscribers.get(name).isEmpty()) {
+					logger.warn("{} is a subscriber with no subscriptions", name);
+					subscribers.remove(name);
+					clazz.detach();
+				}
+			} else {
+				clazz.detach();
 			}
 		} catch (NotFoundException nfe) {
 			// generated classes won't make it into this class pool, which
