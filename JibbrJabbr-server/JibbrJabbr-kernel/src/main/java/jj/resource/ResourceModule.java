@@ -31,7 +31,7 @@ public class ResourceModule extends JJModule {
 	static final class TestWatchService implements ResourceWatchService {
 
 		@Override
-		public void watch(Resource resource) throws IOException {}
+		public void watch(FileResource resource) throws IOException {}
 		
 	}
 	

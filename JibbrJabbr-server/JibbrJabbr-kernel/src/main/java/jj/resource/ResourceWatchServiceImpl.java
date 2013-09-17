@@ -54,9 +54,9 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	}
 
 	@Override
-	public void watch(Resource resource) throws IOException {
+	public void watch(FileResource resource) throws IOException {
 		
-		final Path directory = ((AbstractResource)resource).path().getParent();
+		final Path directory = resource.path().getParent();
 		if (directory.getFileSystem() == FileSystems.getDefault()) {
 			log.trace("registering for watch service: {}", resource);
 			directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);

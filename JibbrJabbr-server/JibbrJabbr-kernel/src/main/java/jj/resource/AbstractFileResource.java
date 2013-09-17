@@ -10,7 +10,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.Date;
 import jj.SHA1Helper;
 import jj.execution.IOThread;
 
@@ -22,7 +21,7 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
-public abstract class AbstractFileResource extends AbstractResourceBase {
+public abstract class AbstractFileResource extends AbstractResourceBase implements FileResource {
 	
 	// beyond this, we don't keep bytes
 	private static final long MAX_IN_MEMORY_SIZE  = 1000000;
@@ -136,18 +135,8 @@ public abstract class AbstractFileResource extends AbstractResourceBase {
 	}
 
 	@Override
-	public FileTime lastModified() {
-		return lastModified;
-	}
-
-	@Override
 	public long size() {
 		return size;
-	}
-	
-	@Override
-	public Date lastModifiedDate() {
-		return new Date(lastModified.toMillis());
 	}
 	
 	@Override

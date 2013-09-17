@@ -1,8 +1,5 @@
 package jj.resource;
 
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.util.Date;
 
 /**
  * represents some resource loaded from the file system
@@ -19,29 +16,10 @@ public interface Resource {
 	String baseName();
 	
 	/**
-	 * The path of the resource
-	 * @return
-	 */
-	Path path();
-	
-	/**
-	 * time this resource was last modified
-	 * @return
-	 */
-	FileTime lastModified();
-	
-	/**
-	 * size of the file in bytes
+	 * size of the resource in bytes
 	 * @return
 	 */
 	long size();
-	
-	/**
-	 * time this resource was last modified as
-	 * a java.util.Date
-	 * @return
-	 */
-	Date lastModifiedDate();
 
 	/**
 	 * uri to this resource, expressed as a path relative to

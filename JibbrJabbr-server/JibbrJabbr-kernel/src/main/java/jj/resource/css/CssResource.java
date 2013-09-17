@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -15,6 +14,7 @@ import javax.inject.Singleton;
 import jj.SHA1Helper;
 import jj.execution.IOThread;
 import jj.resource.AbstractResourceBase;
+import jj.resource.FileResource;
 import jj.resource.LoadedResource;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
@@ -33,7 +33,7 @@ import jj.resource.ResourceCacheKey;
  *
  */
 @Singleton
-public class CssResource extends AbstractResourceBase implements LoadedResource {
+public class CssResource extends AbstractResourceBase implements FileResource, LoadedResource {
 	
 	protected final String baseName;
 	protected final Path path;
@@ -88,16 +88,6 @@ public class CssResource extends AbstractResourceBase implements LoadedResource 
 	@Override
 	public long size() {
 		return byteBuffer.readableBytes();
-	}
-	
-	@Override
-	public Date lastModifiedDate() {
-		return new Date(lastModified.toMillis());
-	}
-
-	@Override
-	public FileTime lastModified() {
-		return lastModified;
 	}
 
 	@Override

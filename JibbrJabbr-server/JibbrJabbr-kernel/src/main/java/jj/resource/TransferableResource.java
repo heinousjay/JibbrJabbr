@@ -20,10 +20,14 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 
 /**
+ * Optional interface a resource can implement to indicate that
+ * it can be transferred from the file system directly to a
+ * network socket.
+ * 
  * @author jason
  *
  */
-public interface TransferableResource extends Resource {
+public interface TransferableResource extends FileResource {
 	
 	FileChannel fileChannel() throws IOException;
 

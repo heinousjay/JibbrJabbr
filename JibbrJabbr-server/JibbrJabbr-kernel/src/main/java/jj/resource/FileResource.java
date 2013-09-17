@@ -15,14 +15,21 @@
  */
 package jj.resource;
 
-import java.io.IOException;
+import java.nio.file.Path;
 
 /**
+ * Small extension to resources which are rooted directly in the
+ * filesystem
+ * 
  * @author jason
  *
  */
-interface ResourceWatchService {
+public interface FileResource extends Resource {
 
-	void watch(FileResource resource) throws IOException;
-
+	
+	/**
+	 * The path of the resource
+	 * @return
+	 */
+	Path path();
 }

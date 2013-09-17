@@ -67,7 +67,9 @@ public abstract class RealResourceBase {
 	protected <T extends Resource> T testFileResource(final T resource) throws Exception {
 		
 		// well this is weirdly ugly haha
-		final Path path = resource.path();
+		assertThat(resource, is(instanceOf(FileResource.class)));
+		
+		final Path path = ((FileResource)resource).path();
 		
 		assertTrue(resource.baseName() + " does not exist", Files.exists(path));
 		
@@ -77,7 +79,6 @@ public abstract class RealResourceBase {
 		assertThat(resource, is(notNullValue()));
 		assertThat(resource.baseName(), is(notNullValue()));
 		assertThat(resource.baseName(), not(Matchers.startsWith("/")));
-		assertThat(resource.lastModified(), is(Files.getLastModifiedTime(path)));
 		assertThat(((AbstractResource)resource).needsReplacing(), is(false));
 		
 		if (!(resource instanceof CssResource)) { 
