@@ -128,6 +128,39 @@ class EventConfiguringTypeListener implements TypeListener {
 				}
 			}
 		}
+		
+		private Class<?> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
+			// might be defined already
+			try {
+				return Class.forName(className);
+			} catch (ClassNotFoundException e) {}
+			
+			CtClass newClass = classPool.makeClass(className);
+			newClass.addInterface(invokerClass);
+			newClass.addField(CtField.make("private final java.lang.ref.WeakReference instance;", newClass));
+			newClass.addConstructor(
+				CtNewConstructor.make(
+					new CtClass[] {classPool.get(WeakReference.class.getName())},
+					null,
+					"{this.instance = $1;}",
+					newClass
+				)
+			);
+			CtMethod newMethod = CtNewMethod.copy(invokeMethod, newClass, null);
+			newMethod.setBody(
+				"{" +
+				injectee.getClass().getName() + " invokee = (" + injectee.getClass().getName() + ")instance.get();" +
+				"if (invokee != null) invokee." + invoked.getName() + "((" + invoked.getParameterTypes()[0].getName() + ")$1);" +
+				"}"
+			);
+			newClass.addMethod(newMethod);
+			
+			invokerClasses.putIfAbsent(className, newClass.toClass());
+			
+			newClass.detach();
+			
+			return invokerClasses.get(className);
+		}
 	}
 
 	private final ConcurrentMap<String, List<CtMethod>> subscribers = PlatformDependent.newConcurrentHashMap();
@@ -183,33 +216,5 @@ class EventConfiguringTypeListener implements TypeListener {
 		}
 		
 		encounter.register(new EventWiringInjectionListener<I>());
-	}
-
-	private Class<?> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
-		// shortcut!
-		if (classPool.getOrNull(className) != null) return Class.forName(className);
-		
-		CtClass newClass = classPool.makeClass(className);
-		newClass.addInterface(invokerClass);
-		newClass.addField(CtField.make("private final java.lang.ref.WeakReference instance;", newClass));
-		newClass.addConstructor(
-			CtNewConstructor.make(
-				new CtClass[] {classPool.get(WeakReference.class.getName())},
-				null,
-				"{this.instance = $1;}",
-				newClass
-			)
-		);
-		CtMethod newMethod = CtNewMethod.copy(invokeMethod, newClass, null);
-		newMethod.setBody(
-			"{" +
-			injectee.getClass().getName() + " invokee = (" + injectee.getClass().getName() + ")instance.get();" +
-			"if (invokee != null) invokee." + invoked.getName() + "((" + invoked.getParameterTypes()[0].getName() + ")$1);" +
-			"}"
-		);
-		newClass.addMethod(newMethod);
-		
-		invokerClasses.putIfAbsent(className, newClass.toClass());
-		return invokerClasses.get(className);
 	}
 }
