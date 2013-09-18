@@ -32,4 +32,10 @@ public interface FileResource extends Resource {
 	 * @return
 	 */
 	Path path();
+	
+	/**
+	 * size of the resource in bytes
+	 * @return
+	 */
+	long size();
 }

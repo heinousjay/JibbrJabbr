@@ -14,12 +14,6 @@ public interface Resource {
 	 * @return
 	 */
 	String baseName();
-	
-	/**
-	 * size of the resource in bytes
-	 * @return
-	 */
-	long size();
 
 	/**
 	 * uri to this resource, expressed as a path relative to

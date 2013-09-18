@@ -15,6 +15,8 @@ import jj.resource.property.PropertiesResource;
 import jj.resource.property.PropertiesResourceCreator;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceCreator;
+import jj.resource.script.environment.DocumentScriptEnvironment;
+import jj.resource.script.environment.DocumentScriptEnvironmentCreator;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.sha1.Sha1ResourceCreator;
 import jj.resource.spec.SpecResource;
@@ -62,6 +64,7 @@ public class ResourceModule extends JJModule {
 		resourceCreatorBinder.addBinding(SpecResource.class).to(SpecResourceCreator.class);
 		resourceCreatorBinder.addBinding(StaticResource.class).to(StaticResourceCreator.class);
 		resourceCreatorBinder.addBinding(PropertiesResource.class).to(PropertiesResourceCreator.class);
+		resourceCreatorBinder.addBinding(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
 		
 		
 		// these guys love each other but it's easier to manage the implementation

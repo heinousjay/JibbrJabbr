@@ -22,7 +22,7 @@ import static org.mockito.BDDMockito.given;
 import java.util.List;
 
 import jj.http.server.RangeHandler.Range;
-import jj.resource.Resource;
+import jj.resource.FileResource;
 import io.netty.handler.codec.http.HttpHeaders;
 
 import org.junit.Test;
@@ -38,7 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class RangeHandlerTest {
 	
 	@Mock HttpHeaders requestHeaders;
-	@Mock Resource resource;
+	@Mock FileResource resource;
 
 	@Test
 	public void test1() {

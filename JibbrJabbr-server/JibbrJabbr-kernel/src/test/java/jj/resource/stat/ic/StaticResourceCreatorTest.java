@@ -32,7 +32,6 @@ public class StaticResourceCreatorTest extends ResourceBase<StaticResource, Stat
 		return "helpers/jquery.fancybox-media.js";
 	}
 
-	@Override
 	protected Path path() {
 		return appPath.resolve(baseName());
 	}

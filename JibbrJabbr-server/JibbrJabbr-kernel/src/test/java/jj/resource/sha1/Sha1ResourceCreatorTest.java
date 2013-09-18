@@ -25,7 +25,6 @@ public class Sha1ResourceCreatorTest extends ResourceBase<Sha1Resource, Sha1Reso
 		return "not.real.test.sha1";
 	}
 
-	@Override
 	protected Path path() {
 		return appPath.resolve(baseName());
 	}

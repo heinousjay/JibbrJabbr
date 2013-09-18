@@ -32,7 +32,6 @@ public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResour
 		return "index";
 	}
 
-	@Override
 	protected Path path() {
 		return appPath.resolve(baseName() + ".properties");
 	}

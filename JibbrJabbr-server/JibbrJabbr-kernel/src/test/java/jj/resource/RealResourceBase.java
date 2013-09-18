@@ -63,36 +63,52 @@ public abstract class RealResourceBase {
 		given(configuration.appPath()).willReturn(appPath);
 		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
 	}
-
-	protected <T extends Resource> T testFileResource(final T resource) throws Exception {
+	
+	protected <T extends Resource> T testResource(final T resource) throws Exception {
 		
+		if (resource instanceof FileResource) {
+			testFileResource((FileResource)resource);
+		} else {
+			testNonFileResource(resource);
+		}
+		
+		return resource;
+	}
+	
+	private <T extends FileResource> T testFileResource(final T resource) throws Exception {
 		// well this is weirdly ugly haha
-		assertThat(resource, is(instanceOf(FileResource.class)));
-		
-		final Path path = ((FileResource)resource).path();
+		final Path path = resource.path();
 		
 		assertTrue(resource.baseName() + " does not exist", Files.exists(path));
 		
+		testNonFileResource(resource);
+		
+		if (!(resource instanceof CssResource)) { 
+			final byte[] bytes = Files.readAllBytes(path);
+			assertThat(resource.sha1(), is(SHA1Helper.keyFor(bytes))); 
+		}
+		return resource;
+	}
+
+	private <T extends Resource> T testNonFileResource(final T resource) throws Exception {
+		
+		
+		
+		
 		assertThat(resource, is(instanceOf(AbstractResource.class)));
 		 
-		final byte[] bytes = Files.readAllBytes(path);
 		assertThat(resource, is(notNullValue()));
 		assertThat(resource.baseName(), is(notNullValue()));
 		assertThat(resource.baseName(), not(Matchers.startsWith("/")));
 		assertThat(((AbstractResource)resource).needsReplacing(), is(false));
 		
-		if (!(resource instanceof CssResource)) { 
-			// css bytes are complicated and tested in CssResourceCreatorTest
-			
-			assertThat(resource.sha1(), is(SHA1Helper.keyFor(bytes))); 
-			
-			if (resource instanceof LoadedResource) {
-				ByteBuf buf = ((LoadedResource)resource).bytes();
-				buf.readBytes(Unpooled.buffer(buf.readableBytes()));
-				// this test is to ensure that all buffers are wrapped before returning
-				// since this has caught me out twice now
-				assertThat(((LoadedResource)resource).bytes().readableBytes(), greaterThan(0));
-			}
+		if (!(resource instanceof CssResource) && (resource instanceof LoadedResource)) { 
+
+			ByteBuf buf = ((LoadedResource)resource).bytes();
+			buf.readBytes(Unpooled.buffer(buf.readableBytes()));
+			// this test is to ensure that all buffers are wrapped before returning
+			// since this has caught me out twice now
+			assertThat(((LoadedResource)resource).bytes().readableBytes(), greaterThan(0));
 		}
 		
 		return resource;

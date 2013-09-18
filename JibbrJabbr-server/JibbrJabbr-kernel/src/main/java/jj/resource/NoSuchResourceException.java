@@ -35,5 +35,8 @@ public class NoSuchResourceException extends ResourceNotViableException {
 	public NoSuchResourceException(Path resourcePath) {
 		super(resourcePath);
 	}
-
+	
+	public NoSuchResourceException(String uri) {
+		super(uri);
+	}
 }

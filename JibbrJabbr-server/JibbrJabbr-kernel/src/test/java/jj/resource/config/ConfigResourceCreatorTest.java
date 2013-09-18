@@ -37,7 +37,6 @@ public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, Conf
 		return CONFIG_JS;
 	}
 	
-	@Override
 	protected Path path() {
 		return appPath.resolve(baseName());
 	}

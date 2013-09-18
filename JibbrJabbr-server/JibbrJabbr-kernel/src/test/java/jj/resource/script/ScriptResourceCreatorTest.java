@@ -33,7 +33,6 @@ public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, Scri
 		return ScriptResourceType.Client.suffix("index");
 	}
 
-	@Override
 	protected Path path() {
 		return appPath.resolve(baseName());
 	}

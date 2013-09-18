@@ -27,7 +27,7 @@ public abstract class JJRunnable implements Runnable {
 		}
 	}
 
-	public void doRun() {}
+	public void doRun() throws Exception {}
 	
 	@Override
 	public final String toString() {

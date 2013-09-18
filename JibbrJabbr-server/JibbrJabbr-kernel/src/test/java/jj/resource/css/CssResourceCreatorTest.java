@@ -59,7 +59,6 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		return new ResourceCacheKey(CssResource.class, path(baseName).toUri());
 	}
 	
-	@Override
 	protected Path path() {
 		return path(baseName());
 	}

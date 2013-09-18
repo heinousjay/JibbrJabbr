@@ -37,7 +37,6 @@ public class SpecResourceCreatorTest extends ResourceBase<SpecResource, SpecReso
 		return "its_a_spec.js";
 	}
 
-	@Override
 	protected Path path() {
 		return appPath.resolveSibling("specs").resolve(baseName());
 	}

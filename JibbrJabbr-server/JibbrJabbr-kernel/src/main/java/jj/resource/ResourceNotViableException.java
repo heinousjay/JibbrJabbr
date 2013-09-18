@@ -65,6 +65,11 @@ public class ResourceNotViableException extends RuntimeException {
 	}
 	
 	public final boolean discard;
+	
+	public ResourceNotViableException(String uri) {
+		super(uri);
+		discard = false;
+	}
 
 	public ResourceNotViableException(Path resourcePath) {
 		super(resourcePath.toAbsolutePath().toString());

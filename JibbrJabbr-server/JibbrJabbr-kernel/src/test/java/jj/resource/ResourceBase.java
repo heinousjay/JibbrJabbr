@@ -20,7 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 
-import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -53,8 +52,6 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 	
 	protected abstract String baseName();
 	
-	protected abstract Path path();
-	
 	protected abstract U resource() throws Exception;
 	
 	protected abstract T toTest();
@@ -86,7 +83,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		U created = toTest.create(baseName(), args()); 
 		
-		testFileResource(created);
+		testResource(created);
 		
 		assertThat(created, is(resource));
 		

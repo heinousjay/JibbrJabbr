@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jj.StringUtils;
-import jj.resource.Resource;
+import jj.resource.FileResource;
 import io.netty.handler.codec.http.HttpHeaders;
 
 /**
@@ -62,7 +62,7 @@ class RangeHandler {
 	}
 	
 	private final HttpHeaders requestHeaders;
-	private final Resource resource;
+	private final FileResource resource;
 	private final List<Range> ranges = new ArrayList<>(2);
 	private final List<Range> originalranges = new ArrayList<>(2);
 	private final long overlapDistance;
@@ -77,7 +77,7 @@ class RangeHandler {
 	 */
 	RangeHandler(
 		final HttpHeaders requestHeaders,
-		final Resource resource,
+		final FileResource resource,
 		final long overlapDistance
 	) {
 		this(requestHeaders, resource, overlapDistance, 5);
@@ -92,7 +92,7 @@ class RangeHandler {
 	 */
 	RangeHandler(
 		final HttpHeaders requestHeaders,
-		final Resource resource,
+		final FileResource resource,
 		final long overlapDistance,
 		final int maxRanges
 	) {

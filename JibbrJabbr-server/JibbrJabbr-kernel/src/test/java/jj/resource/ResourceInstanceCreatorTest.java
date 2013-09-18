@@ -71,7 +71,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	private <T extends Resource> T doCreate(Class<T> type, String baseName, Path path, Object...args) throws Exception {
 		ResourceCacheKey cacheKey = new ResourceCacheKey(type, path.toUri());
 		
-		return testFileResource(rimc.createResource(type, cacheKey, baseName, path, args));
+		return testResource(rimc.createResource(type, cacheKey, baseName, path, args));
 	}
 	
 	@Test

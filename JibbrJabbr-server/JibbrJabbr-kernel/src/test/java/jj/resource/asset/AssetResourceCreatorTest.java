@@ -32,7 +32,6 @@ public class AssetResourceCreatorTest extends ResourceBase<AssetResource, AssetR
 		return AssetResource.JJ_JS;
 	}
 	
-	@Override
 	protected Path path() {
 		return AssetResourceCreator.appPath;
 	}

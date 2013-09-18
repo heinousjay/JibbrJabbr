@@ -22,6 +22,8 @@ import jj.execution.IOThread;
  *
  */
 public class SHA1Helper {
+	
+	private static final byte[] DELIMITER = "|".getBytes(UTF_8);
 
 	private static final ThreadLocal<MessageDigest> sha1 = new ThreadLocal<MessageDigest>() {
 		
@@ -60,7 +62,7 @@ public class SHA1Helper {
 	}
 	
 	/**
-	 * treats input as UTF-8
+	 * treats input as UTF-8, adds a delimiter between inputs
 	 * @param strings
 	 * @return
 	 */
@@ -68,6 +70,7 @@ public class SHA1Helper {
 		for (String string : strings) {
 			if (string != null) {
 				sha1.get().update(string.getBytes(UTF_8));
+				sha1.get().update(DELIMITER);
 			}
 		}
 		return toHex(sha1.get().digest());

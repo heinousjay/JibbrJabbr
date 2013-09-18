@@ -47,9 +47,8 @@ abstract class AbstractResource implements Resource {
 	}
 	
 	/**
-	 * the arguments used to create this resource. only available to the package
-	 * because arrays are inherently mutable and Resources should be immutable to
-	 * the outside world
+	 * the arguments used to create this resource. mocking needs prevent this
+	 * from being kept package private but don't call it
 	 * @return
 	 */
 	protected abstract Object[] creationArgs();
@@ -68,5 +67,9 @@ abstract class AbstractResource implements Resource {
 	
 	ResourceCacheKey cacheKey() {
 		return cacheKey;
+	}
+	
+	public String toString() {
+		return getClass().getSimpleName() + "/" + baseName() + "@" + sha1();
 	}
 }

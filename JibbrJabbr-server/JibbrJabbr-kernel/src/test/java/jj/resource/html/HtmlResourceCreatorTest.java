@@ -13,7 +13,6 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 		return "internal/no-worky";
 	}
 	
-	@Override
 	protected Path path() {
 		return appPath.resolve(baseName() + ".html");
 	}

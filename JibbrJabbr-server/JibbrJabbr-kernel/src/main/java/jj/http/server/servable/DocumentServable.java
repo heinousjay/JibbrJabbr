@@ -15,6 +15,7 @@ import jj.resource.asset.AssetResource;
 import jj.resource.html.HtmlResource;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
+import jj.resource.script.environment.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -103,6 +104,8 @@ class DocumentServable extends Servable<HtmlResource> {
 		if (path != null) {
 			
 			String baseName = toBaseName(path);
+			
+			resourceFinder.loadResource(DocumentScriptEnvironment.class, baseName);
 			
 			final HtmlResource htmlResource = loadResource(new URIMatch("/" + baseName));
 			

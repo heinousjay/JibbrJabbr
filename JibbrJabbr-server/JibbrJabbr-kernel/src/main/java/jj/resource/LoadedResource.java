@@ -22,7 +22,7 @@ import io.netty.buffer.ByteBuf;
  * @author jason
  *
  */
-public interface LoadedResource extends Resource {
+public interface LoadedResource extends FileResource {
 	
 	ByteBuf bytes();
 }
