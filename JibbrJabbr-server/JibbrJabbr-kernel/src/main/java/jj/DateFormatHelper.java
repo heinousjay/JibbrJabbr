@@ -7,8 +7,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class DateFormatHelper {
+public enum DateFormatHelper {
 
+	; // no instances
+	
 	private static final ThreadLocal<SimpleDateFormat> BASIC = 
 		new ThreadLocal<SimpleDateFormat>() {
 			@Override

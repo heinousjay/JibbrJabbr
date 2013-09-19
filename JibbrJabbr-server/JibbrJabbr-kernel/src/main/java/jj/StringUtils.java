@@ -23,8 +23,15 @@ package jj;
  * @author jason
  *
  */
-public class StringUtils {
+public enum StringUtils {
 
+	; // no instances
+	
+	/**
+	 * null safe empty check.  null is empty!
+	 * @param in
+	 * @return
+	 */
 	public static boolean isEmpty(String in) {
 		return in == null || in.isEmpty();
 	}

@@ -21,7 +21,9 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
-public class SHA1Helper {
+public enum SHA1Helper {
+	
+	; // no instances
 	
 	private static final byte[] DELIMITER = "|".getBytes(UTF_8);
 
