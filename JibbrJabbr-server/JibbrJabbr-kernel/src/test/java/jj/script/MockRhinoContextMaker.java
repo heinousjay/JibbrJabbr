@@ -33,7 +33,7 @@ public class MockRhinoContextMaker extends RhinoContextMaker {
 	/**
 	 * @param logger
 	 */
-	MockRhinoContextMaker() {
+	public MockRhinoContextMaker() {
 		super(mock(Logger.class));
 	}
 

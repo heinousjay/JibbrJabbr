@@ -13,40 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.script;
+package jj.resource.document;
+
+import jj.configuration.Configuration;
+import jj.resource.ResourceInstanceCreator;
+import jj.resource.document.HtmlResource;
+import jj.resource.document.HtmlResourceCreator;
 
 /**
  * @author jason
  *
  */
-public enum ScriptResourceType {
-	Client {
-		@Override
-		public String suffix(String baseName)  {
-			return baseName + ".js";
-		}
-	},
+public class HtmlResourceMaker {
+	public static HtmlResource make(Configuration configuration, ResourceInstanceCreator creator, String baseName) throws Exception {
+		return new HtmlResourceCreator(configuration, creator).create(baseName);
+	}
 	
-	Module {
-		@Override
-		public String suffix(String baseName)  {
-			return baseName + ".js";
-		}
-	},
-	
-	Shared {
-		@Override
-		public String suffix(String baseName) {
-			return baseName + ".shared.js";
-		}
-	},
-	
-	Server {
-		@Override
-		public String suffix(String baseName) {
-			return baseName + ".server.js";
-		}
-	};
-	
-	public abstract String suffix(final String baseName);
+	public static HtmlResourceCreator fake(Configuration configuration) {
+		return new HtmlResourceCreator(configuration, null);
+	}
 }

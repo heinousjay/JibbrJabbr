@@ -20,8 +20,10 @@ import static org.mockito.BDDMockito.*;
 import org.slf4j.Logger;
 
 import jj.configuration.Configuration;
-import jj.resource.html.HtmlResource;
-import jj.resource.html.HtmlResourceMaker;
+import jj.resource.document.HtmlResource;
+import jj.resource.document.HtmlResourceMaker;
+import jj.resource.document.ScriptResource;
+import jj.resource.document.ScriptResourceMaker;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
 
@@ -53,5 +55,9 @@ public class ResourceMaker {
 	
 	public HtmlResource makeHtml(String baseName) throws Exception {
 		return HtmlResourceMaker.make(configuration, creator, baseName);
+	}
+	
+	public ScriptResource makeScript(String baseName) throws Exception {
+		return ScriptResourceMaker.make(configuration, creator, baseName);
 	}
 }

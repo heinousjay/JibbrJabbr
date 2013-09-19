@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.script.environment;
+package jj.resource.document;
 
 import java.io.IOException;
 import java.net.URI;

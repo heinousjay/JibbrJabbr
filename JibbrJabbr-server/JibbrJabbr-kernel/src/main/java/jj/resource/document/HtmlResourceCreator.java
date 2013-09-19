@@ -1,4 +1,4 @@
-package jj.resource.script;
+package jj.resource.document;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,23 +12,23 @@ import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
 @Singleton
-public class ScriptResourceCreator extends AbstractResourceCreator<ScriptResource> {
-
+public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
+	
 	private final Configuration configuration;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
-	ScriptResourceCreator(
+	HtmlResourceCreator(
 		final Configuration configuration,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
-	
+
 	@Override
-	public Class<ScriptResource> type() {
-		return ScriptResource.class;
+	public Class<HtmlResource> type() {
+		return HtmlResource.class;
 	}
 	
 	@Override
@@ -40,14 +40,13 @@ public class ScriptResourceCreator extends AbstractResourceCreator<ScriptResourc
 	protected URI uri(String baseName, Object... args) {
 		return path(baseName).toUri();
 	}
-
-	private Path path(String baseName, Object... args) {
-		return configuration.appPath().resolve(baseName);
+	
+	private Path path(final String baseName, Object...args) {
+		return configuration.appPath().resolve(baseName + ".html");
 	}
-
+	
 	@Override
-	public ScriptResource create(String baseName, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(ScriptResource.class, cacheKey(baseName), baseName, path(baseName));
+	public HtmlResource create(final String baseName, final Object...args) throws IOException {
+		return instanceModuleCreator.createResource(HtmlResource.class, cacheKey(baseName), baseName, path(baseName));
 	}
-
 }

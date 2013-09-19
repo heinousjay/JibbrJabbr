@@ -29,13 +29,6 @@ public interface Resource {
 	 * @return
 	 */
 	String sha1();
-	
-	/**
-	 * the mime of the resource, including charset if it
-	 * is textual.  (always utf-8)
-	 * @return
-	 */
-	String mime();
 
 	/**
 	 * Register a dependency on another resource.  This means that

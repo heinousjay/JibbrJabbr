@@ -24,7 +24,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
-import jj.resource.html.HtmlResource;
+import jj.resource.document.HtmlResource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;

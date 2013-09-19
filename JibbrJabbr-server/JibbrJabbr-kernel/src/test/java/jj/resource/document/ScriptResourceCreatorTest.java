@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.script;
+package jj.resource.document;
 
 import java.nio.file.Path;
 
 import jj.resource.ResourceBase;
-import jj.resource.script.ScriptResource;
-import jj.resource.script.ScriptResourceCreator;
-import jj.resource.script.ScriptResourceType;
+import jj.resource.document.ScriptResource;
+import jj.resource.document.ScriptResourceCreator;
+import jj.resource.document.ScriptResourceType;
 
 /**
  * @author jason

@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.DataStore;
-import jj.resource.html.HtmlResource;
+import jj.resource.document.HtmlResource;
 import jj.script.DocumentScriptExecutionEnvironment;
 import jj.execution.JJExecutors;
 import jj.execution.JJRunnable;

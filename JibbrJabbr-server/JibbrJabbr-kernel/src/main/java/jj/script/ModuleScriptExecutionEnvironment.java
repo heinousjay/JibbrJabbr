@@ -16,7 +16,7 @@
 package jj.script;
 
 import jj.event.Publisher;
-import jj.resource.script.ScriptResource;
+import jj.resource.document.ScriptResource;
 
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;

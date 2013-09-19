@@ -16,8 +16,8 @@ import jj.http.server.servable.document.ScriptHelperDocumentFilter;
 import jj.jjmessage.JJMessage;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
-import jj.resource.script.ScriptResource;
-import jj.resource.script.ScriptResourceType;
+import jj.resource.document.ScriptResource;
+import jj.resource.document.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 import jj.script.DocumentScriptExecutionEnvironment;
 

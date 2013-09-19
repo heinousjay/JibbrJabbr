@@ -18,7 +18,7 @@ package jj.jasmine;
 import static org.mockito.BDDMockito.*;
 import jj.execution.events.ExecutionEnvironmentInitialized;
 import jj.resource.ResourceFinder;
-import jj.resource.script.ScriptResource;
+import jj.resource.document.ScriptResource;
 import jj.resource.spec.SpecResource;
 import jj.script.ScriptExecutionEnvironment;
 

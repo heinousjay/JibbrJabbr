@@ -8,7 +8,7 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
-import jj.resource.script.ScriptResourceType;
+import jj.resource.document.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 import jj.script.DocumentScriptExecutionEnvironment;
 

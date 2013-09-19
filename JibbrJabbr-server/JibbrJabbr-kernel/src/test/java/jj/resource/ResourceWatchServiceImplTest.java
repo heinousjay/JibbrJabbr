@@ -38,8 +38,8 @@ import jj.configuration.Configuration;
 import jj.execution.JJExecutors;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
-import jj.resource.html.HtmlResource;
-import jj.resource.html.HtmlResourceMaker;
+import jj.resource.document.HtmlResource;
+import jj.resource.document.HtmlResourceMaker;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
 

@@ -12,7 +12,7 @@ import jj.execution.JJExecutors;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.InlineMessagesDocumentFilter;
 import jj.resource.ResourceFinder;
-import jj.resource.html.HtmlResource;
+import jj.resource.document.HtmlResource;
 import jj.resource.property.PropertiesResource;
 
 import org.jsoup.Jsoup;

@@ -13,36 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
-
-import java.nio.file.Path;
+package jj.resource.document;
 
 /**
- * Small extension to resources which are rooted directly in the
- * filesystem
- * 
  * @author jason
  *
  */
-public interface FileResource extends Resource {
-
+public enum ScriptResourceType {
+	Client {
+		@Override
+		public String suffix(String baseName)  {
+			return baseName + ".js";
+		}
+	},
 	
-	/**
-	 * The path of the resource
-	 * @return
-	 */
-	Path path();
+	Module {
+		@Override
+		public String suffix(String baseName)  {
+			return baseName + ".js";
+		}
+	},
 	
-	/**
-	 * size of the resource in bytes
-	 * @return
-	 */
-	long size();
+	Shared {
+		@Override
+		public String suffix(String baseName) {
+			return baseName + ".shared.js";
+		}
+	},
 	
-	/**
-	 * the mime of the resource, including charset if it
-	 * is textual.  (always utf-8)
-	 * @return
-	 */
-	String mime();
+	Server {
+		@Override
+		public String suffix(String baseName) {
+			return baseName + ".server.js";
+		}
+	};
+	
+	public abstract String suffix(final String baseName);
 }

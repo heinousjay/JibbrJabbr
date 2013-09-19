@@ -11,7 +11,7 @@ import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.DocumentRequestState;
-import jj.resource.script.ScriptResource;
+import jj.resource.document.ScriptResource;
 
 import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.jsoup.Jsoup;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.html;
+package jj.resource.document;
 
 import jj.configuration.Configuration;
 import jj.resource.ResourceInstanceCreator;
@@ -22,12 +22,16 @@ import jj.resource.ResourceInstanceCreator;
  * @author jason
  *
  */
-public class HtmlResourceMaker {
-	public static HtmlResource make(Configuration configuration, ResourceInstanceCreator creator, String baseName) throws Exception {
-		return new HtmlResourceCreator(configuration, creator).create(baseName);
+public class ScriptResourceMaker {
+
+	/**
+	 * @param configuration
+	 * @param creator
+	 * @param baseName
+	 * @return
+	 */
+	public static ScriptResource make(Configuration configuration, ResourceInstanceCreator creator, String baseName) throws Exception {
+		return new ScriptResourceCreator(configuration, creator).create(baseName);
 	}
-	
-	public static HtmlResourceCreator fake(Configuration configuration) {
-		return new HtmlResourceCreator(configuration, null);
-	}
+
 }

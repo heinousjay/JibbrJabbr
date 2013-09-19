@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
-import jj.resource.script.ScriptResource;
+import jj.resource.document.ScriptResource;
 
 import org.junit.Before;
 import org.junit.Test;

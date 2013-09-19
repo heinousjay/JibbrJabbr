@@ -17,7 +17,7 @@ import jj.engine.DoInvokeFunction;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.ScriptThread;
-import jj.resource.script.ScriptResource;
+import jj.resource.document.ScriptResource;
 
 /**
  * The factory.

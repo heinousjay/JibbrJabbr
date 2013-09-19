@@ -69,9 +69,9 @@ public class RhinoContext implements Closeable {
 		return context.initStandardObjects(null, sealed);
 	}
 	
-	public Scriptable newObject(Scriptable scope) {
+	public ScriptableObject newObject(Scriptable scope) {
 		assertNotClosed();
-		return context.newObject(scope);
+		return (ScriptableObject)context.newObject(scope);
 	}
 	
 	public Function compileFunction(final Scriptable scope, final String source, final String sourceName) {

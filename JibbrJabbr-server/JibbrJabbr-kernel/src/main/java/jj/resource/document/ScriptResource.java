@@ -1,4 +1,4 @@
-package jj.resource.script;
+package jj.resource.document;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

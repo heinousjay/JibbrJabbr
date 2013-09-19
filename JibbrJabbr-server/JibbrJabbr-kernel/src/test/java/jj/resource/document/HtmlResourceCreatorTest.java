@@ -1,10 +1,10 @@
-package jj.resource.html;
+package jj.resource.document;
 
 import java.nio.file.Path;
 
 import jj.resource.ResourceBase;
-import jj.resource.html.HtmlResource;
-import jj.resource.html.HtmlResourceCreator;
+import jj.resource.document.HtmlResource;
+import jj.resource.document.HtmlResourceCreator;
 
 public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlResourceCreator> {
 

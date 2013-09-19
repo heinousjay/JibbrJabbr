@@ -5,7 +5,7 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.script.ScriptResourceType;
+import jj.resource.document.ScriptResourceType;
 import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
