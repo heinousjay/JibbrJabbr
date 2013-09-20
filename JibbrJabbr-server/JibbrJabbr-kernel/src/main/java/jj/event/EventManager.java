@@ -18,7 +18,12 @@ package jj.event;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.logging.EmergencyLogger;
+
+import org.slf4j.Logger;
 
 /**
  * Inject the Publisher to publish events.
@@ -29,7 +34,14 @@ import javax.inject.Singleton;
 @Singleton
 class EventManager implements Publisher {
 	
+	private final Logger logger;
+	
 	private Map<Class<?>, Set<Invoker>> listenerMap;
+	
+	@Inject
+	EventManager(final @EmergencyLogger Logger logger) {
+		this.logger = logger;
+	}
 	
 	void listenerMap(Map<Class<?>, Set<Invoker>> listenerMap) {
 		this.listenerMap = listenerMap;
@@ -39,7 +51,11 @@ class EventManager implements Publisher {
 		if (clazz != null && clazz != Object.class) {
 			if (listenerMap.containsKey(clazz)) {
 				for (Invoker invoker : listenerMap.get(clazz)) {
-					invoker.invoke(event);
+					try {
+						invoker.invoke(event);
+					} catch (Exception e) {
+						logger.error("exception invoking event listener", e);
+					}
 				}
 			}
 			for (Class<?> iface : clazz.getInterfaces()) {

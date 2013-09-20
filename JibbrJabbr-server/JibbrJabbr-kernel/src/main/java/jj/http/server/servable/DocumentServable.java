@@ -105,10 +105,7 @@ class DocumentServable extends Servable<HtmlResource> {
 			
 			String baseName = toBaseName(path);
 			
-			resourceFinder.loadResource(DocumentScriptEnvironment.class, baseName);
-			
 			final HtmlResource htmlResource = loadResource(new URIMatch("/" + baseName));
-			
 			if (htmlResource != null) {
 			
 				preloadResources(baseName);
