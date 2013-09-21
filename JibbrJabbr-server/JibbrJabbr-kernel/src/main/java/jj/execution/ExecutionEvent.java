@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.execution;
+
 /**
- * The event objects used by the execution system for tracing and such
  * @author jason
  *
  */
-package jj.execution.events;
+public interface ExecutionEvent {
+	
+}

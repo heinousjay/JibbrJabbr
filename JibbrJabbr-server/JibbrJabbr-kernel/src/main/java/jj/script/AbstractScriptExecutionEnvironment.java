@@ -19,7 +19,7 @@ import static jj.script.ScriptExecutionState.Initialized;
 import static jj.script.ScriptExecutionState.Initializing;
 import static jj.script.ScriptExecutionState.Unitialized;
 import jj.event.Publisher;
-import jj.execution.events.ExecutionEnvironmentInitialized;
+import jj.resource.document.ExecutionEnvironmentInitialized;
 
 /**
  * @author jason

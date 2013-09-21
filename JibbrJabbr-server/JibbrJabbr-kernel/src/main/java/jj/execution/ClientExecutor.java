@@ -16,9 +16,7 @@
 package jj.execution;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -87,24 +85,6 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 		);
 		this.setCorePoolSize(WORKER_COUNT);
 		this.setMaximumPoolSize(WORKER_COUNT);
-	}
-	
-	@Override
-	protected <V> RunnableScheduledFuture<V> decorateTask(
-		final Runnable runnable,
-		final RunnableScheduledFuture<V> task
-	) {
-		return new JJScheduledTask<>(runnable, task);
-	}
-	
-	@Override
-	protected <V> RunnableScheduledFuture<V> decorateTask(
-		final Callable<V> callable,
-		final RunnableScheduledFuture<V> task
-	) {
-		System.err.println("something asked for a callable");
-		new Exception().printStackTrace();
-		return task;
 	}
 
 	@Override

@@ -15,7 +15,7 @@
  */
 package jj.resource.css;
 
-import jj.execution.events.ExecutionEvent;
+import jj.execution.ExecutionEvent;
 
 /**
  * @author jason

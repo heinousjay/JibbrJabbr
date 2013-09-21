@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import jj.JJServerStartupListener;
 import jj.event.Listener;
 import jj.event.Subscriber;
-import jj.execution.events.ExecutionEnvironmentInitialized;
 import jj.resource.ResourceFinder;
+import jj.resource.document.ExecutionEnvironmentInitialized;
 import jj.resource.document.ScriptResource;
 import jj.resource.spec.SpecResource;
 
