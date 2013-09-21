@@ -28,22 +28,22 @@ import jj.http.server.JJWebSocketConnection;
 public class DevNullExecutionTraceImpl implements ExecutionTrace {
 
 	@Override
-	public void preparingTask(JJTask<?> task) {
+	public void preparingTask(OldJJTask<?> task) {
 		
 	}
 
 	@Override
-	public void startingTask(JJTask<?> task) {
+	public void startingTask(OldJJTask<?> task) {
 		
 	}
 
 	@Override
-	public void taskCompletedSuccessfully(JJTask<?> task) {
+	public void taskCompletedSuccessfully(OldJJTask<?> task) {
 		
 	}
 
 	@Override
-	public void taskCompletedWithError(JJTask<?> task, Throwable error) {
+	public void taskCompletedWithError(OldJJTask<?> task, Throwable error) {
 		
 	}
 

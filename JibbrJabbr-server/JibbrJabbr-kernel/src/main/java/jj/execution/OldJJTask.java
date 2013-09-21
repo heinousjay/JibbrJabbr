@@ -15,26 +15,20 @@
  */
 package jj.execution;
 
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.FutureTask;
 
 /**
  * @author jason
  *
  */
-public abstract class JJTask {
+class OldJJTask<V> extends FutureTask<V> {
 	
-	private final String name;
-	
-	JJTask(final String name) {
-		this.name = name;
-	}
-
-	protected abstract void run() throws Exception;
-	
-	abstract ScheduledExecutorService executor(ExecutorBundle executors);
-	
-	String name() {
-		return name;
+	/**
+	 * @param runnable
+	 * @param result
+	 */
+	OldJJTask(Runnable runnable, V result) {
+		super(runnable, result);
 	}
 
 }

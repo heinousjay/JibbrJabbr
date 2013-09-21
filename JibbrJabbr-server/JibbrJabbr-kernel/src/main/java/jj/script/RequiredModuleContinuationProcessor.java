@@ -21,8 +21,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.RequiredModuleException;
+import jj.execution.IOTask;
 import jj.execution.JJExecutors;
-import jj.execution.JJRunnable;
+import jj.execution.ScriptTask;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;
@@ -61,11 +62,11 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		final String baseName = context.baseName();
 		final String path = Paths.get(baseName).resolveSibling(requiredModule.identifier()).toString();
 		
-		executors.ioExecutor().submit(
-			new JJRunnable("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
+		executors.execute(
+			new IOTask("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
 			
 				@Override
-				public void doRun() {
+				public void run() {
 					ScriptResource scriptResource = 
 						finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(path));
 					
@@ -95,11 +96,12 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		final Object result
 	) {
 		
-		executors.scriptExecutorFor(baseName).submit(
-			new JJRunnable("required module " + require.identifier() + " error result in [" + baseName + "]") {
+		executors.execute(
+			
+			new ScriptTask("required module " + require.identifier() + " error result in [" + baseName + "]", baseName) {
 			
 				@Override
-				public void doRun() {
+				public void run() {
 					
 					context.restore(require.parentContext());
 					

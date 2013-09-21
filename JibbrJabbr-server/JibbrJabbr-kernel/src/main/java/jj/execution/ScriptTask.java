@@ -21,20 +21,17 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author jason
  *
  */
-public abstract class JJTask {
+public abstract class ScriptTask extends JJTask {
 	
-	private final String name;
+	private final String scriptName;
 	
-	JJTask(final String name) {
-		this.name = name;
+	protected ScriptTask(final String name, final String scriptName) {
+		super(name);
+		this.scriptName = scriptName;
 	}
-
-	protected abstract void run() throws Exception;
 	
-	abstract ScheduledExecutorService executor(ExecutorBundle executors);
-	
-	String name() {
-		return name;
+	@Override
+	protected final ScheduledExecutorService executor(final ExecutorBundle bundle) {
+		return bundle.scriptExecutorFactory.executorFor(scriptName);
 	}
-
 }

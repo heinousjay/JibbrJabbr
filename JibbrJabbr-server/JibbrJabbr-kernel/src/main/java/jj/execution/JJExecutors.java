@@ -1,19 +1,13 @@
 package jj.execution;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-
+import java.util.concurrent.Future;
 import jj.script.ScriptRunner;
 
 public interface JJExecutors {
+	
+	Future<Void> execute(final JJTask task);
 
 	ScriptRunner scriptRunner();
-
-	ExecutorService ioExecutor();
-
-	ScriptExecutorFactory scriptExecutorFactory();
-
-	ScheduledExecutorService scriptExecutorFor(String baseName);
 
 	boolean isScriptThreadFor(String baseName);
 

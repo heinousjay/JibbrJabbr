@@ -35,10 +35,14 @@ import jj.resource.AbstractResourceBase;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
+import jj.resource.ResourceNotViableException;
 import jj.script.RhinoContext;
 import jj.script.RhinoContextMaker;
 
 /**
+ * Slightly more going on than your average resource. at least some of this will
+ * be moving to a base class
+ * 
  * @author jason
  *
  */
@@ -52,7 +56,7 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 
 	@Override
 	public String uri() {
-		return "/" + baseName;
+		return uri;
 	}
 
 	@Override
@@ -80,6 +84,14 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 
 	private final String baseName;
 	
+	private final String uri;
+	
+	private final String sha1;
+	
+	private final ScriptableObject scope;
+	
+	private final Script script;
+	
 	private final RhinoContextMaker contextMaker;
 	
 	final EngineAPI api;
@@ -89,12 +101,6 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 	private final ScriptResource clientScript;
 	private final ScriptResource sharedScript;
 	private final ScriptResource serverScript;
-	
-	private final String sha1;
-	
-	private final ScriptableObject scope;
-	
-	private final Script script;
 	
 	/**
 	 * @param cacheKey
@@ -109,6 +115,7 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 	) {
 		super(cacheKey);
 		this.baseName = baseName;
+		this.uri = "/" + baseName;
 		this.contextMaker = contextMaker;
 		this.api = api;
 		
@@ -136,7 +143,11 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 		
 		scope = createLocalScope(baseName);
 		
+		try {
 		script = compile();
+		} catch (Exception e) {
+			throw new ResourceNotViableException(baseName, e);
+		}
 	}
 	
 	private ScriptableObject createLocalScope(final String moduleIdentifier) {

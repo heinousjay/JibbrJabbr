@@ -15,131 +15,97 @@
  */
 package jj.execution;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
-import static jj.execution.MockJJExecutors.ThreadType.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import org.jmock.lib.concurrent.DeterministicScheduler;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import jj.execution.JJExecutors;
-import jj.execution.ScriptExecutorFactory;
 import jj.script.ScriptRunner;
 
 /**
- * Used to provide execution services for testing purposes.
- * 
  * @author jason
  *
  */
 public class MockJJExecutors implements JJExecutors {
-	
-	public enum ThreadType {
-		ScriptThread,
-		IOThread;
-	}
-	
-	public final ScriptExecutorFactory scriptExecutorFactory = mock(ScriptExecutorFactory.class);
-	public final ScriptRunner scriptRunner = mock(ScriptRunner.class);
-	public final DeterministicScheduler executor = new DeterministicScheduler();
-	
-	public MockJJExecutors() {
-		prepScriptExecutorFactory();
-	}
-	
-	private void prepScriptExecutorFactory() {
-		given(scriptExecutorFactory.executorFor(any(String.class))).will(new Answer<ScheduledExecutorService>() {
 
-			@Override
-			public ScheduledExecutorService answer(InvocationOnMock invocation) throws Throwable {
-				executorSequence.add(ScriptThread);
-				return executor;
-			}
-		});
-	}
+	public ScriptRunner scriptRunner = mock(ScriptRunner.class);
 
+	public List<JJTask> tasks = new ArrayList<>();
 	
-	@Override
-	public ScriptRunner scriptRunner() {
-		
-		return scriptRunner;
-	}
-	
-	private final List<ThreadType> executorSequence = new ArrayList<>();
-	
-	private int ioExecutorCount = 0;
-
-	@Override
-	public ExecutorService ioExecutor() {
-		executorSequence.add(IOThread);
-		++ioExecutorCount;
-		return executor;
-	}
-	
-	public void assertIOExecutorCountIs(int count) {
-		assertThat("io executor count in " +  executorSequence, ioExecutorCount, is(count));
-	}
-
-	@Override
-	public ScriptExecutorFactory scriptExecutorFactory() {
-		return scriptExecutorFactory;
-	}
-
-	@Override
-	public ScheduledExecutorService scriptExecutorFor(String baseName) {
-		executorSequence.add(ScriptThread);
-		return executor;
-	}
-	
-	public void assertExecutorSequence(ThreadType...threadTypes) {
-		assertThat("jj executor sequence", threadTypes, is(executorSequence.toArray(new ThreadType[executorSequence.size()])));
-	}
-	
-	private final Deque<ThreadType> threadTypeDeque = new ArrayDeque<>();
-	
-	/**
-	 * 
-	 * @param threadType
-	 * @param number
-	 */
-	public void addThreadTypes(ThreadType threadType, int number) {
-		for (int i = 0; i < number; ++i) {
-			threadTypeDeque.addLast(threadType);
+	public void runUntilIdle() throws Exception {
+		JJTask task = tasks.isEmpty() ? null : tasks.remove(0);
+		while (task != null) {
+			task.run();
+			task = tasks.isEmpty() ? null : tasks.remove(0);
 		}
 	}
 	
-	public void assertThreadTypesEmpty() {
-		assertTrue("thread types should be empty", threadTypeDeque.isEmpty());
+	public void runFirstTask() throws Exception {
+		assert(!tasks.isEmpty());
+		
+		tasks.remove(0).run();
+	}
+	
+	@Override
+	public Future<Void> execute(final JJTask task) {
+		tasks.add(task);
+		
+		return new Future<Void>() {
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return false;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return false;
+			}
+
+			@Override
+			public boolean isDone() {
+				return true;
+			}
+
+			@Override
+			public Void get() throws InterruptedException, ExecutionException {
+				return null;
+			}
+
+			@Override
+			public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+				return null;
+			}
+		};
+	}
+
+	@Override
+	public ScriptRunner scriptRunner() {
+		return scriptRunner;
 	}
 	
 	public boolean isScriptThread = false;
-	
+
 	@Override
 	public boolean isScriptThreadFor(String baseName) {
-		return isScriptThread || (!threadTypeDeque.isEmpty() && threadTypeDeque.removeFirst() == ScriptThread);
+		return isScriptThread;
 	}
 	
 	public boolean isIOThread = false;
 
 	@Override
 	public boolean isIOThread() {
-		return isIOThread || (!threadTypeDeque.isEmpty() && threadTypeDeque.removeFirst() == IOThread);
+		return isIOThread;
 	}
-	
-	public int ioPoolSize = 1;
 
 	@Override
 	public int ioPoolSize() {
-		return ioPoolSize;
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

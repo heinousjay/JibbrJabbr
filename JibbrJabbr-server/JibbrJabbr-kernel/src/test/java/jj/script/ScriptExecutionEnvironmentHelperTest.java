@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.execution.MockJJExecutors;
-import jj.execution.MockJJExecutors.ThreadType;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;
@@ -93,7 +92,7 @@ public class ScriptExecutionEnvironmentHelperTest {
 		
 		given(creator.createScriptExecutionEnvironment(scriptResource1, null, scriptResource2, baseName)).willReturn(associatedScriptExecutionEnvironment);
 		
-		executors.addThreadTypes(ThreadType.ScriptThread, 10);
+		executors.isScriptThread = true;
 		
 		ScriptExecutionEnvironmentHelper underTest = new ScriptExecutionEnvironmentHelper(finder, scriptExecutionEnvironments, creator, executors);
 		

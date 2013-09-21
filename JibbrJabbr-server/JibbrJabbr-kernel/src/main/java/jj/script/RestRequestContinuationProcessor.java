@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.JJExecutors;
-import jj.execution.JJRunnable;
+import jj.execution.ScriptTask;
 import jj.http.client.HttpClient;
 import jj.http.client.JJHttpClientResponse;
 
@@ -44,11 +44,11 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 				@Override
 				public void operationComplete(final Future<JJHttpClientResponse> future) throws Exception {
 					
-					executors.scriptExecutorFor(context.baseName()).submit(
-						new JJRunnable("REST response with id [" + restRequest.id() + "]") {
+					executors.execute(
+						new ScriptTask("REST response with id [" + restRequest.id() + "]", context.baseName()) {
 							
 							@Override
-							public void doRun() {
+							protected void run() throws Exception {
 								context.restore(scriptContext);
 								try {
 									executors
@@ -73,8 +73,6 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 						}
 					);
 				}
-				
-				
 			}
 		);
 	}

@@ -15,26 +15,16 @@
  */
 package jj.execution;
 
-import java.util.concurrent.ScheduledExecutorService;
-
 /**
  * @author jason
  *
  */
-public abstract class JJTask {
-	
-	private final String name;
-	
-	JJTask(final String name) {
-		this.name = name;
-	}
+public class TaskInvoker {
 
-	protected abstract void run() throws Exception;
-	
-	abstract ScheduledExecutorService executor(ExecutorBundle executors);
-	
-	String name() {
-		return name;
+	/**
+	 * @param name
+	 */
+	public static void invoke(final JJTask toInvoke) throws Exception {
+		toInvoke.run();
 	}
-
 }

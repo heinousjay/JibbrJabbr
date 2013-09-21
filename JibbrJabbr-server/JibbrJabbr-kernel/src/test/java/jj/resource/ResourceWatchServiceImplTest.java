@@ -30,12 +30,16 @@ import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import jj.configuration.Configuration;
+import jj.execution.IOTask;
 import jj.execution.JJExecutors;
+import jj.execution.MockJJExecutors;
+import jj.execution.TaskInvoker;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
 import jj.resource.document.HtmlResource;
@@ -64,7 +68,8 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceWatchServiceImplTest {
 	
-
+	
+	
 	String fileName = "gibberish.txt";
 	Path gibberish;
 	
@@ -94,8 +99,23 @@ public class ResourceWatchServiceImplTest {
 		given(configuration.appPath()).willReturn(appPath);
 		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
 		
-		executorService = Executors.newFixedThreadPool(2);
-		given(executors.ioExecutor()).willReturn(executorService);
+		
+		executorService = Executors.newCachedThreadPool();
+		given(executors.execute(any(IOTask.class))).willAnswer(new Answer<Void>() {
+
+			@Override
+			public Void answer(final InvocationOnMock invocation) throws Throwable {
+				executorService.submit(new Callable<Void>() {
+
+					@Override
+					public Void call() throws Exception {
+						TaskInvoker.invoke(((IOTask)invocation.getArguments()[0]));
+						return null;
+					}
+				});
+				return null;
+			}
+		});
 		
 		resourceMaker = new ResourceMaker(configuration);
 		

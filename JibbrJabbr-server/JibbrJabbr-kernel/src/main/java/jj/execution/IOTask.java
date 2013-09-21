@@ -21,20 +21,16 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author jason
  *
  */
-public abstract class JJTask {
+public abstract class IOTask extends JJTask {
 	
-	private final String name;
-	
-	JJTask(final String name) {
-		this.name = name;
+	protected IOTask(String name) {
+		super(name);
 	}
 
-	protected abstract void run() throws Exception;
-	
-	abstract ScheduledExecutorService executor(ExecutorBundle executors);
-	
-	String name() {
-		return name;
+	@Override
+	ScheduledExecutorService executor(ExecutorBundle executors) {
+		
+		return executors.ioExecutor;
 	}
 
 }

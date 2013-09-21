@@ -14,8 +14,8 @@ import javax.inject.Singleton;
 import jj.DataStore;
 import jj.resource.document.HtmlResource;
 import jj.script.DocumentScriptExecutionEnvironment;
+import jj.execution.IOTask;
 import jj.execution.JJExecutors;
-import jj.execution.JJRunnable;
 import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -142,10 +142,10 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 		if (ioFilters.isEmpty()) {
 			writeResponse();
 		} else {
-			executors.ioExecutor().submit(new JJRunnable("Document filtering requiring I/O") {
+			executors.execute(new IOTask("Document filtering requiring I/O") {
 				
 				@Override
-				public void doRun() {
+				public void run() {
 					try {
 						
 						executeFilters(ioFilters);

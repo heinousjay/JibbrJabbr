@@ -1,12 +1,11 @@
 package jj.execution;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -22,7 +21,7 @@ import jj.JJServerShutdownListener;
  *
  */
 @Singleton
-public class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownListener {
+public class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdownListener {
 	
 	public static boolean isIOThread() {
 		return flag.get() != null;
@@ -40,11 +39,7 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownLi
 		final UncaughtExceptionHandler uncaughtExceptionHandler
 	) {
 		super(
-			WORKER_COUNT, 
 			WORKER_COUNT,
-			0,
-			TimeUnit.SECONDS,
-			new LinkedBlockingQueue<Runnable>(),
 			new ThreadFactory() {
 				
 				private final AtomicInteger id = new AtomicInteger();
@@ -80,7 +75,7 @@ public class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownLi
 	
 	@Override
 	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-		return new JJTask<>(runnable, value);
+		return new OldJJTask<>(runnable, value);
 	}
 
 	@Override

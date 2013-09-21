@@ -68,6 +68,7 @@ public class DocumentServableTest extends ServableTestBase {
 	public void testBasicOperation() throws Exception {
 		
 		given(request.uri()).willReturn("/");
+		given(request.uriMatch()).willReturn(new URIMatch("/"));
 		given(resourceFinder.loadResource(HtmlResource.class, "index")).willReturn(resource);
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);
@@ -79,6 +80,7 @@ public class DocumentServableTest extends ServableTestBase {
 	public void testNormalizeURI() throws Exception {
 		
 		given(request.uri()).willReturn("/../servable/");
+		given(request.uriMatch()).willReturn(new URIMatch("/../servable/"));
 		given(resourceFinder.loadResource(HtmlResource.class, "index")).willReturn(resource);
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);

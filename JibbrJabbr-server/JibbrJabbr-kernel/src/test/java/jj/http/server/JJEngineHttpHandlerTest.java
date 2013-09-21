@@ -230,42 +230,42 @@ public class JJEngineHttpHandlerTest {
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		//then
 		verify(requestProcessor1).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest2, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		//then
 		verify(requestProcessor2).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest3, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		//then
 		verify(requestProcessor3).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		//then
 		verify(requestProcessor1, times(2)).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest2, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		//then
 		verify(requestProcessor2, times(2)).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest3, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		//then
 		verify(requestProcessor3, times(2)).process();
@@ -276,7 +276,7 @@ public class JJEngineHttpHandlerTest {
 		
 		//when
 		handler.handleHttpRequest(httpRequest4, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		//then
 		verify(requestProcessor3).process();
@@ -286,7 +286,7 @@ public class JJEngineHttpHandlerTest {
 	public void testNotFound() throws Exception {
 		
 		handler.handleHttpRequest(httpRequest5, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		verify(httpResponse).sendNotFound();
 	}
@@ -299,7 +299,7 @@ public class JJEngineHttpHandlerTest {
 		doThrow(ioe).when(requestProcessor1).process();
 		
 		handler.handleHttpRequest(httpRequest1, httpResponse);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		verify(httpResponse).error(ioe);
 	}

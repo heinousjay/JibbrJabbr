@@ -37,8 +37,8 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 	protected final long size;
 	protected final ByteBuf byteBuffer;
 	
-	private String toString;
 	private String sha1;
+	private String uri;
 	
 	@IOThread
 	protected
@@ -86,15 +86,12 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 			if (keepBytes) {
 				byteBuffer = readAllBytes(path);
 				sha1 = SHA1Helper.keyFor(byteBuffer);
-				toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
 			} else if (size <= MAX_READ_AND_DIGEST) {
 				byteBuffer = null;
 				sha1 = SHA1Helper.keyFor(path);
-				toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
 			} else {
 				byteBuffer = null;
 				sha1 = null;
-				toString =  getClass().getSimpleName() + " (large) at " + path;
 			}
 			
 		} catch (IOException ioe) {
@@ -141,10 +138,5 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 	@IOThread
 	protected boolean needsReplacing() throws IOException {
 		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
-	}
-	
-	@Override
-	public String toString() {
-		return toString;
 	}
 }

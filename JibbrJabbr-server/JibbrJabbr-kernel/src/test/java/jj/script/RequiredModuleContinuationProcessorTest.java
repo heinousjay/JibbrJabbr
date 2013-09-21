@@ -75,25 +75,25 @@ public class RequiredModuleContinuationProcessorTest {
 	}
 	
 	@Test
-	public void testFirstRequireOfModule() {
+	public void testFirstRequireOfModule() throws Exception {
 		
 		// given
 		given(finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
 		
 		// when
 		processor.process(continuationState);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		// then
 		verify(executors.scriptRunner).submit(requiredModule);
 	}
 	
 	@Test
-	public void testFirstRequireOfModuleNotFoundError() {
+	public void testFirstRequireOfModuleNotFoundError() throws Exception {
 		
 		// when
 		processor.process(continuationState);
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		// then
 		verify(executors.scriptRunner).restartAfterContinuation(anyString(), any(RequiredModuleException.class));

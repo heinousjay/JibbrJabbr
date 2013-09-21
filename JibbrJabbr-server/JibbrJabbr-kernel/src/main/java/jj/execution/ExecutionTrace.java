@@ -29,13 +29,13 @@ import jj.http.server.JJWebSocketConnection;
  */
 public interface ExecutionTrace {
 	
-	void preparingTask(JJTask<?> task);
+	void preparingTask(OldJJTask<?> task);
 	
-	void startingTask(JJTask<?> task);
+	void startingTask(OldJJTask<?> task);
 	
-	void taskCompletedSuccessfully(JJTask<?> task);
+	void taskCompletedSuccessfully(OldJJTask<?> task);
 	
-	void taskCompletedWithError(JJTask<?> task, Throwable error);
+	void taskCompletedWithError(OldJJTask<?> task, Throwable error);
 	
 	/**
 	 * @param request

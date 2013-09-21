@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
+import jj.execution.IOTask;
 import jj.execution.JJExecutors;
-import jj.execution.JJRunnable;
 
 /**
  * watches for file changes on resources we've already loaded
@@ -65,7 +65,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	
 	@Override
 	public void start() {
-		executors.ioExecutor().submit(loop);
+		executors.execute(loop);
 	}
 	
 	@Override
@@ -85,12 +85,8 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		return (WatchEvent<Path>)event;
 	}
 		
-	private final JJRunnable loop = new JJRunnable(ResourceWatchService.class.getSimpleName() + " loop") {
+	private final IOTask loop = new IOTask(ResourceWatchService.class.getSimpleName() + " loop") {
 
-		@Override
-		protected boolean ignoreInExecutionTrace() {
-			return true;
-		}
 		
 		private void remove(final AbstractResource resource) {
 			log.info("removing {}", resource);
@@ -106,16 +102,12 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 			// the resources are reloaded as a separate task so we don't clog up
 			// the reloader thread doing other work
 			resource.kill();
-			executors.ioExecutor().submit(
-				new JJRunnable(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
-				
-					@Override
-					protected boolean ignoreInExecutionTrace() {
-						return true;
-					}
+			executors.execute(
+				new IOTask(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
+
 
 					@Override
-					public void doRun() {
+					public void run() {
 						log.info("reloading {}", resource);
 						resourceFinder.loadResource(
 							resource.getClass(),
@@ -131,7 +123,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		}
 		
 		@Override
-		public void doRun() {
+		public void run() {
 			try {
 				// we're a daemon thread, run till we can't run no more
 				// or get interrupted, whichever comes first

@@ -17,14 +17,10 @@ package jj.configuration;
 
 import static org.mockito.BDDMockito.*;
 
-import java.util.concurrent.Executors;
-
-import jj.execution.JJExecutors;
+import jj.execution.MockJJExecutors;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -37,24 +33,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationScriptPreloaderTest {
 
-	@Mock JJExecutors executors;
+	MockJJExecutors executors = new MockJJExecutors();
 	@Mock ResourceFinder resourceFinder;
-	
-	@Before
-	public void before() {
-		given(executors.ioExecutor()).willReturn(Executors.newCachedThreadPool());
-	}
-	
-	@After
-	public void after() {
-		executors.ioExecutor().shutdownNow();
-	}
 	
 	@Test
 	public void test() throws Exception {
 		
 		ConfigurationScriptPreloader csp = new ConfigurationScriptPreloader(executors, resourceFinder);
 		csp.start();
+		executors.runFirstTask();
 		
 		verify(resourceFinder).loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
 	}

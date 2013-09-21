@@ -18,13 +18,14 @@ package jj.configuration;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
+import jj.execution.IOTask;
 import jj.execution.JJExecutors;
-import jj.execution.JJRunnable;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 
@@ -53,20 +54,21 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 	@Override
 	public void start() throws Exception {
 		final CountDownLatch latch = new CountDownLatch(1);
-		executors.ioExecutor().submit(new JJRunnable("preloading configuration script") {
-			
-			@Override
-			public void doRun() {
-				resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
-				latch.countDown();
-			}
-		});
 		
-		// 3 seconds is kinda arbitrary but really
+		try {
+			executors.execute(new IOTask("preloading configuration script") {
+				
+				@Override
+				public void run() {
+					resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+					latch.countDown();
+				}
+			}).get(1, SECONDS);
+		} catch (TimeoutException te) {
+		// 1 second is kinda arbitrary but really
 		// if it takes any kind of time at all,
 		// we're hosed
-		if (!latch.await(3, SECONDS)) {
-			throw new AssertionError("timed out loading the configuration");
+			throw new AssertionError("timed out loading the configuration", te);
 		}
 	}
 

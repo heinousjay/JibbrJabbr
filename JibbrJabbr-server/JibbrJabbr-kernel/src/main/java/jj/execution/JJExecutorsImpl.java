@@ -1,24 +1,25 @@
 package jj.execution;
 
+import io.netty.util.concurrent.DefaultPromise;
+
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+
+import jj.logging.EmergencyLogger;
 import jj.script.ScriptRunner;
 
 /**
- * convenience object to pack up all the methods
- * of execution available inside JibbrJabbr, so
- * that dependencies can be simpler and more easily
- * mockable.  uses interface/impl separation and 
- * the picocontainer HIDE_IMPL characteristic because
- * this component is used to break a lot of dependency
- * cycles.  The script runner is kinda central to
- * everything, but at the same time it also relies
- * on pretty much the whole system to get the job
- * done
+ * exposes some execution related information and
+ * provides the API for execution services in the
+ * system.  DO NOT DEPEND ON THIS DIRECTLY, use the
+ * interface
  * 
  * @author jason
  *
@@ -26,49 +27,78 @@ import jj.script.ScriptRunner;
 @Singleton
 class JJExecutorsImpl implements JJExecutors {
 
-	private final ScriptRunner scriptRunner;
-	private final IOExecutor ioExecutor;
-	private final ScriptExecutorFactory scriptExecutorFactory;
+	private final ExecutorBundle bundle;
+	private final Logger logger;
 	
 	@Inject
 	public JJExecutorsImpl(
-		final ScriptRunner scriptRunner,
-		final IOExecutor ioExecutor,
-		final ScriptExecutorFactory scriptExecutorFactory
+		final ExecutorBundle bundle,
+		final @EmergencyLogger Logger logger
 	) {
-		this.scriptRunner = scriptRunner;
-		this.ioExecutor = ioExecutor;
-		this.scriptExecutorFactory = scriptExecutorFactory;
+		this.bundle = bundle;
+		this.logger = logger;
+	}
+	
+	@Override
+	public Future<Void> execute(final JJTask task) {
+		
+		final CountDownLatch latch = new CountDownLatch(1);
+		
+		task.executor(bundle).submit(new Runnable() {
+			
+			@Override
+			public void run() {
+				// execution event
+				try {
+					task.run();
+				} catch (OutOfMemoryError error) {
+					throw error;
+				} catch (Throwable t) {
+					logger.error("Exception caught in executor", t);
+				} finally {
+					latch.countDown();
+				}
+			}
+		});
+		
+		return new DefaultPromise<Void>() {
+			
+			@Override
+			public boolean isDone() {
+				return latch.getCount() == 0;
+			}
+		};
 	}
 	
 	public ScriptRunner scriptRunner() {
-		return scriptRunner;
+		return bundle.scriptRunner;
 	}
 	
 	public ExecutorService ioExecutor() {
-		return ioExecutor;
+		return bundle.ioExecutor;
 	}
 	
 	public ScriptExecutorFactory scriptExecutorFactory() {
-		return scriptExecutorFactory;
+		return bundle.scriptExecutorFactory;
 	}
 	
 	// conveniences to keep method call chains down
 
 	public ScheduledExecutorService scriptExecutorFor(final String baseName) {
-		return scriptExecutorFactory.executorFor(baseName);
+		return bundle.scriptExecutorFactory.executorFor(baseName);
 	}
 	
 	@Override
 	public boolean isScriptThreadFor(String baseName) {
-		return scriptExecutorFactory.isScriptThreadFor(baseName);
+		return bundle.scriptExecutorFactory.isScriptThreadFor(baseName);
 	}
 
 	public boolean isIOThread() {
 		return IOExecutor.isIOThread();
 	}
 	
+	// TODO replace the use of this with configuration
 	public int ioPoolSize() {
-		return ioExecutor.getMaximumPoolSize();
+		return bundle.ioExecutor.getMaximumPoolSize();
 	}
 }

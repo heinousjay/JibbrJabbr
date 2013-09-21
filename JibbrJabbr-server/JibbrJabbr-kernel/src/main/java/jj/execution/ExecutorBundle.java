@@ -15,26 +15,30 @@
  */
 package jj.execution;
 
-import java.util.concurrent.ScheduledExecutorService;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.script.ScriptRunner;
 
 /**
  * @author jason
  *
  */
-public abstract class JJTask {
+@Singleton
+class ExecutorBundle {
 	
-	private final String name;
-	
-	JJTask(final String name) {
-		this.name = name;
-	}
+	final ScriptRunner scriptRunner;
+	final IOExecutor ioExecutor;
+	final ScriptExecutorFactory scriptExecutorFactory;
 
-	protected abstract void run() throws Exception;
-	
-	abstract ScheduledExecutorService executor(ExecutorBundle executors);
-	
-	String name() {
-		return name;
+	@Inject
+	ExecutorBundle(
+		final ScriptRunner scriptRunner,
+		final IOExecutor ioExecutor,
+		final ScriptExecutorFactory scriptExecutorFactory
+	) {
+		this.scriptRunner = scriptRunner;
+		this.ioExecutor = ioExecutor;
+		this.scriptExecutorFactory = scriptExecutorFactory;
 	}
-
 }

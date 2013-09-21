@@ -23,8 +23,8 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 
 import jj.execution.ExecutionTrace;
+import jj.execution.IOTask;
 import jj.execution.JJExecutors;
-import jj.execution.JJRunnable;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
@@ -131,9 +131,9 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final List<Servable<? extends Resource>> list = servables.findMatchingServables(request.uriMatch());
 		
 		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
-		executors.ioExecutor().submit(new JJRunnable("JJEngine core processing") {
+		executors.execute(new IOTask("JJEngine core processing") {
 			@Override
-			public void doRun() {
+			public void run() {
 				try {
 					boolean found = false;
 					for (Servable<? extends Resource> servable : list) {

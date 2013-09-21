@@ -2,7 +2,6 @@ package jj.http.server.servable.document;
 
 
 import static jj.AnswerWithSelf.ANSWER_WITH_SELF;
-import static jj.execution.MockJJExecutors.ThreadType.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -96,7 +95,7 @@ public class DocumentRequestProcessorTest {
 	}
 
 	@Test
-	public void testIOFilterBehavior() {
+	public void testIOFilterBehavior() throws Exception {
 
 		// given
 		Set<DocumentFilter> filters = new LinkedHashSet<>();
@@ -107,23 +106,21 @@ public class DocumentRequestProcessorTest {
 		filters.add(new TestDocumentFilter(true, 6));
 		filters.add(new TestDocumentFilter(false, 3));
 		
-		executors.addThreadTypes(ScriptThread, 4);
-		executors.addThreadTypes(IOThread, 2);
-		
 		DocumentRequestProcessor toTest = 
 			new DocumentRequestProcessor(executors, htmlResource, httpRequest, httpResponse, filters);
 		
 		// when
+		executors.isScriptThread = true;
 		toTest.respond();
-		executors.executor.runUntilIdle();
-		
+		executors.runUntilIdle();
+
 		// then
 		assertThat(filterCalls, is(6));
 		// TODO can make this smarter later
 	}
 	
 	@Test
-	public void testWritesDocumentCorrectly() {
+	public void testWritesDocumentCorrectly() throws Exception {
 		// given
 		DocumentRequestProcessor toTest = 
 				new DocumentRequestProcessor(executors, htmlResource, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
@@ -134,7 +131,7 @@ public class DocumentRequestProcessorTest {
 		
 		// when
 		toTest.respond();
-		executors.executor.runUntilIdle();
+		executors.runUntilIdle();
 		
 		// then
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);

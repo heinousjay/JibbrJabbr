@@ -70,6 +70,6 @@ abstract class AbstractResource implements Resource {
 	}
 	
 	public String toString() {
-		return getClass().getSimpleName() + "/" + baseName() + "@" + sha1();
+		return getClass().getSimpleName() + "@" + uri();
 	}
 }
