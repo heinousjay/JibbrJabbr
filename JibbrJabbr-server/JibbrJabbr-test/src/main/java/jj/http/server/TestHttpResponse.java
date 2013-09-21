@@ -31,7 +31,6 @@ import jj.logging.TestRunnerLogger;
 import jj.resource.MimeTypes;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
-import jj.execution.ExecutionTrace;
 import jj.http.AbstractHttpResponse;
 import jj.http.HttpResponse;
 
@@ -54,18 +53,14 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	private TestHttpRequest request;
 	
-	private final ExecutionTrace trace;
-	
 	private final Logger testRunnerLogger;
 	
 	private final AtomicBoolean gotOnce = new AtomicBoolean(true);
 	
 	@Inject
 	TestHttpResponse(
-		final ExecutionTrace trace,
 		final @TestRunnerLogger Logger testRunnerLogger
 	) {
-		this.trace = trace;
 		this.testRunnerLogger = testRunnerLogger;
 	}
 	
@@ -133,7 +128,6 @@ public class TestHttpResponse extends AbstractHttpResponse {
 			}
 		}
 		
-		trace.end(request, this);
 		latch.countDown();
 	}
 

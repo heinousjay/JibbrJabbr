@@ -17,7 +17,6 @@ import org.mozilla.javascript.Callable;
 
 import jj.DataStore;
 import jj.DateFormatHelper;
-import jj.execution.ExecutionTrace;
 import jj.jjmessage.JJMessage;
 import jj.script.DocumentScriptExecutionEnvironment;
 
@@ -27,8 +26,6 @@ public class JJWebSocketConnection implements DataStore {
 	private static final String CLIENT_STORAGE = "JJWebSocketConnection client storage";
 	
 	private final HashMap<String, Callable> functions = new HashMap<>();
-	
-	private final ExecutionTrace trace;
 	
 	private final ChannelHandlerContext ctx;
 	
@@ -46,11 +43,9 @@ public class JJWebSocketConnection implements DataStore {
 
 	@Inject
 	JJWebSocketConnection(
-		final ExecutionTrace trace,
 		final ChannelHandlerContext ctx,
 		final DocumentScriptExecutionEnvironment scriptExecutionEnvironment
 	) {
-		this.trace = trace;
 		this.ctx = ctx;
 		this.scriptExecutionEnvironment = scriptExecutionEnvironment;
 		description = String.format(
@@ -132,7 +127,6 @@ public class JJWebSocketConnection implements DataStore {
 	public void end() {
 		if (!messages.isEmpty()) {
 			String message = serialize();
-			trace.send(this, message);
 			ctx.writeAndFlush(new TextWebSocketFrame(message));
 		}
 	}

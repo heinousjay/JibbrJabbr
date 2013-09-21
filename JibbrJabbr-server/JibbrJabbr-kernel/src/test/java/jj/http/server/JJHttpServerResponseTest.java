@@ -24,7 +24,6 @@ import static org.mockito.BDDMockito.*;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-import jj.execution.ExecutionTrace;
 import jj.http.AbstractHttpResponse;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.JJHttpServerResponse;
@@ -63,7 +62,6 @@ public class JJHttpServerResponseTest {
 	JJHttpServerRequest request;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock Logger logger;
-	@Mock ExecutionTrace trace;
 	JJHttpServerResponse response;
 
 	@Before
@@ -71,7 +69,7 @@ public class JJHttpServerResponseTest {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		request = new JJHttpServerRequest(nettyRequest, ctx);
 		
-		response = new JJHttpServerResponse(request, ctx, logger, trace);
+		response = new JJHttpServerResponse(request, ctx, logger);
 		assertThat(response.charset(), is(UTF_8));
 	}
 

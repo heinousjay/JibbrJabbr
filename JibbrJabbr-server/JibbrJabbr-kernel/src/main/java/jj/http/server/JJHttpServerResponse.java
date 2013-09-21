@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import jj.DateFormatHelper;
 import jj.Version;
-import jj.execution.ExecutionTrace;
 import jj.http.AbstractHttpResponse;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -66,8 +65,6 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private final Logger access;
 	
-	private final ExecutionTrace trace;
-	
 	/**
 	 * @param response
 	 */
@@ -75,13 +72,11 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	JJHttpServerResponse(
 		final JJHttpServerRequest request,
 		final ChannelHandlerContext ctx,
-		final @AccessLogger Logger access,
-		final ExecutionTrace trace
+		final @AccessLogger Logger access
 	) {
 		this.request = request;
 		this.ctx = ctx;
 		this.access = access;
-		this.trace = trace;
 		header(HttpHeaders.Names.SERVER, SERVER_NAME);
 	}
 	
@@ -101,7 +96,6 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		header(HttpHeaders.Names.DATE, new Date());
 		maybeClose(ctx.writeAndFlush(response));
 		markCommitted();
-		trace.end(request, this);
 		return this;
 	}
 	
@@ -136,7 +130,6 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		maybeClose(ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT));
 		
 		markCommitted();
-		trace.end(request, this);
 		return this;
 	}
 	

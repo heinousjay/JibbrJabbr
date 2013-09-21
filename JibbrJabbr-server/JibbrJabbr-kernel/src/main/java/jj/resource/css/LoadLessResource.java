@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution.events;
+package jj.resource.css;
 
-import jj.script.ScriptExecutionEnvironment;
+import jj.execution.events.ExecutionEvent;
 
 /**
  * @author jason
  *
  */
-public class ExecutionEnvironmentInitialized implements ExecutionEvent {
-	
-	private final ScriptExecutionEnvironment executionEnvironment;
+public class LoadLessResource implements ExecutionEvent {
 
-	public ExecutionEnvironmentInitialized(final ScriptExecutionEnvironment executionEnvironment) {
-		this.executionEnvironment = executionEnvironment;
-	}
-	
-	public ScriptExecutionEnvironment executionEnvironment() {
-		return executionEnvironment;
-	}
+	LoadLessResource(String name) {}
 }

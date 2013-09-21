@@ -22,7 +22,6 @@ import static org.mockito.BDDMockito.*;
 
 import java.net.InetSocketAddress;
 
-import jj.execution.ExecutionTrace;
 import jj.jjmessage.JJMessage;
 import jj.script.DocumentScriptExecutionEnvironment;
 import io.netty.channel.ChannelFutureListener;
@@ -47,7 +46,6 @@ import org.mozilla.javascript.Callable;
 @RunWith(MockitoJUnitRunner.class)
 public class JJWebSocketConnectionTest {
 	
-	@Mock ExecutionTrace trace;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
 	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
@@ -62,7 +60,7 @@ public class JJWebSocketConnectionTest {
 		
 		given(ctx.channel().remoteAddress()).willReturn(InetSocketAddress.createUnresolved("localhost", 8080));
 		
-		connection = new JJWebSocketConnection(trace, ctx, scriptExecutionEnvironment);
+		connection = new JJWebSocketConnection(ctx, scriptExecutionEnvironment);
 	}
 
 	@Test
@@ -71,8 +69,6 @@ public class JJWebSocketConnectionTest {
 		JJMessage message2 = JJMessage.makeInvoke("invoke", "[0]");
 		String sent = "[" + message1 + "," + message2 + "]";
 		connection.send(message1).send(message2).end();
-		
-		verify(trace).send(connection, sent);
 		
 		verify(ctx).writeAndFlush(textFrameCaptor.capture());
 		

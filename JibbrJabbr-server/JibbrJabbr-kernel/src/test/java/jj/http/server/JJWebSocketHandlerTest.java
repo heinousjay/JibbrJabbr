@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.engine.HostEvent;
-import jj.execution.ExecutionTrace;
 import jj.execution.MockJJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
@@ -43,7 +42,6 @@ public class JJWebSocketHandlerTest {
 	JJWebSocketHandler wsh;
 	@Mock JJWebSocketConnection connection;
 	MockJJExecutors executors;
-	@Mock ExecutionTrace trace;
 	@Mock WebSocketMessageProcessor wsmp1;
 	@Mock WebSocketMessageProcessor wsmp2;
 	@Mock WebSocketMessageProcessor wsmp3;
@@ -62,20 +60,18 @@ public class JJWebSocketHandlerTest {
 		given(wsmp2.type()).willReturn(Type.Event);
 		given(wsmp3.type()).willReturn(Type.Element);
 		
-		wsh = new JJWebSocketHandler(executors, trace, messageProcessors);
+		wsh = new JJWebSocketHandler(executors, messageProcessors);
 	}
 
 	@Test
 	public void testOpened() {
 		wsh.opened(connection);
-		verify(trace).start(connection);
 		verify(executors.scriptRunner).submit(connection, HostEvent.clientConnected, connection);
 	}
 	
 	@Test
 	public void testClosed() {
 		wsh.closed(connection);
-		verify(trace).end(connection);
 		verify(executors.scriptRunner).submit(connection, HostEvent.clientDisconnected, connection);
 	}
 	
@@ -85,7 +81,6 @@ public class JJWebSocketHandlerTest {
 		String gibberish = "this is not a message the handler can handle.";
 		wsh.messageReceived(connection, gibberish);
 		
-		verify(trace).message(connection, gibberish);
 		verify(wsmp1, never()).handle(eq(connection), any(JJMessage.class));
 		verify(wsmp2, never()).handle(eq(connection), any(JJMessage.class));
 		verify(wsmp3, never()).handle(eq(connection), any(JJMessage.class));
@@ -96,7 +91,6 @@ public class JJWebSocketHandlerTest {
 		JJMessage jjmessage = MessageMaker.makeResult("id", "value");
 		String message = jjmessage.toString();
 		wsh.messageReceived(connection, message);
-		verify(trace).message(connection, message);
 		verify(wsmp1).handle(connection, jjmessage);
 	}
 	
@@ -105,7 +99,6 @@ public class JJWebSocketHandlerTest {
 		JJMessage jjmessage = MessageMaker.makeEvent("selector", "type");
 		String message = jjmessage.toString();
 		wsh.messageReceived(connection, message);
-		verify(trace).message(connection, message);
 		verify(wsmp2).handle(connection, jjmessage);
 	}
 

@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution.events;
+package jj.event;
 
-import jj.script.ScriptExecutionEnvironment;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author jason
  *
  */
-public class ExecutionEnvironmentInitialized implements ExecutionEvent {
+public class MockPublisher implements Publisher {
 	
-	private final ScriptExecutionEnvironment executionEnvironment;
+	public List<Object> events = new ArrayList<>();
 
-	public ExecutionEnvironmentInitialized(final ScriptExecutionEnvironment executionEnvironment) {
-		this.executionEnvironment = executionEnvironment;
+	@Override
+	public void publish(Object event) {
+		events.add(event);
 	}
-	
-	public ScriptExecutionEnvironment executionEnvironment() {
-		return executionEnvironment;
-	}
+
 }

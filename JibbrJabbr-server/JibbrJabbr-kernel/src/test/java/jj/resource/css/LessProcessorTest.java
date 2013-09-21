@@ -27,7 +27,7 @@ import java.nio.file.Paths;
 
 import jj.JJ;
 import jj.configuration.Configuration;
-import jj.execution.ExecutionTrace;
+import jj.event.MockPublisher;
 import jj.resource.css.LessProcessor;
 import jj.script.RealRhinoContextMaker;
 
@@ -48,14 +48,15 @@ public class LessProcessorTest {
 	Path appPath;
 	String testCss;
 	@Mock Configuration configuration;
-	@Mock ExecutionTrace trace;
+	MockPublisher publisher;
 	
 	@Before
 	public void before() throws IOException {
 		appPath = Paths.get(JJ.uri(LessProcessorTest.class)).getParent().getParent();
 		testCss = new String(Files.readAllBytes(appPath.resolve("test.css")), UTF_8);
 		given(configuration.appPath()).willReturn(appPath);
-		underTest = new LessProcessor(configuration, trace, new RealRhinoContextMaker());
+		publisher = new MockPublisher();
+		underTest = new LessProcessor(configuration, new RealRhinoContextMaker(), publisher);
 	}
 	
 	@Test
@@ -67,10 +68,18 @@ public class LessProcessorTest {
 		// as we care that it worked.
 		assertThat(output, is(testCss));
 		
-		verify(trace).startLessProcessing("test.less");
-		verify(trace).loadLessResource("test.less");
-		verify(trace).loadLessResource("test2.less");
-		verify(trace).finishLessProcessing("test.less");
+		Class<?>[] expected = new Class<?>[] {
+			StartingLessProcessing.class,
+			LoadLessResource.class,
+			LoadLessResource.class,
+			FinishedLessProcessing.class
+		};
+		
+		assertThat(publisher.events.size(), is(expected.length));
+		
+		for (Class<?> clazz : expected) {
+			assertThat(publisher.events.remove(0), is(instanceOf(clazz)));
+		}
 	}
 
 }

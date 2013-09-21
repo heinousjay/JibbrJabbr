@@ -31,12 +31,6 @@ public class ExecutionModule extends JJModule {
 		addShutdownListenerBinding().to(IOExecutor.class);
 		addShutdownListenerBinding().to(ScriptExecutorFactory.class);
 		addShutdownListenerBinding().to(ClientExecutor.class);
-
-		
-		// for now.  this will have different installations in different
-		// environments, i'd think.  if you replace this binding you'll also
-		// have to  do something with TaskCreator
-		bind(ExecutionTrace.class).to(ExecutionTraceImpl.class);
 		
 		// a good place to break apart crafty circular dependencies.  this is
 		// the most popular object in the system.  for good reason.

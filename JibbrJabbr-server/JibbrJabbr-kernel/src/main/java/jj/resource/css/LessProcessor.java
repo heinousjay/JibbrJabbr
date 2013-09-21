@@ -32,7 +32,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import jj.configuration.Configuration;
-import jj.execution.ExecutionTrace;
+import jj.event.Publisher;
 import jj.script.RhinoContext;
 import jj.script.RhinoContextMaker;
 
@@ -50,8 +50,7 @@ class LessProcessor {
 	
 	private static String lessScript() throws IOException {
 		
-		// TODO, load from the resource system, which in turn means
-		// TODO, abstract script running duties to some other object
+		// TODO, LessScriptEnvironment
 		
 		try (BufferedReader reader = 
 			new BufferedReader(new InputStreamReader(LessProcessor.class.getResourceAsStream(SCRIPT_NAME), UTF_8))) {
@@ -106,10 +105,10 @@ class LessProcessor {
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			String resourceName = String.valueOf(args[0]);
 			try {
-				trace.loadLessResource(resourceName);
+				publisher.publish(new LoadLessResource(resourceName));
 				return new String(Files.readAllBytes(configuration.appPath().resolve(resourceName)), UTF_8);
 			} catch (IOException io) {
-				trace.errorLoadingLessResource(resourceName, io);
+				publisher.publish(new ErrorLoadingLessResource(resourceName, io));
 			}
 			return Undefined.instance;
 		}
@@ -117,36 +116,40 @@ class LessProcessor {
 
 	private final ScriptableObject global;
 	private final Configuration configuration;
-	private final ExecutionTrace trace;
 	private final RhinoContextMaker contextMaker;
+	private final Publisher publisher;
 	
 	@Inject
 	LessProcessor(
 		final Configuration configuration,
-		final ExecutionTrace trace,
-		final RhinoContextMaker contextMaker
+		final RhinoContextMaker contextMaker,
+		final Publisher publisher
 	) throws IOException {
 		this.configuration = configuration;
 		this.contextMaker = contextMaker;
+		this.publisher = publisher;
 		global = makeGlobal();
-		this.trace = trace;
 	}
 	
-	String process(final String baseName) {
+	String process(final String lessName) {
 		
 		try (RhinoContext context = context(contextMaker.context())) {
-			trace.startLessProcessing(baseName);
+			publisher.publish(new StartingLessProcessing(lessName));
+			
 			Scriptable local = context.newObject(global);
 			local.setPrototype(global);
 		    local.setParentScope(null);
-			Object result = context.evaluateString(local, "runLess('" + baseName + "');", baseName);
+			Object result = context.evaluateString(local, "runLess('" + lessName + "');", lessName);
+			
 			if (result == Scriptable.NOT_FOUND) {
 				return null;
 			}
+			
 			return String.valueOf(result);
+			
 		} finally {
 			NameFunction.name.set(null);
-			trace.finishLessProcessing(baseName);
+			publisher.publish(new FinishedLessProcessing(lessName));
 		}
 	}
 	

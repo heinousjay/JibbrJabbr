@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import jj.logging.TestRunnerLogger;
-import jj.execution.ExecutionTrace;
 import jj.http.server.TestHttpRequest;
 import jj.http.server.TestHttpResponse;
 import jj.http.server.TestJJEngineHttpHandler;
@@ -153,7 +152,6 @@ class TestRunner {
 		final TestHttpRequest request,
 		final TestHttpResponse response,
 		final TestJJEngineHttpHandler handler,
-		final ExecutionTrace trace,
 		final @TestRunnerLogger Logger testRunnerLog
 	) {
 		this.request = request;

@@ -24,7 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.SHA1Helper;
-import jj.execution.ExecutionTrace;
+import jj.event.Publisher;
 import jj.resource.Resource;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceCacheKey;
@@ -87,7 +87,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	@Mock Logger logger;
 	
 	protected void before() throws Exception {
-		lessProcessor = spy(new LessProcessor(configuration, mock(ExecutionTrace.class), new RealRhinoContextMaker()));
+		lessProcessor = spy(new LessProcessor(configuration, new RealRhinoContextMaker(), mock(Publisher.class)));
 		resourceMaker = new ResourceMaker(configuration, logger);
 	}
 

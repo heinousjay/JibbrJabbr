@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 
 import com.google.inject.Injector;
 
-import jj.execution.ExecutionTrace;
 import jj.execution.JJExecutors;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -47,11 +46,10 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 		final JJExecutors executors,
 		final Servables servables,
 		final Injector injector,
-		final ExecutionTrace trace,
 		final WebSocketUriChecker webSocketUriChecker,
 		final @EmergencyLogger Logger logger
 	) {
-		super(executors, servables, injector, trace, webSocketUriChecker, logger);
+		super(executors, servables, injector, webSocketUriChecker, logger);
 	}
 
 	@Override

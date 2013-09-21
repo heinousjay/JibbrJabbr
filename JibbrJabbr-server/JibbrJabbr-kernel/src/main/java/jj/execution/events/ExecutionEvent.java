@@ -19,6 +19,6 @@ package jj.execution.events;
  * @author jason
  *
  */
-public class ExecutionEvent {
+public interface ExecutionEvent {
 	
 }

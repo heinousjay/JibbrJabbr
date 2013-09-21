@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.resource.css;
 
-import java.util.concurrent.FutureTask;
+import jj.execution.events.ExecutionEvent;
 
 /**
  * @author jason
  *
  */
-class OldJJTask<V> extends FutureTask<V> {
+public class ErrorLoadingLessResource implements ExecutionEvent {
 	
-	/**
-	 * @param runnable
-	 * @param result
-	 */
-	OldJJTask(Runnable runnable, V result) {
-		super(runnable, result);
+	private final String name;
+	private final Throwable cause;
+	
+	ErrorLoadingLessResource(final String name, final Throwable cause) {
+		this.name = name;
+		this.cause = cause;
 	}
-
 }

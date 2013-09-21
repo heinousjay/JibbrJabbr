@@ -32,7 +32,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.IOException;
-import jj.execution.ExecutionTrace;
 import jj.execution.MockJJExecutors;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -63,7 +62,6 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 public class JJEngineHttpHandlerTest {
 	
 	@Mock Logger logger;
-	@Mock ExecutionTrace trace;
 	@Mock ChannelHandlerContext ctx;
 	@Mock Channel channel;
 	@Mock ChannelFuture channelFuture;
@@ -111,7 +109,7 @@ public class JJEngineHttpHandlerTest {
 		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
 		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
-		handler = new JJEngineHttpHandler(executors, servables.servables, injector, trace, webSocketUriChecker, logger);
+		handler = new JJEngineHttpHandler(executors, servables.servables, injector, webSocketUriChecker, logger);
 	}
 
 	@SuppressWarnings("unchecked")

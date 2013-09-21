@@ -2,7 +2,6 @@ package jj.execution;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -71,11 +70,6 @@ public class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerS
 				}
 			}
 		);
-	}
-	
-	@Override
-	protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
-		return new OldJJTask<>(runnable, value);
 	}
 
 	@Override

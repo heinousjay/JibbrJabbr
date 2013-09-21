@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.HostEvent;
-import jj.execution.ExecutionTrace;
 import jj.execution.JJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessageException;
@@ -31,18 +30,14 @@ class JJWebSocketHandler {
 	
 	private final JJExecutors executors;
 	
-	private final ExecutionTrace trace;
-	
 	private final Map<JJMessage.Type, WebSocketMessageProcessor> messageProcessors;
 	
 	@Inject
 	JJWebSocketHandler(
 		final JJExecutors executors,
-		final ExecutionTrace trace,
 		final Set<WebSocketMessageProcessor> messageProcessors
 	) {
 		this.executors = executors;
-		this.trace = trace;
 		this.messageProcessors = makeMessageProcessors(messageProcessors);
 	}
 	
@@ -57,17 +52,14 @@ class JJWebSocketHandler {
 	}
 
 	public void opened(JJWebSocketConnection connection) {
-		trace.start(connection);
 		executors.scriptRunner().submit(connection, HostEvent.clientConnected, connection);
 	}
 
 	public void closed(JJWebSocketConnection connection) {
-		trace.end(connection);
 		executors.scriptRunner().submit(connection, HostEvent.clientDisconnected, connection);
 	}
 
 	public void messageReceived(JJWebSocketConnection connection, String msg) {
-		trace.message(connection, msg);
 		boolean success = false;
 		
 		try {

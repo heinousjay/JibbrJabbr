@@ -22,7 +22,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 
-import jj.execution.ExecutionTrace;
 import jj.execution.IOTask;
 import jj.execution.JJExecutors;
 import jj.http.HttpRequest;
@@ -48,8 +47,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final Injector parentInjector;
 	
-	private final ExecutionTrace trace;
-	
 	private final WebSocketUriChecker webSocketUriChecker;
 	
 	private final Logger logger;
@@ -59,14 +56,12 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final JJExecutors executors,
 		final Servables servables,
 		final Injector parentInjector,
-		final ExecutionTrace trace,
 		final WebSocketUriChecker webSocketUriChecker,
 		final @EmergencyLogger Logger logger
 	) {
 		this.executors = executors;
 		this.servables = servables;
 		this.parentInjector = parentInjector;
-		this.trace = trace;
 		this.webSocketUriChecker = webSocketUriChecker;
 		this.logger = logger;
 	}
@@ -124,8 +119,6 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final HttpRequest request,
 		final HttpResponse response
 	) throws Exception {
-		
-		trace.start(request, response);
 		
 		// figure out if there's something for us to do
 		final List<Servable<? extends Resource>> list = servables.findMatchingServables(request.uriMatch());
