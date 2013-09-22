@@ -1,6 +1,5 @@
 package jj.script;
 
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -42,15 +41,12 @@ public class ScriptRunner {
 	
 	private final ScriptExecutorFactory scriptExecutorFactory;
 	
-	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
-	
 	@Inject
 	ScriptRunner(
 		final ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
-		final ScriptExecutorFactory scriptExecutorFactory,
-		final Map<ContinuationType, ContinuationProcessor> continuationProcessors
+		final ScriptExecutorFactory scriptExecutorFactory
 	) {
 		
 		// this class has a lot of dependencies, but it does
@@ -60,40 +56,27 @@ public class ScriptRunner {
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
 		this.scriptExecutorFactory = scriptExecutorFactory;
-		this.continuationProcessors = continuationProcessors;
 	}
 	
 	@ScriptThread
 	private void httpRequestInitialExecution() {
 		log.trace("performing initial execution of a document request");
 		context.documentRequestProcessor().startingInitialExecution();
-		final ContinuationState continuationState = 
-				continuationCoordinator.execute(context.documentScriptExecutionEnvironment());
-		
-		if (continuationState == null) {
+
+		if (continuationCoordinator.execute(context.documentScriptExecutionEnvironment())) {
 			context.documentScriptExecutionEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
-		} else {
-			log.trace("initial execution - continuation. storing execution state");
-			processContinuationState(continuationState);
 		}
 	}
 
 	@ScriptThread
 	private void resumeHttpRequestInitialExecution(String pendingKey, Object result) {
 		log.trace("resuming initial execution of a script execution environment");
-		
-		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result);
-		
-		if (continuationState == null) {
+		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result)) {
 			context.scriptExecutionEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
-		} else {
-			log.trace("initial execution - continuation. storing execution state");
-			processContinuationState(continuationState);
 		}
 	}
 	
@@ -108,15 +91,10 @@ public class ScriptRunner {
 			log.trace("starting ready function execution");
 			
 			context.documentRequestProcessor().startingReadyFunction();
-			final ContinuationState continuationState = 
-					continuationCoordinator.execute(scriptExecutionEnvironment, scriptExecutionEnvironment.getFunction(READY_FUNCTION_KEY));
 			
-			if (continuationState == null) {
+			if (continuationCoordinator.execute(scriptExecutionEnvironment, ready)) {
 				log.trace("ready function execution - completed, serving document");
 				context.documentRequestProcessor().respond();
-			} else {
-				log.trace("ready function execution - continuation, storing execution state");
-				processContinuationState(continuationState);
 			}
 		}
 	}
@@ -125,15 +103,9 @@ public class ScriptRunner {
 	private void resumeReadyFunction(String pendingKey, Object result) {
 		log.trace("resuming ready function execution of a script execution environment");
 		
-		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.documentScriptExecutionEnvironment(), result);
-		
-		if (continuationState == null) {
+		if (continuationCoordinator.resumeContinuation(pendingKey, context.documentScriptExecutionEnvironment(), result)) {
 			log.trace("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
-		} else {
-			log.trace("ready function execution - continuation, storing execution state");
-			processContinuationState(continuationState);
 		}
 	}
 	
@@ -187,16 +159,10 @@ public class ScriptRunner {
 	private void moduleInitialExecution(final RequiredModule requiredModule) {
 		log.debug("performing initial execution of a required module");
 		
-		final ContinuationState continuationState = 
-				continuationCoordinator.execute(context.moduleScriptExecutionEnvironment());
-		
-		if (continuationState == null) {
+		if (continuationCoordinator.execute(context.moduleScriptExecutionEnvironment())) {
 			context.moduleScriptExecutionEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			completeModuleInitialization();
-		} else {
-			log.debug("initial execution - continuation. storing execution state");
-			processContinuationState(continuationState);
 		}
 	}
 
@@ -204,16 +170,10 @@ public class ScriptRunner {
 	private void resumeModuleInitialExecution(final String pendingKey, final Object result) {
 		log.debug("resuming initial execution of a required module");
 		
-		final ContinuationState continuationState = 
-				continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result);
-		
-		if (continuationState == null) {
+		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result)) {
 			context.scriptExecutionEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			completeModuleInitialization();
-		} else {
-			log.debug("initial execution - continuation. storing execution state");
-			processContinuationState(continuationState);
 		}
 	}
 	
@@ -278,12 +238,10 @@ public class ScriptRunner {
 	
 	@ScriptThread
 	private void resumeContinuation(final String pendingKey, final Object result) {
-		processContinuationState(
-			continuationCoordinator.resumeContinuation(
-				pendingKey,
-				context.scriptExecutionEnvironment(),
-				result
-			)
+		continuationCoordinator.resumeContinuation(
+			pendingKey,
+			context.scriptExecutionEnvironment(),
+			result
 		);
 	}
 	
@@ -302,9 +260,7 @@ public class ScriptRunner {
 				Callable function = connection.getFunction(event);
 				if (function == null) function = executionEnvironment.getFunction(event);
 				try {
-					processContinuationState(
-						continuationCoordinator.execute(executionEnvironment, function, args)
-					);
+					continuationCoordinator.execute(executionEnvironment, function, args);
 				} finally {
 					context.end();
 				}
@@ -320,21 +276,6 @@ public class ScriptRunner {
 	private void submit(final String baseName, final JJRunnable runnable) {
 		
 		scriptExecutorFactory.executorFor(baseName).submit(runnable);
-	}
-	
-	/**
-	 * 
-	 * @param continuationState
-	 */
-	private void processContinuationState(ContinuationState continuationState) {
-		if (continuationState != null) {
-			
-			ContinuationProcessor processor = continuationProcessors.get(continuationState.type());
-			
-			assert processor != null : "could not find a continuation processor of type " + continuationState.type();
-			
-			processor.process(continuationState);
-		}
 	}
 	
 	/** 

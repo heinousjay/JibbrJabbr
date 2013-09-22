@@ -1,4 +1,4 @@
 $(function() {
 	
-	// nothing to do really.
+	require('modules/module2').callMe();
 });

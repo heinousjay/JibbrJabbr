@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head>
 		<title>ANIMAL!</title>
-	<script type="text/javascript" src="/jquery-2.0.3.min.js"></script><script type="text/javascript" src="/4f1b7b2704914702bb7f2dfe60f6f46f69a286d6/jj.js" id="jj-connector-script" data-jj-socket-url="ws://localhost/f7a96f96b5365fb9b8e25c6ef05c33621f79cdef/animal.socket" data-jj-startup-messages="[]"></script><script type="text/javascript" src="/f7a96f96b5365fb9b8e25c6ef05c33621f79cdef/animal.js"></script></head>
+	<script type="text/javascript" src="/jquery-2.0.3.min.js"></script><script type="text/javascript" src="/4f1b7b2704914702bb7f2dfe60f6f46f69a286d6/jj.js" id="jj-connector-script" data-jj-socket-url="ws://localhost/70da196c9ec3b0518ac8b94377d60da834988dc1/animal.socket" data-jj-startup-messages="[]"></script><script type="text/javascript" src="/70da196c9ec3b0518ac8b94377d60da834988dc1/animal.js"></script></head>
 	
 	<body>
 		<input type="file" id="fileElem" multiple="multiple" style="display:none" />
@@ -8,7 +8,7 @@
 		<div id="fileList">
 			<p>No files selected!</p>
 		</div>
-	
+		<div id="call-me-result">called</div>
 	
 
 </body></html>

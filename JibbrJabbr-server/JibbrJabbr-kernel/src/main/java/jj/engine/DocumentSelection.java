@@ -333,6 +333,6 @@ class DocumentSelection implements Selection {
 
 	@Override
 	public String toString() {
-		return DocumentSelection.class.getSimpleName() + ": " + selector;
+		return DocumentSelection.class.getSimpleName() + ": " + selector + "\n" + elements;
 	}
 }

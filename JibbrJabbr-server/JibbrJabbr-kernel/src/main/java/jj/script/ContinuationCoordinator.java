@@ -1,5 +1,7 @@
 package jj.script;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -29,15 +31,19 @@ class ContinuationCoordinator {
 	
 	private final CurrentScriptContext currentScriptContext;
 	
+	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
+	
 	@Inject
 	ContinuationCoordinator(
 		final RhinoContextMaker contextMaker,
 		final CurrentScriptContext currentScriptContext,
-		final @EmergencyLogger Logger log
+		final @EmergencyLogger Logger log,
+		final Map<ContinuationType, ContinuationProcessor> continuationProcessors
 	) {
 		this.contextMaker = contextMaker;
 		this.currentScriptContext = currentScriptContext;
 		this.log = log;
+		this.continuationProcessors = continuationProcessors;
 	}
 	
 	private void log(final Exception e, final ScriptExecutionEnvironment scriptExecutionEnvironment) {
@@ -61,19 +67,19 @@ class ContinuationCoordinator {
 	 * @param scriptExecutionEnvironment
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(final ScriptExecutionEnvironment scriptExecutionEnvironment) {
+	boolean execute(final ScriptExecutionEnvironment scriptExecutionEnvironment) {
 		
 		assert (scriptExecutionEnvironment != null) : "cannot execute without a script execution environment";
 		
 		ScriptableObject.putConstProperty(scriptExecutionEnvironment.scope(), "scriptKey", scriptExecutionEnvironment.sha1());
 		
-		return execute(new ContinuationExecution() {
+		return processContinuationState(execute(new ContinuationExecution() {
 			
 			@Override
 			public void run(RhinoContext context) {
 				context.executeScriptWithContinuations(scriptExecutionEnvironment.script(), scriptExecutionEnvironment.scope());
 			}
-		}, scriptExecutionEnvironment);
+		}, scriptExecutionEnvironment));
 	}
 	
 	/**
@@ -83,25 +89,25 @@ class ContinuationCoordinator {
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	ContinuationState execute(final DocumentScriptExecutionEnvironment scriptExecutionEnvironment, final Callable function, final Object...args) {
+	boolean execute(final DocumentScriptExecutionEnvironment scriptExecutionEnvironment, final Callable function, final Object...args) {
 		
 		assert (scriptExecutionEnvironment != null) : "cannot execute without a script execution environment";
 		
 		if (function != null) {
 
-			return execute(new ContinuationExecution() {
+			return processContinuationState(execute(new ContinuationExecution() {
 				
 				@Override
 				public void run(RhinoContext context) {
 					context.callFunctionWithContinuations(function, scriptExecutionEnvironment.scope(), args);
 				}
-			}, scriptExecutionEnvironment);
+			}, scriptExecutionEnvironment));
 			
 		}
 		
 		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptExecutionEnvironment);
 		log.error("helpful stacktrace", new Exception());
-		return null;
+		return false;
 	}
 	
 	/**
@@ -109,27 +115,27 @@ class ContinuationCoordinator {
 	 * @param pendingKey
 	 * @param scriptExecutionEnvironment
 	 * @param result
-	 * @return
+	 * @return true if completed, false if continued
 	 */
-	ContinuationState resumeContinuation(final String pendingKey, final ScriptExecutionEnvironment scriptExecutionEnvironment, final Object result) {
+	boolean resumeContinuation(final String pendingKey, final ScriptExecutionEnvironment scriptExecutionEnvironment, final Object result) {
 		
 		assert (scriptExecutionEnvironment != null) : "cannot resume without a script execution environment";
 		
 		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
 		if (continuation != null) {
 
-			return execute(new ContinuationExecution() {
+			return processContinuationState(execute(new ContinuationExecution() {
 				
 				@Override
 				public void run(RhinoContext context) {
 					context.resumeContinuation(continuation.getContinuation(), scriptExecutionEnvironment.scope(), result);
 				}
-			}, scriptExecutionEnvironment);
+			}, scriptExecutionEnvironment));
 		}
 		
 		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptExecutionEnvironment, pendingKey);
 		log.error("helpful stacktrace", new Exception());
-		return null;
+		return false;
 	}
 	
 	private ContinuationState extractContinuationState(final ContinuationPending continuation) {
@@ -138,5 +144,22 @@ class ContinuationCoordinator {
 		assert (continuationState != null) : "continuation captured with no state";
 		
 		return continuationState;
+	}
+	
+	/**
+	 * 
+	 * @param continuationState
+	 */
+	private boolean processContinuationState(ContinuationState continuationState) {
+		if (continuationState != null) {
+			
+			ContinuationProcessor processor = continuationProcessors.get(continuationState.type());
+			
+			assert processor != null : "could not find a continuation processor of type " + continuationState.type();
+			
+			processor.process(continuationState);
+			return false;
+		}
+		return true;
 	}
 }

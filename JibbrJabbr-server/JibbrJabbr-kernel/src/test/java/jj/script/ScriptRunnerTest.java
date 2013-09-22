@@ -2,9 +2,6 @@ package jj.script;
 
 import static org.mockito.BDDMockito.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jj.engine.HostEvent;
 import jj.execution.ScriptExecutorFactory;
 import jj.http.HttpRequest;
@@ -22,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Callable;
+import org.mozilla.javascript.Scriptable;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptRunnerTest {
@@ -33,6 +31,8 @@ public class ScriptRunnerTest {
 	
 	Document document;
 	
+	@Mock Scriptable scriptable;
+	
 	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	
 	@Mock ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment;
@@ -42,8 +42,6 @@ public class ScriptRunnerTest {
 	@Mock ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper;
 	
 	@Mock ContinuationCoordinator continuationCoordinator;
-	
-	@Mock ContinuationState continuationState;
 	
 	@Mock CurrentScriptContext currentScriptContext;
 	
@@ -61,12 +59,6 @@ public class ScriptRunnerTest {
 	
 	@Mock Callable eventFunction;
 	
-	@Mock ContinuationProcessor continuationProcessor1;
-	
-	@Mock ContinuationProcessor continuationProcessor2;
-	
-	@Mock ContinuationProcessor continuationProcessor3;
-	
 	ScriptContext httpRequestContext;
 	
 	@Before
@@ -79,17 +71,11 @@ public class ScriptRunnerTest {
 		executor = new DeterministicScheduler();
 		when(scriptExecutorFactory.executorFor(baseName)).thenReturn(executor);
 		
-		Map<ContinuationType, ContinuationProcessor> continuationProcessors = new HashMap<>();
-		continuationProcessors.put(ContinuationType.AsyncHttpRequest, continuationProcessor1);
-		continuationProcessors.put(ContinuationType.JJMessage, continuationProcessor2);
-		continuationProcessors.put(ContinuationType.RequiredModule, continuationProcessor3);
-		
 		scriptRunner = new ScriptRunner(
 			scriptExecutionEnvironmentHelper,
 			continuationCoordinator,
 			currentScriptContext,
-			scriptExecutorFactory,
-			continuationProcessors
+			scriptExecutorFactory
 		);
 		
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
@@ -130,6 +116,8 @@ public class ScriptRunnerTest {
 		
 		// given
 		givenADocumentRequest();
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment)).willReturn(true);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction)).willReturn(true);
 		
 		// when
 		scriptRunner.submit(documentRequestProcessor);
@@ -146,8 +134,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
-		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment)).willReturn(continuationState);
-		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment)).willReturn(false);
 		givenADocumentRequest();
 		
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.InitialExecution);
@@ -158,10 +145,11 @@ public class ScriptRunnerTest {
 		
 		// then
 		verify(documentRequestProcessor).startingInitialExecution();
-		verify(continuationProcessor1).process(continuationState);
 		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
+		given(continuationCoordinator.resumeContinuation("", associatedScriptExecutionEnvironment, null)).willReturn(true);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction)).willReturn(true);
 		
 		// when
 		scriptRunner.restartAfterContinuation("", null);
@@ -176,12 +164,8 @@ public class ScriptRunnerTest {
 		
 		// given
 		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
-		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction))
-			.willReturn(continuationState);
-		
-		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction))
-			.willReturn(continuationState);
-		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment)).willReturn(true);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction)).willReturn(false);
 		
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.ReadyFunctionExecution);
 		givenADocumentRequest();
@@ -193,11 +177,10 @@ public class ScriptRunnerTest {
 		// then
 		verify(documentRequestProcessor).startingInitialExecution();
 		verify(documentRequestProcessor).startingReadyFunction();
-		verify(continuationProcessor1).process(continuationState);
 		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
-		
+		given(continuationCoordinator.resumeContinuation("", associatedScriptExecutionEnvironment, null)).willReturn(true);
 		// when
 		scriptRunner.restartAfterContinuation("", null);
 		
@@ -235,11 +218,10 @@ public class ScriptRunnerTest {
 		// given
 		givenAWebSocketMessage();
 		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
-		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
-		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction, connection)).willReturn(continuationState);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction, connection)).willReturn(false);
 		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any()))
-			.willReturn(continuationState)
-			.willReturn(null);
+			.willReturn(false)
+			.willReturn(true);
 		
 		// when
 		scriptRunner.submit(connection, HostEvent.clientConnected, connection);
@@ -316,12 +298,11 @@ public class ScriptRunnerTest {
 		given(currentScriptContext.scriptExecutionEnvironment()).willReturn(associatedScriptExecutionEnvironment);
 		
 		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
-		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
-		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction)).willReturn(continuationState);
+		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction)).willReturn(false);
 		
 		given(continuationCoordinator.resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any()))
-			.willReturn(continuationState)
-			.willReturn(null);
+			.willReturn(false)
+			.willReturn(true);
 		
 		// when
 		scriptRunner.submit(connection, eventName);
@@ -375,15 +356,14 @@ public class ScriptRunnerTest {
 		
 		// given
 		RequiredModule module = givenAModuleRequire();
+		given(continuationCoordinator.execute(moduleScriptExecutionEnvironment)).willReturn(true);
 		
 		// when
 		scriptRunner.submit(module);
 		executor.runNextPendingCommand();
 		
-		// then
-		verify(continuationCoordinator).execute(moduleScriptExecutionEnvironment);
-		
 		// given
+		given(moduleScriptExecutionEnvironment.exports()).willReturn(scriptable);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.DocumentRequest);
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
 		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
@@ -394,7 +374,7 @@ public class ScriptRunnerTest {
 		
 		// then
 		verify(moduleScriptExecutionEnvironment).initialized(true);
-		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptExecutionEnvironment, null);
+		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptExecutionEnvironment, scriptable);
 	}
 	
 	@Test
@@ -402,34 +382,24 @@ public class ScriptRunnerTest {
 		
 		// given
 		RequiredModule module = givenAModuleRequire();
-		given(continuationCoordinator.execute(moduleScriptExecutionEnvironment)).willReturn(continuationState);
-		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
+		given(continuationCoordinator.execute(moduleScriptExecutionEnvironment)).willReturn(false);
 		
 		// when
 		scriptRunner.submit(module);
 		executor.runNextPendingCommand();
 		
-		// then
-		verify(continuationCoordinator).execute(moduleScriptExecutionEnvironment);
-		
 		// given
 		given(scriptExecutorFactory.isScriptThread()).willReturn(true);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.ModuleInitialization);
-		given(continuationCoordinator.execute(moduleScriptExecutionEnvironment)).willReturn(null);
+		given(continuationCoordinator.resumeContinuation(module.pendingKey(), moduleScriptExecutionEnvironment, scriptable)).willReturn(true);
 		
 		// when
-		scriptRunner.restartAfterContinuation("blah", null);
+		scriptRunner.restartAfterContinuation(module.pendingKey(), scriptable);
 		executor.runNextPendingCommand();
 		
 		// then
-		verify(continuationCoordinator).resumeContinuation("blah", moduleScriptExecutionEnvironment, null);
-		
-		// given
-		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
-		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.Uninitialized);
-		
-		// when
-		executor.runNextPendingCommand();
+		verify(moduleScriptExecutionEnvironment).initialized(true);
+		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptExecutionEnvironment, scriptable);
 	}
 
 }

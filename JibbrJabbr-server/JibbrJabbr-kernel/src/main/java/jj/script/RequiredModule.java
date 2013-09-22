@@ -84,6 +84,6 @@ public class RequiredModule implements DataStore {
 	
 	@Override
 	public String toString() {
-		return "required module " + pendingKey;
+		return "required module " + identifier + " under " + baseName;
 	}
 }

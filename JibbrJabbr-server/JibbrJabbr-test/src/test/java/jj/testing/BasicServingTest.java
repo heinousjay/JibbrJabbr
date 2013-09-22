@@ -69,7 +69,6 @@ public class BasicServingTest {
 
 	private static final String ANIMAL = "/animal";
 	
-	private static final String appPath;
 	private static final Path indexHtmlRenderedPath;
 	private static final Path animalHtmlRenderedPath;
 	
@@ -79,15 +78,13 @@ public class BasicServingTest {
 	public static final VerifiableRequest[] assets;
 	
 	private static VerifiableRequest makeResourceRequest(String name) throws Exception {
-		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(appPath, name)));
+		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(App.path, name)));
 	}
 	
 	static {
 		try {
-			// well it's ugly, but it's portable
-			appPath = Paths.get(JJ.uri(BasicServingTest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
-			indexHtmlRenderedPath = Paths.get(appPath, INDEX_HTML_RENDERED);
-			animalHtmlRenderedPath = Paths.get(appPath, ANIMAL_HTML_RENDERED);
+			indexHtmlRenderedPath = Paths.get(App.path, INDEX_HTML_RENDERED);
+			animalHtmlRenderedPath = Paths.get(App.path, ANIMAL_HTML_RENDERED);
 			
 			List<VerifiableRequest> work = new ArrayList<>();
 			work.add(makeResourceRequest("0.txt"));
@@ -130,7 +127,7 @@ public class BasicServingTest {
 	}
 	
 	@Rule
-	public JJAppTest app = new JJAppTest(appPath);
+	public JJAppTest app = new JJAppTest(App.path);
 	
 	static interface Namer {
 		String name(int i);
@@ -163,14 +160,14 @@ public class BasicServingTest {
 	@Ignore
 	@Test
 	public void writeDocumentBytes_notATest() throws Exception {
-		TestHttpClient client = app.get(INDEX);
+		TestHttpClient client = app.get(ANIMAL);
 		
 		byte[] bytes = client.contentBytes();
 		String string = client.contentsString();
 		System.out.println(string);
 		assertThat(string, is(new String(bytes, UTF_8)));
 		
-		Files.write(indexHtmlRenderedPath, bytes);
+		Files.write(animalHtmlRenderedPath, bytes);
 	}
 	
 	private void runBasicStressTest(final int total , final VerifiableRequest[] toRun) throws Exception {

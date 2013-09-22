@@ -16,9 +16,10 @@
 package jj.script;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -76,6 +77,12 @@ public class ContinuationCoordinatorTest {
 	
 	final String unexpectedExceptionString = "unexpected problem during script execution {}";
 	
+	@Mock ContinuationProcessor continuationProcessor1;
+	
+	@Mock ContinuationProcessor continuationProcessor2;
+	
+	@Mock ContinuationProcessor continuationProcessor3;
+	
 	@Before
 	public void before() {
 		
@@ -89,29 +96,36 @@ public class ContinuationCoordinatorTest {
 		
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
+		Map<ContinuationType, ContinuationProcessor> continuationProcessors = new HashMap<>();
+		continuationProcessors.put(ContinuationType.AsyncHttpRequest, continuationProcessor1);
+		continuationProcessors.put(ContinuationType.JJMessage, continuationProcessor2);
+		continuationProcessors.put(ContinuationType.RequiredModule, continuationProcessor3);
+		
 		RhinoContextMaker contextMaker = new MockRhinoContextMaker();
 		context = contextMaker.context();
-		continuationCoordinator = new ContinuationCoordinator(contextMaker, currentScriptContext, logger);
+		continuationCoordinator = new ContinuationCoordinator(contextMaker, currentScriptContext, logger, continuationProcessors);
 	}
 	
 	@Test
 	public void testInitialExecutionNoContinuation() {
 		
-		ContinuationState result = continuationCoordinator.execute(scriptExecutionEnvironment);
+		boolean result = continuationCoordinator.execute(scriptExecutionEnvironment);
 		
 		verify((ConstProperties)scope).putConst("scriptKey", scope, sha1);
 		
-		assertThat(result, is(nullValue()));
+		assertThat(result, is(true));
 	}
 	
 	@Test
 	public void testInitialExecutionWithContinuation() {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
+		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
-		ContinuationState result = continuationCoordinator.execute(scriptExecutionEnvironment);
+		boolean result = continuationCoordinator.execute(scriptExecutionEnvironment);
 
-		assertThat(result, is(continuationState));
+		assertThat(result, is(false));
+		verify(continuationProcessor1).process(continuationState);
 	}
 	
 	@Test
@@ -134,19 +148,21 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testFunctionExecutionNoContinuation() {
 		
-		ContinuationState result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args[0], args[1]);
+		boolean result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args[0], args[1]);
 		
-		assertThat(result, is(nullValue()));
+		assertThat(result, is(true));
 	}
 	
 	@Test
-	public void testFunctionExecutionWithContinutation() {
+	public void testFunctionExecutionWithContinuation() {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
+		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
 		
-		ContinuationState result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args);
+		boolean result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args);
 		
-		assertThat(result, is(continuationState));
+		assertThat(result, is(false));
+		verify(continuationProcessor2).process(continuationState);
 	}
 	
 	@Test
@@ -171,21 +187,24 @@ public class ContinuationCoordinatorTest {
 		
 		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
 		
-		ContinuationState result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
+		boolean result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
 		
-		assertThat(result, is(nullValue()));
+		assertThat(result, is(true));
 	}
 	
 	@Test
-	public void testContinuationResumptionWithContinutation() {
+	public void testContinuationResumptionWithContinuation() {
 		
 		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
 		
-		ContinuationState result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
+		given(continuationState.type()).willReturn(ContinuationType.RequiredModule);
 		
-		assertThat(result, is(continuationState));
+		boolean result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
+		
+		assertThat(result, is(false));
+		verify(continuationProcessor3).process(continuationState);
 	}
 	
 	@Test
