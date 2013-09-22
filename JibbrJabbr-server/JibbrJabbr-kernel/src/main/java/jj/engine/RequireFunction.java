@@ -28,7 +28,6 @@ import jj.script.ScriptExecutionEnvironmentFinder;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 
 /**
  * @author jason
@@ -84,35 +83,16 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 		return true;
 	}
 	
-	private String toModuleIdentifier(final String input) {
-		String moduleIdentifier = null;
-		if (input.startsWith(".")) {
-			
-			Object obj = ScriptableObject.getProperty(context.scriptExecutionEnvironment().scope(), "module");
-			assert obj instanceof Scriptable : "'module' can't be found in the current execution scope, something wasn't built correctly";
-			
-			Scriptable module = (Scriptable)obj;
-			String base = String.valueOf(ScriptableObject.getProperty(module, "id"));
-			
-			// well this is ridiculous but it works
-			moduleIdentifier =
-				configuration.appPath().relativize(
-					configuration.appPath().resolve(base).getParent().resolve(input).normalize()
-				).toString();
-			
-			// we allow modules outside the document root - after all, this is triggered internally
-			// so presumably the author knows what they intend.
-		} else {
-			moduleIdentifier = input;
-		}
-		
-		return moduleIdentifier;
+	private String toModuleIdentifier(final String input, final String base) {
+		return configuration.appPath().relativize(
+			configuration.appPath().resolve(base).getParent().resolve(input).normalize()
+		).toString();
 	}
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]));
+		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]), String.valueOf(args[1]));
 		
 		ModuleScriptExecutionEnvironment scriptExecutionEnvironment = 
 			scriptExecutionEnvironmentFinder.forBaseNameAndModuleIdentifier(context.baseName(), moduleIdentifier);
@@ -139,15 +119,17 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 
 	@Override
 	public String script() {
+		// actually created individually in each scope
 		// needs to inspect the result and see if it's an exception, and if so throw it
-		return "function require(id) {" +
+		return "global['//makeRequire'] = function(module) {" +
+					"return function(id) {" +
 					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
-					"var result = global['" + REQUIRE + "'](id); " +
+					"var result = global['" + REQUIRE + "'](id, module.id); " +
 					"if (result['getCause']) { " +
 						"throw result;" + 
 					"} " +
 					"return result;" +
-				"}";
+				"}}";
 	}
 
 }

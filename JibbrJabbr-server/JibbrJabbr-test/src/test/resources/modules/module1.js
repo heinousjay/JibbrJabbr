@@ -1,7 +1,6 @@
-//var callMe = ;
 
 exports.callMe = function() {
-	
-	require('./module2').callMe();
+	// this should work!
+	require('module2').callMe();
 	
 }

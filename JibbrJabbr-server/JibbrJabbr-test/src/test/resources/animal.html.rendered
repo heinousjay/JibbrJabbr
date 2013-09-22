@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head>
 		<title>ANIMAL!</title>
-	<script type="text/javascript" src="/jquery-2.0.3.min.js"></script><script type="text/javascript" src="/4f1b7b2704914702bb7f2dfe60f6f46f69a286d6/jj.js" id="jj-connector-script" data-jj-socket-url="ws://localhost/70da196c9ec3b0518ac8b94377d60da834988dc1/animal.socket" data-jj-startup-messages="[]"></script><script type="text/javascript" src="/70da196c9ec3b0518ac8b94377d60da834988dc1/animal.js"></script></head>
+	<script type="text/javascript" src="/jquery-2.0.3.min.js"></script><script type="text/javascript" src="/4f1b7b2704914702bb7f2dfe60f6f46f69a286d6/jj.js" id="jj-connector-script" data-jj-socket-url="ws://localhost/09a4bb7946e431f83337b92b231b95f728c0961e/animal.socket" data-jj-startup-messages="[]"></script><script type="text/javascript" src="/09a4bb7946e431f83337b92b231b95f728c0961e/animal.js"></script></head>
 	
 	<body>
 		<input type="file" id="fileElem" multiple="multiple" style="display:none" />

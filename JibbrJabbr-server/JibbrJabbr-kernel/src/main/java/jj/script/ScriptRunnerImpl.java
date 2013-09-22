@@ -15,8 +15,6 @@ import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 
 /**
- * DO NOT DEPEND ON THIS CLASS, DEPEND ON {@link JJExecutors}
- * 
  * Coordinates script processing in response to http requests,
  * websocket messages, and internal events.  delegates all
  * aspects of script lookup and execution externally, this class
@@ -305,6 +303,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 
 	@Override
 	public void submit(final String description, final ScriptContext saved, final String pendingKey, final Object result) {
+		
 		context.restore(saved);
 		try {
 			assert context.scriptExecutionEnvironment() != null : "attempting to restart a continuation without a script context in place";

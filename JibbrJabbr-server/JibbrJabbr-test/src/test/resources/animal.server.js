@@ -1,4 +1,4 @@
 $(function() {
 	
-	require('modules/module2').callMe();
+	require('modules/module1').callMe();
 });

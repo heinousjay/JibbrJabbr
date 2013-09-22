@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -62,6 +63,8 @@ public class ScriptExecutionEnvironmentCreatorTest {
 		contextMaker = new RealRhinoContextMaker();
 		
 		global = contextMaker.generalScope();
+		global.defineProperty("global", global, ScriptableObject.EMPTY);
+		global.defineProperty("//makeRequire", new BaseFunction(), ScriptableObject.EMPTY);
 		
 		given(engineAPI.global()).willReturn(global);
 		
@@ -81,7 +84,8 @@ public class ScriptExecutionEnvironmentCreatorTest {
 		given(moduleScriptResource.path()).willReturn(Paths.get("/"));
 		
 		// when
-		ModuleScriptExecutionEnvironment result = scriptExecutionEnvironmentCreator.createScriptExecutionEnvironment(moduleScriptResource, moduleIdentifier, baseName);
+		ModuleScriptExecutionEnvironment result = 
+			scriptExecutionEnvironmentCreator.createScriptExecutionEnvironment(moduleScriptResource, moduleIdentifier, baseName);
 		
 		// then
 		assertThat(result, is(notNullValue()));

@@ -189,7 +189,7 @@ class ScriptExecutionEnvironmentCreator {
 		    Scriptable module = context.newObject(local);
 		    ScriptableObject.defineProperty(module, "id", moduleIdentifier, ScriptableObject.CONST);
 		    ScriptableObject.defineProperty(local, "module", module, ScriptableObject.CONST);
-		    
+		    context.evaluateString(local, "var require = global['//makeRequire'](module);", "creation");
 		    return local;
 		}
 	}

@@ -19,7 +19,7 @@ package jj.script;
  * @author jason
  *
  */
-interface ScriptRunnerInternal extends ScriptRunner {
+public interface ScriptRunnerInternal extends ScriptRunner {
 
 	void submit(String description, ScriptContext saved, String pendingKey, Object result);
 }
