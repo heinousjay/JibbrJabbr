@@ -12,7 +12,6 @@ import jj.configuration.Configuration;
 import jj.execution.IOThread;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
-import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.HtmlResource;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;

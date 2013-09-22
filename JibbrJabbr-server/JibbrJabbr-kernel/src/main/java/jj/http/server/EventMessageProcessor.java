@@ -18,17 +18,16 @@ package jj.http.server;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.StringUtils;
 import jj.engine.EventSelection;
 import jj.engine.ScriptJSON;
-import jj.execution.JJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
+import jj.script.ScriptRunner;
 
 /**
  * @author jason
@@ -37,17 +36,17 @@ import jj.script.EventNameHelper;
 @Singleton
 class EventMessageProcessor implements WebSocketMessageProcessor {
 
-	private final JJExecutors executors;
+	private final ScriptRunner scriptRunner;
 	private final CurrentScriptContext context;
 	private final ScriptJSON scriptJSON;
 	
 	@Inject
 	EventMessageProcessor(
-		final JJExecutors executors,
+		final ScriptRunner scriptRunner,
 		final CurrentScriptContext context,
 		final ScriptJSON scriptJSON
 	) {
-		this.executors = executors;
+		this.scriptRunner = scriptRunner;
 		this.context = context;
 		this.scriptJSON = scriptJSON;
 	}
@@ -59,14 +58,15 @@ class EventMessageProcessor implements WebSocketMessageProcessor {
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JJMessage message) {
-		NativeObject event = new NativeObject();
+		
+		ScriptableObject event = context.scriptExecutionEnvironment().newObject();
 		// need to get a way to make the target into the context this for the handler
 		EventSelection target = new EventSelection(message.event().target, context);
 		event.defineProperty("target", target, ScriptableObject.CONST);
 		if (!StringUtils.isEmpty(message.event().form)) {
 			event.defineProperty("form", scriptJSON.parse(message.event().form), ScriptableObject.CONST);
 		}
-		executors.scriptRunner().submit(connection, EventNameHelper.makeEventName(message), event);
+		scriptRunner.submit(connection, EventNameHelper.makeEventName(message), event);
 	}
 
 }

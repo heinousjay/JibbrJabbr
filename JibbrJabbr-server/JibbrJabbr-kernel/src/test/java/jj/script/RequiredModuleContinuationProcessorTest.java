@@ -67,7 +67,7 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		given(context.baseName()).willReturn(baseName);
 		
-		processor = new RequiredModuleContinuationProcessor(context, executors, finder, scriptFinder);
+		processor = new RequiredModuleContinuationProcessor(context, executors, scriptRunner, finder, scriptFinder);
 		
 		requiredModule = new RequiredModule(module, context);
 		
@@ -85,7 +85,7 @@ public class RequiredModuleContinuationProcessorTest {
 		executors.runUntilIdle();
 		
 		// then
-		verify(executors.scriptRunner).submit(requiredModule);
+		verify(scriptRunner).submit(requiredModule);
 	}
 	
 	@Test
@@ -96,7 +96,7 @@ public class RequiredModuleContinuationProcessorTest {
 		executors.runUntilIdle();
 		
 		// then
-		verify(executors.scriptRunner).restartAfterContinuation(anyString(), any(RequiredModuleException.class));
+		verify(scriptRunner).restartAfterContinuation(anyString(), any(RequiredModuleException.class));
 	}
 	
 	@Test
@@ -115,7 +115,7 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// then
-		verify(executors.scriptRunner).restartAfterContinuation(anyString(), any(Scriptable.class));
+		verify(scriptRunner).restartAfterContinuation(anyString(), any(Scriptable.class));
 	}
 	
 	@Test
@@ -131,7 +131,7 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// then
-		verify(executors.scriptRunner).submit(requiredModule);
+		verify(scriptRunner).submit(requiredModule);
 	}
 
 }

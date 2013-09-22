@@ -12,11 +12,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jj.execution.MockJJExecutors;
-import jj.execution.ScriptExecutorFactory;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
 import jj.resource.document.HtmlResource;
+import jj.script.ScriptRunner;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -34,8 +34,9 @@ public class DocumentRequestProcessorTest {
 	
 	Document document;
 	String baseName;
-
-	@Mock ScriptExecutorFactory scriptExecutorFactory;
+	
+	@Mock ScriptRunner scriptRunner;
+	
 	MockJJExecutors executors;
 
 	@Mock HtmlResource htmlResource;
@@ -107,7 +108,7 @@ public class DocumentRequestProcessorTest {
 		filters.add(new TestDocumentFilter(false, 3));
 		
 		DocumentRequestProcessor toTest = 
-			new DocumentRequestProcessor(executors, htmlResource, httpRequest, httpResponse, filters);
+			new DocumentRequestProcessor(executors, scriptRunner, htmlResource, httpRequest, httpResponse, filters);
 		
 		// when
 		executors.isScriptThread = true;
@@ -123,7 +124,7 @@ public class DocumentRequestProcessorTest {
 	public void testWritesDocumentCorrectly() throws Exception {
 		// given
 		DocumentRequestProcessor toTest = 
-				new DocumentRequestProcessor(executors, htmlResource, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
+				new DocumentRequestProcessor(executors, scriptRunner, htmlResource, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
 		
 		executors.isScriptThread = true;
 		

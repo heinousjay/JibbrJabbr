@@ -3,17 +3,13 @@ package jj.execution;
 import io.netty.util.concurrent.DefaultPromise;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 
 import jj.logging.EmergencyLogger;
-import jj.script.ScriptRunner;
 
 /**
  * exposes some execution related information and
@@ -70,22 +66,9 @@ class JJExecutorsImpl implements JJExecutors {
 		};
 	}
 	
-	public ScriptRunner scriptRunner() {
-		return bundle.scriptRunner;
-	}
-	
-	public ExecutorService ioExecutor() {
-		return bundle.ioExecutor;
-	}
-	
-	public ScriptExecutorFactory scriptExecutorFactory() {
-		return bundle.scriptExecutorFactory;
-	}
-	
-	// conveniences to keep method call chains down
-
-	public ScheduledExecutorService scriptExecutorFor(final String baseName) {
-		return bundle.scriptExecutorFactory.executorFor(baseName);
+	@Override
+	public boolean isScriptThread() {
+		return bundle.scriptExecutorFactory.isScriptThread();
 	}
 	
 	@Override

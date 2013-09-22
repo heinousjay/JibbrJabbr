@@ -18,26 +18,23 @@ package jj.execution;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.ScriptRunner;
-
 /**
+ * just a convenience for the moment
+ * 
  * @author jason
  *
  */
 @Singleton
 class ExecutorBundle {
 	
-	final ScriptRunner scriptRunner;
 	final IOExecutor ioExecutor;
 	final ScriptExecutorFactory scriptExecutorFactory;
 
 	@Inject
 	ExecutorBundle(
-		final ScriptRunner scriptRunner,
 		final IOExecutor ioExecutor,
 		final ScriptExecutorFactory scriptExecutorFactory
 	) {
-		this.scriptRunner = scriptRunner;
 		this.ioExecutor = ioExecutor;
 		this.scriptExecutorFactory = scriptExecutorFactory;
 	}

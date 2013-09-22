@@ -14,6 +14,7 @@ import javax.inject.Singleton;
 import jj.DataStore;
 import jj.resource.document.HtmlResource;
 import jj.script.DocumentScriptExecutionEnvironment;
+import jj.script.ScriptRunner;
 import jj.execution.IOTask;
 import jj.execution.JJExecutors;
 import jj.execution.ScriptThread;
@@ -39,7 +40,9 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	private static class FilterList extends ArrayList<DocumentFilter> {}
 	
 	/** the executors in which we run */
-	final JJExecutors executors;
+	private final JJExecutors executors;
+	
+	private final ScriptRunner scriptRunner;
 	
 	private final HtmlResource resource;
 	
@@ -62,12 +65,14 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	@Inject
 	DocumentRequestProcessor(
 		final JJExecutors executors,
+		final ScriptRunner scriptRunner,
 		final HtmlResource resource,
 		final HttpRequest httpRequest,
 		final HttpResponse httpResponse,
 		final Set<DocumentFilter> filters
 	) {
 		this.executors = executors;
+		this.scriptRunner = scriptRunner;
 		this.resource = resource;
 		this.document = resource.document().clone();
 		this.httpRequest = httpRequest;
@@ -121,7 +126,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	
 	@Override
 	public void process() {
-		executors.scriptRunner().submit(this);
+		scriptRunner.submit(this);
 	}
 	
 	/**

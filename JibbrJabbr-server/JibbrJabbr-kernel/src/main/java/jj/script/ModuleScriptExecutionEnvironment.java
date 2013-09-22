@@ -45,6 +45,7 @@ public class ModuleScriptExecutionEnvironment extends AbstractScriptExecutionEnv
 	
 	ModuleScriptExecutionEnvironment(
 		final Publisher publisher,
+		final RhinoContextMaker contextMaker,
 		final ScriptResource scriptResource,
 		final Scriptable local,
 		final Script script,
@@ -52,7 +53,7 @@ public class ModuleScriptExecutionEnvironment extends AbstractScriptExecutionEnv
 		final String moduleIdentifier,
 		final String baseName
 	) {
-		super(publisher);
+		super(publisher, contextMaker);
 		this.scriptResource = scriptResource;
 		this.local = local;
 		this.script = script;

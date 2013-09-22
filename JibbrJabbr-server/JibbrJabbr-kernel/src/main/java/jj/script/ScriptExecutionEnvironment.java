@@ -17,6 +17,7 @@ package jj.script;
 
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * @author jason
@@ -54,5 +55,10 @@ public interface ScriptExecutionEnvironment {
 	void initializing(boolean initializing);
 	
 	String baseName();
+
+	/**
+	 * @return
+	 */
+	ScriptableObject newObject();
 
 }

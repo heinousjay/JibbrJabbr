@@ -78,7 +78,16 @@ class ScriptExecutionEnvironmentCreator {
 		Script script = compile(scriptResource);
 		
 		
-		return new ModuleScriptExecutionEnvironment(publisher, scriptResource, local, script, exports, moduleIdentifier, baseName);
+		return new ModuleScriptExecutionEnvironment(
+			publisher,
+			contextMaker,
+			scriptResource,
+			local,
+			script,
+			exports,
+			moduleIdentifier,
+			baseName
+		);
 	}
 	
 	@ScriptThread
@@ -109,6 +118,7 @@ class ScriptExecutionEnvironmentCreator {
 		
 		return new DocumentScriptExecutionEnvironment(
 			publisher,
+			contextMaker,
 			clientScriptResource,
 			sharedScriptResource,
 			serverScriptResource,

@@ -21,10 +21,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.engine.HostEvent;
-import jj.execution.MockJJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 import jj.jjmessage.MessageMaker;
+import jj.script.ScriptRunner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class JJWebSocketHandlerTest {
 	
 	JJWebSocketHandler wsh;
 	@Mock JJWebSocketConnection connection;
-	MockJJExecutors executors;
+	@Mock ScriptRunner scriptRunner;
 	@Mock WebSocketMessageProcessor wsmp1;
 	@Mock WebSocketMessageProcessor wsmp2;
 	@Mock WebSocketMessageProcessor wsmp3;
@@ -50,7 +50,6 @@ public class JJWebSocketHandlerTest {
 	@Before
 	public void before() {
 		
-		executors = new MockJJExecutors();
 		messageProcessors = new HashSet<>();
 		messageProcessors.add(wsmp1);
 		messageProcessors.add(wsmp2);
@@ -60,19 +59,19 @@ public class JJWebSocketHandlerTest {
 		given(wsmp2.type()).willReturn(Type.Event);
 		given(wsmp3.type()).willReturn(Type.Element);
 		
-		wsh = new JJWebSocketHandler(executors, messageProcessors);
+		wsh = new JJWebSocketHandler(scriptRunner, messageProcessors);
 	}
 
 	@Test
 	public void testOpened() {
 		wsh.opened(connection);
-		verify(executors.scriptRunner).submit(connection, HostEvent.clientConnected, connection);
+		verify(scriptRunner).submit(connection, HostEvent.clientConnected, connection);
 	}
 	
 	@Test
 	public void testClosed() {
 		wsh.closed(connection);
-		verify(executors.scriptRunner).submit(connection, HostEvent.clientDisconnected, connection);
+		verify(scriptRunner).submit(connection, HostEvent.clientDisconnected, connection);
 	}
 	
 	@Test

@@ -23,15 +23,19 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 	
 	private final JJExecutors executors;
 	
+	private final ScriptRunner scriptRunner;
+	
 	@Inject
 	RestRequestContinuationProcessor(
 		final CurrentScriptContext context,
 		final HttpClient httpClient,
-		final JJExecutors executors
+		final JJExecutors executors,
+		final ScriptRunner scriptRunner
 	) {
 		this.context = context;
 		this.httpClient = httpClient;
 		this.executors = executors;
+		this.scriptRunner = scriptRunner;
 	}
 
 	@Override
@@ -51,21 +55,11 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 							protected void run() throws Exception {
 								context.restore(scriptContext);
 								try {
-									executors
-										.scriptRunner()
-										.restartAfterContinuation(
-											restRequest.id(),
-											future.get()
-										);
+									scriptRunner.restartAfterContinuation(restRequest.id(), future.get());
 								} catch (InterruptedException | CancellationException e) {
 									// ignore this, we're shutting down
 								} catch (ExecutionException e) {
-									executors
-									.scriptRunner()
-									.restartAfterContinuation(
-										restRequest.id(),
-										e.getCause()
-									);
+									scriptRunner.restartAfterContinuation(restRequest.id(), e.getCause());
 								} finally {
 									context.end();
 								}

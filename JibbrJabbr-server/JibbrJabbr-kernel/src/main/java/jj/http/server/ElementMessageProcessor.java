@@ -19,10 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.EventSelection;
-import jj.execution.JJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;
+import jj.script.ScriptRunner;
 
 /**
  * handles an element response from the client, which can happen in
@@ -33,13 +33,13 @@ import jj.script.CurrentScriptContext;
 @Singleton
 class ElementMessageProcessor implements WebSocketMessageProcessor {
 
-	private final JJExecutors executors;
+	private final ScriptRunner scriptRunner;
 	
 	private final CurrentScriptContext context;
 	
 	@Inject
-	ElementMessageProcessor(final JJExecutors executors, final CurrentScriptContext context) {
-		this.executors = executors;
+	ElementMessageProcessor(final ScriptRunner scriptRunner, final CurrentScriptContext context) {
+		this.scriptRunner = scriptRunner;
 		this.context = context;
 	}
 	
@@ -50,7 +50,7 @@ class ElementMessageProcessor implements WebSocketMessageProcessor {
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JJMessage message) {
-		executors.scriptRunner().submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
+		scriptRunner.submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
 	}
 
 }

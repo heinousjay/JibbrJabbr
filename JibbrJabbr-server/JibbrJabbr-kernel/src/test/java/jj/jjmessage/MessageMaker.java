@@ -35,6 +35,15 @@ public class MessageMaker {
 		result.event().type = type;
 		return result;
 	}
+
+	public static JJMessage makeEvent(final String selector, final String type, final String form) {
+		JJMessage result = new JJMessage();
+		result.event(new Event());
+		result.event().selector = selector;
+		result.event().type = type;
+		result.event().form = form;
+		return result;
+	}
 	
 	public static JJMessage makeResult(final String id, final String value) {
 		JJMessage result = new JJMessage();

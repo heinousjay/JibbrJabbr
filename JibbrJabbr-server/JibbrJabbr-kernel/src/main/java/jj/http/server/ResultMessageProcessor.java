@@ -19,9 +19,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.ScriptJSON;
-import jj.execution.JJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
+import jj.script.ScriptRunner;
 
 /**
  * processes incoming result messages into usable objects and restarts the
@@ -32,13 +32,13 @@ import jj.jjmessage.JJMessage.Type;
 @Singleton
 class ResultMessageProcessor implements WebSocketMessageProcessor {
 
-	private final JJExecutors executors;
+	private final ScriptRunner scriptRunner;
 	
 	private final ScriptJSON json;
 	
 	@Inject
-	ResultMessageProcessor(final JJExecutors executors, final ScriptJSON json) {
-		this.executors = executors;
+	ResultMessageProcessor(final ScriptRunner scriptRunner, final ScriptJSON json) {
+		this.scriptRunner = scriptRunner;
 		this.json = json;
 	}
 	
@@ -50,7 +50,7 @@ class ResultMessageProcessor implements WebSocketMessageProcessor {
 	@Override
 	public void handle(JJWebSocketConnection connection, JJMessage message) {
 		Object value = message.result().value == null ? null : json.parse(message.result().value);
-		executors.scriptRunner().submitPendingResult(connection, message.result().id, value);
+		scriptRunner.submitPendingResult(connection, message.result().id, value);
 	}
 
 }

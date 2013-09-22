@@ -1,13 +1,12 @@
 package jj.execution;
 
 import java.util.concurrent.Future;
-import jj.script.ScriptRunner;
 
 public interface JJExecutors {
 	
 	Future<Void> execute(final JJTask task);
-
-	ScriptRunner scriptRunner();
+	
+	boolean isScriptThread();
 
 	boolean isScriptThreadFor(String baseName);
 

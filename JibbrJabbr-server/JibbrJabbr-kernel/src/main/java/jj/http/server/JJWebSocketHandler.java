@@ -11,9 +11,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.HostEvent;
-import jj.execution.JJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessageException;
+import jj.script.ScriptRunner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,16 +28,16 @@ class JJWebSocketHandler {
 	
 	private Logger log = LoggerFactory.getLogger(JJWebSocketHandler.class);
 	
-	private final JJExecutors executors;
+	private final ScriptRunner scriptRunner;
 	
 	private final Map<JJMessage.Type, WebSocketMessageProcessor> messageProcessors;
 	
 	@Inject
 	JJWebSocketHandler(
-		final JJExecutors executors,
+		final ScriptRunner scriptRunner,
 		final Set<WebSocketMessageProcessor> messageProcessors
 	) {
-		this.executors = executors;
+		this.scriptRunner = scriptRunner;
 		this.messageProcessors = makeMessageProcessors(messageProcessors);
 	}
 	
@@ -52,11 +52,11 @@ class JJWebSocketHandler {
 	}
 
 	public void opened(JJWebSocketConnection connection) {
-		executors.scriptRunner().submit(connection, HostEvent.clientConnected, connection);
+		scriptRunner.submit(connection, HostEvent.clientConnected, connection);
 	}
 
 	public void closed(JJWebSocketConnection connection) {
-		executors.scriptRunner().submit(connection, HostEvent.clientDisconnected, connection);
+		scriptRunner.submit(connection, HostEvent.clientDisconnected, connection);
 	}
 
 	public void messageReceived(JJWebSocketConnection connection, String msg) {

@@ -15,16 +15,23 @@
  */
 package jj.http.server;
 
+import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.*;
-import jj.execution.JJExecutors;
+import jj.engine.EventSelection;
 import jj.http.server.ElementMessageProcessor;
 import jj.http.server.JJWebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
+import jj.script.CurrentScriptContext;
 import jj.script.ScriptRunner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -35,24 +42,28 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ElementMessageProcessorTest {
 
-	@Mock JJExecutors executors;
+	@Mock CurrentScriptContext context;
 	@Mock ScriptRunner scriptRunner;
 	@Mock JJWebSocketConnection connection;
+	
+	@InjectMocks ElementMessageProcessor emp;
+	
+	@Captor ArgumentCaptor<EventSelection> eventSelection;
 	
 	@Test
 	public void test() {
 		
 		//given
-		given(executors.scriptRunner()).willReturn(scriptRunner);
-		ElementMessageProcessor emp = new ElementMessageProcessor(executors, null);
 		JJMessage jqm = MessageMaker.makeElement("id", "selector");
 		
 		//when
 		emp.handle(connection, jqm);
 		
 		//then
-		verify(scriptRunner).submitPendingResult(eq(connection), eq("id"), anyVararg());
+		verify(scriptRunner).submitPendingResult(eq(connection), eq("id"), eventSelection.capture());
 		
+		// this is goofy
+		assertThat(eventSelection.getValue(), is(notNullValue()));
 	}
 
 }

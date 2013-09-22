@@ -40,6 +40,8 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final JJExecutors executors;
 	
+	private final ScriptRunner scriptRunner;
+	
 	private final ResourceFinder finder;
 	
 	private final ScriptExecutionEnvironmentFinder scriptFinder;
@@ -48,11 +50,13 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	RequiredModuleContinuationProcessor(
 		final CurrentScriptContext context,
 		final JJExecutors executors,
+		final ScriptRunner scriptRunner,
 		final ResourceFinder finder,
 		final ScriptExecutionEnvironmentFinder scriptFinder
 	) {
 		this.context = context;
 		this.executors = executors;
+		this.scriptRunner = scriptRunner;
 		this.finder = finder;
 		this.scriptFinder = scriptFinder;
 	}
@@ -81,7 +85,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 					if (scriptResource != null) {
 						// make sure the associated spec, if any, is also loaded
 						finder.loadResource(SpecResource.class, scriptResource.baseName());
-						executors.scriptRunner().submit(requiredModule);
+						scriptRunner.submit(requiredModule);
 					} else {
 						resumeContinuationAfterError(requiredModule, baseName, new RequiredModuleException(requiredModule.identifier()));
 					}
@@ -106,7 +110,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 					context.restore(require.parentContext());
 					
 					try {
-						executors.scriptRunner().restartAfterContinuation(require.pendingKey(), result);
+						scriptRunner.restartAfterContinuation(require.pendingKey(), result);
 					} finally {
 						context.end();
 					}
@@ -131,12 +135,12 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		}	
 		// decision 2: do we need to reinitialize the execution environment?
 		else if (!scriptResource.sha1().equals(scriptExecutionEnvironment.sha1())) {
-			executors.scriptRunner().submit(requiredModule);
+			scriptRunner.submit(requiredModule);
 		}
 		// otherwise, just restart with the exports, we're already
 		// in the right place
 		else {
-			executors.scriptRunner().restartAfterContinuation(
+			scriptRunner.restartAfterContinuation(
 				requiredModule.pendingKey(),
 				scriptExecutionEnvironment.exports()
 			);

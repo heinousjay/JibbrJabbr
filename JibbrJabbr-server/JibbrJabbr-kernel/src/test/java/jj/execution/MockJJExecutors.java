@@ -15,8 +15,6 @@
  */
 package jj.execution;
 
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -24,15 +22,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import jj.script.ScriptRunner;
-
 /**
  * @author jason
  *
  */
 public class MockJJExecutors implements JJExecutors {
-
-	public ScriptRunner scriptRunner = mock(ScriptRunner.class);
 
 	public List<JJTask> tasks = new ArrayList<>();
 	
@@ -82,13 +76,13 @@ public class MockJJExecutors implements JJExecutors {
 			}
 		};
 	}
-
-	@Override
-	public ScriptRunner scriptRunner() {
-		return scriptRunner;
-	}
 	
 	public boolean isScriptThread = false;
+	
+	@Override
+	public boolean isScriptThread(){
+		return isScriptThread;
+	}
 
 	@Override
 	public boolean isScriptThreadFor(String baseName) {

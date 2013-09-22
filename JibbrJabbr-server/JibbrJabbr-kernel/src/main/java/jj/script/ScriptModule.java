@@ -12,7 +12,7 @@ public class ScriptModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		
+		bind(ScriptRunner.class).to(ScriptRunnerImpl.class);
 		
 		MapBinder<ContinuationType, ContinuationProcessor> processors =
 			MapBinder.newMapBinder(binder(), ContinuationType.class, ContinuationProcessor.class);

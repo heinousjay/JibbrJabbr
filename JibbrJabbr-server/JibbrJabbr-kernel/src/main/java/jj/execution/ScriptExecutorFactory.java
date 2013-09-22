@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class ScriptExecutorFactory implements JJServerShutdownListener {
+class ScriptExecutorFactory implements JJServerShutdownListener {
 	
 	private static final String SPEC_EXECUTOR_NAME = "ScriptExecutor for specs";
 

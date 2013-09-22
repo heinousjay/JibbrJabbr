@@ -18,6 +18,9 @@ package jj.script;
 import static jj.script.ScriptExecutionState.Initialized;
 import static jj.script.ScriptExecutionState.Initializing;
 import static jj.script.ScriptExecutionState.Unitialized;
+
+import org.mozilla.javascript.ScriptableObject;
+
 import jj.event.Publisher;
 import jj.resource.document.ExecutionEnvironmentInitialized;
 
@@ -29,10 +32,20 @@ public abstract class AbstractScriptExecutionEnvironment implements ScriptExecut
 
 	protected final Publisher publisher;
 	
+	protected final RhinoContextMaker contextMaker;
+	
 	protected ScriptExecutionState state = Unitialized;
 	
-	protected AbstractScriptExecutionEnvironment(final Publisher publisher) {
+	protected AbstractScriptExecutionEnvironment(final Publisher publisher, final RhinoContextMaker contextMaker) {
 		this.publisher = publisher;
+		this.contextMaker = contextMaker;
+	}
+	
+	@Override
+	public ScriptableObject newObject() {
+		try (RhinoContext context = contextMaker.context()) {
+			return context.newObject(scope());
+		}
 	}
 
 	@Override

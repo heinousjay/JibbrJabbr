@@ -17,9 +17,9 @@ package jj.http.server;
 
 import static org.mockito.BDDMockito.*;
 import jj.engine.ScriptJSON;
-import jj.execution.MockJJExecutors;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
+import jj.script.ScriptRunner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResultMessageProcessorTest {
 
-	MockJJExecutors executors;
+	@Mock ScriptRunner scriptRunner;
 	@Mock ScriptJSON json;
 	@Mock JJWebSocketConnection connection;
 	
@@ -42,8 +42,8 @@ public class ResultMessageProcessorTest {
 	
 	@Before
 	public void before() {
-		executors = new MockJJExecutors();
-		rmp = new ResultMessageProcessor(executors, json);
+		
+		rmp = new ResultMessageProcessor(scriptRunner, json);
 	}
 	
 	@Test
@@ -54,7 +54,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(executors.scriptRunner).submitPendingResult(connection, id, value);
+		verify(scriptRunner).submitPendingResult(connection, id, value);
 	}
 	
 	@Test
@@ -65,7 +65,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(executors.scriptRunner).submitPendingResult(connection, id, value);
+		verify(scriptRunner).submitPendingResult(connection, id, value);
 	}
 
 }

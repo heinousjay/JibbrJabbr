@@ -40,6 +40,7 @@ public class DocumentScriptExecutionEnvironment extends AbstractScriptExecutionE
 
 	DocumentScriptExecutionEnvironment(
 		final Publisher publisher,
+		final RhinoContextMaker contextMaker,
 		final ScriptResource clientScriptResource,
 		final ScriptResource sharedScriptResource,
 		final ScriptResource serverScriptResource,
@@ -47,7 +48,7 @@ public class DocumentScriptExecutionEnvironment extends AbstractScriptExecutionE
 		final Script script,
 		final String baseName
 	) {
-		super(publisher);
+		super(publisher, contextMaker);
 		this.clientScriptResource = clientScriptResource;
 		this.sharedScriptResource = sharedScriptResource;
 		this.serverScriptResource = serverScriptResource;
