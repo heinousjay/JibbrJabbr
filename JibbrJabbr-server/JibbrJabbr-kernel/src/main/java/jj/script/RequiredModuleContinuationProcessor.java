@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 import jj.engine.RequiredModuleException;
 import jj.execution.IOTask;
 import jj.execution.JJExecutors;
-import jj.execution.ScriptTask;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;
@@ -40,7 +39,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final JJExecutors executors;
 	
-	private final ScriptRunner scriptRunner;
+	private final ScriptRunnerInternal scriptRunner;
 	
 	private final ResourceFinder finder;
 	
@@ -50,7 +49,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	RequiredModuleContinuationProcessor(
 		final CurrentScriptContext context,
 		final JJExecutors executors,
-		final ScriptRunner scriptRunner,
+		final ScriptRunnerInternal scriptRunner,
 		final ResourceFinder finder,
 		final ScriptExecutionEnvironmentFinder scriptFinder
 	) {
@@ -87,32 +86,13 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 						finder.loadResource(SpecResource.class, scriptResource.baseName());
 						scriptRunner.submit(requiredModule);
 					} else {
-						resumeContinuationAfterError(requiredModule, baseName, new RequiredModuleException(requiredModule.identifier()));
-					}
-				}
-			}
-		);
-	}
-	
-	private void resumeContinuationAfterError(
-		final RequiredModule require,
-		final String baseName,
-		final Object result
-	) {
-		
-		executors.execute(
-			
-			new ScriptTask("required module " + require.identifier() + " error result in [" + baseName + "]", baseName) {
-			
-				@Override
-				public void run() {
-					
-					context.restore(require.parentContext());
-					
-					try {
-						scriptRunner.restartAfterContinuation(require.pendingKey(), result);
-					} finally {
-						context.end();
+						
+						scriptRunner.submit(
+							"required module " + requiredModule.identifier() + " error result in [" + baseName + "]",
+							requiredModule.parentContext(),
+							requiredModule.pendingKey(),
+							new RequiredModuleException(requiredModule.identifier())
+						);
 					}
 				}
 			}
@@ -137,10 +117,11 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		else if (!scriptResource.sha1().equals(scriptExecutionEnvironment.sha1())) {
 			scriptRunner.submit(requiredModule);
 		}
-		// otherwise, just restart with the exports, we're already
-		// in the right place
+		// otherwise, just restart with the exports, things are already in progress
 		else {
-			scriptRunner.restartAfterContinuation(
+			scriptRunner.submit(
+				"restarting [" + requiredModule.baseName() + "] with in-progress module [" + requiredModule.identifier() + "]",
+				requiredModule.parentContext(),
 				requiredModule.pendingKey(),
 				scriptExecutionEnvironment.exports()
 			);

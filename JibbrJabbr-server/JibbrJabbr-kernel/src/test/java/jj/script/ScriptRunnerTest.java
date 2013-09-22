@@ -23,9 +23,6 @@ import org.mozilla.javascript.Scriptable;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptRunnerTest {
 	
-	// it takes a village to isolate the ScriptRunner.  it
-	// sits on the top of a serious mountain of man-hours.
-	
 	String baseName = "index";
 	
 	Document document;
@@ -148,7 +145,8 @@ public class ScriptRunnerTest {
 		given(continuationCoordinator.execute(associatedScriptExecutionEnvironment, eventFunction)).willReturn(true);
 		
 		// when
-		scriptRunner.restartAfterContinuation("", null);
+		scriptRunner.submit("", httpRequestContext, "", null);
+		executors.runUntilIdle();
 		
 		// then
 		verify(documentRequestProcessor).startingReadyFunction();
@@ -177,8 +175,10 @@ public class ScriptRunnerTest {
 		// given
 		executors.isScriptThread = true;
 		given(continuationCoordinator.resumeContinuation("", associatedScriptExecutionEnvironment, null)).willReturn(true);
+		
 		// when
-		scriptRunner.restartAfterContinuation("", null);
+		scriptRunner.submit("", httpRequestContext, "", null);
+		executors.runUntilIdle();
 		
 		// then
 		verify(documentRequestProcessor).respond(); // verifies execution processing
@@ -230,8 +230,9 @@ public class ScriptRunnerTest {
 		executors.isScriptThread = true;
 		
 		// when
-		scriptRunner.restartAfterContinuation(null, null);
-		scriptRunner.restartAfterContinuation(null, null);
+		scriptRunner.submit("", httpRequestContext, "", null);
+		scriptRunner.submit("", httpRequestContext, "", null);
+		executors.runUntilIdle();
 		
 		// then
 		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any());
@@ -311,8 +312,9 @@ public class ScriptRunnerTest {
 		executors.isScriptThread = true;
 		
 		// when
-		scriptRunner.restartAfterContinuation(null, null);
-		scriptRunner.restartAfterContinuation(null, null);
+		scriptRunner.submit("", httpRequestContext, "", null);
+		scriptRunner.submit("", httpRequestContext, "", null);
+		executors.runUntilIdle();
 		
 		// then
 		verify(continuationCoordinator, times(2)).resumeContinuation((String)any(), (ScriptExecutionEnvironment)any(), any());
@@ -390,7 +392,7 @@ public class ScriptRunnerTest {
 		given(continuationCoordinator.resumeContinuation(module.pendingKey(), moduleScriptExecutionEnvironment, scriptable)).willReturn(true);
 		
 		// when
-		scriptRunner.restartAfterContinuation(module.pendingKey(), scriptable);
+		scriptRunner.submit("", httpRequestContext, module.pendingKey(), scriptable);
 		executors.runFirstTask();
 		
 		// then

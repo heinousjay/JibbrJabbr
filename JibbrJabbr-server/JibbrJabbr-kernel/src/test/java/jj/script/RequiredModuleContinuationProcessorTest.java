@@ -54,7 +54,7 @@ public class RequiredModuleContinuationProcessorTest {
 
 	RequiredModuleContinuationProcessor processor;
 	
-	@Mock ScriptRunner scriptRunner;
+	@Mock ScriptRunnerInternal scriptRunner;
 	
 	@Mock ScriptResource scriptResource;
 	
@@ -96,7 +96,7 @@ public class RequiredModuleContinuationProcessorTest {
 		executors.runUntilIdle();
 		
 		// then
-		verify(scriptRunner).restartAfterContinuation(anyString(), any(RequiredModuleException.class));
+		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), anyString(), any(RequiredModuleException.class));
 	}
 	
 	@Test
@@ -115,7 +115,7 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// then
-		verify(scriptRunner).restartAfterContinuation(anyString(), any(Scriptable.class));
+		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), anyString(), any(Scriptable.class));
 	}
 	
 	@Test

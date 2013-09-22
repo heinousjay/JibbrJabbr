@@ -58,13 +58,19 @@ class EventMessageProcessor implements WebSocketMessageProcessor {
 
 	@Override
 	public void handle(JJWebSocketConnection connection, JJMessage message) {
-		
-		ScriptableObject event = context.scriptExecutionEnvironment().newObject();
-		// need to get a way to make the target into the context this for the handler
-		EventSelection target = new EventSelection(message.event().target, context);
-		event.defineProperty("target", target, ScriptableObject.CONST);
-		if (!StringUtils.isEmpty(message.event().form)) {
-			event.defineProperty("form", scriptJSON.parse(message.event().form), ScriptableObject.CONST);
+		ScriptableObject event = null;
+		try {
+			context.initialize(connection);
+			event = context.scriptExecutionEnvironment().newObject();
+			// need to get a way to make the target into the context this for the handler
+			// bound function! it is doable
+			EventSelection target = new EventSelection(message.event().target, context);
+			event.defineProperty("target", target, ScriptableObject.CONST);
+			if (!StringUtils.isEmpty(message.event().form)) {
+				event.defineProperty("form", scriptJSON.parse(message.event().form), ScriptableObject.CONST);
+			}
+		} finally {
+			context.end();
 		}
 		scriptRunner.submit(connection, EventNameHelper.makeEventName(message), event);
 	}

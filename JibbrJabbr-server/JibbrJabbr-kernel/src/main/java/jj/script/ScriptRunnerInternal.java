@@ -15,25 +15,11 @@
  */
 package jj.script;
 
-import jj.engine.HostEvent;
-import jj.http.server.JJWebSocketConnection;
-import jj.http.server.servable.document.DocumentRequestProcessor;
-
 /**
  * @author jason
  *
  */
-public interface ScriptRunner {
+interface ScriptRunnerInternal extends ScriptRunner {
 
-	public static final String READY_FUNCTION_KEY = "Document.ready";
-
-	void submit(DocumentRequestProcessor documentRequestProcessor);
-
-	void submit(RequiredModule requiredModule);
-
-	void submitPendingResult(JJWebSocketConnection connection, String pendingKey, Object result);
-
-	void submit(JJWebSocketConnection connection, HostEvent hostEvent, Object... args);
-
-	void submit(JJWebSocketConnection connection, String event, Object... args);
+	void submit(String description, ScriptContext saved, String pendingKey, Object result);
 }

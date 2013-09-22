@@ -42,13 +42,20 @@ public class CurrentScriptContext implements Closeable {
 	}
 	
 	public ScriptContextType type() {
-		return currentContext.get().type;
+		return currentContext.get() != null ? currentContext.get().type : null;
 	}
 	
 	public ScriptExecutionEnvironment scriptExecutionEnvironment() {
-		return moduleScriptExecutionEnvironment() != null ?
-			moduleScriptExecutionEnvironment() :
-			documentScriptExecutionEnvironment();
+		switch (type()) {
+		case DocumentRequest:
+		case WebSocket:
+		case InternalExecution:
+			return documentScriptExecutionEnvironment();
+		case ModuleInitialization:
+			return moduleScriptExecutionEnvironment();
+		}
+		
+		throw new AssertionError("can't make environment for " + type());
 	}
 	
 	public ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment() {

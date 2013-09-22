@@ -26,7 +26,7 @@ import jj.http.server.servable.document.DocumentRequestProcessor;
  *
  */
 @Singleton
-class ScriptRunnerImpl implements ScriptRunner {
+class ScriptRunnerImpl implements ScriptRunnerInternal {
 
 	private final Logger log = LoggerFactory.getLogger(ScriptRunnerImpl.class);
 	
@@ -45,9 +45,6 @@ class ScriptRunnerImpl implements ScriptRunner {
 		final CurrentScriptContext context,
 		final JJExecutors executors
 	) {
-		
-		// this class has a lot of dependencies, but it does
-		// a very complicated job
 		
 		this.scriptExecutionEnvironmentHelper = scriptExecutionEnvironmentHelper;
 		this.continuationCoordinator = continuationCoordinator;
@@ -273,12 +270,9 @@ class ScriptRunnerImpl implements ScriptRunner {
 	/** 
 	 * you must be in a script thread before calling this method.
 	 */
-	@Override
 	@ScriptThread
-	public void restartAfterContinuation(String pendingKey, Object result) {
+	private void restartAfterContinuation(String pendingKey, Object result) {
 		
-		assert executors.isScriptThread() : "attempting to restart a continuation from the wrong thread";
-		assert context.scriptExecutionEnvironment() != null : "attempting to restart a continuation without a script context in place";
 		
 		log.trace("restarting a continuation at {} with {}", pendingKey, result);
 		
@@ -306,6 +300,29 @@ class ScriptRunnerImpl implements ScriptRunner {
 		case InternalExecution:
 			resumeContinuation(pendingKey, result);
 			break;
+		}
+	}
+
+	@Override
+	public void submit(final String description, final ScriptContext saved, final String pendingKey, final Object result) {
+		context.restore(saved);
+		try {
+			assert context.scriptExecutionEnvironment() != null : "attempting to restart a continuation without a script context in place";
+			executors.execute(new ScriptTask(description, context.baseName()) {
+	
+				@Override
+				protected void run() throws Exception {
+					try {
+						context.restore(saved);
+						restartAfterContinuation(pendingKey, result);
+					} finally {
+						context.end();
+					}
+				}
+				
+			});
+		} finally {
+			context.end();
 		}
 	}
 }

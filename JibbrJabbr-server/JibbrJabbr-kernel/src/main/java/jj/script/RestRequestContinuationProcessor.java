@@ -9,8 +9,6 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.JJExecutors;
-import jj.execution.ScriptTask;
 import jj.http.client.HttpClient;
 import jj.http.client.JJHttpClientResponse;
 
@@ -21,20 +19,16 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 	
 	private final HttpClient httpClient;
 	
-	private final JJExecutors executors;
-	
-	private final ScriptRunner scriptRunner;
+	private final ScriptRunnerInternal scriptRunner;
 	
 	@Inject
 	RestRequestContinuationProcessor(
 		final CurrentScriptContext context,
 		final HttpClient httpClient,
-		final JJExecutors executors,
-		final ScriptRunner scriptRunner
+		final ScriptRunnerInternal scriptRunner
 	) {
 		this.context = context;
 		this.httpClient = httpClient;
-		this.executors = executors;
 		this.scriptRunner = scriptRunner;
 	}
 
@@ -48,24 +42,13 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 				@Override
 				public void operationComplete(final Future<JJHttpClientResponse> future) throws Exception {
 					
-					executors.execute(
-						new ScriptTask("REST response with id [" + restRequest.id() + "]", context.baseName()) {
-							
-							@Override
-							protected void run() throws Exception {
-								context.restore(scriptContext);
-								try {
-									scriptRunner.restartAfterContinuation(restRequest.id(), future.get());
-								} catch (InterruptedException | CancellationException e) {
-									// ignore this, we're shutting down
-								} catch (ExecutionException e) {
-									scriptRunner.restartAfterContinuation(restRequest.id(), e.getCause());
-								} finally {
-									context.end();
-								}
-							}
-						}
-					);
+					try {
+						scriptRunner.submit("REST response with id [" + restRequest.id() + "]", scriptContext,restRequest.id(), future.get());
+					} catch (InterruptedException | CancellationException e) {
+						// ignore this, we're shutting down
+					} catch (ExecutionException e) {
+						scriptRunner.submit("REST response with id [" + restRequest.id() + "]", scriptContext,restRequest.id(), e.getCause());
+					}
 				}
 			}
 		);
