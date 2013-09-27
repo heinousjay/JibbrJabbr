@@ -20,6 +20,8 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class AssetResourceCreator extends AbstractResourceCreator<AssetResource> {
 	
+	// this class has low test coverage because it has a special path for tests.
+	
 	static final Path myJar = JJ.jarForClass(AssetResourceCreator.class);
 	
 	// our assets should be here
