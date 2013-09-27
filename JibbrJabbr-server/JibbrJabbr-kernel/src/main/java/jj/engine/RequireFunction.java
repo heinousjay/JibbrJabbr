@@ -119,8 +119,10 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 
 	@Override
 	public String script() {
-		// actually created individually in each scope
-		// needs to inspect the result and see if it's an exception, and if so throw it
+		// the require function as a user API is 
+		// actually created individually in each 
+		// scope when the scope is created by 
+		// calling this function
 		return "global['//makeRequire'] = function(module) {" +
 					"return function(id) {" +
 					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
