@@ -15,8 +15,6 @@
  */
 package jj.script;
 
-import java.nio.file.Paths;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -53,9 +51,8 @@ class ScriptExecutionEnvironmentHelper {
 		this.executors = executors;
 	}
 	
-	private ScriptResource moduleScript(final String baseName, final String moduleIdentifier) {
-		String path = Paths.get(baseName).resolveSibling(moduleIdentifier).toString();
-		return finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(path));
+	private ScriptResource moduleScript(final String moduleIdentifier) {
+		return finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(moduleIdentifier));
 	}
 	
 	private ScriptResource clientScript(final String baseName) {
@@ -155,10 +152,10 @@ class ScriptExecutionEnvironmentHelper {
 				(ModuleScriptExecutionEnvironment)scriptExecutionEnvironment :
 				null;
 		
-		if (candidate != null && moduleScript(baseName, moduleIdentifier) != null) {
+		if (candidate != null && moduleScript(moduleIdentifier) != null) {
 			if (isObselete(candidate)) {
 				ModuleScriptExecutionEnvironment newExecutionEnvironment = 
-					creator.createScriptExecutionEnvironment(moduleScript(baseName, moduleIdentifier), moduleIdentifier, baseName);
+					creator.createScriptExecutionEnvironment(moduleScript(moduleIdentifier), moduleIdentifier, baseName);
 				
 				if (!scriptExecutionEnvironments.replace(key, candidate, newExecutionEnvironment)) {
 					throw new AssertionError("multiple threads are attempting to manipulate a single script execution environment");
@@ -176,7 +173,7 @@ class ScriptExecutionEnvironmentHelper {
 	@ScriptThread
 	private ModuleScriptExecutionEnvironment newScriptExecutionEnvironmentFor(final String key, final String baseName, final String moduleIdentifier) {
 		
-		ScriptResource script = moduleScript(baseName, moduleIdentifier);
+		ScriptResource script = moduleScript(moduleIdentifier);
 		
 		ModuleScriptExecutionEnvironment newExecutionEnvironment = 
 			creator.createScriptExecutionEnvironment(script, moduleIdentifier, baseName);

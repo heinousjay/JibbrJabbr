@@ -15,8 +15,6 @@
  */
 package jj.script;
 
-import java.nio.file.Paths;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -62,16 +60,13 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private void loadScript(final RequiredModule requiredModule) {
 		
-		final String baseName = context.baseName();
-		final String path = Paths.get(baseName).resolveSibling(requiredModule.identifier()).toString();
-		
 		executors.execute(
-			new IOTask("loading module [" + requiredModule.identifier() + "] from [" + baseName + "]") {
+			new IOTask("loading module [" + requiredModule.identifier() + "] from [" + context.baseName() + "]") {
 			
 				@Override
 				public void run() {
 					ScriptResource scriptResource = 
-						finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(path));
+						finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(requiredModule.identifier()));
 					
 					// at this point do we need to check if we got scooped? inside
 					// the script thread makes more sense really, if we check here
@@ -88,7 +83,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 					} else {
 						
 						scriptRunner.submit(
-							"required module " + requiredModule.identifier() + " error result in [" + baseName + "]",
+							"required module " + requiredModule.identifier() + " error result in [" + context.baseName() + "]",
 							requiredModule.parentContext(),
 							requiredModule.pendingKey(),
 							new RequiredModuleException(requiredModule.identifier())
