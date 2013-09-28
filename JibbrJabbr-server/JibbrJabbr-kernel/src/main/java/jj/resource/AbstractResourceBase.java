@@ -14,13 +14,12 @@ public abstract class AbstractResourceBase extends AbstractResource {
 		super(cacheKey);
 	}
 	
-	
 	@Override
-	public void dependsOn(Resource dependency) {
-		assert alive : "cannot depend, i am dead " + toString();
-		assert dependency != null : "can not depend on null";
-		assert dependency != this : "can not depend on myself";
-		((AbstractResource)dependency).dependents.add(this);
+	public void addDependent(Resource dependent) {
+		assert alive : "cannot accept dependents, i am dead " + toString();
+		assert dependent != null : "can not depend on null";
+		assert dependent != this : "can not depend on myself";
+		dependents.add((AbstractResource)dependent);
 	}
 	
 	@Override

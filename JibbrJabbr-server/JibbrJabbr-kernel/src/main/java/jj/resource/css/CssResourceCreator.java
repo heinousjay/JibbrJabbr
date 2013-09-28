@@ -178,7 +178,7 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 				Resource dependency = resourceFinder.loadResource(type, baseName);
 				
 				if (dependency != null) {
-					resource.dependsOn(dependency);
+					dependency.addDependent(resource);
 					URIMatch uriMatch = new URIMatch("/" + baseName);
 					if (!uriMatch.versioned) {
 						// we only want to replace uris that weren't already versioned

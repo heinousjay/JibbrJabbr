@@ -31,11 +31,10 @@ public interface Resource {
 	String sha1();
 
 	/**
-	 * Register a dependency on another resource.  This means that
-	 * when an update to a dependency is detected, the dependent will
-	 * be reloaded, even if it has no changes of its own
+	 * Adds a dependent resource to this resource, which will propagate
+	 * reloads to the dependent
 	 * 
-	 * @param dependency
+	 * @param dependent
 	 */
-	void dependsOn(Resource dependency);
+	void addDependent(Resource dependent);
 }

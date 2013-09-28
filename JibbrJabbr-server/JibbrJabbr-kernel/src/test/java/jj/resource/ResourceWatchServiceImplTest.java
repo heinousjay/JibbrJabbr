@@ -174,11 +174,11 @@ public class ResourceWatchServiceImplTest {
 		StaticResource sr2 = resourceMaker.makeStatic("sox-icon.png");
 		StaticResource sr3 = resourceMaker.makeStatic("replacement.css");
 		StaticResource sr4 = resourceMaker.makeStatic("images/rox-icon.png");
-		sr1.dependsOn(sr2);
-		sr3.dependsOn(sr1);
-		sr4.dependsOn(sr1);
+		sr2.addDependent(sr1);
+		sr1.addDependent(sr3);
+		sr1.addDependent(sr4);
 		// and test circular dependency
-		sr1.dependsOn(sr4);
+		sr4.addDependent(sr1);
 		String name = "index";
 		HtmlResource hr = resourceMaker.makeHtml(name);
 		
@@ -195,11 +195,11 @@ public class ResourceWatchServiceImplTest {
 		StaticResource sr1_2 = resourceMaker.makeStatic("test.css");
 		StaticResource sr1_3 = resourceMaker.makeStatic("test.less");
 		StaticResource sr1_4 = resourceMaker.makeStatic("test2.less");
-		sr1_2.dependsOn(sr1_1);
-		sr1_3.dependsOn(sr1_2);
-		sr1_4.dependsOn(sr1_2);
+		sr1_1.addDependent(sr1_2);
+		sr1_2.addDependent(sr1_3);
+		sr1_2.addDependent(sr1_4);
 		// and test circular dependency
-		sr1_1.dependsOn(sr1_4);
+		sr1_4.addDependent(sr1_1);
 		resourceCache.putIfAbsent(((AbstractResource)sr1_1).cacheKey(), sr1_1);
 		resourceCache.putIfAbsent(((AbstractResource)sr1_2).cacheKey(), sr1_2);
 		resourceCache.putIfAbsent(((AbstractResource)sr1_3).cacheKey(), sr1_3);

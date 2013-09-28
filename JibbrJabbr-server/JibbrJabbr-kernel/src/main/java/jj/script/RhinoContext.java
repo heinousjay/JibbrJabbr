@@ -29,6 +29,13 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
+/**
+ * Thin wrapper around the rhino context mechanism to take advantage of
+ * try-with-resources, and to facilitate mocking and ensure all script
+ * errors are logged
+ * @author jason
+ *
+ */
 public class RhinoContext implements Closeable {
 
 	private final Context context;
@@ -104,7 +111,8 @@ public class RhinoContext implements Closeable {
 	/**
 	 * @param configurationFunction
 	 * @param scope
-	 * @param scope2
+	 * @param thisObj
+	 * @param args
 	 */
 	public Object callFunction(Function configurationFunction, Scriptable scope, Scriptable thisObj, Object...args) {
 		assertNotClosed();
@@ -117,11 +125,6 @@ public class RhinoContext implements Closeable {
 	}
 
 	/**
-	 * @param global
-	 * @param script
-	 * @param scriptName
-	 * @param i
-	 * @param object
 	 */
 	public Object evaluateString(Scriptable scope, String source, String sourceName) {
 		assertNotClosed();

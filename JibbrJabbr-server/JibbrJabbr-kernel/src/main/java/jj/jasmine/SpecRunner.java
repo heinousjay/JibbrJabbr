@@ -63,8 +63,8 @@ public class SpecRunner implements JJServerStartupListener {
 			
 			// make them depend on each other so updates will cause mutual destruction
 			
-			scriptResource.dependsOn(specResource);
-			specResource.dependsOn(scriptResource);
+			scriptResource.addDependent(specResource);
+			specResource.addDependent(scriptResource);
 			
 			logger.info("running a spec!");
 		}

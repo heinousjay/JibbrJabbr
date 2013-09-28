@@ -22,6 +22,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.engine.EngineAPI;
+import jj.event.Publisher;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceMaker;
@@ -43,6 +44,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	@Mock ResourceFinder resourceFinder;
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
+	@Mock Publisher publisher;
 	MockRhinoContextMaker contextMaker;
 	
 
@@ -50,24 +52,35 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	protected String baseName() {
 		return "index";
 	}
+	
+	private void givenMinimalServices() throws Exception {
+		resourceMaker = new ResourceMaker(configuration);
+		
+		contextMaker = new MockRhinoContextMaker();
+		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
+	}
+	
+	private void givenDocumentScriptEnvironmentResources(String baseName) throws Exception {
+		HtmlResource htmlResource = resourceMaker.makeHtml(baseName);
+		given(resourceFinder.loadResource(HtmlResource.class, baseName)).willReturn(htmlResource);
+		
+		ScriptResource serverResource = resourceMaker.makeScript(ScriptResourceType.Server.suffix(baseName));
+		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName))).willReturn(serverResource);
+	}
 
 	@Override
 	protected DocumentScriptEnvironment resource() throws Exception {
 		
-		String baseName = "index";
-		resourceMaker = new ResourceMaker(configuration);
-		HtmlResource htmlResource = resourceMaker.makeHtml(baseName);
-		given(resourceFinder.loadResource(HtmlResource.class, baseName)).willReturn(htmlResource);
-		ScriptResource scriptResource = resourceMaker.makeScript(ScriptResourceType.Server.suffix(baseName));
-		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName))).willReturn(scriptResource);
+		givenMinimalServices();
+		givenDocumentScriptEnvironmentResources(baseName());
 		
-		contextMaker = new MockRhinoContextMaker();
-		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
-		
-		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextMaker, api);
+		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextMaker, api, publisher);
 		
 		return result;
 	}
+
+
+
 
 	@Override
 	protected DocumentScriptEnvironmentCreator toTest() {

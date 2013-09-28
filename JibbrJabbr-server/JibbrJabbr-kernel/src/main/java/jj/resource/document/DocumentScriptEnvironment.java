@@ -30,6 +30,7 @@ import jj.SHA1Helper;
 import jj.engine.DoCallFunction;
 import jj.engine.DoInvokeFunction;
 import jj.engine.EngineAPI;
+import jj.event.Publisher;
 import jj.execution.IOThread;
 import jj.resource.AbstractResourceBase;
 import jj.resource.NoSuchResourceException;
@@ -94,7 +95,9 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 	
 	private final RhinoContextMaker contextMaker;
 	
-	final EngineAPI api;
+	private final EngineAPI api;
+	
+	private final Publisher publisher;
 	
 	private final HtmlResource html;
 	
@@ -111,28 +114,30 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 		final String baseName,
 		final ResourceFinder resourceFinder,
 		final RhinoContextMaker contextMaker,
-		final EngineAPI api
+		final EngineAPI api,
+		final Publisher publisher
 	) {
 		super(cacheKey);
 		this.baseName = baseName;
 		this.uri = "/" + baseName;
 		this.contextMaker = contextMaker;
 		this.api = api;
+		this.publisher = publisher;
 		
 		html = resourceFinder.loadResource(HtmlResource.class, baseName); // + html!
 		
-		if (html == null) throw new NoSuchResourceException(baseName);
+		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName() + ".html");
 		
 		clientScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
 		sharedScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
 		serverScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 		
-		if (serverScript == null) throw new NoSuchResourceException(baseName);
+		if (serverScript == null) throw new NoSuchResourceException(baseName + "-" + baseName() + ".server.js");
 		
-		dependsOn(html);
-		if (clientScript != null) dependsOn(clientScript);
-		if (sharedScript != null) dependsOn(sharedScript);
-		if (serverScript != null) dependsOn(serverScript);
+		html.addDependent(this);
+		if (clientScript != null) clientScript.addDependent(this);
+		if (sharedScript != null) sharedScript.addDependent(this);
+		if (serverScript != null) serverScript.addDependent(this);
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -144,7 +149,7 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 		scope = createLocalScope(baseName);
 		
 		try {
-		script = compile();
+			script = compile();
 		} catch (Exception e) {
 			throw new ResourceNotViableException(baseName, e);
 		}
@@ -173,27 +178,38 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 		try (RhinoContext context = contextMaker.context()) {
 			
 			if (sharedScript != null) {
-				context.evaluateString(
-					scope, 
-					sharedScript.script(),
-					sharedScript.path().toString()
-				);
+				publisher.publish(new EvaluatingSharedScript(sharedScript.path().toString()));
+				
+				try {
+					context.evaluateString(
+						scope, 
+						sharedScript.script(),
+						sharedScript.path().toString()
+					);
+				} catch (RuntimeException e) {
+					publisher.publish(new ErrorEvaluatingSharedScript(sharedScript.path().toString(), e));
+					throw e;
+				}
 			}
 			
 			if (clientScript != null) {
 				String clientStub = extractClientStubs();
+				publisher.publish(new EvaluatingClientStub(clientScript.path().toString(), clientStub));
 				try {
-					//log.trace("evaluating client stub");
 					context.evaluateString(scope, clientStub, "client stub for " + serverScript.path());
 				} catch (RuntimeException e) {
-					//log.error("couldn't evaluate the client stub (follows), check function definitions in {}", clientScript.path());
-					//log.error("\n{}", clientStub);
+					publisher.publish(new ErrorEvaluatingClientStub(clientScript.path().toString(), e));
 					throw e;
 				}
 			}
 		    
-	    	//log.trace("compiling server script");
-	    	return context.compileString(serverScript.script(), serverScript.path().toString());
+			publisher.publish(new CompilingServerScript(serverScript.path().toString()));
+			try {
+				return context.compileString(serverScript.script(), serverScript.path().toString());
+			} catch (RuntimeException e) {
+				publisher.publish(new ErrorCompilingServerScript(serverScript.path().toString(), e));
+				throw e;
+			}
 		    
 		}
 	}
@@ -215,7 +231,7 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 					Matcher matcher = TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN.matcher(line);
 					if (matcher.matches()) {
 						lastMatcher = matcher;
-					} 
+					}
 				} else if ("}".equals(line) && lastMatcher != null) {
 					boolean hasReturn = previousLine.trim().startsWith("return ");
 					stubs.append("function ")

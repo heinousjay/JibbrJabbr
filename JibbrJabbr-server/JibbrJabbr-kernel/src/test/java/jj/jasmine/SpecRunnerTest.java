@@ -54,8 +54,8 @@ public class SpecRunnerTest {
 		
 		// need to be dependent upon each other so that changes to either cause
 		// things to get reloaded
-		verify(scriptResource).dependsOn(specResource);
-		verify(specResource).dependsOn(scriptResource);
+		verify(scriptResource).addDependent(specResource);
+		verify(specResource).addDependent(scriptResource);
 	}
 
 }
