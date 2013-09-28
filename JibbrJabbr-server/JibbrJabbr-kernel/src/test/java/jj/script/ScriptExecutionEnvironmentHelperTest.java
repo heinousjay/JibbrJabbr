@@ -70,7 +70,7 @@ public class ScriptExecutionEnvironmentHelperTest {
 	@Test
 	public void testFindModuleScriptExecutionEnvironment2() {
 		String baseName = "chat/index";
-		String moduleIdentifier = "helpers/linkify";
+		String moduleIdentifier = "chat/helpers/linkify";
 		
 		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix("chat/helpers/linkify"))).willReturn(scriptResource);
 		given(creator.createScriptExecutionEnvironment(scriptResource, moduleIdentifier, baseName)).willReturn(moduleScriptExecutionEnvironment);
