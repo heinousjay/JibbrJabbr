@@ -104,7 +104,7 @@ class ScriptExecutionEnvironmentCreator {
 		log.trace("shared script is {}", sharedScriptResource);
 		log.trace("server script is {}", serverScriptResource);
 		
-		String clientStubs = extractClientStubs(clientScriptResource.script());
+		String clientStubs = clientScriptResource == null ? "" : extractClientStubs(clientScriptResource.script());
 		
 		Scriptable scope = createLocalScope(baseName);
 		
