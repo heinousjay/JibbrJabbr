@@ -50,6 +50,8 @@ public class JJExecutorsImplTest {
 
 	@InjectMocks ExecutorBundle bundle;
 	
+	@Mock CurrentTask currentTask;
+	
 	@Mock Logger logger;
 	
 	JJExecutorsImpl executors;
@@ -59,7 +61,7 @@ public class JJExecutorsImplTest {
 	@Before
 	public void before() {
 		
-		executors = new JJExecutorsImpl(bundle, logger);
+		executors = new JJExecutorsImpl(bundle, currentTask, logger);
 	}
 	
 	private void runTask(ScheduledExecutorService service) {
@@ -75,17 +77,20 @@ public class JJExecutorsImplTest {
 		
 		final AtomicBoolean flag = new AtomicBoolean(false);
 		
-		executors.execute(new ScriptTask("test task", "test") {
+		ScriptTask task = new ScriptTask("test task", "test") {
 			
 			@Override
 			protected void run() {
 				flag.set(true);
 			}
-		});
+		};
+		
+		executors.execute(task);
 		
 		runTask(scriptExecutor);
 		
 		assertThat(flag.get(), is(true));
+		verify(currentTask).set(task);
 	}
 	
 	@Test
@@ -93,16 +98,19 @@ public class JJExecutorsImplTest {
 		
 		final AtomicBoolean flag = new AtomicBoolean(false);
 		
-		executors.execute(new IOTask("test task") {
+		IOTask task = new IOTask("test task") {
 			@Override
 			protected void run() throws Exception {
 				flag.set(true);
 			}
-		});
+		};
+		
+		executors.execute(task);
 		
 		runTask(ioExecutor);
 		
 		assertThat(flag.get(), is(true));
+		verify(currentTask).set(task);
 	}
 	
 	@Test

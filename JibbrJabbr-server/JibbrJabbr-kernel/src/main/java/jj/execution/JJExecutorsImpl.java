@@ -1,7 +1,5 @@
 package jj.execution;
 
-import io.netty.util.concurrent.DefaultPromise;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import javax.inject.Inject;
@@ -24,27 +22,30 @@ import jj.logging.EmergencyLogger;
 class JJExecutorsImpl implements JJExecutors {
 
 	private final ExecutorBundle bundle;
+	private final CurrentTask currentTask;
 	private final Logger logger;
 	
 	@Inject
 	public JJExecutorsImpl(
 		final ExecutorBundle bundle,
+		final CurrentTask currentTask,
 		final @EmergencyLogger Logger logger
 	) {
 		this.bundle = bundle;
+		this.currentTask = currentTask;
 		this.logger = logger;
 	}
 	
 	@Override
-	public Future<Void> execute(final JJTask task) {
+	public Future<?> execute(final JJTask task) {
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 		
-		task.executor(bundle).submit(new Runnable() {
+		return task.executor(bundle).submit(new Runnable() {
 			
 			@Override
 			public void run() {
-				// execution event
+				currentTask.set(task);
 				try {
 					task.run();
 				} catch (OutOfMemoryError error) {
@@ -56,14 +57,6 @@ class JJExecutorsImpl implements JJExecutors {
 				}
 			}
 		});
-		
-		return new DefaultPromise<Void>() {
-			
-			@Override
-			public boolean isDone() {
-				return latch.getCount() == 0;
-			}
-		};
 	}
 	
 	@Override

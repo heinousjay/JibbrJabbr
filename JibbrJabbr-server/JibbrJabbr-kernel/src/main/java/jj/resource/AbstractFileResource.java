@@ -13,9 +13,6 @@ import java.nio.file.attribute.FileTime;
 import jj.SHA1Helper;
 import jj.execution.IOThread;
 
-// needs to be public or mockito can't mock this, so the constructor
-// is package protected to prevent outside things from deriving from
-// this.  for now at least.
 /**
  * re
  * @author jason
@@ -41,8 +38,7 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 	private String uri;
 	
 	@IOThread
-	protected
-	AbstractFileResource(
+	protected AbstractFileResource(
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path
@@ -51,8 +47,7 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 	}
 	
 	@IOThread
-	protected
-	AbstractFileResource(
+	protected AbstractFileResource(
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path,
@@ -97,6 +92,14 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 		} catch (IOException ioe) {
 			throw new ResourceNotViableException(path, ioe);
 		}
+		
+		String sha = sha1();
+		StringBuilder sb = new StringBuilder("/");
+		if (sha != null) {
+			sb.append(sha).append("/");
+		}
+		
+		uri = sb.append(baseName).toString();
 	}
 	
 	private ByteBuf readAllBytes(final Path path) throws IOException {
@@ -110,13 +113,7 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 
 	@Override
 	public String uri() {
-		String sha = sha1();
-		StringBuilder sb = new StringBuilder("/");
-		if (sha != null) {
-			sb.append(sha).append("/");
-		}
-		
-		return sb.append(baseName).toString();
+		return uri;
 	}
 
 	@Override

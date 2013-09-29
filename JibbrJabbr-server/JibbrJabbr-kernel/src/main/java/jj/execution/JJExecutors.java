@@ -4,7 +4,7 @@ import java.util.concurrent.Future;
 
 public interface JJExecutors {
 	
-	Future<Void> execute(final JJTask task);
+	Future<?> execute(final JJTask task);
 	
 	boolean isScriptThread();
 
