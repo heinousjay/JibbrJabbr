@@ -27,7 +27,7 @@ import org.junit.Test;
 public class RunAPage {
 
 	@Rule
-	public JJAppTest app = new JJAppTest(App.path);
+	public JJAppTest app = new JJAppTest(App.path1);
 	
 	@Test
 	public void test() throws Exception {

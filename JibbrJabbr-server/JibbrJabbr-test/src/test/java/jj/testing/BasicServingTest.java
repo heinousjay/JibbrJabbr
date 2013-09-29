@@ -77,13 +77,13 @@ public class BasicServingTest {
 	public static final VerifiableRequest[] assets;
 	
 	private static VerifiableRequest makeResourceRequest(String name) throws Exception {
-		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(App.path, name)));
+		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(App.path1, name)));
 	}
 	
 	static {
 		try {
-			indexHtmlRenderedPath = Paths.get(App.path, INDEX_HTML_RENDERED);
-			animalHtmlRenderedPath = Paths.get(App.path, ANIMAL_HTML_RENDERED);
+			indexHtmlRenderedPath = Paths.get(App.path1, INDEX_HTML_RENDERED);
+			animalHtmlRenderedPath = Paths.get(App.path1, ANIMAL_HTML_RENDERED);
 			
 			List<VerifiableRequest> work = new ArrayList<>();
 			work.add(makeResourceRequest("0.txt"));
@@ -126,7 +126,7 @@ public class BasicServingTest {
 	}
 	
 	@Rule
-	public JJAppTest app = new JJAppTest(App.path);
+	public JJAppTest app = new JJAppTest(App.path1);
 	
 	static interface Namer {
 		String name(int i);

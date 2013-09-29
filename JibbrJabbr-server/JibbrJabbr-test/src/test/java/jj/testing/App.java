@@ -17,17 +17,18 @@ package jj.testing;
 
 import java.nio.file.Paths;
 
-import jj.JJ;
-
 /**
  * @author jason
  *
  */
 public class App {
-	public static final String path;
+	
+	public static final String path1;
 	static {
-		// well it's ugly, but it's portable
-		path = Paths.get(JJ.uri(BasicServingTest.class)).getParent().getParent().getParent().toAbsolutePath().toString();
+		try {
+			path1 = Paths.get(App.class.getResource("/app1/app").toURI()).toAbsolutePath().toString();
+		} catch (Exception e) {
+			throw new AssertionError(e);
+		}
 	}
-
 }
