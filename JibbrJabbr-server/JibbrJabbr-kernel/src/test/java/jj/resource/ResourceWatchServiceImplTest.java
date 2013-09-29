@@ -155,6 +155,9 @@ public class ResourceWatchServiceImplTest {
 			@Override
 			public Resource answer(InvocationOnMock invocation) throws Throwable {
 				latch.countDown();
+				System.out.println(latch.getCount());
+				System.out.println(invocation.getArguments()[0]);
+				System.out.println(invocation.getArguments()[1]);
 				return null;
 			}
 			
