@@ -45,8 +45,6 @@ class JJExecutorsImpl implements JJExecutors {
 				currentTask.set(task);
 				try {
 					task.run();
-				} catch (OutOfMemoryError error) {
-					throw error;
 				} catch (Throwable t) {
 					logger.error("Exception caught in executor", t);
 				}

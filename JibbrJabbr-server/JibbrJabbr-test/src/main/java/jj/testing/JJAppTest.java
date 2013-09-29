@@ -17,7 +17,8 @@ package jj.testing;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import jj.JJServerLifecycle;
+
+
 import jj.StringUtils;
 
 import io.netty.handler.codec.http.HttpHeaders;
@@ -25,13 +26,15 @@ import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
 
 /**
  * A test rule that supplies a context for performing
- * tests against a given HTML resource.
+ * tests against a given HTML resource.  This rule does
+ * not support parallel execution of test methods
  * 
  * @author jason
  *
@@ -48,38 +51,11 @@ public class JJAppTest implements TestRule {
 	
 	@Override
 	public Statement apply(final Statement base, final Description description) {
-		
-		return new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				
-				// we use production to eagerly instantiate the graph, since the next line will do
-				// that anyway.  might be adding the concept of modules back, simple rules to start -
-				// some derivative of Module in your base package (first directory in the jar that has
-				// classes, and that's about it.  you can inject anything public.  the classloader will
-				// treat jj. just like java. in that it will be off limits?  is this smart? it's
-				// probably better to start restrictive and loosen if needed.  ModuleListener interface
-				// to get a call on start-up
-				injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(appPath, description));
-				
-				try {
-					System.out.println("============================================================");
-					System.out.println(" Starting the server up.");
-					System.out.println("============================================================");
-					injector.getInstance(JJServerLifecycle.class).start();
-					System.out.println("============================================================");
-					System.out.println(" executing " + description);
-					System.out.println("============================================================");
-					base.evaluate();
-				} finally {
-					System.out.println("============================================================");
-					System.out.println(" Shutting the server down.");
-					System.out.println("============================================================");
-					injector.getInstance(JJServerLifecycle.class).stop();
-					injector = null;
-				}
-			}
-		};
+
+		// we use production to eagerly instantiate the graph, since the next line will do
+		// that anyway.
+		injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(appPath, base, description));
+		return injector.getInstance(AppStatement.class);
 	}
 	
 	public TestHttpClient doSocketConnection(final Document document) throws Exception {

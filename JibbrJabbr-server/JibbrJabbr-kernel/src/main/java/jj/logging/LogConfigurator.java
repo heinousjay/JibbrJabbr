@@ -48,7 +48,7 @@ class LogConfigurator implements JJServerShutdownListener {
 		if (isTest) {
 			this.asyncAppender = null;
 			logger.setLevel(OFF);
-			testLogger(ERROR);
+			testLogger(INFO);
 			traceLogger(ERROR);
 			InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		} else {

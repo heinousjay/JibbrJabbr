@@ -51,8 +51,6 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	private int id = 0;
 	
-	private TestHttpRequest request;
-	
 	private final Logger testRunnerLogger;
 	
 	private final AtomicBoolean gotOnce = new AtomicBoolean(true);
@@ -81,7 +79,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	public TestHttpResponse end() {
 		markCommitted();
-		testRunnerLogger.info("end called on {}", this);
+		testRunnerLogger.debug("end called on {}", this);
 		processResponse();
 		ended = true;
 		return this;
@@ -168,6 +166,9 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	@Override
 	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
 		try (FileChannel channel = resource.randomAccessFile().getChannel()) {
+			
+			assert channel.size() < 1_000_000L;
+			
 			ByteBuffer buffer = ByteBuffer.allocate((int)channel.size());
 			while (buffer.position() < buffer.capacity()) {
 				channel.read(buffer);

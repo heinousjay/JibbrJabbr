@@ -23,6 +23,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 import jj.CoreModule;
 import jj.JJModule;
@@ -34,10 +35,12 @@ import jj.JJModule;
 class TestModule extends JJModule {
 	
 	private final String appPath;
+	private final Statement base;
 	private final Description description;
 	
-	TestModule(final String appPath, final Description description) {
+	TestModule(final String appPath, final Statement base, final Description description) {
 		this.appPath = appPath;
+		this.base = base;
 		this.description = description;
 	}
 
@@ -46,6 +49,8 @@ class TestModule extends JJModule {
 		
 		addStartupListenerBinding().to(TestListener.class);
 		addShutdownListenerBinding().to(TestListener.class);
+		
+		bind(Statement.class).toInstance(base);
 		
 		bind(Description.class).toInstance(description);
 		

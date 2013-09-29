@@ -142,22 +142,4 @@ public class JJExecutorsImplTest {
 		
 		verify(logger, times(2)).error(anyString(), eq(toThrow));
 	}
-	
-	@Test
-	public void testIgnoresOOM() {
-		executors.execute(new IOTask("test task") {
-			
-			@Override
-			protected void run() throws Exception {
-				throw new OutOfMemoryError();
-			}
-		});
-		
-		try {
-			runTask(ioExecutor);
-			fail("should have thrown through here");
-		} catch(OutOfMemoryError oom) {};
-		
-		verifyZeroInteractions(logger);
-	}
 }

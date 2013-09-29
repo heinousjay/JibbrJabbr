@@ -98,14 +98,14 @@ class TestRunner {
 		@Override
 		public Document document() throws Exception {
 			testRunnerLog.trace("document() on {}", response.id());
-			response.get();
+			getResponse();
 			return response.document();
 		}
 
 		@Override
 		public Document document(final long timeout, final TimeUnit unit) throws Exception {
 			testRunnerLog.trace("document({}, {}) on {}", timeout, unit, response.id());
-			response.get(timeout, unit);
+			getResponse(timeout, unit);
 			return response.document();
 		}
 		
@@ -166,7 +166,7 @@ class TestRunner {
 	
 	TestHttpClient run() {
 		try {
-			testRunnerLog.info("starting request {}", request);
+			testRunnerLog.debug("starting {}", request);
 			handler.handleHttpRequest(request, response);
 		} catch (Throwable t) {
 			response.error(t);

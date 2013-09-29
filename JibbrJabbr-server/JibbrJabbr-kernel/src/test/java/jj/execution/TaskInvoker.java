@@ -16,6 +16,8 @@
 package jj.execution;
 
 /**
+ * just working around access restrictions
+ * 
  * @author jason
  *
  */

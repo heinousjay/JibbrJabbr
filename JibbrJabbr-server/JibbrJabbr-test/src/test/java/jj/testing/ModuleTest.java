@@ -36,6 +36,10 @@ public class ModuleTest {
 		
 		TestHttpClient client = app.get("/deep/nested");
 		
+		client.dumpObjects();
+		
 		assertThat(client.document().select("title").text(), is("titled"));
+		
+		client.dumpObjects();
 	}
 }
