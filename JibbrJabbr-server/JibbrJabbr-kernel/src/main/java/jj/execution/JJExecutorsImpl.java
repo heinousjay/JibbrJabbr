@@ -1,6 +1,5 @@
 package jj.execution;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -39,8 +38,6 @@ class JJExecutorsImpl implements JJExecutors {
 	@Override
 	public Future<?> execute(final JJTask task) {
 		
-		final CountDownLatch latch = new CountDownLatch(1);
-		
 		return task.executor(bundle).submit(new Runnable() {
 			
 			@Override
@@ -52,8 +49,6 @@ class JJExecutorsImpl implements JJExecutors {
 					throw error;
 				} catch (Throwable t) {
 					logger.error("Exception caught in executor", t);
-				} finally {
-					latch.countDown();
 				}
 			}
 		});
