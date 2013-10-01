@@ -33,7 +33,6 @@ import jj.engine.DoInvokeFunction;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.IOThread;
-import jj.resource.AbstractResourceBase;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -49,11 +48,16 @@ import jj.script.RhinoContextMaker;
  *
  */
 @Singleton
-public class DocumentScriptEnvironment extends AbstractResourceBase {
+public class DocumentScriptEnvironment extends AbstractScriptEnvironment {
 
 	@Override
 	public String baseName() {
 		return baseName;
+	}
+	
+	@Override
+	public String scriptName() {
+		return ScriptResourceType.Client.suffix(baseName);
 	}
 
 	@Override
@@ -72,6 +76,10 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 	
 	public Script script() {
 		return script;
+	}
+
+	public Document document() {
+		return html.document().clone();
 	}
 
 	@Override
@@ -94,12 +102,6 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 	
 	private final Script script;
 	
-	private final RhinoContextMaker contextMaker;
-	
-	private final EngineAPI api;
-	
-	private final Publisher publisher;
-	
 	private final HtmlResource html;
 	
 	private final ScriptResource clientScript;
@@ -118,16 +120,13 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 		final EngineAPI api,
 		final Publisher publisher
 	) {
-		super(cacheKey);
+		super(cacheKey, publisher, contextMaker, api);
 		this.baseName = baseName;
 		this.uri = "/" + baseName;
-		this.contextMaker = contextMaker;
-		this.api = api;
-		this.publisher = publisher;
 		
-		html = resourceFinder.loadResource(HtmlResource.class, baseName); // + html!
+		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
 		
-		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName() + ".html");
+		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName + ".html");
 		html.addDependent(this);
 		
 		clientScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
@@ -157,25 +156,6 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 			} catch (Exception e) {
 				throw new ResourceNotViableException(baseName, e);
 			}
-		}
-	}
-	
-	private ScriptableObject createLocalScope(final String moduleIdentifier) {
-		try (RhinoContext context = contextMaker.context()) {
-			ScriptableObject local = context.newObject(api.global());
-			local.setPrototype(api.global());
-		    local.setParentScope(null);
-		    
-		    // setting up the 'module' property as described in 
-		    // the commonjs module 1.1.1 specification
-		    // in the case of the top-level server script, the id
-		    // will be the baseName, which fortunately happens to be
-		    // exactly what is required
-		    ScriptableObject module = context.newObject(local);
-		    module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
-		    local.defineProperty("module", module, ScriptableObject.CONST);
-		    
-		    return local;
 		}
 	}
 	
@@ -262,13 +242,5 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 			}
 		}
 		return stubs.toString();
-	}
-
-	/**
-	 * @return
-	 */
-	public Document document() {
-		// TODO Auto-generated method stub
-		return html.document().clone();
 	}
 }

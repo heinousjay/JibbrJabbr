@@ -66,7 +66,7 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
-		given(resourceFinder.loadResource(HtmlResource.class, baseName)).willReturn(html);
+		given(resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName))).willReturn(html);
 	}
 
 	private void givenAClientScript(String baseName) throws Exception {

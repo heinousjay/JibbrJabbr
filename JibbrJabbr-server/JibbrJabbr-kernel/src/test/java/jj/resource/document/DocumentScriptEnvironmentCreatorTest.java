@@ -61,8 +61,8 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	}
 	
 	private void givenDocumentScriptEnvironmentResources(String baseName) throws Exception {
-		HtmlResource htmlResource = resourceMaker.makeHtml(baseName);
-		given(resourceFinder.loadResource(HtmlResource.class, baseName)).willReturn(htmlResource);
+		HtmlResource htmlResource = resourceMaker.makeHtml(HtmlResourceCreator.resourceName(baseName));
+		given(resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName))).willReturn(htmlResource);
 		
 		ScriptResource serverResource = resourceMaker.makeScript(ScriptResourceType.Server.suffix(baseName));
 		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName))).willReturn(serverResource);

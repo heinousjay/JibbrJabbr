@@ -12,7 +12,11 @@ import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
 @Singleton
-public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
+public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
+	
+	public static String resourceName(String baseName) {
+		return baseName + ".html";
+	}
 	
 	private final Configuration configuration;
 	private final ResourceInstanceCreator instanceModuleCreator;
@@ -42,7 +46,7 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource>{
 	}
 	
 	private Path path(final String baseName, Object...args) {
-		return configuration.appPath().resolve(baseName + ".html");
+		return configuration.appPath().resolve(baseName);
 	}
 	
 	@Override

@@ -15,26 +15,12 @@
  */
 package jj.resource.document;
 
-import jj.execution.ExecutionEvent;
-import jj.script.ScriptExecutionEnvironment;
-
 /**
  * @author jason
  *
  */
-public class ExecutionEnvironmentInitialized implements ExecutionEvent {
-	
-	private final ScriptExecutionEnvironment executionEnvironment;
-
-	public ExecutionEnvironmentInitialized(final ScriptEnvironment scriptEnvironment) {
-		executionEnvironment = null;
-	}
-	
-	public ExecutionEnvironmentInitialized(final ScriptExecutionEnvironment executionEnvironment) {
-		this.executionEnvironment = executionEnvironment;
-	}
-	
-	public ScriptExecutionEnvironment executionEnvironment() {
-		return executionEnvironment;
-	}
+enum ScriptExecutionState {
+	Unitialized,
+	Initializing,
+	Initialized
 }

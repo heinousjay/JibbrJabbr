@@ -25,8 +25,6 @@ public abstract class AbstractResourceCreator<T extends AbstractResource> implem
 
 	protected abstract URI uri(final String baseName, final Object...args);
 	
-	//protected abstract Path path(final String baseName, final Object...args);
-	
 	@Override
 	public final ResourceCacheKey cacheKey(String baseName, Object...args) {
 		return new ResourceCacheKey(type(), uri(baseName, args));

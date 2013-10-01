@@ -182,8 +182,7 @@ public class ResourceWatchServiceImplTest {
 		sr1.addDependent(sr4);
 		// and test circular dependency
 		sr4.addDependent(sr1);
-		String name = "index";
-		HtmlResource hr = resourceMaker.makeHtml(name);
+		HtmlResource hr = resourceMaker.makeHtml("index.html");
 		
 		resourceCache.putIfAbsent(((AbstractResource)sr).cacheKey(), sr);
 		resourceCache.putIfAbsent(((AbstractResource)hr).cacheKey(), hr);
@@ -254,7 +253,7 @@ public class ResourceWatchServiceImplTest {
 		assertTrue(((AbstractResource)sr4).isObselete());
 		
 		verify(resourceFinder).loadResource(StaticResource.class, "index.html");
-		verify(resourceFinder).loadResource(HtmlResource.class, "index");
+		verify(resourceFinder).loadResource(HtmlResource.class, "index.html");
 		verify(resourceFinder).loadResource(StaticResource.class, "url_replacement_output.txt");
 		verify(resourceFinder).loadResource(StaticResource.class, "sox-icon.png");
 		verify(resourceFinder).loadResource(StaticResource.class, "replacement.css");
