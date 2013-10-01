@@ -42,11 +42,15 @@ class JJExecutorsImpl implements JJExecutors {
 			
 			@Override
 			public void run() {
+				String name = Thread.currentThread().getName();
+				Thread.currentThread().setName(name + " - " + task.name());
 				currentTask.set(task);
 				try {
 					task.run();
 				} catch (Throwable t) {
 					logger.error("Exception caught in executor", t);
+				} finally {
+					Thread.currentThread().setName(name);
 				}
 			}
 		});
