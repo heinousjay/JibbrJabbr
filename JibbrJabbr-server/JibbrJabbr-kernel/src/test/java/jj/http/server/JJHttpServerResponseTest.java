@@ -30,6 +30,7 @@ import jj.http.server.JJHttpServerResponse;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
+import jj.uri.RouteFinder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -67,7 +68,7 @@ public class JJHttpServerResponseTest {
 	@Before
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		request = new JJHttpServerRequest(nettyRequest, ctx);
+		request = new JJHttpServerRequest(nettyRequest, new RouteFinder(), ctx);
 		
 		response = new JJHttpServerResponse(request, ctx, logger);
 		assertThat(response.charset(), is(UTF_8));
@@ -234,7 +235,24 @@ public class JJHttpServerResponseTest {
 			.content(bytes)
 			.end();
 		
+		// have to do this outside the verification or mockito gets all jacked up inside
+		String remoteAddress = ctx.channel().remoteAddress().toString();
 		
+		verify(logger).info(
+			eq("{} - - {} \"{} {} {}\" {} {} {} \"{}\""),
+			eq(remoteAddress),
+			anyString(), // the date, not going to try to make this work
+			eq(request.method()),
+			eq(request.request().getUri()),
+			eq(request.request().getProtocolVersion()),
+			eq(response.status()),
+			eq("100"),
+			eq("-"),
+			isNull()
+		);
+		
+		// TODO
+		//verify(logger).trace(captor.capture());
 	}
 
 }

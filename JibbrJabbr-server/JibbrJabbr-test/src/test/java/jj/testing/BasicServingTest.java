@@ -64,7 +64,7 @@ public class BasicServingTest {
 	private static final String INDEX_HTML_RENDERED = "index.html.rendered";
 	private static final String ANIMAL_HTML_RENDERED = "animal.html.rendered";
 
-	private static final String INDEX = "/index";
+	private static final String INDEX = "/";
 
 	private static final String ANIMAL = "/animal";
 	
@@ -145,7 +145,7 @@ public class BasicServingTest {
 				
 				assertThat(client.status(), is(HttpResponseStatus.OK));
 				assertThat(new String(client.contentBytes(), UTF_8), is(new String(request.bytes, UTF_8)));
-			} catch (Exception e) {
+			} catch (Error e) {
 				System.err.print(new StringBuilder()
 					.append(request.uri).append(System.lineSeparator())
 				);

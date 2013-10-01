@@ -12,6 +12,7 @@ import jj.http.client.JJHttpClientRequest;
 import jj.script.CurrentScriptContext;
 import jj.script.RestRequest;
 import jj.uri.Route;
+import jj.uri.RouteFinder;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.mozilla.javascript.BaseFunction;
@@ -29,6 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class RestCallProvider {
 	
 	private final Logger log = LoggerFactory.getLogger(RestCallProvider.class);
+	
+	private final RouteFinder routeFinder;
 	
 	private final HttpClient httpClient;
 	
@@ -107,7 +110,7 @@ class RestCallProvider {
 			}
 			
 			final JJHttpClientRequest request = 
-				new JJHttpClientRequest(options.method(), url.toString())
+				new JJHttpClientRequest(options.method(), url.toString(), routeFinder)
 				.header(HttpHeaders.Names.ACCEPT, options.accept().toString());
 			
 			if (body != null && !"".equals(body.trim())) {
@@ -143,10 +146,12 @@ class RestCallProvider {
 	@Inject
 	RestCallProvider(
 		final HttpClient httpClient,
-		final CurrentScriptContext context
+		final CurrentScriptContext context,
+		final RouteFinder routeFinder
 	) {
 		this.httpClient = httpClient;
 		this.context = context;
+		this.routeFinder = routeFinder;
 	}
 	
 	Function createRestCall(final RestCallOptions options) {

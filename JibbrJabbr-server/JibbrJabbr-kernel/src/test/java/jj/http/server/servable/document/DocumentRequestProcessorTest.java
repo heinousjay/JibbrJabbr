@@ -15,7 +15,8 @@ import jj.execution.MockJJExecutors;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
-import jj.resource.document.HtmlResource;
+import jj.resource.MimeTypes;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.ScriptRunner;
 
 import io.netty.channel.Channel;
@@ -39,7 +40,7 @@ public class DocumentRequestProcessorTest {
 	
 	MockJJExecutors executors;
 
-	@Mock HtmlResource htmlResource;
+	@Mock DocumentScriptEnvironment dse;
 	
 	@Mock Channel channel;
 	@Mock Logger access;
@@ -70,8 +71,6 @@ public class DocumentRequestProcessorTest {
 		}
 	}
 	
-	private static final String MIME = "mime-type";
-	
 	private static final String HTML = "<html><head><title>what</title></head><body></body></html>";
 	
 	@Before
@@ -85,9 +84,8 @@ public class DocumentRequestProcessorTest {
 
 		executors = new MockJJExecutors();
 		
-		when(htmlResource.baseName()).thenReturn(baseName);
-		when(htmlResource.mime()).thenReturn(MIME);
-		when(htmlResource.document()).thenReturn(document);
+		when(dse.baseName()).thenReturn(baseName);
+		when(dse.document()).thenReturn(document);
 		
 		when(httpRequest.uri()).thenReturn("/");
 		
@@ -108,7 +106,7 @@ public class DocumentRequestProcessorTest {
 		filters.add(new TestDocumentFilter(false, 3));
 		
 		DocumentRequestProcessor toTest = 
-			new DocumentRequestProcessor(executors, scriptRunner, htmlResource, httpRequest, httpResponse, filters);
+			new DocumentRequestProcessor(executors, scriptRunner, dse, httpRequest, httpResponse, filters);
 		
 		// when
 		executors.isScriptThread = true;
@@ -124,7 +122,7 @@ public class DocumentRequestProcessorTest {
 	public void testWritesDocumentCorrectly() throws Exception {
 		// given
 		DocumentRequestProcessor toTest = 
-				new DocumentRequestProcessor(executors, scriptRunner, htmlResource, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
+				new DocumentRequestProcessor(executors, scriptRunner, dse, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
 		
 		executors.isScriptThread = true;
 		
@@ -137,7 +135,7 @@ public class DocumentRequestProcessorTest {
 		// then
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MIME);
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"));
 		verify(httpResponse).content(bytes);
 	}
 

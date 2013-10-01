@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import jj.Sequence;
+import jj.uri.RouteFinder;
 import jj.uri.URIMatch;
 
 /**
@@ -49,12 +50,15 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	protected final String id = sequence.next();
 	
 	protected final FullHttpRequest request;
+	
+	protected final RouteFinder routeFinder;
 
 	/**
 	 * 
 	 */
-	protected AbstractHttpRequest(final FullHttpRequest request) {
+	protected AbstractHttpRequest(final FullHttpRequest request, final RouteFinder routeFinder) {
 		this.request = request;
+		this.routeFinder = routeFinder;
 	}
 
 	@Override
@@ -136,11 +140,11 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	 */
 	@Override
 	public String uri() {
-		return request.getUri();
+		return routeFinder.find(request.getUri());
 	}
 	
 	public URIMatch uriMatch() {
-		return new URIMatch(request.getUri());
+		return new URIMatch(uri());
 	}
 
 	/**

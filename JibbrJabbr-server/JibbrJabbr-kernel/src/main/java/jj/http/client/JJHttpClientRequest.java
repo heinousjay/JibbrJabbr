@@ -15,10 +15,13 @@
  */
 package jj.http.client;
 
+import javax.inject.Inject;
+
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import jj.http.AbstractHttpRequest;
+import jj.uri.RouteFinder;
 
 /**
  * @author jason
@@ -29,16 +32,17 @@ public class JJHttpClientRequest extends AbstractHttpRequest {
 	/**
 	 * @param request
 	 */
-	public JJHttpClientRequest() {
-		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"));
+	@Inject
+	public JJHttpClientRequest(final RouteFinder routeFinder) {
+		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"), routeFinder);
 	}
 	
-	public JJHttpClientRequest(final String uri) {
-		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri));
+	public JJHttpClientRequest(final String uri, final RouteFinder routeFinder) {
+		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri), routeFinder);
 	}
 	
-	public JJHttpClientRequest(final HttpMethod method, final String uri) {
-		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri));
+	public JJHttpClientRequest(final HttpMethod method, final String uri, final RouteFinder routeFinder) {
+		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri), routeFinder);
 	}
  
 	public JJHttpClientRequest uri(String uri) {

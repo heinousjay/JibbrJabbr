@@ -92,16 +92,6 @@ public class DocumentScriptEnvironmentTest {
 		} catch (NoSuchResourceException nsre) {
 			assertThat(nsre.getMessage(), is(baseName + "-" + baseName + ".html"));
 		}
-		
-		
-		givenAnHtmlResource(baseName);
-		
-		try {
-			new DocumentScriptEnvironment(cacheKey, baseName, resourceFinder, contextMaker, api, publisher);
-			fail();
-		} catch (NoSuchResourceException nsre) {
-			assertThat(nsre.getMessage(), is(baseName + "-" + baseName + ".server.js"));
-		}
 	}
 	
 	@Test

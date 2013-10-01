@@ -12,7 +12,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.DataStore;
-import jj.resource.document.HtmlResource;
+import jj.resource.MimeTypes;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.DocumentScriptExecutionEnvironment;
 import jj.script.ScriptRunner;
 import jj.execution.IOTask;
@@ -44,7 +45,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	
 	private final ScriptRunner scriptRunner;
 	
-	private final HtmlResource resource;
+	private final DocumentScriptEnvironment dse;
 	
 	private final Document document;
 	
@@ -66,15 +67,15 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	DocumentRequestProcessor(
 		final JJExecutors executors,
 		final ScriptRunner scriptRunner,
-		final HtmlResource resource,
+		final DocumentScriptEnvironment dse,
 		final HttpRequest httpRequest,
 		final HttpResponse httpResponse,
 		final Set<DocumentFilter> filters
 	) {
 		this.executors = executors;
 		this.scriptRunner = scriptRunner;
-		this.resource = resource;
-		this.document = resource.document().clone();
+		this.dse = dse;
+		this.document = dse.document();
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
 		this.filters = filters;
@@ -121,7 +122,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	}
 	
 	public String baseName() {
-		return resource.baseName();
+		return dse.baseName();
 	}
 	
 	@Override
@@ -180,7 +181,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
 			// clients shouldn't cache these responses at all
 			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+			.header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"))
 			.content(bytes)
 			.end();
 	}

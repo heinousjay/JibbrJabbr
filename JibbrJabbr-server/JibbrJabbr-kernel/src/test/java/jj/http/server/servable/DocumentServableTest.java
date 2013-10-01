@@ -20,7 +20,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import jj.resource.document.HtmlResource;
+import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
 
 import org.junit.Before;
@@ -35,16 +36,16 @@ import com.google.inject.Injector;
  */
 public class DocumentServableTest extends ServableTestBase {
 	
-	@Mock HtmlResource resource;
+	@Mock DocumentScriptEnvironment resource;
 	@Mock Injector parentInjector;
-	@Mock RequestProcessor requestProcessor;
+	@Mock DocumentRequestProcessor requestProcessor;
 	
 	DocumentServable ds;
 	
 	@Before
 	public void before() {
 		given(parentInjector.createChildInjector(any(AbstractModule.class))).willReturn(parentInjector);
-		given(parentInjector.getInstance(RequestProcessor.class)).willReturn(requestProcessor);
+		given(parentInjector.getInstance(DocumentRequestProcessor.class)).willReturn(requestProcessor);
 		
 		ds = new DocumentServable(configuration, resourceFinder, parentInjector);
 	}
@@ -54,9 +55,8 @@ public class DocumentServableTest extends ServableTestBase {
 		
 		assertThat(ds.isMatchingRequest(new URIMatch("/")), is(true));
 		assertThat(ds.isMatchingRequest(new URIMatch("/index")), is(true));
-		assertThat(ds.isMatchingRequest(new URIMatch("/index.html")), is(true));
+		assertThat(ds.isMatchingRequest(new URIMatch("/index")), is(true));
 		assertThat(ds.isMatchingRequest(new URIMatch("/index/")), is(true));
-		assertThat(ds.isMatchingRequest(new URIMatch("/../")), is(true));
 		
 		assertThat(ds.isMatchingRequest(new URIMatch("/index.css")), is(false));
 		assertThat(ds.isMatchingRequest(new URIMatch("/index.whatever")), is(false));
@@ -68,30 +68,19 @@ public class DocumentServableTest extends ServableTestBase {
 	public void testBasicOperation() throws Exception {
 		
 		given(request.uri()).willReturn("/");
-		given(request.uriMatch()).willReturn(new URIMatch("/"));
-		given(resourceFinder.loadResource(HtmlResource.class, "index")).willReturn(resource);
+		given(request.uriMatch()).willReturn(new URIMatch("/index"));
+		given(resourceFinder.loadResource(DocumentScriptEnvironment.class, "index")).willReturn(resource);
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);
 		
-		assertThat(rp, is(requestProcessor));
-	}
-	
-	@Test
-	public void testNormalizeURI() throws Exception {
-		
-		given(request.uri()).willReturn("/../servable/");
-		given(request.uriMatch()).willReturn(new URIMatch("/../servable/"));
-		given(resourceFinder.loadResource(HtmlResource.class, "index")).willReturn(resource);
-		
-		RequestProcessor rp = ds.makeRequestProcessor(request, response);
-		
-		assertThat(rp, is(requestProcessor));
+		assertThat(rp, is((RequestProcessor)requestProcessor));
 	}
 
 	@Test
 	public void testOutsideApplicationIsRejected() throws Exception {
 		
 		given(request.uri()).willReturn("/../not-servable/index.html");
+		given(request.uriMatch()).willReturn(new URIMatch(""));
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);
 		
@@ -102,6 +91,7 @@ public class DocumentServableTest extends ServableTestBase {
 	public void testNotFound() throws Exception {
 		
 		given(request.uri()).willReturn("/something");
+		given(request.uriMatch()).willReturn(new URIMatch("/something"));
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);
 		

@@ -147,7 +147,7 @@ public class CurrentScriptContextTest {
 		// given
 		currentScriptContext.initialize(connection);
 		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
-		RestRequest restRequest = new RestRequest(new JJHttpClientRequest());
+		RestRequest restRequest = new RestRequest(new JJHttpClientRequest(null));
 		
 		// when
 		try {

@@ -20,6 +20,7 @@ import java.net.SocketAddress;
 import javax.inject.Inject;
 
 import jj.http.AbstractHttpRequest;
+import jj.uri.RouteFinder;
 
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -35,8 +36,8 @@ public class TestHttpRequest extends AbstractHttpRequest {
 	
 
 	@Inject
-	TestHttpRequest() {
-		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"));
+	TestHttpRequest(final RouteFinder routeFinder) {
+		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"), routeFinder);
 	}
 
 	private final InetSocketAddress socketAddress = new InetSocketAddress(0);

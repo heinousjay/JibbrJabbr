@@ -13,27 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
+package jj.uri;
 
-import static java.util.concurrent.TimeUnit.HOURS;
-
-import org.junit.Rule;
-import org.junit.Test;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author jason
  *
  */
-public class RunAPage {
+public class RouteFinder {
 
-	@Rule
-	public JJAppTest app = new JJAppTest(App.path1);
-	
-	@Test
-	public void test() throws Exception {
-		TestHttpClient client = app.get("/");
+	/**
+	 * @param string
+	 * @return
+	 */
+	public String find(String uri) {
 		
+		Path path = uri.startsWith("/") ? Paths.get(uri) : Paths.get("/" + uri);
 		
-		System.out.println(client.contentsString(1, HOURS));
+		StringBuilder sb = new StringBuilder(path.normalize().toAbsolutePath().toString());
+		
+		if (sb.charAt(sb.length() - 1) == '/') {
+			sb.append("index");
+		} else if (uri.charAt(uri.length() - 1) == '/') {
+			sb.append("/index");
+		}
+		
+		return sb.toString();
 	}
+
 }

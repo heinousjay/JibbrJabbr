@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.jsoup.nodes.Document;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -127,18 +128,17 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 		html = resourceFinder.loadResource(HtmlResource.class, baseName); // + html!
 		
 		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName() + ".html");
+		html.addDependent(this);
 		
 		clientScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
-		
-		if (serverScript == null) throw new NoSuchResourceException(baseName + "-" + baseName() + ".server.js");
-		
-		html.addDependent(this);
 		if (clientScript != null) clientScript.addDependent(this);
-		if (sharedScript != null) sharedScript.addDependent(this);
-		if (serverScript != null) serverScript.addDependent(this);
 		
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
+		if (sharedScript != null) sharedScript.addDependent(this);
+		
+		serverScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
+		if (serverScript != null) serverScript.addDependent(this);
+
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
 			clientScript == null ? "none" : clientScript.sha1(),
@@ -146,12 +146,17 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 			serverScript == null ? "none" : serverScript.sha1()
 		);
 		
-		scope = createLocalScope(baseName);
-		
-		try {
-			script = compile();
-		} catch (Exception e) {
-			throw new ResourceNotViableException(baseName, e);
+		if (serverScript == null)  {
+			scope = null;
+			script = null;
+		} else {
+			scope = createLocalScope(baseName);
+			
+			try {
+				script = compile();
+			} catch (Exception e) {
+				throw new ResourceNotViableException(baseName, e);
+			}
 		}
 	}
 	
@@ -257,5 +262,13 @@ public class DocumentScriptEnvironment extends AbstractResourceBase {
 			}
 		}
 		return stubs.toString();
+	}
+
+	/**
+	 * @return
+	 */
+	public Document document() {
+		// TODO Auto-generated method stub
+		return html.document().clone();
 	}
 }

@@ -148,7 +148,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 				extractIP(request.remoteAddress()),
 				DateFormatHelper.nowInAccessLogFormat(),
 				request.method(),
-				request.uri(),
+				request.request().getUri(),
 				request.request().getProtocolVersion(),
 				response.getStatus(),
 				extractContentLength(),

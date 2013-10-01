@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import jj.DateFormatHelper;
 import jj.http.AbstractHttpRequest;
 import jj.http.HttpRequest;
+import jj.uri.RouteFinder;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -18,8 +19,8 @@ class JJHttpServerRequest extends AbstractHttpRequest implements HttpRequest {
 	protected final ChannelHandlerContext ctx;
 	
 	@Inject
-	JJHttpServerRequest(final FullHttpRequest request, final ChannelHandlerContext ctx) {
-		super(request);
+	JJHttpServerRequest(final FullHttpRequest request, final RouteFinder routeFinder, final ChannelHandlerContext ctx) {
+		super(request, routeFinder);
 		this.ctx = ctx;
 	}
 
