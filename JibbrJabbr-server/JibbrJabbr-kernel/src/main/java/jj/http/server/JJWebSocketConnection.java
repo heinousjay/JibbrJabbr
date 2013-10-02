@@ -19,19 +19,22 @@ import jj.DataStore;
 import jj.DateFormatHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.DocumentScriptExecutionEnvironment;
+import jj.script.FunctionContext;
 
 @Singleton
-public class JJWebSocketConnection implements DataStore {
+public class JJWebSocketConnection implements DataStore, FunctionContext {
 	
 	private static final String CLIENT_STORAGE = "JJWebSocketConnection client storage";
 	
-	private final HashMap<String, Callable> functions = new HashMap<>();
+	// start off with room for three functions
+	private final HashMap<String, Callable> functions = new HashMap<>(4);
 	
 	private final ChannelHandlerContext ctx;
 	
 	private final DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
 	
-	private final HashMap<String, Object> data = new HashMap<>();
+	// room for three data items
+	private final HashMap<String, Object> data = new HashMap<>(4);
 	
 	// room for four messages initially should be good
 	private final List<JJMessage> messages = new ArrayList<>(4);
@@ -76,18 +79,22 @@ public class JJWebSocketConnection implements DataStore {
 		return data.containsKey(name);
 	}
 	
+	@Override
 	public Callable getFunction(String name) {
 		return functions.get(name);
 	}
 
+	@Override
 	public void addFunction(String name, Callable function) {
 		functions.put(name, function);
 	}
 	
+	@Override
 	public boolean removeFunction(String name) {
 		return functions.remove(name) != null;
 	}
 	
+	@Override
 	public boolean removeFunction(String name, Callable function) {
 		return (functions.get(name) == function) && (functions.remove(name) == function);
 	}

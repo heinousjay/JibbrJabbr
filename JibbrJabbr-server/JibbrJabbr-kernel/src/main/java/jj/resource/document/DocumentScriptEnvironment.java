@@ -16,6 +16,7 @@
 package jj.resource.document;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jsoup.nodes.Document;
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -37,6 +39,7 @@ import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
+import jj.script.FunctionContext;
 import jj.script.RhinoContext;
 import jj.script.RhinoContextMaker;
 
@@ -48,7 +51,7 @@ import jj.script.RhinoContextMaker;
  *
  */
 @Singleton
-public class DocumentScriptEnvironment extends AbstractScriptEnvironment {
+public class DocumentScriptEnvironment extends AbstractScriptEnvironment implements FunctionContext {
 
 	@Override
 	public String baseName() {
@@ -81,6 +84,22 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment {
 	public Document document() {
 		return html.document().clone();
 	}
+	
+	public Callable getFunction(String name) {
+		return functions.get(name);
+	}
+
+	public void addFunction(String name, Callable function) {
+		functions.put(name, function);
+	}
+	
+	public boolean removeFunction(String name) {
+		return functions.remove(name) != null;
+	}
+	
+	public boolean removeFunction(String name, Callable function) {
+		return (functions.get(name) == function) && (functions.remove(name) == function);
+	}
 
 	@Override
 	@IOThread
@@ -91,6 +110,9 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment {
 	}
 	
 	// --- implementation
+	
+
+	private final HashMap<String, Callable> functions = new HashMap<>(4);
 
 	private final String baseName;
 	
