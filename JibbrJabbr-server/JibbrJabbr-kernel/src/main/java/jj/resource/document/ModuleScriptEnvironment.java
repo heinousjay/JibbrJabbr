@@ -120,5 +120,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 			
 			script = context.compileString(scriptResource.script(), scriptName());
 		}
+		
+		addDependent(parent.scriptEnvironment());
 	}
 }

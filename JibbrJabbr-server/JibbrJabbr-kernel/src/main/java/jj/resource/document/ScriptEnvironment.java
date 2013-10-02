@@ -15,6 +15,8 @@
  */
 package jj.resource.document;
 
+import jj.resource.Resource;
+
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -23,7 +25,7 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-public interface ScriptEnvironment {
+public interface ScriptEnvironment extends Resource {
 
 	/**
 	 * The execution scope for the script

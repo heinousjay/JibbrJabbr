@@ -73,10 +73,12 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 		return sha1;
 	}
 	
+	@Override
 	public Scriptable scope() {
 		return scope;
 	}
-	
+
+	@Override
 	public Script script() {
 		return script;
 	}
@@ -84,19 +86,23 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 	public Document document() {
 		return html.document().clone();
 	}
-	
+
+	@Override
 	public Callable getFunction(String name) {
 		return functions.get(name);
 	}
 
+	@Override
 	public void addFunction(String name, Callable function) {
 		functions.put(name, function);
 	}
-	
+
+	@Override
 	public boolean removeFunction(String name) {
 		return functions.remove(name) != null;
 	}
-	
+
+	@Override
 	public boolean removeFunction(String name, Callable function) {
 		return (functions.get(name) == function) && (functions.remove(name) == function);
 	}
@@ -149,17 +155,11 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
 		
 		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName + ".html");
-		html.addDependent(this);
 		
 		clientScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
-		if (clientScript != null) clientScript.addDependent(this);
-		
 		sharedScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
-		if (sharedScript != null) sharedScript.addDependent(this);
-		
 		serverScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
-		if (serverScript != null) serverScript.addDependent(this);
-
+		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
 			clientScript == null ? "none" : clientScript.sha1(),
@@ -179,6 +179,11 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 				throw new ResourceNotViableException(baseName, e);
 			}
 		}
+		
+		html.addDependent(this);
+		if (clientScript != null) clientScript.addDependent(this);
+		if (sharedScript != null) sharedScript.addDependent(this);
+		if (serverScript != null) serverScript.addDependent(this);
 	}
 	
 	private Script compile() {

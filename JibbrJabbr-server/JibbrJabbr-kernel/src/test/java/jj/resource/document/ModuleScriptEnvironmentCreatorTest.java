@@ -28,6 +28,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
+import jj.resource.AbstractResourceBase;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -49,7 +50,9 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
 	@Mock Publisher publisher;
-	@Mock ModuleParent parent;
+	ModuleParent parent;
+	// lil ugly! but this satisfies things internally
+	@Mock(extraInterfaces={ScriptEnvironment.class}) AbstractResourceBase scriptEnvironment;
 	MockRhinoContextMaker contextMaker;
 	
 	@Mock ResourceInstanceCreator mockCreator;
@@ -64,6 +67,11 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	protected Object[] args() {
 		
 		return new Object[] {parent};
+	}
+	
+	@Override
+	protected void before() throws Exception {
+		parent = new ModuleParent((ScriptEnvironment)scriptEnvironment);
 	}
 	
 	private void givenMinimalServices() throws Exception {

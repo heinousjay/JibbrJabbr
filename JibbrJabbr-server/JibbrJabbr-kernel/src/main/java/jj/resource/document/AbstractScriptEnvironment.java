@@ -100,6 +100,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 
 	protected ScriptableObject createLocalScope(final String moduleIdentifier) {
 		try (RhinoContext context = contextMaker.context()) {
+			
+			// this technique allows for a "local" global scope that wraps a read-only global
+			// scope that provides a server-wide API installation - effectively sealing the
+			// API to prevent it from being manipulated and allowing it to be shared in a safe
+			// manner
 			ScriptableObject local = context.newObject(api.global());
 			local.setPrototype(api.global());
 		    local.setParentScope(null);
@@ -112,6 +117,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 		    ScriptableObject module = context.newObject(local);
 		    module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
 		    local.defineProperty("module", module, ScriptableObject.CONST);
+		    
+		    // define the require method and the exports object here as well.
+		    // follow the node.js concept of module.exports === exports, and
+		    // assigning to module.exports changes the exports object,
+		    // potentially to a function
 		    
 		    return local;
 		}

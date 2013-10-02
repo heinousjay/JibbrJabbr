@@ -18,6 +18,8 @@ package jj.script;
 import org.mozilla.javascript.Callable;
 
 /**
+ * An object that holds function according to some lifetime, organized by name
+ * 
  * @author jason
  *
  */
