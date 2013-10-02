@@ -96,16 +96,34 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	}
 	
 	@Test
-	public void testRequiresAbstractScriptEnvironmentForCreation() throws Exception {
+	public void testRequiresModuleParentForCreation() throws Exception {
 		
 		boolean caught = false;
 		try {
 			toTest().create(baseName());
 		} catch (AssertionError ae) {
-			caught = ae.getMessage().equals("missing arg!");
+			caught = true;
 		}
 		
 		assertThat(caught, is(true));
+		
+		caught = false;
+		try {
+			toTest().create(baseName(), new Object());
+		} catch (AssertionError ae) {
+			caught = true;
+		}
+		
+		assertThat(caught, is(true));
+		
+		caught = false;
+		try {
+			toTest().create(baseName(), new ModuleParent(null));
+		} catch (AssertionError ae) {
+			caught = true;
+		}
+		
+		assertThat(caught, is(false));
 		
 	}
 	
