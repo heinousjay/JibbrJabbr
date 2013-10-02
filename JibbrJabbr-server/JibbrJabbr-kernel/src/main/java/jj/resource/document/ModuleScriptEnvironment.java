@@ -26,6 +26,7 @@ import jj.execution.IOThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
+import jj.script.RhinoContext;
 import jj.script.RhinoContextMaker;
 
 import org.mozilla.javascript.Script;
@@ -47,8 +48,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 
 	@Override
 	public Script script() {
-		// TODO Auto-generated method stub
-		return null;
+		return script;
 	}
 
 	@Override
@@ -86,6 +86,8 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 	
 	private final String sha1;
 	
+	private final Script script;
+	
 	/**
 	 * @param cacheKey
 	 * @param publisher
@@ -114,6 +116,9 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 		sha1 = scriptResource.sha1();
 		scope = createLocalScope(moduleIdentifier);
 		
+		try (RhinoContext context = contextMaker.context()) {
+			
+			script = context.compileString(scriptResource.script(), scriptName());
+		}
 	}
-
 }

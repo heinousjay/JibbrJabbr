@@ -136,6 +136,15 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		
 		assertThat(caught, is(false));
 		
+		caught = false;
+		try {
+			toTest().create(baseName(), new ModuleParent(mock(ScriptEnvironment.class)), new Object());
+		} catch (AssertionError ae) {
+			caught = true;
+		}
+		
+		assertThat(caught, is(true));
+		
 	}
 	
 	@Test

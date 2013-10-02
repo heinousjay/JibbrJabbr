@@ -161,6 +161,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	public void testModuleScriptEnvironment() throws Exception {
 		DocumentScriptEnvironment dse = mock(DocumentScriptEnvironment.class);
 		ScriptResource sr = mock(ScriptResource.class);
+		given(sr.script()).willReturn("");
 		given(api.global()).willReturn(new NativeObject());
 		given(resourceFinder.loadResource(ScriptResource.class, "index.js")).willReturn(sr);
 		
