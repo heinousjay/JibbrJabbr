@@ -23,7 +23,9 @@ import javax.inject.Singleton;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.IOThread;
+import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceFinder;
 import jj.script.RhinoContextMaker;
 
 import org.mozilla.javascript.Script;
@@ -51,36 +53,38 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 
 	@Override
 	public String sha1() {
-		// TODO Auto-generated method stub
-		return null;
+		return sha1;
 	}
 
 	@Override
 	public String scriptName() {
-		// TODO Auto-generated method stub
-		return null;
+		return ScriptResourceType.Module.suffix(moduleIdentifier);
 	}
 
 	@Override
 	public String baseName() {
-		// TODO Auto-generated method stub
-		return null;
+		return moduleIdentifier;
 	}
 
 	@Override
 	public String uri() {
-		// TODO Auto-generated method stub
-		return null;
+		return "/"; // can not be loaded directly
 	}
 
 	@Override
 	@IOThread
 	protected boolean needsReplacing() throws IOException {
-		// TODO Auto-generated method stub
+		// we get our notifications from our downbelow fellas
 		return false;
 	}
 	
+	private final String moduleIdentifier;
+	
 	private final ScriptableObject scope;
+	
+	private final ScriptResource scriptResource;
+	
+	private final String sha1;
 	
 	/**
 	 * @param cacheKey
@@ -91,13 +95,25 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 	ModuleScriptEnvironment(
 		final ResourceCacheKey cacheKey,
 		final String moduleIdentifier,
+		final ModuleParent parent,
 		final Publisher publisher,
 		final RhinoContextMaker contextMaker,
-		final EngineAPI api
+		final EngineAPI api,
+		final ResourceFinder resourceFinder
 	) {
 		super(cacheKey, publisher, contextMaker, api);
 		
+		this.moduleIdentifier = moduleIdentifier;
+		
+		scriptResource = resourceFinder.loadResource(ScriptResource.class, scriptName());
+		
+		if (scriptResource == null) {
+			throw new NoSuchResourceException(moduleIdentifier);
+		}
+		
+		sha1 = scriptResource.sha1();
 		scope = createLocalScope(moduleIdentifier);
+		
 	}
 
 }

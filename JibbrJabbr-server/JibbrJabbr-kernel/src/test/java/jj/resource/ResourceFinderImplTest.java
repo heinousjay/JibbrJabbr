@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.resource.asset.Asset;
 import jj.resource.asset.AssetResource;
 import jj.resource.document.HtmlResource;
@@ -34,7 +34,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	ResourceCache resourceCache;
 	ResourceCreators resourceCreators;
 	@Mock ResourceWatchService resourceWatchService;
-	@Mock JJExecutors executors;
+	@Mock JJExecutor executors;
 	@Mock Logger logger;
 	
 	@Mock AbstractResourceCreator<AssetResource> assetResourceCreator;

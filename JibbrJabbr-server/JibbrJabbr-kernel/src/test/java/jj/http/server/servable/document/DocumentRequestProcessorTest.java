@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import jj.execution.MockJJExecutors;
+import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
@@ -38,7 +38,7 @@ public class DocumentRequestProcessorTest {
 	
 	@Mock ScriptRunner scriptRunner;
 	
-	MockJJExecutors executors;
+	MockJJExecutor executors;
 
 	@Mock DocumentScriptEnvironment dse;
 	
@@ -82,7 +82,7 @@ public class DocumentRequestProcessorTest {
 		document.outputSettings().prettyPrint(false);
 		baseName = "baseName";
 
-		executors = new MockJJExecutors();
+		executors = new MockJJExecutor();
 		
 		when(dse.baseName()).thenReturn(baseName);
 		when(dse.document()).thenReturn(document);

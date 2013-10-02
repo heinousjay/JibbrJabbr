@@ -18,7 +18,7 @@ package jj.script;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import jj.execution.MockJJExecutors;
+import jj.execution.MockJJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;
@@ -39,7 +39,7 @@ public class ScriptExecutionEnvironmentHelperTest {
 	@Mock ResourceFinder finder;
 	ScriptExecutionEnvironments scriptExecutionEnvironments;
 	@Mock ScriptExecutionEnvironmentCreator creator;
-	MockJJExecutors executors;
+	MockJJExecutor executors;
 	@Mock ScriptResource scriptResource;
 	@Mock ScriptResource scriptResource1;
 	@Mock ScriptResource scriptResource2;
@@ -49,7 +49,7 @@ public class ScriptExecutionEnvironmentHelperTest {
 	@Before
 	public void before() {
 		scriptExecutionEnvironments = new ScriptExecutionEnvironments();
-		executors = new MockJJExecutors();
+		executors = new MockJJExecutor();
 	}
 
 	@Test

@@ -17,7 +17,7 @@ package jj.script;
 
 import static org.mockito.BDDMockito.*;
 import jj.engine.RequiredModuleException;
-import jj.execution.MockJJExecutors;
+import jj.execution.MockJJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;
@@ -42,7 +42,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock CurrentScriptContext context;
 	
-	MockJJExecutors executors;
+	MockJJExecutor executors;
 	
 	@Mock ResourceFinder finder;
 	
@@ -63,7 +63,7 @@ public class RequiredModuleContinuationProcessorTest {
 	@Before
 	public void before() {
 		
-		executors = new MockJJExecutors();
+		executors = new MockJJExecutor();
 		
 		given(context.baseName()).willReturn(baseName);
 		

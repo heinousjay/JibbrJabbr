@@ -78,6 +78,8 @@ public class CoreModule extends JJModule {
 		install(new JasmineModule());
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
+		
+		// i feel like some of this
 	}
 
 }

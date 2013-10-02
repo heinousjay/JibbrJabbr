@@ -6,7 +6,7 @@ import java.util.PropertyResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.property.PropertiesResource;
 
@@ -42,12 +42,12 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 	
 	private final ResourceFinder resourceFinder;
 	
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	@Inject
 	InlineMessagesDocumentFilter(
 		final ResourceFinder resourceFinder,
-		final JJExecutors executors
+		final JJExecutor executors
 	) {
 		this.resourceFinder = resourceFinder;
 		this.executors = executors;

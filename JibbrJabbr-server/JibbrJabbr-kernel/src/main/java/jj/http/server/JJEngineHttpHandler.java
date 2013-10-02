@@ -23,7 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 
 import jj.execution.IOTask;
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
@@ -41,7 +41,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
 	
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	private final Servables servables;
 	
@@ -53,7 +53,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	@Inject
 	JJEngineHttpHandler( 
-		final JJExecutors executors,
+		final JJExecutor executors,
 		final Servables servables,
 		final Injector parentInjector,
 		final WebSocketUriChecker webSocketUriChecker,

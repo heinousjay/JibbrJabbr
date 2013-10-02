@@ -17,7 +17,7 @@ package jj.configuration;
 
 import static org.mockito.BDDMockito.*;
 
-import jj.execution.MockJJExecutors;
+import jj.execution.MockJJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 
@@ -33,7 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationScriptPreloaderTest {
 
-	MockJJExecutors executors = new MockJJExecutors();
+	MockJJExecutor executors = new MockJJExecutor();
 	@Mock ResourceFinder resourceFinder;
 	
 	@Test

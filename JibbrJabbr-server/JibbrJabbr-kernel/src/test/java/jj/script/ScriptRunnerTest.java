@@ -3,7 +3,7 @@ package jj.script;
 import static org.mockito.BDDMockito.*;
 
 import jj.engine.HostEvent;
-import jj.execution.MockJJExecutors;
+import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
@@ -41,7 +41,7 @@ public class ScriptRunnerTest {
 	
 	@Mock CurrentScriptContext currentScriptContext;
 	
-	MockJJExecutors executors;
+	MockJJExecutor executors;
 	
 	@Mock HttpRequest httpRequest;
 	
@@ -62,7 +62,7 @@ public class ScriptRunnerTest {
 		
 		when(currentScriptContext.documentScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
 		
-		executors = new MockJJExecutors();
+		executors = new MockJJExecutor();
 		
 		scriptRunner = new ScriptRunnerImpl(
 			scriptExecutionEnvironmentHelper,

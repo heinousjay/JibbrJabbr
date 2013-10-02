@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class JJExecutorsImplTest {
+public class JJExecutorImplTest {
 	
 	@Mock ScriptRunner scriptRunner;
 	@Mock IOExecutor ioExecutor;
@@ -54,14 +54,14 @@ public class JJExecutorsImplTest {
 	
 	@Mock Logger logger;
 	
-	JJExecutorsImpl executors;
+	JJExecutorImpl executor;
 	
 	@Captor ArgumentCaptor<Runnable> runnableCaptor;
 	
 	@Before
 	public void before() {
 		
-		executors = new JJExecutorsImpl(bundle, currentTask, logger);
+		executor = new JJExecutorImpl(bundle, currentTask, logger);
 	}
 	
 	private void runTask(ScheduledExecutorService service) {
@@ -85,7 +85,7 @@ public class JJExecutorsImplTest {
 			}
 		};
 		
-		executors.execute(task);
+		executor.execute(task);
 		
 		runTask(scriptExecutor);
 		
@@ -105,7 +105,7 @@ public class JJExecutorsImplTest {
 			}
 		};
 		
-		executors.execute(task);
+		executor.execute(task);
 		
 		runTask(ioExecutor);
 		
@@ -120,7 +120,7 @@ public class JJExecutorsImplTest {
 		
 		final Exception toThrow = new Exception();
 		
-		executors.execute(new ScriptTask("test task", "test") {
+		executor.execute(new ScriptTask("test task", "test") {
 			
 			@Override
 			protected void run() throws Exception {
@@ -128,7 +128,7 @@ public class JJExecutorsImplTest {
 			}
 		});
 		
-		executors.execute(new IOTask("test task") {
+		executor.execute(new IOTask("test task") {
 			
 			@Override
 			protected void run() throws Exception {

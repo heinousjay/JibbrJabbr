@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
  * @author jason
  *
  */
-public class MockJJExecutors implements JJExecutors {
+public class MockJJExecutor implements JJExecutor {
 
 	public List<JJTask> tasks = new ArrayList<>();
 	

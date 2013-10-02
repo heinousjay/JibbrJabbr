@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.engine.HostEvent;
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
 import jj.http.server.JJWebSocketConnection;
@@ -34,14 +34,14 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	private final CurrentScriptContext context;
 	
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	@Inject
 	ScriptRunnerImpl(
 		final ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
-		final JJExecutors executors
+		final JJExecutor executors
 	) {
 		
 		this.scriptExecutionEnvironmentHelper = scriptExecutionEnvironmentHelper;

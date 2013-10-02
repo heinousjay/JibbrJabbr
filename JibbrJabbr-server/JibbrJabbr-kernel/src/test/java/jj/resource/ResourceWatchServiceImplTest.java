@@ -37,8 +37,8 @@ import java.util.concurrent.Executors;
 
 import jj.configuration.Configuration;
 import jj.execution.IOTask;
-import jj.execution.JJExecutors;
-import jj.execution.MockJJExecutors;
+import jj.execution.JJExecutor;
+import jj.execution.MockJJExecutor;
 import jj.execution.TaskInvoker;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
@@ -80,7 +80,7 @@ public class ResourceWatchServiceImplTest {
 	ResourceCacheImpl resourceCache;
 	@Mock ResourceFinder resourceFinder;
 	ExecutorService executorService;
-	@Mock JJExecutors executors;
+	@Mock JJExecutor executors;
 	@Mock Logger logger;
 	
 	ResourceWatchServiceImpl rwsi;

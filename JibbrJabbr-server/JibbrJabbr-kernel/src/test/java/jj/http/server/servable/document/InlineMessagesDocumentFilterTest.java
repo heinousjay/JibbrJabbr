@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.PropertyResourceBundle;
 
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.InlineMessagesDocumentFilter;
 import jj.resource.ResourceFinder;
@@ -33,7 +33,7 @@ public class InlineMessagesDocumentFilterTest {
 	@Mock HtmlResource htmlResource;
 	Document document;
 	InlineMessagesDocumentFilter toTest;
-	@Mock JJExecutors executors;
+	@Mock JJExecutor executors;
 	
 	@Test
 	public void test() throws IOException {

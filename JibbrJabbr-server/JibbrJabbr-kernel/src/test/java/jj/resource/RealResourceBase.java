@@ -92,9 +92,6 @@ public abstract class RealResourceBase {
 
 	private <T extends Resource> T testNonFileResource(final T resource) throws Exception {
 		
-		
-		
-		
 		assertThat(resource, is(instanceOf(AbstractResource.class)));
 		 
 		assertThat(resource, is(notNullValue()));

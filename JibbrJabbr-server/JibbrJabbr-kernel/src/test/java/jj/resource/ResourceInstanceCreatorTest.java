@@ -15,15 +15,23 @@
  */
 package jj.resource;
 
+import static org.mockito.BDDMockito.*;
+
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import jj.configuration.Configuration;
+import jj.engine.EngineAPI;
+import jj.event.Publisher;
 import jj.logging.EmergencyLogger;
 import jj.resource.asset.Asset;
 import jj.resource.asset.AssetResource;
 import jj.resource.config.ConfigResource;
 import jj.resource.css.CssResource;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.HtmlResource;
+import jj.resource.document.ModuleParent;
+import jj.resource.document.ModuleScriptEnvironment;
 import jj.resource.document.ScriptResource;
 import jj.resource.property.PropertiesResource;
 import jj.resource.sha1.Sha1Resource;
@@ -32,6 +40,8 @@ import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mozilla.javascript.NativeObject;
 import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
@@ -54,12 +64,30 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 		}), logger);
 	}
 	
+	@Mock Publisher publisher;
+	@Mock EngineAPI api;
+	@Mock ResourceFinder resourceFinder;
+	
+	private ResourceInstanceCreator makeCreator(final Configuration configuration, final Logger logger) {
+		return new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
+			
+			@Override
+			protected void configure() {
+				bind(Configuration.class).toInstance(configuration);
+				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
+				bind(Publisher.class).toInstance(publisher);
+				bind(EngineAPI.class).toInstance(api);
+				bind(ResourceFinder.class).toInstance(resourceFinder);
+			}
+		}), logger);
+	}
+	
 	ResourceInstanceCreator rimc;
 	
 	@Before
 	public void before() {
 		
-		rimc = creator(configuration, logger);
+		rimc = makeCreator(configuration, logger);
 	}
 	
 	private <T extends Resource> T doCreate(Class<T> type, String baseName, Object...args) throws Exception {
@@ -118,5 +146,24 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	@Test
 	public void testStaticResource() throws Exception {
 		doCreate(StaticResource.class, "index.html");
+	}
+	
+	@Test
+	public void testDocumentScriptEnvironment() throws Exception {
+		HtmlResource hr = mock(HtmlResource.class);
+		given(resourceFinder.loadResource(HtmlResource.class, "index.html")).willReturn(hr);
+		given(api.global()).willReturn(new NativeObject());
+		
+		doCreate(DocumentScriptEnvironment.class, "index", Paths.get("/"));
+	}
+	
+	@Test
+	public void testModuleScriptEnvironment() throws Exception {
+		DocumentScriptEnvironment dse = mock(DocumentScriptEnvironment.class);
+		ScriptResource sr = mock(ScriptResource.class);
+		given(api.global()).willReturn(new NativeObject());
+		given(resourceFinder.loadResource(ScriptResource.class, "index.js")).willReturn(sr);
+		
+		doCreate(ModuleScriptEnvironment.class, "index", new ModuleParent(dse));
 	}
 }

@@ -2,7 +2,7 @@ package jj.execution;
 
 import java.util.concurrent.Future;
 
-public interface JJExecutors {
+public interface JJExecutor {
 	
 	Future<?> execute(final JJTask task);
 	

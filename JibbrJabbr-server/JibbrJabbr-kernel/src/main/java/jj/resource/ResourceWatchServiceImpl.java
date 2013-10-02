@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
 import jj.execution.IOTask;
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 
 /**
  * watches for file changes on resources we've already loaded
@@ -39,13 +39,13 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	
 	private final ResourceFinder resourceFinder;
 	
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	@Inject
 	ResourceWatchServiceImpl(
 		final ResourceCache resourceCache,
 		final ResourceFinder resourceFinder,
-		final JJExecutors executors
+		final JJExecutor executors
 	) throws IOException {
 		this.resourceCache = resourceCache;
 		this.resourceFinder = resourceFinder;

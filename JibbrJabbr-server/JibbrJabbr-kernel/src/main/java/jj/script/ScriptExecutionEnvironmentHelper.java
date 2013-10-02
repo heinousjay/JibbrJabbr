@@ -18,7 +18,7 @@ package jj.script;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.execution.ScriptThread;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ScriptResource;
@@ -36,14 +36,14 @@ class ScriptExecutionEnvironmentHelper {
 	private final ResourceFinder finder;
 	private final ScriptExecutionEnvironments scriptExecutionEnvironments;
 	private final ScriptExecutionEnvironmentCreator creator;
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	@Inject
 	ScriptExecutionEnvironmentHelper(
 		final ResourceFinder finder,
 		final ScriptExecutionEnvironments scriptExecutionEnvironments,
 		final ScriptExecutionEnvironmentCreator creator,
-		final JJExecutors executors
+		final JJExecutor executors
 	) {
 		this.finder = finder;
 		this.scriptExecutionEnvironments = scriptExecutionEnvironments;

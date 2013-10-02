@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 
 import com.google.inject.Injector;
 
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
@@ -43,7 +43,7 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 	 */
 	@Inject
 	TestJJEngineHttpHandler(
-		final JJExecutors executors,
+		final JJExecutor executors,
 		final Servables servables,
 		final Injector injector,
 		final WebSocketUriChecker webSocketUriChecker,

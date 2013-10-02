@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import jj.engine.RequiredModuleException;
 import jj.execution.IOTask;
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;
@@ -35,7 +35,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final CurrentScriptContext context;
 	
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	private final ScriptRunnerInternal scriptRunner;
 	
@@ -46,7 +46,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	@Inject
 	RequiredModuleContinuationProcessor(
 		final CurrentScriptContext context,
-		final JJExecutors executors,
+		final JJExecutor executors,
 		final ScriptRunnerInternal scriptRunner,
 		final ResourceFinder finder,
 		final ScriptExecutionEnvironmentFinder scriptFinder

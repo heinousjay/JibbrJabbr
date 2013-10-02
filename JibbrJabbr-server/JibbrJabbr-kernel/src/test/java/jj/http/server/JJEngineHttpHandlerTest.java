@@ -32,7 +32,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.IOException;
-import jj.execution.MockJJExecutors;
+import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.JJEngineHttpHandler;
@@ -74,7 +74,7 @@ public class JJEngineHttpHandlerTest {
 	@Mock WebSocketUriChecker webSocketUriChecker;
 	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
-	MockJJExecutors executors;
+	MockJJExecutor executors;
 
 	@Mock JJHttpServerRequest httpRequest1;
 	@Mock JJHttpServerRequest httpRequest2;
@@ -96,7 +96,7 @@ public class JJEngineHttpHandlerTest {
 	//given
 	@Before
 	public void before() throws Exception {
-		executors = new MockJJExecutors();
+		executors = new MockJJExecutor();
 		
 		given(httpRequest1.uriMatch()).willReturn(servables.staticUri);
 		given(httpRequest2.uriMatch()).willReturn(servables.assetUri);

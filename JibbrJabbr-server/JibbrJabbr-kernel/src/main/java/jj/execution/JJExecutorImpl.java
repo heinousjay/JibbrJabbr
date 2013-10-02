@@ -18,14 +18,14 @@ import jj.logging.EmergencyLogger;
  *
  */
 @Singleton
-class JJExecutorsImpl implements JJExecutors {
+class JJExecutorImpl implements JJExecutor {
 
 	private final ExecutorBundle bundle;
 	private final CurrentTask currentTask;
 	private final Logger logger;
 	
 	@Inject
-	public JJExecutorsImpl(
+	JJExecutorImpl(
 		final ExecutorBundle bundle,
 		final CurrentTask currentTask,
 		final @EmergencyLogger Logger logger

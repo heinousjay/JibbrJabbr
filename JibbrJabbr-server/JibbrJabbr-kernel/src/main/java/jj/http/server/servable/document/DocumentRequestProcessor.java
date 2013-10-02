@@ -17,7 +17,7 @@ import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.DocumentScriptExecutionEnvironment;
 import jj.script.ScriptRunner;
 import jj.execution.IOTask;
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -41,7 +41,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	private static class FilterList extends ArrayList<DocumentFilter> {}
 	
 	/** the executors in which we run */
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	private final ScriptRunner scriptRunner;
 	
@@ -65,7 +65,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 
 	@Inject
 	DocumentRequestProcessor(
-		final JJExecutors executors,
+		final JJExecutor executors,
 		final ScriptRunner scriptRunner,
 		final DocumentScriptEnvironment dse,
 		final HttpRequest httpRequest,

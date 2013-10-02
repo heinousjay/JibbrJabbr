@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.execution.IOThread;
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 
 /**
  * coordinates access to the resource cache for the outside
@@ -27,14 +27,14 @@ class ResourceFinderImpl implements ResourceFinder {
 	
 	private final ResourceWatchService resourceWatchService;
 	
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	
 	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
 		final ResourceCreators resourceCreators,
 		final ResourceWatchService resourceWatchService,
-		final JJExecutors executors
+		final JJExecutor executors
 	) {
 		this.resourceCache = resourceCache;
 		this.resourceCreators = resourceCreators;

@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
 import jj.execution.IOTask;
-import jj.execution.JJExecutors;
+import jj.execution.JJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 
@@ -39,12 +39,12 @@ import jj.resource.config.ConfigResource;
 @Singleton
 class ConfigurationScriptPreloader implements JJServerStartupListener {
 	
-	private final JJExecutors executors;
+	private final JJExecutor executors;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
 	ConfigurationScriptPreloader(
-		final JJExecutors executors,
+		final JJExecutor executors,
 		final ResourceFinder resourceFinder
 	) {
 		this.executors = executors;

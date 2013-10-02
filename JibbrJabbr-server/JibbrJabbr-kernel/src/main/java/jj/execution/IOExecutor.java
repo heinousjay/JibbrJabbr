@@ -14,7 +14,7 @@ import jj.JJServerShutdownListener;
 
 /**
  * You should almost certainly not depend on this class.  depend on
- * {@link JJExecutors} instead. if there is something you need exposed,
+ * {@link JJExecutor} instead. if there is something you need exposed,
  * add it to the JJExecutors class.
  * @author jason
  *

@@ -13,31 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
-
-import java.lang.Thread.UncaughtExceptionHandler;
-
-import jj.JJModule;
+package jj.resource.document;
 
 /**
+ * typesafe argument carrier
+ * 
  * @author jason
  *
  */
-public class ExecutionModule extends JJModule {
+public class ModuleParent {
+	
+	private final ScriptEnvironment scriptEnvironment;
 
-	@Override
-	protected void configure() {
-		
-		addShutdownListenerBinding().to(IOExecutor.class);
-		addShutdownListenerBinding().to(ScriptExecutorFactory.class);
-		addShutdownListenerBinding().to(ClientExecutor.class);
-		
-		// a good place to break apart crafty circular dependencies.  this is
-		// the most popular object in the system.  for good reason.
-		bind(JJExecutor.class).to(JJExecutorImpl.class);
-		
-		bind(UncaughtExceptionHandler.class).to(JJUncaughtExceptionHandler.class);
-		
+	public ModuleParent(final ScriptEnvironment scriptEnvironment) {
+		this.scriptEnvironment = scriptEnvironment;
 	}
-
+	
+	ScriptEnvironment scriptEnvironment() {
+		return scriptEnvironment;
+	}
+	
+	@Override
+	public String toString() {
+		return scriptEnvironment.baseName();
+	}
 }
