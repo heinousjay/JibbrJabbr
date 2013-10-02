@@ -32,6 +32,10 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class ModuleScriptEnvironmentCreator extends AbstractResourceCreator<ModuleScriptEnvironment> {
 	
+	/**
+	 * 
+	 */
+	private static final String ARG_ERROR = "ModuleScriptEnvironmentCreator requires a ModuleParent argument";
 	private final ResourceInstanceCreator creator;
 	
 	@Inject
@@ -52,7 +56,7 @@ public class ModuleScriptEnvironmentCreator extends AbstractResourceCreator<Modu
 	@Override
 	public ModuleScriptEnvironment create(String baseName, Object... args) throws IOException {
 		
-		assert args.length == 1 && args[0] instanceof ModuleParent : "missing arg!";
+		assert args.length == 1 && args[0] instanceof ModuleParent : ARG_ERROR;
 		
 		return creator.createResource(
 			ModuleScriptEnvironment.class,
@@ -66,7 +70,7 @@ public class ModuleScriptEnvironmentCreator extends AbstractResourceCreator<Modu
 	@Override
 	protected URI uri(String baseName, Object... args) {
 		
-		assert args.length == 1 && args[0] instanceof ModuleParent : "missing arg!";
+		assert args.length == 1 && args[0] instanceof ModuleParent : ARG_ERROR;
 		
 		ModuleParent parent = (ModuleParent)args[0];
 		
