@@ -96,6 +96,17 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	}
 	
 	@Test
+	public void testUri() {
+		
+		ScriptEnvironment se = mock(ScriptEnvironment.class);
+		given(se.baseName()).willReturn("parent");
+		
+		ModuleScriptEnvironmentCreator msec = toTest();
+		
+		assertThat(msec.uri("baseName", new ModuleParent(se)).toString(), is("parent#baseName"));
+	}
+	
+	@Test
 	public void testRequiresModuleParentForCreation() throws Exception {
 		
 		boolean caught = false;
@@ -118,7 +129,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		
 		caught = false;
 		try {
-			toTest().create(baseName(), new ModuleParent(null));
+			toTest().create(baseName(), new ModuleParent(mock(ScriptEnvironment.class)));
 		} catch (AssertionError ae) {
 			caught = true;
 		}
