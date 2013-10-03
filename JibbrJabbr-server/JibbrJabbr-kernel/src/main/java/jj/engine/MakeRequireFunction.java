@@ -106,7 +106,7 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 		// pending top call caused by this function.  continuations are like
 		// violence, any problem can be solved by using MOAR!
 		
-		if (scriptEnvironment == null) {
+		if (scriptEnvironment == null || !scriptEnvironment.initialized()) {
 			throw context.prepareContinuation(new RequiredModule(moduleIdentifier, context));
 		}
 		

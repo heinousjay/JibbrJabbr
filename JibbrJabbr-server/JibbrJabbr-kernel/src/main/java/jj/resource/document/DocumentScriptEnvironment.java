@@ -113,7 +113,7 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 
 	@Override
 	@IOThread
-	protected boolean needsReplacing() throws IOException {
+	public boolean needsReplacing() throws IOException {
 		// this never goes out of scope on its own
 		// dependency tracking handles it all 
 		return false;

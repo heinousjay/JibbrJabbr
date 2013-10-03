@@ -1,6 +1,6 @@
 if (module.id !== 'deep/module') throw "module id is broken";
 
-exports.doIt = function() {
+module.exports = function() {
 	
 	if (module.id !== 'deep/module') throw "module id is broken";
 	

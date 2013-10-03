@@ -72,6 +72,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	@Override
 	protected void before() throws Exception {
 		parent = new ModuleParent((ScriptEnvironment)scriptEnvironment);
+		given(resourceFinder.findResource(scriptEnvironment)).willReturn(scriptEnvironment);
 	}
 	
 	private void givenMinimalServices() throws Exception {
@@ -107,11 +108,11 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	public void testUri() {
 		
 		ScriptEnvironment se = mock(ScriptEnvironment.class);
-		given(se.baseName()).willReturn("parent");
+		given(se.uri()).willReturn("parentUri");
 		
 		ModuleScriptEnvironmentCreator msec = toTest();
 		
-		assertThat(msec.uri("baseName", new ModuleParent(se)).toString(), is("parent#baseName"));
+		assertThat(msec.uri("baseName", new ModuleParent(se)).toString(), is("parentUri#baseName"));
 	}
 	
 	@Test

@@ -70,15 +70,24 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 	public String uri() {
 		return "/"; // can not be loaded directly
 	}
+	
+	@Override
+	protected Object[] creationArgs() {
+		return new Object[] { parent };
+	}
 
 	@Override
 	@IOThread
-	protected boolean needsReplacing() throws IOException {
-		// we get our notifications from our downbelow fellas
-		return false;
+	public boolean needsReplacing() throws IOException {
+		// we are obselete when our script is
+		// but we don't listen as a dependent, our parent
+		// does. we'll get reloaded anyway
+		return scriptResource.needsReplacing();
 	}
 	
 	private final String moduleIdentifier;
+	
+	private final ModuleParent parent;
 	
 	private final ScriptableObject scope;
 	
@@ -107,11 +116,16 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 		
 		this.moduleIdentifier = moduleIdentifier;
 		
+		this.parent = new ModuleParent(resourceFinder.findResource(parent.scriptEnvironment()));
+		
 		scriptResource = resourceFinder.loadResource(ScriptResource.class, scriptName());
 		
 		if (scriptResource == null) {
 			throw new NoSuchResourceException(moduleIdentifier);
 		}
+		
+		scriptResource.addDependent(this.parent.scriptEnvironment());
+		this.parent.scriptEnvironment().addDependent(this);
 		
 		sha1 = scriptResource.sha1();
 		scope = createLocalScope(moduleIdentifier);
@@ -120,7 +134,5 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 			
 			script = context.compileString(scriptResource.script(), scriptName());
 		}
-		
-		addDependent(parent.scriptEnvironment());
 	}
 }

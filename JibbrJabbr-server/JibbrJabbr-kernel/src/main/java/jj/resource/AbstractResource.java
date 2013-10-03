@@ -29,7 +29,7 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
-abstract class AbstractResource implements Resource {
+public abstract class AbstractResource implements Resource {
 	
 	private final ResourceCacheKey cacheKey;
 	final Set<AbstractResource> dependents = new HashSet<>();
@@ -40,7 +40,7 @@ abstract class AbstractResource implements Resource {
 	}
 	
 	@IOThread
-	protected abstract boolean needsReplacing() throws IOException;
+	public abstract boolean needsReplacing() throws IOException;
 	
 	boolean isObselete() throws IOException {
 		return !alive || needsReplacing();
@@ -57,7 +57,7 @@ abstract class AbstractResource implements Resource {
 		return Collections.unmodifiableSet(dependents);
 	}
 	
-	boolean alive() {
+	public boolean alive() {
 		return alive;
 	}
 	

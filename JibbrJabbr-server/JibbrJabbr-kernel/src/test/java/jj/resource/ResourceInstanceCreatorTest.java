@@ -174,6 +174,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 		given(sr.script()).willReturn("");
 		given(api.global()).willReturn(new NativeObject());
 		given(resourceFinder.loadResource(ScriptResource.class, "index.js")).willReturn(sr);
+		given(resourceFinder.findResource(dse)).willReturn(dse);
 		given(rhinoContextMaker.context.newObject(any(ScriptableObject.class))).willReturn(new NativeObject());
 		
 		doCreate(ModuleScriptEnvironment.class, "index", new ModuleParent(dse));

@@ -133,7 +133,7 @@ public abstract class AbstractFileResource extends AbstractResourceBase implemen
 	
 	@Override
 	@IOThread
-	protected boolean needsReplacing() throws IOException {
+	public boolean needsReplacing() throws IOException {
 		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}
 }

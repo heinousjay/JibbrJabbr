@@ -108,7 +108,7 @@ public class CssResource extends AbstractResourceBase implements FileResource, L
 	}
 	
 	@IOThread
-	protected boolean needsReplacing() throws IOException {
+	public boolean needsReplacing() throws IOException {
 		return lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}
 
