@@ -23,6 +23,8 @@ import jj.http.client.JJHttpClientRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
+import jj.resource.document.DocumentScriptEnvironment;
+import jj.resource.document.ModuleScriptEnvironment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,10 +49,10 @@ public class CurrentScriptContextTest {
 
 	CurrentScriptContext currentScriptContext;
 	
-	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
+	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	@Mock JJWebSocketConnection connection;
-	@Mock ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment;
+	@Mock ModuleScriptEnvironment moduleScriptEnvironment;
 	@Mock RequiredModule requiredModule;
 	JJMessage jjMessage;
 	
@@ -69,7 +71,7 @@ public class CurrentScriptContextTest {
 	public void testAssociatedScriptExecutionEnvironmentPrepareContinuation() {
 		
 		// given
-		currentScriptContext.initialize(associatedScriptExecutionEnvironment);
+		currentScriptContext.initialize(documentScriptEnvironment);
 		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
 		boolean failed = false;
 		
@@ -119,7 +121,7 @@ public class CurrentScriptContextTest {
 	public void testRequiredModulePrepareContinuation() {
 		
 		// given
-		currentScriptContext.initialize(requiredModule, moduleScriptExecutionEnvironment);
+		currentScriptContext.initialize(requiredModule, moduleScriptEnvironment);
 		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
 		jjMessage = JJMessage.makeRetrieve("key");
 		

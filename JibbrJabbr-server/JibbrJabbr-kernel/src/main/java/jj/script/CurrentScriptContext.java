@@ -7,6 +7,9 @@ import javax.inject.Singleton;
 
 import jj.DataStore;
 import jj.jjmessage.JJMessage;
+import jj.resource.document.DocumentScriptEnvironment;
+import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.document.ScriptEnvironment;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
@@ -45,29 +48,29 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get() != null ? currentContext.get().type : null;
 	}
 	
-	public ScriptExecutionEnvironment scriptExecutionEnvironment() {
+	public ScriptEnvironment scriptEnvironment() {
 		switch (type()) {
 		case DocumentRequest:
 		case WebSocket:
 		case InternalExecution:
-			return documentScriptExecutionEnvironment();
+			return documentScriptEnvironment();
 		case ModuleInitialization:
-			return moduleScriptExecutionEnvironment();
+			return moduleScriptEnvironment();
 		}
 		
 		throw new AssertionError("can't make environment for " + type());
 	}
 	
-	public ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment() {
-		return currentContext.get().moduleScriptExecutionEnvironment;
+	public ModuleScriptEnvironment moduleScriptEnvironment() {
+		return currentContext.get().moduleScriptEnvironment;
 	}
 	
-	public DocumentScriptExecutionEnvironment documentScriptExecutionEnvironment() {
-		return currentContext.get().associatedScriptExecutionEnvironment;
+	public DocumentScriptEnvironment documentScriptEnvironment() {
+		return currentContext.get().documentScriptEnvironment;
 	}
 	
 	public String baseName() {
-		return scriptExecutionEnvironment().baseName();
+		return scriptEnvironment().baseName();
 	}
 	
 	RequiredModule requiredModule() {
@@ -90,13 +93,13 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get().documentRequestProcessor.document();
 	}
 	
-	public ScriptContext initialize(final RequiredModule requiredModule, final ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment) {
-		currentContext.set(new ScriptContext(currentContext.get(), requiredModule, moduleScriptExecutionEnvironment));
+	public ScriptContext initialize(final RequiredModule requiredModule, final ModuleScriptEnvironment moduleScriptEnvironment) {
+		currentContext.set(new ScriptContext(currentContext.get(), requiredModule, moduleScriptEnvironment));
 		return currentContext.get();
 	}
 	
-	public ScriptContext initialize(final DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment) {
-		currentContext.set(new ScriptContext(currentContext.get(), associatedScriptExecutionEnvironment));
+	public ScriptContext initialize(final DocumentScriptEnvironment documentScriptEnvironment) {
+		currentContext.set(new ScriptContext(currentContext.get(), documentScriptEnvironment));
 		return currentContext.get();
 	}
 	
@@ -127,10 +130,10 @@ public class CurrentScriptContext implements Closeable {
 			return documentRequestProcessor();
 		
 		case InternalExecution:
-			return documentScriptExecutionEnvironment();
+			return documentScriptEnvironment();
 			
 		case ModuleInitialization:
-			return moduleScriptExecutionEnvironment();
+			return moduleScriptEnvironment();
 			
 		case WebSocket:
 			return connection();

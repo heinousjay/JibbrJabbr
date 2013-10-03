@@ -15,19 +15,24 @@
  */
 package jj.script;
 
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+
 import jj.engine.RequiredModuleException;
+import jj.execution.IOTask;
 import jj.execution.MockJJExecutor;
 import jj.resource.ResourceFinder;
-import jj.resource.document.ScriptResource;
-import jj.resource.document.ScriptResourceType;
-
+import jj.resource.document.DocumentScriptEnvironment;
+import jj.resource.document.ModuleParent;
+import jj.resource.document.ModuleScriptEnvironment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * @author jason
@@ -42,11 +47,11 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock CurrentScriptContext context;
 	
+	@Mock DocumentScriptEnvironment documentScriptEnvironment;
+	
 	MockJJExecutor executors;
 	
 	@Mock ResourceFinder finder;
-	
-	@Mock ScriptExecutionEnvironmentFinder scriptFinder;
 	
 	@Mock ContinuationState continuationState;
 	
@@ -56,9 +61,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock ScriptRunnerInternal scriptRunner;
 	
-	@Mock ScriptResource scriptResource;
-	
-	@Mock ModuleScriptExecutionEnvironment scriptExecutionEnvironment;
+	@Mock ModuleScriptEnvironment scriptEnvironment;
 	
 	@Before
 	public void before() {
@@ -66,8 +69,9 @@ public class RequiredModuleContinuationProcessorTest {
 		executors = new MockJJExecutor();
 		
 		given(context.baseName()).willReturn(baseName);
+		given(context.documentScriptEnvironment()).willReturn(documentScriptEnvironment);
 		
-		processor = new RequiredModuleContinuationProcessor(context, executors, scriptRunner, finder, scriptFinder);
+		processor = new RequiredModuleContinuationProcessor(context, executors, scriptRunner, finder);
 		
 		requiredModule = new RequiredModule(module, context);
 		
@@ -78,14 +82,21 @@ public class RequiredModuleContinuationProcessorTest {
 	public void testFirstRequireOfModule() throws Exception {
 		
 		// given
-		given(finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
+		given(finder.loadResource(eq(ModuleScriptEnvironment.class), eq(module), any(ModuleParent.class))).willReturn(scriptEnvironment);
 		
 		// when
 		processor.process(continuationState);
+		
+		// then
+		// prove that an IO task was submitted
+		assertThat(executors.tasks.size(), is(1));
+		assertThat(executors.tasks.get(0), is(instanceOf(IOTask.class)));
+		
+		// and run it
 		executors.runUntilIdle();
 		
 		// then
-		verify(scriptRunner).submit(requiredModule);
+		verify(scriptRunner).submit(requiredModule, scriptEnvironment);
 	}
 	
 	@Test
@@ -99,39 +110,38 @@ public class RequiredModuleContinuationProcessorTest {
 		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), anyString(), any(RequiredModuleException.class));
 	}
 	
+	private void givenAScriptEnvironment() {
+		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(module), any(ModuleParent.class))).willReturn(scriptEnvironment);
+	}
+	
 	@Test
 	public void testSecondRequireOfLoadedModule() {
 		
 		// given
-		Scriptable exports = mock(Scriptable.class);
+		ScriptableObject exports = mock(ScriptableObject.class);
 		
-		given(scriptExecutionEnvironment.exports()).willReturn(exports);
-		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
-		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptExecutionEnvironment);
-		given(scriptExecutionEnvironment.sha1()).willReturn("");
-		given(scriptResource.sha1()).willReturn("");
+		given(scriptEnvironment.exports()).willReturn(exports);
+		given(scriptEnvironment.initialized()).willReturn(true);
+		givenAScriptEnvironment();
 		
 		// when
 		processor.process(continuationState);
 		
 		// then
-		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), anyString(), any(Scriptable.class));
+		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), anyString(), eq(exports));
 	}
 	
 	@Test
 	public void testRequireOfObseleteModule() {
 		
 		// given
-		given(finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(module))).willReturn(scriptResource);
-		given(scriptFinder.forBaseNameAndModuleIdentifier(baseName, module)).willReturn(scriptExecutionEnvironment);
-		given(scriptExecutionEnvironment.sha1()).willReturn("sha1");
-		given(scriptResource.sha1()).willReturn("sha2");
+		givenAScriptEnvironment();
 		
 		// when
 		processor.process(continuationState);
 		
 		// then
-		verify(scriptRunner).submit(requiredModule);
+		verify(scriptRunner).submit(requiredModule, scriptEnvironment);
 	}
 
 }

@@ -4,6 +4,8 @@ import static jj.script.ScriptContextType.*;
 
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.resource.document.DocumentScriptEnvironment;
+import jj.resource.document.ModuleScriptEnvironment;
 
 class ScriptContext {
 	
@@ -11,9 +13,9 @@ class ScriptContext {
 	
 	final ScriptContext parent;
 	
-	final DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
+	final DocumentScriptEnvironment documentScriptEnvironment;
 	
-	final ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment;
+	final ModuleScriptEnvironment moduleScriptEnvironment;
 	
 	final RequiredModule requiredModule;
 	
@@ -24,29 +26,29 @@ class ScriptContext {
 	ScriptContext(
 		final ScriptContext parent,
 		final RequiredModule requiredModule,
-		final ModuleScriptExecutionEnvironment moduleScriptExecutionEnvironment
+		final ModuleScriptEnvironment moduleScriptEnvironment
 	) {
 		this.type = ModuleInitialization;
 		this.parent = parent;
 		this.requiredModule = requiredModule;
-		this.moduleScriptExecutionEnvironment = moduleScriptExecutionEnvironment;
+		this.moduleScriptEnvironment = moduleScriptEnvironment;
 
-		this.associatedScriptExecutionEnvironment = null;
+		this.documentScriptEnvironment = null;
 		this.connection = null;
 		this.documentRequestProcessor = null;
 	}
 	
 	ScriptContext(
 		final ScriptContext parent,
-		final DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment
+		final DocumentScriptEnvironment documentScriptEnvironment
 	) {
 		this.type = InternalExecution;
 		this.parent = parent;
-		this.associatedScriptExecutionEnvironment = associatedScriptExecutionEnvironment;
+		this.documentScriptEnvironment = documentScriptEnvironment;
 
 		this.connection = null;
 		this.documentRequestProcessor = null;
-		this.moduleScriptExecutionEnvironment = null;
+		this.moduleScriptEnvironment = null;
 		this.requiredModule = null;
 	}
 	
@@ -57,10 +59,10 @@ class ScriptContext {
 		this.type = WebSocket;
 		this.parent = parent;
 		this.connection = connection;
-		this.associatedScriptExecutionEnvironment = connection.associatedScriptExecutionEnvironment();
+		this.documentScriptEnvironment = connection.documentScriptEnvironment();
 		
 		this.documentRequestProcessor = null;
-		this.moduleScriptExecutionEnvironment = null;
+		this.moduleScriptEnvironment = null;
 		this.requiredModule = null;
 	}
 	
@@ -71,10 +73,10 @@ class ScriptContext {
 		this.type = DocumentRequest;
 		this.parent = parent;
 		this.documentRequestProcessor = documentRequestProcessor;
-		this.associatedScriptExecutionEnvironment = documentRequestProcessor.associatedScriptExecutionEnvironment();
+		this.documentScriptEnvironment = documentRequestProcessor.documentScriptEnvironment();
 		
 		this.connection = null;
-		this.moduleScriptExecutionEnvironment = null;
+		this.moduleScriptEnvironment = null;
 		this.requiredModule = null;
 	}
 }

@@ -34,8 +34,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.DocumentScriptExecutionEnvironment;
-import jj.script.ScriptExecutionEnvironmentFinder;
+import jj.resource.ResourceFinder;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
 
 /**
@@ -47,7 +47,7 @@ class WebSocketConnectionMaker {
 	
 	private final WebSocketFrameHandlerCreator handlerCreator;
 	
-	private final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder;
+	private final ResourceFinder resourceFinder;
 	
 	private final ChannelHandlerContext ctx;
 	
@@ -58,13 +58,13 @@ class WebSocketConnectionMaker {
 	@Inject
 	WebSocketConnectionMaker(
 		final WebSocketFrameHandlerCreator handlerCreator,
-		final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder,
+		final ResourceFinder resourceFinder,
 		final ChannelHandlerContext ctx,
 		final FullHttpRequest request,
 		final WebSocketServerHandshakerFactory handshakerFactory
 	) {
 		this.handlerCreator = handlerCreator;
-		this.scriptExecutionEnvironmentFinder = scriptExecutionEnvironmentFinder;
+		this.resourceFinder = resourceFinder;
 		this.ctx = ctx;
 		this.request = request;
 		this.handshakerFactory = handshakerFactory;
@@ -93,9 +93,13 @@ class WebSocketConnectionMaker {
 				if (future.isSuccess()) {
 					
 					URIMatch uriMatch = new URIMatch(request.getUri());
-					final DocumentScriptExecutionEnvironment scriptExecutionEnvironment = scriptExecutionEnvironmentFinder.forURIMatch(uriMatch);
+					final DocumentScriptEnvironment scriptEnvironment =
+						resourceFinder.findResource(DocumentScriptEnvironment.class, uriMatch.name);
 					
-					if (scriptExecutionEnvironment == null) {
+					if (
+						scriptEnvironment == null || 
+						!uriMatch.sha1.equals(scriptEnvironment.sha1())
+					) {
 						
 						ctx.writeAndFlush(new TextWebSocketFrame("jj-reload"))
 							.addListener(new ChannelFutureListener() {
@@ -112,7 +116,7 @@ class WebSocketConnectionMaker {
 						ctx.pipeline().replace(
 							JJEngine.toString(),
 							JJWebsocketHandler.toString(),
-							handlerCreator.createHandler(handshaker, scriptExecutionEnvironment)
+							handlerCreator.createHandler(handshaker, scriptEnvironment)
 						);
 					}
 					

@@ -19,6 +19,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 import jj.configuration.Configuration;
 import jj.engine.EngineAPI;
@@ -37,11 +38,16 @@ import jj.resource.property.PropertiesResource;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.spec.SpecResource;
 import jj.resource.stat.ic.StaticResource;
+import jj.script.MockRhinoContextMaker;
+import jj.script.RhinoContextMaker;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
@@ -67,6 +73,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	@Mock Publisher publisher;
 	@Mock EngineAPI api;
 	@Mock ResourceFinder resourceFinder;
+	MockRhinoContextMaker rhinoContextMaker;
 	
 	private ResourceInstanceCreator makeCreator(final Configuration configuration, final Logger logger) {
 		return new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
@@ -78,6 +85,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 				bind(Publisher.class).toInstance(publisher);
 				bind(EngineAPI.class).toInstance(api);
 				bind(ResourceFinder.class).toInstance(resourceFinder);
+				bind(RhinoContextMaker.class).toInstance(rhinoContextMaker);
 			}
 		}), logger);
 	}
@@ -86,7 +94,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	@Before
 	public void before() {
-		
+		rhinoContextMaker = new MockRhinoContextMaker();
 		rimc = makeCreator(configuration, logger);
 	}
 	
@@ -109,6 +117,8 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	@Test
 	public void testConfigResource() throws Exception {
+		given(rhinoContextMaker.context.callFunction(any(Function.class), any(Scriptable.class), any(Scriptable.class), anyVararg()))
+			.willReturn(Collections.EMPTY_MAP);
 		doCreate(ConfigResource.class, ConfigResource.CONFIG_JS);
 	}
 	
@@ -164,6 +174,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 		given(sr.script()).willReturn("");
 		given(api.global()).willReturn(new NativeObject());
 		given(resourceFinder.loadResource(ScriptResource.class, "index.js")).willReturn(sr);
+		given(rhinoContextMaker.context.newObject(any(ScriptableObject.class))).willReturn(new NativeObject());
 		
 		doCreate(ModuleScriptEnvironment.class, "index", new ModuleParent(dse));
 	}

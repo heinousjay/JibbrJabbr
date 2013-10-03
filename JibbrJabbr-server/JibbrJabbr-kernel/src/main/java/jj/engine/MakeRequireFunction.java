@@ -20,10 +20,10 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
+import jj.resource.document.ModuleParent;
+import jj.resource.document.ModuleScriptEnvironment;
 import jj.script.CurrentScriptContext;
-import jj.script.ModuleScriptExecutionEnvironment;
 import jj.script.RequiredModule;
-import jj.script.ScriptExecutionEnvironmentFinder;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -34,7 +34,7 @@ import org.mozilla.javascript.Scriptable;
  *
  */
 @Singleton
-class RequireFunction extends BaseFunction implements HostObject, ContributesScript {
+class MakeRequireFunction extends BaseFunction implements HostObject, ContributesScript {
 
 	private static final long serialVersionUID = -3809338081179905958L;
 	
@@ -42,19 +42,16 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 	
 	private final Configuration configuration;
 	private final CurrentScriptContext context;
-	private final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
-	RequireFunction(
+	MakeRequireFunction(
 		final Configuration configuration,
 		final CurrentScriptContext context,
-		final ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder,
 		final ResourceFinder resourceFinder
 	) {
 		this.configuration = configuration;
 		this.context = context;
-		this.scriptExecutionEnvironmentFinder = scriptExecutionEnvironmentFinder;
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -94,8 +91,13 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 		
 		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]), String.valueOf(args[1]));
 		
-		ModuleScriptExecutionEnvironment scriptExecutionEnvironment = 
-			scriptExecutionEnvironmentFinder.forBaseNameAndModuleIdentifier(context.baseName(), moduleIdentifier);
+		ModuleScriptEnvironment scriptEnvironment =
+			resourceFinder.findResource(
+				ModuleScriptEnvironment.class,
+				moduleIdentifier,
+				new ModuleParent(context.documentScriptEnvironment())
+			);
+		
 		
 		// if we have an up-to-date script execution environment, just return exports,
 		// otherwise we need a continuation to start processing it properly,
@@ -104,12 +106,11 @@ class RequireFunction extends BaseFunction implements HostObject, ContributesScr
 		// pending top call caused by this function.  continuations are like
 		// violence, any problem can be solved by using MOAR!
 		
-		if (scriptExecutionEnvironment == null || 
-			resourceFinder.findResource(scriptExecutionEnvironment.scriptResource()) != scriptExecutionEnvironment.scriptResource()) {
+		if (scriptEnvironment == null) {
 			throw context.prepareContinuation(new RequiredModule(moduleIdentifier, context));
 		}
 		
-		return scriptExecutionEnvironment.exports();
+		return scriptEnvironment.exports();
 	}
 	
 	@Override

@@ -112,7 +112,7 @@ public class DocumentScriptEnvironmentTest {
 		
 		RuntimeException re = new RuntimeException();
 		
-		given(contextMaker.context.evaluateString(eq(local), anyString(), anyString())).willThrow(re);
+		given(contextMaker.context.evaluateString(eq(local), anyString(), anyString())).willReturn(null).willThrow(re);
 		
 		try {
 			new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
@@ -122,7 +122,7 @@ public class DocumentScriptEnvironmentTest {
 			assertThat(rnve.getCause(), is(sameInstance((Throwable)re)));
 		}
 		
-		verify(contextMaker.context).evaluateString(eq(local), clientStubCaptor.capture(), anyString());
+		verify(contextMaker.context, times(2)).evaluateString(eq(local), clientStubCaptor.capture(), anyString());
 		
 		assertThat(clientStubCaptor.getValue(), is(
 			"function stubWithReturn(){return global['//doInvoke']('stubWithReturn',global['//convertArgs'](arguments));}\n" +
@@ -145,7 +145,7 @@ public class DocumentScriptEnvironmentTest {
 		
 		RuntimeException re = new RuntimeException();
 		
-		given(contextMaker.context.evaluateString(eq(local), anyString(), anyString())).willThrow(re);
+		given(contextMaker.context.evaluateString(eq(local), anyString(), anyString())).willReturn(null).willThrow(re);
 		
 		try {
 			new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
@@ -167,6 +167,7 @@ public class DocumentScriptEnvironmentTest {
 		String name = "broken";
 		
 		givenAnHtmlResource(name);
+		givenASharedScript(name);
 		givenAServerScript(name);
 		
 		RuntimeException re = new RuntimeException();
@@ -181,10 +182,11 @@ public class DocumentScriptEnvironmentTest {
 			assertThat(rnve.getCause(), is(sameInstance((Throwable)re)));
 		}
 		
-		verify(publisher, times(2)).publish(eventCaptor.capture());
+		verify(publisher, times(3)).publish(eventCaptor.capture());
 		
-		assertThat(eventCaptor.getAllValues().get(0), is(instanceOf(CompilingServerScript.class)));
-		assertThat(eventCaptor.getAllValues().get(1), is(instanceOf(ErrorCompilingServerScript.class)));
+		assertThat(eventCaptor.getAllValues().get(0), is(instanceOf(EvaluatingSharedScript.class)));
+		assertThat(eventCaptor.getAllValues().get(1), is(instanceOf(CompilingServerScript.class)));
+		assertThat(eventCaptor.getAllValues().get(2), is(instanceOf(ErrorCompilingServerScript.class)));
 	}
 	
 	// i know this looks like a private method is being tested... and sure, it is... but the
@@ -206,6 +208,8 @@ public class DocumentScriptEnvironmentTest {
 		// local is return as all new object results.  luckily nothing overlaps
 		verify(local).defineProperty("module", local, ScriptableObject.CONST);
 		verify(local).defineProperty("id", name, ScriptableObject.CONST);
+		verify(local).defineProperty(eq("require"), isNull(), eq(ScriptableObject.CONST));
+		
 	}
 	
 	@Test
@@ -224,6 +228,7 @@ public class DocumentScriptEnvironmentTest {
 		verify(html).addDependent(result);
 		verify(script, times(3)).addDependent(result);
 		
-		assertThat(result.uri(), is("/" + name));
+		assertThat(result.uri(), is("/da39a3ee5e6b4b0d3255bfef95601890afd80709/" + name));
+		assertThat(result.socketUri(), is("/da39a3ee5e6b4b0d3255bfef95601890afd80709/" + name + ".socket"));
 	}
 }

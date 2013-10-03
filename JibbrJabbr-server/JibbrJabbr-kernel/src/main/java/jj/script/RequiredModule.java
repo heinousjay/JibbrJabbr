@@ -33,16 +33,19 @@ public class RequiredModule implements DataStore {
 	
 	private final String baseName;
 	
-	private final ScriptContext parentContext;
+	private final ScriptContext parentScriptContext;
 	
 	private final String pendingKey = pendingKeys.next();
 	
 	private final Map<String, Object> data = new HashMap<>();
 
-	public RequiredModule(final String identifier, final CurrentScriptContext context) {
+	public RequiredModule(
+		final String identifier, 
+		final CurrentScriptContext context
+	) {
 		this.identifier = identifier;
 		this.baseName = context.baseName();
-		this.parentContext = context.save();
+		this.parentScriptContext = context.save();
 	}
 	
 	String baseName() {
@@ -50,7 +53,7 @@ public class RequiredModule implements DataStore {
 	}
 	
 	ScriptContext parentContext() {
-		return parentContext;
+		return parentScriptContext;
 	}
 	
 	String identifier() {

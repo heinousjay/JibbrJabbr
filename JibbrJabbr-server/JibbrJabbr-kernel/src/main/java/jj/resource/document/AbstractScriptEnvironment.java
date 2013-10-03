@@ -40,6 +40,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	protected final EngineAPI api;
 	
 	protected ScriptExecutionState state = Unitialized;
+	
 	/**
 	 * @param cacheKey
 	 */
@@ -87,6 +88,15 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 		}
 	}
 
+	/**
+	 * @return
+	 */
+	public Object exports() {
+		try (RhinoContext context = contextMaker.context()) {
+			return context.evaluateString(scope(), "module.exports", "returning exports"); 
+		}
+	}
+
 	public String toString() {
 		return new StringBuilder(getClass().getName())
 			.append("[")
@@ -107,23 +117,33 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 			// manner
 			ScriptableObject local = context.newObject(api.global());
 			local.setPrototype(api.global());
-		    local.setParentScope(null);
-		    
-		    // setting up the 'module' property as described in 
-		    // the commonjs module 1.1.1 specification
-		    // in the case of the top-level server script, the id
-		    // will be the baseName, which fortunately happens to be
-		    // exactly what is required
-		    ScriptableObject module = context.newObject(local);
-		    module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
-		    local.defineProperty("module", module, ScriptableObject.CONST);
-		    
-		    // define the require method and the exports object here as well.
-		    // follow the node.js concept of module.exports === exports, and
-		    // assigning to module.exports changes the exports object,
-		    // potentially to a function
-		    
-		    return local;
+			local.setParentScope(null);
+
+			// setting up the 'module' property as described in 
+			// the commonjs module 1.1.1 specification
+			// in the case of the top-level server script, the id
+			// will be the baseName, which fortunately happens to be
+			// exactly what is required
+			ScriptableObject module = context.newObject(local);
+			ScriptableObject exports = context.newObject(local);
+			module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
+			module.defineProperty("exports", exports, ScriptableObject.EMPTY);
+			
+			local.defineProperty("module", module, ScriptableObject.CONST);
+			local.defineProperty("exports", exports, ScriptableObject.CONST);
+			
+			// define the require method and the exports object here as well.
+			// follow the node.js concept of module.exports === exports, and
+			// assigning to module.exports changes the exports object,
+			// potentially to a function
+			Object require = context.evaluateString(local, "global['//makeRequire'](module);", "making require");
+			local.defineProperty(
+				"require",
+				require,
+				ScriptableObject.CONST
+			);
+			
+			return local;
 		}
 	}
 

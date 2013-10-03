@@ -14,10 +14,10 @@ import javax.inject.Singleton;
 import jj.DataStore;
 import jj.resource.MimeTypes;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.script.DocumentScriptExecutionEnvironment;
 import jj.script.ScriptRunner;
 import jj.execution.IOTask;
 import jj.execution.JJExecutor;
+import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -45,7 +45,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	
 	private final ScriptRunner scriptRunner;
 	
-	private final DocumentScriptEnvironment dse;
+	private final DocumentScriptEnvironment documentScriptEnvironment;
 	
 	private final Document document;
 	
@@ -58,8 +58,6 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	private final HashMap<String, Object> data = new HashMap<>();
 	
 	private ArrayList<JJMessage> messages; 
-	
-	private DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
 	
 	private volatile DocumentRequestState state = DocumentRequestState.Uninitialized;
 
@@ -74,7 +72,7 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	) {
 		this.executors = executors;
 		this.scriptRunner = scriptRunner;
-		this.dse = dse;
+		this.documentScriptEnvironment = dse;
 		this.document = dse.document();
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
@@ -122,12 +120,22 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	}
 	
 	public String baseName() {
-		return dse.baseName();
+		return documentScriptEnvironment.baseName();
 	}
 	
 	@Override
 	public void process() {
-		scriptRunner.submit(this);
+		if (documentScriptEnvironment.hasServerScript()) {
+			scriptRunner.submit(this);
+		} else {
+			executors.execute(new ScriptTask("responding to document request [" + baseName() + "]", baseName()) {
+				
+				@Override
+				protected void run() throws Exception {
+					respond();
+				}
+			});
+		}
 	}
 	
 	/**
@@ -194,13 +202,14 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	
 	public DocumentRequestProcessor startingInitialExecution() {
 		state = DocumentRequestState.InitialExecution;
-		associatedScriptExecutionEnvironment().initializing(true);
+		documentScriptEnvironment.initializing(true);
 		return this;
 	}
 	
 	
 	public DocumentRequestProcessor startingReadyFunction() {
 		state = DocumentRequestState.ReadyFunctionExecution;
+		documentScriptEnvironment.initialized(true);
 		return this;
 	}
 	
@@ -208,7 +217,12 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 		return state;
 	}
 	
-
+	/**
+	 * @return
+	 */
+	public DocumentScriptEnvironment documentScriptEnvironment() {
+		return documentScriptEnvironment;
+	}
 
 	/**
 	 * adds a message intended to be processed a framework startup
@@ -228,16 +242,6 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 		ArrayList<JJMessage> messages = this.messages;
 		this.messages = null;
 		return messages == null ? Collections.<JJMessage>emptyList() : messages;
-	}
-	
-	
-	public DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment() {
-		return associatedScriptExecutionEnvironment;
-	}
-	
-	public DocumentRequestProcessor associatedScriptExecutionEnvironment(DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment) {
-		this.associatedScriptExecutionEnvironment = associatedScriptExecutionEnvironment;
-		return this;
 	}
 	
 	public String uri() {

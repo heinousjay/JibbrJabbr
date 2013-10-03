@@ -19,9 +19,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
+import jj.resource.ResourceFinder;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.ScriptResource;
-import jj.script.DocumentScriptExecutionEnvironment;
-import jj.script.ScriptExecutionEnvironmentFinder;
 import jj.uri.URIMatch;
 
 import org.junit.Before;
@@ -37,8 +37,8 @@ public class DocumentScriptServableTest extends ServableTestBase {
 	static final String SHA1 = "1234567890123456789012345678901234567890";
 
 	DocumentScriptServable as;
-	@Mock ScriptExecutionEnvironmentFinder finder;
-	@Mock DocumentScriptExecutionEnvironment executionEnvironment;
+	@Mock ResourceFinder resourceFinder;
+	@Mock DocumentScriptEnvironment executionEnvironment;
 	@Mock ScriptResource scriptResource1;
 	@Mock ScriptResource scriptResource2;
 	@Mock ScriptResource scriptResource3;
@@ -46,10 +46,9 @@ public class DocumentScriptServableTest extends ServableTestBase {
 	
 	@Before
 	public void before() {
-		as = new DocumentScriptServable(configuration, finder);
+		as = new DocumentScriptServable(configuration, resourceFinder);
 		given(executionEnvironment.clientScriptResource()).willReturn(scriptResource1);
 		given(executionEnvironment.sharedScriptResource()).willReturn(scriptResource2);
-		given(executionEnvironment.serverScriptResource()).willReturn(scriptResource3);
 		
 		given(scriptResource1.sha1()).willReturn(SHA1);
 		given(scriptResource2.sha1()).willReturn(SHA1);
@@ -57,10 +56,10 @@ public class DocumentScriptServableTest extends ServableTestBase {
 		
 	}
 	
-	private void configureMatch(String uri, boolean withValidationHeader) {
+	private void configureMatch(String baseName, String uri, boolean withValidationHeader) {
 		match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(finder.forURIMatch(match)).willReturn(executionEnvironment);
+		given(resourceFinder.findResource(DocumentScriptEnvironment.class, baseName)).willReturn(executionEnvironment);
 		
 		if (withValidationHeader) {
 			given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
@@ -70,17 +69,17 @@ public class DocumentScriptServableTest extends ServableTestBase {
 	
 	@Test
 	public void testIsMatchingRequest() {
-		configureMatch("/" + SHA1 + "/index.js", false);
+		configureMatch("index", "/" + SHA1 + "/index.js", false);
 		assertThat(as.isMatchingRequest(match), is(true));
-		configureMatch("/" + SHA1 + "/index.shared.js", false);
+		configureMatch("index", "/" + SHA1 + "/index.shared.js", false);
 		assertThat(as.isMatchingRequest(match), is(true));
-		configureMatch("/" + SHA1 + "/index.server.js", false);
+		configureMatch("index", "/" + SHA1 + "/index.server.js", false);
 		assertThat(as.isMatchingRequest(match), is(false));
 	}
 
 	@Test
 	public void testMakeRequestProcessorClientCachedResponse() throws Exception {
-		configureMatch("/" + SHA1 + "/index.js", false);
+		configureMatch("index", "/" + SHA1 + "/index.js", false);
 		
 		as.makeRequestProcessor(request, response).process();
 		
@@ -89,7 +88,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 
 	@Test
 	public void testMakeRequestProcessorSharedCachedResponse() throws Exception {
-		configureMatch("/" + SHA1 + "/index.shared.js", false);
+		configureMatch("index", "/" + SHA1 + "/index.shared.js", false);
 		
 		as.makeRequestProcessor(request, response).process();
 		
@@ -98,7 +97,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 
 	@Test
 	public void testMakeRequestProcessorClientNotModifiedResponse() throws Exception {
-		configureMatch("/" + SHA1 + "/index.js", true);
+		configureMatch("index", "/" + SHA1 + "/index.js", true);
 		
 		as.makeRequestProcessor(request, response).process();
 		
@@ -107,7 +106,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 
 	@Test
 	public void testMakeRequestProcessorSharedNotModifiedResponse() throws Exception {
-		configureMatch("/" + SHA1 + "/index.shared.js", true);
+		configureMatch("index", "/" + SHA1 + "/index.shared.js", true);
 		
 		as.makeRequestProcessor(request, response).process();
 		
@@ -116,7 +115,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 
 	@Test
 	public void testMakeRequestProcessorServerNoResponse() throws Exception {
-		configureMatch("/" + SHA1 + "/index.server.js", false);
+		configureMatch("index", "/" + SHA1 + "/index.server.js", false);
 		
 		assertThat(as.makeRequestProcessor(request, response), is(nullValue()));
 	}

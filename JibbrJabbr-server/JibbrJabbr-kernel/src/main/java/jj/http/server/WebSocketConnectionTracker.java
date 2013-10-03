@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJServerStartupListener;
 import jj.execution.JJNioEventLoopGroup;
-import jj.script.DocumentScriptExecutionEnvironment;
+import jj.resource.document.DocumentScriptEnvironment;
 
 /**
  * 
@@ -55,7 +55,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		PlatformDependent.newConcurrentHashMap(16, 0.75F, 2);
 	
 	private final 
-	ConcurrentMap<DocumentScriptExecutionEnvironment, ConcurrentMap<JJWebSocketConnection, Boolean>> 
+	ConcurrentMap<DocumentScriptEnvironment, ConcurrentMap<JJWebSocketConnection, Boolean>> 
 	perScript =
 		PlatformDependent.newConcurrentHashMap();
 		
@@ -81,14 +81,14 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
 		
 		ConcurrentMap<JJWebSocketConnection, Boolean> connectionSet = 
-			perScript.get(connection.associatedScriptExecutionEnvironment());
+			perScript.get(connection.documentScriptEnvironment());
 		
 		if (connectionSet == null) {
 			perScript.putIfAbsent(
-				connection.associatedScriptExecutionEnvironment(),
+				connection.documentScriptEnvironment(),
 				PlatformDependent.<JJWebSocketConnection, Boolean>newConcurrentHashMap(16, 0.75F, 2)
 			);
-			connectionSet = perScript.get(connection.associatedScriptExecutionEnvironment());
+			connectionSet = perScript.get(connection.documentScriptEnvironment());
 		}
 		connectionSet.putIfAbsent(connection, Boolean.TRUE);
 	}
@@ -98,16 +98,16 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		allConnections.remove(connection);
 		
 		ConcurrentMap<JJWebSocketConnection, Boolean> connectionSet = 
-			perScript.get(connection.associatedScriptExecutionEnvironment());
+			perScript.get(connection.documentScriptEnvironment());
 		
 		assert (connectionSet != null) : "couldn't find a connection set to remove a connection.  impossible!";
 		
 		connectionSet.remove(connection);
 	}
 	
-	public Set<JJWebSocketConnection> forScript(DocumentScriptExecutionEnvironment scriptExecutionEnvironment) {
+	public Set<JJWebSocketConnection> forScript(DocumentScriptEnvironment documentScriptEnvironment) {
 		
-		ConcurrentMap<JJWebSocketConnection, Boolean> connections = perScript.get(scriptExecutionEnvironment);		
+		ConcurrentMap<JJWebSocketConnection, Boolean> connections = perScript.get(documentScriptEnvironment);		
 		
 		return (connections != null) ?
 			Collections.unmodifiableSet(connections.keySet()) :

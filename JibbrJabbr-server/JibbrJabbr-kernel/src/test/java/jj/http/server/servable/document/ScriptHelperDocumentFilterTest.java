@@ -16,16 +16,16 @@ import jj.http.server.servable.document.ScriptHelperDocumentFilter;
 import jj.jjmessage.JJMessage;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.ScriptResource;
 import jj.resource.document.ScriptResourceType;
-import jj.script.CurrentScriptContext;
-import jj.script.DocumentScriptExecutionEnvironment;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -39,18 +39,19 @@ public class ScriptHelperDocumentFilterTest {
 	String scriptUri;
 	String socketUri;
 	String webSocketUri;
-	@Mock Configuration configuration;
-	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
-	@Mock CurrentScriptContext context;
+	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	@Mock ScriptResource scriptResource;
 	@Mock HttpRequest httpRequest;
-	@Mock ResourceFinder resourceFinder;
 	@Mock AssetResource jqueryJs;
 	@Mock AssetResource jjJs;
 	Document document;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 
-	ScriptHelperDocumentFilter filter;
+
+	@Mock Configuration configuration;
+	@Mock ResourceFinder resourceFinder;
+	
+	@InjectMocks ScriptHelperDocumentFilter filter;
 	
 	@Before
 	public void before() {
@@ -59,42 +60,50 @@ public class ScriptHelperDocumentFilterTest {
 		socketUri = scriptUri + ".socket";
 		webSocketUri = "ws://localhost:8080" + socketUri;
 		
-		when(associatedScriptExecutionEnvironment.toUri()).thenReturn(scriptUri);
-		when(associatedScriptExecutionEnvironment.toSocketUri()).thenReturn(socketUri);
+		given(documentScriptEnvironment.uri()).willReturn(scriptUri);
+		given(documentScriptEnvironment.socketUri()).willReturn(socketUri);
+		given(documentScriptEnvironment.hasServerScript()).willReturn(true);
+		given(documentRequestProcessor.documentScriptEnvironment()).willReturn(documentScriptEnvironment);
 		
-		when(context.documentScriptExecutionEnvironment()).thenReturn(associatedScriptExecutionEnvironment);
-		when(context.httpRequest()).thenReturn(httpRequest);
-		when(context.documentRequestProcessor()).thenReturn(documentRequestProcessor);
-		
-		when(documentRequestProcessor.startupJJMessages()).thenReturn(Collections.<JJMessage>emptyList());
-		when(httpRequest.host()).thenReturn("localhost:8080");
+		given(documentRequestProcessor.startupJJMessages()).willReturn(Collections.<JJMessage>emptyList());
+		given(httpRequest.host()).willReturn("localhost:8080");
 
 		document = Jsoup.parse("<html><head><title>what</title></head><body></body></html>");
-		when(documentRequestProcessor.document()).thenReturn(document);
-		when(documentRequestProcessor.httpRequest()).thenReturn(httpRequest);
+		given(documentRequestProcessor.document()).willReturn(document);
+		given(documentRequestProcessor.httpRequest()).willReturn(httpRequest);
 		
-		when(resourceFinder.findResource(AssetResource.class, JQUERY_JS))
-			.thenReturn(jqueryJs);
-		when(resourceFinder.findResource(AssetResource.class, JJ_JS))
-			.thenReturn(jjJs);
+		given(resourceFinder.findResource(AssetResource.class, JQUERY_JS))
+			.willReturn(jqueryJs);
+		given(resourceFinder.findResource(AssetResource.class, JJ_JS))
+			.willReturn(jjJs);
 		
-		when(jqueryJs.uri()).thenReturn(JQUERY_URI);
-		when(jqueryJs.baseName()).thenReturn(JQUERY_JS);
+		given(jqueryJs.uri()).willReturn(JQUERY_URI);
+		given(jqueryJs.baseName()).willReturn(JQUERY_JS);
 		
-		when(jjJs.sha1()).thenReturn(JJ_SHA);
-		when(jjJs.uri()).thenReturn(JJ_URI);
+		given(jjJs.sha1()).willReturn(JJ_SHA);
+		given(jjJs.uri()).willReturn(JJ_URI);
 		
 		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
+	}
+	
+	@Test
+	public void testNothingIsAddedWhenThereIsNoServerScript() {
 		
-		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
+		// given
+		given(documentScriptEnvironment.hasServerScript()).willReturn(false);
+		
+		// when
+		filter.filter(documentRequestProcessor);
+		
+		assertThat(document.select("script[type=text/javascript]").size(), is(0));
 	}
 	
 	@Test
 	public void testClientAndSharedScriptsAddedWhenPresent() {
 		
 		// given
-		given(associatedScriptExecutionEnvironment.clientScriptResource()).willReturn(scriptResource);
-		given(associatedScriptExecutionEnvironment.sharedScriptResource()).willReturn(scriptResource);
+		given(documentScriptEnvironment.clientScriptResource()).willReturn(scriptResource);
+		given(documentScriptEnvironment.sharedScriptResource()).willReturn(scriptResource);
 		
 		// when
 		filter.filter(documentRequestProcessor);
@@ -112,7 +121,7 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientScriptIsAddedWhenPresentAndSharedScriptIsAbsent() {
 		
 		// given
-		given(associatedScriptExecutionEnvironment.clientScriptResource()).willReturn(scriptResource);
+		given(documentScriptEnvironment.clientScriptResource()).willReturn(scriptResource);
 		
 		// when
 		filter.filter(documentRequestProcessor);
@@ -130,7 +139,7 @@ public class ScriptHelperDocumentFilterTest {
 	public void testClientScriptIsAddedWhenAbsentAndSharedScriptIsPresent() {
 		
 		// given
-		given(associatedScriptExecutionEnvironment.sharedScriptResource()).willReturn(scriptResource);
+		given(documentScriptEnvironment.sharedScriptResource()).willReturn(scriptResource);
 		
 		//when
 		filter.filter(documentRequestProcessor);
@@ -172,7 +181,7 @@ public class ScriptHelperDocumentFilterTest {
 		);
 		
 		given(documentRequestProcessor.startupJJMessages()).willReturn(messages);
-		filter = new ScriptHelperDocumentFilter(configuration, context, resourceFinder);
+		filter = new ScriptHelperDocumentFilter(configuration, resourceFinder);
 		
 		// when 
 		filter.filter(documentRequestProcessor);

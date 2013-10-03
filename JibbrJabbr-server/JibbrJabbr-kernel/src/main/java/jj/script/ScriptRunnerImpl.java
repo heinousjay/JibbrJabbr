@@ -13,6 +13,9 @@ import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.resource.document.DocumentScriptEnvironment;
+import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.document.ScriptEnvironment;
 
 /**
  * Coordinates script processing in response to http requests,
@@ -28,8 +31,6 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 
 	private final Logger log = LoggerFactory.getLogger(ScriptRunnerImpl.class);
 	
-	private final ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper;
-	
 	private final ContinuationCoordinator continuationCoordinator;
 	
 	private final CurrentScriptContext context;
@@ -38,13 +39,10 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	@Inject
 	ScriptRunnerImpl(
-		final ScriptExecutionEnvironmentHelper scriptExecutionEnvironmentHelper,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
 		final JJExecutor executors
 	) {
-		
-		this.scriptExecutionEnvironmentHelper = scriptExecutionEnvironmentHelper;
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
 		this.executors = executors;
@@ -55,8 +53,8 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		log.trace("performing initial execution of a document request");
 		context.documentRequestProcessor().startingInitialExecution();
 
-		if (continuationCoordinator.execute(context.documentScriptExecutionEnvironment())) {
-			context.documentScriptExecutionEnvironment().initialized(true);
+		if (continuationCoordinator.execute(context.documentScriptEnvironment())) {
+			context.documentScriptEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		}
@@ -65,8 +63,8 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	@ScriptThread
 	private void resumeHttpRequestInitialExecution(String pendingKey, Object result) {
 		log.trace("resuming initial execution of a script execution environment");
-		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result)) {
-			context.scriptExecutionEnvironment().initialized(true);
+		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptEnvironment(), result)) {
+			context.scriptEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		}
@@ -74,7 +72,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	@ScriptThread
 	private void executeReadyFunction() {
-		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.documentScriptExecutionEnvironment(); 
+		DocumentScriptEnvironment scriptExecutionEnvironment = context.documentScriptEnvironment(); 
 		Callable ready = scriptExecutionEnvironment.getFunction(READY_FUNCTION_KEY);
 		if (ready == null) {
 			log.trace("no ready function found for this document. responding.");
@@ -95,7 +93,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeReadyFunction(String pendingKey, Object result) {
 		log.trace("resuming ready function execution of a script execution environment");
 		
-		if (continuationCoordinator.resumeContinuation(pendingKey, context.documentScriptExecutionEnvironment(), result)) {
+		if (continuationCoordinator.resumeContinuation(pendingKey, context.documentScriptEnvironment(), result)) {
 			log.trace("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
 		}
@@ -113,47 +111,33 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			@Override
 			public void run() {
 				
-				log.trace("preparing to execute document request {}", baseName);
+				log.trace("executing document request {}", baseName);
 				
-				DocumentScriptExecutionEnvironment scriptExecutionEnvironment = scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName);
-				if (scriptExecutionEnvironment == null) {
-					try {
-						context.initialize(documentRequestProcessor);
-						log.trace("no script to execute for this request, responding");
-						documentRequestProcessor.respond();
-					} finally {
-						context.end();
-					}
-				} else {
+				try {
+					context.initialize(documentRequestProcessor);
 					
-					documentRequestProcessor.associatedScriptExecutionEnvironment(scriptExecutionEnvironment);
-					
-					try {
-						context.initialize(documentRequestProcessor);
-						
-						if (scriptExecutionEnvironment.initialized()) {
-							executeReadyFunction();
-						} else if (scriptExecutionEnvironment.initializing()) {
-							// just run us again
-							executors.execute(this);
-						} else {
-							httpRequestInitialExecution();
-						}
-						
-					} finally {
-						context.end();
+					if (documentRequestProcessor.documentScriptEnvironment().initialized()) {
+						executeReadyFunction();
+					} else if (documentRequestProcessor.documentScriptEnvironment().initializing()) {
+						// just run us again
+						executors.execute(this);
+					} else {
+						httpRequestInitialExecution();
 					}
+					
+				} finally {
+					context.end();
 				}
 			}
 		});
 	}
 	
 	@ScriptThread
-	private void moduleInitialExecution(final RequiredModule requiredModule) {
+	private void moduleInitialExecution() {
 		log.debug("performing initial execution of a required module");
 		
-		if (continuationCoordinator.execute(context.moduleScriptExecutionEnvironment())) {
-			context.moduleScriptExecutionEnvironment().initialized(true);
+		if (continuationCoordinator.execute(context.moduleScriptEnvironment())) {
+			context.moduleScriptEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			completeModuleInitialization();
 		}
@@ -163,8 +147,8 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeModuleInitialExecution(final String pendingKey, final Object result) {
 		log.debug("resuming initial execution of a required module");
 		
-		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptExecutionEnvironment(), result)) {
-			context.scriptExecutionEnvironment().initialized(true);
+		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptEnvironment(), result)) {
+			context.scriptEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			completeModuleInitialization();
 		}
@@ -172,16 +156,16 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	private void completeModuleInitialization() {
 		final RequiredModule requiredModule = context.requiredModule();
-		final ModuleScriptExecutionEnvironment scriptExecutionEnvironment = context.moduleScriptExecutionEnvironment();
+		final ModuleScriptEnvironment moduleScriptEnvironment = context.moduleScriptEnvironment();
 		
-		executors.execute(new ScriptTask("module parent resumption", scriptExecutionEnvironment.baseName()) {
+		executors.execute(new ScriptTask("module parent resumption", moduleScriptEnvironment.baseName()) {
 
 			@Override
 			public void run() {
 				log.debug("resuming module parent with exports");
 				context.restore(requiredModule.parentContext());
 				try {
-					restartAfterContinuation(requiredModule.pendingKey(), scriptExecutionEnvironment.exports());
+					restartAfterContinuation(requiredModule.pendingKey(), moduleScriptEnvironment.exports());
 				} finally {
 					context.end();
 				}
@@ -189,8 +173,22 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		});
 	}
 	
+	public void submit(final ScriptEnvironment scriptEnvironment) {
+		
+		executors.execute(new ScriptTask("", scriptEnvironment.baseName()) {
+
+			@Override
+			protected void run() throws Exception {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+	}
+	
 	@Override
-	public void submit(final RequiredModule requiredModule) {
+	public void submit(final RequiredModule requiredModule, final ModuleScriptEnvironment scriptExecutionEnvironment) {
 		final String baseName = requiredModule.baseName();
 		final String identifier = requiredModule.identifier();
 		
@@ -198,12 +196,10 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			
 			@Override
 			public void run() {
-				ModuleScriptExecutionEnvironment scriptExecutionEnvironment = 
-					scriptExecutionEnvironmentHelper.scriptExecutionEnvironmentFor(baseName, identifier);
 				assert !scriptExecutionEnvironment.initialized(): "attempting to reinitialize a required module";
 				context.initialize(requiredModule, scriptExecutionEnvironment);
 				try {
-					moduleInitialExecution(requiredModule);
+					moduleInitialExecution();
 				} finally {
 					context.end();
 				}
@@ -235,7 +231,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeContinuation(final String pendingKey, final Object result) {
 		continuationCoordinator.resumeContinuation(
 			pendingKey,
-			context.scriptExecutionEnvironment(),
+			context.scriptEnvironment(),
 			result
 		);
 	}
@@ -253,7 +249,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			public void run() {
 				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
-				DocumentScriptExecutionEnvironment executionEnvironment = connection.associatedScriptExecutionEnvironment();
+				DocumentScriptEnvironment executionEnvironment = connection.documentScriptEnvironment();
 				Callable function = connection.getFunction(event);
 				if (function == null) function = executionEnvironment.getFunction(event);
 				try {
@@ -306,7 +302,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		
 		context.restore(saved);
 		try {
-			assert context.scriptExecutionEnvironment() != null : "attempting to restart a continuation without a script context in place";
+			assert context.scriptEnvironment() != null : "attempting to restart a continuation without a script context in place";
 			executors.execute(new ScriptTask(description, context.baseName()) {
 	
 				@Override

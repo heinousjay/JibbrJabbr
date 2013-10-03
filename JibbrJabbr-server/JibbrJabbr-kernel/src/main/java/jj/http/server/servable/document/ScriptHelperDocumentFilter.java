@@ -8,9 +8,8 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.ScriptResourceType;
-import jj.script.CurrentScriptContext;
-import jj.script.DocumentScriptExecutionEnvironment;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,16 +25,13 @@ import org.jsoup.nodes.Element;
 class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	private final Configuration configuration;
-	private final CurrentScriptContext context;
 	private final ResourceFinder resourceFinder;
 
 	@Inject
 	public ScriptHelperDocumentFilter(
-		final Configuration configuration, 
-		final CurrentScriptContext context,
+		final Configuration configuration,
 		final ResourceFinder resourceFinder
 	) {
-		this.context = context;
 		this.configuration = configuration;
 		this.resourceFinder = resourceFinder;
 	}
@@ -57,8 +53,8 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 
 	@Override
 	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
-		DocumentScriptExecutionEnvironment scriptExecutionEnvironment = context.documentScriptExecutionEnvironment();
-		if (scriptExecutionEnvironment != null) {
+		DocumentScriptEnvironment scriptEnvironment = documentRequestProcessor.documentScriptEnvironment();
+		if (scriptEnvironment != null && scriptEnvironment.hasServerScript()) {
 			
 			// internal version of jquery
 			// it's versioned already, so no need for sha-ing
@@ -69,7 +65,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				(documentRequestProcessor.httpRequest().secure() ? "s" : "") + 
 				"://" + 
 				documentRequestProcessor.httpRequest().host() + 
-				scriptExecutionEnvironment.toSocketUri();
+				scriptEnvironment.socketUri();
 			
 			Element jjScript = 
 				makeScriptTag(documentRequestProcessor.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())
@@ -77,7 +73,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				.attr("data-jj-socket-url", wsURI)
 				.attr(
 					"data-jj-startup-messages", 
-					context.documentRequestProcessor().startupJJMessages().toString()
+					documentRequestProcessor.startupJJMessages().toString()
 				);
 			
 			if (configuration.get(DocumentConfiguration.class).clientDebug()) {
@@ -87,11 +83,11 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			addScript(documentRequestProcessor.document(), jjScript);
 			
 			// associated scripts
-			if (scriptExecutionEnvironment.sharedScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptExecutionEnvironment.toUri()));
+			if (scriptEnvironment.sharedScriptResource() != null) {
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptEnvironment.uri()));
 			}
-			if (scriptExecutionEnvironment.clientScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptExecutionEnvironment.toUri()));
+			if (scriptEnvironment.clientScriptResource() != null) {
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptEnvironment.uri()));
 			}
 		}
 	}

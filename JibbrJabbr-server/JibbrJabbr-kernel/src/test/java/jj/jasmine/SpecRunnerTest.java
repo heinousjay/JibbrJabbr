@@ -18,9 +18,9 @@ package jj.jasmine;
 import static org.mockito.BDDMockito.*;
 import jj.resource.ResourceFinder;
 import jj.resource.document.ExecutionEnvironmentInitialized;
+import jj.resource.document.ScriptEnvironment;
 import jj.resource.document.ScriptResource;
 import jj.resource.spec.SpecResource;
-import jj.script.ScriptExecutionEnvironment;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,7 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class SpecRunnerTest {
 	
-	@Mock ScriptExecutionEnvironment executionEnvironment;
+	@Mock ScriptEnvironment scriptEnvironment;
 	@Mock ScriptResource scriptResource;
 	@Mock SpecResource specResource;
 	
@@ -46,11 +46,11 @@ public class SpecRunnerTest {
 	@Test
 	public void test() {
 		
-		given(executionEnvironment.scriptName()).willReturn("whatever.js");
-		given(resourceFinder.findResource(ScriptResource.class, executionEnvironment.scriptName())).willReturn(scriptResource);
-		given(resourceFinder.findResource(SpecResource.class, executionEnvironment.scriptName())).willReturn(specResource);
+		given(scriptEnvironment.scriptName()).willReturn("whatever.js");
+		given(resourceFinder.findResource(ScriptResource.class, scriptEnvironment.scriptName())).willReturn(scriptResource);
+		given(resourceFinder.findResource(SpecResource.class, scriptEnvironment.scriptName())).willReturn(specResource);
 		
-		specRunner.findAndExecuteSpec(new ExecutionEnvironmentInitialized(executionEnvironment));
+		specRunner.findAndExecuteSpec(new ExecutionEnvironmentInitialized(scriptEnvironment));
 		
 		// need to be dependent upon each other so that changes to either cause
 		// things to get reloaded

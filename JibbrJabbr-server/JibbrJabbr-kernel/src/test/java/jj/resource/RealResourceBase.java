@@ -52,10 +52,8 @@ import org.slf4j.Logger;
 public abstract class RealResourceBase {
 	
 	protected Path appPath;
-	@Mock
-	protected Configuration configuration;
-	@Mock
-	protected Logger logger;
+	@Mock protected Configuration configuration;
+	@Mock protected Logger logger;
 
 	@Before
 	public final void init() throws Exception {

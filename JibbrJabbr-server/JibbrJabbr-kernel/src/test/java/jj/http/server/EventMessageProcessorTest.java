@@ -67,7 +67,7 @@ public class EventMessageProcessorTest {
 		
 		//given
 		JJMessage event = MessageMaker.makeEvent("selector", "type", form);
-		given(context.scriptExecutionEnvironment().newObject()).willReturn(scriptableObject1);
+		given(context.scriptEnvironment().newObject()).willReturn(scriptableObject1);
 		given(scriptJSON.parse(form)).willReturn(scriptableObject2);
 		//when
 		emp.handle(connection, event);

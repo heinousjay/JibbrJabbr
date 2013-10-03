@@ -10,9 +10,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
+import jj.resource.ResourceFinder;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.ScriptResource;
-import jj.script.DocumentScriptExecutionEnvironment;
-import jj.script.ScriptExecutionEnvironmentFinder;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -27,15 +27,15 @@ import jj.http.HttpResponse;
 @Singleton
 class DocumentScriptServable extends Servable<ScriptResource> {
 	
-	private final ScriptExecutionEnvironmentFinder finder;
+	private final ResourceFinder resourceFinder;
 
 	@Inject
-	DocumentScriptServable(final Configuration configuration, final ScriptExecutionEnvironmentFinder finder) {
+	DocumentScriptServable(final Configuration configuration, final ResourceFinder finder) {
 		super(configuration);
-		this.finder = finder;
+		this.resourceFinder = finder;
 	}
 	
-	private ScriptResource typeFromExecutionEnvironment(DocumentScriptExecutionEnvironment executionEnvironment, String typeSpec) {
+	private ScriptResource typeFromExecutionEnvironment(DocumentScriptEnvironment executionEnvironment, String typeSpec) {
 		ScriptResource result = null;
 		if (typeSpec == null) {
 			result = executionEnvironment.clientScriptResource();
@@ -83,9 +83,10 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 		Matcher typeMatcher = TYPE_PATTERN.matcher(match.baseName);
 		if (match.sha1 != null && typeMatcher.matches()) {
 			
-			DocumentScriptExecutionEnvironment scriptExecutionEnvironment = finder.forURIMatch(match);
-			if (scriptExecutionEnvironment != null) {
-				result = typeFromExecutionEnvironment(scriptExecutionEnvironment, typeMatcher.group(2));
+			DocumentScriptEnvironment scriptEnvironment = 
+				resourceFinder.findResource(DocumentScriptEnvironment.class, typeMatcher.group(1));
+			if (scriptEnvironment != null) {
+				result = typeFromExecutionEnvironment(scriptEnvironment, typeMatcher.group(2));
 			}
 		}
 		

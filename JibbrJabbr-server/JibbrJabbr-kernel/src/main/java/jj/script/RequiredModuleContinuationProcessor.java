@@ -22,9 +22,8 @@ import jj.engine.RequiredModuleException;
 import jj.execution.IOTask;
 import jj.execution.JJExecutor;
 import jj.resource.ResourceFinder;
-import jj.resource.document.ScriptResource;
-import jj.resource.document.ScriptResourceType;
-import jj.resource.spec.SpecResource;
+import jj.resource.document.ModuleParent;
+import jj.resource.document.ModuleScriptEnvironment;
 
 /**
  * @author jason
@@ -41,45 +40,37 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final ResourceFinder finder;
 	
-	private final ScriptExecutionEnvironmentFinder scriptFinder;
-	
 	@Inject
 	RequiredModuleContinuationProcessor(
 		final CurrentScriptContext context,
 		final JJExecutor executors,
 		final ScriptRunnerInternal scriptRunner,
-		final ResourceFinder finder,
-		final ScriptExecutionEnvironmentFinder scriptFinder
+		final ResourceFinder finder
 	) {
 		this.context = context;
 		this.executors = executors;
 		this.scriptRunner = scriptRunner;
 		this.finder = finder;
-		this.scriptFinder = scriptFinder;
 	}
 	
-	private void loadScript(final RequiredModule requiredModule) {
+	private void loadEnvironment(final RequiredModule requiredModule, final ModuleParent moduleParent) {
 		
 		executors.execute(
 			new IOTask("loading module [" + requiredModule.identifier() + "] from [" + context.baseName() + "]") {
 			
 				@Override
 				public void run() {
-					ScriptResource scriptResource = 
-						finder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(requiredModule.identifier()));
+					ModuleScriptEnvironment scriptEnvironment = 
+						finder.loadResource(ModuleScriptEnvironment.class, requiredModule.identifier(), moduleParent);
 					
-					// at this point do we need to check if we got scooped? inside
-					// the script thread makes more sense really, if we check here
-					// then we are potentially contending for the stores but if we
-					// check inside a script thread then strict ordering will happen,
-					// so submit needs to check if it's doing useless work at the
-					// beginning and just restart and then we just wasted a little i/o
-					// time, no biggy
-					
-					if (scriptResource != null) {
-						// make sure the associated spec, if any, is also loaded
-						finder.loadResource(SpecResource.class, scriptResource.baseName());
-						scriptRunner.submit(requiredModule);
+					if (scriptEnvironment != null) {
+						
+						if (scriptEnvironment.initialized() || scriptEnvironment.initializing()) {
+							restartInProgress(requiredModule, scriptEnvironment);
+						} else {
+							scriptRunner.submit(requiredModule, scriptEnvironment);
+						}
+						
 					} else {
 						
 						scriptRunner.submit(
@@ -97,34 +88,41 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	@Override
 	public void process(final ContinuationState continuationState) {
 		final RequiredModule requiredModule = continuationState.requiredModule();
+		final ModuleParent moduleParent = new ModuleParent(context.documentScriptEnvironment());
 		
-		ScriptResource scriptResource = 
-			finder.findResource(ScriptResource.class, ScriptResourceType.Module.suffix(requiredModule.identifier()));
 		
-		ModuleScriptExecutionEnvironment scriptExecutionEnvironment = 
-			scriptFinder.forBaseNameAndModuleIdentifier(context.baseName(), requiredModule.identifier());
+		ModuleScriptEnvironment scriptEnvironment = 
+			finder.findResource(
+				ModuleScriptEnvironment.class,
+				requiredModule.identifier(),
+				moduleParent
+			);
 		
 		// decision 1: do we need i/o?
-		if (scriptResource == null) {
-			loadScript(requiredModule);
+		if (scriptEnvironment == null) {
+			loadEnvironment(requiredModule, moduleParent);
 		}	
-		// decision 2: do we need to reinitialize the execution environment?
-		else if (!scriptResource.sha1().equals(scriptExecutionEnvironment.sha1())) {
-			scriptRunner.submit(requiredModule);
+		// decision 2: do we need to initialize the execution environment?
+		else if (!scriptEnvironment.initialized() && !scriptEnvironment.initializing()) {
+			scriptRunner.submit(requiredModule, scriptEnvironment);
 		}
 		// otherwise, just restart with the exports, things are already in progress
 		else {
-			scriptRunner.submit(
-				"restarting [" + requiredModule.baseName() + "] with in-progress module [" + requiredModule.identifier() + "]",
-				requiredModule.parentContext(),
-				requiredModule.pendingKey(),
-				scriptExecutionEnvironment.exports()
-			);
+			restartInProgress(requiredModule, scriptEnvironment);
 		}
 		
 		// this allows us to automatically implement the circular dependency
 		// specification - if the module is already in progress, then we just
 		// return the exports right away and they will get populated as things
 		// keep running
+	}
+
+	private void restartInProgress(final RequiredModule requiredModule, ModuleScriptEnvironment scriptEnvironment) {
+		scriptRunner.submit(
+			"restarting [" + requiredModule.baseName() + "] with in-progress module [" + requiredModule.identifier() + "]",
+			requiredModule.parentContext(),
+			requiredModule.pendingKey(),
+			scriptEnvironment.exports()
+		);
 	}
 }

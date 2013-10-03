@@ -16,7 +16,6 @@
 package jj.resource.document;
 
 import jj.execution.ExecutionEvent;
-import jj.script.ScriptExecutionEnvironment;
 
 /**
  * @author jason
@@ -24,17 +23,13 @@ import jj.script.ScriptExecutionEnvironment;
  */
 public class ExecutionEnvironmentInitialized implements ExecutionEvent {
 	
-	private final ScriptExecutionEnvironment executionEnvironment;
+	private final ScriptEnvironment scriptEnvironment;
 
 	public ExecutionEnvironmentInitialized(final ScriptEnvironment scriptEnvironment) {
-		executionEnvironment = null;
+		this.scriptEnvironment = scriptEnvironment;
 	}
 	
-	public ExecutionEnvironmentInitialized(final ScriptExecutionEnvironment executionEnvironment) {
-		this.executionEnvironment = executionEnvironment;
-	}
-	
-	public ScriptExecutionEnvironment executionEnvironment() {
-		return executionEnvironment;
+	public ScriptEnvironment executionEnvironment() {
+		return scriptEnvironment;
 	}
 }

@@ -75,7 +75,7 @@ class DocumentSelection implements Selection {
 	public Selection on(final String type, final String selector, final Callable function) {
 		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeBind(this.selector, selector, type));
 		// this is wrong! we need a way to associate the clients!
-		context.documentScriptExecutionEnvironment().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
+		context.documentScriptEnvironment().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
 	}
 	

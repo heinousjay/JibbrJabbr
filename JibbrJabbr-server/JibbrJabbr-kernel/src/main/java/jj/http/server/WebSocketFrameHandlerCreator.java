@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
-import jj.script.DocumentScriptExecutionEnvironment;
+import jj.resource.document.DocumentScriptEnvironment;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -35,14 +35,14 @@ class WebSocketFrameHandlerCreator {
 		
 		final WebSocketServerHandshaker handshaker;
 		
-		final DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
+		final DocumentScriptEnvironment scriptEnvironment;
 		
 		CreatorModule(
 			final WebSocketServerHandshaker handshaker,
-			final DocumentScriptExecutionEnvironment scriptExecutionEnvironment
+			final DocumentScriptEnvironment scriptExecutionEnvironment
 		) {
 			this.handshaker = handshaker;
-			this.scriptExecutionEnvironment = scriptExecutionEnvironment;
+			this.scriptEnvironment = scriptExecutionEnvironment;
 		}
 
 		@Override
@@ -50,7 +50,7 @@ class WebSocketFrameHandlerCreator {
 			bind(JJWebSocketConnection.class);
 			bind(WebSocketFrameHandler.class);
 			bind(WebSocketServerHandshaker.class).toInstance(handshaker);
-			bind(DocumentScriptExecutionEnvironment.class).toInstance(scriptExecutionEnvironment);
+			bind(DocumentScriptEnvironment.class).toInstance(scriptEnvironment);
 			
 		}
 	}
@@ -64,7 +64,7 @@ class WebSocketFrameHandlerCreator {
 	
 	WebSocketFrameHandler createHandler(
 		final WebSocketServerHandshaker handshaker,
-		final DocumentScriptExecutionEnvironment scriptExecutionEnvironment
+		final DocumentScriptEnvironment scriptExecutionEnvironment
 	) {
 		return parentInjector.createChildInjector(
 			new CreatorModule(handshaker, scriptExecutionEnvironment)

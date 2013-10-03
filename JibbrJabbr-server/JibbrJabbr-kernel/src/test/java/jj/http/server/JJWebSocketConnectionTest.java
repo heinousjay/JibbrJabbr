@@ -23,7 +23,7 @@ import static org.mockito.BDDMockito.*;
 import java.net.InetSocketAddress;
 
 import jj.jjmessage.JJMessage;
-import jj.script.DocumentScriptExecutionEnvironment;
+import jj.resource.document.DocumentScriptEnvironment;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
@@ -47,7 +47,7 @@ import org.mozilla.javascript.Callable;
 public class JJWebSocketConnectionTest {
 	
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
-	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
+	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
 	@Captor ArgumentCaptor<CloseWebSocketFrame> closeFrameCaptor;
 	JJWebSocketConnection connection;
@@ -60,7 +60,7 @@ public class JJWebSocketConnectionTest {
 		
 		given(ctx.channel().remoteAddress()).willReturn(InetSocketAddress.createUnresolved("localhost", 8080));
 		
-		connection = new JJWebSocketConnection(ctx, scriptExecutionEnvironment);
+		connection = new JJWebSocketConnection(ctx, documentScriptEnvironment);
 	}
 
 	@Test

@@ -55,7 +55,7 @@ class PrintFunction extends BaseFunction implements HostObject {
 		Object printString = args[0];
 		if (printString == null) printString = "<null>";
 		if (printString == Undefined.instance) printString = "<undefined>";
-		LoggerFactory.getLogger(context.scriptExecutionEnvironment().scriptName()).debug("{}", printString);
+		LoggerFactory.getLogger(context.scriptEnvironment().scriptName()).debug("{}", printString);
 		return Undefined.instance;
 	}
 	

@@ -3,6 +3,7 @@ package jj.http.server.servable.document;
 
 import static jj.AnswerWithSelf.ANSWER_WITH_SELF;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -12,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jj.execution.MockJJExecutor;
+import jj.execution.ScriptTask;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.document.DocumentFilter;
@@ -40,7 +42,7 @@ public class DocumentRequestProcessorTest {
 	
 	MockJJExecutor executors;
 
-	@Mock DocumentScriptEnvironment dse;
+	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
 	@Mock Channel channel;
 	@Mock Logger access;
@@ -73,6 +75,8 @@ public class DocumentRequestProcessorTest {
 	
 	private static final String HTML = "<html><head><title>what</title></head><body></body></html>";
 	
+	byte[] bytes = HTML.getBytes(UTF_8);
+	
 	@Before
 	public void before() {
 		
@@ -84,13 +88,49 @@ public class DocumentRequestProcessorTest {
 
 		executors = new MockJJExecutor();
 		
-		when(dse.baseName()).thenReturn(baseName);
-		when(dse.document()).thenReturn(document);
+		given(documentScriptEnvironment.baseName()).willReturn(baseName);
+		given(documentScriptEnvironment.document()).willReturn(document);
 		
-		when(httpRequest.uri()).thenReturn("/");
+		given(httpRequest.uri()).willReturn("/");
 		
 		// auto-stubbing the builder pattern
 		httpResponse = mock(HttpResponse.class, ANSWER_WITH_SELF);
+	}
+	
+	private DocumentRequestProcessor toTest(Set<DocumentFilter> filters) {
+		return new DocumentRequestProcessor(executors, scriptRunner, documentScriptEnvironment, httpRequest, httpResponse, filters);
+	}
+	
+	@Test
+	public void testRespondsDirectlyWhenNoServerScript() throws Exception {
+		
+		//given
+		DocumentRequestProcessor toTest = toTest(Collections.<DocumentFilter>emptySet());
+		
+		toTest.process();
+		
+		assertThat(executors.tasks.size(), is(1));
+		assertThat(executors.tasks.get(0), is(instanceOf(ScriptTask.class)));
+		executors.isScriptThread = true;
+		executors.runUntilIdle();
+		
+
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"));
+		verify(httpResponse).content(bytes);
+	}
+	
+	@Test
+	public void testInvokesScriptRunnerWhenScriptIsPresent() throws Exception {
+		
+		// given
+		DocumentRequestProcessor toTest = toTest(Collections.<DocumentFilter>emptySet());
+		given(documentScriptEnvironment.hasServerScript()).willReturn(true);
+		
+		toTest.process();
+		
+		verify(scriptRunner).submit(toTest);
 	}
 
 	@Test
@@ -105,8 +145,7 @@ public class DocumentRequestProcessorTest {
 		filters.add(new TestDocumentFilter(true, 6));
 		filters.add(new TestDocumentFilter(false, 3));
 		
-		DocumentRequestProcessor toTest = 
-			new DocumentRequestProcessor(executors, scriptRunner, dse, httpRequest, httpResponse, filters);
+		DocumentRequestProcessor toTest = toTest(filters);
 		
 		// when
 		executors.isScriptThread = true;
@@ -121,12 +160,10 @@ public class DocumentRequestProcessorTest {
 	@Test
 	public void testWritesDocumentCorrectly() throws Exception {
 		// given
-		DocumentRequestProcessor toTest = 
-				new DocumentRequestProcessor(executors, scriptRunner, dse, httpRequest, httpResponse, Collections.<DocumentFilter>emptySet());
+		DocumentRequestProcessor toTest = toTest(Collections.<DocumentFilter>emptySet());
+				
 		
 		executors.isScriptThread = true;
-		
-		byte[] bytes = HTML.getBytes(UTF_8);
 		
 		// when
 		toTest.respond();

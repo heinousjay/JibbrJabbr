@@ -33,8 +33,8 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
-import jj.script.DocumentScriptExecutionEnvironment;
-import jj.script.ScriptExecutionEnvironmentFinder;
+import jj.resource.ResourceFinder;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
 
 import org.junit.Test;
@@ -54,8 +54,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class WebSocketConnectionMakerTest {
 	
 	@Mock WebSocketFrameHandlerCreator handlerCreator;
-	@Mock ScriptExecutionEnvironmentFinder scriptExecutionEnvironmentFinder;
-	@Mock DocumentScriptExecutionEnvironment scriptExecutionEnvironment;
+
+	@Mock DocumentScriptEnvironment scriptEnvironment;
+	@Mock ResourceFinder resourceFinder;
+	
 	@Mock Channel channel;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock ChannelFuture channelFuture;
@@ -86,16 +88,18 @@ public class WebSocketConnectionMakerTest {
 		verify(channelFuture).addListener(futureListenerCaptor.capture());
 		
 		// given
-		String uri = "uri";
+		String sha = "1234567890123456789012345678901234567890";
+		String uri = "/" + sha + "/somethign.socket";
+		given(scriptEnvironment.sha1()).willReturn(sha);
 		given(request.getUri()).willReturn(uri);
-		given(scriptExecutionEnvironmentFinder.forURIMatch(any(URIMatch.class))).willReturn(scriptExecutionEnvironment);
+		given(resourceFinder.findResource(DocumentScriptEnvironment.class, new URIMatch(uri).name)).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when
 		futureListenerCaptor.getValue().operationComplete(channelFuture);
 		
 		// then
-		verify(handlerCreator).createHandler(handshaker, scriptExecutionEnvironment);
+		verify(handlerCreator).createHandler(handshaker, scriptEnvironment);
 		verify(ctx.pipeline()).replace(eq(JJEngine.toString()), eq(JJWebsocketHandler.toString()), channelHandler.capture());
 	}
 	
@@ -135,7 +139,7 @@ public class WebSocketConnectionMakerTest {
 		// given
 		String uri = "uri";
 		given(request.getUri()).willReturn(uri);
-		given(scriptExecutionEnvironmentFinder.forURIMatch(any(URIMatch.class))).willReturn(null);
+		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), anyString())).willReturn(null);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when

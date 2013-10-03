@@ -61,7 +61,7 @@ class EventMessageProcessor implements WebSocketMessageProcessor {
 		ScriptableObject event = null;
 		try {
 			context.initialize(connection);
-			event = context.scriptExecutionEnvironment().newObject();
+			event = context.scriptEnvironment().newObject();
 			// need to get a way to make the target into the context this for the handler
 			// bound function! it is doable
 			EventSelection target = new EventSelection(message.event().target, context);

@@ -16,7 +16,8 @@
 package jj.resource.document;
 
 /**
- * typesafe argument carrier
+ * type-safe argument carrier for resource creation.  a regrettable necessity,
+ * but a cheap one
  * 
  * @author jason
  *

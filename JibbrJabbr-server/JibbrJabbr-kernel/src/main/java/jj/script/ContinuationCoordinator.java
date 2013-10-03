@@ -11,6 +11,8 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 import jj.logging.EmergencyLogger;
+import jj.resource.document.DocumentScriptEnvironment;
+import jj.resource.document.ScriptEnvironment;
 
 /**
  * Coordinates processing a continuable script, returning the 
@@ -46,52 +48,52 @@ class ContinuationCoordinator {
 		this.continuationProcessors = continuationProcessors;
 	}
 	
-	private void log(final Exception e, final ScriptExecutionEnvironment scriptExecutionEnvironment) {
-		log.error("unexpected problem during script execution {}", scriptExecutionEnvironment);
+	private void log(final Exception e, final ScriptEnvironment scriptEnvironment) {
+		log.error("unexpected problem during script execution {}", scriptEnvironment);
 		log.error("", e);
 	} 
 	
-	private ContinuationState execute(final ContinuationExecution execution, final ScriptExecutionEnvironment scriptExecutionEnvironment) {
+	private ContinuationState execute(final ContinuationExecution execution, final ScriptEnvironment scriptEnvironment) {
 		try (RhinoContext context = contextMaker.context()){
 			execution.run(context);
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
 		} catch (RuntimeException e) {
-			log(e, scriptExecutionEnvironment);
+			log(e, scriptEnvironment);
 		}
 		return null;
 	}
 	
 	/**
 	 * initial execution of a script, either associated to a document, or a required module
-	 * @param scriptExecutionEnvironment
+	 * @param scriptEnvironment
 	 * @return true if completed, false if continued
 	 */
-	boolean execute(final ScriptExecutionEnvironment scriptExecutionEnvironment) {
+	boolean execute(final ScriptEnvironment scriptEnvironment) {
 		
-		assert (scriptExecutionEnvironment != null) : "cannot execute without a script execution environment";
+		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
-		ScriptableObject.putConstProperty(scriptExecutionEnvironment.scope(), "scriptKey", scriptExecutionEnvironment.sha1());
+		ScriptableObject.putConstProperty(scriptEnvironment.scope(), "scriptKey", scriptEnvironment.sha1());
 		
 		return processContinuationState(execute(new ContinuationExecution() {
 			
 			@Override
 			public void run(RhinoContext context) {
-				context.executeScriptWithContinuations(scriptExecutionEnvironment.script(), scriptExecutionEnvironment.scope());
+				context.executeScriptWithContinuations(scriptEnvironment.script(), scriptEnvironment.scope());
 			}
-		}, scriptExecutionEnvironment));
+		}, scriptEnvironment));
 	}
 	
 	/**
 	 * function execution within the context of script associated to a document
-	 * @param scriptExecutionEnvironment
+	 * @param scriptEnvironment
 	 * @param functionName
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	boolean execute(final DocumentScriptExecutionEnvironment scriptExecutionEnvironment, final Callable function, final Object...args) {
+	boolean execute(final DocumentScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		
-		assert (scriptExecutionEnvironment != null) : "cannot execute without a script execution environment";
+		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
 		if (function != null) {
 
@@ -99,13 +101,13 @@ class ContinuationCoordinator {
 				
 				@Override
 				public void run(RhinoContext context) {
-					context.callFunctionWithContinuations(function, scriptExecutionEnvironment.scope(), args);
+					context.callFunctionWithContinuations(function, scriptEnvironment.scope(), args);
 				}
-			}, scriptExecutionEnvironment));
+			}, scriptEnvironment));
 			
 		}
 		
-		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptExecutionEnvironment);
+		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptEnvironment);
 		log.error("helpful stacktrace", new Exception());
 		return false;
 	}
@@ -113,13 +115,13 @@ class ContinuationCoordinator {
 	/**
 	 * Resumes a continuation that was previously saved from an execution in this class
 	 * @param pendingKey
-	 * @param scriptExecutionEnvironment
+	 * @param scriptEnvironment
 	 * @param result
 	 * @return true if completed, false if continued
 	 */
-	boolean resumeContinuation(final String pendingKey, final ScriptExecutionEnvironment scriptExecutionEnvironment, final Object result) {
+	boolean resumeContinuation(final String pendingKey, final ScriptEnvironment scriptEnvironment, final Object result) {
 		
-		assert (scriptExecutionEnvironment != null) : "cannot resume without a script execution environment";
+		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
 		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
 		if (continuation != null) {
@@ -128,12 +130,12 @@ class ContinuationCoordinator {
 				
 				@Override
 				public void run(RhinoContext context) {
-					context.resumeContinuation(continuation.getContinuation(), scriptExecutionEnvironment.scope(), result);
+					context.resumeContinuation(continuation.getContinuation(), scriptEnvironment.scope(), result);
 				}
-			}, scriptExecutionEnvironment));
+			}, scriptEnvironment));
 		}
 		
-		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptExecutionEnvironment, pendingKey);
+		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptEnvironment, pendingKey);
 		log.error("helpful stacktrace", new Exception());
 		return false;
 	}

@@ -21,6 +21,9 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import jj.resource.document.DocumentScriptEnvironment;
+import jj.resource.document.ScriptEnvironment;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,9 +58,9 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Script script;
 	
-	@Mock ScriptExecutionEnvironment scriptExecutionEnvironment;
+	@Mock ScriptEnvironment scriptEnvironment;
 	
-	@Mock DocumentScriptExecutionEnvironment associatedScriptExecutionEnvironment;
+	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
 	@Mock CurrentScriptContext currentScriptContext;
 	
@@ -86,13 +89,13 @@ public class ContinuationCoordinatorTest {
 	@Before
 	public void before() {
 		
-		given(scriptExecutionEnvironment.script()).willReturn(script);
-		given(scriptExecutionEnvironment.scope()).willReturn(scope);
-		given(scriptExecutionEnvironment.sha1()).willReturn(sha1);
+		given(scriptEnvironment.script()).willReturn(script);
+		given(scriptEnvironment.scope()).willReturn(scope);
+		given(scriptEnvironment.sha1()).willReturn(sha1);
 		
-		given(associatedScriptExecutionEnvironment.script()).willReturn(script);
-		given(associatedScriptExecutionEnvironment.scope()).willReturn(scope);
-		given(associatedScriptExecutionEnvironment.sha1()).willReturn(sha1);
+		given(documentScriptEnvironment.script()).willReturn(script);
+		given(documentScriptEnvironment.scope()).willReturn(scope);
+		given(documentScriptEnvironment.sha1()).willReturn(sha1);
 		
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
@@ -109,7 +112,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testInitialExecutionNoContinuation() {
 		
-		boolean result = continuationCoordinator.execute(scriptExecutionEnvironment);
+		boolean result = continuationCoordinator.execute(scriptEnvironment);
 		
 		verify((ConstProperties)scope).putConst("scriptKey", scope, sha1);
 		
@@ -122,7 +125,7 @@ public class ContinuationCoordinatorTest {
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
 		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
-		boolean result = continuationCoordinator.execute(scriptExecutionEnvironment);
+		boolean result = continuationCoordinator.execute(scriptEnvironment);
 
 		assertThat(result, is(false));
 		verify(continuationProcessor1).process(continuationState);
@@ -137,9 +140,9 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(e);
 		
-		continuationCoordinator.execute(scriptExecutionEnvironment);
+		continuationCoordinator.execute(scriptEnvironment);
 		
-		verify(logger).error(logCaptor.capture(), eq(scriptExecutionEnvironment));
+		verify(logger).error(logCaptor.capture(), eq(scriptEnvironment));
 		verify(logger).error("", e);
 		
 		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));
@@ -148,7 +151,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testFunctionExecutionNoContinuation() {
 		
-		boolean result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args[0], args[1]);
+		boolean result = continuationCoordinator.execute(documentScriptEnvironment, function, args[0], args[1]);
 		
 		assertThat(result, is(true));
 	}
@@ -159,7 +162,7 @@ public class ContinuationCoordinatorTest {
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
 		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
 		
-		boolean result = continuationCoordinator.execute(associatedScriptExecutionEnvironment, function, args);
+		boolean result = continuationCoordinator.execute(documentScriptEnvironment, function, args);
 		
 		assertThat(result, is(false));
 		verify(continuationProcessor2).process(continuationState);
@@ -174,9 +177,9 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(e);
 		
-		continuationCoordinator.execute(associatedScriptExecutionEnvironment, function);
+		continuationCoordinator.execute(documentScriptEnvironment, function);
 		
-		verify(logger).error(logCaptor.capture(), eq(associatedScriptExecutionEnvironment));
+		verify(logger).error(logCaptor.capture(), eq(documentScriptEnvironment));
 		verify(logger).error("", e);
 		
 		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));
@@ -187,7 +190,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
 		
-		boolean result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
+		boolean result = continuationCoordinator.resumeContinuation(pendingKey, documentScriptEnvironment, args);
 		
 		assertThat(result, is(true));
 	}
@@ -201,7 +204,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(continuationState.type()).willReturn(ContinuationType.RequiredModule);
 		
-		boolean result = continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
+		boolean result = continuationCoordinator.resumeContinuation(pendingKey, documentScriptEnvironment, args);
 		
 		assertThat(result, is(false));
 		verify(continuationProcessor3).process(continuationState);
@@ -218,9 +221,9 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(e);
 		
-		continuationCoordinator.resumeContinuation(pendingKey, associatedScriptExecutionEnvironment, args);
+		continuationCoordinator.resumeContinuation(pendingKey, documentScriptEnvironment, args);
 		
-		verify(logger).error(logCaptor.capture(), eq(associatedScriptExecutionEnvironment));
+		verify(logger).error(logCaptor.capture(), eq(documentScriptEnvironment));
 		verify(logger).error("", e);
 		
 		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));

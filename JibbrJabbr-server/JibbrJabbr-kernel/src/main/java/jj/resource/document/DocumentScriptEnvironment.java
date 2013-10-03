@@ -106,6 +106,10 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 	public boolean removeFunction(String name, Callable function) {
 		return (functions.get(name) == function) && (functions.remove(name) == function);
 	}
+	
+	public boolean hasServerScript() {
+		return serverScript != null;
+	}
 
 	@Override
 	@IOThread
@@ -123,6 +127,8 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 	private final String baseName;
 	
 	private final String uri;
+	
+	private final String socketUri;
 	
 	private final String sha1;
 	
@@ -150,7 +156,6 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 	) {
 		super(cacheKey, publisher, contextMaker, api);
 		this.baseName = baseName;
-		this.uri = "/" + baseName;
 		
 		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
 		
@@ -166,6 +171,10 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 			sharedScript == null ? "none" : sharedScript.sha1(),
 			serverScript == null ? "none" : serverScript.sha1()
 		);
+		
+
+		this.uri = "/" + sha1 + "/" + baseName;
+		this.socketUri = this.uri + ".socket";
 		
 		if (serverScript == null)  {
 			scope = null;
@@ -269,5 +278,26 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 			}
 		}
 		return stubs.toString();
+	}
+
+	/**
+	 * @return
+	 */
+	public String socketUri() {
+		return socketUri;
+	}
+
+	/**
+	 * @return
+	 */
+	public ScriptResource clientScriptResource() {
+		return clientScript;
+	}
+
+	/**
+	 * @return
+	 */
+	public ScriptResource sharedScriptResource() {
+		return sharedScript;
 	}
 }
