@@ -78,6 +78,8 @@ class LogConfigurator implements JJServerShutdownListener {
 		// just play with this!
 		infoAll();
 		
+		accessLogger(OFF);
+		
 		// and make sure netty logs to our log
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 		
@@ -123,11 +125,11 @@ class LogConfigurator implements JJServerShutdownListener {
 	}
 	
 	protected void infoAll() {
-		logger.setLevel(Level.INFO); // start from clean
+		logger.setLevel(INFO);
 	}
 	
 	protected void traceAll() {
-		logger.setLevel(Level.TRACE); // start from clean
+		logger.setLevel(TRACE);
 	}
 
 	@Override

@@ -18,12 +18,19 @@ package jj.testing;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
+
+import jj.StringUtils;
 import jj.logging.TestRunnerLogger;
 import jj.http.server.TestHttpRequest;
 import jj.http.server.TestHttpResponse;
@@ -110,6 +117,21 @@ class TestRunner {
 		}
 		
 		@Override
+		public TestHttpClient[] requestAllDependencies() throws Exception {
+			List<TestHttpClient> result = new ArrayList<>();
+			Document document = document();
+			if (document != null) {
+				Path basePath = Paths.get(uri());
+				for (Element element : document.select("link[href],script[src],img[src]")) {
+					String href = element.attr("href");
+					if (StringUtils.isEmpty(href)) href = element.attr("src");
+					result.add(app.get(basePath.resolveSibling(href).toAbsolutePath().toString()));
+				}
+			}
+			return result.toArray(new TestHttpClient[result.size()]);
+		}
+		
+		@Override
 		public void dumpObjects() {
 			testRunnerLog.trace("{}", request);
 			testRunnerLog.trace("{}", response);
@@ -142,6 +164,7 @@ class TestRunner {
 		}
 	}
 	
+	private final JJAppTest app;
 	private final TestHttpRequest request;
 	private final TestHttpResponse response;
 	private final TestJJEngineHttpHandler handler;
@@ -149,11 +172,13 @@ class TestRunner {
 	
 	@Inject
 	TestRunner(
+		final JJAppTest app,
 		final TestHttpRequest request,
 		final TestHttpResponse response,
 		final TestJJEngineHttpHandler handler,
 		final @TestRunnerLogger Logger testRunnerLog
 	) {
+		this.app = app;
 		this.request = request;
 		this.response = response;
 		this.handler = handler;

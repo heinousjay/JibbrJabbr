@@ -54,7 +54,7 @@ public class JJAppTest implements TestRule {
 
 		// we use production to eagerly instantiate the graph, since the next line will do
 		// that anyway.
-		injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(appPath, base, description));
+		injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(this, appPath, base, description));
 		return injector.getInstance(AppStatement.class);
 	}
 	
@@ -69,7 +69,6 @@ public class JJAppTest implements TestRule {
 	public TestHttpClient get(final String uri) throws Exception {
 		assertThat("supply a uri please", uri, is(notNullValue()));
 		TestRunner runner = injector.getInstance(TestRunner.class);
-		
 		runner.request().uri(uri)
 			.header(HttpHeaders.Names.HOST, "localhost");
 		

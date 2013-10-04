@@ -122,7 +122,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 
 		if (MimeTypes.get("html").equalsIgnoreCase(header(HttpHeaders.Names.CONTENT_TYPE))) {
 			if (!document.compareAndSet(null, Jsoup.parse(contentsString()))) {
-				new AssertionError("document was null").printStackTrace();
+				new AssertionError("document was not null").printStackTrace();
 			}
 		}
 		

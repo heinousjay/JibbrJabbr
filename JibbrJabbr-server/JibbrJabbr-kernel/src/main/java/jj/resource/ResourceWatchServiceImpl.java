@@ -103,7 +103,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 			// the reloader thread doing other work
 			resource.kill();
 			executors.execute(
-				new IOTask(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.baseName()) {
+				new IOTask(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.cacheKey()) {
 
 
 					@Override

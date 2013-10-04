@@ -183,11 +183,11 @@ interface Selection {
 
 	/**
 	 * Get the combined inner HTML of all matched elements.
-	 * @return string of all element's inner HTML.
+	 * @return js string of all element's inner HTML.
 	 * @see #text()
 	 * @see #outerHtml()
 	 */
-	String html();
+	Object html();
 
 	/**
 	 * Set the inner HTML of each matched element.

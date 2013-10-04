@@ -22,11 +22,11 @@ import org.mozilla.javascript.ScriptableObject;
 
 import jj.StringUtils;
 import jj.engine.EventSelection;
-import jj.engine.ScriptJSON;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
+import jj.script.ScriptJSON;
 import jj.script.ScriptRunner;
 
 /**

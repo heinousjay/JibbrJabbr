@@ -18,9 +18,9 @@ package jj.http.server;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.engine.ScriptJSON;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
+import jj.script.ScriptJSON;
 import jj.script.ScriptRunner;
 
 /**

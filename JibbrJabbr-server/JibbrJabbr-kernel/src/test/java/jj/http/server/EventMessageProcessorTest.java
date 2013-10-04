@@ -21,13 +21,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import jj.engine.EventSelection;
-import jj.engine.ScriptJSON;
 import jj.http.server.EventMessageProcessor;
 import jj.http.server.JJWebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
+import jj.script.ScriptJSON;
 import jj.script.ScriptRunner;
 
 import org.junit.Test;

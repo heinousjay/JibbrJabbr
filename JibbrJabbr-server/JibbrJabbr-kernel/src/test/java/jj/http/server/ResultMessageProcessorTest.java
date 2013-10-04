@@ -16,9 +16,9 @@
 package jj.http.server;
 
 import static org.mockito.BDDMockito.*;
-import jj.engine.ScriptJSON;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
+import jj.script.ScriptJSON;
 import jj.script.ScriptRunner;
 
 import org.junit.Before;

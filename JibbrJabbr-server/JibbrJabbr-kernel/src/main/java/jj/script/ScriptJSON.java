@@ -1,20 +1,15 @@
-package jj.engine;
+package jj.script;
 
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Parses a JSON string into an object suitable to be
- * used in the script host.
- * 
- * this isn't a host object but it's a part of the script
- * host so it goes here.
+ * used in the script engine
  * @author jason
  *
  */

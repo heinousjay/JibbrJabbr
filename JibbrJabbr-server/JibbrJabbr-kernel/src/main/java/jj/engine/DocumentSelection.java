@@ -10,6 +10,7 @@ import jj.script.EventNameHelper;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.mozilla.javascript.Callable;
+import org.mozilla.javascript.Context;
 
 
 /**
@@ -220,8 +221,8 @@ class DocumentSelection implements Selection {
 	}
 
 	@Override
-	public String html() {
-		return elements.html();
+	public Object html() {
+		return Context.javaToJS(elements.html(), context.scriptEnvironment().scope());
 	}
 
 	public String outerHtml() {

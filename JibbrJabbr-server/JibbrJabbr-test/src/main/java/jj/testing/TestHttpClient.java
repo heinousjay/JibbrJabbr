@@ -55,4 +55,10 @@ public interface TestHttpClient {
 	 * @throws Exception 
 	 */
 	boolean matchesHeaders(HttpHeaders headers) throws Exception;
+	/**
+	 * @return 
+	 * @throws Exception 
+	 * 
+	 */
+	TestHttpClient[] requestAllDependencies() throws Exception;
 }

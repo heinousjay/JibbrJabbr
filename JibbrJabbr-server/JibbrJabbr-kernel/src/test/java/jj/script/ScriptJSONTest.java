@@ -1,12 +1,11 @@
-package jj.engine;
+package jj.script;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
-import jj.engine.ScriptJSON;
-import jj.script.RealRhinoContextMaker;
+import jj.script.ScriptJSON;
 
 import org.junit.Test;
 

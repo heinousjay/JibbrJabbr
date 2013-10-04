@@ -142,7 +142,7 @@ public class BasicServingTest {
 			final VerifiableRequest request = maker.make();
 			final TestHttpClient client = app.get(request.uri);
 			try {
-				
+				client.requestAllDependencies();
 				assertThat(client.status(), is(HttpResponseStatus.OK));
 				assertThat(new String(client.contentBytes(), UTF_8), is(new String(request.bytes, UTF_8)));
 			} catch (Error e) {

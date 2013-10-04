@@ -27,6 +27,7 @@ import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceCreator;
 
 import com.google.inject.TypeLiteral;
+import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 
 
@@ -44,6 +45,22 @@ public class ResourceModule extends JJModule {
 	public ResourceModule(final boolean isTest) {
 		this.isTest = isTest;
 	}
+	
+	private MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreatorBinder;
+	
+	@SuppressWarnings("unchecked")
+	protected <T extends Resource, U extends ResourceCreator<T>> LinkedBindingBuilder<U> bindCreationOf(Class<T> key) {
+		if (resourceCreatorBinder == null) {
+			resourceCreatorBinder = 
+				MapBinder.newMapBinder(
+					binder(),
+					new TypeLiteral<Class<? extends Resource>>() {},
+					new TypeLiteral<ResourceCreator<? extends Resource>>() {}
+				);
+		}
+		
+		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);
+	}
 
 	@Override
 	protected void configure() {
@@ -51,28 +68,27 @@ public class ResourceModule extends JJModule {
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
 		addShutdownListenerBinding().to(ResourceCacheImpl.class);
 		
-		MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreatorBinder = 
-			MapBinder.newMapBinder(
-				binder(),
-				new TypeLiteral<Class<? extends Resource>>() {},
-				new TypeLiteral<ResourceCreator<? extends Resource>>() {}
-			);
-		resourceCreatorBinder.addBinding(AssetResource.class).to(AssetResourceCreator.class);
-		resourceCreatorBinder.addBinding(ConfigResource.class).to(ConfigResourceCreator.class);
-		resourceCreatorBinder.addBinding(CssResource.class).to(CssResourceCreator.class);
-		resourceCreatorBinder.addBinding(HtmlResource.class).to(HtmlResourceCreator.class);
-		resourceCreatorBinder.addBinding(ScriptResource.class).to(ScriptResourceCreator.class);
-		resourceCreatorBinder.addBinding(Sha1Resource.class).to(Sha1ResourceCreator.class);
-		resourceCreatorBinder.addBinding(SpecResource.class).to(SpecResourceCreator.class);
-		resourceCreatorBinder.addBinding(StaticResource.class).to(StaticResourceCreator.class);
-		resourceCreatorBinder.addBinding(PropertiesResource.class).to(PropertiesResourceCreator.class);
-		resourceCreatorBinder.addBinding(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
-		resourceCreatorBinder.addBinding(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
+		bindCreationOf(AssetResource.class).to(AssetResourceCreator.class);
+		
+		bindCreationOf(ConfigResource.class).to(ConfigResourceCreator.class);
+		
+		bindCreationOf(CssResource.class).to(CssResourceCreator.class);
+		
+		bindCreationOf(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		
+		bindCreationOf(SpecResource.class).to(SpecResourceCreator.class);
+		
+		bindCreationOf(StaticResource.class).to(StaticResourceCreator.class);
+		
+		bindCreationOf(PropertiesResource.class).to(PropertiesResourceCreator.class);
+
+		
+		bindCreationOf(HtmlResource.class).to(HtmlResourceCreator.class);
+		bindCreationOf(ScriptResource.class).to(ScriptResourceCreator.class);
+		bindCreationOf(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
+		bindCreationOf(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
 		
 		
-		// these guys love each other but it's easier to manage the implementation
-		// in two classes so i don't feel this is a big burden.  there may be a 
-		// better design lurking.
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
 		
 		if (!isTest) {
