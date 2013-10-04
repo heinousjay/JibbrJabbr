@@ -79,4 +79,9 @@ class ScriptContext {
 		this.moduleScriptEnvironment = null;
 		this.requiredModule = null;
 	}
+	
+	@Override
+	public String toString() {
+		return type.toString();
+	}
 }
