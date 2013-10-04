@@ -118,7 +118,15 @@ public class CurrentScriptContext implements Closeable {
 	}
 	
 	public void restore(ScriptContext scriptContext) {
-		assert currentContext.get() == null : "cannot restore a context on top of another context";
+		if (currentContext.get() != null) {
+			throw new AssertionError(
+				String.format(
+					"cannot restore a context %s on top of existing context (%s)",
+					scriptContext,
+					currentContext.get()
+				)
+			);
+		}
 		currentContext.set(scriptContext);
 	}
 	
