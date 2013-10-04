@@ -98,9 +98,9 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	}
 
 	public String toString() {
-		return new StringBuilder(getClass().getName())
+		return new StringBuilder(getClass().getSimpleName())
 			.append("[")
-			.append(baseName()).append("/").append(scriptName())
+			.append(baseName())
 			.append("@").append(sha1())
 			.append("] {")
 			.append("state=").append(state)
