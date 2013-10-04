@@ -36,6 +36,6 @@ public class ModuleParent {
 	
 	@Override
 	public String toString() {
-		return scriptEnvironment.uri();
+		return scriptEnvironment.baseName();
 	}
 }

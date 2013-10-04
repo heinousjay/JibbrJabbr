@@ -108,7 +108,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	public void testUri() {
 		
 		ScriptEnvironment se = mock(ScriptEnvironment.class);
-		given(se.uri()).willReturn("parentUri");
+		given(se.baseName()).willReturn("parentUri");
 		
 		ModuleScriptEnvironmentCreator msec = toTest();
 		
