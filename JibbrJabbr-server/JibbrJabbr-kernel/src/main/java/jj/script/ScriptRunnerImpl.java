@@ -15,7 +15,6 @@ import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.ModuleScriptEnvironment;
-import jj.resource.document.ScriptEnvironment;
 
 /**
  * Coordinates script processing in response to http requests,
@@ -171,20 +170,6 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 				}
 			}
 		});
-	}
-	
-	public void submit(final ScriptEnvironment scriptEnvironment) {
-		
-		executors.execute(new ScriptTask("", scriptEnvironment.baseName()) {
-
-			@Override
-			protected void run() throws Exception {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
-		
 	}
 	
 	@Override
