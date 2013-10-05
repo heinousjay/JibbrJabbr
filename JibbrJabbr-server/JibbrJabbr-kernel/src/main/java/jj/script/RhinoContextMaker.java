@@ -42,6 +42,7 @@ public class RhinoContextMaker {
 		this.logger = logger;
 		try (RhinoContext context = new RhinoContext(Context.enter(), logger)) {
 			generalScope = context.initStandardObjects(true);
+			generalScope.sealObject();
 		}
 	}
 

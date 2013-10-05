@@ -154,7 +154,7 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 		final EngineAPI api,
 		final Publisher publisher
 	) {
-		super(cacheKey, publisher, contextMaker, api);
+		super(cacheKey, publisher, contextMaker);
 		this.baseName = baseName;
 		
 		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
@@ -180,7 +180,7 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 			scope = null;
 			script = null;
 		} else {
-			scope = createLocalScope(baseName);
+			scope = createLocalScope(baseName, api.global());
 			
 			try {
 				script = compile();

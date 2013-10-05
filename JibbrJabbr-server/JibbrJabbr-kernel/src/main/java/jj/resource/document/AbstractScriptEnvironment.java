@@ -19,7 +19,6 @@ import static jj.resource.document.ScriptExecutionState.*;
 
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.resource.AbstractResourceBase;
 import jj.resource.ResourceCacheKey;
@@ -37,8 +36,6 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	
 	protected final RhinoContextMaker contextMaker;
 	
-	protected final EngineAPI api;
-	
 	protected ScriptExecutionState state = Unitialized;
 	
 	/**
@@ -47,13 +44,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	protected AbstractScriptEnvironment(
 		final ResourceCacheKey cacheKey,
 		final Publisher publisher,
-		final RhinoContextMaker contextMaker,
-		final EngineAPI api
+		final RhinoContextMaker contextMaker
 	) {
 		super(cacheKey);
 		this.publisher = publisher;
 		this.contextMaker = contextMaker;
-		this.api = api;
 	}
 	
 	@Override
@@ -108,43 +103,47 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 			.toString();
 	}
 
-	protected ScriptableObject createLocalScope(final String moduleIdentifier) {
+	protected ScriptableObject createLocalScope(final String moduleIdentifier, final ScriptableObject global) {
 		try (RhinoContext context = contextMaker.context()) {
 			
 			// this technique allows for a "local" global scope that wraps a read-only global
 			// scope that provides a server-wide API installation - effectively sealing the
 			// API to prevent it from being manipulated and allowing it to be shared in a safe
 			// manner
-			ScriptableObject local = context.newObject(api.global());
-			local.setPrototype(api.global());
+			ScriptableObject local = context.newObject(global);
+			local.setPrototype(global);
 			local.setParentScope(null);
 
-			// setting up the 'module' property as described in 
-			// the commonjs module 1.1.1 specification
-			// in the case of the top-level server script, the id
-			// will be the baseName, which fortunately happens to be
-			// exactly what is required
-			ScriptableObject module = context.newObject(local);
-			ScriptableObject exports = context.newObject(local);
-			module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
-			module.defineProperty("exports", exports, ScriptableObject.EMPTY);
-			
-			local.defineProperty("module", module, ScriptableObject.CONST);
-			local.defineProperty("exports", exports, ScriptableObject.CONST);
-			
-			// define the require method and the exports object here as well.
-			// follow the node.js concept of module.exports === exports, and
-			// assigning to module.exports changes the exports object,
-			// potentially to a function
-			Object require = context.evaluateString(local, "global['//makeRequire'](module);", "making require");
-			local.defineProperty(
-				"require",
-				require,
-				ScriptableObject.CONST
-			);
+			configureModuleObjects(moduleIdentifier, context, local);
 			
 			return local;
 		}
+	}
+
+	protected void configureModuleObjects(final String moduleIdentifier, RhinoContext context, ScriptableObject local) {
+		// setting up the 'module' property as described in 
+		// the commonjs module 1.1.1 specification
+		// in the case of the top-level server script, the id
+		// will be the baseName, which fortunately happens to be
+		// exactly what is required
+		ScriptableObject module = context.newObject(local);
+		ScriptableObject exports = context.newObject(local);
+		module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
+		module.defineProperty("exports", exports, ScriptableObject.EMPTY);
+		
+		local.defineProperty("module", module, ScriptableObject.CONST);
+		local.defineProperty("exports", exports, ScriptableObject.CONST);
+		
+		// define the require method and the exports object here as well.
+		// follow the node.js concept of module.exports === exports, and
+		// assigning to module.exports changes the exports object,
+		// potentially to a function
+		Object require = context.evaluateString(local, "global['//makeRequire'](module);", "making require");
+		local.defineProperty(
+			"require",
+			require,
+			ScriptableObject.CONST
+		);
 	}
 
 }

@@ -112,7 +112,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 		final EngineAPI api,
 		final ResourceFinder resourceFinder
 	) {
-		super(cacheKey, publisher, contextMaker, api);
+		super(cacheKey, publisher, contextMaker);
 		
 		this.moduleIdentifier = moduleIdentifier;
 		
@@ -128,7 +128,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 		this.parent.scriptEnvironment().addDependent(this);
 		
 		sha1 = scriptResource.sha1();
-		scope = createLocalScope(moduleIdentifier);
+		scope = createLocalScope(moduleIdentifier, api.global());
 		
 		try (RhinoContext context = contextMaker.context()) {
 			

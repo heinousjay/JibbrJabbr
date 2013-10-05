@@ -44,7 +44,7 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 		return Jsoup.parse(readPath(me.resolveSibling(DollarFunctionTest.class.getSimpleName() + ".html")));
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void test() throws Exception {
 		

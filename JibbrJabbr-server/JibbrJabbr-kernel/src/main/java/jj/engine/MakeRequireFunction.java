@@ -82,7 +82,7 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 	
 	private String toModuleIdentifier(final String input, final String base) {
 		return configuration.appPath().relativize(
-			configuration.appPath().resolve(base).getParent().resolve(input).normalize()
+			configuration.appPath().resolve(base).resolveSibling(input).normalize()
 		).toString();
 	}
 	

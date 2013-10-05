@@ -5,9 +5,7 @@ describe('selecting from the DOM', function() {
 		//expect(body).not.toBeNull();
 		
 		var p = body.select('p');
-		expect(typeof p.text()).toBe("string");
-		
-		expect('my balls').toBe('squished');
+		expect(String(p.text())).toBe("1 2 3");
 	});
 	
 	it('can confuse me', function() {
