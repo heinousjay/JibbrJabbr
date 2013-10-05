@@ -269,6 +269,7 @@ public class ResourceWatchServiceImplTest {
 		verify(resourceFinder).loadResource(StaticResource.class, "test.less");
 		verify(resourceFinder).loadResource(StaticResource.class, "test2.less");
 		
+		// verifying this to ensure that the dependency cycles didn't result in additional load requests
 		verifyNoMoreInteractions(resourceFinder);
 	}
 }
