@@ -26,10 +26,6 @@ import jj.resource.spec.SpecResourceCreator;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceCreator;
 
-import com.google.inject.TypeLiteral;
-import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.multibindings.MapBinder;
-
 
 public class ResourceModule extends JJModule {
 	
@@ -45,22 +41,6 @@ public class ResourceModule extends JJModule {
 	public ResourceModule(final boolean isTest) {
 		this.isTest = isTest;
 	}
-	
-	private MapBinder<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreatorBinder;
-	
-	@SuppressWarnings("unchecked")
-	protected <T extends Resource, U extends ResourceCreator<T>> LinkedBindingBuilder<U> bindCreationOf(Class<T> key) {
-		if (resourceCreatorBinder == null) {
-			resourceCreatorBinder = 
-				MapBinder.newMapBinder(
-					binder(),
-					new TypeLiteral<Class<? extends Resource>>() {},
-					new TypeLiteral<ResourceCreator<? extends Resource>>() {}
-				);
-		}
-		
-		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);
-	}
 
 	@Override
 	protected void configure() {
@@ -68,25 +48,27 @@ public class ResourceModule extends JJModule {
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
 		addShutdownListenerBinding().to(ResourceCacheImpl.class);
 		
-		bindCreationOf(AssetResource.class).to(AssetResourceCreator.class);
+		ResourceCreatorBinder bindCreation = new ResourceCreatorBinder(binder());
 		
-		bindCreationOf(ConfigResource.class).to(ConfigResourceCreator.class);
+		bindCreation.of(AssetResource.class).to(AssetResourceCreator.class);
 		
-		bindCreationOf(CssResource.class).to(CssResourceCreator.class);
+		bindCreation.of(ConfigResource.class).to(ConfigResourceCreator.class);
 		
-		bindCreationOf(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		bindCreation.of(CssResource.class).to(CssResourceCreator.class);
 		
-		bindCreationOf(SpecResource.class).to(SpecResourceCreator.class);
+		bindCreation.of(Sha1Resource.class).to(Sha1ResourceCreator.class);
 		
-		bindCreationOf(StaticResource.class).to(StaticResourceCreator.class);
+		bindCreation.of(SpecResource.class).to(SpecResourceCreator.class);
 		
-		bindCreationOf(PropertiesResource.class).to(PropertiesResourceCreator.class);
+		bindCreation.of(StaticResource.class).to(StaticResourceCreator.class);
+		
+		bindCreation.of(PropertiesResource.class).to(PropertiesResourceCreator.class);
 
 		
-		bindCreationOf(HtmlResource.class).to(HtmlResourceCreator.class);
-		bindCreationOf(ScriptResource.class).to(ScriptResourceCreator.class);
-		bindCreationOf(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
-		bindCreationOf(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
+		bindCreation.of(HtmlResource.class).to(HtmlResourceCreator.class);
+		bindCreation.of(ScriptResource.class).to(ScriptResourceCreator.class);
+		bindCreation.of(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
+		bindCreation.of(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
 		
 		
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
