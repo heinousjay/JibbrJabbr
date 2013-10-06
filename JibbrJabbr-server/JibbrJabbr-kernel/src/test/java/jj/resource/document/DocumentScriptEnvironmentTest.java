@@ -30,6 +30,8 @@ import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
 import jj.script.MockRhinoContextMaker;
 
 import org.junit.Before;

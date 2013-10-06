@@ -1,4 +1,4 @@
-package jj.resource.document;
+package jj.resource.script;
 
 import java.io.IOException;
 import java.net.URI;

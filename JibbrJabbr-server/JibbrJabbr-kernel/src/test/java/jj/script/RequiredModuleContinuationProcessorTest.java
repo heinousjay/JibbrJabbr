@@ -25,8 +25,9 @@ import jj.execution.IOTask;
 import jj.execution.MockJJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.ModuleParent;
-import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.script.ModuleParent;
+import jj.resource.script.ModuleScriptEnvironment;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

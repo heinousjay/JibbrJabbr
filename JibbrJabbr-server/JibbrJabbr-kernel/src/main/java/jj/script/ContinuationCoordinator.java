@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 
 import jj.logging.EmergencyLogger;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.ScriptEnvironment;
+import jj.resource.script.ScriptEnvironment;
 
 /**
  * Coordinates processing a continuable script, returning the 

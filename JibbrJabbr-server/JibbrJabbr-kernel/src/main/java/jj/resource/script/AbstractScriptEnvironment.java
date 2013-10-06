@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.document;
+package jj.resource.script;
 
-import static jj.resource.document.ScriptExecutionState.*;
+import static jj.resource.script.ScriptExecutionState.*;
 
 import org.mozilla.javascript.ScriptableObject;
 

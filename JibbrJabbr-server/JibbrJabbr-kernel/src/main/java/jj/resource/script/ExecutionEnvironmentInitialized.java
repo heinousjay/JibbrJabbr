@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.document;
+package jj.resource.script;
+
+import jj.execution.ExecutionEvent;
 
 /**
- * type-safe argument carrier for resource creation.  a regrettable necessity,
- * but a cheap one
- * 
  * @author jason
  *
  */
-public class ModuleParent {
+public class ExecutionEnvironmentInitialized implements ExecutionEvent {
 	
 	private final ScriptEnvironment scriptEnvironment;
 
-	public ModuleParent(final ScriptEnvironment scriptEnvironment) {
+	public ExecutionEnvironmentInitialized(final ScriptEnvironment scriptEnvironment) {
 		this.scriptEnvironment = scriptEnvironment;
 	}
 	
-	ScriptEnvironment scriptEnvironment() {
+	public ScriptEnvironment executionEnvironment() {
 		return scriptEnvironment;
-	}
-	
-	@Override
-	public String toString() {
-		return scriptEnvironment.baseName();
 	}
 }

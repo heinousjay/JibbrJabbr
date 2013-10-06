@@ -24,8 +24,8 @@ import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.ModuleScriptEnvironment;
-import jj.resource.document.ScriptEnvironment;
+import jj.resource.script.ModuleScriptEnvironment;
+import jj.resource.script.ScriptEnvironment;
 
 import org.junit.Before;
 import org.junit.Test;

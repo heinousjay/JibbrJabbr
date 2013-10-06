@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.document;
+package jj.resource.script;
 
 import static org.mockito.BDDMockito.*;
 import static org.junit.Assert.*;
@@ -34,6 +34,12 @@ import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.ResourceMaker;
+import jj.resource.script.ModuleParent;
+import jj.resource.script.ModuleScriptEnvironment;
+import jj.resource.script.ModuleScriptEnvironmentCreator;
+import jj.resource.script.ScriptEnvironment;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
 import jj.script.MockRhinoContextMaker;
 
 /**

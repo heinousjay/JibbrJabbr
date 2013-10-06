@@ -47,17 +47,6 @@ import org.junit.Test;
  */
 public class BasicServingTest {
 	
-	public static class VerifiableRequest {
-		
-		public final String uri;
-		public final byte[] bytes;
-		
-		public VerifiableRequest(final String uri, final byte[] bytes) {
-			this.uri = uri;
-			this.bytes = bytes;
-		}
-	}
-	
 	/**
 	 * 
 	 */

@@ -22,8 +22,8 @@ import org.slf4j.Logger;
 import jj.configuration.Configuration;
 import jj.resource.document.HtmlResource;
 import jj.resource.document.HtmlResourceMaker;
-import jj.resource.document.ScriptResource;
-import jj.resource.document.ScriptResourceMaker;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceMaker;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
 

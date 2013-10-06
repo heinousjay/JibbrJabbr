@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.document;
-
-import jj.configuration.Configuration;
-import jj.resource.ResourceInstanceCreator;
+package jj.resource.script;
 
 /**
+ * type-safe argument carrier for resource creation.  a regrettable necessity,
+ * but a cheap one
+ * 
  * @author jason
  *
  */
-public class ScriptResourceMaker {
+public class ModuleParent {
+	
+	private final ScriptEnvironment scriptEnvironment;
 
-	/**
-	 * @param configuration
-	 * @param creator
-	 * @param baseName
-	 * @return
-	 */
-	public static ScriptResource make(Configuration configuration, ResourceInstanceCreator creator, String baseName) throws Exception {
-		return new ScriptResourceCreator(configuration, creator).create(baseName);
+	public ModuleParent(final ScriptEnvironment scriptEnvironment) {
+		this.scriptEnvironment = scriptEnvironment;
 	}
-
+	
+	ScriptEnvironment scriptEnvironment() {
+		return scriptEnvironment;
+	}
+	
+	@Override
+	public String toString() {
+		return scriptEnvironment.baseName();
+	}
 }

@@ -20,8 +20,8 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
-import jj.resource.document.ModuleParent;
-import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.script.ModuleParent;
+import jj.resource.script.ModuleScriptEnvironment;
 import jj.script.CurrentScriptContext;
 import jj.script.RequiredModule;
 

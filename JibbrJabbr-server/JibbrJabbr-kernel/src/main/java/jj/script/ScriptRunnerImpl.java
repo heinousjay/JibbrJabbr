@@ -14,7 +14,7 @@ import jj.execution.ScriptThread;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.script.ModuleScriptEnvironment;
 
 /**
  * Coordinates script processing in response to http requests,

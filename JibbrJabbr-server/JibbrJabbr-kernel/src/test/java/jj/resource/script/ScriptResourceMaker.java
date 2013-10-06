@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.document;
+package jj.resource.script;
 
-import jj.execution.ExecutionEvent;
+import jj.configuration.Configuration;
+import jj.resource.ResourceInstanceCreator;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceCreator;
 
 /**
  * @author jason
  *
  */
-public class ExecutionEnvironmentInitialized implements ExecutionEvent {
-	
-	private final ScriptEnvironment scriptEnvironment;
+public class ScriptResourceMaker {
 
-	public ExecutionEnvironmentInitialized(final ScriptEnvironment scriptEnvironment) {
-		this.scriptEnvironment = scriptEnvironment;
+	/**
+	 * @param configuration
+	 * @param creator
+	 * @param baseName
+	 * @return
+	 */
+	public static ScriptResource make(Configuration configuration, ResourceInstanceCreator creator, String baseName) throws Exception {
+		return new ScriptResourceCreator(configuration, creator).create(baseName);
 	}
-	
-	public ScriptEnvironment executionEnvironment() {
-		return scriptEnvironment;
-	}
+
 }

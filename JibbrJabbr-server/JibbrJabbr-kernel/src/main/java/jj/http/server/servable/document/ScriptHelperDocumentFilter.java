@@ -9,7 +9,7 @@ import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.ScriptResourceType;
+import jj.resource.script.ScriptResourceType;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

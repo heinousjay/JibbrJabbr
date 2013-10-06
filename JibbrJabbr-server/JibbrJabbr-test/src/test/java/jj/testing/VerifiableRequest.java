@@ -13,40 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.document;
+package jj.testing;
 
-/**
- * @author jason
- *
- */
-public enum ScriptResourceType {
-	Client {
-		@Override
-		public String suffix(String baseName)  {
-			return baseName + ".js";
-		}
-	},
+public class VerifiableRequest {
 	
-	Module {
-		@Override
-		public String suffix(String baseName)  {
-			return baseName + ".js";
-		}
-	},
+	public final String uri;
+	public final byte[] bytes;
 	
-	Shared {
-		@Override
-		public String suffix(String baseName) {
-			return baseName + ".shared.js";
-		}
-	},
-	
-	Server {
-		@Override
-		public String suffix(String baseName) {
-			return baseName + ".server.js";
-		}
-	};
-	
-	public abstract String suffix(final String baseName);
+	public VerifiableRequest(final String uri, final byte[] bytes) {
+		this.uri = uri;
+		this.bytes = bytes;
+	}
 }

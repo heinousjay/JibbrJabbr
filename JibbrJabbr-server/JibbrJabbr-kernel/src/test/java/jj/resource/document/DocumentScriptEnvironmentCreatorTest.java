@@ -29,6 +29,8 @@ import jj.resource.ResourceMaker;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.DocumentScriptEnvironmentCreator;
 import jj.resource.document.HtmlResource;
+import jj.resource.script.ScriptResource;
+import jj.resource.script.ScriptResourceType;
 import jj.script.MockRhinoContextMaker;
 
 /**

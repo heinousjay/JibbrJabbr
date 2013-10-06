@@ -22,8 +22,8 @@ import jj.engine.RequiredModuleException;
 import jj.execution.IOTask;
 import jj.execution.JJExecutor;
 import jj.resource.ResourceFinder;
-import jj.resource.document.ModuleParent;
-import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.script.ModuleParent;
+import jj.resource.script.ModuleScriptEnvironment;
 
 /**
  * @author jason

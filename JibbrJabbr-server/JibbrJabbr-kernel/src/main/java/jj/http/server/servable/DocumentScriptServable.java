@@ -12,7 +12,7 @@ import javax.inject.Singleton;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.ScriptResource;
+import jj.resource.script.ScriptResource;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;

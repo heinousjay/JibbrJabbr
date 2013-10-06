@@ -5,7 +5,7 @@ import static jj.script.ScriptContextType.*;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.script.ModuleScriptEnvironment;
 
 class ScriptContext {
 	
