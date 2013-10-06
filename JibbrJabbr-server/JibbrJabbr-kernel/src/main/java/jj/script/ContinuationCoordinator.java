@@ -11,7 +11,6 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 import jj.logging.EmergencyLogger;
-import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ScriptEnvironment;
 
 /**
@@ -65,7 +64,7 @@ class ContinuationCoordinator {
 	}
 	
 	/**
-	 * initial execution of a script, either associated to a document, or a required module
+	 * initial execution of a script environment
 	 * @param scriptEnvironment
 	 * @return true if completed, false if continued
 	 */
@@ -85,13 +84,13 @@ class ContinuationCoordinator {
 	}
 	
 	/**
-	 * function execution within the context of script associated to a document
+	 * function execution within the context of script environment
 	 * @param scriptEnvironment
 	 * @param functionName
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	boolean execute(final DocumentScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
+	boolean execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -119,7 +118,7 @@ class ContinuationCoordinator {
 	 * @param result
 	 * @return true if completed, false if continued
 	 */
-	boolean resumeContinuation(final String pendingKey, final ScriptEnvironment scriptEnvironment, final Object result) {
+	boolean resumeContinuation(final ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		

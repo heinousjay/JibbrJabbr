@@ -190,7 +190,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
 		
-		boolean result = continuationCoordinator.resumeContinuation(pendingKey, documentScriptEnvironment, args);
+		boolean result = continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
 		
 		assertThat(result, is(true));
 	}
@@ -204,7 +204,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(continuationState.type()).willReturn(ContinuationType.RequiredModule);
 		
-		boolean result = continuationCoordinator.resumeContinuation(pendingKey, documentScriptEnvironment, args);
+		boolean result = continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
 		
 		assertThat(result, is(false));
 		verify(continuationProcessor3).process(continuationState);
@@ -221,7 +221,7 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(e);
 		
-		continuationCoordinator.resumeContinuation(pendingKey, documentScriptEnvironment, args);
+		continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
 		
 		verify(logger).error(logCaptor.capture(), eq(documentScriptEnvironment));
 		verify(logger).error("", e);

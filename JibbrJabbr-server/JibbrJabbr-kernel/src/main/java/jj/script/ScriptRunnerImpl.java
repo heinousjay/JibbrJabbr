@@ -62,7 +62,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	@ScriptThread
 	private void resumeHttpRequestInitialExecution(String pendingKey, Object result) {
 		log.trace("resuming initial execution of a script execution environment");
-		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptEnvironment(), result)) {
+		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result)) {
 			context.scriptEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
@@ -92,7 +92,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeReadyFunction(String pendingKey, Object result) {
 		log.trace("resuming ready function execution of a script execution environment");
 		
-		if (continuationCoordinator.resumeContinuation(pendingKey, context.documentScriptEnvironment(), result)) {
+		if (continuationCoordinator.resumeContinuation(context.documentScriptEnvironment(), pendingKey, result)) {
 			log.trace("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
 		}
@@ -146,7 +146,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeModuleInitialExecution(final String pendingKey, final Object result) {
 		log.debug("resuming initial execution of a required module");
 		
-		if (continuationCoordinator.resumeContinuation(pendingKey, context.scriptEnvironment(), result)) {
+		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result)) {
 			context.scriptEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			completeModuleInitialization();
@@ -215,8 +215,8 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	@ScriptThread
 	private void resumeContinuation(final String pendingKey, final Object result) {
 		continuationCoordinator.resumeContinuation(
-			pendingKey,
 			context.scriptEnvironment(),
+			pendingKey,
 			result
 		);
 	}

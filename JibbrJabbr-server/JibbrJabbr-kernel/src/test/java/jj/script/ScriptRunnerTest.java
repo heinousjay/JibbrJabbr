@@ -125,7 +125,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
-		given(continuationCoordinator.resumeContinuation("", documentScriptEnvironment, null)).willReturn(true);
+		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(true);
 		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(true);
 		
 		// when
@@ -158,7 +158,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
-		given(continuationCoordinator.resumeContinuation("", documentScriptEnvironment, null)).willReturn(true);
+		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(true);
 		
 		// when
 		scriptRunner.submit("", httpRequestContext, "", null);
@@ -199,7 +199,7 @@ public class ScriptRunnerTest {
 		givenAWebSocketMessage();
 		given(currentScriptContext.scriptEnvironment()).willReturn(documentScriptEnvironment);
 		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction, connection)).willReturn(false);
-		given(continuationCoordinator.resumeContinuation(anyString(), any(ScriptEnvironment.class), any()))
+		given(continuationCoordinator.resumeContinuation(any(ScriptEnvironment.class), anyString(), any()))
 			.willReturn(false)
 			.willReturn(true);
 		
@@ -219,7 +219,7 @@ public class ScriptRunnerTest {
 		executors.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation(anyString(), any(ScriptEnvironment.class), any());
+		verify(continuationCoordinator, times(2)).resumeContinuation(any(ScriptEnvironment.class), anyString(), any());
 	}
 	
 	@Test
@@ -281,7 +281,7 @@ public class ScriptRunnerTest {
 		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
 		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(false);
 		
-		given(continuationCoordinator.resumeContinuation(anyString(), any(ScriptEnvironment.class), any()))
+		given(continuationCoordinator.resumeContinuation(any(ScriptEnvironment.class), anyString(), any()))
 			.willReturn(false)
 			.willReturn(true);
 		
@@ -301,7 +301,7 @@ public class ScriptRunnerTest {
 		executors.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation(anyString(), any(ScriptEnvironment.class), any());
+		verify(continuationCoordinator, times(2)).resumeContinuation(any(ScriptEnvironment.class), anyString(), any());
 	}
 	
 	@Test
@@ -317,7 +317,7 @@ public class ScriptRunnerTest {
 		executors.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).resumeContinuation(key, null, value);
+		verify(continuationCoordinator).resumeContinuation(null, key, value);
 	}
 	
 	private RequiredModule givenAModuleRequire() {
@@ -355,7 +355,7 @@ public class ScriptRunnerTest {
 		
 		// then
 		verify(moduleScriptEnvironment).initialized(true);
-		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptEnvironment, scriptable);
+		verify(continuationCoordinator).resumeContinuation(moduleScriptEnvironment, module.pendingKey(), scriptable);
 	}
 	
 	@Test
@@ -372,7 +372,7 @@ public class ScriptRunnerTest {
 		// given
 		executors.isScriptThread = true;
 		given(currentScriptContext.type()).willReturn(ScriptContextType.ModuleInitialization);
-		given(continuationCoordinator.resumeContinuation(module.pendingKey(), moduleScriptEnvironment, scriptable)).willReturn(true);
+		given(continuationCoordinator.resumeContinuation(moduleScriptEnvironment, module.pendingKey(), scriptable)).willReturn(true);
 		
 		// when
 		scriptRunner.submit("", httpRequestContext, module.pendingKey(), scriptable);
@@ -380,7 +380,7 @@ public class ScriptRunnerTest {
 		
 		// then
 		verify(moduleScriptEnvironment).initialized(true);
-		verify(continuationCoordinator).resumeContinuation(module.pendingKey(), moduleScriptEnvironment, scriptable);
+		verify(continuationCoordinator).resumeContinuation(moduleScriptEnvironment, module.pendingKey(), scriptable);
 	}
 
 }
