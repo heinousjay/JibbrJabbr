@@ -25,6 +25,7 @@ import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.ModuleScriptEnvironment;
+import jj.resource.document.ScriptEnvironment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -65,6 +66,14 @@ public class CurrentScriptContextTest {
 		rhinoContext = mrcm.context;
 		
 		currentScriptContext = new CurrentScriptContext(mrcm);
+	}
+	
+	@Test
+	public void testRootScriptEnvironment() {
+		currentScriptContext.initialize(documentScriptEnvironment);
+		currentScriptContext.initialize(requiredModule, moduleScriptEnvironment);
+		
+		assertThat(currentScriptContext.rootScriptEnvironment(), is((ScriptEnvironment)documentScriptEnvironment));
 	}
 	
 	@Test

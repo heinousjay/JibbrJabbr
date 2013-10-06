@@ -48,6 +48,16 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get() != null ? currentContext.get().type : null;
 	}
 	
+	public ScriptEnvironment rootScriptEnvironment() {
+		assert currentContext.get() != null : "trying to read a null context";
+		
+		ScriptContext root = currentContext.get().root();
+		
+		assert root.documentScriptEnvironment != null : "script context that is not rooted correctly";
+		
+		return root.documentScriptEnvironment;
+	}
+	
 	public ScriptEnvironment scriptEnvironment() {
 		switch (type()) {
 		case DocumentRequest:

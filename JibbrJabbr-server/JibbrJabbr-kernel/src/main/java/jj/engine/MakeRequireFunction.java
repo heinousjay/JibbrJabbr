@@ -95,7 +95,7 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
 				moduleIdentifier,
-				new ModuleParent(context.documentScriptEnvironment())
+				new ModuleParent(context.rootScriptEnvironment())
 			);
 		
 		

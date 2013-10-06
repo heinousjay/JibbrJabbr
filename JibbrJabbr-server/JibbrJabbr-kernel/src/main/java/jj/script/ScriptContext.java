@@ -80,6 +80,12 @@ class ScriptContext {
 		this.requiredModule = null;
 	}
 	
+	ScriptContext root() {
+		ScriptContext result = this;
+		while (result.parent != null) result = result.parent;
+		return result;
+	}
+	
 	@Override
 	public String toString() {
 		return type.toString();
