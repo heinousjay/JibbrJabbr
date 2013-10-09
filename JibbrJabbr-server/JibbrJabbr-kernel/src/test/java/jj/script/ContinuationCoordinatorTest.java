@@ -27,8 +27,6 @@ import jj.resource.script.ScriptEnvironment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Callable;
@@ -69,8 +67,6 @@ public class ContinuationCoordinatorTest {
 	@Mock ContinuationState continuationState;
 	
 	@Mock Logger logger;
-	
-	@Captor ArgumentCaptor<String> logCaptor;
 	
 	@Mock Callable function;
 
@@ -142,10 +138,8 @@ public class ContinuationCoordinatorTest {
 		
 		continuationCoordinator.execute(scriptEnvironment);
 		
-		verify(logger).error(logCaptor.capture(), eq(scriptEnvironment));
+		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
 		verify(logger).error("", e);
-		
-		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));
 	}
 	
 	@Test
@@ -179,10 +173,8 @@ public class ContinuationCoordinatorTest {
 		
 		continuationCoordinator.execute(documentScriptEnvironment, function);
 		
-		verify(logger).error(logCaptor.capture(), eq(documentScriptEnvironment));
+		verify(logger).error(unexpectedExceptionString, documentScriptEnvironment);
 		verify(logger).error("", e);
-		
-		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));
 	}
 	
 	@Test
@@ -223,10 +215,8 @@ public class ContinuationCoordinatorTest {
 		
 		continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
 		
-		verify(logger).error(logCaptor.capture(), eq(documentScriptEnvironment));
+		verify(logger).error(unexpectedExceptionString, documentScriptEnvironment);
 		verify(logger).error("", e);
-		
-		assertThat(logCaptor.getValue(), is(unexpectedExceptionString));
 	}
 
 }
