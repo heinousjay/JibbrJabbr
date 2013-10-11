@@ -37,10 +37,10 @@ import jj.resource.ResourceMaker;
 import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironmentCreator;
-import jj.resource.script.ScriptEnvironment;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.script.MockRhinoContextMaker;
+import jj.script.ScriptEnvironment;
 
 /**
  * this test only validates that the creator is getting all of the necessary stuff to the resource. there needs to

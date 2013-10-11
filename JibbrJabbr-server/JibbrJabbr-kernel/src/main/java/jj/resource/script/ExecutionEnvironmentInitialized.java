@@ -16,6 +16,7 @@
 package jj.resource.script;
 
 import jj.execution.ExecutionEvent;
+import jj.script.ScriptEnvironment;
 
 /**
  * @author jason

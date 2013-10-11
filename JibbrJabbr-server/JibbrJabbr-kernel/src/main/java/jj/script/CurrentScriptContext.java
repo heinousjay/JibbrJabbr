@@ -9,7 +9,6 @@ import jj.DataStore;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
-import jj.resource.script.ScriptEnvironment;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;

@@ -26,6 +26,7 @@ import jj.execution.IOThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
+import jj.script.AbstractScriptEnvironment;
 import jj.script.RhinoContext;
 import jj.script.RhinoContextMaker;
 

@@ -11,7 +11,6 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 import jj.logging.EmergencyLogger;
-import jj.resource.script.ScriptEnvironment;
 
 /**
  * Coordinates processing a continuable script, returning the 

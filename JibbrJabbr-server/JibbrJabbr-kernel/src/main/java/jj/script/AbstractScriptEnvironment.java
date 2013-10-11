@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.script;
+package jj.script;
 
-import static jj.resource.script.ScriptExecutionState.*;
+import static jj.script.ScriptExecutionState.*;
 
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.event.Publisher;
 import jj.resource.AbstractResourceBase;
 import jj.resource.ResourceCacheKey;
-import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
+import jj.resource.script.ExecutionEnvironmentInitialized;
 
 /**
  * @author jason
@@ -36,7 +35,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	
 	protected final RhinoContextMaker contextMaker;
 	
-	protected ScriptExecutionState state = Unitialized;
+	ScriptExecutionState state = Unitialized;
 	
 	/**
 	 * @param cacheKey
@@ -84,11 +83,12 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	}
 
 	/**
-	 * @return
+	 * @return the exports property of the module object in the script's scope.  This could be
+	 * anything at all, scripts are able to export whatever they want
 	 */
 	public Object exports() {
 		try (RhinoContext context = contextMaker.context()) {
-			return context.evaluateString(scope(), "module.exports", "returning exports"); 
+			return context.evaluateString(scope(), "module.exports", "returning exports");
 		}
 	}
 
@@ -106,7 +106,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	protected ScriptableObject createLocalScope(final String moduleIdentifier, final ScriptableObject global) {
 		try (RhinoContext context = contextMaker.context()) {
 			
-			// this technique allows for a "local" global scope that wraps a read-only global
+			// this technique allows for a "local" global scope that wraps a higher-level global
 			// scope that provides a server-wide API installation - effectively sealing the
 			// API to prevent it from being manipulated and allowing it to be shared in a safe
 			// manner

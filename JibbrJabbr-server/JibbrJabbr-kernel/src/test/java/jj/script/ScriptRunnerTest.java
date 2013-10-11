@@ -10,7 +10,6 @@ import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.DocumentRequestState;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
-import jj.resource.script.ScriptEnvironment;
 import jj.resource.script.ScriptResource;
 
 import org.jsoup.Jsoup;

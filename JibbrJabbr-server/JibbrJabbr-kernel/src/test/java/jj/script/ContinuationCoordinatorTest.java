@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.script.ScriptEnvironment;
 
 import org.junit.Before;
 import org.junit.Test;

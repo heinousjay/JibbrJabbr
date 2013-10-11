@@ -15,6 +15,8 @@
  */
 package jj.resource.script;
 
+import jj.script.ScriptEnvironment;
+
 /**
  * type-safe argument carrier for resource creation.  a regrettable necessity,
  * but a cheap one
