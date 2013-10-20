@@ -29,7 +29,6 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
@@ -71,14 +70,10 @@ public class JJAppTest implements TestRule {
 	
 	public TestHttpClient get(final String uri) throws Exception {
 		assertThat("supply a uri please", uri, is(notNullValue()));
-		TestRunner runner = injector.createChildInjector(new AbstractModule() {
-			
-			@Override
-			protected void configure() {
-				bind(HttpMethod.class).toInstance(HttpMethod.GET);
-				bind(String.class).toInstance(uri);
-			}
-		}).getInstance(TestRunner.class);
+		
+		TestRunner runner = injector.createChildInjector(
+			new RequestParameterModule(HttpMethod.GET, uri)
+		).getInstance(TestRunner.class);
 		
 		runner.request().header(HttpHeaders.Names.HOST, "localhost");
 		

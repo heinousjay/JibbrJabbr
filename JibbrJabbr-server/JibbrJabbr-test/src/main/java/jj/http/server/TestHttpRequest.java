@@ -18,6 +18,7 @@ package jj.http.server;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import jj.http.AbstractHttpRequest;
 import jj.uri.RouteFinder;
@@ -34,9 +35,15 @@ import io.netty.handler.codec.http.HttpVersion;
  */
 public class TestHttpRequest extends AbstractHttpRequest {
 	
+	public static final String REQUEST_URI = "Request URI";
+	
 
 	@Inject
-	TestHttpRequest(final RouteFinder routeFinder, HttpMethod method, String uri) {
+	TestHttpRequest(
+		final RouteFinder routeFinder,
+		final HttpMethod method,
+		final @Named(REQUEST_URI) String uri
+	) {
 		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri), routeFinder);
 	}
 
