@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import jj.resource.stat.ic.StaticResource;
+import jj.uri.URIMatch;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class StaticServableTest extends ServableTestBase {
 	@Test
 	public void testBasicOperation() throws Exception {
 		
-		given(request.uri()).willReturn("/" + ZERO_TXT);
+		given(request.uriMatch()).willReturn(new URIMatch("/" + ZERO_TXT));
 		given(resourceFinder.loadResource(StaticResource.class, ZERO_TXT)).willReturn(resource);
 		given(resource.path()).willReturn(appPath.resolve(ZERO_TXT));
 		
@@ -61,7 +62,7 @@ public class StaticServableTest extends ServableTestBase {
 	@Test
 	public void testOutsideApplicationIsRejected() throws Exception {
 		
-		given(request.uri()).willReturn("/" + NOT_ZERO_TXT);
+		given(request.uriMatch()).willReturn(new URIMatch("/" + NOT_ZERO_TXT));
 		given(resourceFinder.loadResource(StaticResource.class, NOT_ZERO_TXT)).willReturn(resource);
 		given(resource.path()).willReturn(appPath.resolve(NOT_ZERO_TXT));
 		

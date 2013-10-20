@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.resource.script;
 
-import org.slf4j.LoggerFactory;
+import jj.script.ScriptEnvironment;
 
 /**
+ * denotes a script environment as being a container for other script environments,
+ * in particular the API and document varieties can contain modules and specs.
+ * 
  * @author jason
  *
  */
-public class RealRhinoContextMaker extends RhinoContextMaker {
-
-	public RealRhinoContextMaker() {
-		super(LoggerFactory.getLogger("logger"));
-	}
+public interface RootScriptEnvironment extends ScriptEnvironment {
 
 }

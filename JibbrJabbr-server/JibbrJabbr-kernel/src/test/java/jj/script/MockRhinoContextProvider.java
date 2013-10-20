@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.config;
+package jj.script;
 
-import java.nio.file.Path;
+import static org.mockito.BDDMockito.*;
 
-import jj.BasePath;
-import jj.resource.ResourceCacheKey;
-import jj.resource.config.ConfigResource;
-import jj.script.RealRhinoContextProvider;
+import javax.inject.Provider;
 
 /**
- * Spits out the ConfigResource for testing
- * 
  * @author jason
  *
  */
-public class ConfigResourceMaker {
+public class MockRhinoContextProvider implements Provider<RhinoContext>{
 
-	public static ConfigResource configResource() throws Exception {
-		
-		Path path = BasePath.appPath().resolve(ConfigResource.CONFIG_JS);
-		
-		return new ConfigResource(new RealRhinoContextProvider(), new ResourceCacheKey(ConfigResource.class, path.toUri()), path);
+	public final RhinoContext context = mock(RhinoContext.class);
+	
+	@Override
+	public RhinoContext get() {
+		return context;
 	}
 }

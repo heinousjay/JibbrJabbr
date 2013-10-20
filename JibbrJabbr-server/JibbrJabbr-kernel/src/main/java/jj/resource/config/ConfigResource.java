@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.Function;
@@ -35,7 +36,6 @@ import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceNotViableException;
 import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
 import jj.script.Util;
 
 /**
@@ -72,13 +72,13 @@ public class ConfigResource extends AbstractFileResource {
 	 */
 	@Inject
 	ConfigResource(
-		final RhinoContextMaker contextMaker,
+		final Provider<RhinoContext>  contextProvider,
 		final ResourceCacheKey cacheKey,
 		final Path path
 	) {
 		super(cacheKey, CONFIG_JS, path);
 		Function configurationFunction;
-		try (RhinoContext context = contextMaker.context()) {
+		try (RhinoContext context = contextProvider.get()) {
 			
 			global = context.initStandardObjects();
 			configurationFunction = context.compileFunction(global, script(), path.normalize().toString());
@@ -90,7 +90,7 @@ public class ConfigResource extends AbstractFileResource {
 		}
 		
 		Object mapCandidate;
-		try (RhinoContext context = contextMaker.context()) {
+		try (RhinoContext context = contextProvider.get()) {
 			mapCandidate = context.callFunction(configurationFunction, global, global);
 		} catch (RhinoException re) {
 			throw new ResourceNotViableException(path, initialized ? DID_NOT_EXECUTE : DID_NOT_EXECUTE_NO_INIT);

@@ -18,6 +18,7 @@ package jj.resource.script;
 import java.io.IOException;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.engine.EngineAPI;
@@ -28,7 +29,6 @@ import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
 
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
@@ -109,11 +109,11 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 		final String moduleIdentifier,
 		final ModuleParent parent,
 		final Publisher publisher,
-		final RhinoContextMaker contextMaker,
+		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
 		final ResourceFinder resourceFinder
 	) {
-		super(cacheKey, publisher, contextMaker);
+		super(cacheKey, publisher, contextProvider);
 		
 		this.moduleIdentifier = moduleIdentifier;
 		
@@ -131,7 +131,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 		sha1 = scriptResource.sha1();
 		scope = createLocalScope(moduleIdentifier, api.global());
 		
-		try (RhinoContext context = contextMaker.context()) {
+		try (RhinoContext context = contextProvider.get()) {
 			
 			script = context.compileString(scriptResource.script(), scriptName());
 		}

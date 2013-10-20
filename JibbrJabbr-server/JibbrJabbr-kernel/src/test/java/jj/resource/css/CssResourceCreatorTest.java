@@ -34,7 +34,7 @@ import jj.resource.css.CssResource;
 import jj.resource.css.CssResourceCreator;
 import jj.resource.css.LessProcessor;
 import jj.resource.stat.ic.StaticResource;
-import jj.script.RealRhinoContextMaker;
+import jj.script.RealRhinoContextProvider;
 
 import org.junit.Test;
 import org.mockito.Mock;
@@ -87,7 +87,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	@Mock Logger logger;
 	
 	protected void before() throws Exception {
-		lessProcessor = spy(new LessProcessor(configuration, new RealRhinoContextMaker(), mock(Publisher.class)));
+		lessProcessor = spy(new LessProcessor(configuration, new RealRhinoContextProvider(), mock(Publisher.class)));
 		resourceMaker = new ResourceMaker(configuration, logger);
 	}
 

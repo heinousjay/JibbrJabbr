@@ -29,7 +29,7 @@ import jj.JJ;
 import jj.configuration.Configuration;
 import jj.event.MockPublisher;
 import jj.resource.css.LessProcessor;
-import jj.script.RealRhinoContextMaker;
+import jj.script.RealRhinoContextProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class LessProcessorTest {
 		testCss = new String(Files.readAllBytes(appPath.resolve("test.css")), UTF_8);
 		given(configuration.appPath()).willReturn(appPath);
 		publisher = new MockPublisher();
-		underTest = new LessProcessor(configuration, new RealRhinoContextMaker(), publisher);
+		underTest = new LessProcessor(configuration, new RealRhinoContextProvider(), publisher);
 	}
 	
 	@Test

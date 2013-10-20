@@ -24,7 +24,7 @@ import jj.http.server.Binding;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceMaker;
-import jj.script.RealRhinoContextMaker;
+import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 
 import org.junit.Before;
@@ -53,12 +53,12 @@ public class ConfigurationObjectBaseTest {
 	class HttpServerSocketConfigurationObject extends ConfigurationObjectBase implements HttpServerSocketConfiguration {
 
 		HttpServerSocketConfigurationObject() {
-			super(ConfigurationObjectBaseTest.this.converters, resourceFinder, new RealRhinoContextMaker());
+			super(ConfigurationObjectBaseTest.this.converters, resourceFinder, new RealRhinoContextProvider());
 		}
 
 		@Override
 		protected Scriptable configureScriptObject(Scriptable scope) {
-			try (RhinoContext context = contextMaker.context()) {
+			try (RhinoContext context = contextProvider.get()) {
 			
 				Scriptable nativeObject = context.newObject(scope);
 				ScriptableObject.putConstProperty(nativeObject, "keepAlive", 

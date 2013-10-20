@@ -29,8 +29,11 @@ import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.MethodInfo;
+import javassist.bytecode.SignatureAttribute;
 import javassist.bytecode.annotation.Annotation;
 
 import javax.inject.Inject;
@@ -67,7 +70,12 @@ class ConfigurationClassLoader extends ClassLoader {
 	
 	private final ClassPool classPool = new ClassPool(true);
 	
-	private final CtClass abstractConfiguration = classPool.get(ConfigurationObjectBase.class.getName());
+	private final CtClass configBase = classPool.get(ConfigurationObjectBase.class.getName());
+	
+	private final CtConstructor configBaseCtor = configBase.getConstructors()[0];
+	
+	private final AttributeInfo configBaseCtorSignature = 
+		configBaseCtor.getMethodInfo().getAttribute(SignatureAttribute.tag);
 	
 	@Inject
 	ConfigurationClassLoader() throws Exception {}
@@ -83,7 +91,7 @@ class ConfigurationClassLoader extends ClassLoader {
 			Integer.toHexString(configurationClass.hashCode())
 		);
 		
-		CtClass result = classPool.makeClass(name, abstractConfiguration);
+		CtClass result = classPool.makeClass(name, configBase);
 		
 		prepareForInjection(result);
 		implement(result, resultInterface);
@@ -98,7 +106,12 @@ class ConfigurationClassLoader extends ClassLoader {
 	}
 	
 	private void prepareForInjection(final CtClass result) throws CannotCompileException {
-		CtConstructor ctor = CtNewConstructor.copy(abstractConfiguration.getConstructors()[0], result, null);
+		CtConstructor ctor = CtNewConstructor.copy(configBaseCtor, result, null);
+		
+		// need to add the generic information to the constructor
+		MethodInfo ctorInfo = ctor.getMethodInfo();
+		ctorInfo.addAttribute(configBaseCtorSignature.copy(ctorInfo.getConstPool(), null));
+		
 		ctor.setBody("super($$);");
 		result.addConstructor(ctor);
 		
@@ -196,7 +209,7 @@ class ConfigurationClassLoader extends ClassLoader {
 		StringBuilder newMethod = 
 			new StringBuilder("protected org.mozilla.javascript.Scriptable configureScriptObject(org.mozilla.javascript.Scriptable scope) {")
 			.append("org.mozilla.javascript.Scriptable result = null;")
-			.append("jj.script.RhinoContext context = contextMaker.context();")
+			.append("jj.script.RhinoContext context = (jj.script.RhinoContext)contextProvider.get();")
 			.append("try {result = context.newObject(scope);} finally {context.close();}");
 		
 		for (String prop : scriptProps) {

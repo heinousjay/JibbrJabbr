@@ -17,6 +17,8 @@ package jj.script;
 
 import static jj.script.ScriptExecutionState.*;
 
+import javax.inject.Provider;
+
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.event.Publisher;
@@ -33,7 +35,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 
 	protected final Publisher publisher;
 	
-	protected final RhinoContextMaker contextMaker;
+	protected final Provider<RhinoContext> contextProvider;
 	
 	ScriptExecutionState state = Unitialized;
 	
@@ -43,16 +45,16 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	protected AbstractScriptEnvironment(
 		final ResourceCacheKey cacheKey,
 		final Publisher publisher,
-		final RhinoContextMaker contextMaker
+		final Provider<RhinoContext> contextProvider
 	) {
 		super(cacheKey);
 		this.publisher = publisher;
-		this.contextMaker = contextMaker;
+		this.contextProvider = contextProvider;
 	}
 	
 	@Override
 	public ScriptableObject newObject() {
-		try (RhinoContext context = contextMaker.context()) {
+		try (RhinoContext context = contextProvider.get()) {
 			return context.newObject(scope());
 		}
 	}
@@ -87,7 +89,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	 * anything at all, scripts are able to export whatever they want
 	 */
 	public Object exports() {
-		try (RhinoContext context = contextMaker.context()) {
+		try (RhinoContext context = contextProvider.get()) {
 			return context.evaluateString(scope(), "module.exports", "returning exports");
 		}
 	}
@@ -104,7 +106,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	}
 
 	protected ScriptableObject createLocalScope(final String moduleIdentifier, final ScriptableObject global) {
-		try (RhinoContext context = contextMaker.context()) {
+		try (RhinoContext context = contextProvider.get()) {
 			
 			// this technique allows for a "local" global scope that wraps a higher-level global
 			// scope that provides a server-wide API installation - effectively sealing the

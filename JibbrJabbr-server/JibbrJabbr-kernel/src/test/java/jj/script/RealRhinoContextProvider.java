@@ -15,35 +15,21 @@
  */
 package jj.script;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.*;
 
-import org.mozilla.javascript.ScriptableObject;
+import javax.inject.Provider;
+
 import org.slf4j.Logger;
 
 /**
  * @author jason
  *
  */
-public class MockRhinoContextMaker extends RhinoContextMaker {
+public class RealRhinoContextProvider implements Provider<RhinoContext> {
 
-
-	public final RhinoContext context = mock(RhinoContext.class);
-	
-	public final ScriptableObject generalScope = mock(ScriptableObject.class);
-	/**
-	 * @param logger
-	 */
-	public MockRhinoContextMaker() {
-		super(mock(Logger.class));
-	}
-
-	@Override
-	public RhinoContext context() {
-		return context;
-	}
 	
 	@Override
-	public ScriptableObject generalScope() {
-		return generalScope;
+	public RhinoContext get() {
+		return new RhinoContext(mock(Logger.class));
 	}
 }

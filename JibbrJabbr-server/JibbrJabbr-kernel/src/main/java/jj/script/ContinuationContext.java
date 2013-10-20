@@ -13,27 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.config;
+package jj.script;
 
-import java.nio.file.Path;
-
-import jj.BasePath;
-import jj.resource.ResourceCacheKey;
-import jj.resource.config.ConfigResource;
-import jj.script.RealRhinoContextProvider;
+import org.mozilla.javascript.ContinuationPending;
 
 /**
- * Spits out the ConfigResource for testing
+ * ABstracts the storage of continuation information
  * 
  * @author jason
  *
  */
-public class ConfigResourceMaker {
+public interface ContinuationContext {
 
-	public static ConfigResource configResource() throws Exception {
-		
-		Path path = BasePath.appPath().resolve(ConfigResource.CONFIG_JS);
-		
-		return new ConfigResource(new RealRhinoContextProvider(), new ResourceCacheKey(ConfigResource.class, path.toUri()), path);
-	}
+	void store(String continuationKey, ContinuationPending continuationPending);
+	
+	ContinuationPending retrieve(String continuationKey);
 }

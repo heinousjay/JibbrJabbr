@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.jsoup.nodes.Document;
@@ -39,12 +40,12 @@ import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
+import jj.resource.script.RootScriptEnvironment;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.FunctionContext;
 import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
 
 /**
  * Slightly more going on than your average resource. at least some of this will
@@ -54,7 +55,7 @@ import jj.script.RhinoContextMaker;
  *
  */
 @Singleton
-public class DocumentScriptEnvironment extends AbstractScriptEnvironment implements FunctionContext {
+public class DocumentScriptEnvironment extends AbstractScriptEnvironment implements FunctionContext, RootScriptEnvironment {
 
 	@Override
 	public String baseName() {
@@ -153,11 +154,11 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final ResourceFinder resourceFinder,
-		final RhinoContextMaker contextMaker,
+		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
 		final Publisher publisher
 	) {
-		super(cacheKey, publisher, contextMaker);
+		super(cacheKey, publisher, contextProvider);
 		this.baseName = baseName;
 		
 		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
@@ -199,7 +200,7 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 	}
 	
 	private Script compile() {
-		try (RhinoContext context = contextMaker.context()) {
+		try (RhinoContext context = contextProvider.get()) {
 			
 			if (sharedScript != null) {
 				publisher.publish(new EvaluatingSharedScript(sharedScript.path().toString()));

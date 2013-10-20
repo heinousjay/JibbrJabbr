@@ -18,6 +18,7 @@ package jj.http;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -51,14 +52,22 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	
 	protected final FullHttpRequest request;
 	
-	protected final RouteFinder routeFinder;
+	protected final String uri;
+	
+	protected final URIMatch uriMatch;
 
 	/**
 	 * 
 	 */
 	protected AbstractHttpRequest(final FullHttpRequest request, final RouteFinder routeFinder) {
 		this.request = request;
-		this.routeFinder = routeFinder;
+		QueryStringDecoder decoder = new QueryStringDecoder(request.getUri());
+		this.uri = routeFinder.find(QueryStringDecoder.decodeComponent(decoder.path()));
+		this.uriMatch = new URIMatch(uri);
+		
+		// save off the query params into the form,
+		// then if it's a verb that carries a body, read the body
+		
 	}
 
 	@Override
@@ -140,11 +149,11 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	 */
 	@Override
 	public String uri() {
-		return routeFinder.find(request.getUri());
+		return uri;
 	}
 	
 	public URIMatch uriMatch() {
-		return new URIMatch(uri());
+		return uriMatch;
 	}
 
 	/**

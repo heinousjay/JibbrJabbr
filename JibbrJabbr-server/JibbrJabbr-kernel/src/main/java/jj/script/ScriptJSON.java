@@ -2,8 +2,10 @@ package jj.script;
 
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +20,16 @@ public class ScriptJSON {
 	
 	private final Logger log = LoggerFactory.getLogger(ScriptJSON.class);
 	
-	private final RhinoContextMaker contextMaker;
+	private final Provider<RhinoContext> contextProvider;
+	
+	private final ScriptableObject scope;
 	
 	@Inject
-	public ScriptJSON(final RhinoContextMaker contextMaker) {
-		this.contextMaker = contextMaker;
+	public ScriptJSON(final Provider<RhinoContext> contextProvider) {
+		this.contextProvider = contextProvider;
+		try (RhinoContext context = contextProvider.get()) {
+			scope = context.initStandardObjects(true);
+		}
 	}
 	
 	private String emptyOrInput(final String input) {
@@ -33,8 +40,8 @@ public class ScriptJSON {
 		// need to do some serious quote replacement
 		String escaped = emptyOrInput(input).trim().replace("'", "\\'").replace("\"", "\\\"");
 		
-		try (RhinoContext context = contextMaker.context()) {
-			return context.evaluateString(contextMaker.generalScope(), "JSON.parse('" + escaped + "');", "ScriptJSON.parse");
+		try (RhinoContext context = contextProvider.get()) {
+			return context.evaluateString(scope, "JSON.parse('" + escaped + "');", "ScriptJSON.parse");
 		} catch (Exception e) {
 			log.warn("couldn't JSON.parse {}", input);
 			log.warn("", e);

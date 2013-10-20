@@ -99,9 +99,9 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(ContinuationType.JJMessage, continuationProcessor2);
 		continuationProcessors.put(ContinuationType.RequiredModule, continuationProcessor3);
 		
-		RhinoContextMaker contextMaker = new MockRhinoContextMaker();
-		context = contextMaker.context();
-		continuationCoordinator = new ContinuationCoordinator(contextMaker, currentScriptContext, logger, continuationProcessors);
+		MockRhinoContextProvider contextProvider = new MockRhinoContextProvider();
+		context = contextProvider.get();
+		continuationCoordinator = new ContinuationCoordinator(contextProvider, currentScriptContext, logger, continuationProcessors);
 	}
 	
 	@Test

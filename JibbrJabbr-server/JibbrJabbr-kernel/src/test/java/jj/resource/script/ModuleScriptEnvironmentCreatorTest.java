@@ -39,7 +39,7 @@ import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironmentCreator;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
-import jj.script.MockRhinoContextMaker;
+import jj.script.MockRhinoContextProvider;
 import jj.script.ScriptEnvironment;
 
 /**
@@ -59,7 +59,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	ModuleParent parent;
 	// lil ugly! but this satisfies things internally
 	@Mock(extraInterfaces={ScriptEnvironment.class}) AbstractResourceBase scriptEnvironment;
-	MockRhinoContextMaker contextMaker;
+	MockRhinoContextProvider contextProvider;
 	
 	@Mock ResourceInstanceCreator mockCreator;
 	
@@ -84,8 +84,8 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	private void givenMinimalServices() throws Exception {
 		resourceMaker = new ResourceMaker(configuration);
 		
-		contextMaker = new MockRhinoContextMaker();
-		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
+		contextProvider = new MockRhinoContextProvider();
+		given(contextProvider.context.newObject(any(Scriptable.class))).willReturn(local);
 	}
 	
 	private void givenModuleScriptEnvironmentResources(String baseName) throws Exception {
@@ -100,7 +100,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		givenMinimalServices();
 		givenModuleScriptEnvironmentResources("helpers");
 		
-		ModuleScriptEnvironment result = new ModuleScriptEnvironment(cacheKey(), baseName(), parent, publisher, contextMaker, api, resourceFinder);
+		ModuleScriptEnvironment result = new ModuleScriptEnvironment(cacheKey(), baseName(), parent, publisher, contextProvider, api, resourceFinder);
 		
 		return result;
 	}

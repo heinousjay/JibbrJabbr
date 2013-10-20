@@ -32,7 +32,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
-import jj.script.MockRhinoContextMaker;
+import jj.script.MockRhinoContextProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,14 +54,14 @@ public class DocumentScriptEnvironmentTest {
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
 	@Mock ResourceCacheKey cacheKey;
-	MockRhinoContextMaker contextMaker;
+	MockRhinoContextProvider contextMaker;
 	
 	@Captor ArgumentCaptor<ExecutionEvent> eventCaptor;
 	@Captor ArgumentCaptor<String> clientStubCaptor;
 
 	@Before
 	public void before() throws Exception {
-		contextMaker = new MockRhinoContextMaker();
+		contextMaker = new MockRhinoContextProvider();
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
 		
 		given(script.path()).willReturn(Paths.get("/"));
@@ -200,11 +200,12 @@ public class DocumentScriptEnvironmentTest {
 		
 		givenAnHtmlResource(name);
 		givenAServerScript(name);
-		given(api.global()).willReturn(contextMaker.generalScope);
+		ScriptableObject scope = mock(ScriptableObject.class);
+		given(api.global()).willReturn(scope);
 		
 		new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
 		
-		verify(local).setPrototype(contextMaker.generalScope);
+		verify(local).setPrototype(scope);
 		verify(local).setParentScope(null);
 		
 		// local is return as all new object results.  luckily nothing overlaps

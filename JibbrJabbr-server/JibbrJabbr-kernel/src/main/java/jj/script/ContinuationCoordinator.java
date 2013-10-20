@@ -3,6 +3,7 @@ package jj.script;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
@@ -27,7 +28,7 @@ class ContinuationCoordinator {
 	
 	private final Logger log;
 	
-	private final RhinoContextMaker contextMaker;
+	private final Provider<RhinoContext> contextProvider;
 	
 	private final CurrentScriptContext currentScriptContext;
 	
@@ -35,12 +36,12 @@ class ContinuationCoordinator {
 	
 	@Inject
 	ContinuationCoordinator(
-		final RhinoContextMaker contextMaker,
+		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptContext currentScriptContext,
 		final @EmergencyLogger Logger log,
 		final Map<ContinuationType, ContinuationProcessor> continuationProcessors
 	) {
-		this.contextMaker = contextMaker;
+		this.contextProvider = contextProvider;
 		this.currentScriptContext = currentScriptContext;
 		this.log = log;
 		this.continuationProcessors = continuationProcessors;
@@ -52,7 +53,7 @@ class ContinuationCoordinator {
 	} 
 	
 	private ContinuationState execute(final ContinuationExecution execution, final ScriptEnvironment scriptEnvironment) {
-		try (RhinoContext context = contextMaker.context()){
+		try (RhinoContext context = contextProvider.get()){
 			execution.run(context);
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);

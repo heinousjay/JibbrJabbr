@@ -17,6 +17,8 @@ package jj.script;
 
 import java.io.Closeable;
 
+import javax.inject.Inject;
+
 import jj.logging.EmergencyLogger;
 
 import org.mozilla.javascript.Callable;
@@ -43,8 +45,9 @@ public class RhinoContext implements Closeable {
 	
 	private final Logger logger;
 	
-	RhinoContext(final Context context, final @EmergencyLogger Logger logger) {
-		this.context = context;
+	@Inject
+	RhinoContext(final @EmergencyLogger Logger logger) {
+		this.context = Context.enter();
 		this.logger = logger;
 		
 		context.setLanguageVersion(Context.VERSION_1_8);

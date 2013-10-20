@@ -32,7 +32,7 @@ import jj.engine.ContributesScript;
 import jj.engine.EngineAPI;
 import jj.engine.EngineAPIImpl;
 import jj.engine.HostObject;
-import jj.script.RealRhinoContextMaker;
+import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 
 import org.junit.runner.RunWith;
@@ -125,11 +125,11 @@ abstract class AbstractEngineApiTest {
 		Set<HostObject> hostObjectSet = new HashSet<>();
 		Collections.addAll(hostObjectSet,  hostObjects);
 		hostObjectSet.add(new RhinoUnitHostObject());
-		return new EngineAPIImpl(new RealRhinoContextMaker(), hostObjectSet);
+		return new EngineAPIImpl(new RealRhinoContextProvider(), hostObjectSet);
 	}
 
 	protected final void basicExecution(final EngineAPI host) throws Exception {
-		try (RhinoContext context = new RealRhinoContextMaker().context()) {
+		try (RhinoContext context = new RealRhinoContextProvider().get()) {
 			context.evaluateString(host.global(), script(), scriptName());
 		} catch (EvaluatorException ee) {
 			fail(ee.getMessage());

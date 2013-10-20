@@ -31,7 +31,7 @@ import jj.resource.document.DocumentScriptEnvironmentCreator;
 import jj.resource.document.HtmlResource;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
-import jj.script.MockRhinoContextMaker;
+import jj.script.MockRhinoContextProvider;
 
 /**
  * this test only validates that the creator is getting all of the necessary stuff to the resource. there needs to
@@ -47,7 +47,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
 	@Mock Publisher publisher;
-	MockRhinoContextMaker contextMaker;
+	MockRhinoContextProvider contextProvider;
 	
 
 	@Override
@@ -58,8 +58,8 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	private void givenMinimalServices() throws Exception {
 		resourceMaker = new ResourceMaker(configuration);
 		
-		contextMaker = new MockRhinoContextMaker();
-		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
+		contextProvider = new MockRhinoContextProvider();
+		given(contextProvider.context.newObject(any(Scriptable.class))).willReturn(local);
 	}
 	
 	private void givenDocumentScriptEnvironmentResources(String baseName) throws Exception {
@@ -76,7 +76,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 		givenMinimalServices();
 		givenDocumentScriptEnvironmentResources(baseName());
 		
-		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextMaker, api, publisher);
+		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextProvider, api, publisher);
 		
 		return result;
 	}

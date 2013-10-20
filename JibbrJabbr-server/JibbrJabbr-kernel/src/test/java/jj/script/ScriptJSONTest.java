@@ -17,7 +17,7 @@ public class ScriptJSONTest {
 	@Test
 	public void test() {
 		
-		ScriptJSON underTest = new ScriptJSON(new RealRhinoContextMaker());
+		ScriptJSON underTest = new ScriptJSON(new RealRhinoContextProvider());
 		
 		Map<String, Object> map = (Map<String, Object>)underTest.parse(TEST_STRING);
 		map = (Map<String, Object>)underTest.parse(String.valueOf(map.get("form")));

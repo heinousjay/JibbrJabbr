@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.BaseFunction;
@@ -34,7 +35,6 @@ import org.mozilla.javascript.Undefined;
 import jj.configuration.Configuration;
 import jj.event.Publisher;
 import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
 
 /**
  * accepts a path that represents a less source file,
@@ -116,24 +116,24 @@ class LessProcessor {
 
 	private final ScriptableObject global;
 	private final Configuration configuration;
-	private final RhinoContextMaker contextMaker;
+	private final Provider<RhinoContext> contextProvider;
 	private final Publisher publisher;
 	
 	@Inject
 	LessProcessor(
 		final Configuration configuration,
-		final RhinoContextMaker contextMaker,
+		final Provider<RhinoContext> contextProvider,
 		final Publisher publisher
 	) throws IOException {
 		this.configuration = configuration;
-		this.contextMaker = contextMaker;
+		this.contextProvider = contextProvider;
 		this.publisher = publisher;
 		global = makeGlobal();
 	}
 	
 	String process(final String lessName) {
 		
-		try (RhinoContext context = context(contextMaker.context())) {
+		try (RhinoContext context = context(contextProvider.get())) {
 			publisher.publish(new StartingLessProcessing(lessName));
 			
 			Scriptable local = context.newObject(global);
@@ -155,7 +155,7 @@ class LessProcessor {
 	
 	private ScriptableObject makeGlobal() throws IOException {
 		
-		try (RhinoContext context = context(contextMaker.context())) {
+		try (RhinoContext context = context(contextProvider.get())) {
 			ScriptableObject global = context.initStandardObjects(true);
 			global.defineProperty("readFile", new ReadFileFunction(configuration), ScriptableObject.EMPTY);
 			global.defineProperty("name", new NameFunction(), ScriptableObject.EMPTY);

@@ -18,6 +18,8 @@ package jj.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
@@ -25,7 +27,6 @@ import jj.conversion.Converters;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
 
 /**
  * <p>
@@ -49,18 +50,18 @@ public abstract class ConfigurationObjectBase {
 	
 	private final String name;
 	
-	protected final RhinoContextMaker contextMaker;
+	protected final Provider<RhinoContext> contextProvider;
 	
 	protected final Map<String, Object> values = new HashMap<>();
 	
 	protected ConfigurationObjectBase(
 		final Converters converters,
 		final ResourceFinder resourceFinder,
-		final RhinoContextMaker rhinoContextMaker
+		final Provider<RhinoContext> contextProvider
 	) {
 		this.converters = converters;
 		this.resourceFinder = resourceFinder;
-		this.contextMaker = rhinoContextMaker;
+		this.contextProvider = contextProvider;
 		
 		ConfigResource configResource = configResource();
 		
@@ -92,7 +93,7 @@ public abstract class ConfigurationObjectBase {
 	void runScriptFunction() {
 		ConfigResource config = configResource();
 		if (config != null && config.functions().containsKey(name())) {
-			try (RhinoContext context = contextMaker.context()) {
+			try (RhinoContext context = contextProvider.get()) {
 				Function function = config.functions().get(name());
 				context.callFunction(function, config.global(), config.global(), new Object[] {scriptObject});
 			}

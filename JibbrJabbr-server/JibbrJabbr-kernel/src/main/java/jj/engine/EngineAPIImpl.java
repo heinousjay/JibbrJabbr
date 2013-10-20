@@ -3,10 +3,10 @@ package jj.engine;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.script.RhinoContext;
-import jj.script.RhinoContextMaker;
 
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
@@ -26,8 +26,8 @@ class EngineAPIImpl implements EngineAPI {
 	private final Logger log = LoggerFactory.getLogger(EngineAPIImpl.class);
 	
 	@Inject
-	EngineAPIImpl(final RhinoContextMaker contextMaker, final Set<HostObject> hostObjects) {
-		try (RhinoContext context = contextMaker.context()) {
+	EngineAPIImpl(final Provider<RhinoContext> contextProvider, final Set<HostObject> hostObjects) {
+		try (RhinoContext context = contextProvider.get()) {
 			global = initializeGlobalScope(context, hostObjects);
 		}
 	}

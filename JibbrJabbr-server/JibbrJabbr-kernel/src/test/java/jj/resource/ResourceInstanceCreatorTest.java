@@ -38,8 +38,7 @@ import jj.resource.script.ScriptResource;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.spec.SpecResource;
 import jj.resource.stat.ic.StaticResource;
-import jj.script.MockRhinoContextMaker;
-import jj.script.RhinoContextMaker;
+import jj.script.RhinoContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +72,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	@Mock Publisher publisher;
 	@Mock EngineAPI api;
 	@Mock ResourceFinder resourceFinder;
-	MockRhinoContextMaker rhinoContextMaker;
+	@Mock RhinoContext rhinoContext;
 	
 	private ResourceInstanceCreator makeCreator(final Configuration configuration, final Logger logger) {
 		return new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
@@ -85,7 +84,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 				bind(Publisher.class).toInstance(publisher);
 				bind(EngineAPI.class).toInstance(api);
 				bind(ResourceFinder.class).toInstance(resourceFinder);
-				bind(RhinoContextMaker.class).toInstance(rhinoContextMaker);
+				bind(RhinoContext.class).toInstance(rhinoContext);
 			}
 		}), logger);
 	}
@@ -94,7 +93,6 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	@Before
 	public void before() {
-		rhinoContextMaker = new MockRhinoContextMaker();
 		rimc = makeCreator(configuration, logger);
 	}
 	
@@ -117,7 +115,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	@Test
 	public void testConfigResource() throws Exception {
-		given(rhinoContextMaker.context.callFunction(any(Function.class), any(Scriptable.class), any(Scriptable.class), anyVararg()))
+		given(rhinoContext.callFunction(any(Function.class), any(Scriptable.class), any(Scriptable.class), anyVararg()))
 			.willReturn(Collections.EMPTY_MAP);
 		doCreate(ConfigResource.class, ConfigResource.CONFIG_JS);
 	}
@@ -175,7 +173,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 		given(api.global()).willReturn(new NativeObject());
 		given(resourceFinder.loadResource(ScriptResource.class, "index.js")).willReturn(sr);
 		given(resourceFinder.findResource(dse)).willReturn(dse);
-		given(rhinoContextMaker.context.newObject(any(ScriptableObject.class))).willReturn(new NativeObject());
+		given(rhinoContext.newObject(any(ScriptableObject.class))).willReturn(new NativeObject());
 		
 		doCreate(ModuleScriptEnvironment.class, "index", new ModuleParent(dse));
 	}

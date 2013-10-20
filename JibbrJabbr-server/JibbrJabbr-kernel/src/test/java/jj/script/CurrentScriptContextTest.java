@@ -25,6 +25,7 @@ import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
+import jj.uri.RouteFinder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,10 +62,10 @@ public class CurrentScriptContextTest {
 	
 	@Before
 	public void before() {
-		MockRhinoContextMaker mrcm = new MockRhinoContextMaker();
-		rhinoContext = mrcm.context;
+		MockRhinoContextProvider mrcp = new MockRhinoContextProvider();
+		rhinoContext = mrcp.context;
 		
-		currentScriptContext = new CurrentScriptContext(mrcm);
+		currentScriptContext = new CurrentScriptContext(mrcp);
 	}
 	
 	@Test
@@ -157,7 +158,9 @@ public class CurrentScriptContextTest {
 		// given
 		currentScriptContext.initialize(connection);
 		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
-		RestRequest restRequest = new RestRequest(new JJHttpClientRequest(null));
+		RouteFinder routeFinder = mock(RouteFinder.class);
+		given(routeFinder.find(anyString())).willReturn("/");
+		RestRequest restRequest = new RestRequest(new JJHttpClientRequest(routeFinder));
 		
 		// when
 		try {

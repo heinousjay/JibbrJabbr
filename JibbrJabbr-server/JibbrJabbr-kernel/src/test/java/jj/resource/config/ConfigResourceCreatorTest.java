@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import jj.resource.ResourceBase;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceCreator;
-import jj.script.RealRhinoContextMaker;
+import jj.script.RealRhinoContextProvider;
 
 /**
  * @author jason
@@ -43,7 +43,7 @@ public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, Conf
 	
 	@Override
 	protected ConfigResource resource() throws Exception {
-		return new ConfigResource(new RealRhinoContextMaker(), cacheKey(), path());
+		return new ConfigResource(new RealRhinoContextProvider(), cacheKey(), path());
 	}
 	
 	@Override

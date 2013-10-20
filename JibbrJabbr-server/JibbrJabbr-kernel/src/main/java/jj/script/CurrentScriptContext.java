@@ -3,6 +3,7 @@ package jj.script;
 import java.io.Closeable;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.DataStore;
@@ -36,11 +37,11 @@ public class CurrentScriptContext implements Closeable {
 	 */
 	private final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
 	
-	private final RhinoContextMaker rhinoContextMaker;
+	private final Provider<RhinoContext> contextProvider;
 	
 	@Inject
-	CurrentScriptContext(final RhinoContextMaker rhinoContextMaker) {
-		this.rhinoContextMaker = rhinoContextMaker;
+	CurrentScriptContext(final Provider<RhinoContext> contextProvider) {
+		this.contextProvider = contextProvider;
 	}
 	
 	public ScriptContextType type() {
@@ -232,7 +233,7 @@ public class CurrentScriptContext implements Closeable {
 	 */
 	private ContinuationPending prepareContinuation(String pendingId, ContinuationState continuationState) {
 		
-		try(RhinoContext context = rhinoContextMaker.context()) {
+		try(RhinoContext context = contextProvider.get()) {
 			ContinuationPending continuation = context.captureContinuation();
 			continuation.setApplicationState(continuationState);
 			
