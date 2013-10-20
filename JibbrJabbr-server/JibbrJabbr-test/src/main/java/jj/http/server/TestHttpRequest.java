@@ -36,8 +36,8 @@ public class TestHttpRequest extends AbstractHttpRequest {
 	
 
 	@Inject
-	TestHttpRequest(final RouteFinder routeFinder) {
-		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"), routeFinder);
+	TestHttpRequest(final RouteFinder routeFinder, HttpMethod method, String uri) {
+		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri), routeFinder);
 	}
 
 	private final InetSocketAddress socketAddress = new InetSocketAddress(0);
@@ -48,15 +48,6 @@ public class TestHttpRequest extends AbstractHttpRequest {
 
 	public HttpHeaders headers() {
 		return request.headers();
-	}
-
-	/**
-	 * @param uri
-	 * @return
-	 */
-	public TestHttpRequest uri(String uri) {
-		request.setUri(uri);
-		return this;
 	}
 	
 	@Override

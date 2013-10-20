@@ -22,11 +22,14 @@ import static org.junit.Assert.*;
 import jj.StringUtils;
 
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+
 import org.jsoup.nodes.Document;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
@@ -68,9 +71,16 @@ public class JJAppTest implements TestRule {
 	
 	public TestHttpClient get(final String uri) throws Exception {
 		assertThat("supply a uri please", uri, is(notNullValue()));
-		TestRunner runner = injector.getInstance(TestRunner.class);
-		runner.request().uri(uri)
-			.header(HttpHeaders.Names.HOST, "localhost");
+		TestRunner runner = injector.createChildInjector(new AbstractModule() {
+			
+			@Override
+			protected void configure() {
+				bind(HttpMethod.class).toInstance(HttpMethod.GET);
+				bind(String.class).toInstance(uri);
+			}
+		}).getInstance(TestRunner.class);
+		
+		runner.request().header(HttpHeaders.Names.HOST, "localhost");
 		
 		return runner.run();
 	}

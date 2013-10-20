@@ -56,7 +56,8 @@ public class DocumentScriptEnvironmentCreator extends AbstractResourceCreator<Do
 	
 	@Override
 	protected URI uri(String baseName, Object... args) {
-		return URI.create(baseName);
+		// this escapes it for us
+		return Paths.get(baseName).toUri();
 	}
 
 }
