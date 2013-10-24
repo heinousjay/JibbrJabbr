@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 /**
- * Classes to abstract and manage the HTTP client
+ * Classes to abstract and manage the HTTP client.  This package is mainly a sketch,
+ * not a guarantee
  * 
  * @author jason
  *
