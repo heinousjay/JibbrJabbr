@@ -47,6 +47,9 @@ public class HttpServerChannelInitializerTest {
 	@InjectMocks HttpServerChannelInitializer hsci;
 	
 	@Mock JJEngineHttpHandler engine;
+	
+	// mocking things we don't own because said things
+	// connect to a network and they're just interfaces 
 	@Mock SocketChannel ch;
 	@Mock ChannelPipeline pipeline; 
 	
