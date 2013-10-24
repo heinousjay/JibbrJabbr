@@ -62,7 +62,7 @@ public class JJAppTest implements TestRule {
 	
 	public TestHttpClient doSocketConnection(final Document document) throws Exception {
 		String url = document.select("script[data-jj-socket-url]").attr("data-jj-socket-url");
-		assertThat("document doesn't have socket script", StringUtils.isEmpty(url), is(false));
+		assertThat("document must have a socket script to use this method", StringUtils.isEmpty(url), is(false));
 		TestHttpClient client = get(url);
 		client.dumpObjects();
 		return client;
