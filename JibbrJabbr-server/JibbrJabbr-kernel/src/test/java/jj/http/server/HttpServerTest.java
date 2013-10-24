@@ -16,10 +16,12 @@
 package jj.http.server;
 
 import static org.mockito.BDDMockito.given;
+
+import javax.net.SocketFactory;
+
 import jj.configuration.Configuration;
 import jj.execution.MockJJNioEventLoopGroup;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -85,29 +87,41 @@ public class HttpServerTest {
 					public String host() {
 						return null;
 					}
+				},
+				new Binding() {
+
+					@Override
+					public int port() {
+						return 8090;
+					}
+
+					@Override
+					public String host() {
+						return "localhost";
+					}
 				}
 			};
 		}
 	};
 	
-	HttpServer httpServer;
-	
-	@Before
-	public void before() {
-		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
-		
-		httpServer = new HttpServer(new MockJJNioEventLoopGroup(), initializer, configuration);
-	}
-	
 	@Test
-	public void test1() throws Exception {
+	public void testServerStart() throws Exception {
+		
+		// given
+		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
+		HttpServer httpServer = new HttpServer(new MockJJNioEventLoopGroup(), initializer, configuration);
 
 		try {
+			// when
 			httpServer.start();
 			
-			// try to connect to 8080 and 8090 to prove it worked
+			
+			// then
+			SocketFactory.getDefault().createSocket("localhost", 8080).close();
+			SocketFactory.getDefault().createSocket("localhost", 8090).close();
 			
 		} finally {
+			// and don't let it sit around sucking up resources
 			httpServer.stop();
 		}
 	}
