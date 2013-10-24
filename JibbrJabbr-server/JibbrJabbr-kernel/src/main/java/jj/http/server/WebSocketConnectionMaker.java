@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-import static jj.http.server.HttpServerChannelInitializer.PipelineStages.*;
+import static jj.http.server.PipelineStages.*;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

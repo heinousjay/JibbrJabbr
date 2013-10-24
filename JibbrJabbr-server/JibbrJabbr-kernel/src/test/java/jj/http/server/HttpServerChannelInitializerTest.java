@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-import static jj.http.server.HttpServerChannelInitializer.PipelineStages.*;
+import static jj.http.server.PipelineStages.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;

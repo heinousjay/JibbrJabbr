@@ -18,7 +18,7 @@ package jj.http.server;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.http.server.HttpServerChannelInitializer.PipelineStages.*;
+import static jj.http.server.PipelineStages.*;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

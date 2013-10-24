@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-import static jj.http.server.HttpServerChannelInitializer.PipelineStages.*;
+import static jj.http.server.PipelineStages.*;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -35,15 +35,6 @@ import javax.inject.Singleton;
  */
 @Singleton
 class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
-	
-	enum PipelineStages {
-		Decoder,
-		Aggregator,
-		Encoder,
-		ChunkedWriter,
-		JJEngine,
-		JJWebsocketHandler
-	}
 	
 	private final Provider<JJEngineHttpHandler> engineProvider;
 	
