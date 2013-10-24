@@ -29,6 +29,9 @@ import jj.CoreModule;
 import jj.JJModule;
 
 /**
+ * Creates the server kernel without the http server,
+ * for testing.
+ * 
  * @author jason
  *
  */
