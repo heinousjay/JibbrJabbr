@@ -15,7 +15,6 @@
  */
 package jj.script;
 
-import jj.engine.HostEvent;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.script.ModuleScriptEnvironment;
@@ -33,8 +32,6 @@ public interface ScriptRunner {
 	void submit(RequiredModule requiredModule, ModuleScriptEnvironment scriptExecutionEnvironment);
 
 	void submitPendingResult(JJWebSocketConnection connection, String pendingKey, Object result);
-
-	void submit(JJWebSocketConnection connection, HostEvent hostEvent, Object... args);
 
 	void submit(JJWebSocketConnection connection, String event, Object... args);
 }

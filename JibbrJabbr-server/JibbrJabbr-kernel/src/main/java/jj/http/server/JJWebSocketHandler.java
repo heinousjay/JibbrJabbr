@@ -52,11 +52,11 @@ class JJWebSocketHandler {
 	}
 
 	public void opened(JJWebSocketConnection connection) {
-		scriptRunner.submit(connection, HostEvent.clientConnected, connection);
+		scriptRunner.submit(connection, HostEvent.clientConnected.toString(), connection);
 	}
 
 	public void closed(JJWebSocketConnection connection) {
-		scriptRunner.submit(connection, HostEvent.clientDisconnected, connection);
+		scriptRunner.submit(connection, HostEvent.clientDisconnected.toString(), connection);
 	}
 
 	public void messageReceived(JJWebSocketConnection connection, String msg) {

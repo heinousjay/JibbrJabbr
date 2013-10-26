@@ -2,7 +2,6 @@ package jj.script;
 
 import static org.mockito.BDDMockito.*;
 
-import jj.engine.HostEvent;
 import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
@@ -175,50 +174,6 @@ public class ScriptRunnerTest {
 		given(currentScriptContext.connection()).willReturn(connection);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.WebSocket);
 		
-	}
-	
-	@Test
-	public void testWebSocketHostEventWithNoContinuation() throws Exception {
-		
-		// given
-		givenAWebSocketMessage();
-		
-		// when
-		scriptRunner.submit(connection, HostEvent.clientConnected, connection);
-		executors.runUntilIdle();
-		
-		// then
-		verify(continuationCoordinator).execute(documentScriptEnvironment, eventFunction, connection);
-	}
-	
-	@Test
-	public void testWebSocketHostEventWithContinuations() throws Exception {
-		
-		// given
-		givenAWebSocketMessage();
-		given(currentScriptContext.scriptEnvironment()).willReturn(documentScriptEnvironment);
-		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction, connection)).willReturn(false);
-		given(continuationCoordinator.resumeContinuation(any(ScriptEnvironment.class), anyString(), any()))
-			.willReturn(false)
-			.willReturn(true);
-		
-		// when
-		scriptRunner.submit(connection, HostEvent.clientConnected, connection);
-		executors.runUntilIdle();
-		
-		// then
-		verify(continuationCoordinator).execute(documentScriptEnvironment, eventFunction, connection);
-		
-		// given
-		executors.isScriptThread = true;
-		
-		// when
-		scriptRunner.submit("", httpRequestContext, "", null);
-		scriptRunner.submit("", httpRequestContext, "", null);
-		executors.runUntilIdle();
-		
-		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation(any(ScriptEnvironment.class), anyString(), any());
 	}
 	
 	@Test

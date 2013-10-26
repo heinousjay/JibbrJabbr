@@ -65,13 +65,13 @@ public class JJWebSocketHandlerTest {
 	@Test
 	public void testOpened() {
 		wsh.opened(connection);
-		verify(scriptRunner).submit(connection, HostEvent.clientConnected, connection);
+		verify(scriptRunner).submit(connection, HostEvent.clientConnected.toString(), connection);
 	}
 	
 	@Test
 	public void testClosed() {
 		wsh.closed(connection);
-		verify(scriptRunner).submit(connection, HostEvent.clientDisconnected, connection);
+		verify(scriptRunner).submit(connection, HostEvent.clientDisconnected.toString(), connection);
 	}
 	
 	@Test

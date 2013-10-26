@@ -7,7 +7,6 @@ import org.mozilla.javascript.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.engine.HostEvent;
 import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
@@ -219,11 +218,6 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			pendingKey,
 			result
 		);
-	}
-	
-	@Override
-	public void submit(final JJWebSocketConnection connection, final HostEvent hostEvent, final Object...args) {
-		submit(connection, hostEvent.toString(), args);
 	}
 	
 	@Override
