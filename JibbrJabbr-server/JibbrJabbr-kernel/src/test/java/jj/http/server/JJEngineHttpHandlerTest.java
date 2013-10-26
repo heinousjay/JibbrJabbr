@@ -195,6 +195,8 @@ public class JJEngineHttpHandlerTest {
 		Throwable t = new Throwable();
 		handler.exceptionCaught(ctx, t);
 		
+		// validate that the exception is logged because we
+		// care about that
 		verify(logger).error(anyString(), eq(t));
 		verifyNoMoreInteractions(logger);
 		
@@ -212,13 +214,15 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testExceptionCaughtCausesException() throws Exception {
 		
+		//given
 		RuntimeException second = new RuntimeException();
-		
 		given(ctx.writeAndFlush(any())).willThrow(second);
 		
+		//when
 		Throwable t = new Throwable();
 		handler.exceptionCaught(ctx, t);
 		
+		//then
 		verify(logger).error(anyString(), eq(t));
 		verify(logger).error(anyString(), eq(second));
 	}
@@ -283,22 +287,26 @@ public class JJEngineHttpHandlerTest {
 	@Test
 	public void testNotFound() throws Exception {
 		
+		//when
 		handler.handleHttpRequest(httpRequest5, httpResponse);
 		executors.runUntilIdle();
 		
+		// then
 		verify(httpResponse).sendNotFound();
 	}
 	
 	@Test
 	public void testErrorDuringProcessing() throws Exception {
 		
+		//given
 		IOException ioe = new IOException();
-		
 		doThrow(ioe).when(requestProcessor1).process();
 		
+		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
 		executors.runUntilIdle();
 		
+		//then
 		verify(httpResponse).error(ioe);
 	}
 }
