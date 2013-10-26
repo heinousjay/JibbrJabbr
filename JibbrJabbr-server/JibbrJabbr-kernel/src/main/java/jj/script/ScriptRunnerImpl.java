@@ -180,10 +180,13 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			
 			@Override
 			public void run() {
-				assert !scriptExecutionEnvironment.initialized(): "attempting to reinitialize a required module";
 				context.initialize(requiredModule, scriptExecutionEnvironment);
 				try {
-					moduleInitialExecution();
+					if (!scriptExecutionEnvironment.initialized()) {
+						moduleInitialExecution();
+					} else {
+						completeModuleInitialization();
+					}
 				} finally {
 					context.end();
 				}

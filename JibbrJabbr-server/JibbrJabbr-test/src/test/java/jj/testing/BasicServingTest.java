@@ -145,19 +145,6 @@ public class BasicServingTest {
 		
 	}
 	
-	@Ignore
-	@Test
-	public void writeDocumentBytes_notATest() throws Exception {
-		TestHttpClient client = app.get(ANIMAL);
-		
-		byte[] bytes = client.contentBytes();
-		String string = client.contentsString();
-		System.out.println(string);
-		assertThat(string, is(new String(bytes, UTF_8)));
-		
-		Files.write(animalHtmlRenderedPath, bytes);
-	}
-	
 	private void runBasicStressTest(final int total , final VerifiableRequest[] toRun) throws Exception {
 		runStressTestPattern(total, new RequestMaker() {
 			
@@ -202,16 +189,26 @@ public class BasicServingTest {
 	
 	@Test
 	public void runMixedTest() throws Exception {
-		runBasicStressTest(1600, makeAll());
+		timePoundIt(16, 100);
 	}
 	
-	@Ignore
+	
+	@Ignore // until there is a cheaper method of comparison with expected responses.
+	// the current comparison is biasing the result
 	@Test
-	public void poundIt() throws Throwable {
-		timePoundIt(12, 4000);
+	public void areYouKiddingMe() throws Exception {
+		final int threadCount = 12;
+		// one quiet one to warm things up
+		poundIt(threadCount, 4000);
+		// and now make them loud
+		timePoundIt(threadCount, 5000);
+		System.out.println();
+		timePoundIt(threadCount, 500);
+		System.out.println();
+		timePoundIt(threadCount, 5000);
 	}
 	
-	public void poundIt(final int threadCount, final int perClientRequestCount) throws Exception {
+	private void poundIt(final int threadCount, final int perClientRequestCount) throws Exception {
 		final VerifiableRequest[] requests = makeAll();
 		final CountDownLatch latch = new CountDownLatch(threadCount);
 		final ExecutorService service = Executors.newFixedThreadPool(threadCount);
@@ -252,7 +249,7 @@ public class BasicServingTest {
 		if (failed) fail("FAILED");
 	}
 	
-	private void timePoundIt(final int threadCount, final int perClientRequestCount) throws Throwable {
+	private void timePoundIt(final int threadCount, final int perClientRequestCount) throws Exception {
 		final long startingTotalMemory = Runtime.getRuntime().totalMemory();
 		final long startingMaxMemory = Runtime.getRuntime().maxMemory();
 		final long startingFreeMemory = Runtime.getRuntime().freeMemory();
@@ -269,20 +266,5 @@ public class BasicServingTest {
 		Runtime.getRuntime().gc();
 		System.out.println("free\t" + Runtime.getRuntime().freeMemory() + "\ttotal\t" + Runtime.getRuntime().totalMemory() + "\tmax\t" + Runtime.getRuntime().maxMemory() + " after GC");
 	
-	}
-	
-	@Ignore // until there is a cheaper method of comparison with expected responses.
-	// the current comparison is biasing the result
-	@Test
-	public void areYouKiddingMePart2() throws Throwable {
-		final int threadCount = 12;
-		// one quiet one to warm things up
-		poundIt(threadCount, 4000);
-		// and now make them loud
-		timePoundIt(threadCount, 5000);
-		System.out.println();
-		timePoundIt(threadCount, 500);
-		System.out.println();
-		timePoundIt(threadCount, 5000);
 	}
 }
