@@ -83,7 +83,11 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 			
 			@Provides
 			protected WebSocketServerHandshakerFactory provideHandshaker() {
-				String uri = HTTP_REPLACER.matcher(request.headers().get(HttpHeaders.Names.ORIGIN) + request.getUri()).replaceFirst("ws");
+				String uri = HTTP_REPLACER.matcher(
+					request.headers().get(HttpHeaders.Names.ORIGIN) + 
+					request.getUri()
+				).replaceFirst("ws");
+				
 				return new WebSocketServerHandshakerFactory(uri, null, false);
 			}
 		});
@@ -107,8 +111,9 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		if (!(cause instanceof IOException)) {
 			logger.error("engine caught an exception", cause);
 			try {
-				ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR))
-					.addListener(ChannelFutureListener.CLOSE);
+				ctx.writeAndFlush(
+					new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR)
+				).addListener(ChannelFutureListener.CLOSE);
 			} catch (Exception e) {
 				logger.error("additionally, an exception occurred while responding with an error", e);
 			}
