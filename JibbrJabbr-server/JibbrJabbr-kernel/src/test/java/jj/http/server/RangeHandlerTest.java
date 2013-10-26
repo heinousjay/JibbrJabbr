@@ -22,7 +22,6 @@ import static org.mockito.BDDMockito.given;
 import java.util.List;
 
 import jj.http.server.RangeHandler.Range;
-import jj.resource.FileResource;
 import io.netty.handler.codec.http.HttpHeaders;
 
 import org.junit.Test;
@@ -38,14 +37,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class RangeHandlerTest {
 	
 	@Mock HttpHeaders requestHeaders;
-	@Mock FileResource resource;
 
 	@Test
 	public void test1() {
-		given(resource.size()).willReturn(200L);
 		given(requestHeaders.get(HttpHeaders.Names.RANGE)).willReturn("bytes=0-100,200-399");
 		
-		List<Range> ranges = new RangeHandler(requestHeaders, resource, 80).ranges();
+		List<Range> ranges = new RangeHandler(requestHeaders, 200L, 80).ranges();
 		
 		assertThat(ranges.size(), is(1));
 		assertThat(ranges.get(0).start, is(0L));
@@ -54,10 +51,9 @@ public class RangeHandlerTest {
 	
 	@Test
 	public void test2() {
-		given(resource.size()).willReturn(400L);
 		given(requestHeaders.get(HttpHeaders.Names.RANGE)).willReturn("bytes=0-100,200-399");
 		
-		List<Range> ranges = new RangeHandler(requestHeaders, resource, 80).ranges();
+		List<Range> ranges = new RangeHandler(requestHeaders, 400L, 80).ranges();
 		
 		assertThat(ranges.size(), is(2));
 		assertThat(ranges.get(0).start, is(0L));
@@ -68,10 +64,9 @@ public class RangeHandlerTest {
 	
 	@Test
 	public void test2a() {
-		given(resource.size()).willReturn(400L);
 		given(requestHeaders.get(HttpHeaders.Names.RANGE)).willReturn("bytes=0-100,200-399");
 		
-		List<Range> ranges = new RangeHandler(requestHeaders, resource, 100).ranges();
+		List<Range> ranges = new RangeHandler(requestHeaders, 400L, 100).ranges();
 		
 		assertThat(ranges.size(), is(2));
 		assertThat(ranges.get(0).start, is(0L));
@@ -82,11 +77,9 @@ public class RangeHandlerTest {
 	
 	@Test
 	public void test3() {
-
-		given(resource.size()).willReturn(400L);
 		given(requestHeaders.get(HttpHeaders.Names.RANGE)).willReturn("bytes=0-100,170-399");
 		
-		List<Range> ranges = new RangeHandler(requestHeaders, resource, 80).ranges();
+		List<Range> ranges = new RangeHandler(requestHeaders, 400L, 80).ranges();
 		
 		assertThat(ranges.size(), is(1));
 		assertThat(ranges.get(0).start, is(0L));
@@ -95,22 +88,18 @@ public class RangeHandlerTest {
 	
 	@Test
 	public void test4() {
-		
-		given(resource.size()).willReturn(2001L);
 		given(requestHeaders.get(HttpHeaders.Names.RANGE)).willReturn("bytes=-100,-200,1-199,2-198,-198,500-");
 		
-		RangeHandler rangeHandler = new RangeHandler(requestHeaders, resource, 80);
+		RangeHandler rangeHandler = new RangeHandler(requestHeaders, 2001L, 80);
 		assertThat(rangeHandler.ranges().size(), is(0));
 		assertThat(rangeHandler.isBadRequest(), is(true));
 	}
 	
 	@Test
 	public void test5() {
-		
-		given(resource.size()).willReturn(2001L);
 		given(requestHeaders.get(HttpHeaders.Names.RANGE)).willReturn("bytes=-100,-200,1-199,2-198,-198,500-");
 		
-		List<Range> ranges = new RangeHandler(requestHeaders, resource, 80, 6).ranges();
+		List<Range> ranges = new RangeHandler(requestHeaders, 2001L, 80, 6).ranges();
 		
 		assertThat(ranges.size(), is(2));
 		assertThat(ranges.get(0).start, is(1L));

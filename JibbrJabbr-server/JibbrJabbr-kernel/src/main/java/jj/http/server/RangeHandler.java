@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jj.StringUtils;
-import jj.resource.FileResource;
 import io.netty.handler.codec.http.HttpHeaders;
 
 /**
@@ -34,9 +33,6 @@ import io.netty.handler.codec.http.HttpHeaders;
  */
 class RangeHandler {
 	
-	/**
-	 * 
-	 */
 	private static final String HEADER_PREFIX = "bytes=";
 	private static final Pattern SPLITTER = Pattern.compile(",");
 	private static final Pattern RANGE = Pattern.compile("(\\d*)-(\\d*)");
@@ -62,7 +58,7 @@ class RangeHandler {
 	}
 	
 	private final HttpHeaders requestHeaders;
-	private final FileResource resource;
+	private final long responseSize;
 	private final List<Range> ranges = new ArrayList<>(2);
 	private final List<Range> originalranges = new ArrayList<>(2);
 	private final long overlapDistance;
@@ -77,10 +73,10 @@ class RangeHandler {
 	 */
 	RangeHandler(
 		final HttpHeaders requestHeaders,
-		final FileResource resource,
+		final long responseSize,
 		final long overlapDistance
 	) {
-		this(requestHeaders, resource, overlapDistance, 5);
+		this(requestHeaders, responseSize, overlapDistance, 5);
 	}
 	
 	/**
@@ -92,12 +88,12 @@ class RangeHandler {
 	 */
 	RangeHandler(
 		final HttpHeaders requestHeaders,
-		final FileResource resource,
+		final long responseSize,
 		final long overlapDistance,
 		final int maxRanges
 	) {
 		this.requestHeaders = requestHeaders;
-		this.resource = resource;
+		this.responseSize = responseSize;
 		this.overlapDistance = overlapDistance;
 		this.maxRanges = maxRanges;
 		parseRanges();
@@ -106,7 +102,7 @@ class RangeHandler {
 	private void parseRanges() {
 		String value = requestHeaders.get(HttpHeaders.Names.RANGE);
 		if (value == null) {
-			ranges.add(new Range(0, resource.size() - 1));
+			ranges.add(new Range(0, responseSize - 1));
 		} else if (value.startsWith(HEADER_PREFIX)) {
 			String[] candidates = SPLITTER.split(value.substring(HEADER_PREFIX.length()));
 			
@@ -140,16 +136,16 @@ class RangeHandler {
 				Range range;
 				if (StringUtils.isEmpty(group1)) {
 					// it's a range from the end
-					range = new Range(resource.size() - (Long.parseLong(group2) + 1), resource.size() - 1);
+					range = new Range(responseSize - (Long.parseLong(group2) + 1), responseSize - 1);
 				} else if (StringUtils.isEmpty(group2)) {
 					// it specifies a start to the end
-					range = new Range(Long.parseLong(group1), resource.size() - 1);
+					range = new Range(Long.parseLong(group1), responseSize - 1);
 				} else {
 					// it's a normal range
 					range = new Range(Long.parseLong(group1), Long.parseLong(group2));
 				}
-				if (range.start >= 0 && range.start <= range.end && range.start <= resource.size() - 1) {
-					ranges.add(range.end > resource.size() - 1 ? new Range(range.start, resource.size() - 1) : range);
+				if (range.start >= 0 && range.start <= range.end && range.start <= responseSize - 1) {
+					ranges.add(range.end > responseSize - 1 ? new Range(range.start, responseSize - 1) : range);
 				}
 				
 			} else {
