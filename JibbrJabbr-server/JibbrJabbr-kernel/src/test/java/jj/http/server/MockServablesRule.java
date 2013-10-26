@@ -18,6 +18,7 @@ package jj.http.server;
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
@@ -33,6 +34,8 @@ import org.junit.runners.model.Statement;
 import org.mockito.Mock;
 
 /**
+ * Include in a test to provide mock servables for testing
+ * 
  * @author jason
  *
  */
@@ -58,6 +61,11 @@ public class MockServablesRule implements TestRule {
 		cssServable = mock(Servable.class);
 		servables = mock(Servables.class);
 	}
+	
+	@SafeVarargs
+	private final List<Servable<? extends Resource>> asList(Servable<? extends Resource>...servable) {
+		return Arrays.<Servable<? extends Resource>>asList(servable);
+	}
 
 	@Override
 	public Statement apply(final Statement base, final Description description) {
@@ -69,15 +77,19 @@ public class MockServablesRule implements TestRule {
 				init();
 				
 				given(servables.findMatchingServables(staticUri))
-					.willReturn(Arrays.<Servable<? extends Resource>>asList(staticServable));
+					.willReturn(asList(staticServable));
+				
 				given(servables.findMatchingServables(assetUri))
-					.willReturn(Arrays.<Servable<? extends Resource>>asList(assetServable));
+					.willReturn(asList(assetServable));
+				
 				given(servables.findMatchingServables(cssUri))
-					.willReturn(Arrays.<Servable<? extends Resource>>asList(cssServable));
+					.willReturn(asList(cssServable));
+				
 				given(servables.findMatchingServables(uri4))
-					.willReturn(Arrays.<Servable<? extends Resource>>asList(assetServable, cssServable));
+					.willReturn(asList(assetServable, cssServable));
+				
 				given(servables.findMatchingServables(uri5))
-					.willReturn(Arrays.<Servable<? extends Resource>>asList(cssServable));
+					.willReturn(asList(cssServable));
 				
 				base.evaluate();
 			}
