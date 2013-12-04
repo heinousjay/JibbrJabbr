@@ -47,6 +47,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
 	@Mock Publisher publisher;
+	@Mock ScriptCompiler compiler;
 	MockRhinoContextProvider contextProvider;
 	
 
@@ -76,7 +77,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 		givenMinimalServices();
 		givenDocumentScriptEnvironmentResources(baseName());
 		
-		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextProvider, api, publisher);
+		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextProvider, api, publisher, compiler);
 		
 		return result;
 	}

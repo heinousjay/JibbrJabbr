@@ -54,10 +54,10 @@ public class DocumentScriptEnvironmentTest {
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
 	@Mock ResourceCacheKey cacheKey;
+	@Mock ScriptCompiler scriptCompiler;
 	MockRhinoContextProvider contextMaker;
 	
 	@Captor ArgumentCaptor<ExecutionEvent> eventCaptor;
-	@Captor ArgumentCaptor<String> clientStubCaptor;
 
 	@Before
 	public void before() throws Exception {
@@ -89,55 +89,15 @@ public class DocumentScriptEnvironmentTest {
 		String baseName = "index";
 		
 		try {
-			new DocumentScriptEnvironment(cacheKey, baseName, resourceFinder, contextMaker, api, publisher);
+			new DocumentScriptEnvironment(cacheKey, baseName, resourceFinder, contextMaker, api, publisher, scriptCompiler);
 			fail();
 		} catch (NoSuchResourceException nsre) {
 			assertThat(nsre.getMessage(), is(baseName + "-" + baseName + ".html"));
 		}
 	}
-	
-	@Test
-	public void testClientScript() throws Exception {
-		
-		String name = "broken";
-		
-		givenAnHtmlResource(name);
-		givenAClientScript(name);
-		given(script.script()).willReturn(
-			"function stubWithReturn() {\nwhatever\nreturn something;\n}\n" +
-			"function stubNoReturn() {\nwhatever\n}\n" +
-			"var notStubbed = function() {\nwhatever\n}\n" +
-			"random stuff; is ignored;\n" +
-			"function() {\nanonymous not stubbed\n}\n"
-		);
-		givenAServerScript(name);
-		
-		RuntimeException re = new RuntimeException();
-		
-		given(contextMaker.context.evaluateString(eq(local), anyString(), anyString())).willReturn(null).willThrow(re);
-		
-		try {
-			new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
-			fail();
-		} catch (ResourceNotViableException rnve) {
-			assertThat(rnve.getMessage(), is(name));
-			assertThat(rnve.getCause(), is(sameInstance((Throwable)re)));
-		}
-		
-		verify(contextMaker.context, times(2)).evaluateString(eq(local), clientStubCaptor.capture(), anyString());
-		
-		assertThat(clientStubCaptor.getValue(), is(
-			"function stubWithReturn(){return global['//doInvoke']('stubWithReturn',global['//convertArgs'](arguments));}\n" +
-			"function stubNoReturn(){global['//doCall']('stubNoReturn',global['//convertArgs'](arguments));}\n"
-		));
-		
-		verify(publisher, times(2)).publish(eventCaptor.capture());
-		assertThat(eventCaptor.getAllValues().get(0), is(instanceOf(EvaluatingClientStub.class)));
-		assertThat(eventCaptor.getAllValues().get(1), is(instanceOf(ErrorEvaluatingClientStub.class)));
-	}
 
 	@Test
-	public void testSharedScript() throws Exception {
+	public void testCompilationFailureHandledCorrectly() throws Exception {
 		
 		String name = "broken";
 		
@@ -147,48 +107,15 @@ public class DocumentScriptEnvironmentTest {
 		
 		RuntimeException re = new RuntimeException();
 		
-		given(contextMaker.context.evaluateString(eq(local), anyString(), anyString())).willReturn(null).willThrow(re);
+		given(scriptCompiler.compile(local, null, script, script)).willThrow(re);
 		
 		try {
-			new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
+			new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
 			fail();
 		} catch (ResourceNotViableException rnve) {
 			assertThat(rnve.getMessage(), is(name));
 			assertThat(rnve.getCause(), is(sameInstance((Throwable)re)));
 		}
-		
-		verify(publisher, times(2)).publish(eventCaptor.capture());
-		
-		assertThat(eventCaptor.getAllValues().get(0), is(instanceOf(EvaluatingSharedScript.class)));
-		assertThat(eventCaptor.getAllValues().get(1), is(instanceOf(ErrorEvaluatingSharedScript.class)));
-	}
-
-	@Test
-	public void testServerScript() throws Exception {
-		
-		String name = "broken";
-		
-		givenAnHtmlResource(name);
-		givenASharedScript(name);
-		givenAServerScript(name);
-		
-		RuntimeException re = new RuntimeException();
-		
-		given(contextMaker.context.compileString(anyString(), anyString())).willThrow(re);
-		
-		try {
-			new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
-			fail();
-		} catch (ResourceNotViableException rnve) {
-			assertThat(rnve.getMessage(), is(name));
-			assertThat(rnve.getCause(), is(sameInstance((Throwable)re)));
-		}
-		
-		verify(publisher, times(3)).publish(eventCaptor.capture());
-		
-		assertThat(eventCaptor.getAllValues().get(0), is(instanceOf(EvaluatingSharedScript.class)));
-		assertThat(eventCaptor.getAllValues().get(1), is(instanceOf(CompilingServerScript.class)));
-		assertThat(eventCaptor.getAllValues().get(2), is(instanceOf(ErrorCompilingServerScript.class)));
 	}
 	
 	// i know this looks like a private method is being tested... and sure, it is... but the
@@ -203,7 +130,7 @@ public class DocumentScriptEnvironmentTest {
 		ScriptableObject scope = mock(ScriptableObject.class);
 		given(api.global()).willReturn(scope);
 		
-		new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
+		new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
 		
 		verify(local).setPrototype(scope);
 		verify(local).setParentScope(null);
@@ -226,7 +153,7 @@ public class DocumentScriptEnvironmentTest {
 		givenASharedScript(name);
 		givenAServerScript(name);
 		
-		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher);
+		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
 		
 		verify(html).addDependent(result);
 		verify(script, times(3)).addDependent(result);

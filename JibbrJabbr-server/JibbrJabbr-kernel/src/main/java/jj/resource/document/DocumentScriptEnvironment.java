@@ -17,8 +17,7 @@ package jj.resource.document;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -31,11 +30,11 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.SHA1Helper;
-import jj.engine.DoCallFunction;
-import jj.engine.DoInvokeFunction;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.IOThread;
+import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketHost;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -48,14 +47,16 @@ import jj.script.FunctionContext;
 import jj.script.RhinoContext;
 
 /**
- * Slightly more going on than your average resource. at least some of this will
- * be moving to a base class
+ * Represents a document script, and manages all of the attendant resources
+ * and web socket connections
  * 
  * @author jason
  *
  */
 @Singleton
-public class DocumentScriptEnvironment extends AbstractScriptEnvironment implements FunctionContext, RootScriptEnvironment {
+public class DocumentScriptEnvironment
+	extends AbstractScriptEnvironment
+	implements FunctionContext, RootScriptEnvironment, WebSocketHost {
 
 	@Override
 	public String baseName() {
@@ -123,6 +124,24 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 		return false;
 	}
 	
+	@Override
+	public void connected(JJWebSocketConnection connection) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void disconnected(JJWebSocketConnection connection) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public Iterator<JJWebSocketConnection> iterator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	// --- implementation
 	
 
@@ -156,7 +175,8 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 		final ResourceFinder resourceFinder,
 		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
-		final Publisher publisher
+		final Publisher publisher,
+		final ScriptCompiler compiler
 	) {
 		super(cacheKey, publisher, contextProvider);
 		this.baseName = baseName;
@@ -187,7 +207,7 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 			scope = createLocalScope(baseName, api.global());
 			
 			try {
-				script = compile();
+				script = compiler.compile(scope, clientScript, sharedScript, serverScript);
 			} catch (Exception e) {
 				throw new ResourceNotViableException(baseName, e);
 			}
@@ -197,91 +217,6 @@ public class DocumentScriptEnvironment extends AbstractScriptEnvironment impleme
 		if (clientScript != null) clientScript.addDependent(this);
 		if (sharedScript != null) sharedScript.addDependent(this);
 		if (serverScript != null) serverScript.addDependent(this);
-	}
-	
-	private Script compile() {
-		try (RhinoContext context = contextProvider.get()) {
-			
-			if (sharedScript != null) {
-				publisher.publish(new EvaluatingSharedScript(sharedScript.path().toString()));
-				
-				try {
-					context.evaluateString(
-						scope, 
-						sharedScript.script(),
-						sharedScript.path().toString()
-					);
-				} catch (RuntimeException e) {
-					publisher.publish(new ErrorEvaluatingSharedScript(sharedScript.path().toString(), e));
-					throw e;
-				}
-			}
-			
-			if (clientScript != null) {
-				String clientStub = extractClientStubs();
-				publisher.publish(new EvaluatingClientStub(clientScript.path().toString(), clientStub));
-				try {
-					context.evaluateString(scope, clientStub, "client stub for " + serverScript.path());
-				} catch (RuntimeException e) {
-					publisher.publish(new ErrorEvaluatingClientStub(clientScript.path().toString(), e));
-					throw e;
-				}
-			}
-		    
-			publisher.publish(new CompilingServerScript(serverScript.path().toString()));
-			try {
-				return context.compileString(serverScript.script(), serverScript.path().toString());
-			} catch (RuntimeException e) {
-				publisher.publish(new ErrorCompilingServerScript(serverScript.path().toString(), e));
-				throw e;
-			}
-		    
-		}
-	}
-	
-	private static final Pattern COUNT_PATTERN = Pattern.compile("\\r?\\n", Pattern.MULTILINE);
-	
-	private static final Pattern TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN = 
-		Pattern.compile("^function[\\s]*([^\\(]+)\\([^\\)]*\\)[\\s]*\\{[\\s]*$");
-	
-	private String extractClientStubs() {
-		StringBuilder stubs = new StringBuilder();
-		
-		if (clientScript != null) {
-			final String[] lines = COUNT_PATTERN.split(clientScript.script());
-			Matcher lastMatcher = null;
-			String previousLine = null;
-			for (String line : lines) {
-				if (lastMatcher == null) {
-					Matcher matcher = TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN.matcher(line);
-					if (matcher.matches()) {
-						lastMatcher = matcher;
-					}
-				} else if ("}".equals(line) && lastMatcher != null) {
-					boolean hasReturn = previousLine.trim().startsWith("return ");
-					stubs.append("function ")
-						.append(lastMatcher.group(1))
-						.append("(){")
-						.append(hasReturn ? "return " : "")
-						.append("global['")
-						.append(hasReturn ? DoInvokeFunction.PROP_DO_INVOKE : DoCallFunction.PROP_DO_CALL)
-						.append("']('")
-						.append(lastMatcher.group(1))
-						.append("',global['")
-						.append(EngineAPI.PROP_CONVERT_ARGS)
-						.append("'](arguments))")
-						.append(";}\n");
-					
-					//log.trace("found {}, {} return", lastMatcher.group(1), hasReturn ? "with" : "no");
-					
-					
-					lastMatcher = null;
-				}
-				
-				previousLine = line;
-			}
-		}
-		return stubs.toString();
 	}
 
 	/**

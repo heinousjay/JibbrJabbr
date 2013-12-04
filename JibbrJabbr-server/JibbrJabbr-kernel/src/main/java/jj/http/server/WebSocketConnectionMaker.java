@@ -97,7 +97,7 @@ class WebSocketConnectionMaker {
 						resourceFinder.findResource(DocumentScriptEnvironment.class, uriMatch.name);
 					
 					if (
-						scriptEnvironment == null || 
+						scriptEnvironment == null || // actually in this case, just return 404
 						!uriMatch.sha1.equals(scriptEnvironment.sha1())
 					) {
 						

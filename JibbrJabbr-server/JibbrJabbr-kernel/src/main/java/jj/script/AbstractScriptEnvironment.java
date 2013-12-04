@@ -58,6 +58,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 			return context.newObject(scope());
 		}
 	}
+	
+	// this is a nasty mess and really needs a wash
 
 	@Override
 	public boolean initialized() {

@@ -31,7 +31,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 /**
- * coordinates the management of websocket frames.
+ * coordinates the management of websocket frames.  mainly the job here
+ * is to turn the netty API into something a little easier to use
  * 
  * @author jason
  *
