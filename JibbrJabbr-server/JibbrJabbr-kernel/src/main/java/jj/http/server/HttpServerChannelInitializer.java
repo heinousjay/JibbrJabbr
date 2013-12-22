@@ -19,6 +19,7 @@ import static jj.http.server.PipelineStages.*;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
@@ -34,6 +35,7 @@ import javax.inject.Singleton;
  * 
  */
 @Singleton
+@Sharable
 class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 	
 	private final Provider<JJEngineHttpHandler> engineProvider;

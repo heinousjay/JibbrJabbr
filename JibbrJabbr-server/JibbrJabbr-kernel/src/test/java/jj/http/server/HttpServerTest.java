@@ -15,8 +15,9 @@
  */
 package jj.http.server;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 
+import javax.inject.Provider;
 import javax.net.SocketFactory;
 
 import jj.configuration.Configuration;
@@ -33,9 +34,17 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class HttpServerTest {
+	
+	Provider<JJEngineHttpHandler> engineProvider = new Provider<JJEngineHttpHandler>() {
+		
+		@Override
+		public JJEngineHttpHandler get() {
+			return mock(JJEngineHttpHandler.class);
+		}
+	};
 
-	@Mock HttpServerChannelInitializer initializer;
 	@Mock Configuration configuration;
+	
 	HttpServerSocketConfiguration config = new HttpServerSocketConfiguration() {
 		
 		@Override
@@ -109,7 +118,7 @@ public class HttpServerTest {
 		
 		// given
 		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
-		HttpServer httpServer = new HttpServer(new MockJJNioEventLoopGroup(), initializer, configuration);
+		HttpServer httpServer = new HttpServer(new MockJJNioEventLoopGroup(), new HttpServerChannelInitializer(engineProvider), configuration);
 
 		try {
 			// when
