@@ -27,7 +27,7 @@ import jj.uri.URIMatch;
  *
  */
 @Singleton
-class WebSocketUriChecker {
+class WebSocketRequestChecker {
 
 	private static final String SOCKET = "socket";
 

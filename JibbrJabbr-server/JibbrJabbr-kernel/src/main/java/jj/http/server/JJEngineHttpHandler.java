@@ -47,7 +47,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	
 	private final Injector parentInjector;
 	
-	private final WebSocketUriChecker webSocketUriChecker;
+	private final WebSocketRequestChecker webSocketRequestChecker;
 	
 	private final Logger logger;
 	
@@ -56,13 +56,13 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final JJExecutor executors,
 		final Servables servables,
 		final Injector parentInjector,
-		final WebSocketUriChecker webSocketUriChecker,
+		final WebSocketRequestChecker webSocketRequestChecker,
 		final @EmergencyLogger Logger logger
 	) {
 		this.executors = executors;
 		this.servables = servables;
 		this.parentInjector = parentInjector;
-		this.webSocketUriChecker = webSocketUriChecker;
+		this.webSocketRequestChecker = webSocketRequestChecker;
 		this.logger = logger;
 	}
 
@@ -96,7 +96,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		
 			injector.getInstance(HttpResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
-		} else if (webSocketUriChecker.isWebSocketRequest(request)) {
+		} else if (webSocketRequestChecker.isWebSocketRequest(request)) {
 			
 			injector.getInstance(WebSocketConnectionMaker.class).handshakeWebsocket();
 			

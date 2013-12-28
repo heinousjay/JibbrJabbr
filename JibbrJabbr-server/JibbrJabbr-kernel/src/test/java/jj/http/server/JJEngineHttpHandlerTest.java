@@ -71,7 +71,7 @@ public class JJEngineHttpHandlerTest {
 	@Captor ArgumentCaptor<Module> moduleCaptor;
 	@Captor ArgumentCaptor<FullHttpResponse> responseCaptor;
 	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
-	@Mock WebSocketUriChecker webSocketUriChecker;
+	@Mock WebSocketRequestChecker webSocketRequestChecker;
 	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
 	MockJJExecutor executors;
@@ -109,7 +109,7 @@ public class JJEngineHttpHandlerTest {
 		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
 		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
-		handler = new JJEngineHttpHandler(executors, servables.servables, injector, webSocketUriChecker, logger);
+		handler = new JJEngineHttpHandler(executors, servables.servables, injector, webSocketRequestChecker, logger);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -138,7 +138,7 @@ public class JJEngineHttpHandlerTest {
 	public void testChannelRead0WebSocketRequest() throws Exception {
 		
 		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		given(webSocketUriChecker.isWebSocketRequest(fullHttpRequest)).willReturn(true);
+		given(webSocketRequestChecker.isWebSocketRequest(fullHttpRequest)).willReturn(true);
 		
 		prepareInjectorStubbing();
 		

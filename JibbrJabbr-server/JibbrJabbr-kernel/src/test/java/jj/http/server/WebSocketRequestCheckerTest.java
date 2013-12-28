@@ -32,16 +32,16 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class WebSocketUriCheckerTest {
+public class WebSocketRequestCheckerTest {
 	
 	final String socketUri = "/1234567890123456789012345678901234567890/something.socket";
 	
-	WebSocketUriChecker wsuc;
+	WebSocketRequestChecker wsrc;
 	FullHttpRequest request;
 	
 	@Before
 	public void before() {
-		wsuc = new WebSocketUriChecker();
+		wsrc = new WebSocketRequestChecker();
 	}
 
 	@Test
@@ -51,15 +51,15 @@ public class WebSocketUriCheckerTest {
 		request.headers()
 			.add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.UPGRADE)
 			.add(HttpHeaders.Names.UPGRADE, HttpHeaders.Values.WEBSOCKET);
-		assertThat(wsuc.isWebSocketRequest(request), is(true));
+		assertThat(wsrc.isWebSocketRequest(request), is(true));
 
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/some/uri");
 		request.headers()
 			.add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.UPGRADE)
 			.add(HttpHeaders.Names.UPGRADE, HttpHeaders.Values.WEBSOCKET);
-		assertThat(wsuc.isWebSocketRequest(request), is(false));
+		assertThat(wsrc.isWebSocketRequest(request), is(false));
 		
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, socketUri);
-		assertThat(wsuc.isWebSocketRequest(request), is(false));
+		assertThat(wsrc.isWebSocketRequest(request), is(false));
 	}
 }
