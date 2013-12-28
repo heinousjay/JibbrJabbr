@@ -21,7 +21,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -65,7 +65,11 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 	private final Logger logger = LoggerFactory.getLogger(EventConfiguringTypeListener.class);
 
-	/** mapped from subscriber class name -> the methodinfos for the listener methods of the class */
+	/**
+	 * mapped from subscriber class name -> the methodinfos for the listener methods of the class. 
+	 * since this list stored as the value is only ever manipulated when a new type is encountered for
+	 * the first time, and is read-only after that, it doesn't need to be synchronized
+	 */
 	private final ConcurrentMap<String, List<MethodInfo>> subscribers = PlatformDependent.newConcurrentHashMap();
 	
 	/** 
@@ -76,7 +80,12 @@ class EventConfiguringTypeListener implements TypeListener {
 	 */
 	private final ConcurrentMap<String, Class<? extends Invoker>> invokerClasses = PlatformDependent.newConcurrentHashMap();
 	
-	/** mapped from the event type -> the set of listener invokers for that event */
+	/** 
+	 * mapped from the event type -> the set of listener invokers for that event 
+	 * the set stored as the value can be manipulated from multiple threads, so it needs
+	 * to also be concurrent, but the value itself will only ever be set once on first encounter
+	 * for a given event type and never removed after so that should do it
+	 */
 	private final ConcurrentMap<Class<?>, Set<Invoker>> invokers = PlatformDependent.newConcurrentHashMap();
 	
 	/** mapped from the weak reference to the instance invoked -> invoker */
@@ -122,7 +131,7 @@ class EventConfiguringTypeListener implements TypeListener {
 					}
 				}
 			} catch (Exception e) {
-				// this shouldn't happen
+				// this shouldn't ever happen
 				System.err.println("failure cleaning up references to event listeners!");
 				e.printStackTrace();
 			}
@@ -242,7 +251,10 @@ class EventConfiguringTypeListener implements TypeListener {
 						method.getParameterTypes().length == 1
 					) {
 						subscribers.get(name).add(new MethodInfo(method));
-						invokers.putIfAbsent(Class.forName(method.getParameterTypes()[0].getName()), new HashSet<Invoker>());
+						Class<?> key = Class.forName(method.getParameterTypes()[0].getName());
+						if (!invokers.containsKey(key)) {
+							invokers.putIfAbsent(key, Collections.newSetFromMap(PlatformDependent.<Invoker, Boolean>newConcurrentHashMap()));
+						}
 					}
 				}
 				

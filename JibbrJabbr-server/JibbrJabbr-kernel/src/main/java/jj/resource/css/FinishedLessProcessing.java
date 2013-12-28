@@ -15,6 +15,8 @@
  */
 package jj.resource.css;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -23,5 +25,14 @@ import jj.execution.ExecutionEvent;
  */
 public class FinishedLessProcessing implements ExecutionEvent {
 
-	FinishedLessProcessing(final String lessName) {}
+	private final String lessName;
+	
+	FinishedLessProcessing(final String lessName) {
+		this.lessName = lessName;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.debug("finished processing less resource {}", lessName);
+	}
 }

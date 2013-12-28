@@ -13,24 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.script;
+package jj.script;
+
+import org.slf4j.Logger;
 
 import jj.execution.ExecutionEvent;
-import jj.script.ScriptEnvironment;
 
 /**
  * @author jason
  *
  */
-public class ExecutionEnvironmentInitialized implements ExecutionEvent {
+public class ScriptEnvironmentInitialized implements ExecutionEvent {
 	
 	private final ScriptEnvironment scriptEnvironment;
 
-	public ExecutionEnvironmentInitialized(final ScriptEnvironment scriptEnvironment) {
+	public ScriptEnvironmentInitialized(final ScriptEnvironment scriptEnvironment) {
 		this.scriptEnvironment = scriptEnvironment;
 	}
 	
 	public ScriptEnvironment executionEnvironment() {
 		return scriptEnvironment;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.info("script environment initialized: {}", scriptEnvironment);
 	}
 }

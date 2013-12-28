@@ -15,10 +15,14 @@
  */
 package jj.execution;
 
+import org.slf4j.Logger;
+
 /**
  * @author jason
  *
  */
 public interface ExecutionEvent {
+	
+	void describeTo(Logger log);
 	
 }

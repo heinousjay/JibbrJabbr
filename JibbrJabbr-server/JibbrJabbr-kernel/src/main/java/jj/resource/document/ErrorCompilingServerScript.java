@@ -15,6 +15,8 @@
  */
 package jj.resource.document;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -23,7 +25,17 @@ import jj.execution.ExecutionEvent;
  */
 class ErrorCompilingServerScript implements ExecutionEvent {
 
-	ErrorCompilingServerScript(String path, Throwable cause) {
-		
+	private final String path;
+	private final Throwable cause;
+	
+	ErrorCompilingServerScript(final String path, final Throwable cause) {
+		this.path = path;
+		this.cause = cause;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.error("error compiling server script at {}", path);
+		log.error("", cause);
 	}
 }

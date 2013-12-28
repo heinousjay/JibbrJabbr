@@ -15,6 +15,8 @@
  */
 package jj.resource.css;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -23,8 +25,15 @@ import jj.execution.ExecutionEvent;
  */
 public class StartingLessProcessing implements ExecutionEvent {
 	
+	private final String lessName;
+	
 	StartingLessProcessing(final String lessName) {
-		
+		this.lessName = lessName;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.info("started processing less resource {}", lessName);
 	}
 
 }

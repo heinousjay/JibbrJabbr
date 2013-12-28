@@ -15,6 +15,8 @@
  */
 package jj.resource.document;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -22,8 +24,18 @@ import jj.execution.ExecutionEvent;
  *
  */
 class ErrorEvaluatingSharedScript implements ExecutionEvent {
+
+	private final String path;
+	private final Throwable cause;
 	
-	
-	ErrorEvaluatingSharedScript(String path, Throwable cause) {
+	ErrorEvaluatingSharedScript(final String path, final Throwable cause) {
+		this.path = path;
+		this.cause = cause;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.error("error evaluating shared script at {}", path);
+		log.error("", cause);
 	}
 }

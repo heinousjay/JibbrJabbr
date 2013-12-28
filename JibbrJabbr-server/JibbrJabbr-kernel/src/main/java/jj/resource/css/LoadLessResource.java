@@ -15,6 +15,8 @@
  */
 package jj.resource.css;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -23,5 +25,14 @@ import jj.execution.ExecutionEvent;
  */
 public class LoadLessResource implements ExecutionEvent {
 
-	LoadLessResource(String name) {}
+	private final String name;
+	
+	LoadLessResource(final String name) {
+		this.name = name;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.debug("loading less resource {}", name);
+	}
 }

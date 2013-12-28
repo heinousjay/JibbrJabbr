@@ -25,9 +25,9 @@ import jj.JJServerStartupListener;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
-import jj.resource.script.ExecutionEnvironmentInitialized;
 import jj.resource.script.ScriptResource;
 import jj.resource.spec.SpecResource;
+import jj.script.ScriptEnvironmentInitialized;
 
 /**
  * @author jason
@@ -54,7 +54,7 @@ public class SpecRunner implements JJServerStartupListener {
 	 * @param scriptResource
 	 */
 	@Listener
-	void findAndExecuteSpec(final ExecutionEnvironmentInitialized event) {
+	void findAndExecuteSpec(final ScriptEnvironmentInitialized event) {
 		String name = event.executionEnvironment().scriptName();
 		ScriptResource scriptResource = resourceFinder.findResource(ScriptResource.class, name);
 		SpecResource specResource = resourceFinder.findResource(SpecResource.class, name);

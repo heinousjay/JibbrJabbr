@@ -15,6 +15,8 @@
  */
 package jj.resource.document;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -23,7 +25,14 @@ import jj.execution.ExecutionEvent;
  */
 class CompilingServerScript implements ExecutionEvent {
 
-	CompilingServerScript(String path) {
-		
+	private final String path;
+	
+	CompilingServerScript(final String path) {
+		this.path = path;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.info("compiling server script at {}", path);
 	}
 }

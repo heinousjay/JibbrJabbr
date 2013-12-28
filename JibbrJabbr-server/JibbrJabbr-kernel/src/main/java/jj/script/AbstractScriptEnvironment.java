@@ -24,7 +24,6 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.event.Publisher;
 import jj.resource.AbstractResourceBase;
 import jj.resource.ResourceCacheKey;
-import jj.resource.script.ExecutionEnvironmentInitialized;
 
 /**
  * @author jason
@@ -70,7 +69,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResourceBase imp
 	public void initialized(boolean initialized) {
 		if (initialized) {
 			state = Initialized;
-			publisher.publish(new ExecutionEnvironmentInitialized(this));
+			publisher.publish(new ScriptEnvironmentInitialized(this));
 		}
 	}
 

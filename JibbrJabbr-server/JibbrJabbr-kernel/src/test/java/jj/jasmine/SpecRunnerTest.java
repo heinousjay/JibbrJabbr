@@ -17,10 +17,10 @@ package jj.jasmine;
 
 import static org.mockito.BDDMockito.*;
 import jj.resource.ResourceFinder;
-import jj.resource.script.ExecutionEnvironmentInitialized;
 import jj.resource.script.ScriptResource;
 import jj.resource.spec.SpecResource;
 import jj.script.ScriptEnvironment;
+import jj.script.ScriptEnvironmentInitialized;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,7 +50,7 @@ public class SpecRunnerTest {
 		given(resourceFinder.findResource(ScriptResource.class, scriptEnvironment.scriptName())).willReturn(scriptResource);
 		given(resourceFinder.findResource(SpecResource.class, scriptEnvironment.scriptName())).willReturn(specResource);
 		
-		specRunner.findAndExecuteSpec(new ExecutionEnvironmentInitialized(scriptEnvironment));
+		specRunner.findAndExecuteSpec(new ScriptEnvironmentInitialized(scriptEnvironment));
 		
 		// need to be dependent upon each other so that changes to either cause
 		// things to get reloaded

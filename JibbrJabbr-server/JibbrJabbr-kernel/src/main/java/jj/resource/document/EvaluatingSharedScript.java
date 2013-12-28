@@ -15,6 +15,8 @@
  */
 package jj.resource.document;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -23,7 +25,14 @@ import jj.execution.ExecutionEvent;
  */
 class EvaluatingSharedScript implements ExecutionEvent {
 	
+	private final String path;
 	
-	EvaluatingSharedScript(String path) {
+	EvaluatingSharedScript(final String path) {
+		this.path = path;
+	}
+	
+	@Override
+	public void describeTo(Logger log) {
+		log.info("evaluating shared script at {}", path);
 	}
 }

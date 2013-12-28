@@ -165,4 +165,10 @@ public class EventSystemTest {
 		return pub;
 	}
 
+	private void write_a_concurrent_registration_and_invocation_test() {
+		// perhaps loop threads that keep creating and discarding new instances,
+		// while another set of threads publish a lot
+		// have to figure out how to make this verifiable, though
+	}
+	
 }

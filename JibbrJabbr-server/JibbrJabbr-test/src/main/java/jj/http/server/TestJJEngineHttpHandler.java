@@ -46,10 +46,10 @@ public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
 		final JJExecutor executors,
 		final Servables servables,
 		final Injector injector,
-		final WebSocketRequestChecker webSocketRequestChecker,
+		final WebSocketRequestChecker webSocketUriChecker,
 		final @EmergencyLogger Logger logger
 	) {
-		super(executors, servables, injector, webSocketRequestChecker, logger);
+		super(executors, servables, injector, webSocketUriChecker, logger);
 	}
 
 	@Override

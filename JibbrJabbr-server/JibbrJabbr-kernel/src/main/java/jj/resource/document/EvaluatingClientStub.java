@@ -15,6 +15,8 @@
  */
 package jj.resource.document;
 
+import org.slf4j.Logger;
+
 import jj.execution.ExecutionEvent;
 
 /**
@@ -22,8 +24,18 @@ import jj.execution.ExecutionEvent;
  *
  */
 class EvaluatingClientStub implements ExecutionEvent {
+	
+	private final String path;
+	private final String stub;
 
-	EvaluatingClientStub(String path, String stub) {
-		
+	EvaluatingClientStub(final String path, final String stub) {
+		this.path = path;
+		this.stub = stub;
+	}
+	
+	@Override
+	public void describeTo(Logger log) {
+		log.info("evaluating client stub from {}", path);
+		log.debug("{}", stub);
 	}
 }
