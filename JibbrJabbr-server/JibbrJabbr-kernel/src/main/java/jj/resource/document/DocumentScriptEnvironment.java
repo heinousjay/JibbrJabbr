@@ -197,13 +197,14 @@ public class DocumentScriptEnvironment
 		);
 		
 
-		this.uri = "/" + sha1 + "/" + baseName;
-		this.socketUri = this.uri + ".socket";
+		uri = "/" + sha1 + "/" + baseName;
 		
 		if (serverScript == null)  {
+			socketUri = null;
 			scope = null;
 			script = null;
 		} else {
+			socketUri = uri + ".socket";
 			scope = createLocalScope(baseName, api.global());
 			
 			try {

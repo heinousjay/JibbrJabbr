@@ -17,8 +17,8 @@ package jj.resource.document;
 
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
 import java.nio.file.Paths;
@@ -158,7 +158,27 @@ public class DocumentScriptEnvironmentTest {
 		verify(html).addDependent(result);
 		verify(script, times(3)).addDependent(result);
 		
-		assertThat(result.uri(), is("/da39a3ee5e6b4b0d3255bfef95601890afd80709/" + name));
-		assertThat(result.socketUri(), is("/da39a3ee5e6b4b0d3255bfef95601890afd80709/" + name + ".socket"));
+		assertThat(result.sha1().length(), is(40));
+		assertThat(result.uri(), is("/" + result.sha1() + "/" + name));
+		assertThat(result.socketUri(), is("/" + result.sha1() + "/" + name + ".socket"));
+	}
+	
+	@Test
+	public void testHTMLWithNoServerScript() throws Exception {
+		
+		String name = "index";
+		
+		givenAnHtmlResource(name);
+		givenAClientScript(name);
+		givenASharedScript(name);
+		
+		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
+		
+		assertThat(result.sha1().length(), is(40));
+		assertThat(result.uri(), is("/" + result.sha1() + "/" + name));
+		assertThat(result.socketUri(), is(nullValue()));
+		
+		assertThat(result.scope(), is(nullValue()));
+		assertThat(result.script(), is(nullValue()));
 	}
 }
