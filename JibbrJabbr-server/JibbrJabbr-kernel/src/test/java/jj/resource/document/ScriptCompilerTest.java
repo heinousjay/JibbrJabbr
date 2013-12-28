@@ -61,6 +61,14 @@ public class ScriptCompilerTest {
 		contextProvider = new MockRhinoContextProvider();
 		
 		given(clientScript.path()).willReturn(Paths.get("/"));
+		given(clientScript.script()).willReturn(
+			"var notStubbed = function() {\nwhatever\n}\n" +
+			"function stubWithReturn() {\nwhatever\nreturn something;\n}\n" +
+			"random stuff; is ignored;\n" +
+			"function stubNoReturn() {\nwhatever\n}\n" +
+			"function() {\nanonymous not stubbed\n}\n"
+		);
+		
 		given(sharedScript.path()).willReturn(Paths.get("/"));
 		given(serverScript.path()).willReturn(Paths.get("/"));
 		
@@ -69,39 +77,6 @@ public class ScriptCompilerTest {
 	
 	@Test
 	public void testClientScript() {
-		
-		given(clientScript.script()).willReturn(
-			"function stubWithReturn() {\nwhatever\nreturn something;\n}\n" +
-			"function stubNoReturn() {\nwhatever\n}\n" +
-			"var notStubbed = function() {\nwhatever\n}\n" +
-			"random stuff; is ignored;\n" +
-			"function() {\nanonymous not stubbed\n}\n"
-		);
-		
-		given(contextProvider.context.evaluateString(eq(scope), anyString(), anyString())).willReturn(null);
-		
-		sc.compile(scope, clientScript, null, serverScript);
-		
-		verify(contextProvider.context).evaluateString(eq(scope), clientStubCaptor.capture(), anyString());
-		
-		assertThat(clientStubCaptor.getValue(), is(
-			"function stubWithReturn(){return global['//doInvoke']('stubWithReturn',global['//convertArgs'](arguments));}\n" +
-			"function stubNoReturn(){global['//doCall']('stubNoReturn',global['//convertArgs'](arguments));}\n"
-		));
-		
-		verify(publisher).publish(isA(EvaluatingClientStub.class));
-	}
-	
-	@Test
-	public void testClientScriptWithFailure() {
-		
-		given(clientScript.script()).willReturn(
-			"function stubWithReturn() {\nwhatever\nreturn something;\n}\n" +
-			"function stubNoReturn() {\nwhatever\n}\n" +
-			"var notStubbed = function() {\nwhatever\n}\n" +
-			"random stuff; is ignored;\n" +
-			"function() {\nanonymous not stubbed\n}\n"
-		);
 		
 		RuntimeException re = new RuntimeException();
 		
@@ -116,6 +91,8 @@ public class ScriptCompilerTest {
 		
 		verify(contextProvider.context).evaluateString(eq(scope), clientStubCaptor.capture(), anyString());
 		
+		verify(contextProvider.context).evaluateString(eq(scope), anyString(), anyString());
+		
 		assertThat(clientStubCaptor.getValue(), is(
 			"function stubWithReturn(){return global['//doInvoke']('stubWithReturn',global['//convertArgs'](arguments));}\n" +
 			"function stubNoReturn(){global['//doCall']('stubNoReturn',global['//convertArgs'](arguments));}\n"
@@ -127,16 +104,6 @@ public class ScriptCompilerTest {
 	
 	@Test
 	public void testSharedScript() {
-		
-		given(contextProvider.context.evaluateString(eq(scope), anyString(), anyString())).willReturn(null);
-		
-		sc.compile(scope, null, sharedScript, serverScript);
-		
-		verify(publisher).publish(isA(EvaluatingSharedScript.class));
-	}
-	
-	@Test
-	public void testSharedScriptWithFailure() {
 		
 		RuntimeException re = new RuntimeException();
 		
@@ -154,4 +121,30 @@ public class ScriptCompilerTest {
 		verify(publisher).publish(isA(ErrorEvaluatingSharedScript.class));
 	}
 
+	@Test
+	public void testServerScript() {
+		
+		RuntimeException re = new RuntimeException();
+		
+		given(contextProvider.context.compileString(serverScript.script(), serverScript.path().toString())).willThrow(re);
+		
+		try {
+			sc.compile(scope, null, null, serverScript);
+			fail();
+		} catch (RuntimeException caught) {
+			assertThat(caught, is(re));
+		}
+		
+		verify(publisher).publish(isA(CompilingServerScript.class));
+		verify(publisher).publish(isA(ErrorCompilingServerScript.class));
+	}
+	
+	@Test
+	public void testAll() {
+		sc.compile(scope, clientScript, sharedScript, serverScript);
+		
+		verify(publisher).publish(isA(EvaluatingClientStub.class));
+		verify(publisher).publish(isA(EvaluatingSharedScript.class));
+		verify(publisher).publish(isA(CompilingServerScript.class));
+	}
 }

@@ -106,42 +106,47 @@ class ScriptCompiler {
 	private static final Pattern TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN = 
 		Pattern.compile("^function[\\s]*([^\\(]+)\\([^\\)]*\\)[\\s]*\\{[\\s]*$");
 	
+	/**
+	 * Pulls the client stubs out of the client script according to some simple rules
+	 * which have been detailed... somewhere.  in the test!
+	 * 
+	 * will throw an NPE if the client script is null
+	 * @param clientScript
+	 * @return
+	 */
 	private String extractClientStubs(final ScriptResource clientScript) {
 		StringBuilder stubs = new StringBuilder();
-		
-		if (clientScript != null) {
-			final String[] lines = COUNT_PATTERN.split(clientScript.script());
-			Matcher lastMatcher = null;
-			String previousLine = null;
-			for (String line : lines) {
-				if (lastMatcher == null) {
-					Matcher matcher = TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN.matcher(line);
-					if (matcher.matches()) {
-						lastMatcher = matcher;
-					}
-				} else if ("}".equals(line) && lastMatcher != null) {
-					boolean hasReturn = previousLine.trim().startsWith("return ");
-					stubs.append("function ")
-						.append(lastMatcher.group(1))
-						.append("(){")
-						.append(hasReturn ? "return " : "")
-						.append("global['")
-						.append(hasReturn ? DoInvokeFunction.PROP_DO_INVOKE : DoCallFunction.PROP_DO_CALL)
-						.append("']('")
-						.append(lastMatcher.group(1))
-						.append("',global['")
-						.append(EngineAPI.PROP_CONVERT_ARGS)
-						.append("'](arguments))")
-						.append(";}\n");
-					
-					//log.trace("found {}, {} return", lastMatcher.group(1), hasReturn ? "with" : "no");
-					
-					
-					lastMatcher = null;
+		final String[] lines = COUNT_PATTERN.split(clientScript.script());
+		Matcher lastMatcher = null;
+		String previousLine = null;
+		for (String line : lines) {
+			if (lastMatcher == null) {
+				Matcher matcher = TOP_LEVEL_FUNCTION_SIGNATURE_PATTERN.matcher(line);
+				if (matcher.matches()) {
+					lastMatcher = matcher;
 				}
+			} else if ("}".equals(line) && lastMatcher != null) {
+				boolean hasReturn = previousLine.trim().startsWith("return ");
+				stubs.append("function ")
+					.append(lastMatcher.group(1))
+					.append("(){")
+					.append(hasReturn ? "return " : "")
+					.append("global['")
+					.append(hasReturn ? DoInvokeFunction.PROP_DO_INVOKE : DoCallFunction.PROP_DO_CALL)
+					.append("']('")
+					.append(lastMatcher.group(1))
+					.append("',global['")
+					.append(EngineAPI.PROP_CONVERT_ARGS)
+					.append("'](arguments))")
+					.append(";}\n");
 				
-				previousLine = line;
+				//log.trace("found {}, {} return", lastMatcher.group(1), hasReturn ? "with" : "no");
+				
+				
+				lastMatcher = null;
 			}
+			
+			previousLine = line;
 		}
 		return stubs.toString();
 	}
