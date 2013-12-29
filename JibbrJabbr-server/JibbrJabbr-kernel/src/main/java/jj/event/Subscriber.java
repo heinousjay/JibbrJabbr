@@ -15,6 +15,7 @@
  */
 package jj.event;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -22,10 +23,13 @@ import java.lang.annotation.Target;
  * Marks a class as subscribing to events.  This is mainly
  * to avoid introspecting every class the system loads.
  * 
+ * It's intr
+ * 
  * @author jason
  *
  */
 @Target(ElementType.TYPE)
+@Documented
 public @interface Subscriber {
 
 }

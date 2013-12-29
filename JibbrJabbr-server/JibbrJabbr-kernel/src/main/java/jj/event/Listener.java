@@ -15,6 +15,7 @@
  */
 package jj.event;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -35,6 +36,7 @@ import java.lang.annotation.Target;
  *
  */
 @Target(ElementType.METHOD)
+@Documented
 public @interface Listener {
 
 }
