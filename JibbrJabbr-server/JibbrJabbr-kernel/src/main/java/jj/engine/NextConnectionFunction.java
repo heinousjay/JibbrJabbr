@@ -80,16 +80,16 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		Object obj = context.documentScriptEnvironment().scope().get(PROP_CURRENT_ITERATOR, scope);
+		Object obj = context.webSocketConnectionHost().scope().get(PROP_CURRENT_ITERATOR, scope);
 		if (!(obj instanceof Iterator<?>)) {
 			// something really went wrong up in here
-			log.error("broadcast attempted but the current iterator does not exist for {}", context.documentScriptEnvironment());
+			log.error("broadcast attempted but the current iterator does not exist for {}", context.webSocketConnectionHost());
 			throw new AssertionError("NextConnectionFunction called with no iterator.  something crossed up?");
 		}
 		
 		@SuppressWarnings("unchecked")
 		Iterator<JJWebSocketConnection> iterator = (Iterator<JJWebSocketConnection>)obj;
-		Boolean needsFinish = (Boolean)context.documentScriptEnvironment().scope().get(PROP_ITERATOR_NEEDS_FINISH, scope);
+		Boolean needsFinish = (Boolean)context.webSocketConnectionHost().scope().get(PROP_ITERATOR_NEEDS_FINISH, scope);
 		
 		if (needsFinish != null && needsFinish) {
 			context.end();
@@ -104,13 +104,13 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 		if (next != null) {
 			context.initialize(next);
 			ScriptableObject.putProperty(
-				context.documentScriptEnvironment().scope(),
+				context.webSocketConnectionHost().scope(),
 				PROP_ITERATOR_NEEDS_FINISH,
 				Boolean.TRUE
 			);
 		} else {
-			context.documentScriptEnvironment().scope().delete(PROP_CURRENT_ITERATOR);
-			context.documentScriptEnvironment().scope().delete(PROP_ITERATOR_NEEDS_FINISH);
+			context.webSocketConnectionHost().scope().delete(PROP_CURRENT_ITERATOR);
+			context.webSocketConnectionHost().scope().delete(PROP_ITERATOR_NEEDS_FINISH);
 		}
 		
 		return next != null;

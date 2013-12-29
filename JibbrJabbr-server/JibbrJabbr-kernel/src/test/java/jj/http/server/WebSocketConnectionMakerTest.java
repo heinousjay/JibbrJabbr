@@ -137,9 +137,10 @@ public class WebSocketConnectionMakerTest {
 		verify(channelFuture).addListener(futureListenerCaptor.capture());
 		
 		// given
-		String uri = "uri";
+		String uri = "/1234567890123456789012345678901234567890/uri.socket";
 		given(request.getUri()).willReturn(uri);
-		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), anyString())).willReturn(null);
+		given(scriptEnvironment.sha1()).willReturn("ABCDEF");
+		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), anyString())).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when
@@ -160,7 +161,7 @@ public class WebSocketConnectionMakerTest {
 		
 		// then
 		verify(ctx).writeAndFlush(closeFrameCaptor.capture());
-		assertThat(closeFrameCaptor.getValue().statusCode(), is(1000));
+		assertThat(closeFrameCaptor.getValue().statusCode(), is(1001));
 		verify(ctx.writeAndFlush(closeFrameCaptor.getValue())).addListener(ChannelFutureListener.CLOSE);
 	}
 	

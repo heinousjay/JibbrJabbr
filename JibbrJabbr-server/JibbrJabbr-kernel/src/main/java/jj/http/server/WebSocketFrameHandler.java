@@ -65,6 +65,7 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 
 		connectionTracker.addConnection(connection);
+		connection.webSocketConnectionHost().connected(connection);
 		handler.opened(connection);
 		
 		ctx.channel().closeFuture().addListener(new ChannelFutureListener() {
@@ -72,6 +73,7 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				connectionTracker.removeConnection(connection);
+				connection.webSocketConnectionHost().disconnected(connection);
 				handler.closed(connection);
 			}
 		});

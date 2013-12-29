@@ -3,6 +3,7 @@ package jj.script;
 import static jj.script.ScriptContextType.*;
 
 import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
@@ -13,7 +14,7 @@ class ScriptContext {
 	
 	final ScriptContext parent;
 	
-	final DocumentScriptEnvironment documentScriptEnvironment;
+	final WebSocketConnectionHost webSocketConnectionHost;
 	
 	final ModuleScriptEnvironment moduleScriptEnvironment;
 	
@@ -33,7 +34,7 @@ class ScriptContext {
 		this.requiredModule = requiredModule;
 		this.moduleScriptEnvironment = moduleScriptEnvironment;
 
-		this.documentScriptEnvironment = null;
+		this.webSocketConnectionHost = null;
 		this.connection = null;
 		this.documentRequestProcessor = null;
 	}
@@ -44,7 +45,7 @@ class ScriptContext {
 	) {
 		this.type = InternalExecution;
 		this.parent = parent;
-		this.documentScriptEnvironment = documentScriptEnvironment;
+		this.webSocketConnectionHost = documentScriptEnvironment;
 
 		this.connection = null;
 		this.documentRequestProcessor = null;
@@ -59,7 +60,7 @@ class ScriptContext {
 		this.type = WebSocket;
 		this.parent = parent;
 		this.connection = connection;
-		this.documentScriptEnvironment = connection.documentScriptEnvironment();
+		this.webSocketConnectionHost = connection.webSocketConnectionHost();
 		
 		this.documentRequestProcessor = null;
 		this.moduleScriptEnvironment = null;
@@ -73,7 +74,7 @@ class ScriptContext {
 		this.type = DocumentRequest;
 		this.parent = parent;
 		this.documentRequestProcessor = documentRequestProcessor;
-		this.documentScriptEnvironment = documentRequestProcessor.documentScriptEnvironment();
+		this.webSocketConnectionHost = documentRequestProcessor.documentScriptEnvironment();
 		
 		this.connection = null;
 		this.moduleScriptEnvironment = null;

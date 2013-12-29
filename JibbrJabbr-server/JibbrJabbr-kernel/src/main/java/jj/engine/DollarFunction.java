@@ -8,8 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.SelectorFormatException;
+import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
-import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.CurrentScriptContext;
 import jj.script.ScriptRunner;
 import org.jsoup.nodes.Element;
@@ -81,10 +81,10 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		DocumentScriptEnvironment scriptExecutionEnvironment = context.documentScriptEnvironment();
+		WebSocketConnectionHost webSocketConnectionHost = context.webSocketConnectionHost();
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
-			scriptExecutionEnvironment.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);
+			webSocketConnectionHost.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);
 			return this; 
 		}
 		
@@ -102,7 +102,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		
 		// warn that we are being called with something we don't recognize. see ConsString
 		// comments above for the argument why :D
-		log.warn("called with unrecognized argument set executing {}", scriptExecutionEnvironment.uri());
+		log.warn("called with unrecognized argument set executing {}", webSocketConnectionHost.uri());
 		for (Object arg : args) {
 			log.warn("{} of type {}", arg, arg == null ? "<null>" : arg.getClass());
 		}

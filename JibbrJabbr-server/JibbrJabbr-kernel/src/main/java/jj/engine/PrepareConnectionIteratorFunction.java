@@ -1,15 +1,10 @@
 package jj.engine;
 
 
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.script.CurrentScriptContext;
-import jj.http.server.JJWebSocketConnection;
-import jj.http.server.WebSocketConnectionTracker;
-
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -31,15 +26,11 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 	
 	private final CurrentScriptContext context;
 	
-	private final WebSocketConnectionTracker connections;
-	
 	@Inject
 	PrepareConnectionIteratorFunction(
-		final CurrentScriptContext context,
-		final WebSocketConnectionTracker connections
+		final CurrentScriptContext context
 	) {
 		this.context = context;
-		this.connections = connections;
 	}
 
 	@Override
@@ -70,22 +61,19 @@ class PrepareConnectionIteratorFunction extends BaseFunction implements HostObje
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		log.trace("preparing to broadcast for {}", context.documentScriptEnvironment());
-		
-		Set<JJWebSocketConnection> connectionSet = connections.forScript(context.documentScriptEnvironment());
-		
-		log.trace("connections are {}", connectionSet);
+		log.trace("preparing to broadcast for {}", context.webSocketConnectionHost());
 		
 		ScriptableObject.putProperty(
-			context.documentScriptEnvironment().scope(),
+			context.webSocketConnectionHost().scope(),
 			PROP_CURRENT_ITERATOR,
-			connectionSet.iterator()
+			context.webSocketConnectionHost().iterator()
 		);
 		ScriptableObject.putProperty(
-			context.documentScriptEnvironment().scope(),
+			context.webSocketConnectionHost().scope(),
 			PROP_ITERATOR_NEEDS_FINISH,
 			Boolean.FALSE
 		);
+		
 		return Undefined.instance;
 	}
 	

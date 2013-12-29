@@ -16,7 +16,9 @@
 package jj.resource.document;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.inject.Inject;
@@ -34,7 +36,7 @@ import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.IOThread;
 import jj.http.server.JJWebSocketConnection;
-import jj.http.server.WebSocketHost;
+import jj.http.server.WebSocketConnectionHost;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -43,7 +45,6 @@ import jj.resource.script.RootScriptEnvironment;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.script.AbstractScriptEnvironment;
-import jj.script.FunctionContext;
 import jj.script.RhinoContext;
 
 /**
@@ -56,7 +57,7 @@ import jj.script.RhinoContext;
 @Singleton
 public class DocumentScriptEnvironment
 	extends AbstractScriptEnvironment
-	implements FunctionContext, RootScriptEnvironment, WebSocketHost {
+	implements RootScriptEnvironment, WebSocketConnectionHost {
 
 	@Override
 	public String baseName() {
@@ -126,26 +127,25 @@ public class DocumentScriptEnvironment
 	
 	@Override
 	public void connected(JJWebSocketConnection connection) {
-		// TODO Auto-generated method stub
-		
+		connections.add(connection);
 	}
 	
 	@Override
 	public void disconnected(JJWebSocketConnection connection) {
-		// TODO Auto-generated method stub
-		
+		connections.remove(connection);
 	}
 	
 	@Override
 	public Iterator<JJWebSocketConnection> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableSet(connections).iterator();
 	}
 	
 	// --- implementation
 	
 
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
+	
+	private final HashSet<JJWebSocketConnection> connections = new HashSet<>(10);
 
 	private final String baseName;
 	

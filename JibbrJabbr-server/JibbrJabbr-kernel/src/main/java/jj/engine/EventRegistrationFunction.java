@@ -72,7 +72,7 @@ abstract class EventRegistrationFunction extends BaseFunction implements HostObj
 			throw new IllegalArgumentException(String.format("%s takes only one argument of type function", hostEvent));
 		}
 		
-		context.documentScriptEnvironment().addFunction(hostEvent.toString(), (Callable)args[0]);
+		context.webSocketConnectionHost().addFunction(hostEvent.toString(), (Callable)args[0]);
 		
 		// nothing worth returning here, chaining doesn't make sense
 		return Undefined.instance;

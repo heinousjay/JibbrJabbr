@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -75,13 +76,15 @@ public class WebSocketFrameHandlerCreatorTest {
 		AbstractModule module = moduleCaptor.getValue();
 		module.configure(binder);
 		
+		InOrder bindings = inOrder(binder,abb);
+		
 		// then
-		verify(binder).bind(JJWebSocketConnection.class);
-		verify(binder).bind(WebSocketFrameHandler.class);
-		verify(binder).bind(WebSocketServerHandshaker.class);
-		verify(abb).toInstance(handshaker);
-		verify(binder).bind(DocumentScriptEnvironment.class);
-		verify(abb).toInstance(scriptEnvironment);
+		bindings.verify(binder).bind(JJWebSocketConnection.class);
+		bindings.verify(binder).bind(WebSocketFrameHandler.class);
+		bindings.verify(binder).bind(WebSocketServerHandshaker.class);
+		bindings.verify(abb).toInstance(handshaker);
+		bindings.verify(binder).bind(WebSocketConnectionHost.class);
+		bindings.verify(abb).toInstance(scriptEnvironment);
 		
 		verifyNoMoreInteractions(binder, abb);
 		

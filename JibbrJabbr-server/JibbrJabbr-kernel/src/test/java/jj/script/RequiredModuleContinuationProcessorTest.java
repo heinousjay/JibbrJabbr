@@ -70,7 +70,7 @@ public class RequiredModuleContinuationProcessorTest {
 		executors = new MockJJExecutor();
 		
 		given(context.baseName()).willReturn(baseName);
-		given(context.documentScriptEnvironment()).willReturn(documentScriptEnvironment);
+		given(context.webSocketConnectionHost()).willReturn(documentScriptEnvironment);
 		
 		processor = new RequiredModuleContinuationProcessor(context, executors, scriptRunner, finder);
 		

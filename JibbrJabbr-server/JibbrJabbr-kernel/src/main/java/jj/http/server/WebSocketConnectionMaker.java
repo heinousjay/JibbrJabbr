@@ -96,17 +96,23 @@ class WebSocketConnectionMaker {
 					final DocumentScriptEnvironment scriptEnvironment =
 						resourceFinder.findResource(DocumentScriptEnvironment.class, uriMatch.name);
 					
-					if (
-						scriptEnvironment == null || // actually in this case, just return 404
-						!uriMatch.sha1.equals(scriptEnvironment.sha1())
-					) {
+					if (scriptEnvironment == null) {
+						
+						// 1011 indicates that a server is terminating the connection because
+					    // it encountered an unexpected condition that prevented it from
+					    // fulfilling the request.
+						ctx.writeAndFlush(new CloseWebSocketFrame(1011, null)).addListener(CLOSE);
+					
+					} else if (!uriMatch.sha1.equals(scriptEnvironment.sha1())) {
 						
 						ctx.writeAndFlush(new TextWebSocketFrame("jj-reload"))
 							.addListener(new ChannelFutureListener() {
 								
 								@Override
 								public void operationComplete(ChannelFuture future) throws Exception {
-									ctx.writeAndFlush(new CloseWebSocketFrame(1000, null)).addListener(CLOSE);
+									// 1001 indicates that an endpoint is "going away", such as a server
+								    // going down or a browser having navigated away from a page.
+									ctx.writeAndFlush(new CloseWebSocketFrame(1001, null)).addListener(CLOSE);
 								}
 							});
 						

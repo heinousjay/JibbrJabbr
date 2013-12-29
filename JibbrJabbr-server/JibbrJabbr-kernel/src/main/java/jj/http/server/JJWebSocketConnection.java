@@ -18,7 +18,6 @@ import org.mozilla.javascript.Callable;
 import jj.DataStore;
 import jj.DateFormatHelper;
 import jj.jjmessage.JJMessage;
-import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.FunctionContext;
 
 @Singleton
@@ -31,7 +30,7 @@ public class JJWebSocketConnection implements DataStore, FunctionContext {
 	
 	private final ChannelHandlerContext ctx;
 	
-	private final DocumentScriptEnvironment documentScriptEnvironment;
+	private final WebSocketConnectionHost webSocketConnectionHost;
 	
 	// room for three data items
 	private final HashMap<String, Object> data = new HashMap<>(4);
@@ -47,10 +46,10 @@ public class JJWebSocketConnection implements DataStore, FunctionContext {
 	@Inject
 	JJWebSocketConnection(
 		final ChannelHandlerContext ctx,
-		final DocumentScriptEnvironment documentScriptEnvironment
+		final WebSocketConnectionHost webSocketConnectionHost
 	) {
 		this.ctx = ctx;
-		this.documentScriptEnvironment = documentScriptEnvironment;
+		this.webSocketConnectionHost = webSocketConnectionHost;
 		description = String.format(
 			"WebSocket connection to %s started at %s",
 			ctx.channel().remoteAddress(),
@@ -108,11 +107,11 @@ public class JJWebSocketConnection implements DataStore, FunctionContext {
 	}
 	
 	public String baseName() {
-		return documentScriptEnvironment().baseName();
+		return webSocketConnectionHost().baseName();
 	}
 	
-	public DocumentScriptEnvironment documentScriptEnvironment() {
-		return documentScriptEnvironment;
+	public WebSocketConnectionHost webSocketConnectionHost() {
+		return webSocketConnectionHost;
 	}
 	
 	public Map<String, Object> clientStorage() {

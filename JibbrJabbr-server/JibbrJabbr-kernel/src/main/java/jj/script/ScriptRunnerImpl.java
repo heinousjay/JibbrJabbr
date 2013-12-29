@@ -11,8 +11,8 @@ import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
 import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 
 /**
@@ -51,8 +51,8 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		log.trace("performing initial execution of a document request");
 		context.documentRequestProcessor().startingInitialExecution();
 
-		if (continuationCoordinator.execute(context.documentScriptEnvironment())) {
-			context.documentScriptEnvironment().initialized(true);
+		if (continuationCoordinator.execute(context.webSocketConnectionHost())) {
+			context.webSocketConnectionHost().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
 		}
@@ -70,8 +70,8 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	@ScriptThread
 	private void executeReadyFunction() {
-		DocumentScriptEnvironment scriptExecutionEnvironment = context.documentScriptEnvironment(); 
-		Callable ready = scriptExecutionEnvironment.getFunction(READY_FUNCTION_KEY);
+		WebSocketConnectionHost webSocketConnectionHost = context.webSocketConnectionHost(); 
+		Callable ready = webSocketConnectionHost.getFunction(READY_FUNCTION_KEY);
 		if (ready == null) {
 			log.trace("no ready function found for this document. responding.");
 			context.documentRequestProcessor().respond();
@@ -80,7 +80,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			
 			context.documentRequestProcessor().startingReadyFunction();
 			
-			if (continuationCoordinator.execute(scriptExecutionEnvironment, ready)) {
+			if (continuationCoordinator.execute(webSocketConnectionHost, ready)) {
 				log.trace("ready function execution - completed, serving document");
 				context.documentRequestProcessor().respond();
 			}
@@ -91,7 +91,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeReadyFunction(String pendingKey, Object result) {
 		log.trace("resuming ready function execution of a script execution environment");
 		
-		if (continuationCoordinator.resumeContinuation(context.documentScriptEnvironment(), pendingKey, result)) {
+		if (continuationCoordinator.resumeContinuation(context.webSocketConnectionHost(), pendingKey, result)) {
 			log.trace("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
 		}
@@ -231,11 +231,11 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			public void run() {
 				log.trace("executing event {} for connection {}", event, connection);
 				context.initialize(connection);
-				DocumentScriptEnvironment executionEnvironment = connection.documentScriptEnvironment();
+				WebSocketConnectionHost webSocketConnectionHost = connection.webSocketConnectionHost();
 				Callable function = connection.getFunction(event);
-				if (function == null) function = executionEnvironment.getFunction(event);
+				if (function == null) function = webSocketConnectionHost.getFunction(event);
 				try {
-					continuationCoordinator.execute(executionEnvironment, function, args);
+					continuationCoordinator.execute(webSocketConnectionHost, function, args);
 				} finally {
 					context.end();
 				}

@@ -15,11 +15,14 @@
  */
 package jj.http.server;
 
+import jj.script.FunctionContext;
+import jj.script.ScriptEnvironment;
+
 /**
  * @author jason
  *
  */
-public interface WebSocketHost extends Iterable<JJWebSocketConnection> {
+public interface WebSocketConnectionHost extends Iterable<JJWebSocketConnection>, ScriptEnvironment, FunctionContext {
 
 	void connected(JJWebSocketConnection connection);
 

@@ -12,6 +12,7 @@ import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.http.HttpRequest;
 import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 
 import org.jsoup.nodes.Document;
@@ -53,9 +54,9 @@ public class CurrentScriptContext implements Closeable {
 		
 		ScriptContext root = currentContext.get().root();
 		
-		assert root.documentScriptEnvironment != null : "script context that is not rooted correctly";
+		assert root.webSocketConnectionHost != null : "script context that is not rooted correctly";
 		
-		return root.documentScriptEnvironment;
+		return root.webSocketConnectionHost;
 	}
 	
 	public ScriptEnvironment scriptEnvironment() {
@@ -63,7 +64,7 @@ public class CurrentScriptContext implements Closeable {
 		case DocumentRequest:
 		case WebSocket:
 		case InternalExecution:
-			return documentScriptEnvironment();
+			return webSocketConnectionHost();
 		case ModuleInitialization:
 			return moduleScriptEnvironment();
 		}
@@ -75,8 +76,8 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get().moduleScriptEnvironment;
 	}
 	
-	public DocumentScriptEnvironment documentScriptEnvironment() {
-		return currentContext.get().documentScriptEnvironment;
+	public WebSocketConnectionHost webSocketConnectionHost() {
+		return currentContext.get().webSocketConnectionHost;
 	}
 	
 	public String baseName() {
@@ -148,7 +149,7 @@ public class CurrentScriptContext implements Closeable {
 			return documentRequestProcessor();
 		
 		case InternalExecution:
-			return documentScriptEnvironment();
+			return webSocketConnectionHost();
 			
 		case ModuleInitialization:
 			return moduleScriptEnvironment();

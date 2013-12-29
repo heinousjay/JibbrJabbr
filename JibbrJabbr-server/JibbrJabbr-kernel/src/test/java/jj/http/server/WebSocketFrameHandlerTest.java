@@ -50,6 +50,7 @@ public class WebSocketFrameHandlerTest {
 	@Mock WebSocketServerHandshaker handshaker;
 	@Mock JJWebSocketHandler handler;
 	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketConnectionHost webSocketConnectionHost;
 	@Mock WebSocketConnectionTracker connectionTracker;
 	@InjectMocks WebSocketFrameHandler wsfh;
 	
@@ -68,6 +69,8 @@ public class WebSocketFrameHandlerTest {
 	@Before
 	public void before() {
 		byteBuf = Unpooled.buffer(0);
+		
+		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
 	}
 	
 	@Test
@@ -76,6 +79,7 @@ public class WebSocketFrameHandlerTest {
 		wsfh.handlerAdded(ctx);
 		
 		verify(connectionTracker).addConnection(connection);
+		verify(webSocketConnectionHost).connected(connection);
 		verify(handler).opened(connection);
 		verify(ctx.channel().closeFuture()).addListener(futureListenerCaptor.capture());
 		
@@ -84,6 +88,7 @@ public class WebSocketFrameHandlerTest {
 		listener.operationComplete(future);
 		
 		verify(connectionTracker).removeConnection(connection);
+		verify(webSocketConnectionHost).disconnected(connection);
 		verify(handler).closed(connection);
 	}
 	
