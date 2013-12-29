@@ -38,6 +38,8 @@ public class ExecutionModule extends JJModule {
 		
 		bind(UncaughtExceptionHandler.class).to(JJUncaughtExceptionHandler.class);
 		
+		bind(ExecutionEventLogger.class).asEagerSingleton();
+		
 	}
 
 }
