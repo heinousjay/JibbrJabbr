@@ -101,7 +101,7 @@ public class WebSocketFrameHandlerTest {
 		wsfh.channelRead0(ctx, textFrame);
 		
 		verify(connection).markActivity();
-		verify(handler).messageReceived(connection, text);
+		verify(webSocketConnectionHost).message(connection, text);
 	}
 	
 	@Test

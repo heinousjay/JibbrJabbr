@@ -27,5 +27,7 @@ public interface WebSocketConnectionHost extends Iterable<JJWebSocketConnection>
 	void connected(JJWebSocketConnection connection);
 
 	void disconnected(JJWebSocketConnection connection);
+	
+	void message(JJWebSocketConnection connection, String message);
 
 }

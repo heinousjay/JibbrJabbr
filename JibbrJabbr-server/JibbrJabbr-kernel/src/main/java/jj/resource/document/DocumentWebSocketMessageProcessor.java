@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.resource.document;
 
+import jj.http.server.JJWebSocketConnection;
+import jj.jjmessage.JJMessage;
 
 /**
+ * component based refactoring of handling incoming websocket messages
+ * 
  * @author jason
  *
  */
-public interface WebSocketMessageProcessor {
-
-	boolean process(JJWebSocketConnection connection, String message);
-
+interface DocumentWebSocketMessageProcessor {
+	
+	void handle(JJWebSocketConnection connection, JJMessage message);
 }

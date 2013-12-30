@@ -17,18 +17,12 @@ package jj.http.server;
 
 import static org.mockito.BDDMockito.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jj.engine.HostEvent;
-import jj.jjmessage.JJMessage;
-import jj.jjmessage.JJMessage.Type;
-import jj.jjmessage.MessageMaker;
 import jj.script.ScriptRunner;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -39,28 +33,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JJWebSocketHandlerTest {
 	
-	JJWebSocketHandler wsh;
+	@InjectMocks JJWebSocketHandler wsh;
 	@Mock JJWebSocketConnection connection;
 	@Mock ScriptRunner scriptRunner;
-	@Mock WebSocketMessageProcessor wsmp1;
-	@Mock WebSocketMessageProcessor wsmp2;
-	@Mock WebSocketMessageProcessor wsmp3;
-	Set<WebSocketMessageProcessor> messageProcessors;
-	
-	@Before
-	public void before() {
-		
-		messageProcessors = new HashSet<>();
-		messageProcessors.add(wsmp1);
-		messageProcessors.add(wsmp2);
-		messageProcessors.add(wsmp3);
-		
-		given(wsmp1.type()).willReturn(Type.Result);
-		given(wsmp2.type()).willReturn(Type.Event);
-		given(wsmp3.type()).willReturn(Type.Element);
-		
-		wsh = new JJWebSocketHandler(scriptRunner, messageProcessors);
-	}
 
 	@Test
 	public void testOpened() {
@@ -72,33 +47,6 @@ public class JJWebSocketHandlerTest {
 	public void testClosed() {
 		wsh.closed(connection);
 		verify(scriptRunner).submit(connection, HostEvent.clientDisconnected.toString(), connection);
-	}
-	
-	@Test
-	public void testGibberishIgnored() {
-		
-		String gibberish = "this is not a message the handler can handle.";
-		wsh.messageReceived(connection, gibberish);
-		
-		verify(wsmp1, never()).handle(eq(connection), any(JJMessage.class));
-		verify(wsmp2, never()).handle(eq(connection), any(JJMessage.class));
-		verify(wsmp3, never()).handle(eq(connection), any(JJMessage.class));
-	}
-	
-	@Test
-	public void testTextMessageReceived1() {
-		JJMessage jjmessage = MessageMaker.makeResult("id", "value");
-		String message = jjmessage.toString();
-		wsh.messageReceived(connection, message);
-		verify(wsmp1).handle(connection, jjmessage);
-	}
-	
-	@Test
-	public void testTextMessageReceived2() {
-		JJMessage jjmessage = MessageMaker.makeEvent("selector", "type");
-		String message = jjmessage.toString();
-		wsh.messageReceived(connection, message);
-		verify(wsmp2).handle(connection, jjmessage);
 	}
 
 }

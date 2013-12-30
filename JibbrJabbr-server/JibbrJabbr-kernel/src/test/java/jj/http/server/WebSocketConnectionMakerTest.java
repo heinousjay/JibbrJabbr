@@ -26,23 +26,24 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import jj.AnswerWithSelf;
+import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -63,16 +64,25 @@ public class WebSocketConnectionMakerTest {
 	@Mock ChannelFuture channelFuture;
 	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
 	@Mock FullHttpRequest request;
+	HttpResponse response;
 	@Mock WebSocketServerHandshakerFactory handshakerFactory;
 	@Mock WebSocketServerHandshaker handshaker;
 	@Mock WebSocketFrameHandler frameHandler;
 	@Captor ArgumentCaptor<WebSocketFrameHandler> channelHandler;
-	@Captor ArgumentCaptor<HttpResponse> responseCaptor;
+
 	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
 	@Captor ArgumentCaptor<CloseWebSocketFrame> closeFrameCaptor;
 	
-	@InjectMocks WebSocketConnectionMaker wscm;
+	WebSocketConnectionMaker wscm;
 
+	@Before
+	public void before() {
+		
+		response = mock(HttpResponse.class, AnswerWithSelf.ANSWER_WITH_SELF);
+		
+		wscm = new WebSocketConnectionMaker(handlerCreator, resourceFinder, ctx, request, response, handshakerFactory);
+	}
+	
 	@Test
 	public void testValidConnection() throws Exception {
 		
@@ -113,13 +123,8 @@ public class WebSocketConnectionMakerTest {
 		wscm.handshakeWebsocket();
 		
 		// then
-		verify(ctx).writeAndFlush(responseCaptor.capture());
-		verify(ctx.writeAndFlush(any())).addListener(ChannelFutureListener.CLOSE);
-		
-		HttpResponse response = responseCaptor.getValue();
-		
-		assertThat(response.getStatus(), is(HttpResponseStatus.UPGRADE_REQUIRED));
-		assertThat(response.headers().get(HttpHeaders.Names.SEC_WEBSOCKET_VERSION), is(WebSocketVersion.V13.toHttpHeaderValue()));
+		verify(response).header(HttpHeaders.Names.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue());
+		verify(response).sendError(HttpResponseStatus.UPGRADE_REQUIRED);
 	}
 	
 	@Test

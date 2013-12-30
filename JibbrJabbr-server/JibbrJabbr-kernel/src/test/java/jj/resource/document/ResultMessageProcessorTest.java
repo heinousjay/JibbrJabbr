@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.resource.document;
 
 import static org.mockito.BDDMockito.*;
+import jj.http.server.JJWebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
+import jj.resource.document.ResultMessageProcessor;
 import jj.script.ScriptJSON;
 import jj.script.ScriptRunner;
 

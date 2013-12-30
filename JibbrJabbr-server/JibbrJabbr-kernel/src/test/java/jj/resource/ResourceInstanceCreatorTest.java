@@ -24,6 +24,7 @@ import java.util.Collections;
 import jj.configuration.Configuration;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
+import jj.http.server.WebSocketMessageProcessor;
 import jj.logging.EmergencyLogger;
 import jj.resource.asset.Asset;
 import jj.resource.asset.AssetResource;
@@ -73,6 +74,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	@Mock EngineAPI api;
 	@Mock ResourceFinder resourceFinder;
 	@Mock RhinoContext rhinoContext;
+	@Mock WebSocketMessageProcessor processor;
 	
 	private ResourceInstanceCreator makeCreator(final Configuration configuration, final Logger logger) {
 		return new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
@@ -85,6 +87,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 				bind(EngineAPI.class).toInstance(api);
 				bind(ResourceFinder.class).toInstance(resourceFinder);
 				bind(RhinoContext.class).toInstance(rhinoContext);
+				bind(WebSocketMessageProcessor.class).toInstance(processor);
 			}
 		}), logger);
 	}

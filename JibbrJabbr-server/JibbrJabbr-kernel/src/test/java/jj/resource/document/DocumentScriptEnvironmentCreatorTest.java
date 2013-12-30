@@ -48,6 +48,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	@Mock ScriptableObject local;
 	@Mock Publisher publisher;
 	@Mock ScriptCompiler compiler;
+	@Mock DocumentWebSocketMessageProcessors processors;
 	MockRhinoContextProvider contextProvider;
 	
 
@@ -77,7 +78,8 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 		givenMinimalServices();
 		givenDocumentScriptEnvironmentResources(baseName());
 		
-		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextProvider, api, publisher, compiler);
+		DocumentScriptEnvironment result = 
+			new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextProvider, api, publisher, compiler, processors);
 		
 		return result;
 	}

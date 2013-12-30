@@ -55,6 +55,7 @@ public class DocumentScriptEnvironmentTest {
 	@Mock ScriptableObject local;
 	@Mock ResourceCacheKey cacheKey;
 	@Mock ScriptCompiler scriptCompiler;
+	@Mock DocumentWebSocketMessageProcessors processors;
 	MockRhinoContextProvider contextMaker;
 	
 	@Captor ArgumentCaptor<ExecutionEvent> eventCaptor;
@@ -83,13 +84,17 @@ public class DocumentScriptEnvironmentTest {
 		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
 	}
 	
+	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {
+		return new DocumentScriptEnvironment(cacheKey, baseName, resourceFinder, contextMaker, api, publisher, scriptCompiler, processors);
+	}
+	
 	@Test
 	public void testThrowsNotFound() throws Exception {
 		
 		String baseName = "index";
 		
 		try {
-			new DocumentScriptEnvironment(cacheKey, baseName, resourceFinder, contextMaker, api, publisher, scriptCompiler);
+			givenADocumentScriptEnvironment(baseName);
 			fail();
 		} catch (NoSuchResourceException nsre) {
 			assertThat(nsre.getMessage(), is(baseName + "-" + baseName + ".html"));
@@ -110,7 +115,7 @@ public class DocumentScriptEnvironmentTest {
 		given(scriptCompiler.compile(local, null, script, script)).willThrow(re);
 		
 		try {
-			new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
+			givenADocumentScriptEnvironment(name);
 			fail();
 		} catch (ResourceNotViableException rnve) {
 			assertThat(rnve.getMessage(), is(name));
@@ -130,7 +135,7 @@ public class DocumentScriptEnvironmentTest {
 		ScriptableObject scope = mock(ScriptableObject.class);
 		given(api.global()).willReturn(scope);
 		
-		new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
+		givenADocumentScriptEnvironment(name);
 		
 		verify(local).setPrototype(scope);
 		verify(local).setParentScope(null);
@@ -153,7 +158,7 @@ public class DocumentScriptEnvironmentTest {
 		givenASharedScript(name);
 		givenAServerScript(name);
 		
-		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
+		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);
 		
 		verify(html).addDependent(result);
 		verify(script, times(3)).addDependent(result);
@@ -172,7 +177,7 @@ public class DocumentScriptEnvironmentTest {
 		givenAClientScript(name);
 		givenASharedScript(name);
 		
-		DocumentScriptEnvironment result = new DocumentScriptEnvironment(cacheKey, name, resourceFinder, contextMaker, api, publisher, scriptCompiler);
+		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);;
 		
 		assertThat(result.sha1().length(), is(40));
 		assertThat(result.uri(), is("/" + result.sha1() + "/" + name));

@@ -38,7 +38,7 @@ public class ResourceCreatorBinder {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T extends Resource, U extends ResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
+	public <T extends Resource, U extends ResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
 		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);
 	}
 }

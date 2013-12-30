@@ -19,14 +19,12 @@ import static jj.http.server.PipelineStages.*;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.HttpHeaders.Names;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
@@ -34,6 +32,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
@@ -53,6 +52,8 @@ class WebSocketConnectionMaker {
 	
 	private final FullHttpRequest request;
 	
+	private final HttpResponse response;
+	
 	private final WebSocketServerHandshakerFactory handshakerFactory;
 	
 	@Inject
@@ -61,21 +62,23 @@ class WebSocketConnectionMaker {
 		final ResourceFinder resourceFinder,
 		final ChannelHandlerContext ctx,
 		final FullHttpRequest request,
+		final HttpResponse response,
 		final WebSocketServerHandshakerFactory handshakerFactory
 	) {
 		this.handlerCreator = handlerCreator;
 		this.resourceFinder = resourceFinder;
 		this.ctx = ctx;
 		this.request = request;
+		this.response = response;
 		this.handshakerFactory = handshakerFactory;
 	}
 	
 	void handshakeWebsocket() {
 		final WebSocketServerHandshaker handshaker = handshakerFactory.newHandshaker(request);
 		if (handshaker == null) {
-			HttpResponse res = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UPGRADE_REQUIRED);
-	        res.headers().set(Names.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue());
-	        ctx.writeAndFlush(res).addListener(ChannelFutureListener.CLOSE);
+			response
+				.header(Names.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue())
+				.sendError(HttpResponseStatus.UPGRADE_REQUIRED);
 		} else {
 			doHandshake(ctx, request, handshaker);
 		}
@@ -88,6 +91,11 @@ class WebSocketConnectionMaker {
 	) {
 		handshaker.handshake(ctx.channel(), request).addListener(new ChannelFutureListener() {
 			
+			private boolean isHandshakeFailure(ChannelFuture future) {
+				return future.cause() != null &&
+					future.cause() instanceof WebSocketHandshakeException;
+			}
+			
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
@@ -99,9 +107,11 @@ class WebSocketConnectionMaker {
 					if (scriptEnvironment == null) {
 						
 						// 1011 indicates that a server is terminating the connection because
-					    // it encountered an unexpected condition that prevented it from
-					    // fulfilling the request.
+						// it encountered an unexpected condition that prevented it from
+						// fulfilling the request.
 						ctx.writeAndFlush(new CloseWebSocketFrame(1011, null)).addListener(CLOSE);
+						// TODO: is closing here the right thing? or do we count on the client closing the connection
+						// to avoid the time_wait state? 
 					
 					} else if (!uriMatch.sha1.equals(scriptEnvironment.sha1())) {
 						
@@ -111,8 +121,10 @@ class WebSocketConnectionMaker {
 								@Override
 								public void operationComplete(ChannelFuture future) throws Exception {
 									// 1001 indicates that an endpoint is "going away", such as a server
-								    // going down or a browser having navigated away from a page.
+									// going down or a browser having navigated away from a page.
 									ctx.writeAndFlush(new CloseWebSocketFrame(1001, null)).addListener(CLOSE);
+									// TODO: is closing here the right thing? or do we count on the client closing the connection
+									// to avoid the time_wait state? 
 								}
 							});
 						
@@ -126,6 +138,8 @@ class WebSocketConnectionMaker {
 						);
 					}
 					
+				} else if (isHandshakeFailure(future)) {
+					response.sendError(HttpResponseStatus.BAD_REQUEST);
 				} else {
 					ctx.close();
 				}

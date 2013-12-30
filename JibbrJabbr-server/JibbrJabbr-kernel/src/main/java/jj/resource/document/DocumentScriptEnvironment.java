@@ -30,6 +30,8 @@ import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jj.SHA1Helper;
 import jj.engine.EngineAPI;
@@ -37,6 +39,7 @@ import jj.event.Publisher;
 import jj.execution.IOThread;
 import jj.http.server.JJWebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
+import jj.http.server.WebSocketMessageProcessor;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -140,9 +143,20 @@ public class DocumentScriptEnvironment
 		return Collections.unmodifiableSet(connections).iterator();
 	}
 	
+	@Override
+	public void message(JJWebSocketConnection connection, String message) {
+		if (!processor.process(connection, message)) {
+			log.warn("{} spoke gibberish to me: {}", 
+				connection,
+				message
+			);
+		}
+	}
+	
 	// --- implementation
 	
-
+	private final Logger log = LoggerFactory.getLogger(DocumentScriptEnvironment.class);
+	
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
 	
 	private final HashSet<JJWebSocketConnection> connections = new HashSet<>(10);
@@ -165,6 +179,8 @@ public class DocumentScriptEnvironment
 	private final ScriptResource sharedScript;
 	private final ScriptResource serverScript;
 	
+	private final WebSocketMessageProcessor processor;
+	
 	/**
 	 * @param cacheKey
 	 */
@@ -176,7 +192,8 @@ public class DocumentScriptEnvironment
 		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
 		final Publisher publisher,
-		final ScriptCompiler compiler
+		final ScriptCompiler compiler,
+		final WebSocketMessageProcessor processor
 	) {
 		super(cacheKey, publisher, contextProvider);
 		this.baseName = baseName;
@@ -218,6 +235,8 @@ public class DocumentScriptEnvironment
 		if (clientScript != null) clientScript.addDependent(this);
 		if (sharedScript != null) sharedScript.addDependent(this);
 		if (serverScript != null) serverScript.addDependent(this);
+		
+		this.processor = processor;
 	}
 
 	/**

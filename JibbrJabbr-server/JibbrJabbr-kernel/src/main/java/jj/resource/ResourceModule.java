@@ -9,8 +9,7 @@ import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceCreator;
 import jj.resource.css.CssResource;
 import jj.resource.css.CssResourceCreator;
-import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.DocumentScriptEnvironmentCreator;
+import jj.resource.document.DocumentProcessingModule;
 import jj.resource.document.HtmlResource;
 import jj.resource.document.HtmlResourceCreator;
 import jj.resource.property.PropertiesResource;
@@ -67,7 +66,6 @@ public class ResourceModule extends JJModule {
 		
 		bindCreation.of(HtmlResource.class).to(HtmlResourceCreator.class);
 		bindCreation.of(ScriptResource.class).to(ScriptResourceCreator.class);
-		bindCreation.of(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
 		bindCreation.of(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
 		
 		
@@ -80,6 +78,8 @@ public class ResourceModule extends JJModule {
 		} else {
 			bind(ResourceWatchService.class).to(TestWatchService.class);
 		}
+		
+		install(new DocumentProcessingModule());
 		
 	}
 }

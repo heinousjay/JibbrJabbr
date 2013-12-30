@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.resource.document;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,8 +22,8 @@ import org.mozilla.javascript.ScriptableObject;
 
 import jj.StringUtils;
 import jj.engine.EventSelection;
+import jj.http.server.JJWebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.jjmessage.JJMessage.Type;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 import jj.script.ScriptJSON;
@@ -34,7 +34,7 @@ import jj.script.ScriptRunner;
  *
  */
 @Singleton
-class EventMessageProcessor implements WebSocketMessageProcessor {
+class EventMessageProcessor implements DocumentWebSocketMessageProcessor {
 
 	private final ScriptRunner scriptRunner;
 	private final CurrentScriptContext context;
@@ -49,11 +49,6 @@ class EventMessageProcessor implements WebSocketMessageProcessor {
 		this.scriptRunner = scriptRunner;
 		this.context = context;
 		this.scriptJSON = scriptJSON;
-	}
-	
-	@Override
-	public Type type() {
-		return Type.Event;
 	}
 
 	@Override

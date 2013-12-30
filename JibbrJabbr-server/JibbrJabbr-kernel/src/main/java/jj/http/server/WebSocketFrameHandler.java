@@ -80,6 +80,12 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 	}
 	
 	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		handler.errored(connection, cause);
+		ctx.close();
+	}
+	
+	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
 		
 		connection.markActivity();
@@ -92,7 +98,7 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			if ("jj-hi".equals(text)) {
 				ctx.writeAndFlush(new TextWebSocketFrame("jj-yo"));
 			} else {
-				handler.messageReceived(connection, text);
+				connection.webSocketConnectionHost().message(connection, text);
 			}
 			
 		} else if (frame instanceof PingWebSocketFrame) {
