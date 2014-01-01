@@ -28,6 +28,7 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
+import javassist.LoaderClassPath;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
@@ -68,17 +69,23 @@ class ConfigurationClassLoader extends ClassLoader {
 		primitiveDefaults = Collections.unmodifiableMap(builder);
 	}
 	
-	private final ClassPool classPool = new ClassPool(true);
+	private final ClassPool classPool;
 	
-	private final CtClass configBase = classPool.get(ConfigurationObjectBase.class.getName());
+	private final CtClass configBase;
 	
-	private final CtConstructor configBaseCtor = configBase.getConstructors()[0];
+	private final CtConstructor configBaseCtor;
 	
-	private final AttributeInfo configBaseCtorSignature = 
-		configBaseCtor.getMethodInfo().getAttribute(SignatureAttribute.tag);
+	private final AttributeInfo configBaseCtorSignature;
 	
 	@Inject
-	ConfigurationClassLoader() throws Exception {}
+	ConfigurationClassLoader() throws Exception {
+		super(ConfigurationClassLoader.class.getClassLoader());
+		classPool = new ClassPool();
+		classPool.appendClassPath(new LoaderClassPath(getParent()));
+		configBase = classPool.get(ConfigurationObjectBase.class.getName());
+		configBaseCtor = configBase.getConstructors()[0];
+		configBaseCtorSignature = configBaseCtor.getMethodInfo().getAttribute(SignatureAttribute.tag);
+	}
 
 	@SuppressWarnings("unchecked")
 	Class<? extends ConfigurationObjectBase> makeClassFor(Class<?> configurationClass) throws Exception {

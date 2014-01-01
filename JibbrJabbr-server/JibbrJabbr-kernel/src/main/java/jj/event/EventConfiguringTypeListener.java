@@ -35,6 +35,7 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
+import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
@@ -93,12 +94,15 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
 	
-	private final ClassPool classPool = ClassPool.getDefault();
+	private final ClassPool classPool;
 	private final CtClass invokerClass;
 	private final CtMethod invokeMethod;
 	
 	EventConfiguringTypeListener() {
 		try {
+			classPool = new ClassPool();
+			classPool.appendClassPath(new LoaderClassPath(EventConfiguringTypeListener.class.getClassLoader()));
+			
 			invokerClass = classPool.get("jj.event.Invoker");
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
 			Thread queueCleaner = new Thread(new ListenerCleaner(), "Event System cleanup");
@@ -224,7 +228,13 @@ class EventConfiguringTypeListener implements TypeListener {
 			);
 			newClass.addMethod(newMethod);
 			
-			invokerClasses.putIfAbsent(className, newClass.toClass());
+			Class<? extends Invoker> invokerClass = classPool.toClass(
+				newClass, 
+				EventConfiguringTypeListener.class.getClassLoader(), 
+				EventConfiguringTypeListener.class.getProtectionDomain()
+			);
+			
+			invokerClasses.putIfAbsent(className, invokerClass);
 			
 			newClass.detach();
 			
