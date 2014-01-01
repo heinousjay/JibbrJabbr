@@ -27,7 +27,6 @@ import jj.script.CurrentScriptContext;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
