@@ -18,7 +18,7 @@ import jj.execution.IOThread;
  * @author jason
  *
  */
-public abstract class AbstractFileResource extends AbstractResourceBase implements FileResource {
+public abstract class AbstractFileResource extends AbstractResource implements FileResource {
 	
 	// beyond this, we don't keep bytes
 	private static final long MAX_IN_MEMORY_SIZE  = 1000000;

@@ -22,14 +22,14 @@ import javax.inject.Provider;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.event.Publisher;
-import jj.resource.AbstractResourceBase;
+import jj.resource.AbstractResource;
 import jj.resource.ResourceCacheKey;
 
 /**
  * @author jason
  *
  */
-public abstract class AbstractScriptEnvironment extends AbstractResourceBase implements ScriptEnvironment {
+public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
 
 
 	protected final Publisher publisher;

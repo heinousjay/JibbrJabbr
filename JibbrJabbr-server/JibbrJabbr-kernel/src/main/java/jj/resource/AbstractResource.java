@@ -30,12 +30,14 @@ import jj.execution.IOThread;
  *
  */
 public abstract class AbstractResource implements Resource {
+
+	protected static final Object[] EMPTY_ARGS = {};
 	
 	private final ResourceCacheKey cacheKey;
 	final Set<AbstractResource> dependents = new HashSet<>();
 	volatile boolean alive = true;
 	
-	AbstractResource(final ResourceCacheKey cacheKey) {
+	protected AbstractResource(final ResourceCacheKey cacheKey) {
 		this.cacheKey = cacheKey;
 	}
 	
@@ -46,12 +48,23 @@ public abstract class AbstractResource implements Resource {
 		return !alive || needsReplacing();
 	}
 	
+	@Override
+	public void addDependent(Resource dependent) {
+		assert alive : "cannot accept dependents, i am dead " + toString();
+		assert dependent != null : "can not depend on null";
+		assert dependent != this : "can not depend on myself";
+		dependents.add((AbstractResource)dependent);
+	}
+
+	
 	/**
 	 * the arguments used to create this resource. mocking needs prevent this
 	 * from being kept package private but don't call it
 	 * @return
 	 */
-	protected abstract Object[] creationArgs();
+	protected Object[] creationArgs() {
+		return EMPTY_ARGS;
+	}
 	
 	Set<AbstractResource> dependents() {
 		return Collections.unmodifiableSet(dependents);

@@ -13,7 +13,7 @@ import javax.inject.Singleton;
 
 import jj.SHA1Helper;
 import jj.execution.IOThread;
-import jj.resource.AbstractResourceBase;
+import jj.resource.AbstractResource;
 import jj.resource.FileResource;
 import jj.resource.LoadedResource;
 import jj.resource.MimeTypes;
@@ -33,7 +33,7 @@ import jj.resource.ResourceCacheKey;
  *
  */
 @Singleton
-public class CssResource extends AbstractResourceBase implements FileResource, LoadedResource {
+public class CssResource extends AbstractResource implements FileResource, LoadedResource {
 	
 	protected final String baseName;
 	protected final Path path;
