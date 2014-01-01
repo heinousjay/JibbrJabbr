@@ -241,25 +241,36 @@ public final class JJ {
 			}
 		}).start();
 		
-		mainInstance = mainClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
-		
-		latch.countDown();
+		try { 
+			mainInstance = mainClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
+		} catch (Throwable t) {
+			System.err.println("Couldn't initialize the server!");
+			t.printStackTrace();
+		} finally {
+			latch.countDown();
+		}
 	}
 
 	public void start() throws Exception {
-		mainClass.getMethod("start").invoke(mainInstance);
+		if (mainInstance != null) {
+			mainClass.getMethod("start").invoke(mainInstance);
+		}
 	}
 
 	public void stop() throws Exception {
-		mainClass.getMethod("stop").invoke(mainInstance);
+		if (mainInstance != null) {
+			mainClass.getMethod("stop").invoke(mainInstance);
+		}
 	}
 	
 	public void destroy() {
-		try {
-			mainClass.getMethod("dispose").invoke(mainInstance);
-		} catch (Exception e) {
-			System.err.println("Trouble shutting down");
-			e.printStackTrace();
+		if (mainInstance != null) {
+			try {
+				mainClass.getMethod("dispose").invoke(mainInstance);
+			} catch (Exception e) {
+				System.err.println("Trouble shutting down");
+				e.printStackTrace();
+			}
 		}
 	}
 }
