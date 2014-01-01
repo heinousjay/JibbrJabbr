@@ -24,6 +24,17 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
+		
+		
+		<!-- 
+		this is only a dependency because we want to ensure the
+		integration tests run before we build a new distro
+		-->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>JibbrJabbr-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>

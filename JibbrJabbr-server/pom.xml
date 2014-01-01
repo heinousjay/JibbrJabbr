@@ -39,6 +39,11 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
+				<artifactId>JibbrJabbr-test</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>JibbrJabbr-all</artifactId>
 				<version>${project.version}</version>
 			</dependency>
