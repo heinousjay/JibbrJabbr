@@ -17,6 +17,7 @@ package jj.configuration;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import jj.InitializationException;
 
 import org.junit.Test;
 
@@ -37,11 +38,12 @@ public class ArgumentsTest {
 	@Test
 	public void testError() {
 		try {
-			new Arguments(new String[] {"error= awesome"});
+			new Arguments(new String[] {"error= awesome","notballs=blocks","balls"});
 			fail("should have thrown");
-		} catch (Exception e) {
-			assertThat(e.getMessage(), is("all arguments must be name=value pairs (error= awesome)"));
+		} catch (InitializationException e) {
+			assertThat(e.getMessage(), is("all arguments must be name=value pairs, the following were not understood\n[error= awesome, balls]"));
+		} catch (Throwable t) {
+			fail(t.getMessage());
 		}
 	}
-
 }

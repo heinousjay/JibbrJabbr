@@ -18,6 +18,7 @@ package jj;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -243,17 +244,27 @@ public final class JJ {
 		
 		try { 
 			mainInstance = mainClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
+		} catch (InvocationTargetException ite) {
+			messageInitError(ite.getCause());
 		} catch (Throwable t) {
-			System.err.println("Couldn't initialize the server!");
-			t.printStackTrace();
+			messageInitError(t);
 		} finally {
 			latch.countDown();
 		}
 	}
+	
+	private void messageInitError(Throwable cause) {
+		System.err.println("Couldn't initialize the server!");
+		cause.printStackTrace();
+	}
 
 	public void start() throws Exception {
 		if (mainInstance != null) {
-			mainClass.getMethod("start").invoke(mainInstance);
+			try {
+				mainClass.getMethod("start").invoke(mainInstance);
+			} catch (InvocationTargetException ite) {
+				messageInitError(ite.getCause());
+			}
 		}
 	}
 

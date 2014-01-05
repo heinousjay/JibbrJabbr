@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.SelectorFormatException;
 import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;

@@ -60,8 +60,11 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 				
 				@Override
 				public void run() {
-					resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
-					latch.countDown();
+					try {
+						resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+					} finally {
+						latch.countDown();
+					}
 				}
 			}).get(1, SECONDS);
 		} catch (TimeoutException te) {

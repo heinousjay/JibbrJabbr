@@ -1,4 +1,4 @@
-package jj;
+package jj.engine;
 
 public class SelectorFormatException extends RuntimeException {
 

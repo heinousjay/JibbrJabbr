@@ -20,9 +20,6 @@ import com.google.inject.Injector;
 @Singleton
 public class Configuration {
 	
-	/**
-	 * 
-	 */
 	private static final String APP_PATH_ARG_NAME = "app";
 
 	private final ConcurrentMap<Class<?>, Class<? extends ConfigurationObjectBase>> configurationInterfaceToImplementation =

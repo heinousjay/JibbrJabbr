@@ -47,6 +47,8 @@ public class SystemJarsTest {
 	
 	Map<String, List<String>> filesByJar;
 	
+	Map<String, URI> urisByJar;
+	
 	@Before
 	public void before() throws IOException {
 		jarFsPropertiesMap = new HashMap<>();
@@ -60,7 +62,7 @@ public class SystemJarsTest {
 			"/com/something/whatever/Otherthing.notaclass",
 			"/com/something/whatever/deeper/Thing.class",
 			"/META-INF/maven/pom.xml",
-			"/META-INF/MANIFEST"
+			"/META-INF/MANIFEST.MF"
 		));
 		filesByJar.put("test2.jar", Arrays.asList(
 			"/com/otherthing/Init.class",
@@ -69,16 +71,16 @@ public class SystemJarsTest {
 			"/com/otherthing/whatever/deeper/Thing.class",
 			"/com/otherthing/whatever/deeper/and/deeper/Thing.txt",
 			"/META-INF/maven/pom.xml",
-			"/META-INF/MANIFEST"
+			"/META-INF/MANIFEST.MF"
 		));
 		
 		baseDir = Files.createTempDirectory(SystemJarsTest.class.getSimpleName().toLowerCase());
 		
-
-		
+		urisByJar = new HashMap<>();
 		for (String jarName : filesByJar.keySet()) {
-			URI uri = URI.create("jar:file:" + baseDir.resolve(jarName).toString());
-			
+			URI uri = URI.create("file:" + baseDir.resolve(jarName).toString());
+			urisByJar.put(jarName, uri);
+			uri = URI.create("jar:" + uri.toString());
 			try (FileSystem fs = FileSystems.newFileSystem(uri, jarFsPropertiesMap)) {
 				
 				for (String path : filesByJar.get(jarName)) {
@@ -148,6 +150,9 @@ public class SystemJarsTest {
 				} else {
 					assertThat(path, is(notNullValue()));
 					assertThat(path.toUri().toString(), containsString(jarName));
+					assertThat(sj.jarManifestForFile(file), is(notNullValue()));
+					assertThat(sj.codeSourceForFile(file), is(notNullValue()));
+					assertThat(sj.codeSourceForFile(file).getLocation(), is(urisByJar.get(jarName).toURL()));
 				}
 				
 			}

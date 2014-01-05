@@ -4,10 +4,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AllPermission;
+import java.security.CodeSource;
+import java.security.Permissions;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+import java.util.jar.Attributes.Name;
 
 /**
  * Responsible for loading the kernel and its direct dependencies
@@ -24,9 +31,13 @@ public final class BootstrapClassLoader extends ClassLoader {
 
 	private static final String CLASS_FILE_FORMAT = "/%s.class";
 	private static final String RESOURCE_FORMAT = "/%s";
+	private static final Permissions ALL_PERMISSIONS = new Permissions();
+	
 	static {
-		// does this speed up the start-up? exciting...
 		registerAsParallelCapable();
+		
+		ALL_PERMISSIONS.add(new AllPermission());
+		ALL_PERMISSIONS.setReadOnly();
 	}
 
 	private final SystemJars systemJars;
@@ -48,7 +59,10 @@ public final class BootstrapClassLoader extends ClassLoader {
 			Path attempt = systemJars.pathForFile(classFile);
 			if (attempt != null) {
 				byte[] classBytes = Files.readAllBytes(attempt);
-				return defineClass(name, classBytes, 0, classBytes.length);
+				definePackageIfNeeded(name, classFile);
+				CodeSource codeSource = systemJars.codeSourceForFile(classFile);
+				ProtectionDomain protectionDomain = new ProtectionDomain(codeSource, ALL_PERMISSIONS);
+				return defineClass(name, classBytes, 0, classBytes.length, protectionDomain);
 			}
 			
 		} catch (Exception e) {
@@ -58,6 +72,48 @@ public final class BootstrapClassLoader extends ClassLoader {
 		}
 		
 		throw new ClassNotFoundException(name);
+	}
+	
+	private void definePackageIfNeeded(String name, String classFile) throws Exception {
+		String packageName = name.substring(0, name.lastIndexOf('.'));
+		if (getPackage(packageName) == null) {
+			Manifest manifest = systemJars.jarManifestForFile(classFile);
+			doDefinePackage(packageName, manifest);
+		}
+	}
+	
+	private Package doDefinePackage(String packageName, Manifest manifest) {
+		
+		String specTitle = null,
+			specVersion = null,
+			specVendor = null,
+			implTitle = null,
+			implVersion = null,
+			implVendor = null;
+		
+		if (manifest != null) {
+			Attributes attributes = manifest.getAttributes(packageName.replace('.', '/').concat("/"));
+			if (attributes != null) {
+				specTitle = attributes.getValue(Name.SPECIFICATION_TITLE);
+				specVersion = attributes.getValue(Name.SPECIFICATION_VERSION);
+				specVendor = attributes.getValue(Name.SPECIFICATION_VENDOR);
+				implTitle = attributes.getValue(Name.IMPLEMENTATION_TITLE);
+				implVersion = attributes.getValue(Name.IMPLEMENTATION_VERSION);
+				implVendor = attributes.getValue(Name.IMPLEMENTATION_VENDOR);
+			}
+			
+			attributes = manifest.getMainAttributes();
+			if (attributes != null) {
+				specTitle = specTitle == null ? attributes.getValue(Name.SPECIFICATION_TITLE) : specTitle;
+				specVersion = specVersion == null ? attributes.getValue(Name.SPECIFICATION_VERSION) : specVersion;
+				specVendor = specVendor == null ? attributes.getValue(Name.SPECIFICATION_VENDOR) : specVendor;
+				implTitle = implTitle == null ? attributes.getValue(Name.IMPLEMENTATION_TITLE) : implTitle;
+				implVersion = implVersion == null ? attributes.getValue(Name.IMPLEMENTATION_VERSION) : implVersion;
+				implVendor = implVendor == null ? attributes.getValue(Name.IMPLEMENTATION_VENDOR) : implVendor;
+			}
+		}
+		
+		return definePackage(packageName, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor, null);
 	}
 	
 	@Override

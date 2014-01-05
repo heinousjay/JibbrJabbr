@@ -17,11 +17,14 @@ package jj.configuration;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.InitializationException;
 
 /**
  * @author jason
@@ -40,19 +43,23 @@ class Arguments {
 	}
 
 	/**
-	 * @param arguments2
+	 * @param arguments the arguments
 	 * @return
 	 */
 	private Map<String, String> readArguments(String[] arguments) {
 		HashMap<String, String> result = new HashMap<>();
+		LinkedHashSet<String> badArgs = new LinkedHashSet<>();
 		for (final String argument : arguments) {
 			String[] particles = SPLITTER.split(argument);
 			if (particles.length == 2) {
 				result.put(particles[0], particles[1]);
 			} else {
-				// TODO better exception
-				throw new RuntimeException("all arguments must be name=value pairs (" + argument + ')');
+				badArgs.add(argument);
 			}
+		}
+		
+		if (!badArgs.isEmpty()) {
+			throw new InitializationException("all arguments must be name=value pairs, the following were not understood\n" + badArgs);
 		}
 		return Collections.unmodifiableMap(result);
 	}

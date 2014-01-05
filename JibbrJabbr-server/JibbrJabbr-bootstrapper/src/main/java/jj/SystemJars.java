@@ -16,31 +16,35 @@
 package jj;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.CodeSource;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.jar.Manifest;
 
 /**
  * 
  * manages the system jars that make up JibbrJabbr, exposes a simple
- * interface to get to their files.  the motivation here is to make
- * class loading faster - the old style was way unoptimized and made
- * start-up take 7 seconds after JVM initialization.  now we're down
- * a bit on that :D
+ * interface to get to their files and related information
  * 
  * @author jason
  *
  */
 class SystemJars {
 	
+	private static final String META_INF = "/META-INF";
+	private static final String MANIFEST_PATH = META_INF + "/MANIFEST.MF";
+
 	private static final String JAR_GLOB = "*.jar";
 
 	private final Path libPath;
@@ -48,18 +52,23 @@ class SystemJars {
 	private static final class FileSystemNode {
 		
 		final FileSystem fileSystem;
+		final Path jarPath;
 		FileSystemNode next;
 		
-		FileSystemNode(final FileSystem fileSystem) {
+		FileSystemNode(final Path jarPath, final FileSystem fileSystem) throws IOException {
+			this.jarPath = jarPath;
 			this.fileSystem = fileSystem;
 		}
 	}
 	
 	private final Map<String, FileSystemNode> jars;
 	
+	private final Map<FileSystem, CodeSource> codeSources;
+	
 	SystemJars(final Path libPath) throws IOException {
 		this.libPath = libPath;
 		this.jars = makeJarsMap();
+		this.codeSources = makeCodeSources();
 	}
 	
 	public Path pathForFile(String file) throws IOException {
@@ -92,6 +101,37 @@ class SystemJars {
 		return result.toArray(new Path[result.size()]);
 	}
 	
+	public CodeSource codeSourceForFile(String file) throws IOException {
+		FileSystemNode fs = jarsForFile(file);
+		Path attempt = null;
+		
+		while (attempt == null && fs != null) {
+			attempt = fs.fileSystem.getPath(file);
+			if (!Files.exists(attempt)) {
+				attempt = null;
+				fs = fs.next;
+			}
+		}
+		
+		return (fs != null) ? codeSources.get(fs.fileSystem) : null; 
+	}
+	
+	public Manifest jarManifestForFile(String file) throws IOException {
+		
+		Manifest result = null;
+		FileSystemNode fs = jarsForFile(file);
+		if (fs != null) {
+			Path manifest = fs.fileSystem.getPath(MANIFEST_PATH);
+			if (Files.exists(manifest)) {
+				try (InputStream is = Files.newInputStream(manifest)) {
+					result = new Manifest(is);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	private FileSystemNode jarsForFile(String file) {
 		String key = Paths.get(file).getParent().toString() + "/";
 		return jars.get(key);
@@ -101,7 +141,7 @@ class SystemJars {
 
 		@Override
 		public boolean accept(Path entry) throws IOException {
-			return Files.isDirectory(entry) && !entry.startsWith("/META-INF");
+			return Files.isDirectory(entry) && !entry.startsWith(META_INF);
 		}
 		
 	};
@@ -116,16 +156,33 @@ class SystemJars {
 		return result;
 	}
 	
-	private void addDirectoriesAndRecurse(Path basePath, HashSet<String> paths) throws IOException {
+	private void addDirectoriesAndRecurse(Path basePath, HashSet<Path> paths) throws IOException {
 		try (DirectoryStream<Path> directories = Files.newDirectoryStream(basePath, directoryFilter)) {
 			for (Path directory : directories) {
 				Path nextDirectory = basePath.resolve(directory);
 				if (hasFiles(nextDirectory)) {
-					paths.add(nextDirectory.toString());
+					paths.add(nextDirectory);
 				}
 				addDirectoriesAndRecurse(nextDirectory, paths);
 			}
 		}
+	}
+	
+	private Map<FileSystem, CodeSource> makeCodeSources() throws IOException {
+		Map<FileSystem, CodeSource> result = new HashMap<>();
+		
+		for (FileSystemNode node : jars.values()) {
+			while (node != null) {
+				if (!result.containsKey(node.fileSystem)) {
+					// should actually read the certs! if any
+					CodeSource codeSource = new CodeSource(node.jarPath.toUri().toURL(), (Certificate[])null);
+					result.put(node.fileSystem, codeSource);
+				}
+				node = node.next;
+			}
+		}
+		
+		return Collections.unmodifiableMap(result);
 	}
 	
 	private Map<String, FileSystemNode> makeJarsMap() throws IOException {
@@ -135,17 +192,17 @@ class SystemJars {
 		try (DirectoryStream<Path> libDir = Files.newDirectoryStream(libPath, JAR_GLOB)) {
 			for (Path jarPath : libDir) {
 				FileSystem myJarFS = FileSystems.newFileSystem(jarPath, null);
-				HashSet<String> paths = new HashSet<>();
+				HashSet<Path> paths = new HashSet<>();
 				
 				for (Path root : myJarFS.getRootDirectories()) {
 					addDirectoriesAndRecurse(root, paths);
 				}
 				
-				for (String path : paths) {
+				for (Path path : paths) {
 					if (result.containsKey(path)) {
-						result.get(path).next = new FileSystemNode(myJarFS);
+						result.get(path.toString()).next = new FileSystemNode(jarPath, myJarFS);
 					} else {
-						result.put(path, new FileSystemNode(myJarFS));
+						result.put(path.toString(), new FileSystemNode(jarPath, myJarFS));
 					}
 				}
 			}
