@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.CommandLine;
 import jj.InitializationException;
 
 /**
@@ -38,7 +39,7 @@ class Arguments {
 	private final Map<String, String> arguments;
 
 	@Inject
-	Arguments(final String[] arguments) {
+	Arguments(final @CommandLine String[] arguments) {
 		this.arguments = readArguments(arguments);
 	}
 
