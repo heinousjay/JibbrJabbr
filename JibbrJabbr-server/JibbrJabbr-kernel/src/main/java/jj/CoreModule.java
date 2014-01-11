@@ -63,7 +63,7 @@ public class CoreModule extends JJModule {
 	protected void configure() {
 		
 		// bind up the command line args
-		bind(String[].class).toInstance(args);
+		bind(String[].class).annotatedWith(CommandLine.class).toInstance(args);
 		
 		// we need the logging module to configure our async logger before we do anything that might log
 		install(new LoggingModule(isTest));
