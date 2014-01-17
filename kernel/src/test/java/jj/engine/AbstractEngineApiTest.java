@@ -18,6 +18,7 @@ package jj.engine;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -113,8 +114,11 @@ abstract class AbstractEngineApiTest {
 	}
 
 	protected final String script() throws Exception {
-		Path me = Paths.get(JJ.uri(getClass()));
-		return readPath(me.resolveSibling(scriptName()));
+		return readPath(getClass().getResource(scriptName()));
+	}
+	
+	protected final String readPath(final URL url) throws Exception {
+		return readPath(Paths.get(url.toURI()));
 	}
 
 	protected final String readPath(final Path scriptPath) throws Exception {

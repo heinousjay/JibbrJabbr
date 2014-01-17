@@ -65,12 +65,6 @@ public final class Version {
 	/** date and time of the commit for this build version */
 	public static final Date commitDate;
 	
-	/** user name of the person who built this version */
-	public static final String buildUserName;
-	
-	/** email address of the person who built this version */
-	public static final String buildUserEmail;
-	
 	/** date and time when this version was built */
 	public static final Date buildDate;
 	
@@ -98,17 +92,13 @@ public final class Version {
 			
 			branchName = r.readLine();
 			
-			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy '@' HH:mm:ss z");
-			
 			commitUserName = r.readLine();
 			commitUserEmail = r.readLine();
 			commitId = r.readLine();
 			commitDescription = r.readLine();
-			commitDate = sdf.parse(r.readLine());
+			commitDate = new Date(Long.parseLong(r.readLine()));
 			
-			buildUserName = r.readLine();
-			buildUserEmail = r.readLine();
-			buildDate = sdf.parse(r.readLine());
+			buildDate = new Date(Long.parseLong(r.readLine()));
 
 			
 		} catch (Exception e) {

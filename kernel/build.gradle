@@ -1,0 +1,35 @@
+dependencies {
+	compile(project(':bootstrapper')) {
+		transitive = true
+	}
+	compile('io.netty:netty-all:4.0.6.Final') {
+		transitive = true
+	}
+	compile('org.mozilla:rhino:1.7R4') {
+		transitive = true
+	}
+	compile('org.jsoup:jsoup:1.7.2') {
+		transitive = true
+	}
+	compile('com.fasterxml.jackson.core:jackson-databind:2.2.2') {
+		transitive = true
+	}
+	compile('org.slf4j:slf4j-api:1.7.2') {
+		transitive = true
+	}
+	compile('ch.qos.logback:logback-classic:1.0.7') {
+		transitive = true
+	}
+		// exclude org.slf4j:slf4j-api?
+	compile('com.google.inject:guice:3.0') {
+		transitive = true
+	}
+	compile('com.google.inject.extensions:guice-multibindings:3.0') {
+		transitive = true
+	}
+	compile('org.javassist:javassist:3.18.0-GA') {
+		transitive = true
+	}
+		
+	testCompile 'com.google.inject.extensions:guice-grapher:3.0'
+}

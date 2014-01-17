@@ -17,6 +17,7 @@ package jj.engine;
 
 import static org.mockito.BDDMockito.given;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -39,10 +40,10 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 	@Mock CurrentScriptContext context;
 	
 	private Document document() throws Exception {
-		Path me = Paths.get(JJ.uri(getClass()));
-		return Jsoup.parse(readPath(me.resolveSibling(DollarFunctionTest.class.getSimpleName() + ".html")));
+		URL url = getClass().getResource(getClass().getSimpleName() + ".html");
+		return Jsoup.parse(readPath(url));
 	}
-	
+
 	//@Ignore
 	@Test
 	public void test() throws Exception {

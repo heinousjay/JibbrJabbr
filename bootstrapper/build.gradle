@@ -1,0 +1,43 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	
+	dependencies {
+		classpath 'org.ajoberstar:gradle-git:0.6.3'
+	}
+}
+
+import org.ajoberstar.gradle.git.tasks.*
+import org.apache.tools.ant.filters.ReplaceTokens
+
+ext {
+	versionInfo = [
+		friendlyname: 'JibbrJabbr',
+		version: project.version,
+		'build-time': System.currentTimeMillis() + ''
+	]
+}
+
+task readBranch(type: GitBranchList) << {
+	project.versionInfo.branch = workingBranch.name
+}
+
+task readLog(type: GitLog) {
+	maxCommits 1
+	doLast {
+		log.each {
+			project.versionInfo.put('commit-id', it.id)
+			project.versionInfo.put('commit-message', it.shortMessage)
+			project.versionInfo.put('commit-user', it.committer.name)
+			project.versionInfo.put('commit-email', it.committer.email)
+			project.versionInfo.put('commit-time', it.time + '000')
+		}
+	}
+}
+
+processResources {
+	filter ReplaceTokens, tokens: project.versionInfo
+}
+
+processResources.dependsOn readLog, readBranch

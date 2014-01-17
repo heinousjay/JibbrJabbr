@@ -54,7 +54,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		"%s/%s (%s)",
 		Version.name,
 		Version.version,
-		Version.branchName		
+		Version.branchName
 	);
 
 	private static final Logger log = LoggerFactory.getLogger(JJHttpServerResponse.class);
