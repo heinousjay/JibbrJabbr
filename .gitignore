@@ -4,6 +4,7 @@ target
 .project
 .settings/
 Notes
+bin/
 build/
 .gradle/
 
