@@ -49,10 +49,10 @@
 	</properties>
 
 	<modules>
-		<module>JibbrJabbr-kernel</module>
-		<module>JibbrJabbr-bootstrapper</module>
-		<module>JibbrJabbr-all</module>
-		<module>JibbrJabbr-test</module>
+		<module>kernel</module>
+		<module>bootstrapper</module>
+		<module>all</module>
+		<module>test</module>
 	</modules>
 
 	<dependencyManagement>
