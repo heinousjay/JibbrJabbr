@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>JibbrJabbr-server</artifactId>
-		<groupId>com.jibbrjabbr</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<groupId>jibbrjabbr</groupId>
+		<artifactId>jj</artifactId>
+		<version>0.5-SNAPSHOT</version>
 	</parent>
-	<artifactId>JibbrJabbr-kernel</artifactId>
+	<artifactId>kernel</artifactId>
 	<name>JibbrJabbr Kernel</name>
 	<dependencies>
 		<dependency>
@@ -61,8 +61,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.jibbrjabbr</groupId>
-			<artifactId>JibbrJabbr-bootstrapper</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>bootstrapper</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.javassist</groupId>

@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>JibbrJabbr-server</artifactId>
-		<groupId>com.jibbrjabbr</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<groupId>jibbrjabbr</groupId>
+		<artifactId>jj</artifactId>
+		<version>0.5-SNAPSHOT</version>
 	</parent>
-	<artifactId>JibbrJabbr-all</artifactId>
+	<artifactId>all</artifactId>
 	<packaging>pom</packaging>
 	<name>JibbrJabbr Packaging and Distribution</name>
 	<description>Packages the JibbrJabbr product in a manner that can be easily run.</description>
@@ -14,11 +14,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>JibbrJabbr-kernel</artifactId>
+			<artifactId>kernel</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>JibbrJabbr-bootstrapper</artifactId>
+			<artifactId>bootstrapper</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -32,7 +32,7 @@
 		-->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>JibbrJabbr-test</artifactId>
+			<artifactId>test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -21,7 +21,7 @@
 		<dependencySet>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-					<include>${project.groupId}:JibbrJabbr-bootstrapper</include>
+					<include>${project.groupId}:bootstrapper</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
 			<unpack>true</unpack>
@@ -34,7 +34,7 @@
 		<dependencySet>
 			<outputDirectory>/META-INF/system</outputDirectory>
 			<excludes>
-				<exclude>${project.groupId}:JibbrJabbr-bootstrapper</exclude>
+				<exclude>${project.groupId}:bootstrapper</exclude>
 			</excludes>
 			<useProjectArtifact>false</useProjectArtifact>
 			<unpack>false</unpack>

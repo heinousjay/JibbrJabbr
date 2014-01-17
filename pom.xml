@@ -47,7 +47,6 @@
 	
 	<modules>
 		<module>JibbrJabbr-server</module>
-		<module>JibbrJabbr-site</module>
 	</modules>
 	
 	<build>

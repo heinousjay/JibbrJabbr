@@ -1,18 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>JibbrJabbr</artifactId>
-		<groupId>com.jibbrjabbr</groupId>
-		<version>1.0-SNAPSHOT</version>
-	</parent>
-	<artifactId>JibbrJabbr-server</artifactId>
+	
+	<groupId>jibbrjabbr</groupId>
+	<artifactId>jj</artifactId>
+	<version>0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>JibbrJabbr Server</name>
-	<description>An attempt at a simple Java web server. More or less an incubator for concepts and a reason to learn new Java stuff.</description>
+	<name>The JibbrJabbr Server</name>
+	<description>
+		A simple event-driven Java web server. Has a neat API, and a very flexible core.
+	</description>
 
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>https://github.com/heinousjay/JibbrJabbr.git</connection>
+		<developerConnection>scm:git:git@github.com:heinousjay/JibbrJabbr.git</developerConnection>
+		<url>https://github.com/heinousjay/JibbrJabbr</url>
+	</scm>
+	
+	<developers>
+		<developer>
+			<id>heinousjay</id>
+			<name>Jason Miller</name>
+			<email>jibbrjabbr@heinousjay.com</email>
+			<url>http://heinousjay.com</url>
+			<roles>
+				<role>project lead</role>
+			</roles>
+			<timezone>-5</timezone>
+		</developer>
+	</developers>
+	
 	<properties>
+		<friendlyname>JibbrJabbr</friendlyname>
+		<jj.project.basedir>${project.basedir}</jj.project.basedir>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- the integration test project will probably care -->
 		<!-- hopefully there will be a better way -->
 		<distro.id>all</distro.id>
@@ -29,22 +59,22 @@
 		<dependencies>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>JibbrJabbr-kernel</artifactId>
+				<artifactId>kernel</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>JibbrJabbr-bootstrapper</artifactId>
+				<artifactId>bootstrapper</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>JibbrJabbr-test</artifactId>
+				<artifactId>test</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>JibbrJabbr-all</artifactId>
+				<artifactId>all</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -162,6 +192,14 @@
 	</repositories>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
