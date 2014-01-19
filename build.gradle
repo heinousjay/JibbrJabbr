@@ -1,16 +1,80 @@
-subprojects {
+allprojects {
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
+	apply plugin: 'jacoco'
 
 	repositories {
 		mavenCentral()
 	}
 
+	group = 'jibbrjabbr'
 	version = '0.5-SNAPSHOT'
+	
+	sourceCompatibility = '1.7'
+	targetCompatibility = '1.7'
+	
+	tasks.withType(Compile) {
+		options.encoding = "UTF-8"
+	}
+	
+	configurations {
+		testPack {
+			transitive = false
+		}
+		serverCore {
+			transitive = true
+		}
+	}
 
 	dependencies {
-		testCompile 'junit:junit:4.11',
-			'org.hamcrest:hamcrest-library:1.3',
-			'org.mockito:mockito-core:1.9.5'
+		testPack 'org.hamcrest:hamcrest-library:1.3'
+		testPack('junit:junit:4.11') {
+			exclude group: 'org.hamcrest'
+		}
+		testPack('org.mockito:mockito-core:1.9.5') {
+			exclude group: 'org.hamcrest'
+		}
+			
+		serverCore project(':bootstrapper')
+		serverCore 'io.netty:netty-all:4.0.6.Final'
+		serverCore 'org.mozilla:rhino:1.7R4'
+		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
+		serverCore 'com.google.inject:guice:3.0'
+		serverCore 'com.google.inject.extensions:guice-multibindings:3.0'
+		serverCore 'org.javassist:javassist:3.18.0-GA'
+		serverCore 'org.slf4j:slf4j-api:1.7.2'
+		serverCore('ch.qos.logback:logback-classic:1.0.7') {
+			exclude group: 'org.slf4j'
+		}
+		serverCore 'org.jsoup:jsoup:1.7.2'
+	}
+	
+	check.dependsOn jacocoTestReport
+	
+	eclipseClasspath.doFirst {
+				
+		Map<String, String> sourceMap = new HashMap<String, String>()
+		project.sourceSets.each { sourceSet ->
+			def classesOut = project.relativePath(sourceSet.output.classesDir)
+			def resourcesOut = project.relativePath(sourceSet.output.resourcesDir)
+			
+			sourceSet.java.srcDirs.each { dir ->
+				sourceMap[project.relativePath(dir)] = classesOut
+			}
+			
+			sourceSet.resources.srcDirs.each { dir ->
+				sourceMap[project.relativePath(dir)] = resourcesOut
+			}
+		}
+	
+		eclipse.classpath.file {
+			whenMerged { classpath ->
+				classpath.entries.findAll { entry -> 
+					entry.kind == 'src' && sourceMap.containsKey(entry.path) 
+				}.each { entry -> 
+					entry.output = sourceMap[entry.path];
+				}
+			}
+		}
 	}
 }

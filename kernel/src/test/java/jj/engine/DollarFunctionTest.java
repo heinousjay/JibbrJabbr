@@ -18,10 +18,6 @@ package jj.engine;
 import static org.mockito.BDDMockito.given;
 
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import jj.JJ;
 import jj.engine.DollarFunction;
 import jj.engine.EngineAPI;
 import jj.script.CurrentScriptContext;

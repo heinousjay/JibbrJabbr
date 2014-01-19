@@ -38,7 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class ServableTestBase {
 	
-	Path appPath = Paths.get(JJ.uri(ServableTestBase.class)).getParent();
+	Path appPath;
 	
 	@Mock Configuration configuration;
 	@Mock ResourceFinder resourceFinder;
@@ -47,7 +47,13 @@ public abstract class ServableTestBase {
 	@Mock HttpResponse response;
 	
 	@Before
-	public void baseBefore() {
+	public void baseBefore() throws Exception {
+		
+		String path = 
+			JJ.resourcePath(ServableTestBase.class).replace(ServableTestBase.class.getSimpleName() + ".class", "0.txt");
+		
+		appPath = Paths.get(ServableTestBase.class.getResource(path).toURI()).getParent();
+		
 		given(configuration.appPath()).willReturn(appPath);
 	}
 

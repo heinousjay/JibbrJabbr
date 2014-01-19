@@ -32,8 +32,9 @@ public class AssetResourceCreator extends AbstractResourceCreator<AssetResource>
 		Path attempt = null;
 		try {
 			if (myJar == null) {
-				URI uri = AssetResourceCreator.class.getResource("/jj/resource/asset/AssetResourceCreator.class").toURI();
-				attempt = Paths.get(uri).getParent().getParent().getParent().resolve("assets");
+				// ugly but necessary for testing, and favicon.ico will always be there
+				URI uri = AssetResourceCreator.class.getResource("/jj/assets/favicon.ico").toURI();
+				attempt = Paths.get(uri).getParent();
 			} 
 			
 		} catch (Exception e) {

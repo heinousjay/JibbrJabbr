@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.CoreModule;
-import jj.JJ;
 import jj.engine.ContributesScript;
 import jj.engine.EngineAPI;
 import jj.engine.EngineAPIImpl;
@@ -61,7 +60,7 @@ abstract class AbstractEngineApiTest {
 	private static final String RHINO_UNIT = "jasmine.js";
 	
 	private final String rhinoUnit() throws Exception {
-		Path me = Paths.get(JJ.uri(AbstractEngineApiTest.class));
+		Path me = Paths.get(AbstractEngineApiTest.class.getResource(RHINO_UNIT).toURI());
 		return readPath(me.resolveSibling(RHINO_UNIT));
 	}
 	

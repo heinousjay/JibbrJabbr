@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.JJ;
 import jj.configuration.Configuration;
 import jj.event.MockPublisher;
 import jj.resource.css.LessProcessor;
@@ -51,8 +50,8 @@ public class LessProcessorTest {
 	MockPublisher publisher;
 	
 	@Before
-	public void before() throws IOException {
-		appPath = Paths.get(JJ.uri(LessProcessorTest.class)).getParent().getParent();
+	public void before() throws Exception {
+		appPath = Paths.get(LessProcessorTest.class.getResource("/jj/resource/test.css").toURI()).getParent();
 		testCss = new String(Files.readAllBytes(appPath.resolve("test.css")), UTF_8);
 		given(configuration.appPath()).willReturn(appPath);
 		publisher = new MockPublisher();

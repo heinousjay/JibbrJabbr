@@ -1,3 +1,6 @@
+import org.ajoberstar.gradle.git.tasks.*
+import org.apache.tools.ant.filters.ReplaceTokens
+
 buildscript {
 	repositories {
 		mavenCentral()
@@ -8,36 +11,39 @@ buildscript {
 	}
 }
 
-import org.ajoberstar.gradle.git.tasks.*
-import org.apache.tools.ant.filters.ReplaceTokens
-
-ext {
-	versionInfo = [
-		friendlyname: 'JibbrJabbr',
-		version: project.version,
-		'build-time': System.currentTimeMillis() + ''
-	]
+dependencies {
+	testCompile configurations.testPack
 }
 
+
+def versionInfo = [
+	friendlyname: 'JibbrJabbr',
+	version: project.version,
+	'build-time': System.currentTimeMillis() + ''
+]
+
 task readBranch(type: GitBranchList) << {
-	project.versionInfo.branch = workingBranch.name
+	versionInfo.branch = workingBranch.name
 }
 
 task readLog(type: GitLog) {
 	maxCommits 1
 	doLast {
 		log.each {
-			project.versionInfo.put('commit-id', it.id)
-			project.versionInfo.put('commit-message', it.shortMessage)
-			project.versionInfo.put('commit-user', it.committer.name)
-			project.versionInfo.put('commit-email', it.committer.email)
-			project.versionInfo.put('commit-time', it.time + '000')
+			versionInfo['commit-id'] = it.id
+			versionInfo['commit-message'] = it.shortMessage
+			versionInfo['commit-user'] = it.committer.name
+			versionInfo['commit-email'] = it.committer.email
+			versionInfo['commit-time'] = it.time + '000'
 		}
 	}
 }
 
 processResources {
-	filter ReplaceTokens, tokens: project.versionInfo
+	outputs.upToDateWhen {
+		false // we always want the build time, so it's always out of date
+	}
+	filter ReplaceTokens, tokens: versionInfo
 }
 
 processResources.dependsOn readLog, readBranch

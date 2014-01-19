@@ -18,7 +18,6 @@ package jj;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,7 +70,6 @@ public final class Version {
 	static {
 		// we do things this way to avoid depending on any jj internal classes in
 		// order to create these values
-		
 		try (BufferedReader r = new BufferedReader(
 				new InputStreamReader(
 					Version.class.getResourceAsStream("VERSION"), StandardCharsets.UTF_8
