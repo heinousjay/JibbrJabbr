@@ -1,7 +1,29 @@
+import java.awt.Checkbox;
+
+sourceSets {
+	intJava
+	intTest
+}
+
 dependencies {
 	
 	compile configurations.serverCore
 	
 	testCompile configurations.testPack
 	testCompile 'com.google.inject.extensions:guice-grapher:3.0'
+	
+	intJavaCompile configurations.compile
+	intJavaCompile configurations.testPack
+	intJavaCompile sourceSets.main.output
+	
+	intTestCompile sourceSets.intJava.output
+	intTestCompile configurations.intJavaCompile
 }
+
+task integrationTest(type: Test, dependsOn: test) {
+	testClassesDir = sourceSets.intTest.output.classesDir
+	classpath = sourceSets.intTest.runtimeClasspath
+	systemProperties['jar.path'] = jar.archivePath
+}
+
+check.dependsOn integrationTest
