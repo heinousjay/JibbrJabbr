@@ -1,3 +1,5 @@
+def projectName = 'JibbrJabbr'
+
 allprojects {
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
@@ -22,6 +24,14 @@ allprojects {
 		}
 		serverCore {
 			transitive = true
+		}
+	}
+	
+	jar {
+		manifest {
+			attributes(
+				"Implementation-Version": version
+			)
 		}
 	}
 
@@ -79,13 +89,19 @@ subprojects {
 	apply plugin: 'jacoco'
 	
 	check.dependsOn jacocoTestReport
+	
+	jar {
+		manifest {
+			attributes(
+				"Implementation-Title": projectName + '-' + project.name,
+			)
+		}
+	}
 }
 
 task distJar(type: Jar, dependsOn: ':kernel:jar') {
 	
-	println project(':kernel').jar.archivePath
-	
-	baseName = 'JibbrJabbr'
+	baseName = projectName
 		
 	from project(':bootstrapper').sourceSets.main.output
 	
@@ -96,7 +112,10 @@ task distJar(type: Jar, dependsOn: ':kernel:jar') {
 	}
 	
 	manifest {
-		attributes 'Main-Class': 'jj.JJ'
+		attributes (
+			'Main-Class': 'jj.JJ',
+			"Implementation-Title": projectName
+		)
 	}
 }
 
