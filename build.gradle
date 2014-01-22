@@ -44,7 +44,7 @@ allprojects {
 			exclude group: 'org.hamcrest'
 		}
 		
-		serverCore 'io.netty:netty-all:4.0.6.Final'
+		serverCore 'io.netty:netty-all:4.0.15.Final'
 		serverCore 'org.mozilla:rhino:1.7R4'
 		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
 		serverCore 'com.google.inject:guice:3.0'
