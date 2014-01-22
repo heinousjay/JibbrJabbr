@@ -7,4 +7,5 @@ Notes
 bin/
 build/
 .gradle/
+.jar
 

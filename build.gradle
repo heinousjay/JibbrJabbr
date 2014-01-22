@@ -1,14 +1,13 @@
 allprojects {
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
-	apply plugin: 'jacoco'
 
 	repositories {
 		mavenCentral()
 	}
 
 	group = 'jibbrjabbr'
-	version = '0.5-SNAPSHOT'
+	version = '0.5'
 	
 	sourceCompatibility = '1.7'
 	targetCompatibility = '1.7'
@@ -34,8 +33,7 @@ allprojects {
 		testPack('org.mockito:mockito-core:1.9.5') {
 			exclude group: 'org.hamcrest'
 		}
-			
-		serverCore project(':bootstrapper')
+		
 		serverCore 'io.netty:netty-all:4.0.6.Final'
 		serverCore 'org.mozilla:rhino:1.7R4'
 		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
@@ -48,8 +46,6 @@ allprojects {
 		}
 		serverCore 'org.jsoup:jsoup:1.7.2'
 	}
-	
-	check.dependsOn jacocoTestReport
 	
 	eclipseClasspath.doFirst {
 				
@@ -78,3 +74,32 @@ allprojects {
 		}
 	}
 }
+
+subprojects {
+	apply plugin: 'jacoco'
+	
+	check.dependsOn jacocoTestReport
+}
+
+task distJar(type: Jar, dependsOn: ':kernel:jar') {
+	
+	println project(':kernel').jar.archivePath
+	
+	baseName = 'JibbrJabbr'
+		
+	from project(':bootstrapper').sourceSets.main.output
+	
+	metaInf {
+		into 'system'
+		from configurations.serverCore.files
+		from project(':kernel').jar.archivePath
+	}
+	
+	manifest {
+		attributes 'Main-Class': 'jj.JJ'
+	}
+}
+
+assemble.dependsOn distJar
+
+jar.onlyIf { false }

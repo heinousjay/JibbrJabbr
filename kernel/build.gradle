@@ -6,11 +6,12 @@ sourceSets {
 dependencies {
 	
 	compile configurations.serverCore
+	compile project(':bootstrapper')
 	
 	testCompile configurations.testPack
 	testCompile 'com.google.inject.extensions:guice-grapher:3.0'
 	
-	intJavaCompile configurations.compile
+	intJavaCompile configurations.runtime
 	intJavaCompile configurations.testPack
 	intJavaCompile sourceSets.main.output
 	
@@ -18,11 +19,14 @@ dependencies {
 	intTestCompile sourceSets.intJava.output
 }
 
-task integrationTest(type: Test, dependsOn: jar) {
+task integrationTest(type: Test, dependsOn: intTestClasses) {
 	testClassesDir = sourceSets.intTest.output.classesDir
 	classpath = sourceSets.intTest.runtimeClasspath
 }
 
 integrationTest.shouldRunAfter test
+
+jar.mustRunAfter test
+jar.mustRunAfter integrationTest
 
 check.dependsOn integrationTest
