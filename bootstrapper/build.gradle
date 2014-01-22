@@ -23,7 +23,7 @@ def versionInfo = [
 ]
 
 task readBranch(type: GitBranchList) << {
-	versionInfo.branch = workingBranch.name
+	versionInfo.branch = workingBranch.name ?: 'master'
 }
 
 task readLog(type: GitLog) {
