@@ -64,9 +64,6 @@ public final class Version {
 	/** date and time of the commit for this build version */
 	public static final Date commitDate;
 	
-	/** date and time when this version was built */
-	public static final Date buildDate;
-	
 	static {
 		// we do things this way to avoid depending on any jj internal classes in
 		// order to create these values
@@ -95,8 +92,6 @@ public final class Version {
 			commitId = r.readLine();
 			commitDescription = r.readLine();
 			commitDate = new Date(Long.parseLong(r.readLine()));
-			
-			buildDate = new Date(Long.parseLong(r.readLine()));
 
 			
 		} catch (Exception e) {

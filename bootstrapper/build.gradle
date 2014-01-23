@@ -18,8 +18,7 @@ dependencies {
 
 def versionInfo = [
 	friendlyname: 'JibbrJabbr',
-	version: project.version,
-	'build-time': System.currentTimeMillis() + ''
+	version: project.version
 ]
 
 task readBranch(type: GitBranchList) << {
@@ -41,7 +40,13 @@ task readLog(type: GitLog) {
 
 processResources {
 	outputs.upToDateWhen {
-		false // we always want the build time, so it's always out of date
+		
+		Set<String> values = new HashSet<String>(versionInfo.values());
+		file(outputs.files.singleFile.path + File.separator + 'jj' + File.separator + 'VERSION').eachLine('UTF-8') {
+			values.remove(it);
+		}
+		
+		values.empty
 	}
 	filter ReplaceTokens, tokens: versionInfo
 }

@@ -20,6 +20,5 @@ public class VersionTest {
 		assertThat(Version.commitUserName, is(not(nullValue())));
 		assertThat(Version.commitUserEmail, is(not(nullValue())));
 		assertThat(Version.commitDate, is(not(nullValue())));
-		assertThat(Version.buildDate, is(not(nullValue())));
 	}
 }

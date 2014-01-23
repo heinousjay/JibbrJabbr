@@ -99,6 +99,10 @@ subprojects {
 	}
 }
 
+configurations {
+	dist
+}
+
 task distJar(type: Jar, dependsOn: ':kernel:jar') {
 	
 	baseName = projectName
@@ -108,7 +112,7 @@ task distJar(type: Jar, dependsOn: ':kernel:jar') {
 	metaInf {
 		into 'system'
 		from configurations.serverCore.files
-		from project(':kernel').jar.archivePath
+		from project(":kernel").configurations.archives.allArtifacts.collect { it.file }
 	}
 	
 	manifest {
@@ -117,6 +121,10 @@ task distJar(type: Jar, dependsOn: ':kernel:jar') {
 			"Implementation-Title": projectName
 		)
 	}
+}
+
+artifacts {
+	dist distJar
 }
 
 assemble.dependsOn distJar
