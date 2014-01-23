@@ -99,13 +99,7 @@ subprojects {
 	}
 }
 
-configurations {
-	dist
-}
-
-task distJar(type: Jar, dependsOn: ':kernel:jar') {
-	
-	baseName = projectName
+jar {
 		
 	from project(':bootstrapper').sourceSets.main.output
 	
@@ -123,10 +117,4 @@ task distJar(type: Jar, dependsOn: ':kernel:jar') {
 	}
 }
 
-artifacts {
-	dist distJar
-}
-
-assemble.dependsOn distJar
-
-jar.onlyIf { false }
+jar.dependsOn ':kernel:jar'

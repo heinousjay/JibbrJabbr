@@ -41,12 +41,14 @@ task readLog(type: GitLog) {
 processResources {
 	outputs.upToDateWhen {
 		
+		def version = file(outputs.files.singleFile.path + File.separator + 'jj' + File.separator + 'VERSION')
 		Set<String> values = new HashSet<String>(versionInfo.values());
-		file(outputs.files.singleFile.path + File.separator + 'jj' + File.separator + 'VERSION').eachLine('UTF-8') {
-			values.remove(it);
+		if (version.exists()) {
+			version.eachLine('UTF-8') {
+				values.remove(it);
+			}
 		}
-		
-		values.empty
+		version.exists() && values.empty
 	}
 	filter ReplaceTokens, tokens: versionInfo
 }
