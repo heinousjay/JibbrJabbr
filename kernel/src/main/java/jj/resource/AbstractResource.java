@@ -43,7 +43,8 @@ public abstract class AbstractResource implements Resource {
 	
 	@IOThread
 	public abstract boolean needsReplacing() throws IOException;
-	
+
+	@IOThread
 	boolean isObselete() throws IOException {
 		return !alive || needsReplacing();
 	}
