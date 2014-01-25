@@ -23,6 +23,9 @@ import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jj.JJServerStartupListener;
 import jj.execution.IOTask;
 import jj.execution.JJExecutor;
@@ -38,6 +41,8 @@ import jj.resource.config.ConfigResource;
  */
 @Singleton
 class ConfigurationScriptPreloader implements JJServerStartupListener {
+	
+	private final Logger log = LoggerFactory.getLogger(ConfigurationScriptPreloader.class);
 	
 	private final JJExecutor executors;
 	private final ResourceFinder resourceFinder;
@@ -61,7 +66,12 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 				@Override
 				public void run() {
 					try {
-						resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+						ConfigResource config = resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+						if (config != null) {
+							log.info("Found configuration at " + config.path());
+						} else {
+							log.info("No configuration found, using defaults");
+						}
 					} finally {
 						latch.countDown();
 					}
