@@ -50,15 +50,12 @@ public class BasicServingTest {
 	/**
 	 * 
 	 */
-	private static final String INDEX_HTML_RENDERED = "index.html.rendered";
-	private static final String ANIMAL_HTML_RENDERED = "animal.html.rendered";
+	private static final String INDEX_HTML_RENDERED = "/app1/app/index.html.rendered";
+	private static final String ANIMAL_HTML_RENDERED = "/app1/app/animal.html.rendered";
 
 	private static final String INDEX = "/";
 
 	private static final String ANIMAL = "/animal";
-	
-	private static final Path indexHtmlRenderedPath;
-	private static final Path animalHtmlRenderedPath;
 	
 	public static final VerifiableRequest[] statics;
 	public static final VerifiableRequest[] documents;
@@ -71,9 +68,6 @@ public class BasicServingTest {
 	
 	static {
 		try {
-			indexHtmlRenderedPath = Paths.get(App.path1, INDEX_HTML_RENDERED);
-			animalHtmlRenderedPath = Paths.get(App.path1, ANIMAL_HTML_RENDERED);
-			
 			List<VerifiableRequest> work = new ArrayList<>();
 			work.add(makeResourceRequest("0.txt"));
 			work.add(makeResourceRequest("1.txt"));
@@ -88,9 +82,11 @@ public class BasicServingTest {
 			Collections.shuffle(work);
 			statics = work.toArray(new VerifiableRequest[work.size()]);
 			
+			ResourceReader reader = new ResourceReader();
+			
 			work = new ArrayList<>();
-			work.add(new VerifiableRequest(INDEX, Files.readAllBytes(indexHtmlRenderedPath)));
-			work.add(new VerifiableRequest(ANIMAL, Files.readAllBytes(animalHtmlRenderedPath)));
+			work.add(new VerifiableRequest(INDEX, reader.readResource(INDEX_HTML_RENDERED)));
+			work.add(new VerifiableRequest(ANIMAL, reader.readResource(ANIMAL_HTML_RENDERED)));
 			
 			documents = work.toArray(new VerifiableRequest[work.size()]);
 			

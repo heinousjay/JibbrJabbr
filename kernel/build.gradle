@@ -21,7 +21,10 @@ dependencies {
 
 task integrationTest(type: Test, dependsOn: intTestClasses) {
 	testClassesDir = sourceSets.intTest.output.classesDir
-	classpath = sourceSets.intTest.runtimeClasspath
+	classpath = files(
+		sourceSets.intTest.runtimeClasspath,
+		project(':').sourceSets.test.resources.srcDirs
+	)
 }
 
 integrationTest.shouldRunAfter test

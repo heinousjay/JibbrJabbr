@@ -1,0 +1,125 @@
+import java.io.File;
+
+def rootDir = "${buildDir}/phantomjs"
+def executable = "${rootDir}/bin/phantomjs"
+def needsPermissionChange = true
+def classifier = { os, arch ->
+	if (os == 'Mac OS X') {
+		'macosx'
+	} else if (os =~ /^Windows/) {
+		needsPermissionChange = false
+		executable = "${rootDir}/phantomjs.exe"
+		'windows'
+	} else if (os == 'Linux' && arch =~ '64') {
+		'linux-64'
+	} else if (os == 'Linux') {
+		'linux-32'
+	} else {
+		'unsupported-operating-system'
+	}
+}(System.getProperty('os.name'), System.getProperty("sun.arch.data.model"))
+
+
+
+/**
+ * Wraps up the logic for starting/stopping a JibbrJabbr instance, given a server jar, app base, and place to
+ * redirect logs.
+ */
+class JibbrJabbrServer {
+	
+	private final ProcessBuilder pb
+	private Process p
+	private Integer exit
+	
+	public JibbrJabbrServer(File serverJar, File logDir, File appBase) {
+		pb = new ProcessBuilder('java', '-jar', serverJar.name, "app=${appBase}")
+		pb.directory(serverJar.parentFile).redirectOutput(new File(logDir, 'out.log')).redirectError(new File(logDir, 'error.log'))
+	}
+	
+	public void start() {
+		if (p != null) throw new IllegalStateException("this JibbrJabbr instance was already started")
+		p = pb.start();
+		
+		Thread.sleep(3000) // should be enough? find a better way! maybe keep trying a passed-in port every second until it accepts a connection
+	}
+	
+	public void stop() {
+		if (p == null) throw new IllegalStateException("this JibbrJabbr instance was not started")
+		try {
+			exit = p.exitValue() // may have stopped already due to error
+		} catch (IllegalThreadStateException ise) {
+			p.getOutputStream().write(3) // does this terminate it?  let's see!
+			p.getOutputStream().flush()
+			p.waitFor()
+			exit = p.exitValue()
+		}
+		p = null;
+	}
+	
+	public Integer exit() {
+		return exit;
+	}
+}
+
+configurations {
+	phantomJS {
+		transitive = false
+	}
+}
+
+dependencies {
+	
+	testCompile configurations.testPack
+	testCompile 'com.github.detro.ghostdriver:phantomjsdriver:1.1.0'
+	
+	phantomJS "org.jboss.arquillian.extension:arquillian-phantom-binary:1.9.2:${classifier}"
+}
+
+task setUpPhantomJS(type:Copy) {
+	
+	// there's only one jar in the file, so just get the first one
+	from zipTree(configurations.phantomJS.files.find { true })
+	include 'bin/phantomjs'
+	include 'phantomjs.exe'
+	
+	into rootDir
+	
+	if (needsPermissionChange) {
+		doLast {
+			ant.chmod(file:executable, perm:'700')
+		}
+	}
+}
+
+test {
+	systemProperty 'phantomjs.binary.path', executable
+}
+
+def findApp(String path) {
+	def base = project(':').sourceSets.test.resources.srcDirs.find();
+	
+	return new File(base, path);
+}
+
+task startJibbrJabbr(dependsOn: ':jar') {
+	
+	finalizedBy 'stopJibbrJabbr'
+	
+	ext {
+		jjs = new JibbrJabbrServer(project(':').jar.archivePath, buildDir, findApp('/app1/app'));
+	}
+	
+	doLast {
+		jjs.start()
+	}
+}
+
+task stopJibbrJabbr(dependsOn: startJibbrJabbr) << {
+	startJibbrJabbr.jjs.stop()
+	println startJibbrJabbr.jjs.exit
+}
+
+stopJibbrJabbr.mustRunAfter test
+
+test.dependsOn startJibbrJabbr
+test.dependsOn setUpPhantomJS

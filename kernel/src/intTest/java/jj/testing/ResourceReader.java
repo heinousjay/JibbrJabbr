@@ -15,20 +15,17 @@
  */
 package jj.testing;
 
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
  * @author jason
  *
  */
-public class App {
+public class ResourceReader {
+
 	
-	public static final String path1;
-	static {
-		try {
-			path1 = Paths.get(App.class.getResource("/app1/app/0.txt").toURI()).toAbsolutePath().getParent().toString();
-		} catch (Exception e) {
-			throw new AssertionError(e);
-		}
+	public byte[] readResource(String path) throws Exception {
+		return Files.readAllBytes(Paths.get(ResourceReader.class.getResource(path).toURI()));
 	}
 }

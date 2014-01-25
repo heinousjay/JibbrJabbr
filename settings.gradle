@@ -1,1 +1,1 @@
-include "bootstrapper","kernel"
+include 'bootstrapper','kernel','test'

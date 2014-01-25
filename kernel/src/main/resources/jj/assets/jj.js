@@ -310,11 +310,8 @@ jQuery(function($) {
 
 		function send(payload) {
 			debug && console.debug("WebSocket", "send", payload);
-			var message = JSON.stringify(payload);
-			if (ws)
-			ws.send(message);
+			ws && ws.send(JSON.stringify(payload));
 		}
-		
 		
 		function processMessages(messages) {
 			messages.forEach(function(message) {

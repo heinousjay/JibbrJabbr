@@ -29,6 +29,7 @@ import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.json.JsonParser;
 import org.slf4j.Logger;
 
 /**
@@ -82,6 +83,11 @@ public class RhinoContext implements Closeable {
 	public ScriptableObject newObject(Scriptable scope) {
 		assertNotClosed();
 		return (ScriptableObject)context.newObject(scope);
+	}
+	
+	public JsonParser newJsonParser(Scriptable scope) {
+		assertNotClosed();
+		return new JsonParser(context, scope);
 	}
 	
 	public Function compileFunction(final Scriptable scope, final String source, final String sourceName) {

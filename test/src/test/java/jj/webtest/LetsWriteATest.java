@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
+package jj.webtest;
 
-import java.nio.file.Paths;
+import org.junit.Rule;
+import org.junit.Test;
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author jason
  *
  */
-public class App {
+public class LetsWriteATest {
 	
-	public static final String path1;
-	static {
-		try {
-			path1 = Paths.get(App.class.getResource("/app1/app/0.txt").toURI()).toAbsolutePath().getParent().toString();
-		} catch (Exception e) {
-			throw new AssertionError(e);
-		}
+	@Rule
+	public WebDriverRule webDriverRule = new WebDriverRule();
+
+	@Test
+	public void test() throws Exception {
+		WebDriver webDriver = webDriverRule.get("http://localhost:8080/");
+		Thread.sleep(250);
+		
+		System.out.println(webDriver.getTitle());
 	}
+
 }

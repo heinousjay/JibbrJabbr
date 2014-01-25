@@ -227,7 +227,9 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	/**
 	 * adds a message intended to be processed a framework startup
 	 * on the client.  initially intended for event bindings but
-	 * some other case may come up
+	 * some other case may come up.
+	 * 
+	 * MOVE THIS to inside.  it's so sloppy in the html
 	 * @param message
 	 */
 	public DocumentRequestProcessor addStartupJJMessage(final JJMessage message) {

@@ -37,13 +37,11 @@ public class ScriptJSON {
 	}
 	
 	public Object parse(final String input) {
-		// need to do some serious quote replacement
-		String escaped = emptyOrInput(input).trim().replace("'", "\\'").replace("\"", "\\\"");
 		
 		try (RhinoContext context = contextProvider.get()) {
-			return context.evaluateString(scope, "JSON.parse('" + escaped + "');", "ScriptJSON.parse");
+			return context.newJsonParser(scope).parseValue(emptyOrInput(input).trim());
 		} catch (Exception e) {
-			log.warn("couldn't JSON.parse {}", input);
+			//log.warn("couldn't JSON.parse {}", input);
 			log.warn("", e);
 			return null;
 		}

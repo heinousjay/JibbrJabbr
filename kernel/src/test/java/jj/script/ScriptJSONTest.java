@@ -11,18 +11,21 @@ import org.junit.Test;
 
 public class ScriptJSONTest {
 	
-	private static final String TEST_STRING = "{\"form\":\"{\\\"userName\\\":\\\"jaybird\\\"}\"}";
-
+	private static final String TEST_STRING = "{\"form\":\"{\\\"userName\\\":\\\"jaybird\\\",\\\"userLame\\\":\\\"sure plus a \\\\\\\\slash for testing\\\"}\"}";
+	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void test() {
+	public void test() throws Exception {
 		
 		ScriptJSON underTest = new ScriptJSON(new RealRhinoContextProvider());
 		
-		Map<String, Object> map = (Map<String, Object>)underTest.parse(TEST_STRING);
-		map = (Map<String, Object>)underTest.parse(String.valueOf(map.get("form")));
+		Map<String, String> map = (Map<String, String>)underTest.parse(TEST_STRING);
+		String form = map.get("form");
 		
-		assertThat((String)map.get("userName"), is("jaybird"));
+		map = (Map<String, String>)underTest.parse(form);
+		
+		assertThat(map.get("userName"), is("jaybird"));
+		assertThat(map.get("userLame"), is("sure plus a \\slash for testing"));
 	}
 
 }
