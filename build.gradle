@@ -99,6 +99,7 @@ subprojects {
 	}
 }
 
+// configures the jar to be the actual final build product
 jar {
 	
 	baseName = projectName
@@ -120,3 +121,47 @@ jar {
 }
 
 jar.dependsOn ':kernel:jar'
+
+/**
+ * Wraps up the logic for starting/stopping a JibbrJabbr instance, given a server jar, app base, and place to
+ * redirect logs.
+ */
+class JibbrJabbrServer {
+	
+	private final ProcessBuilder pb
+	private Process p
+	private Integer exit
+	
+	public JibbrJabbrServer(File serverJar, File logDir, String appBase) {
+		pb = new ProcessBuilder('java', '-jar', serverJar.name, "app=${appBase}")
+		pb.directory(serverJar.parentFile).redirectOutput(new File(logDir, 'out.log')).redirectError(new File(logDir, 'error.log'))
+	}
+	
+	public void start() {
+		if (p != null) throw new IllegalStateException("this JibbrJabbr instance was already started")
+		p = pb.start();
+		
+		Thread.sleep(3000) // should be enough? find a better way! maybe keep trying a passed-in port every second until it accepts a connection
+	}
+	
+	public void stop() {
+		if (p == null) throw new IllegalStateException("this JibbrJabbr instance was not started")
+		try {
+			exit = p.exitValue() // may have stopped already due to error
+		} catch (IllegalThreadStateException ise) {
+			p.getOutputStream().write(3) // does this terminate it?  let's see!
+			p.getOutputStream().flush()
+			p.waitFor()
+			exit = p.exitValue()
+		}
+		p = null;
+	}
+	
+	public Integer exit() {
+		return exit;
+	}
+}
+
+def getJibbrJabbrServer(File logDir, String appBase) {
+	new JibbrJabbrServer(jar.archivePath, logDir, appBase);
+}
