@@ -45,7 +45,7 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 	
 	// reaper +
 	// half the processors
-	public static final int WORKER_COUNT = 1 + (int)(Runtime.getRuntime().availableProcessors() * 0.5);
+	public static final int WORKER_COUNT = 1 + Math.max(2, (int)(Runtime.getRuntime().availableProcessors() * 0.5));
 		
 	@Inject
 	ClientExecutor(
