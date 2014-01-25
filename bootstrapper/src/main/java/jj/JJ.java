@@ -124,6 +124,24 @@ public final class JJ {
 
 	public static void main(String[] args) 
 		throws Exception {
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						if (System.in.read() == 3) {
+							break;
+						}
+					} catch (Exception e) {
+						break;
+					}
+				}
+				System.exit(0);
+			}
+		}).start();
+		
 		try {
 			final JJ jj = new JJ(true).init(args);
 
@@ -136,11 +154,13 @@ public final class JJ {
 					} catch (Exception e) {
 						// kablizzle
 						e.printStackTrace();
+						System.exit(-1);
 					}
 				}
 			});
 		} catch (IllegalStateException ise) {
 			ise.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
@@ -256,6 +276,7 @@ public final class JJ {
 	private void messageInitError(Throwable cause) {
 		System.err.println("Couldn't initialize the server!");
 		cause.printStackTrace();
+		System.exit(-1);
 	}
 
 	public void start() throws Exception {
