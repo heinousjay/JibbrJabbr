@@ -114,6 +114,7 @@ public class JJHttpServerResponseTest {
 	
 	private void verifyInlineResponse() {
 		
+		verify(ctx, times(2)).write(any());
 		verify(ctx).writeAndFlush(any());
 		
 		verifyNoMoreInteractions(ctx);

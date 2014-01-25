@@ -16,8 +16,8 @@
 package jj.http;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
@@ -41,7 +42,8 @@ import jj.resource.TransferableResource;
 public abstract class AbstractHttpResponse implements HttpResponse {
 
 	public static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
-	protected final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+	protected final DefaultHttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+	protected AtomicReference<ByteBuf> content = new AtomicReference<>();
 	private volatile boolean isCommitted = false;
 	protected final Charset charset = StandardCharsets.UTF_8;
 
@@ -138,18 +140,25 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	public HttpVersion version() {
 		return response.getProtocolVersion();
 	}
+	
+	protected ByteBuf content() {
+		if (content.get() == null) {
+			content.compareAndSet(null, Unpooled.buffer(0));
+		}
+		return content.get();
+	}
 
 	@Override
 	public HttpResponse content(final byte[] bytes) {
 		assertNotCommitted();
-		response.content().writeBytes(bytes);
+		content().writeBytes(bytes);
 		return this;
 	}
 
 	@Override
 	public HttpResponse content(final ByteBuf buffer) {
 		assertNotCommitted();
-		response.content().writeBytes(buffer);
+		content().writeBytes(buffer);
 		return this;
 	}
 
@@ -171,7 +180,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	 */
 	@Override
 	public String contentsString() {
-		return response.content().toString(charset);
+		return content().toString(charset);
 	}
 
 	@Override

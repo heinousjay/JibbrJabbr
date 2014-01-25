@@ -158,7 +158,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 			.append(", headers=").append(response.headers())
 			.append(", error=").append(error())
 			.append(", ended=").append(ended())
-			.append(", contents size=").append(response.content().readableBytes())
+			.append(", contents size=").append(content().readableBytes())
 			.append("}")
 			.toString();
 	}
@@ -183,8 +183,8 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	}
 	
 	public byte[] contentBytes() {
-		byte[] contentBytes = new byte[response.content().readableBytes()];
-		response.content().slice().readBytes(contentBytes);
+		byte[] contentBytes = new byte[content().readableBytes()];
+		content().slice().readBytes(contentBytes);
 		return contentBytes;
 	}
 }

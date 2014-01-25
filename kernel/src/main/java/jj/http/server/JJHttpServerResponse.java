@@ -20,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Date;
 import java.util.Map.Entry;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -34,14 +35,13 @@ import jj.http.HttpResponse;
 import jj.logging.AccessLogger;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
-
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.DefaultFileRegion;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.handler.stream.ChunkedNioFile;
 
 /**
  * @author jason
@@ -94,7 +94,9 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	public HttpResponse end() {
 		assertNotCommitted();
 		header(HttpHeaders.Names.DATE, new Date());
-		maybeClose(ctx.writeAndFlush(response));
+		ctx.write(response);
+		ctx.write(content());
+		maybeClose(ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT));
 		markCommitted();
 		return this;
 	}
@@ -126,8 +128,11 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
 		
 		ctx.write(response);
-		ctx.write(new DefaultFileRegion(resource.fileChannel(), 0, resource.size()));
+		ctx.write(new ChunkedNioFile(resource.fileChannel()));
 		maybeClose(ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT));
+		
+		// configuration can decide if we're doing zero-copy or chunking?
+		//maybeClose(ctx.writeAndFlush(new DefaultFileRegion(resource.fileChannel(), 0, resource.size())));
 		
 		markCommitted();
 		return this;
@@ -195,6 +200,6 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	 * @return {@code true} if the response has no body, {@code false} otherwise
 	 */
 	public boolean hasNoBody() {
-		return response.content().readableBytes() == 0;
+		return content().readableBytes() == 0;
 	}
 }
