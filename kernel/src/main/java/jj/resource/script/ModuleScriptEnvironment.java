@@ -28,7 +28,9 @@ import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
+import jj.script.ChildScriptEnvironment;
 import jj.script.RhinoContext;
+import jj.script.ScriptEnvironment;
 
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
@@ -39,7 +41,7 @@ import org.mozilla.javascript.ScriptableObject;
  *
  */
 @Singleton
-public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
+public class ModuleScriptEnvironment extends AbstractScriptEnvironment implements ChildScriptEnvironment {
 
 
 	@Override
@@ -76,6 +78,11 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 	protected Object[] creationArgs() {
 		return new Object[] { parent };
 	}
+	
+	@Override
+	public ScriptEnvironment parent() {
+		return parent;
+	}
 
 	@Override
 	@IOThread
@@ -88,7 +95,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 	
 	private final String moduleIdentifier;
 	
-	private final ModuleParent parent;
+	private final ScriptEnvironment parent;
 	
 	private final ScriptableObject scope;
 	
@@ -107,7 +114,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 	ModuleScriptEnvironment(
 		final ResourceCacheKey cacheKey,
 		final String moduleIdentifier,
-		final ModuleParent parent,
+		final ModuleParent moduleParent,
 		final Publisher publisher,
 		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
@@ -117,7 +124,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 		
 		this.moduleIdentifier = moduleIdentifier;
 		
-		this.parent = new ModuleParent(resourceFinder.findResource(parent.scriptEnvironment()));
+		parent = resourceFinder.findResource(moduleParent.scriptEnvironment());
 		
 		scriptResource = resourceFinder.loadResource(ScriptResource.class, scriptName());
 		
@@ -125,8 +132,8 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment {
 			throw new NoSuchResourceException(moduleIdentifier);
 		}
 		
-		scriptResource.addDependent(this.parent.scriptEnvironment());
-		this.parent.scriptEnvironment().addDependent(this);
+		scriptResource.addDependent(parent);
+		parent.addDependent(this);
 		
 		sha1 = scriptResource.sha1();
 		scope = createLocalScope(moduleIdentifier, api.global());
