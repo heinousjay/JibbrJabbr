@@ -78,9 +78,11 @@ class JJExecutorImpl implements JJExecutor {
 				try {
 					task.run();
 				} catch (Throwable t) {
-					logger.error("Exception caught in executor", t);
+					logger.error("Task [{}] ended in exception", task.name());
+					logger.error("", t);
 				} finally {
 					task.end();
+					currentTask.set(null);
 					Thread.currentThread().setName(name);
 				}
 			}
