@@ -35,6 +35,8 @@ import jj.resource.Resource;
 /**
  * Acts as the bridge from netty into our core.
  * @author jason
+ * 
+ * TODO this needs to be made into the new style without channelRead0 as a method name.  i think that's a thing
  *
  */
 public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -66,6 +68,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		this.logger = logger;
 	}
 
+	// TODO 
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
 		
@@ -125,7 +128,12 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 		final HttpResponse response
 	) throws Exception {
 		
-		// figure out if there's something for us to do
+		// look up the candidate ways to service the request
+		// try them out to see if the request can be handled?
+		//  - TODO always in the IO thread? not sure there, maybe document servable can launch the script execution immediately
+		//  - but it may not matter since all threads will generally be warm under load and it's no big deal otherwise
+		// see if the request can get handled
+		// return 404 if not
 		final List<Servable<? extends Resource>> list = servables.findMatchingServables(request.uriMatch());
 		
 		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
