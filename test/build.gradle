@@ -92,6 +92,8 @@ task setUpPhantomJS(type:Copy) {
 }
 
 test {
+	inputs.file project(':').jar.archivePath
+	
 	systemProperty 'phantomjs.binary.path', executable
 }
 
