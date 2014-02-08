@@ -25,7 +25,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class CurrentTask {
+public class CurrentTask {
 
 	private final ThreadLocal<JJTask> store = new ThreadLocal<>();
 	
@@ -36,5 +36,9 @@ class CurrentTask {
 	JJTask get() {
 		return store.get();
 	}
-
+	
+	public String name() {
+		JJTask task = store.get();
+		return task == null ? "no current task" : task.name();
+	}
 }
