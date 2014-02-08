@@ -51,7 +51,7 @@ public class HttpServerChannelInitializerTest {
 	// mocking things we don't own because said things
 	// connect to a network and they're just interfaces 
 	@Mock SocketChannel ch;
-	@Mock ChannelPipeline pipeline; 
+	@Mock ChannelPipeline pipeline;
 	
 	@Test
 	public void test() throws Exception {
