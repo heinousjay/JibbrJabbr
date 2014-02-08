@@ -22,6 +22,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import jj.script.ScriptEnvironment;
 import jj.script.ScriptRunner;
 
 import org.junit.Before;
@@ -47,6 +48,8 @@ public class JJExecutorImplTest {
 	@Mock IOExecutor ioExecutor;
 	@Mock ScriptExecutorFactory scriptExecutorFactory;
 	@Mock ScheduledExecutorService scriptExecutor;
+	
+	@Mock ScriptEnvironment scriptEnvironment;
 
 	@InjectMocks ExecutorBundle bundle;
 	
@@ -58,10 +61,15 @@ public class JJExecutorImplTest {
 	
 	@Captor ArgumentCaptor<Runnable> runnableCaptor;
 	
+	String baseName = "test";
+	
 	@Before
 	public void before() {
 		
 		executor = new JJExecutorImpl(bundle, currentTask, logger);
+		
+		given(scriptEnvironment.baseName()).willReturn(baseName);
+		given(scriptExecutorFactory.executorFor(baseName)).willReturn(scriptExecutor);
 	}
 	
 	private void runTask(ScheduledExecutorService service) {
@@ -73,11 +81,10 @@ public class JJExecutorImplTest {
 	public void testExecuteScriptTask() {
 		
 		// kind og a 
-		given(scriptExecutorFactory.executorFor("test")).willReturn(scriptExecutor);
 		
 		final AtomicBoolean flag = new AtomicBoolean(false);
 		
-		ScriptTask task = new ScriptTask("test task", "test") {
+		ScriptTask<ScriptEnvironment> task = new ScriptTask<ScriptEnvironment>("test task", scriptEnvironment) {
 			
 			@Override
 			protected void run() {
@@ -116,11 +123,9 @@ public class JJExecutorImplTest {
 	@Test
 	public void testExecuteErrorLogged() {
 		
-		given(scriptExecutorFactory.executorFor("test")).willReturn(scriptExecutor);
-		
 		final Exception toThrow = new Exception();
 		
-		executor.execute(new ScriptTask("test task", "test") {
+		executor.execute(new ScriptTask<ScriptEnvironment>("test task", scriptEnvironment) {
 			
 			@Override
 			protected void run() throws Exception {
