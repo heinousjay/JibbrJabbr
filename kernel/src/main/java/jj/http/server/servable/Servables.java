@@ -52,23 +52,6 @@ public class Servables {
 		
 		return Collections.unmodifiableList(result);
 	}
-	
-	@SuppressWarnings("unchecked")
-	private <T extends Resource> Servable<T> cast(Servable<?> in, Class<T> resourceClass) {
-		return (Servable<T>)in;
-	}
-	
-	public <T extends Resource> Servable<T> findMatchingServable(Class<T> resourceClass) {
-		Servable<T> result = null;
-		for (Servable<?> servable : servables) {
-			if (servable.type().equals(resourceClass)) {
-				result = cast(servable, resourceClass);
-				break;
-			}
-		}
-		
-		return result;
-	}
 
 	/**
 	 * @param uriMatch

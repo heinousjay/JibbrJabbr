@@ -84,13 +84,5 @@ public class ServablesTest {
 		assertThat(result.size(), is(2));
 		assertThat(result, containsInAnyOrder((Servable<? extends Resource>)assetServable, staticServable));
 	}
-	
-	@Test
-	public void testTypeMatch() {
-		
-		assertThat(servables.findMatchingServable(AssetResource.class), is(assetServable));
-		assertThat(servables.findMatchingServable(CssResource.class), is(cssServable));
-		assertThat(servables.findMatchingServable(StaticResource.class), is(staticServable));
-	}
 
 }
