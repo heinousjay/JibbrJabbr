@@ -114,6 +114,8 @@ jar {
 		from project(":kernel").configurations.archives.allArtifacts.collect { it.file }
 	}
 	
+	// write the sha1 of the libs into a file
+	
 	manifest {
 		attributes (
 			'Main-Class': 'jj.JJ',
