@@ -128,7 +128,8 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 		if (documentScriptEnvironment.hasServerScript()) {
 			scriptRunner.submit(this);
 		} else {
-			executors.execute(new ScriptTask("responding to document request [" + baseName() + "]", baseName()) {
+			String name = "responding to document request [" + baseName() + "]";
+			executors.execute(new ScriptTask<DocumentScriptEnvironment>(name, documentScriptEnvironment) {
 				
 				@Override
 				protected void run() throws Exception {

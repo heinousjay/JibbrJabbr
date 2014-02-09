@@ -104,7 +104,9 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		
 		final String baseName = documentRequestProcessor.baseName();
 		
-		executors.execute(new ScriptTask("document request [" + documentRequestProcessor + "]", baseName) {
+		String name = "document request [" + documentRequestProcessor + "]";
+		
+		executors.execute(new ScriptTask<ScriptEnvironment>(name, documentRequestProcessor.documentScriptEnvironment()) {
 
 			@Override
 			public void run() {
@@ -156,7 +158,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		final RequiredModule requiredModule = context.requiredModule();
 		final ModuleScriptEnvironment moduleScriptEnvironment = context.moduleScriptEnvironment();
 		
-		executors.execute(new ScriptTask("module parent resumption", moduleScriptEnvironment.baseName()) {
+		executors.execute(new ScriptTask<ScriptEnvironment>("module parent resumption", moduleScriptEnvironment) {
 
 			@Override
 			public void run() {
@@ -173,10 +175,9 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	@Override
 	public void submit(final RequiredModule requiredModule, final ModuleScriptEnvironment scriptExecutionEnvironment) {
-		final String baseName = requiredModule.baseName();
 		final String identifier = requiredModule.identifier();
 		
-		executors.execute(new ScriptTask("module script initialization for [" + identifier + "]", baseName) {
+		executors.execute(new ScriptTask<ScriptEnvironment>("module script initialization for [" + identifier + "]", scriptExecutionEnvironment) {
 			
 			@Override
 			public void run() {
@@ -200,7 +201,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		final String pendingKey,
 		final Object result
 	) {
-		executors.execute(new ScriptTask("resuming continuation on [" + connection + "]", connection.baseName()) {
+		executors.execute(new ScriptTask<ScriptEnvironment>("resuming continuation on [" + connection + "]", connection.webSocketConnectionHost()) {
 			
 			@Override
 			public void run() {
@@ -225,7 +226,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	@Override
 	public void submit(final JJWebSocketConnection connection, final String event, final Object...args) {
-		executors.execute(new ScriptTask("host event on WebSocket connection", connection.baseName()) {
+		executors.execute(new ScriptTask<ScriptEnvironment>("host event on WebSocket connection", connection.webSocketConnectionHost()) {
 
 			@Override
 			public void run() {
@@ -285,7 +286,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		context.restore(saved);
 		try {
 			assert context.scriptEnvironment() != null : "attempting to restart a continuation without a script context in place";
-			executors.execute(new ScriptTask(description, context.baseName()) {
+			executors.execute(new ScriptTask<ScriptEnvironment>(description, context.webSocketConnectionHost()) {
 	
 				@Override
 				protected void run() throws Exception {

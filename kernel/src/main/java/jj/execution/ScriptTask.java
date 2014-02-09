@@ -17,21 +17,23 @@ package jj.execution;
 
 import java.util.concurrent.ScheduledExecutorService;
 
+import jj.script.ScriptEnvironment;
+
 /**
  * @author jason
  *
  */
-public abstract class ScriptTask extends JJTask {
+public abstract class ScriptTask<T extends ScriptEnvironment> extends JJTask {
 	
-	private final String scriptName;
+	protected final T scriptEnvironment;
 	
-	protected ScriptTask(final String name, final String scriptName) {
+	protected ScriptTask(final String name, final T scriptEnvironment) {
 		super(name);
-		this.scriptName = scriptName;
+		this.scriptEnvironment = scriptEnvironment;
 	}
 	
 	@Override
 	protected final ScheduledExecutorService executor(final ExecutorBundle bundle) {
-		return bundle.scriptExecutorFactory.executorFor(scriptName);
+		return bundle.scriptExecutorFactory.executorFor(scriptEnvironment.baseName());
 	}
 }

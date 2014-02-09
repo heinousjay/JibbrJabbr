@@ -84,7 +84,7 @@ public class JJExecutorImplTest {
 		
 		final AtomicBoolean flag = new AtomicBoolean(false);
 		
-		ScriptTask task = new ScriptTask("test task", scriptEnvironment.baseName()) {
+		ScriptTask<ScriptEnvironment> task = new ScriptTask<ScriptEnvironment>("test task", scriptEnvironment) {
 			
 			@Override
 			protected void run() {
@@ -125,7 +125,7 @@ public class JJExecutorImplTest {
 		
 		final Exception toThrow = new Exception();
 		
-		executor.execute(new ScriptTask("test task", scriptEnvironment.baseName()) {
+		executor.execute(new ScriptTask<ScriptEnvironment>("test task", scriptEnvironment) {
 			
 			@Override
 			protected void run() throws Exception {
