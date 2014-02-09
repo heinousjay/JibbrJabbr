@@ -15,14 +15,89 @@
  */
 package jj.script;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.mozilla.javascript.ContinuationPending;
+
 import jj.CurrentResource;
+import jj.jjmessage.JJMessage;
 
 /**
+ * 
+ * 
  * @author jason
  *
  */
+@Singleton
 public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment> {
+	
+	private final Provider<RhinoContext> contextProvider;
+	
+	@Inject
+	CurrentScriptEnvironment(final Provider<RhinoContext> contextProvider) {
+		this.contextProvider = contextProvider;
+	}
+	
+	/**
+	 * Prepares a continuation and throws it.  Returns the ContinuationPending
+	 * so that callers can write
+	 * <code>throw context.prepareContinuation(...)</code>
+	 * so the compiler stays happy, but this method never returns normally
+	 * 
+	 * the result will return a string
+	 * 
+	 * @param jjMessage
+	 * @return
+	 */
+	public ContinuationPending prepareContinuation(JJMessage jjMessage) {
+		ContinuationPending result = prepareContinuation(new ContinuationState(jjMessage));
+		jjMessage.id(); // = new key!, then store it!
+		current().continuationPending(result);
+		throw result;
+	}
+	
+	/**
+	 * Prepares and throws a continuation for a rest request
+	 * @param restRequest
+	 * @return
+	 */
+	public ContinuationPending prepareContinuation(RestRequest restRequest) {
+		ContinuationPending result = prepareContinuation(new ContinuationState(restRequest));
+		restRequest.id(); // = new key!, then store it!
+		current().continuationPending(result);
+		throw result;
+	}
+	
+	/**
+	 * prepares and throws a continuation to require a new module
+	 * @param require
+	 * @return
+	 */
+	public ContinuationPending prepareContinuation(RequiredModule require) {
+		ContinuationPending result = prepareContinuation(new ContinuationState(require));
+		current().continuationPending(result);
+		require.pendingKey(); // = new key!
+		throw result;
+	}
+	
 
-	
-	
+	/**
+	 * captures a continuation from the rhino interpreter, and stores the information
+	 * necessary for resumption
+	 * @param pendingId 
+	 * @param continuationState
+	 * @return
+	 */
+	private ContinuationPending prepareContinuation(ContinuationState continuationState) {
+		
+		try(RhinoContext context = contextProvider.get()) {
+			ContinuationPending continuation = context.captureContinuation();
+			continuation.setApplicationState(continuationState);
+			return continuation;
+		} catch (Exception e) {
+			throw new AssertionError("could not capture a continuation", e);
+		}
+	}
 }

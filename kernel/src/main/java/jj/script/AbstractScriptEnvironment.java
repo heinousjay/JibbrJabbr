@@ -17,10 +17,14 @@ package jj.script;
 
 import static jj.script.ScriptExecutionState.*;
 
+import java.util.HashMap;
+
 import javax.inject.Provider;
 
+import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.Sequence;
 import jj.event.Publisher;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceCacheKey;
@@ -35,6 +39,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected final Publisher publisher;
 	
 	protected final Provider<RhinoContext> contextProvider;
+	
+	private final Sequence continuationIds = new Sequence();
+	
+	protected final HashMap<String, ContinuationPending> continuationPendings = new HashMap<>();
 	
 	ScriptExecutionState state = Unitialized;
 	
@@ -83,6 +91,20 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		if (initializing && state == Unitialized) {
 			state = Initializing;
 		}
+	}
+	
+	// TODO - make things package private and out of the general script environment interface
+	@Override
+	public String continuationPending(final ContinuationPending continuationPending) {
+		String id = continuationIds.next();
+		continuationPendings.put("", continuationPending);
+		return id;
+	}
+	
+	@Override
+	public ContinuationPending continuationPending(final String key) {
+		assert continuationPendings.containsKey(key);
+		return continuationPendings.remove(key);
 	}
 
 	/**

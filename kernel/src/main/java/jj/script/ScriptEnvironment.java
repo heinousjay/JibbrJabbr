@@ -17,6 +17,7 @@ package jj.script;
 
 import jj.resource.Resource;
 
+import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -62,5 +63,9 @@ public interface ScriptEnvironment extends Resource {
 	 * @return
 	 */
 	ScriptableObject newObject();
+	
+	ContinuationPending continuationPending(String key);
+	
+	String continuationPending(ContinuationPending continuationPending);
 
 }

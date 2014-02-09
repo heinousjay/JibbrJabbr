@@ -42,7 +42,6 @@ public class MessagesTest {
 	private void verifyExpectsNoResult(JJMessage message) {
 		assertThat(message.expectsResult(), is(false));
 		assertThat(message.id(), is(nullValue()));
-		assertThat(message.resultId(), is(nullValue()));
 	}
 	
 	private void verifyExpectsResult(JJMessage message) {
