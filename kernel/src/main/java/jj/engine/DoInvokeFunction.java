@@ -52,7 +52,7 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		// TODO assert that we're in a connection context
-		throw env.prepareContinuation(
+		throw env.preparedContinuation(
 			JJMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]))
 		);
 	}

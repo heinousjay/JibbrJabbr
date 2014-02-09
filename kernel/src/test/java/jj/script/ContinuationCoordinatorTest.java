@@ -16,6 +16,7 @@
 package jj.script;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -24,9 +25,7 @@ import java.util.Map;
 
 import jj.Closer;
 import jj.jjmessage.JJMessage;
-import jj.resource.document.DocumentScriptEnvironment;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,9 +58,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Script script;
 	
-	@Mock ScriptEnvironment scriptEnvironment;
-	
-	@Mock DocumentScriptEnvironment documentScriptEnvironment;
+	@Mock AbstractScriptEnvironment scriptEnvironment;
 	
 	@Mock CurrentScriptEnvironment env;
 	@Mock Closer closer;
@@ -74,7 +71,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Callable function;
 
-	ContinuationCoordinator continuationCoordinator;
+	ContinuationCoordinatorImpl continuationCoordinator;
 	
 	final Object[] args = { new Object(), new Object() };
 	
@@ -95,10 +92,6 @@ public class ContinuationCoordinatorTest {
 		given(scriptEnvironment.scope()).willReturn(scope);
 		given(scriptEnvironment.sha1()).willReturn(sha1);
 		
-		given(documentScriptEnvironment.script()).willReturn(script);
-		given(documentScriptEnvironment.scope()).willReturn(scope);
-		given(documentScriptEnvironment.sha1()).willReturn(sha1);
-		
 		continuationState = new ContinuationState(JJMessage.makeRetrieve(""));
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
@@ -112,9 +105,18 @@ public class ContinuationCoordinatorTest {
 		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, logger, continuationProcessors);
 	}
 	
-	@After
-	public void after() {
-		verify(env).enterScope(any(ScriptEnvironment.class));
+	public void verifyDefaultContextMaintained() {
+		// the continuation coordinator is responsible for maining the scope
+		// of the script environment
+		verify(env).enterScope(scriptEnvironment);
+		assertThat(env.current(), is(nullValue()));
+	}
+	
+	public void verifyContinuedContextMaintained() {
+		// the continuation coordinator is responsible for maining the scope
+		// of the script environment
+		verify(env).enterScope(eq(scriptEnvironment), anyString());
+		assertThat(env.current(), is(nullValue()));
 	}
 	
 	@Test
@@ -123,6 +125,7 @@ public class ContinuationCoordinatorTest {
 		boolean result = continuationCoordinator.execute(scriptEnvironment);
 		
 		assertThat(result, is(true));
+		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -134,6 +137,7 @@ public class ContinuationCoordinatorTest {
 
 		assertThat(result, is(false));
 		verify(continuationProcessor2).process(continuationState);
+		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -149,14 +153,16 @@ public class ContinuationCoordinatorTest {
 		
 		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
 		verify(logger).error("", e);
+		verifyDefaultContextMaintained();
 	}
 	
 	@Test
 	public void testFunctionExecutionNoContinuation() {
 		
-		boolean result = continuationCoordinator.execute(documentScriptEnvironment, function, args[0], args[1]);
+		boolean result = continuationCoordinator.execute(scriptEnvironment, function, args[0], args[1]);
 		
 		assertThat(result, is(true));
+		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -164,10 +170,11 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
 		
-		boolean result = continuationCoordinator.execute(documentScriptEnvironment, function, args);
+		boolean result = continuationCoordinator.execute(scriptEnvironment, function, args);
 		
 		assertThat(result, is(false));
 		verify(continuationProcessor2).process(continuationState);
+		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -179,18 +186,19 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(e);
 		
-		continuationCoordinator.execute(documentScriptEnvironment, function);
+		continuationCoordinator.execute(scriptEnvironment, function);
 		
-		verify(logger).error(unexpectedExceptionString, documentScriptEnvironment);
+		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
 		verify(logger).error("", e);
+		verifyDefaultContextMaintained();
 	}
 	
 	@Test
 	public void testContinuationResumptionNoContinuation() {
 		
-		given(documentScriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
+		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
-		boolean result = continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
+		boolean result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
 		assertThat(result, is(true));
 	}
@@ -198,20 +206,21 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testContinuationResumptionWithContinuation() {
 		
-		given(documentScriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
+		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
 		
-		boolean result = continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
+		boolean result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
 		assertThat(result, is(false));
 		verify(continuationProcessor2).process(continuationState);
+		verifyContinuedContextMaintained();
 	}
 	
 	@Test
 	public void testContinuationResumptionWithUnexpectedException() {
 		
-		given(documentScriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
+		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		given(logger.isErrorEnabled()).willReturn(true);
 		
@@ -219,10 +228,11 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(e);
 		
-		continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
+		continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
-		verify(logger).error(unexpectedExceptionString, documentScriptEnvironment);
+		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
 		verify(logger).error("", e);
+		verifyContinuedContextMaintained();
 	}
 
 }

@@ -134,7 +134,7 @@ public class EventSelection implements Selection {
 	
 	public String data(String key) {
 		verifyContext("get data");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "data", key));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "data", key));
 	}
 
 	@Override
@@ -161,18 +161,18 @@ public class EventSelection implements Selection {
 	@Override
 	public String attr(String attributeKey) {
 		verifyContext("get an attribute value");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "attr", attributeKey));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "attr", attributeKey));
 	}
 	
 	public String prop(String propKey) {
 		verifyContext("get an property value");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "prop", propKey));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "prop", propKey));
 	}
 
 	@Override
 	public boolean hasAttr(String attributeKey) {
 		verifyContext("check for an attribute");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "hasAttr", attributeKey));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "hasAttr", attributeKey));
 	}
 
 	@Override
@@ -219,13 +219,13 @@ public class EventSelection implements Selection {
 	@Override
 	public boolean hasClass(String className) {
 		verifyContext("check for a class");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "hasClass", className));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "hasClass", className));
 	}
 
 	@Override
 	public String val() {
 		verifyContext("retrieve a value");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "val"));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "val"));
 	}
 
 	@Override
@@ -238,13 +238,13 @@ public class EventSelection implements Selection {
 	@Override
 	public String text() {
 		verifyContext("retrieve text");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "text"));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "text"));
 	}
 
 	@Override
 	public String html() {
 		verifyContext("retrieve html");
-		throw env.prepareContinuation(JJMessage.makeGet(selector, "html"));
+		throw env.preparedContinuation(JJMessage.makeGet(selector, "html"));
 	}
 
 	@Override

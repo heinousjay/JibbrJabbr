@@ -127,7 +127,7 @@ class RestCallProvider {
 
 			if (!options.ignoreResult()) {
 				// TODO - handle the result in a way consistent with configuration, gets set on the RestRequest
-				throw env.prepareContinuation(new RestRequest(request));
+				throw env.preparedContinuation(new RestRequest(request));
 			} else {
 				// just fire and forget!
 				httpClient.execute(request);

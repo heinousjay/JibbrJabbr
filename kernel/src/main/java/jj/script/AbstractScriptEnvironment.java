@@ -40,7 +40,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	protected final Provider<RhinoContext> contextProvider;
 	
-	private final Sequence continuationIds = new Sequence();
+	private final Sequence continuationKeys = new Sequence();
 	
 	protected final HashMap<String, ContinuationPending> continuationPendings = new HashMap<>();
 	
@@ -93,18 +93,26 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		}
 	}
 	
-	// TODO - make things package private and out of the general script environment interface
-	@Override
-	public String continuationPending(final ContinuationPending continuationPending) {
-		String id = continuationIds.next();
-		continuationPendings.put(id, continuationPending);
-		return id;
+	String createContinuationContext(final ContinuationPending continuationPending) {
+		String key = continuationKeys.next();
+		continuationPendings.put(key, continuationPending);
+		captureContextForKey(key);
+		return key;
 	}
 	
-	@Override
-	public ContinuationPending continuationPending(final String key) {
-		assert continuationPendings.containsKey(key) : key;
+	ContinuationPending continuationPending(final String key) {
+		assert continuationPendings.containsKey(key) : "trying to retrieve a nonexistent continuation for " + key;
+		// the continuation coordinator is responsible for 
 		return continuationPendings.remove(key);
+	}
+	
+	protected void captureContextForKey(String key) {
+		// nothing to do in the abstract, but specific type will have things
+		// DocumentScriptEnvironment needs to save connections and documents, for example
+	}
+	
+	protected void restoreContextForKey(String key) {
+		
 	}
 
 	/**

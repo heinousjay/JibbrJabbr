@@ -55,7 +55,7 @@ class DoRetrieveFunction extends BaseFunction implements HostObject {
 			throw new IllegalArgumentException("retrieve can only be called with a key");
 		}
 		// TODO, ensure we are connected to something
-		throw env.prepareContinuation(
+		throw env.preparedContinuation(
 			JJMessage.makeRetrieve(String.valueOf(args[0]))
 		);
 	}

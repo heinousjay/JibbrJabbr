@@ -17,7 +17,6 @@ package jj.script;
 
 import jj.resource.Resource;
 
-import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -41,12 +40,16 @@ public interface ScriptEnvironment extends Resource {
 	Script script();
 	
 	/**
-	 * unique ID for the script, based on the resources that
+	 * (hopefully) unique ID for the script, based on the resources that
 	 * compose the execution environment
 	 * @return
 	 */
 	String sha1();
 	
+	/**
+	 * 
+	 * @return
+	 */
 	String scriptName();
 
 	boolean initialized();
@@ -60,12 +63,8 @@ public interface ScriptEnvironment extends Resource {
 	String baseName();
 
 	/**
-	 * @return
+	 * Get a new, empty script object in the scope of this environment
 	 */
 	ScriptableObject newObject();
-	
-	ContinuationPending continuationPending(String key);
-	
-	String continuationPending(ContinuationPending continuationPending);
 
 }

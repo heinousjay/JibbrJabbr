@@ -21,8 +21,8 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
 
+import jj.Closer;
 import jj.CurrentResource;
-import jj.jjmessage.JJMessage;
 
 /**
  * 
@@ -41,6 +41,22 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	}
 	
 	/**
+	 * internal method, to allow continuation resumption to restore environment-dependent
+	 * contexts
+	 * @param resource
+	 * @param pendingKey
+	 * @return
+	 */
+	Closer enterScope(ScriptEnvironment resource, String pendingKey) {
+		
+		return super.enterScope(resource);
+	}
+	
+	protected AbstractScriptEnvironment innerCurrent() {
+		return (AbstractScriptEnvironment)current();
+	}
+	
+	/**
 	 * Prepares a continuation and throws it.  Returns the ContinuationPending
 	 * so that callers can write
 	 * <code>throw context.prepareContinuation(...)</code>
@@ -48,40 +64,17 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 * 
 	 * the result will return a string
 	 * 
-	 * @param jjMessage
+	 * @param continuable
 	 * @return
 	 */
-	public ContinuationPending prepareContinuation(JJMessage jjMessage) {
-		ContinuationPending result = prepareContinuation(new ContinuationState(jjMessage));
-		String pendingKey = current().continuationPending(result);
-		jjMessage.pendingKey(pendingKey);
+	public ContinuationPending preparedContinuation(Continuable continuable) {
+		assert current() != null : "can't perform a continuation unless a script is in context";
+		
+		ContinuationPending result = prepareContinuation(new ContinuationState(continuable));
+		String pendingKey = innerCurrent().createContinuationContext(result);
+		continuable.pendingKey(pendingKey);
 		throw result;
 	}
-	
-	/**
-	 * Prepares and throws a continuation for a rest request
-	 * @param restRequest
-	 * @return
-	 */
-	public ContinuationPending prepareContinuation(RestRequest restRequest) {
-		ContinuationPending result = prepareContinuation(new ContinuationState(restRequest));
-		String pendingKey = current().continuationPending(result);
-		restRequest.pendingKey(pendingKey);
-		throw result;
-	}
-	
-	/**
-	 * prepares and throws a continuation to require a new module
-	 * @param require
-	 * @return
-	 */
-	public ContinuationPending prepareContinuation(RequiredModule require) {
-		ContinuationPending result = prepareContinuation(new ContinuationState(require));
-		String pendingKey = current().continuationPending(result);
-		require.pendingKey(pendingKey); // = new key!
-		throw result;
-	}
-	
 
 	/**
 	 * captures a continuation from the rhino interpreter, and stores the information

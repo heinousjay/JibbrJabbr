@@ -183,7 +183,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				context.connection().send(JJMessage.makeInlineCreate(html, args));
 				return new EventSelection(String.format("#%s", args.get(ATTR_ID)), context, env);
 			} else {
-				throw env.prepareContinuation(
+				throw env.preparedContinuation(
 					JJMessage.makeCreate(html, args));
 			}
 		}

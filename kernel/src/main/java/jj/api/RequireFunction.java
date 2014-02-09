@@ -93,7 +93,7 @@ class RequireFunction extends BaseFunction {
 		// violence, any problem can be solved by using MOAR!
 		
 		if (scriptEnvironment == null || !scriptEnvironment.initialized()) {
-			throw env.prepareContinuation(new RequiredModule(moduleIdentifier, context));
+			throw env.preparedContinuation(new RequiredModule(moduleIdentifier, context));
 		}
 		
 		return scriptEnvironment.exports();

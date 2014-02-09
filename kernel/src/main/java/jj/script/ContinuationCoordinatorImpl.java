@@ -54,9 +54,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	
 	private ContinuationState execute(final ContinuationExecution execution, final ScriptEnvironment scriptEnvironment) {
 		try (RhinoContext context = contextProvider.get()) {
-			try (Closer closer = env.enterScope(scriptEnvironment)) {
-				execution.run(context);
-			}
+			execution.run(context);
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
 		} catch (RuntimeException e) {
@@ -79,7 +77,9 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			
 			@Override
 			public void run(RhinoContext context) {
-				context.executeScriptWithContinuations(scriptEnvironment.script(), scriptEnvironment.scope());
+				try (Closer closer = env.enterScope(scriptEnvironment)) {
+					context.executeScriptWithContinuations(scriptEnvironment.script(), scriptEnvironment.scope());
+				}
 			}
 		}, scriptEnvironment));
 	}
@@ -102,7 +102,9 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 				
 				@Override
 				public void run(RhinoContext context) {
-					context.callFunctionWithContinuations(function, scriptEnvironment.scope(), args);
+					try (Closer closer = env.enterScope(scriptEnvironment)) {
+						context.callFunctionWithContinuations(function, scriptEnvironment.scope(), args);
+					}
 				}
 			}, scriptEnvironment));
 			
@@ -125,14 +127,16 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
-		final ContinuationPending continuation = scriptEnvironment.continuationPending(pendingKey);
+		final ContinuationPending continuation = ((AbstractScriptEnvironment)scriptEnvironment).continuationPending(pendingKey);
 		if (continuation != null) {
 
 			return processContinuationState(execute(new ContinuationExecution() {
 				
 				@Override
 				public void run(RhinoContext context) {
-					context.resumeContinuation(continuation.getContinuation(), scriptEnvironment.scope(), result);
+					try (Closer closer = env.enterScope(scriptEnvironment, pendingKey)) {
+						context.resumeContinuation(continuation.getContinuation(), scriptEnvironment.scope(), result);
+					}
 				}
 			}, scriptEnvironment));
 		}
