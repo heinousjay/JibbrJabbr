@@ -35,11 +35,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class HttpServerTest {
 	
-	Provider<JJEngineHttpHandler> engineProvider = new Provider<JJEngineHttpHandler>() {
+	Provider<EngineHttpHandler> engineProvider = new Provider<EngineHttpHandler>() {
 		
 		@Override
-		public JJEngineHttpHandler get() {
-			return mock(JJEngineHttpHandler.class);
+		public EngineHttpHandler get() {
+			return mock(EngineHttpHandler.class);
 		}
 	};
 

@@ -39,7 +39,7 @@ import jj.resource.Resource;
  * TODO this needs to be made into the new style without channelRead0 as a method name.  i think that's a thing
  *
  */
-public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 	
 	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
 	
@@ -54,7 +54,7 @@ public class JJEngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReq
 	private final Logger logger;
 	
 	@Inject
-	JJEngineHttpHandler( 
+	EngineHttpHandler( 
 		final JJExecutor executors,
 		final Servables servables,
 		final Injector parentInjector,

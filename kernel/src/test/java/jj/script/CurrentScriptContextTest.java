@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import jj.http.client.JJHttpClientRequest;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
@@ -52,7 +52,7 @@ public class CurrentScriptContextTest {
 	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
-	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketConnection connection;
 	@Mock ModuleScriptEnvironment moduleScriptEnvironment;
 	@Mock RequiredModule requiredModule;
 	JJMessage jjMessage;

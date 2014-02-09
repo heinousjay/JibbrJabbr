@@ -15,7 +15,7 @@
  */
 package jj.resource.document;
 
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 
 /**
@@ -26,5 +26,5 @@ import jj.jjmessage.JJMessage;
  */
 interface DocumentWebSocketMessageProcessor {
 	
-	void handle(JJWebSocketConnection connection, JJMessage message);
+	void handle(WebSocketConnection connection, JJMessage message);
 }

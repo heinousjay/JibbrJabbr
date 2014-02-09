@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.jjmessage.JJMessage.Type;
@@ -42,7 +42,7 @@ import jj.jjmessage.JJMessage.Type;
 @RunWith(MockitoJUnitRunner.class)
 public class WebSocketMessageProcessorsTest {
 	
-	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketConnection connection;
 	
 	@Mock DocumentWebSocketMessageProcessor wsmp1;
 	@Mock DocumentWebSocketMessageProcessor wsmp2;

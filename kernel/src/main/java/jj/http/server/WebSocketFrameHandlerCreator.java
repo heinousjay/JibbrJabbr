@@ -45,7 +45,7 @@ class WebSocketFrameHandlerCreator {
 
 		@Override
 		protected void configure() {
-			bind(JJWebSocketConnection.class);
+			bind(WebSocketConnection.class);
 			bind(WebSocketFrameHandler.class);
 			bind(WebSocketServerHandshaker.class).toInstance(handshaker);
 			bind(WebSocketConnectionHost.class).toInstance(webSocketConnectionHost);

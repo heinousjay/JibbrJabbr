@@ -44,13 +44,13 @@ import org.mozilla.javascript.Callable;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JJWebSocketConnectionTest {
+public class WebSocketConnectionTest {
 	
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
 	@Captor ArgumentCaptor<CloseWebSocketFrame> closeFrameCaptor;
-	JJWebSocketConnection connection;
+	WebSocketConnection connection;
 	
 	@Mock Callable function1;
 	@Mock Callable function2;
@@ -60,7 +60,7 @@ public class JJWebSocketConnectionTest {
 		
 		given(ctx.channel().remoteAddress()).willReturn(InetSocketAddress.createUnresolved("localhost", 8080));
 		
-		connection = new JJWebSocketConnection(ctx, documentScriptEnvironment);
+		connection = new WebSocketConnection(ctx, documentScriptEnvironment);
 	}
 
 	@Test

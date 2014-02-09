@@ -31,10 +31,10 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JJWebSocketHandlerTest {
+public class WebSocketHandlerTest {
 	
-	@InjectMocks JJWebSocketHandler wsh;
-	@Mock JJWebSocketConnection connection;
+	@InjectMocks WebSocketHandler wsh;
+	@Mock WebSocketConnection connection;
 	@Mock ScriptRunner scriptRunner;
 
 	@Test

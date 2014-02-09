@@ -39,8 +39,8 @@ public class WebSocketConnectionTrackerTest {
 	@Mock JJNioEventLoopGroup eventLoopGroup;
 	@InjectMocks WebSocketConnectionTracker wsct;
 	
-	@Mock JJWebSocketConnection connection1;
-	@Mock JJWebSocketConnection connection2;
+	@Mock WebSocketConnection connection1;
+	@Mock WebSocketConnection connection2;
 	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment1;
 	@Mock DocumentScriptEnvironment documentScriptEnvironment2;

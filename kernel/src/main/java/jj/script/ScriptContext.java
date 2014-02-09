@@ -2,7 +2,7 @@ package jj.script;
 
 import static jj.script.ScriptContextType.*;
 
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
@@ -20,7 +20,7 @@ class ScriptContext {
 	
 	final RequiredModule requiredModule;
 	
-	final JJWebSocketConnection connection;
+	final WebSocketConnection connection;
 	
 	final DocumentRequestProcessor documentRequestProcessor;
 	
@@ -55,7 +55,7 @@ class ScriptContext {
 	
 	ScriptContext( 
 		final ScriptContext parent,
-		final JJWebSocketConnection connection
+		final WebSocketConnection connection
 	) {
 		this.type = WebSocket;
 		this.parent = parent;

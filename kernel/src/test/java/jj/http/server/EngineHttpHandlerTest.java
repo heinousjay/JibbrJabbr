@@ -35,7 +35,7 @@ import java.io.IOException;
 import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.server.JJEngineHttpHandler;
+import jj.http.server.EngineHttpHandler;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
@@ -59,7 +59,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JJEngineHttpHandlerTest {
+public class EngineHttpHandlerTest {
 	
 	@Mock Logger logger;
 	@Mock ChannelHandlerContext ctx;
@@ -88,7 +88,7 @@ public class JJEngineHttpHandlerTest {
 	@Mock RequestProcessor requestProcessor2;
 	@Mock RequestProcessor requestProcessor3;
 	
-	JJEngineHttpHandler handler;
+	EngineHttpHandler handler;
 	
 	@Rule
 	public MockServablesRule servables = new MockServablesRule();
@@ -109,7 +109,7 @@ public class JJEngineHttpHandlerTest {
 		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
 		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
-		handler = new JJEngineHttpHandler(executors, servables.servables, injector, webSocketRequestChecker, logger);
+		handler = new EngineHttpHandler(executors, servables.servables, injector, webSocketRequestChecker, logger);
 	}
 
 	@SuppressWarnings("unchecked")

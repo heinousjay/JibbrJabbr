@@ -18,7 +18,7 @@ package jj.resource.document;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.ScriptJSON;
 import jj.script.ScriptRunner;
@@ -43,7 +43,7 @@ class ResultMessageProcessor implements DocumentWebSocketMessageProcessor {
 	}
 
 	@Override
-	public void handle(JJWebSocketConnection connection, JJMessage message) {
+	public void handle(WebSocketConnection connection, JJMessage message) {
 		Object value = message.result().value == null ? null : json.parse(message.result().value);
 		scriptRunner.submitPendingResult(connection, message.result().id, value);
 	}

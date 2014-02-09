@@ -48,8 +48,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class WebSocketFrameHandlerTest {
 	
 	@Mock WebSocketServerHandshaker handshaker;
-	@Mock JJWebSocketHandler handler;
-	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketHandler handler;
+	@Mock WebSocketConnection connection;
 	@Mock WebSocketConnectionHost webSocketConnectionHost;
 	@Mock WebSocketConnectionTracker connectionTracker;
 	@InjectMocks WebSocketFrameHandler wsfh;

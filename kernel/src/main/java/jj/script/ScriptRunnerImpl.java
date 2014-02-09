@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.script.ModuleScriptEnvironment;
@@ -197,7 +197,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 
 	@Override
 	public void submitPendingResult(
-		final JJWebSocketConnection connection,
+		final WebSocketConnection connection,
 		final String pendingKey,
 		final Object result
 	) {
@@ -225,7 +225,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	}
 	
 	@Override
-	public void submit(final JJWebSocketConnection connection, final String event, final Object...args) {
+	public void submit(final WebSocketConnection connection, final String event, final Object...args) {
 		executors.execute(new ScriptTask<ScriptEnvironment>("host event on WebSocket connection", connection.webSocketConnectionHost()) {
 
 			@Override

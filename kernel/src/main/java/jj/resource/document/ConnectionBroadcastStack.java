@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 
 /**
  * Represents a subset of current connections built by some predicate,
@@ -31,36 +31,36 @@ import jj.http.server.JJWebSocketConnection;
 class ConnectionBroadcastStack {
 	
 	public interface Predicate {
-		boolean accept(JJWebSocketConnection connection);
+		boolean accept(WebSocketConnection connection);
 	}
 	
-	private final Iterator<JJWebSocketConnection> iterator;
+	private final Iterator<WebSocketConnection> iterator;
 	
 	private final Predicate predicate;
 	
 	private ConnectionBroadcastStack parent;
 	
-	ConnectionBroadcastStack(final Set<JJWebSocketConnection> connections) {
+	ConnectionBroadcastStack(final Set<WebSocketConnection> connections) {
 		this(connections, new Predicate() {
 			
 			@Override
-			public boolean accept(JJWebSocketConnection connection) {
+			public boolean accept(WebSocketConnection connection) {
 				return true;
 			}
 		});
 	}
 
-	ConnectionBroadcastStack(final Set<JJWebSocketConnection> connections, final Predicate predicate) {
+	ConnectionBroadcastStack(final Set<WebSocketConnection> connections, final Predicate predicate) {
 		iterator = new HashSet<>(connections).iterator();
 		this.predicate = predicate;
 	}
 	
-	private JJWebSocketConnection getNext() {
+	private WebSocketConnection getNext() {
 		return iterator.hasNext() ? iterator.next() : null;
 	}
 	
-	public JJWebSocketConnection popConnection() {
-		JJWebSocketConnection next;
+	public WebSocketConnection popConnection() {
+		WebSocketConnection next;
 		while((next = getNext()) != null) {
 			if (predicate.accept(next)) break;
 		}

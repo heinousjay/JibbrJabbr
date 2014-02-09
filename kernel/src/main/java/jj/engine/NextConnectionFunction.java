@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.script.CurrentScriptContext;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -88,14 +88,14 @@ class NextConnectionFunction extends BaseFunction implements HostObject, Contrib
 		}
 		
 		@SuppressWarnings("unchecked")
-		Iterator<JJWebSocketConnection> iterator = (Iterator<JJWebSocketConnection>)obj;
+		Iterator<WebSocketConnection> iterator = (Iterator<WebSocketConnection>)obj;
 		Boolean needsFinish = (Boolean)context.webSocketConnectionHost().scope().get(PROP_ITERATOR_NEEDS_FINISH, scope);
 		
 		if (needsFinish != null && needsFinish) {
 			context.end();
 		}
 		
-		JJWebSocketConnection next = null;
+		WebSocketConnection next = null;
 		
 		if (iterator.hasNext()) {
 			next = iterator.next();

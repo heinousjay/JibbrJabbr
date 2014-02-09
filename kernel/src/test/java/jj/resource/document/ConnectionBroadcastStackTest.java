@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,19 +34,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectionBroadcastStackTest {
 	
-	@Mock JJWebSocketConnection con1;
-	@Mock JJWebSocketConnection con2;
-	@Mock JJWebSocketConnection con3;
+	@Mock WebSocketConnection con1;
+	@Mock WebSocketConnection con2;
+	@Mock WebSocketConnection con3;
 
 	@Test
 	public void test() {
-		HashSet<JJWebSocketConnection> connections = new HashSet<>();
+		HashSet<WebSocketConnection> connections = new HashSet<>();
 		connections.add(con1);
 		connections.add(con2);
 		connections.add(con3);
 		ConnectionBroadcastStack stack = new ConnectionBroadcastStack(connections);
 		
-		JJWebSocketConnection current;
+		WebSocketConnection current;
 		while ((current = stack.popConnection()) != null) {
 			assertTrue(connections.remove(current));
 		}
@@ -59,7 +59,7 @@ public class ConnectionBroadcastStackTest {
 		stack = new ConnectionBroadcastStack(connections, new ConnectionBroadcastStack.Predicate() {
 			int yes = 0;
 			@Override
-			public boolean accept(JJWebSocketConnection connection) {
+			public boolean accept(WebSocketConnection connection) {
 				return yes++ == 0;
 			}
 		});

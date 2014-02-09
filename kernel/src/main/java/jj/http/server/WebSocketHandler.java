@@ -13,45 +13,49 @@ import org.slf4j.LoggerFactory;
 
 /**
  * bridges websocket connections into the correct script execution
+ * 
+ * pretty much going away, it's way too thin, reorg this stuff as 
+ * creating a task using a factory
+ * 
  * @author jason
  *
  */
 @Singleton
-class JJWebSocketHandler {
+class WebSocketHandler {
 	
-	private Logger log = LoggerFactory.getLogger(JJWebSocketHandler.class);
+	private Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
 	
 	private final ScriptRunner scriptRunner;
 	
 	
 	
 	@Inject
-	JJWebSocketHandler(
+	WebSocketHandler(
 		final ScriptRunner scriptRunner
 	) {
 		this.scriptRunner = scriptRunner;
 	}
 
-	public void opened(JJWebSocketConnection connection) {
+	public void opened(WebSocketConnection connection) {
 		scriptRunner.submit(connection, HostEvent.clientConnected.toString(), connection);
 	}
 
-	public void closed(JJWebSocketConnection connection) {
+	public void closed(WebSocketConnection connection) {
 		scriptRunner.submit(connection, HostEvent.clientDisconnected.toString(), connection);
 	}
 	
-	public void errored(JJWebSocketConnection connection, Throwable cause) {
+	public void errored(WebSocketConnection connection, Throwable cause) {
 		
 	}
 
-	public void messageReceived(JJWebSocketConnection connection, ByteBuf byteBuf) {
+	public void messageReceived(WebSocketConnection connection, ByteBuf byteBuf) {
 		// at some point this is going to become interesting
 		// the notion of receiving a bytebuf is not going to happen. there will be
 		// some sort of streamable thing
 		log.info("receiving bytes, length is {}", byteBuf.readableBytes());
 	}
 
-	public void ponged(JJWebSocketConnection connection, ByteBuf byteBuf) {
+	public void ponged(WebSocketConnection connection, ByteBuf byteBuf) {
 		
 	}
 }

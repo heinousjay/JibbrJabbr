@@ -30,7 +30,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		@Override
 		public void run() {
 			
-			for (JJWebSocketConnection connection : allConnections.keySet()) {
+			for (WebSocketConnection connection : allConnections.keySet()) {
 				if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
 					log.debug("terminating an idle connection {}", connection);
 					connection.close();
@@ -45,7 +45,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		
 	}
 
-	private final ConcurrentMap<JJWebSocketConnection, Boolean> allConnections =
+	private final ConcurrentMap<WebSocketConnection, Boolean> allConnections =
 		PlatformDependent.newConcurrentHashMap(16, 0.75F, 2);
 		
 	private final JJNioEventLoopGroup eventLoopGroup;
@@ -65,12 +65,12 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		return Priority.Lowest;
 	}
 	
-	void addConnection(JJWebSocketConnection connection) {
+	void addConnection(WebSocketConnection connection) {
 		
 		allConnections.putIfAbsent(connection, Boolean.TRUE);
 	}
 	
-	void removeConnection(JJWebSocketConnection connection) {
+	void removeConnection(WebSocketConnection connection) {
 		
 		allConnections.remove(connection);
 	}

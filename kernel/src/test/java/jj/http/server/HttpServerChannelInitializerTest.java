@@ -42,11 +42,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class HttpServerChannelInitializerTest {
 
 	
-	@Mock Provider<JJEngineHttpHandler> engineProvider;
+	@Mock Provider<EngineHttpHandler> engineProvider;
 	
 	@InjectMocks HttpServerChannelInitializer hsci;
 	
-	@Mock JJEngineHttpHandler engine;
+	@Mock EngineHttpHandler engine;
 	
 	// mocking things we don't own because said things
 	// connect to a network and they're just interfaces 

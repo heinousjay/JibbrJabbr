@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.EventSelection;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 import jj.script.ScriptRunner;
@@ -44,7 +44,7 @@ class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
 	}
 
 	@Override
-	public void handle(JJWebSocketConnection connection, JJMessage message) {
+	public void handle(WebSocketConnection connection, JJMessage message) {
 		scriptRunner.submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
 	}
 

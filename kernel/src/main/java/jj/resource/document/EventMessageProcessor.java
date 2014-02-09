@@ -22,7 +22,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import jj.StringUtils;
 import jj.engine.EventSelection;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
@@ -52,7 +52,7 @@ class EventMessageProcessor implements DocumentWebSocketMessageProcessor {
 	}
 
 	@Override
-	public void handle(JJWebSocketConnection connection, JJMessage message) {
+	public void handle(WebSocketConnection connection, JJMessage message) {
 		ScriptableObject event = null;
 		try {
 			context.initialize(connection);

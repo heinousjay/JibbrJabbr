@@ -4,7 +4,7 @@ import static org.mockito.BDDMockito.*;
 
 import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.DocumentRequestState;
 import jj.resource.document.DocumentScriptEnvironment;
@@ -48,7 +48,7 @@ public class ScriptRunnerTest {
 	
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	
-	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketConnection connection;
 	
 	@Mock Callable eventFunction;
 	

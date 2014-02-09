@@ -79,7 +79,7 @@ public class WebSocketFrameHandlerCreatorTest {
 		InOrder bindings = inOrder(binder,abb);
 		
 		// then
-		bindings.verify(binder).bind(JJWebSocketConnection.class);
+		bindings.verify(binder).bind(WebSocketConnection.class);
 		bindings.verify(binder).bind(WebSocketFrameHandler.class);
 		bindings.verify(binder).bind(WebSocketServerHandshaker.class);
 		bindings.verify(abb).toInstance(handshaker);

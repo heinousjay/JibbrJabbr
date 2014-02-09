@@ -11,7 +11,7 @@ import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.http.HttpRequest;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 
@@ -88,7 +88,7 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get().requiredModule;
 	}
 	
-	public JJWebSocketConnection connection() {
+	public WebSocketConnection connection() {
 		return currentContext.get().connection;
 	}
 	
@@ -114,7 +114,7 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get();
 	}
 	
-	public ScriptContext initialize(final JJWebSocketConnection connection) {
+	public ScriptContext initialize(final WebSocketConnection connection) {
 		currentContext.set(new ScriptContext(currentContext.get(), connection));
 		return currentContext.get();
 	}

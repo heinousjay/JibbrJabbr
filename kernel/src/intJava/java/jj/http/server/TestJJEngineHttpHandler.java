@@ -25,7 +25,7 @@ import com.google.inject.Injector;
 import jj.execution.JJExecutor;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.server.JJEngineHttpHandler;
+import jj.http.server.EngineHttpHandler;
 import jj.http.server.servable.Servables;
 import jj.logging.EmergencyLogger;
 
@@ -35,7 +35,7 @@ import jj.logging.EmergencyLogger;
  *
  */
 @Singleton
-public class TestJJEngineHttpHandler extends JJEngineHttpHandler {
+public class TestJJEngineHttpHandler extends EngineHttpHandler {
 
 	/**
 	 * @param executors

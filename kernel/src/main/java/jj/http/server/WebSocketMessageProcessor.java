@@ -22,6 +22,6 @@ package jj.http.server;
  */
 public interface WebSocketMessageProcessor {
 
-	boolean process(JJWebSocketConnection connection, String message);
+	boolean process(WebSocketConnection connection, String message);
 
 }

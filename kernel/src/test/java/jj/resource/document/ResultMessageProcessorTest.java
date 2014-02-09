@@ -16,7 +16,7 @@
 package jj.resource.document;
 
 import static org.mockito.BDDMockito.*;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ResultMessageProcessor;
@@ -38,7 +38,7 @@ public class ResultMessageProcessorTest {
 
 	@Mock ScriptRunner scriptRunner;
 	@Mock ScriptJSON json;
-	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketConnection connection;
 	
 	ResultMessageProcessor rmp;
 	

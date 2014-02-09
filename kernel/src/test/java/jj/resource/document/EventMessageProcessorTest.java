@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import jj.engine.EventSelection;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.EventMessageProcessor;
@@ -56,7 +56,7 @@ public class EventMessageProcessorTest {
 	
 	@InjectMocks EventMessageProcessor emp;
 	
-	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketConnection connection;
 	
 	@Captor ArgumentCaptor<EventSelection> eventSelection;
 	

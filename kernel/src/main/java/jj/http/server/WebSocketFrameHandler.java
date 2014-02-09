@@ -42,17 +42,17 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 
 	private final WebSocketServerHandshaker handshaker;
 	
-	private final JJWebSocketHandler handler;
+	private final WebSocketHandler handler;
 	
-	private final JJWebSocketConnection connection;
+	private final WebSocketConnection connection;
 	
 	private final WebSocketConnectionTracker connectionTracker;
 	
 	@Inject
 	WebSocketFrameHandler(
 		final WebSocketServerHandshaker handshaker,
-		final JJWebSocketHandler handler,
-		final JJWebSocketConnection connection,
+		final WebSocketHandler handler,
+		final WebSocketConnection connection,
 		final WebSocketConnectionTracker connectionTracker
 	) {
 		this.handshaker = handshaker;

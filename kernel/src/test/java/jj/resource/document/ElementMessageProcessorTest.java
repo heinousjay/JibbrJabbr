@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.*;
 import jj.engine.EventSelection;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ElementMessageProcessor;
@@ -44,7 +44,7 @@ public class ElementMessageProcessorTest {
 
 	@Mock CurrentScriptContext context;
 	@Mock ScriptRunner scriptRunner;
-	@Mock JJWebSocketConnection connection;
+	@Mock WebSocketConnection connection;
 	
 	@InjectMocks ElementMessageProcessor emp;
 	

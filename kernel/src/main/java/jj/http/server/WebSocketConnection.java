@@ -21,7 +21,7 @@ import jj.jjmessage.JJMessage;
 import jj.script.FunctionContext;
 
 @Singleton
-public class JJWebSocketConnection implements DataStore, FunctionContext {
+public class WebSocketConnection implements DataStore, FunctionContext {
 	
 	private static final String CLIENT_STORAGE = "JJWebSocketConnection client storage";
 	
@@ -44,7 +44,7 @@ public class JJWebSocketConnection implements DataStore, FunctionContext {
 	private volatile long lastActivity = System.currentTimeMillis();
 
 	@Inject
-	JJWebSocketConnection(
+	WebSocketConnection(
 		final ChannelHandlerContext ctx,
 		final WebSocketConnectionHost webSocketConnectionHost
 	) {
@@ -58,7 +58,7 @@ public class JJWebSocketConnection implements DataStore, FunctionContext {
 	}
 	
 	@Override
-	public JJWebSocketConnection data(String name, Object value) {
+	public WebSocketConnection data(String name, Object value) {
 		data.put(name, value);
 		return this;
 	}
@@ -125,7 +125,7 @@ public class JJWebSocketConnection implements DataStore, FunctionContext {
 		return map;
 	}
 	
-	public JJWebSocketConnection send(JJMessage message) {
+	public WebSocketConnection send(JJMessage message) {
 		messages.add(message);
 		return this;
 	}

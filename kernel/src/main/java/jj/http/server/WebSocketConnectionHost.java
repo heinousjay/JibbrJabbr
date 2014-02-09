@@ -22,12 +22,12 @@ import jj.script.ScriptEnvironment;
  * @author jason
  *
  */
-public interface WebSocketConnectionHost extends Iterable<JJWebSocketConnection>, ScriptEnvironment, FunctionContext {
+public interface WebSocketConnectionHost extends Iterable<WebSocketConnection>, ScriptEnvironment, FunctionContext {
 
-	void connected(JJWebSocketConnection connection);
+	void connected(WebSocketConnection connection);
 
-	void disconnected(JJWebSocketConnection connection);
+	void disconnected(WebSocketConnection connection);
 	
-	void message(JJWebSocketConnection connection, String message);
+	void message(WebSocketConnection connection, String message);
 
 }

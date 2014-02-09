@@ -20,7 +20,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessageException;
@@ -42,7 +42,7 @@ class DocumentWebSocketMessageProcessors implements WebSocketMessageProcessor {
 	}
 	
 	@Override
-	public boolean process(final JJWebSocketConnection connection, final String message) {
+	public boolean process(final WebSocketConnection connection, final String message) {
 		boolean success = false;
 		
 		try {

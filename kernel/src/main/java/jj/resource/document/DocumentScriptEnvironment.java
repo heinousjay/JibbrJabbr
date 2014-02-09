@@ -37,7 +37,7 @@ import jj.SHA1Helper;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.IOThread;
-import jj.http.server.JJWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.resource.NoSuchResourceException;
@@ -129,22 +129,22 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	public void connected(JJWebSocketConnection connection) {
+	public void connected(WebSocketConnection connection) {
 		connections.add(connection);
 	}
 	
 	@Override
-	public void disconnected(JJWebSocketConnection connection) {
+	public void disconnected(WebSocketConnection connection) {
 		connections.remove(connection);
 	}
 	
 	@Override
-	public Iterator<JJWebSocketConnection> iterator() {
+	public Iterator<WebSocketConnection> iterator() {
 		return Collections.unmodifiableSet(connections).iterator();
 	}
 	
 	@Override
-	public void message(JJWebSocketConnection connection, String message) {
+	public void message(WebSocketConnection connection, String message) {
 		if (!processor.process(connection, message)) {
 			log.warn("{} spoke gibberish to me: {}", 
 				connection,
@@ -159,7 +159,7 @@ public class DocumentScriptEnvironment
 	
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
 	
-	private final HashSet<JJWebSocketConnection> connections = new HashSet<>(10);
+	private final HashSet<WebSocketConnection> connections = new HashSet<>(10);
 
 	private final String baseName;
 	

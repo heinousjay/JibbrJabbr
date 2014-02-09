@@ -38,11 +38,11 @@ import javax.inject.Singleton;
 @Sharable
 class HttpServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 	
-	private final Provider<JJEngineHttpHandler> engineProvider;
+	private final Provider<EngineHttpHandler> engineProvider;
 	
 	@Inject
 	public HttpServerChannelInitializer(
-		final Provider<JJEngineHttpHandler> engineProvider
+		final Provider<EngineHttpHandler> engineProvider
 	) {
 		this.engineProvider = engineProvider;
 	}
