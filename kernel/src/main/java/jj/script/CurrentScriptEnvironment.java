@@ -15,14 +15,14 @@
  */
 package jj.script;
 
+import jj.CurrentResource;
+
 /**
- * Just here to support getting a context in try-with-resources syntax
- * 
  * @author jason
  *
  */
-public interface ContextCloser extends AutoCloseable {
+public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment> {
 
-	@Override
-	public void close();
+	
+	
 }
