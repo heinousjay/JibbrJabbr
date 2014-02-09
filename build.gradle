@@ -117,12 +117,11 @@ jar {
 	manifest {
 		attributes (
 			'Main-Class': 'jj.JJ',
-			"Implementation-Title": projectName
+			'Implementation-Title': projectName
 		)
 	}
-}
-
-jar << {
-	// if we build a new jar, be sure to clean up the system directory from the old one
-	new File(destinationDir, 'system').deleteDir()
+	
+	doLast {
+		new File(destinationDir, 'system').deleteDir()
+	}
 }
