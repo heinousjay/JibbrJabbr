@@ -20,7 +20,7 @@ dependencies {
 }
 
 test {
-	maxParallelForks = Runtime.getRuntime().availableProcessors()
+	maxParallelForks = Runtime.getRuntime().availableProcessors() / 2
 }
 
 task integrationTest(type: Test, dependsOn: intTestClasses) {
