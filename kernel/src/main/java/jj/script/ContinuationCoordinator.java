@@ -20,7 +20,7 @@ import jj.logging.EmergencyLogger;
  *
  */
 @Singleton
-class ContinuationCoordinator {
+public class ContinuationCoordinator {
 	
 	private interface ContinuationExecution {
 		void run(RhinoContext context);
@@ -68,7 +68,7 @@ class ContinuationCoordinator {
 	 * @param scriptEnvironment
 	 * @return true if completed, false if continued
 	 */
-	boolean execute(final ScriptEnvironment scriptEnvironment) {
+	public boolean execute(final ScriptEnvironment scriptEnvironment) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -90,7 +90,7 @@ class ContinuationCoordinator {
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	boolean execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
+	public boolean execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -118,7 +118,7 @@ class ContinuationCoordinator {
 	 * @param result
 	 * @return true if completed, false if continued
 	 */
-	boolean resumeContinuation(final ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
+	public boolean resumeContinuation(final ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
