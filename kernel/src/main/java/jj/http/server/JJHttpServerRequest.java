@@ -43,8 +43,6 @@ class JJHttpServerRequest extends AbstractHttpRequest implements HttpRequest {
 		return "httpRequest[" +
 			remoteAddress() +
 			"] started at " +
-			DateFormatHelper.basicFormat(timestamp()) +
-			" with data " +
-			data;
+			DateFormatHelper.basicFormat(timestamp());
 	}
 }

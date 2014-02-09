@@ -22,8 +22,6 @@ import jj.script.FunctionContext;
 @Singleton
 public class WebSocketConnection implements FunctionContext {
 	
-	private static final String CLIENT_STORAGE = "JJWebSocketConnection client storage";
-	
 	// start off with room for three functions
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
 	
@@ -31,10 +29,9 @@ public class WebSocketConnection implements FunctionContext {
 	
 	private final WebSocketConnectionHost webSocketConnectionHost;
 	
-	// room for three data items
-	private final HashMap<String, Object> data = new HashMap<>(4);
+	private final HashMap<String, Object> clientStorage = new HashMap<>(4);
 	
-	// room for four messages initially should be good
+	// TODO get this out of there.  connections should be protocol agnostic
 	private final List<JJMessage> messages = new ArrayList<>(4);
 	
 	private final String description;
@@ -93,14 +90,7 @@ public class WebSocketConnection implements FunctionContext {
 	}
 	
 	public Map<String, Object> clientStorage() {
-		// TODO move this to something more independent so it can be picked up and put down
-		@SuppressWarnings("unchecked")
-		Map<String, Object> map = (Map<String, Object>)data.get(CLIENT_STORAGE);
-		if (map == null) {
-			map = new HashMap<>();
-			data.put(CLIENT_STORAGE, map);
-		}
-		return map;
+		return clientStorage;
 	}
 	
 	public WebSocketConnection send(JJMessage message) {

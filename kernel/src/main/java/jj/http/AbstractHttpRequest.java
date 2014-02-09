@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -43,8 +42,6 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	private static final String HEADER_X_HOST = "x-host";
 	
 	private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
-	
-	protected final HashMap<String, Object> data = new HashMap<>();
 	
 	protected final long startTime = System.nanoTime();
 	
