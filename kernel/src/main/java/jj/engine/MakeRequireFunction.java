@@ -23,6 +23,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 import jj.script.RequiredModule;
 
 import org.mozilla.javascript.BaseFunction;
@@ -42,16 +43,19 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 	
 	private final Configuration configuration;
 	private final CurrentScriptContext context;
+	private final CurrentScriptEnvironment env;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
 	MakeRequireFunction(
 		final Configuration configuration,
 		final CurrentScriptContext context,
+		final CurrentScriptEnvironment env,
 		final ResourceFinder resourceFinder
 	) {
 		this.configuration = configuration;
 		this.context = context;
+		this.env = env;
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -107,7 +111,7 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 		// violence, any problem can be solved by using MOAR!
 		
 		if (scriptEnvironment == null || !scriptEnvironment.initialized()) {
-			throw context.prepareContinuation(new RequiredModule(moduleIdentifier, context));
+			throw env.prepareContinuation(new RequiredModule(moduleIdentifier, context));
 		}
 		
 		return scriptEnvironment.exports();

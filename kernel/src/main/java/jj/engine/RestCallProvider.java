@@ -9,12 +9,12 @@ import javax.inject.Inject;
 
 import jj.http.client.HttpClient;
 import jj.http.client.JJHttpClientRequest;
-import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 import jj.script.RestRequest;
 import jj.uri.Route;
 import jj.uri.RouteFinder;
-
 import io.netty.handler.codec.http.HttpHeaders;
+
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -35,7 +35,7 @@ class RestCallProvider {
 	
 	private final HttpClient httpClient;
 	
-	private final CurrentScriptContext context;
+	private final CurrentScriptEnvironment env;
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -127,7 +127,7 @@ class RestCallProvider {
 
 			if (!options.ignoreResult()) {
 				// TODO - handle the result in a way consistent with configuration, gets set on the RestRequest
-				throw context.prepareContinuation(new RestRequest(request));
+				throw env.prepareContinuation(new RestRequest(request));
 			} else {
 				// just fire and forget!
 				httpClient.execute(request);
@@ -146,11 +146,11 @@ class RestCallProvider {
 	@Inject
 	RestCallProvider(
 		final HttpClient httpClient,
-		final CurrentScriptContext context,
+		final CurrentScriptEnvironment env,
 		final RouteFinder routeFinder
 	) {
 		this.httpClient = httpClient;
-		this.context = context;
+		this.env = env;
 		this.routeFinder = routeFinder;
 	}
 	

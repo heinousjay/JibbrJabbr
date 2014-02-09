@@ -1,27 +1,29 @@
 package jj.script;
 
-import jj.Sequence;
 import jj.engine.MIME;
 import jj.http.client.JJHttpClientRequest;
 
-public class RestRequest {
-	
-	private static final Sequence sequence = new Sequence();
+public class RestRequest implements Continuable {
 	
 	private final JJHttpClientRequest request;
-	private final String id;
+	private String pendingKey;
 	
 	public RestRequest(final JJHttpClientRequest request) {
 		this.request = request;
-		this.id = String.format("RestRequest-%s", sequence.next());
 	}
 
 	public JJHttpClientRequest request() {
 		return request;
 	}
 	
-	public String id() {
-		return id;
+	@Override
+	public String pendingKey() {
+		return pendingKey;
+	}
+	
+	@Override
+	public void pendingKey(String pendingKey) {
+		this.pendingKey = pendingKey;
 	}
 	
 	public MIME produce() {
@@ -30,6 +32,6 @@ public class RestRequest {
 	}
 	
 	public String toString() {
-		return id + ": " + request;
+		return pendingKey + ": " + request;
 	}
 }

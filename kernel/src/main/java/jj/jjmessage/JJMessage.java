@@ -6,7 +6,7 @@ import static jj.jjmessage.JJMessage.Type.*;
 
 import java.util.Map;
 
-import jj.Sequence;
+import jj.script.Continuable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author jason
  *
  */
-public class JJMessage {
+public class JJMessage implements Continuable {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
@@ -62,19 +62,12 @@ public class JJMessage {
 		Unbind;
 	}
 	
-	private static Sequence ids = new Sequence();
-	
-	private static String makeId() {
-		return String.format("jqm-%s", ids.next());
-	}
-	
 	public static JJMessage makeGet(String selector, String type) {
 		return makeGet(selector, type, null);
 	}
 	
 	public static JJMessage makeGet(String selector, String type, String name) {
 		JJMessage result = new JJMessage(Get);
-		result.get().id = makeId();
 		result.get().selector = selector;
 		result.get().type = type;
 		result.get().name = name;
@@ -103,7 +96,6 @@ public class JJMessage {
 
 	public static JJMessage makeCreate(String html, Map<?,?> args) {
 		JJMessage result = new JJMessage(Create);
-		result.create().id = makeId();
 		result.create().html = html;
 		result.create().args = args;
 		return result;
@@ -139,7 +131,6 @@ public class JJMessage {
 		assert !isEmpty(args) && args.startsWith("[") && args.endsWith("]") :
 			"invoke message must have a JSON array argument";
 		JJMessage result = new JJMessage(Invoke);
-		result.invoke().id = makeId();
 		result.invoke().name = name;
 		result.invoke().args = args;
 		return result;
@@ -171,7 +162,6 @@ public class JJMessage {
 	
 	public static JJMessage makeRetrieve(String key) {
 		JJMessage result = new JJMessage(Retrieve);
-		result.retrieve().id = makeId();
 		result.retrieve().key = key;
 		return result;
 	}
@@ -345,21 +335,21 @@ public class JJMessage {
 			throw new JJMessageException(e);
 		}
 	}
-
-	/** indicates if this message expects a result */
-	@JsonIgnore
-	public boolean expectsResult() {
-		return (message instanceof ExpectsResult) && ((ExpectsResult)message).id != null;
-	}
+	
+	// WE ARE CONTINUABLE! MIGHTY BABY MIGHTY!
 	
 	@JsonIgnore
-	public String resultId() {
-		return expectsResult() ? ((ExpectsResult)message).id : null;
-	}
-	
-	@JsonIgnore
-	public String id() {
+	@Override
+	public String pendingKey() {
 		return (message instanceof ExpectsResult) ? ((ExpectsResult)message).id : null;
+	}
+	
+	@JsonIgnore
+	@Override
+	public void pendingKey(String pendingKey) {
+		if (message instanceof ExpectsResult) {
+			((ExpectsResult)message).id = pendingKey;
+		}
 	}
 	
 }

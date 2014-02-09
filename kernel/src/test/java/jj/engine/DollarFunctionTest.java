@@ -46,7 +46,7 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 		
 		given(context.document()).willReturn(document());
 		
-		EngineAPI host = makeHost(new DollarFunction(context));
+		EngineAPI host = makeHost(new DollarFunction(context, null));
 		basicExecution(host);
 	}
 

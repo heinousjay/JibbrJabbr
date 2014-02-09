@@ -2,12 +2,9 @@ package jj.script;
 
 import java.io.Closeable;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.DataStore;
-import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.http.HttpRequest;
@@ -37,13 +34,6 @@ public class CurrentScriptContext implements Closeable {
 	 * to keep track of what it's working for
 	 */
 	private final ThreadLocal<ScriptContext> currentContext = new ThreadLocal<>();
-	
-	private final Provider<RhinoContext> contextProvider;
-	
-	@Inject
-	CurrentScriptContext(final Provider<RhinoContext> contextProvider) {
-		this.contextProvider = contextProvider;
-	}
 	
 	public ScriptContextType type() {
 		return currentContext.get() != null ? currentContext.get().type : null;
@@ -161,23 +151,6 @@ public class CurrentScriptContext implements Closeable {
 		throw new AssertionError();
 	}
 
-	private void addPendingContinuation(
-		DataStore dataStore,
-		String key,
-		ContinuationPending continuationPending
-	) {
-		String pendingKey = String.format(PENDING_KEY, key);
-		
-		if (dataStore.containsData(pendingKey)) {
-			log.error("more than one continuation pending under key {} for {}", key, onBehalfOf());
-			log.error("current pending : {}", dataStore.data(pendingKey));
-			log.error("new pending : {}", continuationPending);
-			throw new AssertionError("more than one continuation pending for a connection.");
-		}
-		log.trace("storing a continuation under key {} for  {}", key, onBehalfOf());
-		dataStore.data(pendingKey, continuationPending);
-	}
-
 	private ContinuationPending pendingContinuation(DataStore dataStore, String key) {
 		String pendingKey = String.format(PENDING_KEY, key);
 		
@@ -187,78 +160,6 @@ public class CurrentScriptContext implements Closeable {
 		}
 		
 		return (ContinuationPending)dataStore.removeData(pendingKey);
-	}
-	
-	/**
-	 * Prepares a continuation and throws it.  Returns the ContinuationPending
-	 * so that callers can write
-	 * <code>throw context.prepareContinuation(...)</code>
-	 * so the compiler stays happy, but this method never returns normally
-	 * 
-	 * the result will return a string
-	 * 
-	 * @param jjMessage
-	 * @return
-	 */
-	public ContinuationPending prepareContinuation(JJMessage jjMessage) {
-		ContinuationState continuationState = new ContinuationState(jjMessage);
-		throw prepareContinuation(jjMessage.id(), continuationState);
-	}
-	
-	/**
-	 * Prepares and throws a continuation for a rest request
-	 * @param restRequest
-	 * @return
-	 */
-	public ContinuationPending prepareContinuation(RestRequest restRequest) {
-		ContinuationState continuationState = new ContinuationState(restRequest);
-		throw prepareContinuation(restRequest.id(), continuationState);
-	}
-	
-	/**
-	 * prepares and throws a continuation to require a new module
-	 * @param require
-	 * @return
-	 */
-	public ContinuationPending prepareContinuation(RequiredModule require) {
-		ContinuationState continuationState = new ContinuationState(require);
-		throw prepareContinuation(require.pendingKey(), continuationState);
-	}
-	
-	/**
-	 * captures a continuation from the rhino interpreter, and stores the information
-	 * necessary for resumption
-	 * @param pendingId 
-	 * @param continuationState
-	 * @return
-	 */
-	private ContinuationPending prepareContinuation(String pendingId, ContinuationState continuationState) {
-		
-		try(RhinoContext context = contextProvider.get()) {
-			ContinuationPending continuation = context.captureContinuation();
-			continuation.setApplicationState(continuationState);
-			
-			switch(type()) {
-			case DocumentRequest:
-				addPendingContinuation(documentRequestProcessor(), pendingId, continuation);
-				break;
-			
-			case WebSocket:
-				addPendingContinuation(connection(), pendingId, continuation);
-				break;
-			
-			case ModuleInitialization:
-				addPendingContinuation(requiredModule(), pendingId, continuation);
-				break;
-				
-			default:
-				throw new AssertionError("attempting a continuation with nothing to coordinate resumption");
-			}
-			
-			return continuation;
-		} catch (Exception e) {
-			throw new AssertionError("could not capture a continuation", e);
-		}
 	}
 	
 	public ContinuationPending pendingContinuation(String key) {

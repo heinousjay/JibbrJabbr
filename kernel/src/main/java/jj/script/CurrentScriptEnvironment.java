@@ -53,8 +53,8 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 */
 	public ContinuationPending prepareContinuation(JJMessage jjMessage) {
 		ContinuationPending result = prepareContinuation(new ContinuationState(jjMessage));
-		jjMessage.id(); // = new key!, then store it!
-		current().continuationPending(result);
+		String pendingKey = current().continuationPending(result);
+		jjMessage.pendingKey(pendingKey);
 		throw result;
 	}
 	
@@ -65,8 +65,8 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 */
 	public ContinuationPending prepareContinuation(RestRequest restRequest) {
 		ContinuationPending result = prepareContinuation(new ContinuationState(restRequest));
-		restRequest.id(); // = new key!, then store it!
-		current().continuationPending(result);
+		String pendingKey = current().continuationPending(result);
+		restRequest.pendingKey(pendingKey);
 		throw result;
 	}
 	
@@ -77,8 +77,8 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 */
 	public ContinuationPending prepareContinuation(RequiredModule require) {
 		ContinuationPending result = prepareContinuation(new ContinuationState(require));
-		current().continuationPending(result);
-		require.pendingKey(); // = new key!
+		String pendingKey = current().continuationPending(result);
+		require.pendingKey(pendingKey); // = new key!
 		throw result;
 	}
 	

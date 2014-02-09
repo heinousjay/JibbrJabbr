@@ -17,16 +17,11 @@ package jj.script;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
-
-import jj.http.client.JJHttpClientRequest;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
-import jj.uri.RouteFinder;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +41,6 @@ public class CurrentScriptContextTest {
 	String pendingKey1 = "pending key 1";
 	String pendingKey2 = "pending key 2";
 	
-	RhinoContext rhinoContext;
 
 	CurrentScriptContext currentScriptContext;
 	
@@ -62,10 +56,7 @@ public class CurrentScriptContextTest {
 	
 	@Before
 	public void before() {
-		MockRhinoContextProvider mrcp = new MockRhinoContextProvider();
-		rhinoContext = mrcp.context;
-		
-		currentScriptContext = new CurrentScriptContext(mrcp);
+		currentScriptContext = new CurrentScriptContext();
 	}
 	
 	@Test
@@ -75,109 +66,4 @@ public class CurrentScriptContextTest {
 		
 		assertThat(currentScriptContext.rootScriptEnvironment(), is((ScriptEnvironment)documentScriptEnvironment));
 	}
-	
-	@Test
-	public void testAssociatedScriptExecutionEnvironmentPrepareContinuation() {
-		
-		// given
-		currentScriptContext.initialize(documentScriptEnvironment);
-		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
-		boolean failed = false;
-		
-		// when
-		try {
-			currentScriptContext.prepareContinuation(requiredModule);
-			
-		// then
-			failed = true;
-		} catch (AssertionError assertionError) {
-			assertThat(assertionError.getMessage(), is("attempting a continuation with nothing to coordinate resumption"));
-		}
-		
-		// and while we're here...
-		currentScriptContext.end();
-		assertThat(currentScriptContext.save(), is(nullValue()));
-		assertThat(failed, is(false));
-	}
-	
-	@Test
-	public void testDocumentRequestProcessorPrepareContinuation() {
-		
-		// given
-		currentScriptContext.initialize(documentRequestProcessor);
-		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
-		given(requiredModule.pendingKey()).willReturn(pendingKey1);
-		
-		// when
-		try {
-			currentScriptContext.prepareContinuation(requiredModule);
-			
-		// then
-			fail();
-		} catch (ContinuationPending continuationPending) {
-			verify(documentRequestProcessor).data(contains(pendingKey1), eq(continuationPending));
-		}
-		
-		verify(continuationPending).setApplicationState(continuationStateCaptor.capture());
-		assertThat(continuationStateCaptor.getValue().requiredModule(), is(requiredModule));
-		
-		// and while we're here...
-		currentScriptContext.end();
-		assertThat(currentScriptContext.save(), is(nullValue()));
-	}
-	
-	@Test
-	public void testRequiredModulePrepareContinuation() {
-		
-		// given
-		currentScriptContext.initialize(requiredModule, moduleScriptEnvironment);
-		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
-		jjMessage = JJMessage.makeRetrieve("key");
-		
-		// when
-		try {
-			currentScriptContext.prepareContinuation(jjMessage);
-			
-		// then
-			fail();
-		} catch (ContinuationPending continuationPending) {
-			verify(requiredModule).data(contains(jjMessage.id()), eq(continuationPending));
-		}
-		
-		verify(continuationPending).setApplicationState(continuationStateCaptor.capture());
-		assertThat(continuationStateCaptor.getValue().jjMessage(), is(jjMessage));
-		
-		// and while we're here...
-		currentScriptContext.end();
-		assertThat(currentScriptContext.save(), is(nullValue()));
-	}
-	
-	@Test
-	public void testWebSocketConnectionPrepareContinuation() {
-		
-		// given
-		currentScriptContext.initialize(connection);
-		given(rhinoContext.captureContinuation()).willReturn(continuationPending);
-		RouteFinder routeFinder = mock(RouteFinder.class);
-		given(routeFinder.find(anyString())).willReturn("/");
-		RestRequest restRequest = new RestRequest(new JJHttpClientRequest(routeFinder));
-		
-		// when
-		try {
-			currentScriptContext.prepareContinuation(restRequest);
-			
-		// then
-			fail();
-		} catch (ContinuationPending continuationPending) {
-			verify(connection).data(contains(restRequest.id()), eq(continuationPending));
-		}
-		
-		verify(continuationPending).setApplicationState(continuationStateCaptor.capture());
-		assertThat(continuationStateCaptor.getValue().restRequest(), is(restRequest));
-		
-		// and while we're here...
-		currentScriptContext.end();
-		assertThat(currentScriptContext.save(), is(nullValue()));
-	}
-
 }

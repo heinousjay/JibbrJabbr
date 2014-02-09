@@ -39,24 +39,12 @@ public class MessagesTest {
 	
 	ObjectMapper mapper = new ObjectMapper();
 
-	private void verifyExpectsNoResult(JJMessage message) {
-		assertThat(message.expectsResult(), is(false));
-		assertThat(message.id(), is(nullValue()));
-	}
-	
-	private void verifyExpectsResult(JJMessage message) {
-		assertThat(message.expectsResult(), is(true));
-		assertThat(message.id(), is(notNullValue()));
-	}
-
 	@Test
 	public void testAppend() throws Exception {
 		JJMessage message = JJMessage.makeAppend("parent", "child");
 		assertThat(message, is(notNullValue()));
 		assertThat(message.type(), is(Append));
 		assertThat(message.append(), is(notNullValue()));
-		
-		verifyExpectsNoResult(message);
 		
 		assertThat(message.append().parent, is("parent"));
 		assertThat(message.append().child, is("child"));
@@ -108,8 +96,6 @@ public class MessagesTest {
 		assertThat(message.type(), is(Bind));
 		assertThat(message.bind(), is(notNullValue()));
 		
-		verifyExpectsNoResult(message);
-		
 		assertThat(message.bind().context, is("context"));
 		assertThat(message.bind().selector, is("selector"));
 		assertThat(message.bind().type, is("type"));
@@ -149,8 +135,6 @@ public class MessagesTest {
 		assertThat(message.type(), is(Call));
 		assertThat(message.call(), is(notNullValue()));
 		
-		verifyExpectsNoResult(message);
-		
 		assertThat(message.call().name, is("name"));
 		assertThat(message.call().args, is("[]"));
 		
@@ -189,8 +173,6 @@ public class MessagesTest {
 		assertThat(message, is(notNullValue()));
 		assertThat(message.type(), is(Create));
 		assertThat(message.create(), is(notNullValue()));
-		
-		verifyExpectsResult(message);
 	}
 	
 	@Test
@@ -199,8 +181,6 @@ public class MessagesTest {
 		assertThat(message, is(notNullValue()));
 		assertThat(message.type(), is(Invoke));
 		assertThat(message.invoke(), is(notNullValue()));
-		
-		verifyExpectsResult(message);
 		
 		assertThat(message.invoke().name, is("name"));
 		assertThat(message.invoke().args, is("[]"));
@@ -229,7 +209,6 @@ public class MessagesTest {
 		Map<String, String> map2 = map.get("invoke");
 		assertThat(map2.get("name"), is("name"));
 		assertThat(map2.get("args"), is("[]"));
-		assertThat(map2.get("id"), is(notNullValue()));
-		assertThat(map2.size(), is(3));
+		assertThat(map2.size(), is(2));
 	}
 }

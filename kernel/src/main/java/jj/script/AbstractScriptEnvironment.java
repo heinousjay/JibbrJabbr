@@ -97,13 +97,13 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	@Override
 	public String continuationPending(final ContinuationPending continuationPending) {
 		String id = continuationIds.next();
-		continuationPendings.put("", continuationPending);
+		continuationPendings.put(id, continuationPending);
 		return id;
 	}
 	
 	@Override
 	public ContinuationPending continuationPending(final String key) {
-		assert continuationPendings.containsKey(key);
+		assert continuationPendings.containsKey(key) : key;
 		return continuationPendings.remove(key);
 	}
 

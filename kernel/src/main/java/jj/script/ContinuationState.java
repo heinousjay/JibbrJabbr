@@ -46,9 +46,9 @@ public class ContinuationState implements Serializable {
 	public String pendingKey() {
 		switch (type) {
 		case AsyncHttpRequest:
-			return restRequest().id();
+			return restRequest().pendingKey();
 		case JJMessage:
-			return jjMessage().id();
+			return jjMessage().pendingKey();
 		case RequiredModule:
 			return requiredModule().pendingKey();
 		}

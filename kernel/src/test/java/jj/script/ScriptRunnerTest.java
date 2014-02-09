@@ -303,6 +303,7 @@ public class ScriptRunnerTest {
 		executors.isScriptThread = true;
 		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.Uninitialized);
+		module.pendingKey("");
 		
 		// when
 		executors.runUntilIdle();
@@ -325,6 +326,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
+		module.pendingKey("");
 		given(currentScriptContext.type()).willReturn(ScriptContextType.ModuleInitialization);
 		given(continuationCoordinator.resumeContinuation(moduleScriptEnvironment, module.pendingKey(), scriptable)).willReturn(true);
 		

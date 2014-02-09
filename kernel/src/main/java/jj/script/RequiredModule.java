@@ -19,15 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.DataStore;
-import jj.Sequence;
 
 /**
  * @author jason
  *
  */
-public class RequiredModule implements DataStore {
-	
-	private static final Sequence pendingKeys = new Sequence();
+public class RequiredModule implements DataStore, Continuable {
 	
 	private final String identifier;
 	
@@ -35,7 +32,7 @@ public class RequiredModule implements DataStore {
 	
 	private final ScriptContext parentScriptContext;
 	
-	private final String pendingKey = pendingKeys.next();
+	private String pendingKey;
 	
 	private final Map<String, Object> data = new HashMap<>();
 
@@ -81,8 +78,17 @@ public class RequiredModule implements DataStore {
 		return data.containsKey(name);
 	}
 	
-	String pendingKey() {
+	@Override
+	public String pendingKey() {
+		assert pendingKey != null;
 		return pendingKey;
+	}
+	
+	@Override
+	public void pendingKey(String pendingKey) {
+		assert this.pendingKey == null;
+		assert pendingKey != null;
+		this.pendingKey = pendingKey;
 	}
 	
 	@Override

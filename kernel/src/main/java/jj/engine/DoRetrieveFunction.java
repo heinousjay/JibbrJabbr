@@ -4,7 +4,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -16,11 +16,11 @@ class DoRetrieveFunction extends BaseFunction implements HostObject {
 	
 	private static final String RETRIEVE = "retrieve";
 	
-	private final CurrentScriptContext context;
+	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	public DoRetrieveFunction(final CurrentScriptContext context) {
-		this.context = context;
+	public DoRetrieveFunction(final CurrentScriptEnvironment context) {
+		this.env = context;
 	}
 	
 	@Override
@@ -50,13 +50,12 @@ class DoRetrieveFunction extends BaseFunction implements HostObject {
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+		// TODO make this a type error
 		if (args.length != 1) {
 			throw new IllegalArgumentException("retrieve can only be called with a key");
 		}
-		if (context.connection() == null) {
-			throw new IllegalStateException("cannot retrieve remote info during " + context.documentRequestProcessor().state());
-		}
-		throw context.prepareContinuation(
+		// TODO, ensure we are connected to something
+		throw env.prepareContinuation(
 			JJMessage.makeRetrieve(String.valueOf(args[0]))
 		);
 	}

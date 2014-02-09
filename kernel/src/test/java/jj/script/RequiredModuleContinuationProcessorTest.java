@@ -103,6 +103,9 @@ public class RequiredModuleContinuationProcessorTest {
 	@Test
 	public void testFirstRequireOfModuleNotFoundError() throws Exception {
 		
+		// given
+		requiredModule.pendingKey("key");
+		
 		// when
 		processor.process(continuationState);
 		executors.runUntilIdle();
@@ -124,6 +127,8 @@ public class RequiredModuleContinuationProcessorTest {
 		given(scriptEnvironment.exports()).willReturn(exports);
 		given(scriptEnvironment.initialized()).willReturn(true);
 		givenAScriptEnvironment();
+		
+		requiredModule.pendingKey("key");
 		
 		// when
 		processor.process(continuationState);

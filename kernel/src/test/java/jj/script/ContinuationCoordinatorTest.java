@@ -18,11 +18,14 @@ package jj.script;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import jj.Closer;
 import jj.resource.document.DocumentScriptEnvironment;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,7 +62,8 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
-	@Mock CurrentScriptContext currentScriptContext;
+	@Mock CurrentScriptEnvironment env;
+	@Mock Closer closer;
 	
 	@Mock ContinuationPending continuation;
 	
@@ -84,6 +88,8 @@ public class ContinuationCoordinatorTest {
 	@Before
 	public void before() {
 		
+		given(env.enterScope(any(ScriptEnvironment.class))).willReturn(closer);
+		
 		given(scriptEnvironment.script()).willReturn(script);
 		given(scriptEnvironment.scope()).willReturn(scope);
 		given(scriptEnvironment.sha1()).willReturn(sha1);
@@ -101,15 +107,18 @@ public class ContinuationCoordinatorTest {
 		
 		MockRhinoContextProvider contextProvider = new MockRhinoContextProvider();
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinator(contextProvider, currentScriptContext, logger, continuationProcessors);
+		continuationCoordinator = new ContinuationCoordinator(contextProvider, env, logger, continuationProcessors);
+	}
+	
+	@After
+	public void after() {
+		verify(env).enterScope(any(ScriptEnvironment.class));
 	}
 	
 	@Test
 	public void testInitialExecutionNoContinuation() {
 		
 		boolean result = continuationCoordinator.execute(scriptEnvironment);
-		
-		verify((ConstProperties)scope).putConst("scriptKey", scope, sha1);
 		
 		assertThat(result, is(true));
 	}
@@ -179,7 +188,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testContinuationResumptionNoContinuation() {
 		
-		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
+		given(documentScriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		boolean result = continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
 		
@@ -189,7 +198,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testContinuationResumptionWithContinuation() {
 		
-		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
+		given(documentScriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
 		
@@ -204,7 +213,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testContinuationResumptionWithUnexpectedException() {
 		
-		given(currentScriptContext.pendingContinuation(pendingKey)).willReturn(continuation);
+		given(documentScriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		given(logger.isErrorEnabled()).willReturn(true);
 		

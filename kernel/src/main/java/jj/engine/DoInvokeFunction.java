@@ -4,8 +4,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
-import jj.script.ScriptContextType;
+import jj.script.CurrentScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -17,11 +16,11 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 	
 	public static final String PROP_DO_INVOKE = "//doInvoke";
 	
-	private final CurrentScriptContext context;
+	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	public DoInvokeFunction(final CurrentScriptContext context) {
-		this.context = context;
+	public DoInvokeFunction(final CurrentScriptEnvironment env) {
+		this.env = env;
 	}
 	
 	@Override
@@ -52,10 +51,8 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		if (context.type() != ScriptContextType.WebSocket) {
-			throw new IllegalStateException("cannot invoke remote functions without a connecton");
-		}
-		throw context.prepareContinuation(
+		// TODO assert that we're in a connection context
+		throw env.prepareContinuation(
 			JJMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]))
 		);
 	}

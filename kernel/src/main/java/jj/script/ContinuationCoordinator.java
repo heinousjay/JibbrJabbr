@@ -8,9 +8,9 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
-import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
+import jj.Closer;
 import jj.logging.EmergencyLogger;
 
 /**
@@ -30,19 +30,19 @@ public class ContinuationCoordinator {
 	
 	private final Provider<RhinoContext> contextProvider;
 	
-	private final CurrentScriptContext currentScriptContext;
+	private final CurrentScriptEnvironment env;
 	
 	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
 	
 	@Inject
 	ContinuationCoordinator(
 		final Provider<RhinoContext> contextProvider,
-		final CurrentScriptContext currentScriptContext,
+		final CurrentScriptEnvironment env,
 		final @EmergencyLogger Logger log,
 		final Map<ContinuationType, ContinuationProcessor> continuationProcessors
 	) {
 		this.contextProvider = contextProvider;
-		this.currentScriptContext = currentScriptContext;
+		this.env = env;
 		this.log = log;
 		this.continuationProcessors = continuationProcessors;
 	}
@@ -53,8 +53,10 @@ public class ContinuationCoordinator {
 	} 
 	
 	private ContinuationState execute(final ContinuationExecution execution, final ScriptEnvironment scriptEnvironment) {
-		try (RhinoContext context = contextProvider.get()){
-			execution.run(context);
+		try (RhinoContext context = contextProvider.get()) {
+			try (Closer closer = env.enterScope(scriptEnvironment)) {
+				execution.run(context);
+			}
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
 		} catch (RuntimeException e) {
@@ -71,8 +73,6 @@ public class ContinuationCoordinator {
 	public boolean execute(final ScriptEnvironment scriptEnvironment) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
-		
-		ScriptableObject.putConstProperty(scriptEnvironment.scope(), "scriptKey", scriptEnvironment.sha1());
 		
 		return processContinuationState(execute(new ContinuationExecution() {
 			
@@ -122,7 +122,7 @@ public class ContinuationCoordinator {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
-		final ContinuationPending continuation = currentScriptContext.pendingContinuation(pendingKey);
+		final ContinuationPending continuation = scriptEnvironment.continuationPending(pendingKey);
 		if (continuation != null) {
 
 			return processContinuationState(execute(new ContinuationExecution() {

@@ -22,6 +22,7 @@ import jj.engine.EventSelection;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptRunner;
 
 /**
@@ -37,15 +38,18 @@ class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
 	
 	private final CurrentScriptContext context;
 	
+	private final CurrentScriptEnvironment env;
+	
 	@Inject
-	ElementMessageProcessor(final ScriptRunner scriptRunner, final CurrentScriptContext context) {
+	ElementMessageProcessor(final ScriptRunner scriptRunner, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
 		this.scriptRunner = scriptRunner;
 		this.context = context;
+		this.env = env;
 	}
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
-		scriptRunner.submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context));
+		scriptRunner.submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context, env));
 	}
 
 }

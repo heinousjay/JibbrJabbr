@@ -106,7 +106,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		else if (!scriptEnvironment.initialized() && !scriptEnvironment.initializing()) {
 			scriptRunner.submit(requiredModule, scriptEnvironment);
 		}
-		// otherwise, just restart with the exports, things are already in progress
+		// otherwise, we get back in line!!!
 		else {
 			restartInProgress(requiredModule, scriptEnvironment);
 		}

@@ -25,6 +25,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 import jj.script.RequiredModule;
 
 import org.mozilla.javascript.BaseFunction;
@@ -41,6 +42,7 @@ class RequireFunction extends BaseFunction {
 	private static final long serialVersionUID = -3809338081179905958L;
 	
 	private final CurrentScriptContext context;
+	private final CurrentScriptEnvironment env;
 	private final ResourceFinder resourceFinder;
 	// we just need this to have a base upon which to determine location
 	private final Path base = Paths.get("/requireBase");
@@ -48,9 +50,11 @@ class RequireFunction extends BaseFunction {
 	@Inject
 	RequireFunction(
 		final CurrentScriptContext context,
+		final CurrentScriptEnvironment env,
 		final ResourceFinder resourceFinder
 	) {
 		this.context = context;
+		this.env = env;
 		this.resourceFinder = resourceFinder;
 	}
 	
@@ -89,7 +93,7 @@ class RequireFunction extends BaseFunction {
 		// violence, any problem can be solved by using MOAR!
 		
 		if (scriptEnvironment == null || !scriptEnvironment.initialized()) {
-			throw context.prepareContinuation(new RequiredModule(moduleIdentifier, context));
+			throw env.prepareContinuation(new RequiredModule(moduleIdentifier, context));
 		}
 		
 		return scriptEnvironment.exports();

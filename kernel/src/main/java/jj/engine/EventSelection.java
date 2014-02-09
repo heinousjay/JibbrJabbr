@@ -2,6 +2,7 @@ package jj.engine;
 
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 import jj.script.EventNameHelper;
 import jj.script.ScriptContextType;
 
@@ -19,9 +20,12 @@ public class EventSelection implements Selection {
 	
 	private final CurrentScriptContext context;
 	
-	public EventSelection(final String selector, final CurrentScriptContext context) {
+	private final CurrentScriptEnvironment env;
+	
+	public EventSelection(final String selector, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
 		this.selector = selector;
 		this.context = context;
+		this.env = env;
 	}
 	
 	private void verifyContext(final String actionDescription) {
@@ -130,7 +134,7 @@ public class EventSelection implements Selection {
 	
 	public String data(String key) {
 		verifyContext("get data");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "data", key));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "data", key));
 	}
 
 	@Override
@@ -157,18 +161,18 @@ public class EventSelection implements Selection {
 	@Override
 	public String attr(String attributeKey) {
 		verifyContext("get an attribute value");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "attr", attributeKey));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "attr", attributeKey));
 	}
 	
 	public String prop(String propKey) {
 		verifyContext("get an property value");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "prop", propKey));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "prop", propKey));
 	}
 
 	@Override
 	public boolean hasAttr(String attributeKey) {
 		verifyContext("check for an attribute");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "hasAttr", attributeKey));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "hasAttr", attributeKey));
 	}
 
 	@Override
@@ -215,13 +219,13 @@ public class EventSelection implements Selection {
 	@Override
 	public boolean hasClass(String className) {
 		verifyContext("check for a class");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "hasClass", className));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "hasClass", className));
 	}
 
 	@Override
 	public String val() {
 		verifyContext("retrieve a value");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "val"));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "val"));
 	}
 
 	@Override
@@ -234,13 +238,13 @@ public class EventSelection implements Selection {
 	@Override
 	public String text() {
 		verifyContext("retrieve text");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "text"));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "text"));
 	}
 
 	@Override
 	public String html() {
 		verifyContext("retrieve html");
-		throw context.prepareContinuation(JJMessage.makeGet(selector, "html"));
+		throw env.prepareContinuation(JJMessage.makeGet(selector, "html"));
 	}
 
 	@Override
@@ -309,7 +313,7 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection select(String query) {
 		// this i believe is exactly what jquery does!
-		return new EventSelection(selector + " " + query, context);
+		return new EventSelection(selector + " " + query, context, env);
 	}
 
 	@Override
@@ -344,7 +348,7 @@ public class EventSelection implements Selection {
 	
 	@Override
 	public Selection clone() {
-		return new EventSelection(selector, context);
+		return new EventSelection(selector, context, env);
 	}
 
 	@Override

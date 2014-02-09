@@ -10,7 +10,9 @@ import javax.inject.Singleton;
 import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptRunner;
+
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -37,9 +39,12 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	
 	private final CurrentScriptContext context;
 	
+	private final CurrentScriptEnvironment env;
+	
 	@Inject
-	public DollarFunction(final CurrentScriptContext context) {
+	public DollarFunction(final CurrentScriptContext context, final CurrentScriptEnvironment env) {
 		this.context = context;
+		this.env = env;
 	}
 	
 	@Override
@@ -118,7 +123,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		// then just select
 		if (result == null) {
 			if (context.connection() != null) {
-				result = new EventSelection(selector, context);
+				result = new EventSelection(selector, context, env);
 			} else {
 				result = new DocumentSelection(selector, context.document().select(selector), context);
 			}
@@ -176,9 +181,9 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				// we can just return immediately, since we can make a unique selector here
 				// so fire-and-forget style
 				context.connection().send(JJMessage.makeInlineCreate(html, args));
-				return new EventSelection(String.format("#%s", args.get(ATTR_ID)), context);
+				return new EventSelection(String.format("#%s", args.get(ATTR_ID)), context, env);
 			} else {
-				throw context.prepareContinuation(
+				throw env.prepareContinuation(
 					JJMessage.makeCreate(html, args));
 			}
 		}
