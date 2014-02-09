@@ -2,65 +2,37 @@ package jj.script;
 
 import java.io.Serializable;
 
-import jj.jjmessage.JJMessage;
-
-public class ContinuationState implements Serializable {
+class ContinuationState implements Serializable {
 	
-	private final Object message;
+	private final Continuable continuable;
 	
-	private final ContinuationType type;
+	private final Class<? extends Continuable> type;
 	
-	public ContinuationState(final JJMessage jjMessage) {
-		this.type = ContinuationType.JJMessage; 
-		this.message = jjMessage;
-	}
-	
-	public ContinuationState(final RestRequest request) {
-		this.type = ContinuationType.AsyncHttpRequest;
-		this.message = request;
-	}
-	
-	public ContinuationState(final RequiredModule require) {
-		this.type = ContinuationType.RequiredModule;
-		this.message = require;
+	ContinuationState(final Continuable continuable) {
+		this.type = continuable.getClass();
+		this.continuable = continuable;
 	}
 
 	private static final long serialVersionUID = 1L;
 	
-	public ContinuationType type() {
+	public Class<? extends Continuable> type() {
 		return type;
 	}
 	
-	public JJMessage jjMessage() {
-		return type == ContinuationType.JJMessage ? (JJMessage)message : null;
-	}
-	
-	public RestRequest restRequest() {
-		return type == ContinuationType.AsyncHttpRequest ? (RestRequest)message : null;
-	}
-	
-	public RequiredModule requiredModule() {
-		return type == ContinuationType.RequiredModule ? (RequiredModule)message : null;
+	public <T extends Continuable> T continuableAs(Class<T> type) {
+		assert this.type == type;
+		return type.cast(continuable);
 	}
 	
 	public String pendingKey() {
-		switch (type) {
-		case AsyncHttpRequest:
-			return restRequest().pendingKey();
-		case JJMessage:
-			return jjMessage().pendingKey();
-		case RequiredModule:
-			return requiredModule().pendingKey();
-		}
-		
-		throw new AssertionError("weird construction, can't happen");
+		return continuable.pendingKey();
 	}
 	
 	public String toString() {
 		return new StringBuilder("type: ")
-			.append(type())
+			.append(type)
 			.append(", message: ")
-			.append(message)
+			.append(continuable)
 			.toString();
 	}
 }

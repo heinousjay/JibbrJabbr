@@ -76,7 +76,7 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		requiredModule = new RequiredModule(module, context);
 		
-		given(continuationState.requiredModule()).willReturn(requiredModule);
+		given(continuationState.continuableAs(RequiredModule.class)).willReturn(requiredModule);
 	}
 	
 	@Test

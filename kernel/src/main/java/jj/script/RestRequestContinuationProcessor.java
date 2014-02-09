@@ -35,7 +35,7 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 	@Override
 	public void process(final ContinuationState continuationState) {
 		final ScriptContext scriptContext = context.save();
-		final RestRequest restRequest = continuationState.restRequest();
+		final RestRequest restRequest = continuationState.continuableAs(RestRequest.class);
 		httpClient.execute(restRequest.request()).addListener(
 			new GenericFutureListener<Future<JJHttpClientResponse>>() {
 

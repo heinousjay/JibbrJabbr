@@ -87,7 +87,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 
 	@Override
 	public void process(final ContinuationState continuationState) {
-		final RequiredModule requiredModule = continuationState.requiredModule();
+		final RequiredModule requiredModule = continuationState.continuableAs(RequiredModule.class);
 		final ModuleParent moduleParent = new ModuleParent(context.rootScriptEnvironment());
 		
 		

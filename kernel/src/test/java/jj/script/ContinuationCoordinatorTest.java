@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.Closer;
+import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 
 import org.junit.After;
@@ -67,7 +68,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock ContinuationPending continuation;
 	
-	@Mock ContinuationState continuationState;
+	ContinuationState continuationState;
 	
 	@Mock Logger logger;
 	
@@ -98,12 +99,13 @@ public class ContinuationCoordinatorTest {
 		given(documentScriptEnvironment.scope()).willReturn(scope);
 		given(documentScriptEnvironment.sha1()).willReturn(sha1);
 		
+		continuationState = new ContinuationState(JJMessage.makeRetrieve(""));
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
-		Map<ContinuationType, ContinuationProcessor> continuationProcessors = new HashMap<>();
-		continuationProcessors.put(ContinuationType.AsyncHttpRequest, continuationProcessor1);
-		continuationProcessors.put(ContinuationType.JJMessage, continuationProcessor2);
-		continuationProcessors.put(ContinuationType.RequiredModule, continuationProcessor3);
+		Map<Class<? extends Continuable>, ContinuationProcessor> continuationProcessors = new HashMap<>();
+		continuationProcessors.put(RestRequest.class, continuationProcessor1);
+		continuationProcessors.put(JJMessage.class, continuationProcessor2);
+		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		
 		MockRhinoContextProvider contextProvider = new MockRhinoContextProvider();
 		context = contextProvider.get();
@@ -127,12 +129,11 @@ public class ContinuationCoordinatorTest {
 	public void testInitialExecutionWithContinuation() {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
-		given(continuationState.type()).willReturn(ContinuationType.AsyncHttpRequest);
 		
 		boolean result = continuationCoordinator.execute(scriptEnvironment);
 
 		assertThat(result, is(false));
-		verify(continuationProcessor1).process(continuationState);
+		verify(continuationProcessor2).process(continuationState);
 	}
 	
 	@Test
@@ -162,7 +163,6 @@ public class ContinuationCoordinatorTest {
 	public void testFunctionExecutionWithContinuation() {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
-		given(continuationState.type()).willReturn(ContinuationType.JJMessage);
 		
 		boolean result = continuationCoordinator.execute(documentScriptEnvironment, function, args);
 		
@@ -202,12 +202,10 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
 		
-		given(continuationState.type()).willReturn(ContinuationType.RequiredModule);
-		
 		boolean result = continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, args);
 		
 		assertThat(result, is(false));
-		verify(continuationProcessor3).process(continuationState);
+		verify(continuationProcessor2).process(continuationState);
 	}
 	
 	@Test

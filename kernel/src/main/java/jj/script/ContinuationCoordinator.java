@@ -32,14 +32,14 @@ public class ContinuationCoordinator {
 	
 	private final CurrentScriptEnvironment env;
 	
-	private final Map<ContinuationType, ContinuationProcessor> continuationProcessors;
+	private final Map<Class<? extends Continuable>, ContinuationProcessor> continuationProcessors;
 	
 	@Inject
 	ContinuationCoordinator(
 		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptEnvironment env,
 		final @EmergencyLogger Logger log,
-		final Map<ContinuationType, ContinuationProcessor> continuationProcessors
+		final Map<Class<? extends Continuable>, ContinuationProcessor> continuationProcessors
 	) {
 		this.contextProvider = contextProvider;
 		this.env = env;

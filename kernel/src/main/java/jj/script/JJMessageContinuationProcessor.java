@@ -3,6 +3,8 @@ package jj.script;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.jjmessage.JJMessage;
+
 /**
  * Kinda simple as these things go
  * @author jason
@@ -24,7 +26,7 @@ class JJMessageContinuationProcessor implements ContinuationProcessor {
 		// of a connected WebSocket client, we we just send the message
 		// along to the client and let any results get handled by
 		// the connection listener
-		context.connection().send(continuationState.jjMessage());
+		context.connection().send(continuationState.continuableAs(JJMessage.class));
 	}
 
 }
