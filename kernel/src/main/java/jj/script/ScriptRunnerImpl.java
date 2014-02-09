@@ -224,26 +224,6 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		);
 	}
 	
-	@Override
-	public void submit(final WebSocketConnection connection, final String event, final Object...args) {
-		executors.execute(new ScriptTask<ScriptEnvironment>("host event on WebSocket connection", connection.webSocketConnectionHost()) {
-
-			@Override
-			public void run() {
-				log.trace("executing event {} for connection {}", event, connection);
-				context.initialize(connection);
-				WebSocketConnectionHost webSocketConnectionHost = connection.webSocketConnectionHost();
-				Callable function = connection.getFunction(event);
-				if (function == null) function = webSocketConnectionHost.getFunction(event);
-				try {
-					continuationCoordinator.execute(webSocketConnectionHost, function, args);
-				} finally {
-					context.end();
-				}
-			}
-		});	
-	}
-	
 	/** 
 	 * you must be in a script thread before calling this method.
 	 */

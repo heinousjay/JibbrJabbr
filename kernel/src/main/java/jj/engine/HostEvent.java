@@ -8,6 +8,8 @@ public enum HostEvent {
 	clientConnected,
 	/** called when a client disconnects */
 	clientDisconnected,
+	/** called when there is an error */
+	clientErrored,
 	/** called when the script is being terminated */
 	terminating;
 }

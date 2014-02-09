@@ -18,6 +18,7 @@ package jj.http.server;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.engine.HostEvent;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,7 +43,7 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 
 	private final WebSocketServerHandshaker handshaker;
 	
-	private final WebSocketHandler handler;
+	private final ConnectionEventExecutor executor;
 	
 	private final WebSocketConnection connection;
 	
@@ -51,12 +52,12 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 	@Inject
 	WebSocketFrameHandler(
 		final WebSocketServerHandshaker handshaker,
-		final WebSocketHandler handler,
+		final ConnectionEventExecutor executor,
 		final WebSocketConnection connection,
 		final WebSocketConnectionTracker connectionTracker
 	) {
 		this.handshaker = handshaker;
-		this.handler = handler;
+		this.executor = executor;
 		this.connection = connection;
 		this.connectionTracker = connectionTracker;
 	}
@@ -66,7 +67,7 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 
 		connectionTracker.addConnection(connection);
 		connection.webSocketConnectionHost().connected(connection);
-		handler.opened(connection);
+		executor.submit(connection, HostEvent.clientConnected.toString(), connection);
 		
 		ctx.channel().closeFuture().addListener(new ChannelFutureListener() {
 			
@@ -74,14 +75,14 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			public void operationComplete(ChannelFuture future) throws Exception {
 				connectionTracker.removeConnection(connection);
 				connection.webSocketConnectionHost().disconnected(connection);
-				handler.closed(connection);
+				executor.submit(connection, HostEvent.clientDisconnected.toString(), connection);
 			}
 		});
 	}
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		handler.errored(connection, cause);
+		executor.submit(connection, HostEvent.clientErrored.toString(), connection);
 		ctx.close();
 	}
 	
@@ -107,11 +108,11 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			
 		} else if (frame instanceof PongWebSocketFrame) {
 				
-			handler.ponged(connection, frame.content().retain());
+			// this should never happen
 				
 		} else if (frame instanceof BinaryWebSocketFrame) {
 			
-			handler.messageReceived(connection, frame.content().retain());
+			// need to understand this
 			
 		} else if (frame instanceof CloseWebSocketFrame) {
 			

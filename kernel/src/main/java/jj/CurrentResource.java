@@ -39,6 +39,7 @@ public abstract class CurrentResource<RESOURCE> {
 			
 			@Override
 			public void close() {
+				willClose();
 				resources.set(null);
 			}
 		};
@@ -47,4 +48,6 @@ public abstract class CurrentResource<RESOURCE> {
 	public RESOURCE current() {
 		return resources.get();
 	}
+	
+	protected void willClose() {}
 }

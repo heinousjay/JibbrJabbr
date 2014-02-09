@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.http.server;
 
-import jj.http.server.WebSocketConnection;
-import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.resource.script.ModuleScriptEnvironment;
+import jj.CurrentResource;
 
 /**
  * @author jason
  *
  */
-public interface ScriptRunner {
+public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnection> {
 
-	public static final String READY_FUNCTION_KEY = "Document.ready";
-
-	void submit(DocumentRequestProcessor documentRequestProcessor);
-
-	void submit(RequiredModule requiredModule, ModuleScriptEnvironment scriptExecutionEnvironment);
-
-	void submitPendingResult(WebSocketConnection connection, String pendingKey, Object result);
-
-	//void submit(WebSocketConnection connection, String event, Object... args);
+	protected void willClose() {
+		current().end();
+	}
 }

@@ -36,7 +36,7 @@ public class ScriptRunnerTest {
 		
 	@Mock ScriptResource scriptResource;
 	
-	@Mock ContinuationCoordinator continuationCoordinator;
+	@Mock ContinuationCoordinatorImpl continuationCoordinator;
 	
 	@Mock CurrentScriptContext currentScriptContext;
 	
@@ -177,76 +177,11 @@ public class ScriptRunnerTest {
 	}
 	
 	@Test
-	public void testWebSocketEventDelegationToGlobal() throws Exception {
-		
-		// given 
-		givenAWebSocketMessage();
-		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
-		given(documentScriptEnvironment.getFunction(eventName)).willReturn(eventFunction);
-		given(connection.getFunction(eventName)).willReturn(null);
-		
-		// when
-		scriptRunner.submit(connection, eventName);
-		executors.runUntilIdle();
-		
-		// then
-		verify(continuationCoordinator).execute(documentScriptEnvironment, eventFunction);
-		verify(connection).getFunction(eventName);
-		verify(documentScriptEnvironment).getFunction(eventName);
-
-		//given
-		eventName = EventNameHelper.makeEventName("jason", "miller", "rocks");
-		given(documentScriptEnvironment.getFunction(eventName)).willReturn(null);
-		given(connection.getFunction(eventName)).willReturn(eventFunction);
-		
-		// when
-		scriptRunner.submit(connection, eventName);
-		executors.runUntilIdle();
-		
-		// then
-		verify(continuationCoordinator, times(2)).execute(documentScriptEnvironment, eventFunction);
-		verify(connection).getFunction(eventName);
-		verify(documentScriptEnvironment, never()).getFunction(eventName);
-		
-	}
-	
-	@Test
-	public void testWebSocketJJMessageEventWithNoContinuation() throws Exception {
-		
-		// given
-		givenAWebSocketMessage();
-		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
-		
-		// when
-		scriptRunner.submit(connection, eventName);
-		executors.runUntilIdle();
-		
-		// then
-		verify(continuationCoordinator).execute(documentScriptEnvironment, eventFunction);
-	}
-	
-	@Test
-	public void testWebSocketJJMessageEventWithContinuations() throws Exception {
+	public void testContinuationResumption() throws Exception {
 		
 		// given
 		givenAWebSocketMessage();
 		given(currentScriptContext.scriptEnvironment()).willReturn(documentScriptEnvironment);
-		
-		String eventName = EventNameHelper.makeEventName("jason", "miller", "rules");
-		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(false);
-		
-		given(continuationCoordinator.resumeContinuation(any(ScriptEnvironment.class), anyString(), any()))
-			.willReturn(false)
-			.willReturn(true);
-		
-		// when
-		scriptRunner.submit(connection, eventName);
-		executors.runUntilIdle();
-		
-		// then
-		verify(continuationCoordinator).execute(documentScriptEnvironment, eventFunction);
-		
-		// given
 		executors.isScriptThread = true;
 		
 		// when

@@ -22,13 +22,13 @@ import org.mozilla.javascript.ScriptableObject;
 
 import jj.StringUtils;
 import jj.engine.EventSelection;
+import jj.http.server.ConnectionEventExecutor;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.EventNameHelper;
 import jj.script.ScriptJSON;
-import jj.script.ScriptRunner;
 
 /**
  * @author jason
@@ -37,19 +37,19 @@ import jj.script.ScriptRunner;
 @Singleton
 class EventMessageProcessor implements DocumentWebSocketMessageProcessor {
 
-	private final ScriptRunner scriptRunner;
+	private final ConnectionEventExecutor executor;
 	private final CurrentScriptContext context;
 	private final CurrentScriptEnvironment env;
 	private final ScriptJSON scriptJSON;
 	
 	@Inject
 	EventMessageProcessor(
-		final ScriptRunner scriptRunner,
+		final ConnectionEventExecutor executor,
 		final CurrentScriptContext context,
 		final CurrentScriptEnvironment env,
 		final ScriptJSON scriptJSON
 	) {
-		this.scriptRunner = scriptRunner;
+		this.executor = executor;
 		this.context = context;
 		this.env = env;
 		this.scriptJSON = scriptJSON;
@@ -57,21 +57,16 @@ class EventMessageProcessor implements DocumentWebSocketMessageProcessor {
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
-		ScriptableObject event = null;
-		try {
-			context.initialize(connection);
-			event = context.scriptEnvironment().newObject();
-			// need to get a way to make the target into the context this for the handler
-			// bound function! it is doable
-			EventSelection target = new EventSelection(message.event().target, context, env);
-			event.defineProperty("target", target, ScriptableObject.CONST);
-			if (!StringUtils.isEmpty(message.event().form)) {
-				event.defineProperty("form", scriptJSON.parse(message.event().form), ScriptableObject.CONST);
-			}
-		} finally {
-			context.end();
+		
+		ScriptableObject event = connection.webSocketConnectionHost().newObject();
+		
+		EventSelection target = new EventSelection(message.event().target, context, env);
+		event.defineProperty("target", target, ScriptableObject.CONST);
+		if (!StringUtils.isEmpty(message.event().form)) {
+			event.defineProperty("form", scriptJSON.parse(message.event().form), ScriptableObject.CONST);
 		}
-		scriptRunner.submit(connection, EventNameHelper.makeEventName(message), event);
+		
+		executor.submit(connection, EventNameHelper.makeEventName(message), event);
 	}
 
 }

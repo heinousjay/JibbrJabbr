@@ -19,8 +19,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
-
 import jj.engine.EventSelection;
+import jj.http.server.ConnectionEventExecutor;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
@@ -28,7 +28,6 @@ import jj.resource.document.EventMessageProcessor;
 import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 import jj.script.ScriptJSON;
-import jj.script.ScriptRunner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,8 +46,8 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class EventMessageProcessorTest {
 
-	@Mock ScriptRunner scriptRunner;
-	@Mock(answer = Answers.RETURNS_DEEP_STUBS) CurrentScriptContext context;
+	@Mock ConnectionEventExecutor executor;
+	@Mock CurrentScriptContext context;
 	@Mock ScriptJSON scriptJSON;
 	
 	@Mock ScriptableObject scriptableObject1;
@@ -56,7 +55,7 @@ public class EventMessageProcessorTest {
 	
 	@InjectMocks EventMessageProcessor emp;
 	
-	@Mock WebSocketConnection connection;
+	@Mock(answer = Answers.RETURNS_DEEP_STUBS) WebSocketConnection connection;
 	
 	@Captor ArgumentCaptor<EventSelection> eventSelection;
 	
@@ -67,7 +66,7 @@ public class EventMessageProcessorTest {
 		
 		//given
 		JJMessage event = MessageMaker.makeEvent("selector", "type", form);
-		given(context.scriptEnvironment().newObject()).willReturn(scriptableObject1);
+		given(connection.webSocketConnectionHost().newObject()).willReturn(scriptableObject1);
 		given(scriptJSON.parse(form)).willReturn(scriptableObject2);
 		//when
 		emp.handle(connection, event);
@@ -75,7 +74,7 @@ public class EventMessageProcessorTest {
 		//then
 		verify(scriptableObject1).defineProperty(eq("target"), eventSelection.capture(), eq(ScriptableObject.CONST));
 		verify(scriptableObject1).defineProperty("form", scriptableObject2, ScriptableObject.CONST);
-		verify(scriptRunner).submit(connection, EventNameHelper.makeEventName(event), scriptableObject1);
+		verify(executor).submit(connection, EventNameHelper.makeEventName(event), scriptableObject1);
 		
 		assertThat(eventSelection.getValue(), is(notNullValue()));
 	}

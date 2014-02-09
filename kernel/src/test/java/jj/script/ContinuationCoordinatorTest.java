@@ -109,7 +109,7 @@ public class ContinuationCoordinatorTest {
 		
 		MockRhinoContextProvider contextProvider = new MockRhinoContextProvider();
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinator(contextProvider, env, logger, continuationProcessors);
+		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, logger, continuationProcessors);
 	}
 	
 	@After

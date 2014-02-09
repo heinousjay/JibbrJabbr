@@ -18,6 +18,7 @@ package jj.http.server;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import jj.engine.HostEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -48,10 +49,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class WebSocketFrameHandlerTest {
 	
 	@Mock WebSocketServerHandshaker handshaker;
-	@Mock WebSocketHandler handler;
 	@Mock WebSocketConnection connection;
 	@Mock WebSocketConnectionHost webSocketConnectionHost;
 	@Mock WebSocketConnectionTracker connectionTracker;
+	@Mock ConnectionEventExecutor executor;
 	@InjectMocks WebSocketFrameHandler wsfh;
 	
 	// don't mock things you don't own!
@@ -80,7 +81,7 @@ public class WebSocketFrameHandlerTest {
 		
 		verify(connectionTracker).addConnection(connection);
 		verify(webSocketConnectionHost).connected(connection);
-		verify(handler).opened(connection);
+		verify(executor).submit(connection, HostEvent.clientConnected.toString(), connection);
 		verify(ctx.channel().closeFuture()).addListener(futureListenerCaptor.capture());
 		
 		ChannelFutureListener listener = futureListenerCaptor.getValue();
@@ -89,7 +90,7 @@ public class WebSocketFrameHandlerTest {
 		
 		verify(connectionTracker).removeConnection(connection);
 		verify(webSocketConnectionHost).disconnected(connection);
-		verify(handler).closed(connection);
+		verify(executor).submit(connection, HostEvent.clientDisconnected.toString(), connection);;
 	}
 	
 	@Test
@@ -112,7 +113,7 @@ public class WebSocketFrameHandlerTest {
 		wsfh.channelRead0(ctx, textFrame);
 		
 		verify(connection).markActivity();
-		verifyZeroInteractions(handler);
+		verifyZeroInteractions(executor);
 		verify(ctx).writeAndFlush(textFrameCaptor.capture());
 		assertThat(textFrameCaptor.getValue().text(), is("jj-yo"));
 	}
@@ -138,7 +139,7 @@ public class WebSocketFrameHandlerTest {
 		wsfh.channelRead0(ctx, pongFrame);
 		
 		verify(connection).markActivity();
-		verify(handler).ponged(connection, byteBuf);
+		//verify(handler).ponged(connection, byteBuf);
 	}
 	
 	@Test
@@ -149,7 +150,7 @@ public class WebSocketFrameHandlerTest {
 		wsfh.channelRead0(ctx, binaryFrame);
 		
 		verify(connection).markActivity();
-		verify(handler).messageReceived(connection, byteBuf);
+		//verify(handler).messageReceived(connection, byteBuf);
 	}
 	
 	@Test
