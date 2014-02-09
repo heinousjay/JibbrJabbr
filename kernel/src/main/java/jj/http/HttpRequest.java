@@ -23,22 +23,13 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map.Entry;
 
-import jj.DataStore;
 import jj.uri.URIMatch;
 
 /**
  * @author jason
  *
  */
-public interface HttpRequest extends DataStore {
-
-	HttpRequest data(String name, Object value);
-
-	Object data(String name);
-
-	boolean containsData(String name);
-
-	Object removeData(String name);
+public interface HttpRequest {
 
 	BigDecimal wallTime();
 

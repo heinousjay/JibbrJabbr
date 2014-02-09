@@ -15,16 +15,11 @@
  */
 package jj.script;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jj.DataStore;
-
 /**
  * @author jason
  *
  */
-public class RequiredModule implements DataStore, Continuable {
+public class RequiredModule implements Continuable {
 	
 	private final String identifier;
 	
@@ -33,8 +28,6 @@ public class RequiredModule implements DataStore, Continuable {
 	private final ScriptContext parentScriptContext;
 	
 	private String pendingKey;
-	
-	private final Map<String, Object> data = new HashMap<>();
 
 	public RequiredModule(
 		final String identifier, 
@@ -55,27 +48,6 @@ public class RequiredModule implements DataStore, Continuable {
 	
 	String identifier() {
 		return identifier;
-	}
-	
-	@Override
-	public RequiredModule data(final String name, final Object value) {
-		data.put(name, value);
-		return this;
-	}
-	
-	@Override
-	public Object data(final String name) {
-		return data.get(name);
-	}
-	
-	@Override
-	public Object removeData(String name) {
-		return data.remove(name);
-	}
-	
-	@Override
-	public boolean containsData(String name) {
-		return data.containsKey(name);
 	}
 	
 	@Override

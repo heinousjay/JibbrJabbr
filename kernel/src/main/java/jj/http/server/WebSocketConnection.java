@@ -15,13 +15,12 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 
-import jj.DataStore;
 import jj.DateFormatHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.FunctionContext;
 
 @Singleton
-public class WebSocketConnection implements DataStore, FunctionContext {
+public class WebSocketConnection implements FunctionContext {
 	
 	private static final String CLIENT_STORAGE = "JJWebSocketConnection client storage";
 	
@@ -55,27 +54,6 @@ public class WebSocketConnection implements DataStore, FunctionContext {
 			ctx.channel().remoteAddress(),
 			DateFormatHelper.nowInBasicFormat()
 		);
-	}
-	
-	@Override
-	public WebSocketConnection data(String name, Object value) {
-		data.put(name, value);
-		return this;
-	}
-	
-	@Override
-	public Object data(String name) {
-		return data.get(name);
-	}
-	
-	@Override
-	public Object removeData(String name) {
-		return data.remove(name);
-	}
-	
-	@Override
-	public boolean containsData(String name) {
-		return data.containsKey(name);
 	}
 	
 	@Override

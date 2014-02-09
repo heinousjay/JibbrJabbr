@@ -71,27 +71,6 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	}
 
 	@Override
-	public HttpRequest data(String name, Object value) {
-		data.put(name, value);
-		return this;
-	}
-
-	@Override
-	public Object data(String name) {
-		return data.get(name);
-	}
-
-	@Override
-	public boolean containsData(String name) {
-		return data.containsKey(name);
-	}
-
-	@Override
-	public Object removeData(String name) {
-		return data.remove(name);
-	}
-
-	@Override
 	public BigDecimal wallTime() {
 		return BigDecimal.valueOf(System.nanoTime() - startTime, 6);
 	}

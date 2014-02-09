@@ -4,14 +4,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.DataStore;
 import jj.resource.MimeTypes;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.ScriptRunner;
@@ -35,7 +33,7 @@ import org.jsoup.nodes.Document;
  *
  */
 @Singleton
-public class DocumentRequestProcessor implements RequestProcessor, DataStore {
+public class DocumentRequestProcessor implements RequestProcessor {
 	
 	@SuppressWarnings("serial")
 	private static class FilterList extends ArrayList<DocumentFilter> {}
@@ -54,8 +52,6 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 	private final HttpResponse httpResponse;
 	
 	private final Set<DocumentFilter> filters;
-	
-	private final HashMap<String, Object> data = new HashMap<>();
 	
 	private ArrayList<JJMessage> messages; 
 	
@@ -88,27 +84,6 @@ public class DocumentRequestProcessor implements RequestProcessor, DataStore {
 			}
 		}
 		return filterList;
-	}
-
-	@Override
-	public DocumentRequestProcessor data(String name, Object value) {
-		data.put(name, value);
-		return this;
-	}
-
-	@Override
-	public Object data(String name) {
-		return data.get(name);
-	}
-
-	@Override
-	public boolean containsData(String name) {
-		return data.containsKey(name);
-	}
-
-	@Override
-	public Object removeData(String name) {
-		return data.remove(name);
 	}
 	
 	public HttpRequest httpRequest() {
