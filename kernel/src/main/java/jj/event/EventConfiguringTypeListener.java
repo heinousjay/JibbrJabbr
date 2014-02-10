@@ -105,6 +105,10 @@ class EventConfiguringTypeListener implements TypeListener {
 			
 			invokerClass = classPool.get("jj.event.Invoker");
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
+			
+			// this should be a task on the InternalExecutor
+			// this class can listen for the JJExecutorImpl after injection and fire a
+			// task into it.  dirty dirty but this whole class is dirty dirty
 			Thread queueCleaner = new Thread(new ListenerCleaner(), "Event System cleanup");
 			queueCleaner.setDaemon(true);
 			queueCleaner.start();

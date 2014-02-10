@@ -16,6 +16,7 @@
 package jj.execution;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -53,7 +54,7 @@ public class JJExecutorImplTest {
 
 	@InjectMocks ExecutorBundle bundle;
 	
-	@Mock CurrentTask currentTask;
+	CurrentTask currentTask;
 	
 	@Mock Logger logger;
 	
@@ -65,6 +66,8 @@ public class JJExecutorImplTest {
 	
 	@Before
 	public void before() {
+		
+		currentTask = new CurrentTask();
 		
 		executor = new JJExecutorImpl(bundle, currentTask, logger);
 		
@@ -88,16 +91,17 @@ public class JJExecutorImplTest {
 			
 			@Override
 			protected void run() {
-				flag.set(true);
+				flag.set(currentTask.current() == this);
 			}
 		};
+
+		assertThat(currentTask.current(), is(nullValue()));
 		
 		executor.execute(task);
-		
 		runTask(scriptExecutor);
 		
 		assertThat(flag.get(), is(true));
-		verify(currentTask).set(task);
+		assertThat(currentTask.current(), is(nullValue()));
 	}
 	
 	@Test
@@ -108,16 +112,17 @@ public class JJExecutorImplTest {
 		IOTask task = new IOTask("test task") {
 			@Override
 			protected void run() throws Exception {
-				flag.set(true);
+				flag.set(currentTask.current() == this);
 			}
 		};
+
+		assertThat(currentTask.current(), is(nullValue()));
 		
 		executor.execute(task);
-		
 		runTask(ioExecutor);
 		
 		assertThat(flag.get(), is(true));
-		verify(currentTask).set(task);
+		assertThat(currentTask.current(), is(nullValue()));
 	}
 	
 	@Test

@@ -20,14 +20,26 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * <p>
+ * provides the base facilities for task management, and
+ * an API for task construction.  Only derive from this directly
+ * if making a new type of task, otherwise {@link IOTask} or
+ * {@link ScriptTask} are what you're looking for.
+ * </p>
+ * 
+ * <p>
+ * After constructing a task instance, submit it to the {@link JJExecutor}
+ * for scheduling
+ * </p>
+ * 
  * @author jason
  *
  */
 public abstract class JJTask implements Delayed {
 	
-	private static final long MAX_QUEUED_TIME = TimeUnit.SECONDS.toMillis(20);
-	
 	private final String name;
+	
+	private volatile long maxTime = 0;
 	
 	private volatile long enqueuedTime = 0;
 	
@@ -47,7 +59,8 @@ public abstract class JJTask implements Delayed {
 		return name;
 	}
 	
-	void enqueue() {
+	void enqueue(long timeoutMillis) {
+		maxTime = timeoutMillis;
 		enqueuedTime = System.currentTimeMillis();
 	}
 	
@@ -81,7 +94,7 @@ public abstract class JJTask implements Delayed {
 	
 	@Override
 	public long getDelay(TimeUnit unit) {
-		return unit.convert(MAX_QUEUED_TIME - (System.currentTimeMillis() - enqueuedTime), TimeUnit.MILLISECONDS);
+		return unit.convert(maxTime - (System.currentTimeMillis() - enqueuedTime), TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
@@ -90,4 +103,10 @@ public abstract class JJTask implements Delayed {
 		long y = o.getDelay(TimeUnit.MILLISECONDS);
 		return (x < y) ? -1 : ((x == y) ? 0 : 1);
 	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder(getClass().getName()).append(" - ").append(name).toString();
+	}
+	
 }

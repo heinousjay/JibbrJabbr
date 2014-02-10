@@ -2,12 +2,14 @@ package jj.execution;
 
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 
+import jj.Closer;
 import jj.logging.EmergencyLogger;
 
 /**
@@ -21,6 +23,8 @@ import jj.logging.EmergencyLogger;
  */
 @Singleton
 class JJExecutorImpl implements JJExecutor {
+	
+	private static final long MAX_QUEUED_TIME = TimeUnit.SECONDS.toMillis(20);
 
 	private final ExecutorBundle bundle;
 	private final CurrentTask currentTask;
@@ -36,11 +40,11 @@ class JJExecutorImpl implements JJExecutor {
 			try {
 				while (true) {
 					JJTask task = queuedTasks.take();
-					System.err.println(task + " has been waiting too long to execute!");
+					// TODO - do something more interesting than this! after all at this point it's an issue, i'm sure
+					System.err.println(task + " has been waiting too long to execute! not sure what else to say but DAMN baby");
 				}
 			} catch (InterruptedException e) {
-				// just let the hate flow...
-				// for now, anyway.  maybe this belongs in the loop
+				// if we get interrupted, just end
 			}
 		}
 	};
@@ -55,6 +59,10 @@ class JJExecutorImpl implements JJExecutor {
 		this.currentTask = currentTask;
 		this.logger = logger;
 		
+		// TODO - make a new set of executors for internal stuff,
+		// like this, the file watcher, and there's another lil daemon out there somewhere
+		// and just make InternalTask to handle them
+		// should allow unlimited thread of execution
 		this.monitorThread = new Thread(monitor, "Task execution monitor");
 		this.monitorThread.setDaemon(true);
 		this.monitorThread.start();
@@ -63,7 +71,7 @@ class JJExecutorImpl implements JJExecutor {
 	@Override
 	public Future<?> execute(final JJTask task) {
 		
-		task.enqueue();
+		task.enqueue(MAX_QUEUED_TIME);
 		queuedTasks.add(task);
 		
 		return task.executor(bundle).submit(new Runnable() {
@@ -72,17 +80,15 @@ class JJExecutorImpl implements JJExecutor {
 			public void run() {
 				String name = Thread.currentThread().getName();
 				Thread.currentThread().setName(name + " - " + task.name());
-				currentTask.set(task);
 				queuedTasks.remove(task);
 				task.start();
-				try {
+				try (Closer closer = currentTask.enterScope(task)) {
 					task.run();
 				} catch (Throwable t) {
 					logger.error("Task [{}] ended in exception", task.name());
 					logger.error("", t);
 				} finally {
 					task.end();
-					currentTask.set(null);
 					Thread.currentThread().setName(name);
 				}
 			}
@@ -104,6 +110,8 @@ class JJExecutorImpl implements JJExecutor {
 	}
 	
 	// TODO replace the use of this with configuration
+	// TODO along with that, rework the executors to be restartable
+	// so that the size configurations can change at runtime for tuning
 	public int ioPoolSize() {
 		return bundle.ioExecutor.getMaximumPoolSize();
 	}

@@ -17,6 +17,8 @@ package jj.execution;
 
 import javax.inject.Singleton;
 
+import jj.CurrentResource;
+
 /**
  * Simple thread local container for the current task so the execution trace
  * can figure out what's what
@@ -25,20 +27,10 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-public class CurrentTask {
-
-	private final ThreadLocal<JJTask> store = new ThreadLocal<>();
-	
-	void set(final JJTask current) {
-		store.set(current);
-	}
-	
-	JJTask get() {
-		return store.get();
-	}
+public class CurrentTask extends CurrentResource<JJTask> {
 	
 	public String name() {
-		JJTask task = store.get();
+		JJTask task = current();
 		return task == null ? "no current task" : task.name();
 	}
 }
