@@ -16,6 +16,8 @@
 package jj.script;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -103,19 +105,22 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testInitialExecutionNoContinuation() {
 		
-		boolean result = continuationCoordinator.execute(scriptEnvironment);
+		String result = continuationCoordinator.execute(scriptEnvironment);
 		
-		assertThat(result, is(true));
+		assertThat(result, is(nullValue()));
 	}
 	
 	@Test
 	public void testInitialExecutionWithContinuation() {
 		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
+		String pendingKey = "pendingKey";
 		
-		boolean result = continuationCoordinator.execute(scriptEnvironment);
+		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
+		continuationState.continuableAs(Continuable.class).pendingKey(pendingKey);
+		
+		String result = continuationCoordinator.execute(scriptEnvironment);
 
-		assertThat(result, is(false));
+		assertThat(result, is(pendingKey));
 		verify(continuationProcessor2).process(continuationState);
 	}
 	
@@ -137,19 +142,20 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testFunctionExecutionNoContinuation() {
 		
-		boolean result = continuationCoordinator.execute(scriptEnvironment, function, args[0], args[1]);
+		String result = continuationCoordinator.execute(scriptEnvironment, function, args[0], args[1]);
 		
-		assertThat(result, is(true));
+		assertThat(result, is(nullValue()));
 	}
 	
 	@Test
 	public void testFunctionExecutionWithContinuation() {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
+		continuationState.continuableAs(Continuable.class).pendingKey("");
 		
-		boolean result = continuationCoordinator.execute(scriptEnvironment, function, args);
+		String result = continuationCoordinator.execute(scriptEnvironment, function, args);
 		
-		assertThat(result, is(false));
+		assertThat(result, is(notNullValue()));
 		verify(continuationProcessor2).process(continuationState);
 	}
 	
@@ -173,9 +179,9 @@ public class ContinuationCoordinatorTest {
 		
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
-		boolean result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
+		String result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
-		assertThat(result, is(true));
+		assertThat(result, is(nullValue()));
 	}
 	
 	@Test
@@ -184,10 +190,11 @@ public class ContinuationCoordinatorTest {
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
+		continuationState.continuableAs(Continuable.class).pendingKey("");
 		
-		boolean result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
+		String result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
-		assertThat(result, is(false));
+		assertThat(result, is(notNullValue()));
 		verify(continuationProcessor2).process(continuationState);
 	}
 	

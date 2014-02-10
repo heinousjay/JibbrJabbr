@@ -28,7 +28,7 @@ public interface ContinuationCoordinator {
 	 * @param scriptEnvironment
 	 * @return true if completed, false if continued
 	 */
-	boolean execute(ScriptEnvironment scriptEnvironment);
+	String execute(ScriptEnvironment scriptEnvironment);
 
 	/**
 	 * function execution within the context of script environment
@@ -37,7 +37,7 @@ public interface ContinuationCoordinator {
 	 * @param args
 	 * @return true if completed, false if continued
 	 */
-	boolean execute(ScriptEnvironment scriptEnvironment, Callable function, Object... args);
+	String execute(ScriptEnvironment scriptEnvironment, Callable function, Object... args);
 
 	/**
 	 * Resumes a continuation that was previously saved from an execution in this class
@@ -46,6 +46,6 @@ public interface ContinuationCoordinator {
 	 * @param result
 	 * @return true if completed, false if continued
 	 */
-	boolean resumeContinuation(ScriptEnvironment scriptEnvironment, String pendingKey, Object result);
+	String resumeContinuation(ScriptEnvironment scriptEnvironment, String pendingKey, Object result);
 
 }

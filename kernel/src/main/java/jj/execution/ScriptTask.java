@@ -36,4 +36,9 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends JJTask {
 	protected final ScheduledExecutorService executor(final ExecutorBundle bundle) {
 		return bundle.scriptExecutorFactory.executorFor(scriptEnvironment.baseName());
 	}
+	
+	// if this task supports resumption post-continuation (and why wouldn't you?)
+	// then this will be called upon that resumption.  somehow.  not sure what this deal
+	// is yet though.
+	protected void resume(final String pendingKey) throws Exception {}
 }

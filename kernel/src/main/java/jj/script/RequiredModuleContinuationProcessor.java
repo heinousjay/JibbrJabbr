@@ -26,6 +26,8 @@ import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
 
 /**
+ * notified when a 
+ * 
  * @author jason
  *
  */

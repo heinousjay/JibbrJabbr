@@ -20,7 +20,7 @@ class ContinuationState implements Serializable {
 	}
 	
 	public <T extends Continuable> T continuableAs(Class<T> type) {
-		assert this.type == type;
+		assert type.isAssignableFrom(this.type);
 		return type.cast(continuable);
 	}
 	

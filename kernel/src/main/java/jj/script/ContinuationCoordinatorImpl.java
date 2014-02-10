@@ -69,7 +69,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	@Override
-	public boolean execute(final ScriptEnvironment scriptEnvironment) {
+	public String execute(final ScriptEnvironment scriptEnvironment) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -92,7 +92,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	@Override
-	public boolean execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
+	public String execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -112,7 +112,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptEnvironment);
 		log.error("helpful stacktrace", new Exception());
-		return false;
+		return null;
 	}
 	
 	/**
@@ -123,7 +123,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	@Override
-	public boolean resumeContinuation(ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
+	public String resumeContinuation(ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
@@ -147,7 +147,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptEnvironment, pendingKey);
 		log.error("helpful stacktrace", new Exception());
-		return false;
+		return null;
 	}
 	
 	private ContinuationState extractContinuationState(final ContinuationPending continuation) {
@@ -162,7 +162,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * 
 	 * @param continuationState
 	 */
-	private boolean processContinuationState(ContinuationState continuationState) {
+	private String processContinuationState(ContinuationState continuationState) {
 		if (continuationState != null) {
 			
 			ContinuationProcessor processor = continuationProcessors.get(continuationState.type());
@@ -170,8 +170,9 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			assert processor != null : "could not find a continuation processor of type " + continuationState.type();
 			
 			processor.process(continuationState);
-			return false;
+			
+			return continuationState.continuableAs(Continuable.class).pendingKey();
 		}
-		return true;
+		return null;
 	}
 }

@@ -58,7 +58,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		log.trace("performing initial execution of a document request");
 		context.documentRequestProcessor().startingInitialExecution();
 
-		if (continuationCoordinator.execute(context.webSocketConnectionHost())) {
+		if (continuationCoordinator.execute(context.webSocketConnectionHost()) == null) {
 			context.webSocketConnectionHost().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			executeReadyFunction();
@@ -68,7 +68,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	@ScriptThread
 	private void resumeHttpRequestInitialExecution(String pendingKey, Object result) {
 		log.trace("resuming initial execution of a script execution environment");
-		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result)) {
+		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result) == null) {
 			context.scriptEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
 			submit(context.documentRequestProcessor());
@@ -88,7 +88,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			
 			context.documentRequestProcessor().startingReadyFunction();
 			
-			if (continuationCoordinator.execute(webSocketConnectionHost, ready)) {
+			if (continuationCoordinator.execute(webSocketConnectionHost, ready) == null) {
 				log.trace("ready function execution - completed, serving document");
 				context.documentRequestProcessor().respond();
 			}
@@ -99,7 +99,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeReadyFunction(String pendingKey, Object result) {
 		log.trace("resuming ready function execution of a script execution environment");
 		
-		if (continuationCoordinator.resumeContinuation(context.webSocketConnectionHost(), pendingKey, result)) {
+		if (continuationCoordinator.resumeContinuation(context.webSocketConnectionHost(), pendingKey, result) == null) {
 			log.trace("ready function execution - completed, serving document");
 			context.documentRequestProcessor().respond();
 		}
@@ -148,7 +148,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void moduleInitialExecution() {
 		log.debug("performing initial execution of a required module");
 		
-		if (continuationCoordinator.execute(context.moduleScriptEnvironment())) {
+		if (continuationCoordinator.execute(context.moduleScriptEnvironment()) == null) {
 			context.moduleScriptEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			completeModuleInitialization();
@@ -159,7 +159,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	private void resumeModuleInitialExecution(final String pendingKey, final Object result) {
 		log.debug("resuming initial execution of a required module");
 		
-		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result)) {
+		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result) == null) {
 			context.scriptEnvironment().initialized(true);
 			log.debug("initial execution - completed, resuming");
 			completeModuleInitialization();

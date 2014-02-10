@@ -16,6 +16,8 @@
 package jj.script;
 
 /**
+ * Identifies a ScriptEnvironment as belonging to some sort of parent.
+ * 
  * @author jason
  *
  */

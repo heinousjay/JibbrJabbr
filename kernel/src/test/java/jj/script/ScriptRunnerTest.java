@@ -1,7 +1,6 @@
 package jj.script;
 
 import static org.mockito.BDDMockito.*;
-import jj.Closer;
 import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.server.WebSocketConnection;
@@ -94,8 +93,8 @@ public class ScriptRunnerTest {
 		
 		// given
 		givenADocumentRequest();
-		given(continuationCoordinator.execute(documentScriptEnvironment)).willReturn(true);
-		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(true);
+		given(continuationCoordinator.execute(documentScriptEnvironment)).willReturn(null);
+		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(null);
 		
 		// when
 		scriptRunner.submit(documentRequestProcessor);
@@ -112,7 +111,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		given(currentScriptContext.scriptEnvironment()).willReturn(documentScriptEnvironment);
-		given(continuationCoordinator.execute(documentScriptEnvironment)).willReturn(false);
+		given(continuationCoordinator.execute(documentScriptEnvironment)).willReturn(null);
 		givenADocumentRequest();
 		
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.InitialExecution);
@@ -126,8 +125,8 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
-		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(true);
-		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(true);
+		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn("");
+		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn("");
 		given(documentScriptEnvironment.initialized()).willReturn(true);
 		
 		// when
@@ -144,8 +143,8 @@ public class ScriptRunnerTest {
 		
 		// given
 		given(currentScriptContext.scriptEnvironment()).willReturn(documentScriptEnvironment);
-		given(continuationCoordinator.execute(documentScriptEnvironment)).willReturn(true);
-		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(false);
+		given(continuationCoordinator.execute(documentScriptEnvironment)).willReturn(null);
+		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn("");
 		
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.ReadyFunctionExecution);
 		givenADocumentRequest();
@@ -160,7 +159,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
-		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(true);
+		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(null);
 		
 		// when
 		//try (Closer closer = currentDocument.enterScope(documentRequestProcessor)) {
@@ -231,7 +230,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		RequiredModule module = givenAModuleRequire();
-		given(continuationCoordinator.execute(moduleScriptEnvironment)).willReturn(true);
+		given(continuationCoordinator.execute(moduleScriptEnvironment)).willReturn(null);
 		
 		// when
 		scriptRunner.submit(module, moduleScriptEnvironment);
@@ -258,7 +257,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		RequiredModule module = givenAModuleRequire();
-		given(continuationCoordinator.execute(moduleScriptEnvironment)).willReturn(false);
+		given(continuationCoordinator.execute(moduleScriptEnvironment)).willReturn("");
 		
 		// when
 		scriptRunner.submit(module, moduleScriptEnvironment);
@@ -268,7 +267,7 @@ public class ScriptRunnerTest {
 		executors.isScriptThread = true;
 		module.pendingKey("");
 		given(currentScriptContext.type()).willReturn(ScriptContextType.ModuleInitialization);
-		given(continuationCoordinator.resumeContinuation(moduleScriptEnvironment, module.pendingKey(), scriptable)).willReturn(true);
+		given(continuationCoordinator.resumeContinuation(moduleScriptEnvironment, module.pendingKey(), scriptable)).willReturn(null);
 		
 		// when
 		scriptRunner.submit("", httpRequestContext, module.pendingKey(), scriptable);
