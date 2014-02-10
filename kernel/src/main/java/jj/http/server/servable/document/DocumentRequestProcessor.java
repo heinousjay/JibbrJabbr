@@ -202,8 +202,9 @@ public class DocumentRequestProcessor implements RequestProcessor {
 
 	/**
 	 * adds a message intended to be processed a framework startup
-	 * on the client.  initially intended for event bindings but
-	 * some other case may come up.
+	 * on the client.
+	 * 
+	 * currently read in the document but needs to be moved into the connection event
 	 * 
 	 * MOVE THIS to inside.  it's so sloppy in the html
 	 * @param message

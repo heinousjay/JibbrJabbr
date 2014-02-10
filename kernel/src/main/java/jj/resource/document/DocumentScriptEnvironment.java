@@ -33,10 +33,13 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.Closer;
+import jj.CurrentResource;
 import jj.SHA1Helper;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.IOThread;
+import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.WebSocketMessageProcessor;
@@ -61,6 +64,103 @@ import jj.script.RhinoContext;
 public class DocumentScriptEnvironment
 	extends AbstractScriptEnvironment
 	implements RootScriptEnvironment, WebSocketConnectionHost {
+	
+	// --- implementation
+	
+	private final Logger log = LoggerFactory.getLogger(DocumentScriptEnvironment.class);
+	
+	private final HashMap<String, Callable> functions = new HashMap<>(4);
+	
+	private final HashSet<WebSocketConnection> connections = new HashSet<>(10);
+
+	private final String baseName;
+	
+	private final String uri;
+	
+	private final String socketUri;
+	
+	private final String sha1;
+	
+	private final ScriptableObject scope;
+	
+	private final Script script;
+	
+	private final HtmlResource html;
+	
+	private final ScriptResource clientScript;
+	private final ScriptResource sharedScript;
+	private final ScriptResource serverScript;
+	
+	private final WebSocketMessageProcessor processor;
+	
+	private final CurrentDocument currentDocument;
+	
+	private final CurrentWebSocketConnection currentConnection;
+	
+	private final HashMap<String, Context<?>> contexts = new HashMap<>(10);
+	
+	/**
+	 * @param cacheKey
+	 */
+	@Inject
+	DocumentScriptEnvironment(
+		final ResourceCacheKey cacheKey,
+		final String baseName,
+		final ResourceFinder resourceFinder,
+		final Provider<RhinoContext> contextProvider,
+		final EngineAPI api,
+		final Publisher publisher,
+		final ScriptCompiler compiler,
+		final WebSocketMessageProcessor processor,
+		final CurrentDocument currentDocument,
+		final CurrentWebSocketConnection currentConnection
+	) {
+		super(cacheKey, publisher, contextProvider);
+		this.baseName = baseName;
+		
+		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
+		
+		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName + ".html");
+		
+		clientScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
+		
+		sha1 = SHA1Helper.keyFor(
+			html.sha1(),
+			clientScript == null ? "none" : clientScript.sha1(),
+			sharedScript == null ? "none" : sharedScript.sha1(),
+			serverScript == null ? "none" : serverScript.sha1()
+		);
+		
+
+		uri = "/" + sha1 + "/" + baseName;
+		
+		if (serverScript == null)  {
+			socketUri = null;
+			scope = null;
+			script = null;
+		} else {
+			socketUri = uri + ".socket";
+			scope = createLocalScope(baseName, api.global());
+			
+			try {
+				script = compiler.compile(scope, clientScript, sharedScript, serverScript);
+			} catch (Exception e) {
+				throw new ResourceNotViableException(baseName, e);
+			}
+		}
+		
+		html.addDependent(this);
+		if (clientScript != null) clientScript.addDependent(this);
+		if (sharedScript != null) sharedScript.addDependent(this);
+		if (serverScript != null) serverScript.addDependent(this);
+		
+		this.processor = processor;
+		
+		this.currentDocument = currentDocument;
+		this.currentConnection = currentConnection;
+	}
 
 	@Override
 	public String baseName() {
@@ -153,90 +253,35 @@ public class DocumentScriptEnvironment
 		}
 	}
 	
-	// --- implementation
-	
-	private final Logger log = LoggerFactory.getLogger(DocumentScriptEnvironment.class);
-	
-	private final HashMap<String, Callable> functions = new HashMap<>(4);
-	
-	private final HashSet<WebSocketConnection> connections = new HashSet<>(10);
-
-	private final String baseName;
-	
-	private final String uri;
-	
-	private final String socketUri;
-	
-	private final String sha1;
-	
-	private final ScriptableObject scope;
-	
-	private final Script script;
-	
-	private final HtmlResource html;
-	
-	private final ScriptResource clientScript;
-	private final ScriptResource sharedScript;
-	private final ScriptResource serverScript;
-	
-	private final WebSocketMessageProcessor processor;
-	
-	/**
-	 * @param cacheKey
-	 */
-	@Inject
-	DocumentScriptEnvironment(
-		final ResourceCacheKey cacheKey,
-		final String baseName,
-		final ResourceFinder resourceFinder,
-		final Provider<RhinoContext> contextProvider,
-		final EngineAPI api,
-		final Publisher publisher,
-		final ScriptCompiler compiler,
-		final WebSocketMessageProcessor processor
-	) {
-		super(cacheKey, publisher, contextProvider);
-		this.baseName = baseName;
+	private static class Context<T> {
 		
-		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
+		final CurrentResource<T> source;
+		final T current;
 		
-		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName + ".html");
-		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
-		
-		sha1 = SHA1Helper.keyFor(
-			html.sha1(),
-			clientScript == null ? "none" : clientScript.sha1(),
-			sharedScript == null ? "none" : sharedScript.sha1(),
-			serverScript == null ? "none" : serverScript.sha1()
-		);
-		
-
-		uri = "/" + sha1 + "/" + baseName;
-		
-		if (serverScript == null)  {
-			socketUri = null;
-			scope = null;
-			script = null;
-		} else {
-			socketUri = uri + ".socket";
-			scope = createLocalScope(baseName, api.global());
-			
-			try {
-				script = compiler.compile(scope, clientScript, sharedScript, serverScript);
-			} catch (Exception e) {
-				throw new ResourceNotViableException(baseName, e);
-			}
+		Context(final CurrentResource<T> source) {
+			this.source = source;
+			this.current = source.current();
 		}
 		
-		html.addDependent(this);
-		if (clientScript != null) clientScript.addDependent(this);
-		if (sharedScript != null) sharedScript.addDependent(this);
-		if (serverScript != null) serverScript.addDependent(this);
-		
-		this.processor = processor;
+		public Closer enterContext() {
+			return source.enterScope(current);
+		}
+	}
+	
+	@Override
+	protected void captureContextForKey(String key) {
+		assert !contexts.containsKey(key) : "cannot capture multiple times with the same key";
+		if (currentDocument.current() != null) {
+			contexts.put(key, new Context<Document>(currentDocument));
+		} else if (currentConnection.current() != null) {
+			contexts.put(key, new Context<WebSocketConnection>(currentConnection));
+		}
+	}
+	
+	@Override
+	protected Closer restoreContextForKey(String key) {
+		Context<?> context = contexts.remove(key);
+		return (context != null) ? context.enterContext() : super.restoreContextForKey(key);
 	}
 
 	/**

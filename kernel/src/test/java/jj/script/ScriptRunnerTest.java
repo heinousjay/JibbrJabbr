@@ -1,12 +1,12 @@
 package jj.script;
 
 import static org.mockito.BDDMockito.*;
-
 import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.DocumentRequestState;
+import jj.resource.document.CurrentDocument;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.ScriptResource;
@@ -64,6 +64,7 @@ public class ScriptRunnerTest {
 		scriptRunner = new ScriptRunnerImpl(
 			continuationCoordinator,
 			currentScriptContext,
+			new CurrentDocument(),
 			executors
 		);
 		
@@ -81,7 +82,6 @@ public class ScriptRunnerTest {
 	
 	private void givenADocumentRequest() {
 
-		given(currentScriptContext.httpRequest()).willReturn(httpRequest);
 		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.DocumentRequest);
 	}
@@ -125,6 +125,7 @@ public class ScriptRunnerTest {
 		executors.isScriptThread = true;
 		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(true);
 		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(true);
+		given(documentScriptEnvironment.initialized()).willReturn(true);
 		
 		// when
 		scriptRunner.submit("", httpRequestContext, "", null);

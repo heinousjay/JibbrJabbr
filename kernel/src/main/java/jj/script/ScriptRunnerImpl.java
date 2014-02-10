@@ -7,12 +7,15 @@ import org.mozilla.javascript.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.Closer;
 import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.resource.document.CurrentDocument;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 
 /**
@@ -33,16 +36,20 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	private final CurrentScriptContext context;
 	
+	private final CurrentDocument document;
+	
 	private final JJExecutor executors;
 	
 	@Inject
 	ScriptRunnerImpl(
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
+		final CurrentDocument document,
 		final JJExecutor executors
 	) {
 		this.continuationCoordinator = continuationCoordinator;
 		this.context = context;
+		this.document = document;
 		this.executors = executors;
 	}
 	
@@ -64,7 +71,8 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result)) {
 			context.scriptEnvironment().initialized(true);
 			log.trace("initial execution - completed, running ready function");
-			executeReadyFunction();
+			submit(context.documentRequestProcessor());
+			//executeReadyFunction();
 		}
 	}
 	
@@ -106,20 +114,24 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		
 		String name = "document request [" + documentRequestProcessor + "]";
 		
-		executors.execute(new ScriptTask<ScriptEnvironment>(name, documentRequestProcessor.documentScriptEnvironment()) {
+		final DocumentScriptEnvironment dse = documentRequestProcessor.documentScriptEnvironment();
+		
+		executors.execute(new ScriptTask<ScriptEnvironment>(name, dse) {
 
 			@Override
 			public void run() {
 				
 				log.trace("executing document request {}", baseName);
 				
-				try {
+				// this task will become a standalone outside of the script package,
+				// just need to validate that the document stays available even through continuations
+				try (Closer closer = document.enterScope(documentRequestProcessor.document())) { 
 					context.initialize(documentRequestProcessor);
 					
 					if (documentRequestProcessor.documentScriptEnvironment().initialized()) {
 						executeReadyFunction();
 					} else if (documentRequestProcessor.documentScriptEnvironment().initializing()) {
-						// just run us again
+						// just run us again later
 						executors.execute(this);
 					} else {
 						httpRequestInitialExecution();
@@ -158,11 +170,12 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 		final RequiredModule requiredModule = context.requiredModule();
 		final ModuleScriptEnvironment moduleScriptEnvironment = context.moduleScriptEnvironment();
 		
-		executors.execute(new ScriptTask<ScriptEnvironment>("module parent resumption", moduleScriptEnvironment) {
+		String name = "resuming module [" + requiredModule.identifier() + "] in parent [" + requiredModule.baseName() + "]";
+		
+		executors.execute(new ScriptTask<ScriptEnvironment>(name, moduleScriptEnvironment) {
 
 			@Override
 			public void run() {
-				log.debug("resuming module parent with exports");
 				context.restore(requiredModule.parentContext());
 				try {
 					restartAfterContinuation(requiredModule.pendingKey(), moduleScriptEnvironment.exports());
@@ -177,7 +190,9 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	public void submit(final RequiredModule requiredModule, final ModuleScriptEnvironment scriptExecutionEnvironment) {
 		final String identifier = requiredModule.identifier();
 		
-		executors.execute(new ScriptTask<ScriptEnvironment>("module script initialization for [" + identifier + "]", scriptExecutionEnvironment) {
+		String name = "initializing module [" + identifier + "] in parent [" + requiredModule.baseName() + "]";
+		
+		executors.execute(new ScriptTask<ScriptEnvironment>(name, scriptExecutionEnvironment) {
 			
 			@Override
 			public void run() {

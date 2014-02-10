@@ -23,9 +23,12 @@ import static org.hamcrest.Matchers.sameInstance;
 
 import java.nio.file.Paths;
 
+import jj.Closer;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.ExecutionEvent;
+import jj.http.server.CurrentWebSocketConnection;
+import jj.http.server.WebSocketConnection;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -34,6 +37,8 @@ import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.script.MockRhinoContextProvider;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,6 +63,12 @@ public class DocumentScriptEnvironmentTest {
 	@Mock DocumentWebSocketMessageProcessors processors;
 	MockRhinoContextProvider contextMaker;
 	
+	@Mock WebSocketConnection connection;
+	
+	CurrentDocument currentDocument;
+	
+	CurrentWebSocketConnection currentConnection;
+	
 	@Captor ArgumentCaptor<ExecutionEvent> eventCaptor;
 
 	@Before
@@ -66,6 +77,10 @@ public class DocumentScriptEnvironmentTest {
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
 		
 		given(script.path()).willReturn(Paths.get("/"));
+		
+		currentDocument = new CurrentDocument();
+		
+		currentConnection = new CurrentWebSocketConnection();
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
@@ -85,7 +100,56 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {
-		return new DocumentScriptEnvironment(cacheKey, baseName, resourceFinder, contextMaker, api, publisher, scriptCompiler, processors);
+		return new DocumentScriptEnvironment(
+			cacheKey,
+			baseName,
+			resourceFinder,
+			contextMaker,
+			api,
+			publisher,
+			scriptCompiler,
+			processors,
+			currentDocument,
+			currentConnection
+		);
+	}
+	
+	@Test
+	public void testManagesContext() throws Exception {
+		
+		String key = "key";
+		String name = "index";
+		
+		givenAnHtmlResource(name);
+		given(html.document()).willReturn(Jsoup.parse("<html><head><title>test</title></head></html>"));
+		DocumentScriptEnvironment dse = givenADocumentScriptEnvironment(name);
+		
+		// we expect documents to be cloned on first access, and that instance should be maintained
+		Document document = dse.document();
+		
+		try (Closer closer = currentDocument.enterScope(document)) {
+			dse.captureContextForKey(key);
+		}
+		
+		assertThat(currentDocument.current(), is(nullValue()));
+		
+		try (Closer closer = dse.restoreContextForKey(key)) {
+			assertThat(currentDocument.current(), is(sameInstance(document)));
+		}
+
+		assertThat(currentDocument.current(), is(nullValue()));
+		
+		try (Closer closer = currentConnection.enterScope(connection)) {
+			dse.captureContextForKey(key);
+		}
+		
+		assertThat(currentConnection.current(), is(nullValue()));
+		
+		try (Closer closer = dse.restoreContextForKey(key)) {
+			assertThat(currentConnection.current(), is(sameInstance(connection)));
+		}
+		
+		assertThat(currentConnection.current(), is(nullValue()));
 	}
 	
 	@Test

@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 
 import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
+import jj.resource.document.CurrentDocument;
 import jj.script.CurrentScriptContext;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptRunner;
@@ -39,11 +40,18 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	
 	private final CurrentScriptContext context;
 	
+	private final CurrentDocument document;
+	
 	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	public DollarFunction(final CurrentScriptContext context, final CurrentScriptEnvironment env) {
+	public DollarFunction(
+		final CurrentScriptContext context,
+		final CurrentDocument document,
+		final CurrentScriptEnvironment env
+	) {
 		this.context = context;
+		this.document = document;
 		this.env = env;
 	}
 	
@@ -88,6 +96,11 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		WebSocketConnectionHost webSocketConnectionHost = context.webSocketConnectionHost();
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
+			
+			// this works in three modes - initial execution, it registers a function
+			// document in scope, it's a selection API
+			// connection in scope, it's a remote control
+			
 			webSocketConnectionHost.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);
 			return this; 
 		}
@@ -122,10 +135,10 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		
 		// then just select
 		if (result == null) {
-			if (context.connection() != null) {
-				result = new EventSelection(selector, context, env);
+			if (document.current() != null) {
+				result = new DocumentSelection(selector, document.current().select(selector), context);
 			} else {
-				result = new DocumentSelection(selector, context.document().select(selector), context);
+				result = new EventSelection(selector, context, env);
 			}
 		}
 		
@@ -155,8 +168,8 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	private Selection createInternal(String html, Map<?,?> args) {
 		String el = checkSimpleCreation(html);
 		if (el != null) {
-			if (context.document() != null) {
-				Element element = context.document().createElement(el);
+			if (document.current() != null) {
+				Element element = document.current().createElement(el);
 				String id = null;
 				if (args != null) {
 					for (Object key : args.keySet()) {
@@ -183,8 +196,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				context.connection().send(JJMessage.makeInlineCreate(html, args));
 				return new EventSelection(String.format("#%s", args.get(ATTR_ID)), context, env);
 			} else {
-				throw env.preparedContinuation(
-					JJMessage.makeCreate(html, args));
+				throw env.preparedContinuation(JJMessage.makeCreate(html, args));
 			}
 		}
 		

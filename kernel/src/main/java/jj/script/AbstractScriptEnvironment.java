@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.Closer;
 import jj.Sequence;
 import jj.event.Publisher;
 import jj.resource.AbstractResource;
@@ -102,7 +103,6 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	ContinuationPending continuationPending(final String key) {
 		assert continuationPendings.containsKey(key) : "trying to retrieve a nonexistent continuation for " + key;
-		// the continuation coordinator is responsible for 
 		return continuationPendings.remove(key);
 	}
 	
@@ -111,8 +111,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		// DocumentScriptEnvironment needs to save connections and documents, for example
 	}
 	
-	protected void restoreContextForKey(String key) {
-		
+	protected Closer restoreContextForKey(String key) {
+		return new Closer() {
+			
+			@Override
+			public void close() {
+				// nothing to do in the abstract
+			}
+		};
 	}
 
 	/**

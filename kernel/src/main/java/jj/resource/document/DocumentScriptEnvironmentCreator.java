@@ -51,7 +51,12 @@ public class DocumentScriptEnvironmentCreator extends AbstractResourceCreator<Do
 
 	@Override
 	public DocumentScriptEnvironment create(String baseName, Object... args) throws IOException {
-		return creator.createResource(DocumentScriptEnvironment.class, cacheKey(baseName), baseName, Paths.get("/"), args);
+		DocumentScriptEnvironment dse = creator.createResource(DocumentScriptEnvironment.class, cacheKey(baseName), baseName, Paths.get("/"), args);
+		
+		// perform the initial execution immediately
+		
+		
+		return dse;
 	}
 	
 	@Override

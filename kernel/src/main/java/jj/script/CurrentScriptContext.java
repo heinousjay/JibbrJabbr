@@ -6,12 +6,9 @@ import javax.inject.Singleton;
 
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
-import jj.http.HttpRequest;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
-
-import org.jsoup.nodes.Document;
 
 /**
  * Maintains the current context for a thread
@@ -78,14 +75,6 @@ public class CurrentScriptContext implements Closeable {
 	
 	public DocumentRequestProcessor documentRequestProcessor() {
 		return currentContext.get().documentRequestProcessor;
-	}
-	
-	public HttpRequest httpRequest() {
-		return currentContext.get().documentRequestProcessor.httpRequest();
-	}
-	
-	public Document document() {
-		return currentContext.get().documentRequestProcessor.document();
 	}
 	
 	public ScriptContext initialize(final RequiredModule requiredModule, final ModuleScriptEnvironment moduleScriptEnvironment) {

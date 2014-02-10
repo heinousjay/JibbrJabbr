@@ -31,7 +31,9 @@ public abstract class CurrentResource<RESOURCE> {
 	protected final ThreadLocal<RESOURCE> resources = new ThreadLocal<>();
 
 	public Closer enterScope(RESOURCE resource) {
-		assert resources.get() == null : "don't nest! that's not a thing anymore!";
+		final String name = getClass().getSimpleName();
+		
+		assert resources.get() == null : "attempting to nest in " + name;
 		
 		resources.set(resource);
 		

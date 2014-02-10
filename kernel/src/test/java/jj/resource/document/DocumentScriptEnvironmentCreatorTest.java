@@ -23,6 +23,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
+import jj.http.server.CurrentWebSocketConnection;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceMaker;
@@ -79,12 +80,21 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 		givenDocumentScriptEnvironmentResources(baseName());
 		
 		DocumentScriptEnvironment result = 
-			new DocumentScriptEnvironment(cacheKey(), baseName(), resourceFinder, contextProvider, api, publisher, compiler, processors);
+			new DocumentScriptEnvironment(
+				cacheKey(),
+				baseName(),
+				resourceFinder,
+				contextProvider,
+				api,
+				publisher,
+				compiler,
+				processors,
+				new CurrentDocument(),
+				new CurrentWebSocketConnection()
+			);
 		
 		return result;
 	}
-
-
 
 
 	@Override

@@ -41,15 +41,22 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	}
 	
 	/**
-	 * internal method, to allow continuation resumption to restore environment-dependent
-	 * contexts
-	 * @param resource
-	 * @param pendingKey
-	 * @return
+	 * internal method, to allow continuation resumption to also involve environment-dependent
+	 * context restoration
 	 */
-	Closer enterScope(ScriptEnvironment resource, String pendingKey) {
+	Closer enterScope(final AbstractScriptEnvironment scriptEnvironment, final String pendingKey) {
 		
-		return super.enterScope(resource);
+		final Closer environmentCloser = enterScope(scriptEnvironment);
+		final Closer contextCloser = scriptEnvironment.restoreContextForKey(pendingKey);
+		
+		return new Closer() {
+			
+			@Override
+			public void close() {
+				environmentCloser.close();
+				contextCloser.close();
+			}
+		};
 	}
 	
 	protected AbstractScriptEnvironment innerCurrent() {

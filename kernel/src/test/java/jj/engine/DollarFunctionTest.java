@@ -15,11 +15,12 @@
  */
 package jj.engine;
 
-import static org.mockito.BDDMockito.given;
-
 import java.net.URL;
+
+import jj.Closer;
 import jj.engine.DollarFunction;
 import jj.engine.EngineAPI;
+import jj.resource.document.CurrentDocument;
 import jj.script.CurrentScriptContext;
 
 import org.jsoup.Jsoup;
@@ -44,10 +45,12 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 	@Test
 	public void test() throws Exception {
 		
-		given(context.document()).willReturn(document());
+		CurrentDocument document = new CurrentDocument();
 		
-		EngineAPI host = makeHost(new DollarFunction(context, null));
-		basicExecution(host);
+		try (Closer closer = document.enterScope(document())) {
+			EngineAPI host = makeHost(new DollarFunction(context, document, null));
+			basicExecution(host);
+		}
 	}
 
 }

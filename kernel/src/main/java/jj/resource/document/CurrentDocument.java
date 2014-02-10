@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.resource.document;
+
+import javax.inject.Singleton;
+
+import org.jsoup.nodes.Document;
 
 import jj.CurrentResource;
 
 /**
+ * exposes the current document being processed as a resource
  * @author jason
  *
  */
-public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnection> {
+@Singleton
+public class CurrentDocument extends CurrentResource<Document> {
 
-	protected void willClose() {
-		// that's one thing to do!
-		current().end();
-	}
 }

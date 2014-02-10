@@ -123,9 +123,13 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	@Override
-	public boolean resumeContinuation(final ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
+	public boolean resumeContinuation(ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
+		
+		assert scriptEnvironment instanceof AbstractScriptEnvironment : "all script environments must be abstract script environments";
+		
+		final AbstractScriptEnvironment environment = (AbstractScriptEnvironment)scriptEnvironment;
 		
 		final ContinuationPending continuation = ((AbstractScriptEnvironment)scriptEnvironment).continuationPending(pendingKey);
 		if (continuation != null) {
@@ -134,8 +138,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 				
 				@Override
 				public void run(RhinoContext context) {
-					try (Closer closer = env.enterScope(scriptEnvironment, pendingKey)) {
-						context.resumeContinuation(continuation.getContinuation(), scriptEnvironment.scope(), result);
+					try (Closer closer = env.enterScope(environment, pendingKey)) {
+						context.resumeContinuation(continuation.getContinuation(), environment.scope(), result);
 					}
 				}
 			}, scriptEnvironment));
