@@ -40,17 +40,12 @@ public interface ScriptEnvironment extends Resource {
 	Script script();
 	
 	/**
-	 * (hopefully) unique ID for the script, based on the resources that
-	 * compose the execution environment
-	 * @return
-	 */
-	String sha1();
-	
-	/**
 	 * 
 	 * @return
 	 */
 	String scriptName();
+	
+	// this crap needs a wash
 
 	boolean initialized();
 	
@@ -59,8 +54,6 @@ public interface ScriptEnvironment extends Resource {
 	boolean initializing();
 	
 	void initializing(boolean initializing);
-	
-	String baseName();
 
 	/**
 	 * Get a new, empty script object in the scope of this environment

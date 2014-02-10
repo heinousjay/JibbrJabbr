@@ -18,7 +18,7 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 
 /**
  * @author jason
@@ -32,11 +32,11 @@ class ClientDisconnectedFunction extends EventRegistrationFunction {
 
 	/**
 	 * @param functionName
-	 * @param context
+	 * @param env
 	 */
 	@Inject
-	protected ClientDisconnectedFunction(CurrentScriptContext context) {
-		super(HostEvent.clientDisconnected, context);
+	protected ClientDisconnectedFunction(CurrentScriptEnvironment env) {
+		super(HostEvent.clientDisconnected, env);
 	}
 
 }

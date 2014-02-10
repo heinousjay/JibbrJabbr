@@ -22,7 +22,7 @@ package jj;
  * try (Closer closer = resource.enterScope(..something..)) {
  *     // use that resource
  * }
- * 
+ * </pre>
  * @author jason
  *
  */

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 import jj.script.EventNameHelper;
 
 import org.jsoup.nodes.Element;
@@ -27,14 +28,17 @@ class DocumentSelection implements Selection {
 	
 	private final CurrentScriptContext context;
 	
-	public DocumentSelection(final String selector, final Element element, final CurrentScriptContext context) {
-		this(selector, new Elements(element), context);
+	private final CurrentScriptEnvironment env;
+	
+	public DocumentSelection(final String selector, final Element element, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
+		this(selector, new Elements(element), context, env);
 	}
 	
-	public DocumentSelection(final String selector, final Elements elements, final CurrentScriptContext context) {
+	public DocumentSelection(final String selector, final Elements elements, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
 		this.selector = selector;
 		this.elements = elements;
 		this.context = context;
+		this.env = env;
 	}
 	
 	
@@ -222,7 +226,7 @@ class DocumentSelection implements Selection {
 
 	@Override
 	public Object html() {
-		return Context.javaToJS(elements.html(), context.scriptEnvironment().scope());
+		return Context.javaToJS(elements.html(), env.current().scope());
 	}
 
 	public String outerHtml() {
@@ -291,19 +295,19 @@ class DocumentSelection implements Selection {
 	@Override
 	public Selection select(String query) {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.select(query), context);
+		return new DocumentSelection(selector, elements.select(query), context, env);
 	}
 
 	@Override
 	public Selection not(String query) {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.not(query), context);
+		return new DocumentSelection(selector, elements.not(query), context, env);
 	}
 
 	@Override
 	public Selection eq(int index) {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.eq(index), context);
+		return new DocumentSelection(selector, elements.eq(index), context, env);
 	}
 
 	@Override
@@ -314,7 +318,7 @@ class DocumentSelection implements Selection {
 	@Override
 	public Selection parents() {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.parents(), context);
+		return new DocumentSelection(selector, elements.parents(), context, env);
 	}
 
 	@Override
@@ -329,7 +333,7 @@ class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection clone() {
-		return new DocumentSelection(selector, elements.clone(), context);
+		return new DocumentSelection(selector, elements.clone(), context, env);
 	}
 
 	@Override

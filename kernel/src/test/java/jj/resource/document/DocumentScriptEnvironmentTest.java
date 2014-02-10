@@ -297,7 +297,7 @@ public class DocumentScriptEnvironmentTest {
 		
 		HashSet<WebSocketConnection> iterated = new HashSet<>();
 		
-		while (result.nextConnection() != null) {
+		while (result.nextConnection()) {
 			iterated.add(result.currentConnection());
 		}
 		
@@ -326,8 +326,10 @@ public class DocumentScriptEnvironmentTest {
 		
 		result.startBroadcasting();
 		
-		assertThat(iterated1.remove(result.nextConnection()), is(true));
-		assertThat(iterated1.remove(result.nextConnection()), is(true));
+		assertThat(result.nextConnection(), is(true));
+		assertThat(iterated1.remove(result.currentConnection()), is(true));
+		assertThat(result.nextConnection(), is(true));
+		assertThat(iterated1.remove(result.currentConnection()), is(true));
 		
 		String key = "key";
 		
@@ -338,27 +340,39 @@ public class DocumentScriptEnvironmentTest {
 		
 		result.restoreContextForKey(key);
 
-		assertThat(iterated1.remove(result.nextConnection()), is(true));
+		assertThat(result.nextConnection(), is(true));
+		assertThat(iterated1.remove(result.currentConnection()), is(true));
 		
-		// now we nest broadcasting duties - the broadcast function for some reason is also
-		// broadcasting something
-		result.startBroadcasting();
-
-		assertThat(iterated2.remove(result.nextConnection()), is(true));
-		assertThat(iterated2.remove(result.nextConnection()), is(true));
+		{
+			// now we nest broadcasting duties - the broadcast function for some reason is also
+			// broadcasting something
+			// wrapped in its own block for clarity
+			result.startBroadcasting();
+	
+			assertThat(result.nextConnection(), is(true));
+			assertThat(iterated2.remove(result.currentConnection()), is(true));
+			assertThat(result.nextConnection(), is(true));
+			assertThat(iterated2.remove(result.currentConnection()), is(true));
+			
+			// should we continue again here? 
+	
+			assertThat(result.nextConnection(), is(true));
+			assertThat(iterated2.remove(result.currentConnection()), is(true));
+			assertThat(result.nextConnection(), is(true));
+			assertThat(iterated2.remove(result.currentConnection()), is(true));
+			assertThat(result.nextConnection(), is(true));
+			assertThat(iterated2.remove(result.currentConnection()), is(true));
+			assertThat(result.nextConnection(), is(false));
+			
+			result.endBroadcasting();
+			// and we end that without sufferance and so forbears love
+		}
 		
-		// should we continue again here? 
-		
-		assertThat(iterated2.remove(result.nextConnection()), is(true));
-		assertThat(iterated2.remove(result.nextConnection()), is(true));
-		assertThat(iterated2.remove(result.nextConnection()), is(true));
-		
-		result.endBroadcasting();
-		// and we end that without sufferance and so forbears love
-
-		assertThat(iterated1.remove(result.nextConnection()), is(true));
-		assertThat(iterated1.remove(result.nextConnection()), is(true));
-		assertThat(result.nextConnection(), is(nullValue()));
+		assertThat(result.nextConnection(), is(true));
+		assertThat(iterated1.remove(result.currentConnection()), is(true));
+		assertThat(result.nextConnection(), is(true));
+		assertThat(iterated1.remove(result.currentConnection()), is(true));
+		assertThat(result.nextConnection(), is(false));
 		
 		result.endBroadcasting();
 		

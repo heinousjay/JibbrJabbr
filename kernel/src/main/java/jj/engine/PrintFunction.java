@@ -3,7 +3,7 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -17,11 +17,11 @@ class PrintFunction extends BaseFunction implements HostObject {
 	
 	private static final String PRINT = "print";
 
-	private final CurrentScriptContext context;
+	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	public PrintFunction(final CurrentScriptContext context) {
-		this.context = context;
+	public PrintFunction(final CurrentScriptEnvironment env) {
+		this.env = env;
 	}
 	
 	@Override
@@ -55,7 +55,7 @@ class PrintFunction extends BaseFunction implements HostObject {
 		Object printString = args[0];
 		if (printString == null) printString = "<null>";
 		if (printString == Undefined.instance) printString = "<undefined>";
-		LoggerFactory.getLogger(context.scriptEnvironment().scriptName()).debug("{}", printString);
+		LoggerFactory.getLogger(env.current().scriptName()).debug("{}", printString);
 		return Undefined.instance;
 	}
 	

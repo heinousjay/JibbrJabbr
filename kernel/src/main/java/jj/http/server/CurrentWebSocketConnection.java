@@ -41,6 +41,9 @@ public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnect
 	
 	@Override
 	public WebSocketConnection current() {
+		// we have to do something a little special here.  the web socket connection host, if any, may
+		// be broadcasting, and so in that case, we want to use its connection.
+		
 		WebSocketConnection current = resources.get();
 		if (env.currentWebSocketConnectionHost() != null && env.currentWebSocketConnectionHost().broadcasting()) {
 			current = env.currentWebSocketConnectionHost().currentConnection();

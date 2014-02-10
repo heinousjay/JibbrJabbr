@@ -36,7 +36,7 @@ public interface WebSocketConnectionHost extends ScriptEnvironment, FunctionCont
 	
 	void endBroadcasting();
 	
-	WebSocketConnection nextConnection();
+	boolean nextConnection();
 	
 	WebSocketConnection currentConnection();
 }

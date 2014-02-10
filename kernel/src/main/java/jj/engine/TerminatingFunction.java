@@ -18,7 +18,7 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 
 /**
  * @author jason
@@ -32,11 +32,11 @@ class TerminatingFunction extends EventRegistrationFunction {
 
 	/**
 	 * @param functionName
-	 * @param context
+	 * @param env
 	 */
 	@Inject
-	protected TerminatingFunction(CurrentScriptContext context) {
-		super(HostEvent.terminating, context);
+	protected TerminatingFunction(CurrentScriptEnvironment env) {
+		super(HostEvent.terminating, env);
 	}
 
 }

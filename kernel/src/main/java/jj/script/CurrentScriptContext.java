@@ -1,7 +1,5 @@
 package jj.script;
 
-import java.io.Closeable;
-
 import javax.inject.Singleton;
 
 import jj.resource.document.DocumentScriptEnvironment;
@@ -18,7 +16,7 @@ import jj.http.server.servable.document.DocumentRequestProcessor;
  *
  */
 @Singleton
-public class CurrentScriptContext implements Closeable {
+public class CurrentScriptContext {
 	
 	/**
 	 * maintains a per-thread nestable context that the ScriptRunner et al can use
@@ -69,10 +67,6 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get().requiredModule;
 	}
 	
-	private WebSocketConnection connection() {
-		return currentContext.get().connection;
-	}
-	
 	public DocumentRequestProcessor documentRequestProcessor() {
 		return currentContext.get().documentRequestProcessor;
 	}
@@ -115,15 +109,6 @@ public class CurrentScriptContext implements Closeable {
 	}
 	
 	public void end() {
-		// if this was a connection, let it know the context ended
-		if (connection() != null) {
-			connection().end();
-		}
 		currentContext.set(currentContext.get().parent);
-	}
-
-	@Override
-	public void close() {
-		end();
 	}
 }

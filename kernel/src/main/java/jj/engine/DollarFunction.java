@@ -98,7 +98,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		WebSocketConnectionHost webSocketConnectionHost = context.webSocketConnectionHost();
+		WebSocketConnectionHost webSocketConnectionHost = env.currentWebSocketConnectionHost();
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
 			
@@ -141,7 +141,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		// then just select
 		if (result == null) {
 			if (document.current() != null) {
-				result = new DocumentSelection(selector, document.current().select(selector), context);
+				result = new DocumentSelection(selector, document.current().select(selector), context, env);
 			} else {
 				result = new EventSelection(selector, connection, env);
 			}
@@ -192,7 +192,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				} else {
 					newSelection = "#" + id;
 				}
-				return new DocumentSelection(newSelection, element, context);
+				return new DocumentSelection(newSelection, element, context, env);
 			}
 			
 			if (args.containsKey(ATTR_ID)) {

@@ -43,11 +43,11 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 				public void operationComplete(final Future<JJHttpClientResponse> future) throws Exception {
 					
 					try {
-						scriptRunner.submit("REST response with id [" + restRequest.pendingKey() + "]", scriptContext,restRequest.pendingKey(), future.get());
+						scriptRunner.submit("REST response with id [" + restRequest.pendingKey() + "]", scriptContext, restRequest.pendingKey(), future.get());
 					} catch (InterruptedException | CancellationException e) {
 						// ignore this, we're shutting down
 					} catch (ExecutionException e) {
-						scriptRunner.submit("REST response with id [" + restRequest.pendingKey() + "]", scriptContext,restRequest.pendingKey(), e.getCause());
+						scriptRunner.submit("REST response with id [" + restRequest.pendingKey() + "]", scriptContext, restRequest.pendingKey(), e.getCause());
 					}
 				}
 			}

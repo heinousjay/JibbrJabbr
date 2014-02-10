@@ -74,7 +74,8 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 * <code>throw context.prepareContinuation(...)</code>
 	 * so the compiler stays happy, but this method never returns normally
 	 * 
-	 * the result will return a string
+	 * the continuable will be configured to restore the state of the script environment
+	 * on resumption
 	 * 
 	 * @param continuable
 	 * @return

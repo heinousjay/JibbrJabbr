@@ -284,9 +284,9 @@ public class DocumentScriptEnvironment
 	
 	@Override
 	@ScriptThread
-	public WebSocketConnection nextConnection() {
+	public boolean nextConnection() {
 		assert broadcasting();
-		return broadcastStack.pop();
+		return broadcastStack.pop() != null;
 	}
 	
 	@Override

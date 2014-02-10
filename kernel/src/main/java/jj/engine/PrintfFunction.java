@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.script.ScriptResourceType;
-import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -22,11 +22,11 @@ class PrintfFunction extends BaseFunction implements HostObject {
 	
 	private static final Object[] EMPTY_ARGS = {};
 	
-	private final CurrentScriptContext context;
+	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	public PrintfFunction(final CurrentScriptContext context) {
-		this.context = context;
+	public PrintfFunction(final CurrentScriptEnvironment env) {
+		this.env = env;
 	}
 	
 	@Override
@@ -65,7 +65,7 @@ class PrintfFunction extends BaseFunction implements HostObject {
 				Arrays.asList(args).subList(1, args.length).toArray() :
 				EMPTY_ARGS;
 
-		LoggerFactory.getLogger(ScriptResourceType.Server.suffix(context.webSocketConnectionHost().uri())).debug(
+		LoggerFactory.getLogger(ScriptResourceType.Server.suffix(env.currentWebSocketConnectionHost().uri())).debug(
 			String.format(String.valueOf(formatString), toFormat)
 		);
 		return Undefined.instance;
