@@ -7,19 +7,18 @@ An experiment in Java HTTP server concepts.
 [![Build Status](https://travis-ci.org/heinousjay/JibbrJabbr.png?branch=master)](https://travis-ci.org/heinousjay/JibbrJabbr)
 
 Requires [JDK 7](http://openjdk.java.net/install/index.html)
-and [Maven 3](http://maven.apache.org).
 
-Doesn't do a whole heck of a lot, yet.  Run the build,
-put JibbrJabbr-server/JibbrJabbr/target/JibbrJabbr-1.0-SNAPSHOT-all.jar in a directory
-of your choosing, then run
+Build using Gradle, for example
 
-`$JDK7_HOME/bin/java -jar JibbrJabbr-1.0-SNAPSHOT-all.jar /path/to/your/test/directory`
+`./gradlew build`
 
-and browse to
+then you can start the sample with
+`cd build/libs`
+`java -jar Jibbr-Jibbr-0.5.jar app=../../kernel/src/test/resources/app`
+
+then browse to 
 
 [http://localhost:8080](http://localhost:8080)
-
-There is a partial chat sample living in JibbrJabbr-server/JibbrJabbr-kernel/src/test/resources/ you can use to explore.
 
 The capabilities of the system are currently limited.  There 
 is a notion of modules as defined in the commonjs modules spec,
