@@ -6,7 +6,7 @@ import jj.http.HttpRequest;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.DocumentRequestState;
-import jj.resource.document.CurrentDocument;
+import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.ScriptResource;
@@ -64,7 +64,7 @@ public class ScriptRunnerTest {
 		scriptRunner = new ScriptRunnerImpl(
 			continuationCoordinator,
 			currentScriptContext,
-			new CurrentDocument(),
+			new CurrentDocumentRequestProcessor(),
 			executors
 		);
 		

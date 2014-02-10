@@ -14,7 +14,7 @@ import jj.execution.ScriptThread;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.resource.document.CurrentDocument;
+import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 
@@ -36,7 +36,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	
 	private final CurrentScriptContext context;
 	
-	private final CurrentDocument document;
+	private final CurrentDocumentRequestProcessor document;
 	
 	private final JJExecutor executors;
 	
@@ -44,7 +44,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	ScriptRunnerImpl(
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptContext context,
-		final CurrentDocument document,
+		final CurrentDocumentRequestProcessor document,
 		final JJExecutor executors
 	) {
 		this.continuationCoordinator = continuationCoordinator;
@@ -125,7 +125,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 				
 				// this task will become a standalone outside of the script package,
 				// just need to validate that the document stays available even through continuations
-				try (Closer closer = document.enterScope(documentRequestProcessor.document())) { 
+				try (Closer closer = document.enterScope(documentRequestProcessor)) { 
 					context.initialize(documentRequestProcessor);
 					
 					if (documentRequestProcessor.documentScriptEnvironment().initialized()) {

@@ -32,6 +32,7 @@ import jj.execution.ExecutionEvent;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.MockCurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
+import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -64,11 +65,12 @@ public class DocumentScriptEnvironmentTest {
 	@Mock ResourceCacheKey cacheKey;
 	@Mock ScriptCompiler scriptCompiler;
 	@Mock DocumentWebSocketMessageProcessors processors;
+	@Mock DocumentRequestProcessor documentRequestProcessor;
 	MockRhinoContextProvider contextMaker;
 	
 	@Mock WebSocketConnection connection;
 	
-	CurrentDocument currentDocument;
+	CurrentDocumentRequestProcessor currentDocument;
 	
 	CurrentWebSocketConnection currentConnection;
 	
@@ -81,7 +83,7 @@ public class DocumentScriptEnvironmentTest {
 		
 		given(script.path()).willReturn(Paths.get("/"));
 		
-		currentDocument = new CurrentDocument();
+		currentDocument = new CurrentDocumentRequestProcessor();
 		
 		currentConnection = new MockCurrentWebSocketConnection();
 	}
@@ -129,15 +131,16 @@ public class DocumentScriptEnvironmentTest {
 		given(connection.webSocketConnectionHost()).willReturn(dse);
 		// we expect documents to be cloned on first access, and that instance should be maintained
 		Document document = dse.document();
+		given(documentRequestProcessor.document()).willReturn(document);
 		
-		try (Closer closer = currentDocument.enterScope(document)) {
+		try (Closer closer = currentDocument.enterScope(documentRequestProcessor)) {
 			dse.captureContextForKey(key);
 		}
 		
 		assertThat(currentDocument.current(), is(nullValue()));
 		
 		try (Closer closer = dse.restoreContextForKey(key)) {
-			assertThat(currentDocument.current(), is(sameInstance(document)));
+			assertThat(currentDocument.current(), is(sameInstance(documentRequestProcessor)));
 		}
 
 		assertThat(currentDocument.current(), is(nullValue()));

@@ -45,6 +45,7 @@ import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.WebSocketMessageProcessor;
+import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -95,7 +96,7 @@ public class DocumentScriptEnvironment
 	
 	private final WebSocketMessageProcessor processor;
 	
-	private final CurrentDocument currentDocument;
+	private final CurrentDocumentRequestProcessor currentDocument;
 	
 	private final CurrentWebSocketConnection currentConnection;
 	
@@ -116,7 +117,7 @@ public class DocumentScriptEnvironment
 		final Publisher publisher,
 		final ScriptCompiler compiler,
 		final WebSocketMessageProcessor processor,
-		final CurrentDocument currentDocument,
+		final CurrentDocumentRequestProcessor currentDocument,
 		final CurrentWebSocketConnection currentConnection
 	) {
 		super(cacheKey, publisher, contextProvider);
@@ -338,7 +339,7 @@ public class DocumentScriptEnvironment
 		assert !contexts.containsKey(key) : "cannot capture multiple times with the same key";
 		// we can't have both a document and a connection, so this works out neatly...
 		if (currentDocument.current() != null) {
-			contexts.put(key, new Context<Document>(currentDocument, currentDocument.current(), broadcastStack));
+			contexts.put(key, new Context<DocumentRequestProcessor>(currentDocument, currentDocument.current(), broadcastStack));
 		} else if (currentConnection.trueCurrent() != null) {
 			contexts.put(key, new Context<WebSocketConnection>(currentConnection, currentConnection.trueCurrent(), broadcastStack));
 		} else {

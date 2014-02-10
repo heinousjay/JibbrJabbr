@@ -15,12 +15,15 @@
  */
 package jj.engine;
 
+import static org.mockito.BDDMockito.given;
+
 import java.net.URL;
 
 import jj.Closer;
 import jj.engine.DollarFunction;
 import jj.engine.EngineAPI;
-import jj.resource.document.CurrentDocument;
+import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.script.CurrentScriptContext;
 
 import org.jsoup.Jsoup;
@@ -35,6 +38,7 @@ import org.mockito.Mock;
 public class DollarFunctionTest extends AbstractEngineApiTest {
 
 	@Mock CurrentScriptContext context;
+	@Mock DocumentRequestProcessor documentRequestProcessor;
 	
 	private Document document() throws Exception {
 		URL url = getClass().getResource(getClass().getSimpleName() + ".html");
@@ -45,9 +49,10 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 	@Test
 	public void test() throws Exception {
 		
-		CurrentDocument document = new CurrentDocument();
+		CurrentDocumentRequestProcessor document = new CurrentDocumentRequestProcessor();
+		given(documentRequestProcessor.document()).willReturn(document());
 		
-		try (Closer closer = document.enterScope(document())) {
+		try (Closer closer = document.enterScope(documentRequestProcessor)) {
 			EngineAPI host = makeHost(new DollarFunction(context, null, document, null));
 			basicExecution(host);
 		}

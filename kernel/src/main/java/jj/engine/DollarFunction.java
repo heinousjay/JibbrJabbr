@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
-import jj.resource.document.CurrentDocument;
+import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.script.CurrentScriptContext;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptRunner;
@@ -43,7 +43,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	
 	private final CurrentWebSocketConnection connection;
 	
-	private final CurrentDocument document;
+	private final CurrentDocumentRequestProcessor document;
 	
 	private final CurrentScriptEnvironment env;
 	
@@ -51,7 +51,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	public DollarFunction(
 		final CurrentScriptContext context,
 		final CurrentWebSocketConnection connection,
-		final CurrentDocument document,
+		final CurrentDocumentRequestProcessor document,
 		final CurrentScriptEnvironment env
 	) {
 		this.context = context;
@@ -141,7 +141,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		// then just select
 		if (result == null) {
 			if (document.current() != null) {
-				result = new DocumentSelection(selector, document.current().select(selector), context, env);
+				result = new DocumentSelection(selector, document.currentDocument().select(selector), context, env);
 			} else {
 				result = new EventSelection(selector, connection, env);
 			}
@@ -174,7 +174,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		String el = checkSimpleCreation(html);
 		if (el != null) {
 			if (document.current() != null) {
-				Element element = document.current().createElement(el);
+				Element element = document.currentDocument().createElement(el);
 				String id = null;
 				if (args != null) {
 					for (Object key : args.keySet()) {

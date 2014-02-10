@@ -93,7 +93,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 				publisher,
 				compiler,
 				processors,
-				new CurrentDocument(),
+				new CurrentDocumentRequestProcessor(),
 				new MockCurrentWebSocketConnection()
 			);
 		
