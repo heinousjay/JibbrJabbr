@@ -45,7 +45,7 @@ public class ConnectionBroadcastStackTest {
 		connections.add(con1);
 		connections.add(con2);
 		connections.add(con3);
-		ConnectionBroadcastStack stack = new ConnectionBroadcastStack(connections);
+		ConnectionBroadcastStack stack = new ConnectionBroadcastStack(new HashSet<>(connections).iterator());
 		
 		WebSocketConnection current;
 		while ((current = stack.popConnection()) != null) {
@@ -57,7 +57,7 @@ public class ConnectionBroadcastStackTest {
 		connections.add(con1);
 		connections.add(con2);
 		connections.add(con3);
-		stack = new ConnectionBroadcastStack(connections, new ConnectionBroadcastStack.Predicate() {
+		stack = new ConnectionBroadcastStack(new HashSet<>(connections).iterator(), new ConnectionBroadcastStack.Predicate() {
 			int yes = 0;
 			@Override
 			public boolean accept(WebSocketConnection connection) {

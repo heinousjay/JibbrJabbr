@@ -15,9 +15,7 @@
  */
 package jj.http.server;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Represents a subset of current connections built by some predicate,
@@ -38,8 +36,8 @@ class ConnectionBroadcastStack {
 	
 	private ConnectionBroadcastStack parent;
 	
-	ConnectionBroadcastStack(final Set<WebSocketConnection> connections) {
-		this(connections, new Predicate() {
+	ConnectionBroadcastStack(final Iterator<WebSocketConnection> iterator) {
+		this(iterator, new Predicate() {
 			
 			@Override
 			public boolean accept(WebSocketConnection connection) {
@@ -48,8 +46,8 @@ class ConnectionBroadcastStack {
 		});
 	}
 
-	ConnectionBroadcastStack(final Set<WebSocketConnection> connections, final Predicate predicate) {
-		iterator = new HashSet<>(connections).iterator();
+	ConnectionBroadcastStack(final Iterator<WebSocketConnection> iterator, final Predicate predicate) {
+		this.iterator = iterator;
 		this.predicate = predicate;
 	}
 	

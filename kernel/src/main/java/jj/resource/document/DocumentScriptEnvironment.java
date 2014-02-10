@@ -16,7 +16,6 @@
 package jj.resource.document;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -240,7 +239,7 @@ public class DocumentScriptEnvironment
 	
 	@Override
 	public Iterator<WebSocketConnection> iterator() {
-		return Collections.unmodifiableSet(connections).iterator();
+		return new HashSet<>(connections).iterator();
 	}
 	
 	@Override
