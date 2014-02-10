@@ -44,6 +44,7 @@ public class ConnectionEventExecutorTest {
 	@Mock ContinuationCoordinator continuationCoordinator;
 	@Mock CurrentScriptContext context;
 	@Mock Callable eventFunction;
+	@Mock Callable eventFunction2;
 	
 	ConnectionEventExecutor cee;
 	
@@ -75,7 +76,7 @@ public class ConnectionEventExecutorTest {
 
 		//given
 		eventName = EventNameHelper.makeEventName("jason", "miller", "rocks");
-		given(webSocketConnectionHost.getFunction(eventName)).willReturn(null);
+		given(webSocketConnectionHost.getFunction(eventName)).willReturn(eventFunction2);
 		given(connection.getFunction(eventName)).willReturn(eventFunction);
 		
 		// when
