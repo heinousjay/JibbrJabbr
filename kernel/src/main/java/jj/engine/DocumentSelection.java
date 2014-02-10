@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
+import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.EventNameHelper;
 
@@ -26,18 +26,18 @@ class DocumentSelection implements Selection {
 	
 	private final String selector;
 	
-	private final CurrentScriptContext context;
+	private final CurrentDocumentRequestProcessor document;
 	
 	private final CurrentScriptEnvironment env;
 	
-	public DocumentSelection(final String selector, final Element element, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
-		this(selector, new Elements(element), context, env);
+	public DocumentSelection(final String selector, final Element element, final CurrentDocumentRequestProcessor document, final CurrentScriptEnvironment env) {
+		this(selector, new Elements(element), document, env);
 	}
 	
-	public DocumentSelection(final String selector, final Elements elements, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
+	public DocumentSelection(final String selector, final Elements elements, final CurrentDocumentRequestProcessor document, final CurrentScriptEnvironment env) {
 		this.selector = selector;
 		this.elements = elements;
-		this.context = context;
+		this.document = document;
 		this.env = env;
 	}
 	
@@ -48,25 +48,25 @@ class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection hide() {
-		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", null));
+		document.current().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", null));
 		return this;
 	}
 
 	@Override
 	public Selection hide(final String duration) {
-		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", duration));
+		document.current().addStartupJJMessage(JJMessage.makeSet(this.selector, "hide", duration));
 		return this;
 	}
 
 	@Override
 	public Selection show() {
-		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", null));
+		document.current().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", null));
 		return this;
 	}
 
 	@Override
 	public Selection show(final String duration) {
-		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", duration));
+		document.current().addStartupJJMessage(JJMessage.makeSet(this.selector, "show", duration));
 		return this;
 	}
 	
@@ -78,9 +78,9 @@ class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection on(final String type, final String selector, final Callable function) {
-		context.documentRequestProcessor().addStartupJJMessage(JJMessage.makeBind(this.selector, selector, type));
+		document.current().addStartupJJMessage(JJMessage.makeBind(this.selector, selector, type));
 		// this is wrong! we need a way to associate the clients!
-		context.webSocketConnectionHost().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
+		env.currentWebSocketConnectionHost().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
 	}
 	
@@ -295,19 +295,19 @@ class DocumentSelection implements Selection {
 	@Override
 	public Selection select(String query) {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.select(query), context, env);
+		return new DocumentSelection(selector, elements.select(query), document, env);
 	}
 
 	@Override
 	public Selection not(String query) {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.not(query), context, env);
+		return new DocumentSelection(selector, elements.not(query), document, env);
 	}
 
 	@Override
 	public Selection eq(int index) {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.eq(index), context, env);
+		return new DocumentSelection(selector, elements.eq(index), document, env);
 	}
 
 	@Override
@@ -318,7 +318,7 @@ class DocumentSelection implements Selection {
 	@Override
 	public Selection parents() {
 		// FIXME this selector is not correct at all
-		return new DocumentSelection(selector, elements.parents(), context, env);
+		return new DocumentSelection(selector, elements.parents(), document, env);
 	}
 
 	@Override
@@ -333,7 +333,7 @@ class DocumentSelection implements Selection {
 	
 	@Override
 	public Selection clone() {
-		return new DocumentSelection(selector, elements.clone(), context, env);
+		return new DocumentSelection(selector, elements.clone(), document, env);
 	}
 
 	@Override

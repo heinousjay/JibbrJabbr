@@ -24,7 +24,6 @@ import jj.engine.DollarFunction;
 import jj.engine.EngineAPI;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.CurrentDocumentRequestProcessor;
-import jj.script.CurrentScriptContext;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,7 +36,6 @@ import org.mockito.Mock;
  */
 public class DollarFunctionTest extends AbstractEngineApiTest {
 
-	@Mock CurrentScriptContext context;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	
 	private Document document() throws Exception {
@@ -53,7 +51,7 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 		given(documentRequestProcessor.document()).willReturn(document());
 		
 		try (Closer closer = document.enterScope(documentRequestProcessor)) {
-			EngineAPI host = makeHost(new DollarFunction(context, null, document, null));
+			EngineAPI host = makeHost(new DollarFunction(null, document, null));
 			basicExecution(host);
 		}
 	}

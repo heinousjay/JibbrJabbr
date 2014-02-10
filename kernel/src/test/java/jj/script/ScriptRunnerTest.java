@@ -1,6 +1,7 @@
 package jj.script;
 
 import static org.mockito.BDDMockito.*;
+import jj.Closer;
 import jj.execution.MockJJExecutor;
 import jj.http.HttpRequest;
 import jj.http.server.WebSocketConnection;
@@ -48,6 +49,8 @@ public class ScriptRunnerTest {
 	
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	
+	CurrentDocumentRequestProcessor currentDocument;
+	
 	@Mock WebSocketConnection connection;
 	
 	@Mock Callable eventFunction;
@@ -64,7 +67,7 @@ public class ScriptRunnerTest {
 		scriptRunner = new ScriptRunnerImpl(
 			continuationCoordinator,
 			currentScriptContext,
-			new CurrentDocumentRequestProcessor(),
+			currentDocument = new CurrentDocumentRequestProcessor(),
 			executors
 		);
 		
@@ -160,8 +163,10 @@ public class ScriptRunnerTest {
 		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(true);
 		
 		// when
-		scriptRunner.submit("", httpRequestContext, "", null);
-		executors.runUntilIdle();
+		//try (Closer closer = currentDocument.enterScope(documentRequestProcessor)) {
+			scriptRunner.submit("", httpRequestContext, "", null);
+			executors.runUntilIdle();
+		//}
 		
 		// then
 		verify(documentRequestProcessor).respond(); // verifies execution processing

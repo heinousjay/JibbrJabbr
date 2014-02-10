@@ -67,7 +67,7 @@ public class CurrentScriptContext {
 		return currentContext.get().requiredModule;
 	}
 	
-	public DocumentRequestProcessor documentRequestProcessor() {
+	DocumentRequestProcessor documentRequestProcessor() {
 		return currentContext.get().documentRequestProcessor;
 	}
 	

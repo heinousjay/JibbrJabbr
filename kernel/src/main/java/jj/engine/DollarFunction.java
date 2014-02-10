@@ -11,7 +11,6 @@ import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.CurrentDocumentRequestProcessor;
-import jj.script.CurrentScriptContext;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptRunner;
 
@@ -39,8 +38,6 @@ final class DollarFunction extends BaseFunction implements HostObject {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final CurrentScriptContext context;
-	
 	private final CurrentWebSocketConnection connection;
 	
 	private final CurrentDocumentRequestProcessor document;
@@ -49,12 +46,10 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	
 	@Inject
 	public DollarFunction(
-		final CurrentScriptContext context,
 		final CurrentWebSocketConnection connection,
 		final CurrentDocumentRequestProcessor document,
 		final CurrentScriptEnvironment env
 	) {
-		this.context = context;
 		this.connection = connection;
 		this.document = document;
 		this.env = env;
@@ -141,7 +136,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 		// then just select
 		if (result == null) {
 			if (document.current() != null) {
-				result = new DocumentSelection(selector, document.currentDocument().select(selector), context, env);
+				result = new DocumentSelection(selector, document.currentDocument().select(selector), document, env);
 			} else {
 				result = new EventSelection(selector, connection, env);
 			}
@@ -192,7 +187,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				} else {
 					newSelection = "#" + id;
 				}
-				return new DocumentSelection(newSelection, element, context, env);
+				return new DocumentSelection(newSelection, element, document, env);
 			}
 			
 			if (args.containsKey(ATTR_ID)) {

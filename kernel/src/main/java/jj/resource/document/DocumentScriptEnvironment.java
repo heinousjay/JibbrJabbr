@@ -102,6 +102,11 @@ public class DocumentScriptEnvironment
 	
 	private final HashMap<String, Context<?>> contexts = new HashMap<>(10);
 	
+	// this and the methods that manage it should probably go into an AbstractWebSocketConnectionHost
+	// that derives from AbstractScriptEnvironment
+	// it's getting kinda springframeworkesque in a hierarchy sense but it's really just mix-ins of layers
+	// of functionality
+	// i may wait on it until i come up with another environment that wants connections
 	private ConnectionBroadcastStack broadcastStack;
 	
 	/**

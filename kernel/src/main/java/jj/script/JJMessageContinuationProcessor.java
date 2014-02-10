@@ -8,6 +8,7 @@ import jj.jjmessage.JJMessage;
 
 /**
  * Kinda simple as these things go
+ * should live in the same package as the messages and get added using a facility for such things
  * @author jason
  *
  */
