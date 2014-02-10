@@ -6,6 +6,7 @@ import static jj.jjmessage.JJMessage.Type.*;
 
 import java.util.Map;
 
+import jj.http.server.WebSocketMessage;
 import jj.script.Continuable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author jason
  *
  */
-public class JJMessage implements Continuable {
+public class JJMessage implements Continuable, WebSocketMessage {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
@@ -326,6 +327,11 @@ public class JJMessage implements Continuable {
 		} catch (Exception e) {
 			throw new JJMessageException(e);
 		}
+	}
+	
+	@Override
+	public String stringify() {
+		return toString();
 	}
 	
 	public static JJMessage fromString(String input) {

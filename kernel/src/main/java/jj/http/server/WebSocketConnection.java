@@ -16,7 +16,6 @@ import javax.inject.Singleton;
 import org.mozilla.javascript.Callable;
 
 import jj.DateFormatHelper;
-import jj.jjmessage.JJMessage;
 import jj.script.FunctionContext;
 
 @Singleton
@@ -31,13 +30,14 @@ public class WebSocketConnection implements FunctionContext {
 	
 	private final HashMap<String, Object> clientStorage = new HashMap<>(4);
 	
-	// TODO get this out of there.  connections should be protocol agnostic
-	private final List<JJMessage> messages = new ArrayList<>(4);
+	private final List<WebSocketMessage> messages = new ArrayList<>(4);
 	
 	private final String description;
 	
 	// accessed from many threads
 	private volatile long lastActivity = System.currentTimeMillis();
+	
+	private ConnectionBroadcastStack broadcastStack;
 
 	@Inject
 	WebSocketConnection(
@@ -93,7 +93,7 @@ public class WebSocketConnection implements FunctionContext {
 		return clientStorage;
 	}
 	
-	public WebSocketConnection send(JJMessage message) {
+	public WebSocketConnection send(WebSocketMessage message) {
 		messages.add(message);
 		return this;
 	}
@@ -109,8 +109,8 @@ public class WebSocketConnection implements FunctionContext {
 		StringBuilder output = new StringBuilder();
 		if (!messages.isEmpty()) {
 			output.append("[");
-			for (JJMessage message : messages) {
-				output.append(message).append(',');
+			for (WebSocketMessage message : messages) {
+				output.append(message.stringify()).append(',');
 			}
 			output.setCharAt(output.length() - 1, ']');
 			messages.clear();
