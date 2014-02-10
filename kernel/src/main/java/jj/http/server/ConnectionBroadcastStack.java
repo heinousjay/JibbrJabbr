@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.document;
+package jj.http.server;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import jj.http.server.WebSocketConnection;
 
 /**
  * Represents a subset of current connections built by some predicate,

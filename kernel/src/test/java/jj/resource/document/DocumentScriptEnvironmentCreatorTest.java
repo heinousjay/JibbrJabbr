@@ -24,6 +24,8 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.http.server.CurrentWebSocketConnection;
+import jj.http.server.servable.document.DocumentConfiguration;
+import jj.http.server.servable.document.MockDocumentConfiguration;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceMaker;
@@ -59,6 +61,8 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	}
 	
 	private void givenMinimalServices() throws Exception {
+		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
+		
 		resourceMaker = new ResourceMaker(configuration);
 		
 		contextProvider = new MockRhinoContextProvider();

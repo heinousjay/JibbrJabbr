@@ -33,8 +33,6 @@ import java.nio.file.Path;
 import jj.BasePath;
 import jj.SHA1Helper;
 import jj.configuration.Configuration;
-import jj.http.server.servable.document.DocumentConfiguration;
-import jj.http.server.servable.document.MockDocumentConfiguration;
 import jj.resource.css.CssResource;
 
 import org.hamcrest.Matchers;
@@ -59,7 +57,6 @@ public abstract class RealResourceBase {
 	public final void init() throws Exception {
 		appPath = BasePath.appPath();
 		given(configuration.appPath()).willReturn(appPath);
-		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
 	}
 	
 	protected <T extends Resource> T testResource(final T resource) throws Exception {

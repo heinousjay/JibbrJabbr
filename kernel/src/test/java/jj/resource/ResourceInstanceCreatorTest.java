@@ -25,6 +25,8 @@ import jj.configuration.Configuration;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.http.server.WebSocketMessageProcessor;
+import jj.http.server.servable.document.DocumentConfiguration;
+import jj.http.server.servable.document.MockDocumentConfiguration;
 import jj.logging.EmergencyLogger;
 import jj.resource.asset.Asset;
 import jj.resource.asset.AssetResource;
@@ -131,6 +133,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	@Test
 	public void testHtmlResource() throws Exception {
+		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
 		doCreate(HtmlResource.class, "index.html");
 	}
 	
