@@ -23,9 +23,9 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.StringUtils;
 import jj.engine.EventSelection;
 import jj.http.server.ConnectionEventExecutor;
+import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.EventNameHelper;
 import jj.script.ScriptJSON;
@@ -38,19 +38,19 @@ import jj.script.ScriptJSON;
 class EventMessageProcessor implements DocumentWebSocketMessageProcessor {
 
 	private final ConnectionEventExecutor executor;
-	private final CurrentScriptContext context;
+	private final CurrentWebSocketConnection currentConnection;
 	private final CurrentScriptEnvironment env;
 	private final ScriptJSON scriptJSON;
 	
 	@Inject
 	EventMessageProcessor(
 		final ConnectionEventExecutor executor,
-		final CurrentScriptContext context,
+		final CurrentWebSocketConnection currentConnection,
 		final CurrentScriptEnvironment env,
 		final ScriptJSON scriptJSON
 	) {
 		this.executor = executor;
-		this.context = context;
+		this.currentConnection = currentConnection;
 		this.env = env;
 		this.scriptJSON = scriptJSON;
 	}
@@ -60,7 +60,7 @@ class EventMessageProcessor implements DocumentWebSocketMessageProcessor {
 		
 		ScriptableObject event = connection.webSocketConnectionHost().newObject();
 		
-		EventSelection target = new EventSelection(message.event().target, context, env);
+		EventSelection target = new EventSelection(message.event().target, currentConnection, env);
 		event.defineProperty("target", target, ScriptableObject.CONST);
 		if (!StringUtils.isEmpty(message.event().form)) {
 			event.defineProperty("form", scriptJSON.parse(message.event().form), ScriptableObject.CONST);

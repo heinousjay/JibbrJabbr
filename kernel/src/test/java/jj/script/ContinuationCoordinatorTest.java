@@ -16,14 +16,12 @@
 package jj.script;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.Closer;
 import jj.jjmessage.JJMessage;
 
 import org.junit.Before;
@@ -60,8 +58,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock AbstractScriptEnvironment scriptEnvironment;
 	
-	@Mock CurrentScriptEnvironment env;
-	@Mock Closer closer;
+	CurrentScriptEnvironment env = new CurrentScriptEnvironment(new MockRhinoContextProvider());
 	
 	@Mock ContinuationPending continuation;
 	
@@ -86,7 +83,7 @@ public class ContinuationCoordinatorTest {
 	@Before
 	public void before() {
 		
-		given(env.enterScope(any(ScriptEnvironment.class))).willReturn(closer);
+		MockRhinoContextProvider contextProvider = new MockRhinoContextProvider();
 		
 		given(scriptEnvironment.script()).willReturn(script);
 		given(scriptEnvironment.scope()).willReturn(scope);
@@ -99,24 +96,8 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(RestRequest.class, continuationProcessor1);
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
-		
-		MockRhinoContextProvider contextProvider = new MockRhinoContextProvider();
 		context = contextProvider.get();
 		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, logger, continuationProcessors);
-	}
-	
-	public void verifyDefaultContextMaintained() {
-		// the continuation coordinator is responsible for maining the scope
-		// of the script environment
-		verify(env).enterScope(scriptEnvironment);
-		assertThat(env.current(), is(nullValue()));
-	}
-	
-	public void verifyContinuedContextMaintained() {
-		// the continuation coordinator is responsible for maining the scope
-		// of the script environment
-		verify(env).enterScope(eq(scriptEnvironment), anyString());
-		assertThat(env.current(), is(nullValue()));
 	}
 	
 	@Test
@@ -125,7 +106,6 @@ public class ContinuationCoordinatorTest {
 		boolean result = continuationCoordinator.execute(scriptEnvironment);
 		
 		assertThat(result, is(true));
-		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -137,7 +117,6 @@ public class ContinuationCoordinatorTest {
 
 		assertThat(result, is(false));
 		verify(continuationProcessor2).process(continuationState);
-		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -153,7 +132,6 @@ public class ContinuationCoordinatorTest {
 		
 		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
 		verify(logger).error("", e);
-		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -162,7 +140,6 @@ public class ContinuationCoordinatorTest {
 		boolean result = continuationCoordinator.execute(scriptEnvironment, function, args[0], args[1]);
 		
 		assertThat(result, is(true));
-		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -174,7 +151,6 @@ public class ContinuationCoordinatorTest {
 		
 		assertThat(result, is(false));
 		verify(continuationProcessor2).process(continuationState);
-		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -190,7 +166,6 @@ public class ContinuationCoordinatorTest {
 		
 		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
 		verify(logger).error("", e);
-		verifyDefaultContextMaintained();
 	}
 	
 	@Test
@@ -214,7 +189,6 @@ public class ContinuationCoordinatorTest {
 		
 		assertThat(result, is(false));
 		verify(continuationProcessor2).process(continuationState);
-		verifyContinuedContextMaintained();
 	}
 	
 	@Test
@@ -232,7 +206,6 @@ public class ContinuationCoordinatorTest {
 		
 		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
 		verify(logger).error("", e);
-		verifyContinuedContextMaintained();
 	}
 
 }

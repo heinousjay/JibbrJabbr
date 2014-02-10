@@ -17,17 +17,20 @@ package jj.resource.document;
 
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
 import java.nio.file.Paths;
+import java.util.HashSet;
 
 import jj.Closer;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.ExecutionEvent;
 import jj.http.server.CurrentWebSocketConnection;
+import jj.http.server.MockCurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
@@ -80,7 +83,7 @@ public class DocumentScriptEnvironmentTest {
 		
 		currentDocument = new CurrentDocument();
 		
-		currentConnection = new CurrentWebSocketConnection();
+		currentConnection = new MockCurrentWebSocketConnection();
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
@@ -123,7 +126,7 @@ public class DocumentScriptEnvironmentTest {
 		givenAnHtmlResource(name);
 		given(html.document()).willReturn(Jsoup.parse("<html><head><title>test</title></head></html>"));
 		DocumentScriptEnvironment dse = givenADocumentScriptEnvironment(name);
-		
+		given(connection.webSocketConnectionHost()).willReturn(dse);
 		// we expect documents to be cloned on first access, and that instance should be maintained
 		Document document = dse.document();
 		
@@ -241,7 +244,7 @@ public class DocumentScriptEnvironmentTest {
 		givenAClientScript(name);
 		givenASharedScript(name);
 		
-		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);;
+		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);
 		
 		assertThat(result.sha1().length(), is(40));
 		assertThat(result.uri(), is("/" + result.sha1() + "/" + name));
@@ -249,5 +252,117 @@ public class DocumentScriptEnvironmentTest {
 		
 		assertThat(result.scope(), is(nullValue()));
 		assertThat(result.script(), is(nullValue()));
+	}
+	
+	@Mock WebSocketConnection connection1;
+	@Mock WebSocketConnection connection2;
+	@Mock WebSocketConnection connection3;
+	@Mock WebSocketConnection connection4;
+	@Mock WebSocketConnection connection5;
+	
+	private DocumentScriptEnvironment givenAConnectedDocumentScriptEnvironment() throws Exception {
+		
+		String name = "index";
+		
+		givenAnHtmlResource(name);
+		givenAClientScript(name);
+		givenAServerScript(name);
+		
+		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);
+		
+		result.connected(connection1);
+		result.connected(connection2);
+		result.connected(connection3);
+		result.connected(connection4);
+		result.connected(connection5);
+		given(connection1.webSocketConnectionHost()).willReturn(result);
+		given(connection2.webSocketConnectionHost()).willReturn(result);
+		given(connection3.webSocketConnectionHost()).willReturn(result);
+		given(connection4.webSocketConnectionHost()).willReturn(result);
+		given(connection5.webSocketConnectionHost()).willReturn(result);
+		
+		return result;
+	}
+	
+	@Test
+	public void testConnectionBroadcasting() throws Exception {
+		
+		DocumentScriptEnvironment result = givenAConnectedDocumentScriptEnvironment();
+
+		assertThat(result.broadcasting(), is(false));
+		result.startBroadcasting();
+		assertThat(result.broadcasting(), is(true));
+		
+		assertThat(result.currentConnection(), is(nullValue()));
+		
+		HashSet<WebSocketConnection> iterated = new HashSet<>();
+		
+		while (result.nextConnection() != null) {
+			iterated.add(result.currentConnection());
+		}
+		
+		result.endBroadcasting();
+		assertThat(result.broadcasting(), is(false));
+		
+		assertThat(iterated, containsInAnyOrder(connection1, connection2, connection3, connection4, connection5));
+	}
+	
+	private HashSet<WebSocketConnection> makeSet() {
+		HashSet<WebSocketConnection> result = new HashSet<>();
+		result.add(connection1);
+		result.add(connection2);
+		result.add(connection3);
+		result.add(connection4);
+		result.add(connection5);
+		return result;
+	}
+	
+	@Test
+	public void testConnectionBroadcastingWithContinuationAndNesting() throws Exception {
+		
+		DocumentScriptEnvironment result = givenAConnectedDocumentScriptEnvironment();
+		HashSet<WebSocketConnection> iterated1 = makeSet();
+		HashSet<WebSocketConnection> iterated2 = makeSet();
+		
+		result.startBroadcasting();
+		
+		assertThat(iterated1.remove(result.nextConnection()), is(true));
+		assertThat(iterated1.remove(result.nextConnection()), is(true));
+		
+		String key = "key";
+		
+		result.captureContextForKey(key);
+		result.end();
+		
+		assertThat(result.currentConnection(), is(nullValue()));
+		
+		result.restoreContextForKey(key);
+
+		assertThat(iterated1.remove(result.nextConnection()), is(true));
+		
+		// now we nest broadcasting duties - the broadcast function for some reason is also
+		// broadcasting something
+		result.startBroadcasting();
+
+		assertThat(iterated2.remove(result.nextConnection()), is(true));
+		assertThat(iterated2.remove(result.nextConnection()), is(true));
+		
+		// should we continue again here? 
+		
+		assertThat(iterated2.remove(result.nextConnection()), is(true));
+		assertThat(iterated2.remove(result.nextConnection()), is(true));
+		assertThat(iterated2.remove(result.nextConnection()), is(true));
+		
+		result.endBroadcasting();
+		// and we end that without sufferance and so forbears love
+
+		assertThat(iterated1.remove(result.nextConnection()), is(true));
+		assertThat(iterated1.remove(result.nextConnection()), is(true));
+		assertThat(result.nextConnection(), is(nullValue()));
+		
+		result.endBroadcasting();
+		
+		assertTrue(iterated1.isEmpty());
+		assertTrue(iterated2.isEmpty());
 	}
 }

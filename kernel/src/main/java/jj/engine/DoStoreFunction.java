@@ -3,8 +3,8 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.server.CurrentWebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -17,11 +17,11 @@ class DoStoreFunction extends BaseFunction implements HostObject, ContributesScr
 	
 	private static final String PROP_DO_STORE = "//doStore";
 	
-	private final CurrentScriptContext context;
+	private final CurrentWebSocketConnection connection;
 	
 	@Inject
-	public DoStoreFunction(final CurrentScriptContext context) {
-		this.context = context;
+	public DoStoreFunction(final CurrentWebSocketConnection connection) {
+		this.connection = connection;
 	}
 	
 	@Override
@@ -56,10 +56,10 @@ class DoStoreFunction extends BaseFunction implements HostObject, ContributesScr
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		if (context.connection() == null) {
+		if (connection.current() == null) {
 			throw new IllegalStateException("cannot store remote info without a connected client in context");
 		}
-		context.connection().send(JJMessage.makeStore(String.valueOf(args[0]), String.valueOf(args[1])));
+		connection.current().send(JJMessage.makeStore(String.valueOf(args[0]), String.valueOf(args[1])));
 		return Undefined.instance;
 	}
 	

@@ -172,7 +172,6 @@ public class ScriptRunnerTest {
 		given(connection.baseName()).willReturn(baseName);
 		given(connection.getFunction(any(String.class))).willReturn(eventFunction);
 		given(connection.webSocketConnectionHost()).willReturn(documentScriptEnvironment);
-		given(currentScriptContext.connection()).willReturn(connection);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.WebSocket);
 		
 	}

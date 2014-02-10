@@ -24,7 +24,7 @@ import java.util.Iterator;
  * @author jason
  *
  */
-class ConnectionBroadcastStack {
+public class ConnectionBroadcastStack {
 	
 	public interface Predicate {
 		boolean accept(WebSocketConnection connection);
@@ -34,10 +34,12 @@ class ConnectionBroadcastStack {
 	
 	private final Predicate predicate;
 	
-	private ConnectionBroadcastStack parent;
+	private WebSocketConnection current;
 	
-	ConnectionBroadcastStack(final Iterator<WebSocketConnection> iterator) {
-		this(iterator, new Predicate() {
+	private final ConnectionBroadcastStack parent;
+	
+	public ConnectionBroadcastStack(final ConnectionBroadcastStack parent, final Iterator<WebSocketConnection> iterator) {
+		this(parent, iterator, new Predicate() {
 			
 			@Override
 			public boolean accept(WebSocketConnection connection) {
@@ -46,7 +48,8 @@ class ConnectionBroadcastStack {
 		});
 	}
 
-	ConnectionBroadcastStack(final Iterator<WebSocketConnection> iterator, final Predicate predicate) {
+	public ConnectionBroadcastStack(final ConnectionBroadcastStack parent, final Iterator<WebSocketConnection> iterator, final Predicate predicate) {
+		this.parent = parent;
 		this.iterator = iterator;
 		this.predicate = predicate;
 	}
@@ -55,22 +58,29 @@ class ConnectionBroadcastStack {
 		return iterator.hasNext() ? iterator.next() : null;
 	}
 	
-	public WebSocketConnection popConnection() {
-		WebSocketConnection next;
-		while((next = getNext()) != null) {
-			if (predicate.accept(next)) break;
+	/**
+	 * the next connection in the broadcast, subsequently available from peek
+	 */
+	public WebSocketConnection pop() {
+		if (current != null) {
+			current.end();
 		}
 		
-		return next;
+		while((current = getNext()) != null) {
+			if (predicate.accept(current)) break;
+		}
+		
+		return current;
+	}
+
+	/**
+	 * the connection as last returned by popConnection
+	 */
+	public WebSocketConnection peek() {
+		return current;
 	}
 	
-	public void push(final ConnectionBroadcastStack parent) {
-		this.parent = this;
-	}
-	
-	public ConnectionBroadcastStack pop() {
-		ConnectionBroadcastStack result = parent;
-		parent = null;
-		return result;
+	public ConnectionBroadcastStack parent() {
+		return parent;
 	}
 }

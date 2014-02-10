@@ -16,10 +16,11 @@ import javax.inject.Singleton;
 import org.mozilla.javascript.Callable;
 
 import jj.DateFormatHelper;
+import jj.ResourceAware;
 import jj.script.FunctionContext;
 
 @Singleton
-public class WebSocketConnection implements FunctionContext {
+public class WebSocketConnection implements FunctionContext, ResourceAware {
 	
 	// start off with room for three functions
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
@@ -36,8 +37,6 @@ public class WebSocketConnection implements FunctionContext {
 	
 	// accessed from many threads
 	private volatile long lastActivity = System.currentTimeMillis();
-	
-	private ConnectionBroadcastStack broadcastStack;
 
 	@Inject
 	WebSocketConnection(
@@ -98,6 +97,12 @@ public class WebSocketConnection implements FunctionContext {
 		return this;
 	}
 	
+	@Override
+	public void start() {
+		// nothing to do
+	}
+	
+	@Override
 	public void end() {
 		if (!messages.isEmpty()) {
 			String message = serialize();

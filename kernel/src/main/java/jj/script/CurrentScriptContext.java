@@ -69,7 +69,7 @@ public class CurrentScriptContext implements Closeable {
 		return currentContext.get().requiredModule;
 	}
 	
-	public WebSocketConnection connection() {
+	private WebSocketConnection connection() {
 		return currentContext.get().connection;
 	}
 	

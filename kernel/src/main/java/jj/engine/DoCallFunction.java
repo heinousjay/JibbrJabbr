@@ -3,8 +3,8 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.server.CurrentWebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -17,11 +17,11 @@ public class DoCallFunction extends BaseFunction implements HostObject {
 	
 	public static final String PROP_DO_CALL = "//doCall";
 	
-	private final CurrentScriptContext context;
+	private final CurrentWebSocketConnection connection;
 	
 	@Inject
-	public DoCallFunction(final CurrentScriptContext context) {
-		this.context = context;
+	public DoCallFunction(final CurrentWebSocketConnection connection) {
+		this.connection = connection;
 	}
 	
 	@Override
@@ -51,10 +51,10 @@ public class DoCallFunction extends BaseFunction implements HostObject {
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		if (context.connection() == null) {
+		if (connection.current() == null) {
 			throw new IllegalStateException("cannot call remote functions without a connected client in context");
 		}
-		context.connection().send(JJMessage.makeCall(String.valueOf(args[0]), String.valueOf(args[1])));
+		connection.current().send(JJMessage.makeCall(String.valueOf(args[0]), String.valueOf(args[1])));
 		return Undefined.instance;
 	}
 	

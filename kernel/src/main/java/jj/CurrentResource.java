@@ -30,19 +30,26 @@ public abstract class CurrentResource<RESOURCE> {
 	
 	protected final ThreadLocal<RESOURCE> resources = new ThreadLocal<>();
 
-	public Closer enterScope(RESOURCE resource) {
+	public final Closer enterScope(final RESOURCE resource) {
 		final String name = getClass().getSimpleName();
 		
 		assert resources.get() == null : "attempting to nest in " + name;
 		
 		resources.set(resource);
 		
+		if (resource instanceof ResourceAware) {
+			((ResourceAware)resource).start();
+		}
+		
 		return new Closer() {
 			
 			@Override
 			public void close() {
-				willClose();
 				resources.set(null);
+				
+				if (resource instanceof ResourceAware) {
+					((ResourceAware)resource).end();
+				}
 			}
 		};
 	}
@@ -50,6 +57,4 @@ public abstract class CurrentResource<RESOURCE> {
 	public RESOURCE current() {
 		return resources.get();
 	}
-	
-	protected void willClose() {}
 }

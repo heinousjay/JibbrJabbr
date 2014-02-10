@@ -52,7 +52,7 @@ public class ConnectionEventExecutorTest {
 	public void before() {
 		executor = new MockJJExecutor();
 		
-		cee = new ConnectionEventExecutor(executor, continuationCoordinator, context, new CurrentWebSocketConnection());
+		cee = new ConnectionEventExecutor(executor, continuationCoordinator, context, new MockCurrentWebSocketConnection());
 		
 		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
 	}

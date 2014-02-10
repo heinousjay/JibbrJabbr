@@ -48,7 +48,7 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 		CurrentDocument document = new CurrentDocument();
 		
 		try (Closer closer = document.enterScope(document())) {
-			EngineAPI host = makeHost(new DollarFunction(context, document, null));
+			EngineAPI host = makeHost(new DollarFunction(context, null, document, null));
 			basicExecution(host);
 		}
 	}

@@ -23,7 +23,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
-import jj.http.server.CurrentWebSocketConnection;
+import jj.http.server.MockCurrentWebSocketConnection;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
 import jj.resource.ResourceBase;
@@ -94,7 +94,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 				compiler,
 				processors,
 				new CurrentDocument(),
-				new CurrentWebSocketConnection()
+				new MockCurrentWebSocketConnection()
 			);
 		
 		return result;

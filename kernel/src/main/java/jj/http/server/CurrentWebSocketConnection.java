@@ -15,16 +15,36 @@
  */
 package jj.http.server;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.CurrentResource;
+import jj.script.CurrentScriptEnvironment;
 
 /**
  * @author jason
  *
  */
+@Singleton
 public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnection> {
 
-	protected void willClose() {
-		// that's one thing to do!
-		current().end();
+	private final CurrentScriptEnvironment env;
+	
+	@Inject
+	CurrentWebSocketConnection(final CurrentScriptEnvironment env) {
+		this.env = env;
+	}
+	
+	public WebSocketConnection trueCurrent() {
+		return resources.get();
+	}
+	
+	@Override
+	public WebSocketConnection current() {
+		WebSocketConnection current = resources.get();
+		if (env.currentWebSocketConnectionHost() != null && env.currentWebSocketConnectionHost().broadcasting()) {
+			current = env.currentWebSocketConnectionHost().currentConnection();
+		}
+		return current;
 	}
 }

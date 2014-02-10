@@ -3,6 +3,7 @@ package jj.script;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.server.CurrentWebSocketConnection;
 import jj.jjmessage.JJMessage;
 
 /**
@@ -13,11 +14,11 @@ import jj.jjmessage.JJMessage;
 @Singleton
 class JJMessageContinuationProcessor implements ContinuationProcessor {
 	
-	private final CurrentScriptContext context;
+	private final CurrentWebSocketConnection connection;
 	
 	@Inject
-	JJMessageContinuationProcessor(final CurrentScriptContext context) {
-		this.context = context;
+	JJMessageContinuationProcessor(final CurrentWebSocketConnection connection) {
+		this.connection = connection;
 	}
 
 	@Override
@@ -26,7 +27,7 @@ class JJMessageContinuationProcessor implements ContinuationProcessor {
 		// of a connected WebSocket client, we we just send the message
 		// along to the client and let any results get handled by
 		// the connection listener
-		context.connection().send(continuationState.continuableAs(JJMessage.class));
+		connection.current().send(continuationState.continuableAs(JJMessage.class));
 	}
 
 }

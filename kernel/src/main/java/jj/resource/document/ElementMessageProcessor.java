@@ -19,9 +19,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.EventSelection;
+import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptRunner;
 
@@ -36,20 +36,24 @@ class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
 
 	private final ScriptRunner scriptRunner;
 	
-	private final CurrentScriptContext context;
+	private final CurrentWebSocketConnection currentConnection;
 	
 	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	ElementMessageProcessor(final ScriptRunner scriptRunner, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
+	ElementMessageProcessor(final ScriptRunner scriptRunner, final CurrentWebSocketConnection connection, final CurrentScriptEnvironment env) {
 		this.scriptRunner = scriptRunner;
-		this.context = context;
+		this.currentConnection = connection;
 		this.env = env;
 	}
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
-		scriptRunner.submitPendingResult(connection, message.element().id, new EventSelection(message.element().selector, context, env));
+		scriptRunner.submitPendingResult(
+			connection,
+			message.element().id,
+			new EventSelection(message.element().selector, currentConnection, env)
+		);
 	}
 
 }

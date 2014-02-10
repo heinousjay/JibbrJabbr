@@ -13,30 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
-
-import jj.script.FunctionContext;
-import jj.script.ScriptEnvironment;
+package jj;
 
 /**
+ * Can be implemented by resources managed by current resource, and it will
+ * get notified when it is transitioned
+ * 
  * @author jason
  *
  */
-public interface WebSocketConnectionHost extends ScriptEnvironment, FunctionContext {
+public interface ResourceAware {
 
-	void connected(WebSocketConnection connection);
-
-	void disconnected(WebSocketConnection connection);
+	void start();
 	
-	void message(WebSocketConnection connection, String message);
-	
-	void startBroadcasting();
-	
-	boolean broadcasting();
-	
-	void endBroadcasting();
-	
-	WebSocketConnection nextConnection();
-	
-	WebSocketConnection currentConnection();
+	void end();
 }

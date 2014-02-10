@@ -1,11 +1,9 @@
 package jj.engine;
 
+import jj.http.server.CurrentWebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.script.CurrentScriptContext;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.EventNameHelper;
-import jj.script.ScriptContextType;
-
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.Callable;
 
@@ -18,18 +16,18 @@ public class EventSelection implements Selection {
 
 	private final String selector;
 	
-	private final CurrentScriptContext context;
+	private final CurrentWebSocketConnection connection;
 	
 	private final CurrentScriptEnvironment env;
 	
-	public EventSelection(final String selector, final CurrentScriptContext context, final CurrentScriptEnvironment env) {
+	public EventSelection(final String selector, final CurrentWebSocketConnection connection, final CurrentScriptEnvironment env) {
 		this.selector = selector;
-		this.context = context;
+		this.connection = connection;
 		this.env = env;
 	}
 	
 	private void verifyContext(final String actionDescription) {
-		if (context.type() != ScriptContextType.WebSocket) {
+		if (connection.current() == null) {
 			throw new IllegalStateException("cannot " + actionDescription + " from this context");
 		}
 	}
@@ -42,28 +40,28 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection hide() {
 		verifyContext("hide a selection");
-		context.connection().send(JJMessage.makeSet(this.selector, "hide", null));
+		connection.current().send(JJMessage.makeSet(this.selector, "hide", null));
 		return this;
 	}
 
 	@Override
 	public Selection hide(final String duration) {
 		verifyContext("hide a selection");
-		context.connection().send(JJMessage.makeSet(this.selector, "hide", duration));
+		connection.current().send(JJMessage.makeSet(this.selector, "hide", duration));
 		return this;
 	}
 
 	@Override
 	public Selection show() {
 		verifyContext("show a selection");
-		context.connection().send(JJMessage.makeSet(this.selector, "show", null));
+		connection.current().send(JJMessage.makeSet(this.selector, "show", null));
 		return this;
 	}
 
 	@Override
 	public Selection show(final String duration) {
 		verifyContext("show a selection");
-		context.connection().send(JJMessage.makeSet(this.selector, "show", duration));
+		connection.current().send(JJMessage.makeSet(this.selector, "show", duration));
 		return this;
 	}
 	
@@ -75,8 +73,8 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection on(String type, String selector, Callable function) {
 		verifyContext("bind an event");
-		context.connection().send(JJMessage.makeBind(this.selector, selector, type));
-		context.connection().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
+		connection.current().send(JJMessage.makeBind(this.selector, selector, type));
+		connection.current().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
 	}
 	
@@ -86,8 +84,8 @@ public class EventSelection implements Selection {
 	
 	public Selection off(String type, String selector) {
 		verifyContext("unbind an event");
-		if (context.connection().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type))) {
-			context.connection().send(JJMessage.makeUnbind(this.selector, selector, type));
+		if (connection.current().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type))) {
+			connection.current().send(JJMessage.makeUnbind(this.selector, selector, type));
 		}
 		return this;
 		
@@ -99,8 +97,8 @@ public class EventSelection implements Selection {
 	
 	public Selection off(String type, String selector, Callable function) {
 		verifyContext("unbind an event");
-		if (context.connection().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type), function)) {
-			context.connection().send(JJMessage.makeUnbind(this.selector, selector, type));
+		if (connection.current().removeFunction(EventNameHelper.makeEventName(this.selector, selector, type), function)) {
+			connection.current().send(JJMessage.makeUnbind(this.selector, selector, type));
 		}
 		return this;
 	}
@@ -140,21 +138,21 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection data(String key, String value) {
 		verifyContext("set data");
-		context.connection().send(JJMessage.makeSet(selector, "data", key, value));
+		connection.current().send(JJMessage.makeSet(selector, "data", key, value));
 		return this;
 	}
 
 	@Override
 	public Selection text(String text) {
 		verifyContext("retrieve text");
-		context.connection().send(JJMessage.makeSet(selector, "text", text));
+		connection.current().send(JJMessage.makeSet(selector, "text", text));
 		return this;
 	}
 
 	@Override
 	public Selection append(Selection selection) {
 		verifyContext("append");
-		context.connection().send(JJMessage.makeAppend(selector, selection.selector()));
+		connection.current().send(JJMessage.makeAppend(selector, selection.selector()));
 		return this;
 	}
 
@@ -178,41 +176,41 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection attr(String attributeKey, String attributeValue) {
 		verifyContext("set an attribute");
-		context.connection().send(JJMessage.makeSet(selector, "attr", attributeKey, attributeValue));
+		connection.current().send(JJMessage.makeSet(selector, "attr", attributeKey, attributeValue));
 		return this;
 	}
 
 	public Selection prop(String propKey, String propValue) {
 		verifyContext("set an property");
-		context.connection().send(JJMessage.makeSet(selector, "prop", propKey, propValue));
+		connection.current().send(JJMessage.makeSet(selector, "prop", propKey, propValue));
 		return this;
 	}
 
 	@Override
 	public Selection removeAttr(String attributeKey) {
 		verifyContext("remove an attribute");
-		context.connection().send(JJMessage.makeSet(selector, "removeAttr", attributeKey));
+		connection.current().send(JJMessage.makeSet(selector, "removeAttr", attributeKey));
 		return this;
 	}
 
 	@Override
 	public Selection addClass(String className) {
 		verifyContext("add a class");
-		context.connection().send(JJMessage.makeSet(selector, "addClass", className));
+		connection.current().send(JJMessage.makeSet(selector, "addClass", className));
 		return this;
 	}
 
 	@Override
 	public Selection removeClass(String className) {
 		verifyContext("remove a class");
-		context.connection().send(JJMessage.makeSet(selector, "removeClass", className));
+		connection.current().send(JJMessage.makeSet(selector, "removeClass", className));
 		return this;
 	}
 
 	@Override
 	public Selection toggleClass(String className) {
 		verifyContext("toggle a class");
-		context.connection().send(JJMessage.makeSet(selector, "toggleClass", className));
+		connection.current().send(JJMessage.makeSet(selector, "toggleClass", className));
 		return this;
 	}
 
@@ -231,7 +229,7 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection val(String value) {
 		verifyContext("set a value");
-		context.connection().send(JJMessage.makeSet(selector, "val", value));
+		connection.current().send(JJMessage.makeSet(selector, "val", value));
 		return this;
 	}
 
@@ -250,70 +248,70 @@ public class EventSelection implements Selection {
 	@Override
 	public Selection html(String html) {
 		verifyContext("set html");
-		context.connection().send(JJMessage.makeSet(selector, "html", html));
+		connection.current().send(JJMessage.makeSet(selector, "html", html));
 		return this;
 	}
 
 	@Override
 	public Selection prepend(String html) {
 		verifyContext("prepend html");
-		context.connection().send(JJMessage.makeSet(selector, "prepend", html));
+		connection.current().send(JJMessage.makeSet(selector, "prepend", html));
 		return this;
 	}
 
 	@Override
 	public Selection append(String html) {
 		verifyContext("append html");
-		context.connection().send(JJMessage.makeSet(selector, "append", html));
+		connection.current().send(JJMessage.makeSet(selector, "append", html));
 		return this;
 	}
 
 	@Override
 	public Selection before(String html) {
 		verifyContext("set html before");
-		context.connection().send(JJMessage.makeSet(selector, "before", html));
+		connection.current().send(JJMessage.makeSet(selector, "before", html));
 		return this;
 	}
 
 	@Override
 	public Selection after(String html) {
 		verifyContext("set html after");
-		context.connection().send(JJMessage.makeSet(selector, "after", html));
+		connection.current().send(JJMessage.makeSet(selector, "after", html));
 		return this;
 	}
 
 	@Override
 	public Selection wrap(String html) {
 		verifyContext("wrap elements with html");
-		context.connection().send(JJMessage.makeSet(selector, "wrap", html));
+		connection.current().send(JJMessage.makeSet(selector, "wrap", html));
 		return this;
 	}
 
 	@Override
 	public Selection unwrap() {
 		verifyContext("unwrap elements");
-		context.connection().send(JJMessage.makeSet(selector, "unwrap", ""));
+		connection.current().send(JJMessage.makeSet(selector, "unwrap", ""));
 		return this;
 	}
 
 	@Override
 	public Selection empty() {
 		verifyContext("empty an element set");
-		context.connection().send(JJMessage.makeSet(selector, "empty", ""));
+		connection.current().send(JJMessage.makeSet(selector, "empty", ""));
 		return this;
 	}
 
 	@Override
 	public Selection remove() {
 		verifyContext("remove elements");
-		context.connection().send(JJMessage.makeSet(selector, "remove", ""));
+		connection.current().send(JJMessage.makeSet(selector, "remove", ""));
 		return this;
 	}
 
 	@Override
 	public Selection select(String query) {
 		// this i believe is exactly what jquery does!
-		return new EventSelection(selector + " " + query, context, env);
+		return new EventSelection(selector + " " + query, connection, env);
 	}
 
 	@Override
@@ -348,7 +346,7 @@ public class EventSelection implements Selection {
 	
 	@Override
 	public Selection clone() {
-		return new EventSelection(selector, context, env);
+		return new EventSelection(selector, connection, env);
 	}
 
 	@Override

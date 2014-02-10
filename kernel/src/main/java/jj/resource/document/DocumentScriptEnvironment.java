@@ -34,10 +34,13 @@ import org.slf4j.LoggerFactory;
 
 import jj.Closer;
 import jj.CurrentResource;
+import jj.ResourceAware;
 import jj.SHA1Helper;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.execution.IOThread;
+import jj.execution.ScriptThread;
+import jj.http.server.ConnectionBroadcastStack;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
@@ -62,7 +65,7 @@ import jj.script.RhinoContext;
 @Singleton
 public class DocumentScriptEnvironment
 	extends AbstractScriptEnvironment
-	implements RootScriptEnvironment, WebSocketConnectionHost {
+	implements RootScriptEnvironment, WebSocketConnectionHost, ResourceAware {
 	
 	// --- implementation
 	
@@ -97,6 +100,8 @@ public class DocumentScriptEnvironment
 	private final CurrentWebSocketConnection currentConnection;
 	
 	private final HashMap<String, Context<?>> contexts = new HashMap<>(10);
+	
+	private ConnectionBroadcastStack broadcastStack;
 	
 	/**
 	 * @param cacheKey
@@ -228,21 +233,74 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
+	public void start() {
+		// nothing to do
+	}
+	
+	@Override
+	public void end() {
+		// presumably, if there is still broadcasting to be done, then it's saved
+		// away with continuation state
+		broadcastStack = null;
+	}
+	
+	@Override
+	@ScriptThread
 	public void connected(WebSocketConnection connection) {
 		connections.add(connection);
 	}
 	
 	@Override
+	@ScriptThread
 	public void disconnected(WebSocketConnection connection) {
 		connections.remove(connection);
 	}
 	
-	@Override
-	public Iterator<WebSocketConnection> iterator() {
+	private Iterator<WebSocketConnection> iterator() {
 		return new HashSet<>(connections).iterator();
 	}
 	
+	// this stuff is a candidate for removal! it's kinda self contained.  maybe a connection
+	// manager component this can just instantiate on its own
+	// or maybe this can all live in the broadcastStack itself and that gets exposed?
+	
 	@Override
+	@ScriptThread
+	public void startBroadcasting() {
+		broadcastStack = new ConnectionBroadcastStack(broadcastStack, iterator());
+	}
+	
+	@Override
+	@ScriptThread
+	public boolean broadcasting() {
+		return broadcastStack != null;
+	}
+	
+	@Override
+	@ScriptThread
+	public void endBroadcasting() {
+		broadcastStack = broadcastStack.parent();
+	}
+	
+	@Override
+	@ScriptThread
+	public WebSocketConnection nextConnection() {
+		assert broadcasting();
+		return broadcastStack.pop();
+	}
+	
+	@Override
+	@ScriptThread
+	public WebSocketConnection currentConnection() {
+		WebSocketConnection result = null;
+		if (broadcastStack != null) {
+			result = broadcastStack.peek();
+		}
+		return result;
+	}
+	
+	@Override
+	@ScriptThread
 	public void message(WebSocketConnection connection, String message) {
 		if (!processor.process(connection, message)) {
 			log.warn("{} spoke gibberish to me: {}", 
@@ -256,31 +314,45 @@ public class DocumentScriptEnvironment
 		
 		final CurrentResource<T> source;
 		final T current;
+		final ConnectionBroadcastStack broadcastStack;
 		
-		Context(final CurrentResource<T> source) {
+		Context(final ConnectionBroadcastStack broadcastStack) {
+			this.source = null;
+			this.current = null;
+			this.broadcastStack = broadcastStack;
+		}
+		
+		Context(final CurrentResource<T> source, T resource, final ConnectionBroadcastStack broadcastStack) {
 			this.source = source;
-			this.current = source.current();
+			this.current = resource;
+			this.broadcastStack = broadcastStack;
 		}
 		
 		public Closer enterContext() {
-			return source.enterScope(current);
+			return source != null ? source.enterScope(current) : null;
 		}
 	}
 	
 	@Override
 	protected void captureContextForKey(String key) {
 		assert !contexts.containsKey(key) : "cannot capture multiple times with the same key";
+		// we can't have both a document and a connection, so this works out neatly...
 		if (currentDocument.current() != null) {
-			contexts.put(key, new Context<Document>(currentDocument));
-		} else if (currentConnection.current() != null) {
-			contexts.put(key, new Context<WebSocketConnection>(currentConnection));
+			contexts.put(key, new Context<Document>(currentDocument, currentDocument.current(), broadcastStack));
+		} else if (currentConnection.trueCurrent() != null) {
+			contexts.put(key, new Context<WebSocketConnection>(currentConnection, currentConnection.trueCurrent(), broadcastStack));
+		} else {
+			contexts.put(key, new Context<Void>(broadcastStack));
 		}
 	}
 	
 	@Override
 	protected Closer restoreContextForKey(String key) {
+		assert broadcastStack == null : "restoring into a DocumentScriptEnvironment with a standing broadcastStack";
 		Context<?> context = contexts.remove(key);
-		return (context != null) ? context.enterContext() : super.restoreContextForKey(key);
+		broadcastStack = context.broadcastStack;
+		Closer closer = context.enterContext();
+		return (closer != null) ? closer : super.restoreContextForKey(key);
 	}
 
 	/**

@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.CurrentScriptContext;
+import jj.http.server.CurrentWebSocketConnection;
 
 import org.mozilla.javascript.Scriptable;
 
@@ -24,14 +24,14 @@ import org.mozilla.javascript.Scriptable;
 class ClientStorage implements HostObject {
 	
 	private Map<String,Object> data() {
-		return context.connection().clientStorage();
+		return connection.current().clientStorage();
 	}
 	
-	private final CurrentScriptContext context;
+	private final CurrentWebSocketConnection connection;
 	
 	@Inject
-	ClientStorage(final CurrentScriptContext context) {
-		this.context = context;
+	ClientStorage(final CurrentWebSocketConnection connection) {
+		this.connection = connection;
 	}
 	
 	@Override

@@ -15,28 +15,22 @@
  */
 package jj.http.server;
 
-import jj.script.FunctionContext;
-import jj.script.ScriptEnvironment;
+import static org.mockito.Mockito.mock;
+import jj.script.CurrentScriptEnvironment;
 
 /**
  * @author jason
  *
  */
-public interface WebSocketConnectionHost extends ScriptEnvironment, FunctionContext {
+public class MockCurrentWebSocketConnection extends CurrentWebSocketConnection {
+	
+	/**
+	 * @param env
+	 */
+	public MockCurrentWebSocketConnection() {
+		super(mock(CurrentScriptEnvironment.class));
+		
+		
+	}
 
-	void connected(WebSocketConnection connection);
-
-	void disconnected(WebSocketConnection connection);
-	
-	void message(WebSocketConnection connection, String message);
-	
-	void startBroadcasting();
-	
-	boolean broadcasting();
-	
-	void endBroadcasting();
-	
-	WebSocketConnection nextConnection();
-	
-	WebSocketConnection currentConnection();
 }

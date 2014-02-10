@@ -23,6 +23,7 @@ import org.mozilla.javascript.ContinuationPending;
 
 import jj.Closer;
 import jj.CurrentResource;
+import jj.http.server.WebSocketConnectionHost;
 
 /**
  * 
@@ -57,6 +58,10 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 				contextCloser.close();
 			}
 		};
+	}
+	
+	public WebSocketConnectionHost currentWebSocketConnectionHost() {
+		return current() instanceof WebSocketConnectionHost ? (WebSocketConnectionHost)current() : null;
 	}
 	
 	protected AbstractScriptEnvironment innerCurrent() {
