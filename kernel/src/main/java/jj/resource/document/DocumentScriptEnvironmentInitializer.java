@@ -76,11 +76,6 @@ class DocumentScriptEnvironmentInitializer {
 				context.end();
 			}
 		}
-		
-		@Override
-		protected void resume(String pendingKey) throws Exception {
-			
-		}
 	
 	}
 

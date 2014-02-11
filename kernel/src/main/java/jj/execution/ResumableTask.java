@@ -15,6 +15,8 @@
  */
 package jj.execution;
 
+import jj.script.ContinuationPendingKey;
+
 /**
  * implement this to notify the executor system that your task can be resumed
  * 
@@ -26,7 +28,15 @@ public interface ResumableTask {
 	/**
 	 * return null if the task is completed
 	 * return the continuation pendingKey if the task needs to be resumed
+	 * be sure to store the key for resumption
 	 * @return
 	 */
-	String pendingKey();
+	ContinuationPendingKey pendingKey();
+	
+	/**
+	 * The executor will call this with the result to be used to continue.
+	 * do not do any processing in this method! store the value and wait to be run
+	 * @param result
+	 */
+	void resumeWith(Object result);
 }

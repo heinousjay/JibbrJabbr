@@ -23,6 +23,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import jj.script.ContinuationPendingKey;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptRunner;
 
@@ -76,7 +77,7 @@ public class JJExecutorImplTest {
 	}
 	
 	private void runTask(ScheduledExecutorService service) {
-		verify(service).submit(runnableCaptor.capture());
+		verify(service, atLeastOnce()).submit(runnableCaptor.capture());
 		runnableCaptor.getValue().run();
 	}
 	
@@ -151,5 +152,55 @@ public class JJExecutorImplTest {
 		runTask(ioExecutor);
 		
 		verify(logger, times(2)).error(anyString(), eq(toThrow));
+	}
+	
+	private final class ResumableScriptTask extends ScriptTask<ScriptEnvironment> implements ResumableTask {
+
+		boolean run = false;
+		ContinuationPendingKey key = new ContinuationPendingKey();
+		Object result;
+		int count = 0;
+		
+		ResumableScriptTask(ScriptEnvironment scriptEnvironment) {
+			super("who needs a name", scriptEnvironment);
+		}
+
+		@Override
+		public ContinuationPendingKey pendingKey() {
+			return key;
+		}
+
+		@Override
+		public void resumeWith(Object result) {
+			this.result = result;
+		}
+
+		@Override
+		protected void run() throws Exception {
+			count++;
+			if (!(run = !run)) {
+				key = null;
+			}
+		}
+		
+	}
+	
+	@Test
+	public void testResumableTask() {
+		
+		ResumableScriptTask task = new ResumableScriptTask(scriptEnvironment);
+		
+		executor.execute(task);
+		
+		runTask(scriptExecutor);
+		
+		executor.resume(task.key, "whatever");
+		
+		runTask(scriptExecutor);
+		
+		assertThat("whatever", is(task.result));
+		assertThat(task.key, is(nullValue()));
+		assertThat(task.count, is(2));
+		
 	}
 }

@@ -13,8 +13,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 
 import jj.Closer;
-import jj.StringUtils;
 import jj.logging.EmergencyLogger;
+import jj.script.ContinuationPendingKey;
 
 /**
  * exposes some execution related information and
@@ -78,13 +78,13 @@ class JJExecutorImpl implements JJExecutor {
 	 * 
 	 * also need to make a specific type for the pendingKey, not just strings.  too messy
 	 */
-	private ConcurrentMap<String, JJTask> resumableTasks = PlatformDependent.newConcurrentHashMap();
+	private ConcurrentMap<ContinuationPendingKey, JJTask> resumableTasks = PlatformDependent.newConcurrentHashMap();
 	
 	private void storeIfResumable(final JJTask task) {
 		if (task instanceof ResumableTask) {
-			String pendingKey = ((ResumableTask)task).pendingKey();
+			ContinuationPendingKey pendingKey = ((ResumableTask)task).pendingKey();
 			
-			if (!StringUtils.isEmpty(pendingKey)) {
+			if (pendingKey != null) {
 				if (resumableTasks.putIfAbsent(pendingKey, task) != null) {
 					throw new AssertionError("pending key is being shared!");
 				}
@@ -92,11 +92,13 @@ class JJExecutorImpl implements JJExecutor {
 		}
 	}
 	
-	public Future<?> resume(final String pendingKey) {
-		
+	public Future<?> resume(final ContinuationPendingKey pendingKey, final Object result) {
 		JJTask task = resumableTasks.remove(pendingKey);
+		// probably not an assertion in the long run - people will at some point be sending bullshit results at this thing and
+		// we will just ignore them.  but that will be when one can do things like run with kernel assertions off :D
+		// so NOT YET
 		assert task != null : "asked to resume a nonexistent task";
-		
+		((ResumableTask)task).resumeWith(result);
 		return execute(task);
 	}
 	
