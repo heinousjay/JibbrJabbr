@@ -34,6 +34,6 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableT
 	
 	@Override
 	protected final ScheduledExecutorService executor(final ExecutorBundle bundle) {
-		return bundle.scriptExecutorFactory.executorFor(scriptEnvironment.baseName());
+		return bundle.scriptExecutorFactory.executorFor(scriptEnvironment);
 	}
 }

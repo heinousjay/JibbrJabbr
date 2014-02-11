@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerShutdownListener;
-
+import jj.script.ScriptEnvironment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,19 +87,21 @@ class ScriptExecutorFactory implements JJServerShutdownListener {
 		this.specExecutor = new ScriptExecutor(new InnerBridge(SPEC_EXECUTOR_NAME));
 	}
 	
-	public ScheduledExecutorService executorFor(String baseName) {
+	ScheduledExecutorService executorFor(ScriptEnvironment scriptEnvironment) {
+		// remember! when you fix this so there are pools of script threads, you also
+		// have to ensure that it's the root script environment that is in charge of things
 		return executor;
 	}
 	
-	public ScheduledExecutorService specExecutor() {
+	ScheduledExecutorService specExecutor() {
 		return specExecutor;
 	}
 	
-	public boolean isScriptThreadFor(String baseName) {
+	boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
 		return flag.get() != null && !SPEC_EXECUTOR_NAME.equals(flag.get());
 	}
 	
-	public boolean isSpecExecutor() {
+	boolean isSpecExecutor() {
 		return SPEC_EXECUTOR_NAME.equals(flag.get());
 	}
 

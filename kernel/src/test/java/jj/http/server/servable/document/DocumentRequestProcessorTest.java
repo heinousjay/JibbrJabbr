@@ -3,7 +3,6 @@ package jj.http.server.servable.document;
 
 import static jj.AnswerWithSelf.ANSWER_WITH_SELF;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -13,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import jj.execution.JJTask;
 import jj.execution.MockJJExecutor;
 import jj.execution.ScriptTask;
 import jj.execution.TaskHelper;

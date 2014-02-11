@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import jj.script.ContinuationPendingKey;
+import jj.script.ScriptEnvironment;
 
 /**
  * @author jason
@@ -103,7 +104,7 @@ public class MockJJExecutor implements JJExecutor {
 	}
 
 	@Override
-	public boolean isScriptThreadFor(String baseName) {
+	public boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
 		return isScriptThread;
 	}
 	

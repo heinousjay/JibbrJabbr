@@ -73,7 +73,7 @@ public class JJExecutorImplTest {
 		executor = new JJExecutorImpl(bundle, currentTask, logger);
 		
 		given(scriptEnvironment.baseName()).willReturn(baseName);
-		given(scriptExecutorFactory.executorFor(baseName)).willReturn(scriptExecutor);
+		given(scriptExecutorFactory.executorFor(scriptEnvironment)).willReturn(scriptExecutor);
 	}
 	
 	private void runTask(ScheduledExecutorService service) {

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import jj.Closer;
 import jj.logging.EmergencyLogger;
 import jj.script.ContinuationPendingKey;
+import jj.script.ScriptEnvironment;
 
 /**
  * exposes some execution related information and
@@ -138,8 +139,8 @@ class JJExecutorImpl implements JJExecutor {
 	}
 	
 	@Override
-	public boolean isScriptThreadFor(String baseName) {
-		return bundle.scriptExecutorFactory.isScriptThreadFor(baseName);
+	public boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
+		return bundle.scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
 	}
 
 	public boolean isIOThread() {

@@ -100,6 +100,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	public void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task) {
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
+		assert executor.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(task, null));
 	}
 	
@@ -111,6 +112,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Override
 	public void resumeOnInitialization(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
+		assert executor.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(null, pendingKey));
 	}
 	

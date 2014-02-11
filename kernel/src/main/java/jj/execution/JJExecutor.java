@@ -3,6 +3,7 @@ package jj.execution;
 import java.util.concurrent.Future;
 
 import jj.script.ContinuationPendingKey;
+import jj.script.ScriptEnvironment;
 
 public interface JJExecutor {
 	
@@ -12,7 +13,7 @@ public interface JJExecutor {
 	
 	boolean isScriptThread();
 
-	boolean isScriptThreadFor(String baseName);
+	boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment);
 
 	boolean isIOThread();
 
