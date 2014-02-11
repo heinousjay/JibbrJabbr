@@ -24,40 +24,42 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptRunnerTest {
 	
-	String baseName = "index";
+	private ContinuationPendingKey pendingKey;
 	
-	Document document;
+	private String baseName = "index";
 	
-	@Mock ScriptableObject scriptable;
+	private Document document;
 	
-	@Mock DocumentScriptEnvironment documentScriptEnvironment;
+	private @Mock ScriptableObject scriptable;
 	
-	@Mock ModuleScriptEnvironment moduleScriptEnvironment;
+	private @Mock DocumentScriptEnvironment documentScriptEnvironment;
+	
+	private @Mock ModuleScriptEnvironment moduleScriptEnvironment;
 		
-	@Mock ScriptResource scriptResource;
+	private @Mock ScriptResource scriptResource;
 	
-	@Mock ContinuationCoordinatorImpl continuationCoordinator;
+	private @Mock ContinuationCoordinatorImpl continuationCoordinator;
 	
-	@Mock CurrentScriptContext currentScriptContext;
+	private @Mock CurrentScriptContext currentScriptContext;
 	
-	MockJJExecutor executors;
+	private MockJJExecutor executors;
 	
-	@Mock HttpRequest httpRequest;
+	private @Mock HttpRequest httpRequest;
 	
-	ScriptRunnerImpl scriptRunner;
+	private ScriptRunnerImpl scriptRunner;
 	
-	@Mock DocumentRequestProcessor documentRequestProcessor;
+	private @Mock DocumentRequestProcessor documentRequestProcessor;
 	
-	CurrentDocumentRequestProcessor currentDocument;
+	private @Mock WebSocketConnection connection;
 	
-	@Mock WebSocketConnection connection;
+	private @Mock Callable eventFunction;
 	
-	@Mock Callable eventFunction;
-	
-	ScriptContext httpRequestContext;
+	private ScriptContext httpRequestContext;
 	
 	@Before
 	public void before() {
+		
+		pendingKey = new ContinuationPendingKey();
 		
 		given(currentScriptContext.webSocketConnectionHost()).willReturn(documentScriptEnvironment);
 		
@@ -66,7 +68,7 @@ public class ScriptRunnerTest {
 		scriptRunner = new ScriptRunnerImpl(
 			continuationCoordinator,
 			currentScriptContext,
-			currentDocument = new CurrentDocumentRequestProcessor(),
+			new CurrentDocumentRequestProcessor(),
 			executors
 		);
 		
@@ -125,12 +127,12 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
-		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn("");
-		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn("");
+		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, null)).willReturn(pendingKey);
+		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(pendingKey);
 		given(documentScriptEnvironment.initialized()).willReturn(true);
 		
 		// when
-		scriptRunner.submit("", httpRequestContext, "", null);
+		scriptRunner.submit("", httpRequestContext, pendingKey, null);
 		executors.runUntilIdle();
 		
 		// then
@@ -144,7 +146,7 @@ public class ScriptRunnerTest {
 		// given
 		given(currentScriptContext.scriptEnvironment()).willReturn(documentScriptEnvironment);
 		given(continuationCoordinator.execute(documentScriptEnvironment)).willReturn(null);
-		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn("");
+		given(continuationCoordinator.execute(documentScriptEnvironment, eventFunction)).willReturn(pendingKey);
 		
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.ReadyFunctionExecution);
 		givenADocumentRequest();
@@ -159,11 +161,11 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
-		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, "", null)).willReturn(null);
+		given(continuationCoordinator.resumeContinuation(documentScriptEnvironment, pendingKey, null)).willReturn(null);
 		
 		// when
 		//try (Closer closer = currentDocument.enterScope(documentRequestProcessor)) {
-			scriptRunner.submit("", httpRequestContext, "", null);
+			scriptRunner.submit("", httpRequestContext, pendingKey, null);
 			executors.runUntilIdle();
 		//}
 		
@@ -189,28 +191,27 @@ public class ScriptRunnerTest {
 		executors.isScriptThread = true;
 		
 		// when
-		scriptRunner.submit("", httpRequestContext, "", null);
-		scriptRunner.submit("", httpRequestContext, "", null);
+		scriptRunner.submit("", httpRequestContext, pendingKey, null);
+		scriptRunner.submit("", httpRequestContext, pendingKey, null);
 		executors.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator, times(2)).resumeContinuation(any(ScriptEnvironment.class), anyString(), any());
+		verify(continuationCoordinator, times(2)).resumeContinuation(any(ScriptEnvironment.class), eq(pendingKey), any());
 	}
 	
 	@Test
 	public void testWebSocketJJMessageResultWithNoContinuation() throws Exception {
 		
 		// given
-		final String key = "0";
 		final String value = "value";
 		givenAWebSocketMessage();
 		
 		// when
-		scriptRunner.submitPendingResult(connection, key, value);
+		scriptRunner.submitPendingResult(connection, pendingKey, value);
 		executors.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).resumeContinuation(null, key, value);
+		verify(continuationCoordinator).resumeContinuation(null, pendingKey, value);
 	}
 	
 	private RequiredModule givenAModuleRequire() {
@@ -242,7 +243,7 @@ public class ScriptRunnerTest {
 		executors.isScriptThread = true;
 		given(currentScriptContext.documentRequestProcessor()).willReturn(documentRequestProcessor);
 		given(documentRequestProcessor.state()).willReturn(DocumentRequestState.Uninitialized);
-		module.pendingKey("");
+		module.pendingKey(pendingKey);
 		
 		// when
 		executors.runUntilIdle();
@@ -257,7 +258,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		RequiredModule module = givenAModuleRequire();
-		given(continuationCoordinator.execute(moduleScriptEnvironment)).willReturn("");
+		given(continuationCoordinator.execute(moduleScriptEnvironment)).willReturn(pendingKey);
 		
 		// when
 		scriptRunner.submit(module, moduleScriptEnvironment);
@@ -265,7 +266,7 @@ public class ScriptRunnerTest {
 		
 		// given
 		executors.isScriptThread = true;
-		module.pendingKey("");
+		module.pendingKey(pendingKey);
 		given(currentScriptContext.type()).willReturn(ScriptContextType.ModuleInitialization);
 		given(continuationCoordinator.resumeContinuation(moduleScriptEnvironment, module.pendingKey(), scriptable)).willReturn(null);
 		

@@ -51,7 +51,7 @@ class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
 	public void handle(WebSocketConnection connection, JJMessage message) {
 		scriptRunner.submitPendingResult(
 			connection,
-			message.element().id,
+			message.pendingKey(),
 			new EventSelection(message.element().selector, currentConnection, env)
 		);
 	}

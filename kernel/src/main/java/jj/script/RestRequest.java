@@ -6,7 +6,7 @@ import jj.http.client.JJHttpClientRequest;
 public class RestRequest implements Continuable {
 	
 	private final JJHttpClientRequest request;
-	private String pendingKey;
+	private ContinuationPendingKey pendingKey;
 	
 	public RestRequest(final JJHttpClientRequest request) {
 		this.request = request;
@@ -17,12 +17,12 @@ public class RestRequest implements Continuable {
 	}
 	
 	@Override
-	public String pendingKey() {
+	public ContinuationPendingKey pendingKey() {
 		return pendingKey;
 	}
 	
 	@Override
-	public void pendingKey(String pendingKey) {
+	public void pendingKey(ContinuationPendingKey pendingKey) {
 		this.pendingKey = pendingKey;
 	}
 	

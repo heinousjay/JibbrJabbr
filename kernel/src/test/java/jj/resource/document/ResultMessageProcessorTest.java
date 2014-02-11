@@ -20,6 +20,7 @@ import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ResultMessageProcessor;
+import jj.script.ContinuationPendingKey;
 import jj.script.ScriptJSON;
 import jj.script.ScriptRunner;
 
@@ -56,7 +57,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(scriptRunner).submitPendingResult(connection, id, value);
+		verify(scriptRunner).submitPendingResult(connection, new ContinuationPendingKey(id), value);
 	}
 	
 	@Test
@@ -67,7 +68,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(scriptRunner).submitPendingResult(connection, id, value);
+		verify(scriptRunner).submitPendingResult(connection, new ContinuationPendingKey(id), value);
 	}
 
 }

@@ -42,6 +42,8 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class RequiredModuleContinuationProcessorTest {
 	
+	ContinuationPendingKey pendingKey;
+	
 	String baseName = "index";
 	
 	String module = "module";
@@ -66,6 +68,8 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Before
 	public void before() {
+		
+		pendingKey = new ContinuationPendingKey();
 		
 		executors = new MockJJExecutor();
 		
@@ -104,14 +108,14 @@ public class RequiredModuleContinuationProcessorTest {
 	public void testFirstRequireOfModuleNotFoundError() throws Exception {
 		
 		// given
-		requiredModule.pendingKey("key");
+		requiredModule.pendingKey(pendingKey);
 		
 		// when
 		processor.process(continuationState);
 		executors.runUntilIdle();
 		
 		// then
-		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), anyString(), any(RequiredModuleException.class));
+		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), eq(pendingKey), any(RequiredModuleException.class));
 	}
 	
 	private void givenAScriptEnvironment() {
@@ -128,13 +132,13 @@ public class RequiredModuleContinuationProcessorTest {
 		given(scriptEnvironment.initialized()).willReturn(true);
 		givenAScriptEnvironment();
 		
-		requiredModule.pendingKey("key");
+		requiredModule.pendingKey(pendingKey);
 		
 		// when
 		processor.process(continuationState);
 		
 		// then
-		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), anyString(), eq(exports));
+		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), eq(pendingKey), eq(exports));
 	}
 	
 	@Test

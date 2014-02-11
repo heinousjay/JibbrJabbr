@@ -39,6 +39,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
+import jj.script.ContinuationPendingKey;
 import jj.script.MockRhinoContextProvider;
 
 import org.jsoup.Jsoup;
@@ -122,7 +123,7 @@ public class DocumentScriptEnvironmentTest {
 	@Test
 	public void testManagesContext() throws Exception {
 		
-		String key = "key";
+		ContinuationPendingKey key = new ContinuationPendingKey();
 		String name = "index";
 		
 		givenAnHtmlResource(name);
@@ -334,7 +335,7 @@ public class DocumentScriptEnvironmentTest {
 		assertThat(result.nextConnection(), is(true));
 		assertThat(iterated1.remove(result.currentConnection()), is(true));
 		
-		String key = "key";
+		ContinuationPendingKey key = new ContinuationPendingKey();
 		
 		result.captureContextForKey(key);
 		result.end();

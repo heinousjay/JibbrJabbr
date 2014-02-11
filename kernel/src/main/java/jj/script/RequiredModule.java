@@ -27,7 +27,7 @@ public class RequiredModule implements Continuable {
 	
 	private final ScriptContext parentScriptContext;
 	
-	private String pendingKey;
+	private ContinuationPendingKey pendingKey;
 
 	public RequiredModule(
 		final String identifier, 
@@ -51,13 +51,13 @@ public class RequiredModule implements Continuable {
 	}
 	
 	@Override
-	public String pendingKey() {
+	public ContinuationPendingKey pendingKey() {
 		assert pendingKey != null;
 		return pendingKey;
 	}
 	
 	@Override
-	public void pendingKey(String pendingKey) {
+	public void pendingKey(ContinuationPendingKey pendingKey) {
 		assert this.pendingKey == null;
 		assert pendingKey != null;
 		this.pendingKey = pendingKey;

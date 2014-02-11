@@ -31,7 +31,5 @@ public interface ScriptRunner {
 
 	void submit(RequiredModule requiredModule, ModuleScriptEnvironment scriptExecutionEnvironment);
 
-	void submitPendingResult(WebSocketConnection connection, String pendingKey, Object result);
-
-	//void submit(WebSocketConnection connection, String event, Object... args);
+	void submitPendingResult(WebSocketConnection connection, ContinuationPendingKey pendingKey, Object result);
 }

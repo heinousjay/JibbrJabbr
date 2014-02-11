@@ -2,7 +2,7 @@ package jj.jjmessage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Get extends ExpectsResult {
+public class Get extends HasResultID {
 	
 	Get() {}
 	

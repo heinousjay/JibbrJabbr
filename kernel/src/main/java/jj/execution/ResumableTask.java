@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.execution;
 
 /**
+ * implement this to notify the executor system that your task can be resumed
+ * 
  * @author jason
  *
  */
-public interface Continuable {
-
-	void pendingKey(ContinuationPendingKey pendingKey);
+public interface ResumableTask {
 	
-	ContinuationPendingKey pendingKey();
+	/**
+	 * return null if the task is completed
+	 * return the continuation pendingKey if the task needs to be resumed
+	 * @return
+	 */
+	String pendingKey();
 }

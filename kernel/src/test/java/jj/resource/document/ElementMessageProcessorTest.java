@@ -24,6 +24,7 @@ import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ElementMessageProcessor;
+import jj.script.ContinuationPendingKey;
 import jj.script.CurrentScriptContext;
 import jj.script.ScriptRunner;
 
@@ -60,7 +61,7 @@ public class ElementMessageProcessorTest {
 		emp.handle(connection, jqm);
 		
 		//then
-		verify(scriptRunner).submitPendingResult(eq(connection), eq("id"), eventSelection.capture());
+		verify(scriptRunner).submitPendingResult(eq(connection), any(ContinuationPendingKey.class), eventSelection.capture());
 		
 		// this is goofy
 		assertThat(eventSelection.getValue(), is(notNullValue()));

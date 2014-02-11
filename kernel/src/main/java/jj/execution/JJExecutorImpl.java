@@ -1,5 +1,8 @@
 package jj.execution;
 
+import io.netty.util.internal.PlatformDependent;
+
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +13,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 
 import jj.Closer;
+import jj.StringUtils;
 import jj.logging.EmergencyLogger;
 
 /**
@@ -68,6 +72,34 @@ class JJExecutorImpl implements JJExecutor {
 		this.monitorThread.start();
 	}
 	
+	/* maybe put this into the executor since resumable tasks will always be
+	 * script tasks, hence single-threaded, hence regular HashMap can be used
+	 * there..
+	 * 
+	 * also need to make a specific type for the pendingKey, not just strings.  too messy
+	 */
+	private ConcurrentMap<String, JJTask> resumableTasks = PlatformDependent.newConcurrentHashMap();
+	
+	private void storeIfResumable(final JJTask task) {
+		if (task instanceof ResumableTask) {
+			String pendingKey = ((ResumableTask)task).pendingKey();
+			
+			if (!StringUtils.isEmpty(pendingKey)) {
+				if (resumableTasks.putIfAbsent(pendingKey, task) != null) {
+					throw new AssertionError("pending key is being shared!");
+				}
+			}
+		}
+	}
+	
+	public Future<?> resume(final String pendingKey) {
+		
+		JJTask task = resumableTasks.remove(pendingKey);
+		assert task != null : "asked to resume a nonexistent task";
+		
+		return execute(task);
+	}
+	
 	@Override
 	public Future<?> execute(final JJTask task) {
 		
@@ -84,6 +116,7 @@ class JJExecutorImpl implements JJExecutor {
 				task.start();
 				try (Closer closer = currentTask.enterScope(task)) {
 					task.run();
+					storeIfResumable(task);
 				} catch (Throwable t) {
 					logger.error("Task [{}] ended in exception", task.name());
 					logger.error("", t);

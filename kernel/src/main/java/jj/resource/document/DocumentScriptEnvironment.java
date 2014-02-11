@@ -54,6 +54,7 @@ import jj.resource.script.RootScriptEnvironment;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.script.AbstractScriptEnvironment;
+import jj.script.ContinuationPendingKey;
 import jj.script.RhinoContext;
 
 /**
@@ -100,7 +101,7 @@ public class DocumentScriptEnvironment
 	
 	private final CurrentWebSocketConnection currentConnection;
 	
-	private final HashMap<String, Context<?>> contexts = new HashMap<>(10);
+	private final HashMap<ContinuationPendingKey, Context<?>> contexts = new HashMap<>(10);
 	
 	// this and the methods that manage it should probably go into an AbstractWebSocketConnectionHost
 	// that derives from AbstractScriptEnvironment
@@ -340,7 +341,7 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	protected void captureContextForKey(String key) {
+	protected void captureContextForKey(ContinuationPendingKey key) {
 		assert !contexts.containsKey(key) : "cannot capture multiple times with the same key";
 		// we can't have both a document and a connection, so this works out neatly...
 		if (currentDocument.current() != null) {
@@ -353,7 +354,7 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	protected Closer restoreContextForKey(String key) {
+	protected Closer restoreContextForKey(ContinuationPendingKey key) {
 		assert broadcastStack == null : "restoring into a DocumentScriptEnvironment with a standing broadcastStack";
 		Context<?> context = contexts.remove(key);
 		broadcastStack = context.broadcastStack;

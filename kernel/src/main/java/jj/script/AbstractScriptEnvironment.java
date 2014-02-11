@@ -25,7 +25,6 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.Closer;
-import jj.Sequence;
 import jj.event.Publisher;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceCacheKey;
@@ -41,9 +40,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	protected final Provider<RhinoContext> contextProvider;
 	
-	private final Sequence continuationKeys = new Sequence();
-	
-	protected final HashMap<String, ContinuationPending> continuationPendings = new HashMap<>();
+	protected final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
 	ScriptExecutionState state = Unitialized;
 	
@@ -94,24 +91,24 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		}
 	}
 	
-	String createContinuationContext(final ContinuationPending continuationPending) {
-		String key = continuationKeys.next();
+	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
+		ContinuationPendingKey key = new ContinuationPendingKey();
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;
 	}
 	
-	ContinuationPending continuationPending(final String key) {
+	ContinuationPending continuationPending(final ContinuationPendingKey key) {
 		assert continuationPendings.containsKey(key) : "trying to retrieve a nonexistent continuation for " + key;
 		return continuationPendings.remove(key);
 	}
 	
-	protected void captureContextForKey(String key) {
+	protected void captureContextForKey(ContinuationPendingKey key) {
 		// nothing to do in the abstract, but specific type will have things
 		// DocumentScriptEnvironment needs to save connections and documents, for example
 	}
 	
-	protected Closer restoreContextForKey(String key) {
+	protected Closer restoreContextForKey(ContinuationPendingKey key) {
 		return new Closer() {
 			
 			@Override

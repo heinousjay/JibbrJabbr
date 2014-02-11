@@ -45,7 +45,7 @@ class ResultMessageProcessor implements DocumentWebSocketMessageProcessor {
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
 		Object value = message.result().value == null ? null : json.parse(message.result().value);
-		scriptRunner.submitPendingResult(connection, message.result().id, value);
+		scriptRunner.submitPendingResult(connection, message.pendingKey(), value);
 	}
 
 }

@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Create extends ExpectsResult {
+public class Create extends HasResultID {
 
 	Create() {}
 	

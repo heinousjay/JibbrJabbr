@@ -66,7 +66,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	}
 
 	@ScriptThread
-	private void resumeHttpRequestInitialExecution(String pendingKey, Object result) {
+	private void resumeHttpRequestInitialExecution(ContinuationPendingKey pendingKey, Object result) {
 		log.trace("resuming initial execution of a script execution environment");
 		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result) == null) {
 			context.scriptEnvironment().initialized(true);
@@ -96,7 +96,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	}
 
 	@ScriptThread
-	private void resumeReadyFunction(String pendingKey, Object result) {
+	private void resumeReadyFunction(ContinuationPendingKey pendingKey, Object result) {
 		log.trace("resuming ready function execution of a script execution environment");
 		
 		if (continuationCoordinator.resumeContinuation(context.webSocketConnectionHost(), pendingKey, result) == null) {
@@ -156,7 +156,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	}
 
 	@ScriptThread
-	private void resumeModuleInitialExecution(final String pendingKey, final Object result) {
+	private void resumeModuleInitialExecution(final ContinuationPendingKey pendingKey, final Object result) {
 		log.debug("resuming initial execution of a required module");
 		
 		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result) == null) {
@@ -213,7 +213,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	@Override
 	public void submitPendingResult(
 		final WebSocketConnection connection,
-		final String pendingKey,
+		final ContinuationPendingKey pendingKey,
 		final Object result
 	) {
 		executors.execute(new ScriptTask<ScriptEnvironment>("resuming continuation on [" + connection + "]", connection.webSocketConnectionHost()) {
@@ -231,7 +231,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	}
 	
 	@ScriptThread
-	private void resumeContinuation(final String pendingKey, final Object result) {
+	private void resumeContinuation(final ContinuationPendingKey pendingKey, final Object result) {
 		continuationCoordinator.resumeContinuation(
 			context.scriptEnvironment(),
 			pendingKey,
@@ -243,7 +243,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	 * you must be in a script thread before calling this method.
 	 */
 	@ScriptThread
-	private void restartAfterContinuation(String pendingKey, Object result) {
+	private void restartAfterContinuation(ContinuationPendingKey pendingKey, Object result) {
 		
 		
 		log.trace("restarting a continuation at {} with {}", pendingKey, result);
@@ -276,7 +276,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 	}
 
 	@Override
-	public void submit(final String description, final ScriptContext saved, final String pendingKey, final Object result) {
+	public void submit(final String description, final ScriptContext saved, final ContinuationPendingKey pendingKey, final Object result) {
 		
 		context.restore(saved);
 		try {

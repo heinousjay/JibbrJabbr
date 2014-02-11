@@ -21,5 +21,5 @@ package jj.script;
  */
 public interface ScriptRunnerInternal extends ScriptRunner {
 
-	void submit(String description, ScriptContext saved, String pendingKey, Object result);
+	void submit(String description, ScriptContext saved, ContinuationPendingKey pendingKey, Object result);
 }

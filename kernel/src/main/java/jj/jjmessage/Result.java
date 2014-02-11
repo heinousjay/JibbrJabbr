@@ -2,12 +2,9 @@ package jj.jjmessage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Result {
+public class Result extends HasResultID {
 
 	Result() {}
-	
-	@JsonProperty
-	public String id;
 	
 	@JsonProperty
 	public String value;

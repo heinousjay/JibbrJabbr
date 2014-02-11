@@ -69,7 +69,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	@Override
-	public String execute(final ScriptEnvironment scriptEnvironment) {
+	public ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -92,7 +92,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	@Override
-	public String execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
+	public ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -123,7 +123,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	@Override
-	public String resumeContinuation(ScriptEnvironment scriptEnvironment, final String pendingKey, final Object result) {
+	public ContinuationPendingKey resumeContinuation(ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey, final Object result) {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
@@ -162,7 +162,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	 * 
 	 * @param continuationState
 	 */
-	private String processContinuationState(ContinuationState continuationState) {
+	private ContinuationPendingKey processContinuationState(ContinuationState continuationState) {
 		if (continuationState != null) {
 			
 			ContinuationProcessor processor = continuationProcessors.get(continuationState.type());

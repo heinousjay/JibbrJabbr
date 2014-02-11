@@ -45,7 +45,7 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 * internal method, to allow continuation resumption to also involve environment-dependent
 	 * context restoration
 	 */
-	Closer enterScope(final AbstractScriptEnvironment scriptEnvironment, final String pendingKey) {
+	Closer enterScope(final AbstractScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
 		
 		final Closer environmentCloser = enterScope(scriptEnvironment);
 		final Closer contextCloser = scriptEnvironment.restoreContextForKey(pendingKey);
@@ -84,7 +84,7 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 		assert current() != null : "can't perform a continuation unless a script is in context";
 		
 		ContinuationPending result = prepareContinuation(new ContinuationState(continuable));
-		String pendingKey = innerCurrent().createContinuationContext(result);
+		ContinuationPendingKey pendingKey = innerCurrent().createContinuationContext(result);
 		continuable.pendingKey(pendingKey);
 		throw result;
 	}

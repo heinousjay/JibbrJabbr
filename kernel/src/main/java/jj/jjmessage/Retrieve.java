@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author jason
  *
  */
-public class Retrieve extends ExpectsResult {
+public class Retrieve extends HasResultID {
 
 	@JsonProperty
 	public String key;
