@@ -23,20 +23,34 @@ import jj.script.ContinuationPendingKey;
  * @author jason
  *
  */
-public interface ResumableTask {
+public abstract class ResumableTask extends JJTask {
 	
+	protected ContinuationPendingKey pendingKey;
+	protected Object result;
+	
+	/**
+	 * @param name
+	 */
+	ResumableTask(String name) {
+		super(name);
+	}
+
 	/**
 	 * return null if the task is completed
 	 * return the continuation pendingKey if the task needs to be resumed
 	 * be sure to store the key for resumption
 	 * @return
 	 */
-	ContinuationPendingKey pendingKey();
+	final ContinuationPendingKey pendingKey() {
+		return pendingKey;
+	}
 	
 	/**
 	 * The executor will call this with the result to be used to continue.
 	 * do not do any processing in this method! store the value and wait to be run
 	 * @param result
 	 */
-	void resumeWith(Object result);
+	final void resumeWith(Object result) {
+		this.result = result;
+	}
 }

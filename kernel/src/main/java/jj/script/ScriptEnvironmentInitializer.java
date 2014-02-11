@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.JJExecutor;
-import jj.execution.ResumableTask;
 import jj.execution.ScriptTask;
 
 /**
@@ -38,12 +37,22 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	private final JJExecutor executor;
 	
 	private final ContinuationCoordinator continuationCoordinator;
+	
+	private static final class TaskOrKey {
+		private final ContinuationPendingKey pendingKey;
+		private final ScriptTask<? extends ScriptEnvironment> task;
+		
+		TaskOrKey(final ScriptTask<? extends ScriptEnvironment> task, final ContinuationPendingKey pendingKey) {
+			this.task = task;
+			this.pendingKey = pendingKey;
+		}
+	}
 
-	private final ThreadLocal<HashMap<ScriptEnvironment, List<ContinuationPendingKey>>> pendingInitialization = 
-		new ThreadLocal<HashMap<ScriptEnvironment, List<ContinuationPendingKey>>>() {
+	private final ThreadLocal<HashMap<ScriptEnvironment, List<TaskOrKey>>> pendingInitialization = 
+		new ThreadLocal<HashMap<ScriptEnvironment, List<TaskOrKey>>>() {
 		
 		@Override
-		protected HashMap<ScriptEnvironment, List<ContinuationPendingKey>> initialValue() {
+		protected HashMap<ScriptEnvironment, List<TaskOrKey>> initialValue() {
 			return new HashMap<>();
 		}
 	};
@@ -66,12 +75,32 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	}
 	
 	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
-		List<ContinuationPendingKey> keys = pendingInitialization.get().remove(scriptEnvironment);
-		if (keys != null) {
-			for (ContinuationPendingKey pendingKey : keys) {
-				executor.resume(pendingKey, scriptEnvironment.exports());
+		List<TaskOrKey> tasksOrKeys = pendingInitialization.get().remove(scriptEnvironment);
+		if (tasksOrKeys != null) {
+			for (TaskOrKey taskOrKey : tasksOrKeys) {
+				if (taskOrKey.task != null) {
+					executor.execute(taskOrKey.task);
+				} else if (taskOrKey.pendingKey != null) { 
+					executor.resume(taskOrKey.pendingKey, scriptEnvironment.exports());
+				} else {
+					throw new AssertionError("taskOrKey list was not maintained properly!");
+				}
 			}
 		}
+	}
+	
+	private List<TaskOrKey> getTaskOrKeyList(ScriptEnvironment scriptEnvironment) {
+		List<TaskOrKey> taskOrKeys = pendingInitialization.get().get(scriptEnvironment);
+		if (taskOrKeys == null) {
+			pendingInitialization.get().put(scriptEnvironment, new ArrayList<TaskOrKey>());
+			taskOrKeys = pendingInitialization.get().get(scriptEnvironment);
+		}
+		return taskOrKeys;
+	}
+	
+	public void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task) {
+		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
+		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(task, null));
 	}
 	
 	/**
@@ -82,13 +111,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Override
 	public void resumeOnInitialization(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
-		
-		List<ContinuationPendingKey> keys = pendingInitialization.get().get(scriptEnvironment);
-		if (keys == null) {
-			pendingInitialization.get().put(scriptEnvironment, new ArrayList<ContinuationPendingKey>());
-			keys = pendingInitialization.get().get(scriptEnvironment);
-		}
-		keys.add(pendingKey);
+		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(null, pendingKey));
 	}
 	
 	// this should come from the script environment
@@ -99,10 +122,8 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		Broken
 	}
 	
-	private class InitializerTask extends ScriptTask<AbstractScriptEnvironment> implements ResumableTask {
+	private class InitializerTask extends ScriptTask<AbstractScriptEnvironment> {
 		
-		private ContinuationPendingKey pendingKey;
-		private Object result;
 		private State state = State.Uninitialized;
 
 		/**
@@ -184,17 +205,6 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 			
 			scriptEnvironmentInitialized(scriptEnvironment);
 		}
-
-		@Override
-		public ContinuationPendingKey pendingKey() {
-			return pendingKey;
-		}
-
-		@Override
-		public void resumeWith(Object result) {
-			this.result = result;
-		}
-	
 	}
 
 }

@@ -11,8 +11,8 @@ import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.CurrentDocumentRequestProcessor;
+import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.ScriptRunner;
 
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.BaseFunction;
@@ -101,7 +101,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 			// document in scope, it's a selection API
 			// connection in scope, it's a remote control
 			
-			webSocketConnectionHost.addFunction(ScriptRunner.READY_FUNCTION_KEY, (Function)args[0]);
+			webSocketConnectionHost.addFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY, (Function)args[0]);
 			return this; 
 		}
 		

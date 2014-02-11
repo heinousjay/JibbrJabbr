@@ -39,6 +39,13 @@ public class MockJJExecutor implements JJExecutor {
 			task = tasks.isEmpty() ? null : tasks.remove(0);
 		}
 	}
+
+	/**
+	 * @return
+	 */
+	public JJTask firstTask() {
+		return tasks.get(0);
+	}
 	
 	public void runFirstTask() throws Exception {
 		assert(!tasks.isEmpty());

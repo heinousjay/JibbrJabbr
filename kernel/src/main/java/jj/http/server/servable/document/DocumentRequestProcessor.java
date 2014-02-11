@@ -10,9 +10,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.Closer;
 import jj.resource.MimeTypes;
+import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.script.ScriptRunner;
+import jj.script.ContinuationCoordinator;
+import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.execution.IOTask;
 import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
@@ -21,9 +24,10 @@ import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
 import jj.jjmessage.JJMessage;
-
 import io.netty.handler.codec.http.HttpHeaders;
+
 import org.jsoup.nodes.Document;
+import org.mozilla.javascript.Callable;
 
 /**
  * Coordinates the resources necessary to execute a request
@@ -38,10 +42,13 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	@SuppressWarnings("serial")
 	private static class FilterList extends ArrayList<DocumentFilter> {}
 	
-	/** the executors in which we run */
-	private final JJExecutor executors;
+	private final JJExecutor executor;
 	
-	private final ScriptRunner scriptRunner;
+	private final DependsOnScriptEnvironmentInitialization initializer;
+	
+	private final ContinuationCoordinator continuationCoordinator;
+	
+	private final CurrentDocumentRequestProcessor currentDocument;
 	
 	private final DocumentScriptEnvironment documentScriptEnvironment;
 	
@@ -54,20 +61,23 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	private final Set<DocumentFilter> filters;
 	
 	private ArrayList<JJMessage> messages; 
-	
-	private volatile DocumentRequestState state = DocumentRequestState.Uninitialized;
 
 	@Inject
 	DocumentRequestProcessor(
-		final JJExecutor executors,
-		final ScriptRunner scriptRunner,
+		final JJExecutor executor,
+		final DependsOnScriptEnvironmentInitialization initializer,
+		final ContinuationCoordinator continuationCoordinator,
+		final CurrentDocumentRequestProcessor currentDocument,
 		final DocumentScriptEnvironment dse,
 		final HttpRequest httpRequest,
 		final HttpResponse httpResponse,
+		// move this out!
 		final Set<DocumentFilter> filters
 	) {
-		this.executors = executors;
-		this.scriptRunner = scriptRunner;
+		this.executor = executor;
+		this.initializer = initializer;
+		this.continuationCoordinator = continuationCoordinator;
+		this.currentDocument = currentDocument;
 		this.documentScriptEnvironment = dse;
 		this.document = dse.document();
 		this.httpRequest = httpRequest;
@@ -100,27 +110,59 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	
 	@Override
 	public void process() {
-		if (documentScriptEnvironment.hasServerScript()) {
-			scriptRunner.submit(this);
-		} else {
-			String name = "responding to document request [" + baseName() + "]";
-			executors.execute(new ScriptTask<DocumentScriptEnvironment>(name, documentScriptEnvironment) {
+		executor.execute(new DocumentRequestProcessTask(documentScriptEnvironment));
+	}
+	
+	private final class DocumentRequestProcessTask extends ScriptTask<DocumentScriptEnvironment> {
+		
+		/**
+		 * @param name
+		 * @param scriptEnvironment
+		 */
+		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment) {
+			super("processing document request at " + scriptEnvironment.baseName(), scriptEnvironment);
+		}
+
+		@Override
+		protected void run() throws Exception {
+			
+			if (!scriptEnvironment.hasServerScript()) {
+				respond();
+			} else if (!scriptEnvironment.initialized()) {
+				initializer.executeOnInitialization(scriptEnvironment, this);
+			} else {
+			
+				if (result == null) {
+					
+					Callable readyFunction = scriptEnvironment.getFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY);
+					if (readyFunction != null) {
+						try (Closer closer = currentDocument.enterScope(DocumentRequestProcessor.this)) {
+							// should make a request object wrapper of some sort.  and perhaps response too?
+							pendingKey = continuationCoordinator.execute(scriptEnvironment, readyFunction);
+						}
+					}
+					
+				} else {
+					// continuations put all their own stuff back, so we only scope our resource to the initial execution. handy!
+					pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
+				}
 				
-				@Override
-				protected void run() throws Exception {
+				if (pendingKey == null) {
 					respond();
 				}
-			});
+			}
 		}
 	}
 	
 	/**
 	 * Pulls the document together and spits it out
+	 * 
+	 * this should all be somewhere else
 	 */
 	@ScriptThread
-	public void respond() {
+	void respond() {
 		
-		assert executors.isScriptThreadFor(baseName()) : "must be called in a script thread for " + baseName();
+		assert executor.isScriptThreadFor(baseName()) : "must be called in a script thread for " + baseName();
 		try {
 			executeFilters(makeFilterList(filters, false));
 		} catch (Exception e) {
@@ -132,7 +174,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		if (ioFilters.isEmpty()) {
 			writeResponse();
 		} else {
-			executors.execute(new IOTask("Document filtering requiring I/O") {
+			executor.execute(new IOTask("Document filtering requiring I/O") {
 				
 				@Override
 				public void run() {
@@ -175,28 +217,10 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		return getClass().getSimpleName() + ": " + httpRequest.uri();
 	}
 	
-	
-	public DocumentRequestProcessor startingInitialExecution() {
-		state = DocumentRequestState.InitialExecution;
-		documentScriptEnvironment.initializing(true);
-		return this;
-	}
-	
-	
-	public DocumentRequestProcessor startingReadyFunction() {
-		state = DocumentRequestState.ReadyFunctionExecution;
-		documentScriptEnvironment.initialized(true);
-		return this;
-	}
-	
-	public DocumentRequestState state() {
-		return state;
-	}
-	
 	/**
 	 * @return
 	 */
-	public DocumentScriptEnvironment documentScriptEnvironment() {
+	DocumentScriptEnvironment documentScriptEnvironment() {
 		return documentScriptEnvironment;
 	}
 
@@ -223,7 +247,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		return messages == null ? Collections.<JJMessage>emptyList() : messages;
 	}
 	
-	public String uri() {
+	String uri() {
 		return httpRequest.uri();
 	}
 }

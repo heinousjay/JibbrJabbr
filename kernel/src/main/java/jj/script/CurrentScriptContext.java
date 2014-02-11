@@ -87,11 +87,6 @@ public class CurrentScriptContext {
 		return currentContext.get();
 	}
 	
-	public ScriptContext initialize(final DocumentRequestProcessor documentRequestProcessor) {
-		currentContext.set(new ScriptContext(currentContext.get(), documentRequestProcessor));
-		return currentContext.get();
-	}
-	
 	ScriptContext save() {
 		return currentContext.get();
 	}

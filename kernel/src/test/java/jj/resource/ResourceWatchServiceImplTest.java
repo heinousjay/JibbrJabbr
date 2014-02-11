@@ -39,7 +39,7 @@ import jj.configuration.Configuration;
 import jj.execution.IOTask;
 import jj.execution.JJExecutor;
 import jj.execution.MockJJExecutor;
-import jj.execution.TaskInvoker;
+import jj.execution.TaskHelper;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
 import jj.resource.document.HtmlResource;
@@ -109,7 +109,7 @@ public class ResourceWatchServiceImplTest {
 
 					@Override
 					public Void call() throws Exception {
-						TaskInvoker.invoke(((IOTask)invocation.getArguments()[0]));
+						TaskHelper.invoke(((IOTask)invocation.getArguments()[0]));
 						return null;
 					}
 				});

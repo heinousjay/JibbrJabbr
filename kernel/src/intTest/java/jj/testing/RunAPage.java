@@ -31,7 +31,7 @@ public class RunAPage {
 	
 	@Test
 	public void test() throws Exception {
-		TestHttpClient client = app.get("/ ain't even a thing");
+		TestHttpClient client = app.get("/animal");
 		
 		
 		System.out.println(client.contentsString(1, HOURS));

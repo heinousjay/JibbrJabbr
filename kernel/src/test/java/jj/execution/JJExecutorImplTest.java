@@ -154,11 +154,8 @@ public class JJExecutorImplTest {
 		verify(logger, times(2)).error(anyString(), eq(toThrow));
 	}
 	
-	private final class ResumableScriptTask extends ScriptTask<ScriptEnvironment> implements ResumableTask {
+	private final class ResumableScriptTask extends ScriptTask<ScriptEnvironment> {
 
-		boolean run = false;
-		ContinuationPendingKey key = new ContinuationPendingKey();
-		Object result;
 		int count = 0;
 		
 		ResumableScriptTask(ScriptEnvironment scriptEnvironment) {
@@ -166,23 +163,12 @@ public class JJExecutorImplTest {
 		}
 
 		@Override
-		public ContinuationPendingKey pendingKey() {
-			return key;
-		}
-
-		@Override
-		public void resumeWith(Object result) {
-			this.result = result;
-		}
-
-		@Override
 		protected void run() throws Exception {
-			count++;
-			if (!(run = !run)) {
-				key = null;
+			pendingKey = new ContinuationPendingKey();
+			if (count++ > 0) {
+				pendingKey = null;
 			}
 		}
-		
 	}
 	
 	@Test
@@ -194,12 +180,12 @@ public class JJExecutorImplTest {
 		
 		runTask(scriptExecutor);
 		
-		executor.resume(task.key, "whatever");
+		executor.resume(task.pendingKey(), "whatever");
 		
 		runTask(scriptExecutor);
 		
 		assertThat("whatever", is(task.result));
-		assertThat(task.key, is(nullValue()));
+		assertThat(task.pendingKey, is(nullValue()));
 		assertThat(task.count, is(2));
 		
 	}

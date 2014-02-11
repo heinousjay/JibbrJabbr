@@ -16,17 +16,12 @@
 package jj.script;
 
 import jj.http.server.WebSocketConnection;
-import jj.http.server.servable.document.DocumentRequestProcessor;
 
 /**
  * @author jason
  *
  */
 public interface ScriptRunner {
-
-	public static final String READY_FUNCTION_KEY = "Document.ready";
-
-	void submit(DocumentRequestProcessor documentRequestProcessor);
 
 	void submitPendingResult(WebSocketConnection connection, ContinuationPendingKey pendingKey, Object result);
 }

@@ -67,20 +67,6 @@ class ScriptContext {
 		this.requiredModule = null;
 	}
 	
-	ScriptContext( 
-		final ScriptContext parent,
-		final DocumentRequestProcessor documentRequestProcessor
-	) {
-		this.type = DocumentRequest;
-		this.parent = parent;
-		this.documentRequestProcessor = documentRequestProcessor;
-		this.webSocketConnectionHost = documentRequestProcessor.documentScriptEnvironment();
-		
-		this.connection = null;
-		this.moduleScriptEnvironment = null;
-		this.requiredModule = null;
-	}
-	
 	ScriptContext root() {
 		ScriptContext result = this;
 		while (result.parent != null) result = result.parent;

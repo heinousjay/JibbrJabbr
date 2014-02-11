@@ -69,6 +69,8 @@ public class DocumentScriptEnvironment
 	extends AbstractScriptEnvironment
 	implements RootScriptEnvironment, WebSocketConnectionHost, ResourceAware {
 	
+	public static final String READY_FUNCTION_KEY = "Document.ready";
+	
 	// --- implementation
 	
 	private final Logger log = LoggerFactory.getLogger(DocumentScriptEnvironment.class);

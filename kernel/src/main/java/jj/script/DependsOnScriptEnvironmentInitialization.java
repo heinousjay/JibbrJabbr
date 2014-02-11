@@ -15,6 +15,8 @@
  */
 package jj.script;
 
+import jj.execution.ScriptTask;
+
 /**
  * Inject this component to hitch a continuation to the
  * initialization of a script environment
@@ -30,5 +32,7 @@ public interface DependsOnScriptEnvironmentInitialization {
 	 * @param pendingKey
 	 */
 	void resumeOnInitialization(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey);
+	
+	void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task);
 
 }

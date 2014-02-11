@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.*;
 import jj.execution.JJTask;
 import jj.execution.MockJJExecutor;
 import jj.execution.ResumableTask;
+import jj.execution.TaskHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -67,11 +68,11 @@ public class ScriptEnvironmentInitializerTest {
 		
 		executor.runFirstTask();
 		
-		assertThat(resumable.pendingKey(), is(pendingKey1));
+		assertThat(TaskHelper.pendingKey(resumable), is(pendingKey1));
 		verify(scriptEnvironment).initializing(true);
 		
 		Object result = new Object();
-		resumable.resumeWith(result);
+		TaskHelper.resumeWith(resumable, result);
 		
 		given(continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey1, result)).willReturn(pendingKey2);
 		
@@ -80,17 +81,17 @@ public class ScriptEnvironmentInitializerTest {
 		executor.runFirstTask();
 		
 		verify(scriptEnvironment, never()).initialized(true);
-		assertThat(resumable.pendingKey(), is(pendingKey2));
+		assertThat(TaskHelper.pendingKey(resumable), is(pendingKey2));
 		
 		result = new Object();
-		resumable.resumeWith(result);
+		TaskHelper.resumeWith(resumable, result);
 		
 		executor.tasks.add(task);
 		executor.runFirstTask();
 		
 		verify(continuationCoordinator).resumeContinuation(scriptEnvironment, pendingKey2, result);
 		verify(scriptEnvironment).initialized(true);
-		assertThat(resumable.pendingKey(), is(nullValue()));
+		assertThat(TaskHelper.pendingKey(resumable), is(nullValue()));
 		
 	}
 

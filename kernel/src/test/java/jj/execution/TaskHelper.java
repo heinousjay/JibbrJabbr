@@ -15,18 +15,29 @@
  */
 package jj.execution;
 
+import jj.script.ContinuationPendingKey;
+
 /**
  * just working around access restrictions
+ * for test purposes
  * 
  * @author jason
  *
  */
-public class TaskInvoker {
+public class TaskHelper {
 
 	/**
 	 * @param name
 	 */
 	public static void invoke(final JJTask toInvoke) throws Exception {
 		toInvoke.run();
+	}
+	
+	public static ContinuationPendingKey pendingKey(final ResumableTask task) {
+		return task.pendingKey();
+	}
+	
+	public static void resumeWith(final ResumableTask task, final Object result) {
+		task.resumeWith(result);
 	}
 }

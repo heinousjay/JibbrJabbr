@@ -79,16 +79,20 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		assertThat(scriptEnvironment.initialized(), is(true));
 		
+		// these lines just validate that the animal ScriptEnvironment correctly loaded and initialized its dependencies
+		
 		ModuleScriptEnvironment mse =
 			resourceFinder.findResource(ModuleScriptEnvironment.class, "modules/module1", new RequiredModule(scriptEnvironment, "modules/module1"));
 		
 		assertThat(mse, is(notNullValue()));
+		assertThat(mse.initialized(), is(true));
 		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
 		
 		mse =
 			resourceFinder.findResource(ModuleScriptEnvironment.class, "modules/module2", new RequiredModule(scriptEnvironment, "modules/module2"));
 		
 		assertThat(mse, is(notNullValue()));
+		assertThat(mse.initialized(), is(true));
 		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
 	}
 

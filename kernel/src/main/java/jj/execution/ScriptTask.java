@@ -23,7 +23,7 @@ import jj.script.ScriptEnvironment;
  * @author jason
  *
  */
-public abstract class ScriptTask<T extends ScriptEnvironment> extends JJTask {
+public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableTask {
 	
 	protected final T scriptEnvironment;
 	
