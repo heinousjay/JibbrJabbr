@@ -20,13 +20,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.*;
 import jj.engine.EventSelection;
+import jj.execution.JJExecutor;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ElementMessageProcessor;
-import jj.script.ContinuationPendingKey;
-import jj.script.CurrentScriptContext;
-import jj.script.ScriptRunner;
+
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +42,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ElementMessageProcessorTest {
 
-	@Mock CurrentScriptContext context;
-	@Mock ScriptRunner scriptRunner;
+	@Mock JJExecutor executor;
 	@Mock WebSocketConnection connection;
 	
 	@InjectMocks ElementMessageProcessor emp;
@@ -61,7 +59,7 @@ public class ElementMessageProcessorTest {
 		emp.handle(connection, jqm);
 		
 		//then
-		verify(scriptRunner).submitPendingResult(eq(connection), any(ContinuationPendingKey.class), eventSelection.capture());
+		verify(executor).resume(eq(jqm.pendingKey()), eventSelection.capture());
 		
 		// this is goofy
 		assertThat(eventSelection.getValue(), is(notNullValue()));

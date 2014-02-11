@@ -22,7 +22,6 @@ import jj.Closer;
 import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
 import jj.script.ContinuationCoordinator;
-import jj.script.CurrentScriptContext;
 
 import org.mozilla.javascript.Callable;
 
@@ -39,35 +38,37 @@ public class ConnectionEventExecutor {
 	
 	private final ContinuationCoordinator continuationCoordinator;
 	
-	private final CurrentScriptContext context;
-	
 	private final CurrentWebSocketConnection currentConnection;
 
 	@Inject
 	ConnectionEventExecutor(
 		final JJExecutor executor,
 		final ContinuationCoordinator continuationCoordinator,
-		final CurrentScriptContext context,
 		final CurrentWebSocketConnection currentConnection
 	) {
 		this.executor = executor;
 		this.continuationCoordinator = continuationCoordinator;
-		this.context = context;
 		this.currentConnection = currentConnection;
 	}
 	
 	public void submit(final WebSocketConnection connection, final String event, final Object...args) {
-		executor.execute(new ScriptTask<WebSocketConnectionHost>("host event on WebSocket connection", connection.webSocketConnectionHost()) {
+		executor.execute(new ScriptTask<WebSocketConnectionHost>("host event " + event + " on WebSocket connection", connection.webSocketConnectionHost()) {
 
 			@Override
 			public void run() {
-				context.initialize(connection);
-				Callable function = connection.getFunction(event);
-				if (function == null) function = scriptEnvironment.getFunction(event);
-				try (Closer closer = currentConnection.enterScope(connection)) {
-					continuationCoordinator.execute(scriptEnvironment, function, args);
-				} finally {
-					context.end();
+				
+				if (result == null) {
+				
+					Callable function = connection.getFunction(event);
+					// NO! is this okay?  it isn't.  need to scope this stuff to clients
+					if (function == null) function = scriptEnvironment.getFunction(event);
+					try (Closer closer = currentConnection.enterScope(connection)) {
+						pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+					}
+					
+				} else {
+					
+					pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
 				}
 			}
 		});	

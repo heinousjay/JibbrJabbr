@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptEnvironment;
-import jj.script.ScriptRunner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,6 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public class JJExecutorImplTest {
 	
-	@Mock ScriptRunner scriptRunner;
 	@Mock IOExecutor ioExecutor;
 	@Mock ScriptExecutorFactory scriptExecutorFactory;
 	@Mock ScheduledExecutorService scriptExecutor;

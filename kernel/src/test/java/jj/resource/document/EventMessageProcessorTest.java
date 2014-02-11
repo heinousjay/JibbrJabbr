@@ -25,7 +25,6 @@ import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.EventMessageProcessor;
-import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 import jj.script.ScriptJSON;
 
@@ -47,7 +46,6 @@ import org.mozilla.javascript.ScriptableObject;
 public class EventMessageProcessorTest {
 
 	@Mock ConnectionEventExecutor executor;
-	@Mock CurrentScriptContext context;
 	@Mock ScriptJSON scriptJSON;
 	
 	@Mock ScriptableObject scriptableObject1;

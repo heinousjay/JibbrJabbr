@@ -19,11 +19,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.EventSelection;
+import jj.execution.JJExecutor;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.ScriptRunner;
 
 /**
  * handles an element response from the client, which can happen in
@@ -34,26 +34,22 @@ import jj.script.ScriptRunner;
 @Singleton
 class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
 
-	private final ScriptRunner scriptRunner;
+	private final JJExecutor executor;
 	
 	private final CurrentWebSocketConnection currentConnection;
 	
 	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	ElementMessageProcessor(final ScriptRunner scriptRunner, final CurrentWebSocketConnection connection, final CurrentScriptEnvironment env) {
-		this.scriptRunner = scriptRunner;
+	ElementMessageProcessor(final JJExecutor executor, final CurrentWebSocketConnection connection, final CurrentScriptEnvironment env) {
+		this.executor = executor;
 		this.currentConnection = connection;
 		this.env = env;
 	}
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
-		scriptRunner.submitPendingResult(
-			connection,
-			message.pendingKey(),
-			new EventSelection(message.element().selector, currentConnection, env)
-		);
+		executor.resume(message.pendingKey(), new EventSelection(message.element().selector, currentConnection, env));
 	}
 
 }

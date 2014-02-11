@@ -9,32 +9,28 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.execution.JJExecutor;
 import jj.http.client.HttpClient;
 import jj.http.client.JJHttpClientResponse;
 
 @Singleton
 class RestRequestContinuationProcessor implements ContinuationProcessor {
 
-	private final CurrentScriptContext context;
+	private final JJExecutor executor;
 	
 	private final HttpClient httpClient;
 	
-	private final ScriptRunnerInternal scriptRunner;
-	
 	@Inject
 	RestRequestContinuationProcessor(
-		final CurrentScriptContext context,
 		final HttpClient httpClient,
-		final ScriptRunnerInternal scriptRunner
+		final JJExecutor executor
 	) {
-		this.context = context;
+		this.executor = executor;
 		this.httpClient = httpClient;
-		this.scriptRunner = scriptRunner;
 	}
 
 	@Override
 	public void process(final ContinuationState continuationState) {
-		final ScriptContext scriptContext = context.save();
 		final RestRequest restRequest = continuationState.continuableAs(RestRequest.class);
 		httpClient.execute(restRequest.request()).addListener(
 			new GenericFutureListener<Future<JJHttpClientResponse>>() {
@@ -43,11 +39,11 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 				public void operationComplete(final Future<JJHttpClientResponse> future) throws Exception {
 					
 					try {
-						scriptRunner.submit("REST response with id [" + restRequest.pendingKey() + "]", scriptContext, restRequest.pendingKey(), future.get());
+						executor.resume(restRequest.pendingKey(), future.get());
 					} catch (InterruptedException | CancellationException e) {
 						// ignore this, we're shutting down
 					} catch (ExecutionException e) {
-						scriptRunner.submit("REST response with id [" + restRequest.pendingKey() + "]", scriptContext, restRequest.pendingKey(), e.getCause());
+						executor.resume(restRequest.pendingKey(), e.getCause());
 					}
 				}
 			}

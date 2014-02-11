@@ -16,13 +16,13 @@
 package jj.resource.document;
 
 import static org.mockito.BDDMockito.*;
+import jj.execution.JJExecutor;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ResultMessageProcessor;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptJSON;
-import jj.script.ScriptRunner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResultMessageProcessorTest {
 
-	@Mock ScriptRunner scriptRunner;
+	@Mock JJExecutor executor;
 	@Mock ScriptJSON json;
 	@Mock WebSocketConnection connection;
 	
@@ -46,7 +46,7 @@ public class ResultMessageProcessorTest {
 	@Before
 	public void before() {
 		
-		rmp = new ResultMessageProcessor(scriptRunner, json);
+		rmp = new ResultMessageProcessor(executor, json);
 	}
 	
 	@Test
@@ -57,7 +57,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(scriptRunner).submitPendingResult(connection, new ContinuationPendingKey(id), value);
+		verify(executor).resume(new ContinuationPendingKey(id), value);
 	}
 	
 	@Test
@@ -68,7 +68,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(scriptRunner).submitPendingResult(connection, new ContinuationPendingKey(id), value);
+		verify(executor).resume(new ContinuationPendingKey(id), value);
 	}
 
 }

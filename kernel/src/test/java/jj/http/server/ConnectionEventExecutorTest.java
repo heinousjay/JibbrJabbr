@@ -21,7 +21,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import jj.execution.MockJJExecutor;
 import jj.script.ContinuationCoordinator;
-import jj.script.CurrentScriptContext;
 import jj.script.EventNameHelper;
 
 import org.junit.Before;
@@ -42,7 +41,6 @@ public class ConnectionEventExecutorTest {
 	@Mock WebSocketConnectionHost webSocketConnectionHost;
 	MockJJExecutor executor;
 	@Mock ContinuationCoordinator continuationCoordinator;
-	@Mock CurrentScriptContext context;
 	@Mock Callable eventFunction;
 	@Mock Callable eventFunction2;
 	
@@ -52,7 +50,7 @@ public class ConnectionEventExecutorTest {
 	public void before() {
 		executor = new MockJJExecutor();
 		
-		cee = new ConnectionEventExecutor(executor, continuationCoordinator, context, new MockCurrentWebSocketConnection());
+		cee = new ConnectionEventExecutor(executor, continuationCoordinator, new MockCurrentWebSocketConnection());
 		
 		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
 	}

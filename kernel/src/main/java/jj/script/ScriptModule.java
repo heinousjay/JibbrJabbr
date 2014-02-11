@@ -16,9 +16,6 @@ public class ScriptModule extends JJModule {
 		
 		bind(DependsOnScriptEnvironmentInitialization.class).to(ScriptEnvironmentInitializer.class);
 		
-		bind(ScriptRunner.class).to(ScriptRunnerImpl.class);
-		bind(ScriptRunnerInternal.class).to(ScriptRunnerImpl.class);
-		
 		bind(ContinuationCoordinator.class).to(ContinuationCoordinatorImpl.class);
 		
 		MapBinder<Class<? extends Continuable>, ContinuationProcessor> processors =
