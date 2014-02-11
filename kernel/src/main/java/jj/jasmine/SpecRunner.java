@@ -55,7 +55,7 @@ public class SpecRunner implements JJServerStartupListener {
 	 */
 	@Listener
 	void findAndExecuteSpec(final ScriptEnvironmentInitialized event) {
-		String name = event.executionEnvironment().scriptName();
+		String name = event.scriptEnvironment().scriptName();
 		ScriptResource scriptResource = resourceFinder.findResource(ScriptResource.class, name);
 		SpecResource specResource = resourceFinder.findResource(SpecResource.class, name);
 		

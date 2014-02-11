@@ -106,4 +106,15 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 			throw new AssertionError("could not capture a continuation", e);
 		}
 	}
+
+	/**
+	 * @return
+	 */
+	public ScriptEnvironment currentRootScriptEnvironment() {
+		ScriptEnvironment current = current();
+		while (current instanceof ChildScriptEnvironment) {
+			current = ((ChildScriptEnvironment)current).parent();
+		}
+		return current;
+	}
 }

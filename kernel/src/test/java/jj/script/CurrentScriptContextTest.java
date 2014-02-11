@@ -22,6 +22,8 @@ import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
+import jj.resource.script.RequiredModule;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

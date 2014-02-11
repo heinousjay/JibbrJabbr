@@ -29,6 +29,7 @@ import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ChildScriptEnvironment;
+import jj.script.ContinuationPendingKey;
 import jj.script.RhinoContext;
 import jj.script.ScriptEnvironment;
 
@@ -42,7 +43,64 @@ import org.mozilla.javascript.ScriptableObject;
  */
 @Singleton
 public class ModuleScriptEnvironment extends AbstractScriptEnvironment implements ChildScriptEnvironment {
-
+	
+	private final String moduleIdentifier;
+	
+	private final ScriptEnvironment parent;
+	
+	// the key of our parent.  gets removed on first read and is null forever after
+	private ContinuationPendingKey pendingKey;
+	
+	private final ScriptableObject scope;
+	
+	private final ScriptResource scriptResource;
+	
+	private final String sha1;
+	
+	private final Script script;
+	
+	/**
+	 * @param cacheKey
+	 * @param publisher
+	 * @param contextMaker
+	 */
+	@Inject
+	ModuleScriptEnvironment(
+		final ResourceCacheKey cacheKey,
+		final String moduleIdentifier,
+		final RequiredModule requiredModule,
+		final Publisher publisher,
+		final Provider<RhinoContext> contextProvider,
+		final EngineAPI api,
+		final ResourceFinder resourceFinder
+	) {
+		super(cacheKey, publisher, contextProvider);
+		
+		this.moduleIdentifier = moduleIdentifier;
+		
+		parent = requiredModule.parent();
+		
+		pendingKey = requiredModule.pendingKey();
+		
+		scriptResource = resourceFinder.loadResource(ScriptResource.class, scriptName());
+		
+		if (scriptResource == null) {
+			throw new NoSuchResourceException(moduleIdentifier);
+		}
+		
+		scriptResource.addDependent(parent);
+		parent.addDependent(this);
+		
+		sha1 = scriptResource.sha1();
+		scope = createLocalScope(moduleIdentifier, api.global());
+		
+		try (RhinoContext context = contextProvider.get()) {
+			
+			script = context.compileString(scriptResource.script(), scriptName());
+		
+		}
+	}
+	
 
 	@Override
 	public Scriptable scope() {
@@ -85,62 +143,18 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 
 	@Override
+	public ContinuationPendingKey pendingKey() {
+		ContinuationPendingKey result = pendingKey;
+		pendingKey = null;
+		return result;
+	}
+
+	@Override
 	@IOThread
 	public boolean needsReplacing() throws IOException {
 		// we are obselete when our script is
 		// but we don't listen as a dependent, our parent
 		// does. we'll get reloaded anyway
 		return scriptResource.needsReplacing();
-	}
-	
-	private final String moduleIdentifier;
-	
-	private final ScriptEnvironment parent;
-	
-	private final ScriptableObject scope;
-	
-	private final ScriptResource scriptResource;
-	
-	private final String sha1;
-	
-	private final Script script;
-	
-	/**
-	 * @param cacheKey
-	 * @param publisher
-	 * @param contextMaker
-	 */
-	@Inject
-	ModuleScriptEnvironment(
-		final ResourceCacheKey cacheKey,
-		final String moduleIdentifier,
-		final ModuleParent moduleParent,
-		final Publisher publisher,
-		final Provider<RhinoContext> contextProvider,
-		final EngineAPI api,
-		final ResourceFinder resourceFinder
-	) {
-		super(cacheKey, publisher, contextProvider);
-		
-		this.moduleIdentifier = moduleIdentifier;
-		
-		parent = resourceFinder.findResource(moduleParent.scriptEnvironment());
-		
-		scriptResource = resourceFinder.loadResource(ScriptResource.class, scriptName());
-		
-		if (scriptResource == null) {
-			throw new NoSuchResourceException(moduleIdentifier);
-		}
-		
-		scriptResource.addDependent(parent);
-		parent.addDependent(this);
-		
-		sha1 = scriptResource.sha1();
-		scope = createLocalScope(moduleIdentifier, api.global());
-		
-		try (RhinoContext context = contextProvider.get()) {
-			
-			script = context.compileString(scriptResource.script(), scriptName());
-		}
 	}
 }

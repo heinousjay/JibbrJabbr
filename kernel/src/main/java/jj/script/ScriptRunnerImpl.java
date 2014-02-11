@@ -16,7 +16,6 @@ import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.script.ModuleScriptEnvironment;
 
 /**
  * Coordinates script processing in response to http requests,
@@ -143,72 +142,6 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			}
 		});
 	}
-	
-	@ScriptThread
-	private void moduleInitialExecution() {
-		log.debug("performing initial execution of a required module");
-		
-		if (continuationCoordinator.execute(context.moduleScriptEnvironment()) == null) {
-			context.moduleScriptEnvironment().initialized(true);
-			log.debug("initial execution - completed, resuming");
-			completeModuleInitialization();
-		}
-	}
-
-	@ScriptThread
-	private void resumeModuleInitialExecution(final ContinuationPendingKey pendingKey, final Object result) {
-		log.debug("resuming initial execution of a required module");
-		
-		if (continuationCoordinator.resumeContinuation(context.scriptEnvironment(), pendingKey, result) == null) {
-			context.scriptEnvironment().initialized(true);
-			log.debug("initial execution - completed, resuming");
-			completeModuleInitialization();
-		}
-	}
-	
-	private void completeModuleInitialization() {
-		final RequiredModule requiredModule = context.requiredModule();
-		final ModuleScriptEnvironment moduleScriptEnvironment = context.moduleScriptEnvironment();
-		
-		String name = "resuming module [" + requiredModule.identifier() + "] in parent [" + requiredModule.baseName() + "]";
-		
-		executors.execute(new ScriptTask<ScriptEnvironment>(name, moduleScriptEnvironment) {
-
-			@Override
-			public void run() {
-				context.restore(requiredModule.parentContext());
-				try {
-					restartAfterContinuation(requiredModule.pendingKey(), moduleScriptEnvironment.exports());
-				} finally {
-					context.end();
-				}
-			}
-		});
-	}
-	
-	@Override
-	public void submit(final RequiredModule requiredModule, final ModuleScriptEnvironment scriptExecutionEnvironment) {
-		final String identifier = requiredModule.identifier();
-		
-		String name = "initializing module [" + identifier + "] in parent [" + requiredModule.baseName() + "]";
-		
-		executors.execute(new ScriptTask<ScriptEnvironment>(name, scriptExecutionEnvironment) {
-			
-			@Override
-			public void run() {
-				context.initialize(requiredModule, scriptExecutionEnvironment);
-				try {
-					if (!scriptExecutionEnvironment.initialized()) {
-						moduleInitialExecution();
-					} else {
-						completeModuleInitialization();
-					}
-				} finally {
-					context.end();
-				}
-			}
-		});
-	}
 
 	@Override
 	public void submitPendingResult(
@@ -265,8 +198,7 @@ class ScriptRunnerImpl implements ScriptRunnerInternal {
 			break;
 			
 		case ModuleInitialization:
-			resumeModuleInitialExecution(pendingKey, result);
-			break;
+			throw new AssertionError("SHOULD NEVER HAPPEN AGAIN");
 			
 		case WebSocket:
 		case InternalExecution:

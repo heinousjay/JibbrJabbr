@@ -20,11 +20,10 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
-import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
-import jj.script.CurrentScriptContext;
+import jj.resource.script.RequiredModule;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.RequiredModule;
+import jj.script.ScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -42,19 +41,16 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 	private static final String REQUIRE = "//require";
 	
 	private final Configuration configuration;
-	private final CurrentScriptContext context;
 	private final CurrentScriptEnvironment env;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
 	MakeRequireFunction(
 		final Configuration configuration,
-		final CurrentScriptContext context,
 		final CurrentScriptEnvironment env,
 		final ResourceFinder resourceFinder
 	) {
 		this.configuration = configuration;
-		this.context = context;
 		this.env = env;
 		this.resourceFinder = resourceFinder;
 	}
@@ -85,6 +81,7 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 	}
 	
 	private String toModuleIdentifier(final String input, final String base) {
+		// crazytimes! can probably be simplified
 		return configuration.appPath().relativize(
 			configuration.appPath().resolve(base).resolveSibling(input).normalize()
 		).toString();
@@ -95,11 +92,15 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 		
 		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]), String.valueOf(args[1]));
 		
+		ScriptEnvironment parent = env.currentRootScriptEnvironment();
+		
+		RequiredModule requiredModule = new RequiredModule(parent, moduleIdentifier);
+		
 		ModuleScriptEnvironment scriptEnvironment =
 			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
 				moduleIdentifier,
-				new ModuleParent(context.rootScriptEnvironment())
+				requiredModule
 			);
 		
 		
@@ -111,7 +112,7 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 		// violence, any problem can be solved by using MOAR!
 		
 		if (scriptEnvironment == null || !scriptEnvironment.initialized()) {
-			throw env.preparedContinuation(new RequiredModule(moduleIdentifier, context));
+			throw env.preparedContinuation(requiredModule);
 		}
 		
 		return scriptEnvironment.exports();

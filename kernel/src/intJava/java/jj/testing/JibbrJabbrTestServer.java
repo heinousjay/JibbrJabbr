@@ -41,19 +41,32 @@ import com.google.inject.Stage;
  * @author jason
  *
  */
-public class JJAppTest implements TestRule {
+public class JibbrJabbrTestServer implements TestRule {
 	
 	private final String appPath;
 	
 	private Injector injector;
 	
-	public JJAppTest(final String appPath) {
+	/**
+	 * construct a test server with no file watching pointing to appPath
+	 * @param appPath
+	 */
+	public JibbrJabbrTestServer(final String appPath) {
+		this(appPath, false);
+	}
+	
+	/**
+	 * construct a test server pointing to appPath, with option file watching
+	 * @param appPath
+	 * @param withFileWatch
+	 */
+	public JibbrJabbrTestServer(final String appPath, boolean withFileWatch) {
 		this.appPath = appPath;
 	}
 	
 	@Override
 	public Statement apply(final Statement base, final Description description) {
-
+		
 		// we use production to eagerly instantiate the graph, since the next line will do
 		// that anyway.
 		injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(this, appPath, base, description));
@@ -66,6 +79,10 @@ public class JJAppTest implements TestRule {
 		TestHttpClient client = get(url);
 		client.dumpObjects();
 		return client;
+	}
+	
+	public void inject(Object object) {
+		injector.injectMembers(object);
 	}
 	
 	public TestHttpClient get(final String uri) throws Exception {

@@ -1,12 +1,12 @@
 package jj.script;
 
 import static jj.script.ScriptContextType.*;
-
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
+import jj.resource.script.RequiredModule;
 
 class ScriptContext {
 	

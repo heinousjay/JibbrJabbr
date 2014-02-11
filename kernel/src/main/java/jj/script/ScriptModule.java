@@ -2,6 +2,8 @@ package jj.script;
 
 import jj.JJModule;
 import jj.jjmessage.JJMessage;
+import jj.resource.script.RequiredModule;
+import jj.resource.script.RequiredModuleContinuationProcessor;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
@@ -11,6 +13,8 @@ public class ScriptModule extends JJModule {
 
 	@Override
 	protected void configure() {
+		
+		bind(DependsOnScriptEnvironmentInitialization.class).to(ScriptEnvironmentInitializer.class);
 		
 		bind(ScriptRunner.class).to(ScriptRunnerImpl.class);
 		bind(ScriptRunnerInternal.class).to(ScriptRunnerImpl.class);

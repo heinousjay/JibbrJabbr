@@ -18,6 +18,7 @@ package jj.resource.document;
 import static org.mockito.BDDMockito.*;
 
 import org.mockito.Mock;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -35,6 +36,7 @@ import jj.resource.document.HtmlResource;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.script.MockRhinoContextProvider;
+import jj.script.MockableScriptEnvironmentInitializer;
 
 /**
  * this test only validates that the creator is getting all of the necessary stuff to the resource. there needs to
@@ -53,6 +55,10 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	@Mock ScriptCompiler compiler;
 	@Mock DocumentWebSocketMessageProcessors processors;
 	MockRhinoContextProvider contextProvider;
+	
+	@Mock Script script;
+	
+	@Mock MockableScriptEnvironmentInitializer initializer;
 	
 
 	@Override
@@ -75,6 +81,18 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 		
 		ScriptResource serverResource = resourceMaker.makeScript(ScriptResourceType.Server.suffix(baseName));
 		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName))).willReturn(serverResource);
+		
+		given(compiler.compile(
+			any(ScriptableObject.class),
+			any(ScriptResource.class),
+			any(ScriptResource.class),
+			eq(serverResource)
+		)).willReturn(script);
+	}
+	
+	@Override
+	protected void resourceAssertions(DocumentScriptEnvironment resource) throws Exception {
+		verify(initializer).initializeScript(resource);
 	}
 
 	@Override
@@ -103,7 +121,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 
 	@Override
 	protected DocumentScriptEnvironmentCreator toTest() {
-		return new DocumentScriptEnvironmentCreator(creator);
+		return new DocumentScriptEnvironmentCreator(initializer, creator);
 	}
 
 }

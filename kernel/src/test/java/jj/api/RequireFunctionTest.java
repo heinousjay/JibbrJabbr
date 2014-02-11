@@ -18,10 +18,9 @@ package jj.api;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
-
 import jj.resource.ResourceFinder;
 import jj.resource.script.ModuleScriptEnvironment;
-import jj.script.CurrentScriptContext;
+import jj.script.CurrentScriptEnvironment;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +40,7 @@ import org.mozilla.javascript.Scriptable;
 @RunWith(MockitoJUnitRunner.class)
 public class RequireFunctionTest {
 	
-	@Mock CurrentScriptContext context;
+	@Mock CurrentScriptEnvironment env;
 	@Mock ResourceFinder resourceFinder;
 	
 	@InjectMocks RequireFunction requireFunction;

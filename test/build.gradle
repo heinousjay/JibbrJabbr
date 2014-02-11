@@ -98,7 +98,7 @@ test {
 }
 
 def findApp(String path) {
-	def base = project(':').sourceSets.test.resources.srcDirs.find();
+	def base = project(':kernel').sourceSets.test.resources.srcDirs.find();
 	
 	return new File(base, path);
 }
@@ -108,7 +108,7 @@ task startJibbrJabbr(dependsOn: ':jar') {
 	finalizedBy 'stopJibbrJabbr'
 	
 	ext {
-		jjs = new JibbrJabbrServer(project(':').jar.archivePath, buildDir, findApp('/app1/app'));
+		jjs = new JibbrJabbrServer(project(':').jar.archivePath, buildDir, findApp('/app'));
 	}
 	
 	doLast {

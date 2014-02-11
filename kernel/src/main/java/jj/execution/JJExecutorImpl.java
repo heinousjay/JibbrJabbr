@@ -92,14 +92,14 @@ class JJExecutorImpl implements JJExecutor {
 		}
 	}
 	
-	public Future<?> resume(final ContinuationPendingKey pendingKey, final Object result) {
+	public void resume(final ContinuationPendingKey pendingKey, final Object result) {
 		JJTask task = resumableTasks.remove(pendingKey);
 		// probably not an assertion in the long run - people will at some point be sending bullshit results at this thing and
 		// we will just ignore them.  but that will be when one can do things like run with kernel assertions off :D
 		// so NOT YET
 		assert task != null : "asked to resume a nonexistent task";
 		((ResumableTask)task).resumeWith(result);
-		return execute(task);
+		execute(task);
 	}
 	
 	@Override

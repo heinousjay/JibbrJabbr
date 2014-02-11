@@ -37,13 +37,13 @@ import jj.JJModule;
  */
 class TestModule extends JJModule {
 	
-	private final JJAppTest app;
+	private final JibbrJabbrTestServer testServer;
 	private final String appPath;
 	private final Statement base;
 	private final Description description;
 	
-	TestModule(final JJAppTest app, final String appPath, final Statement base, final Description description) {
-		this.app = app;
+	TestModule(final JibbrJabbrTestServer testServer, final String appPath, final Statement base, final Description description) {
+		this.testServer = testServer;
 		this.appPath = appPath;
 		this.base = base;
 		this.description = description;
@@ -55,7 +55,7 @@ class TestModule extends JJModule {
 		addStartupListenerBinding().to(TestListener.class);
 		addShutdownListenerBinding().to(TestListener.class);
 		
-		bind(JJAppTest.class).toInstance(app);
+		bind(JibbrJabbrTestServer.class).toInstance(testServer);
 		
 		bind(Statement.class).toInstance(base);
 		

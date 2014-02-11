@@ -2,7 +2,7 @@ package jj.script;
 
 import java.io.Serializable;
 
-class ContinuationState implements Serializable {
+public class ContinuationState implements Serializable {
 	
 	private final Continuable continuable;
 	

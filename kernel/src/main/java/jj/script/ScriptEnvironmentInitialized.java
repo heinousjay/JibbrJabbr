@@ -31,7 +31,7 @@ public class ScriptEnvironmentInitialized implements ExecutionEvent {
 		this.scriptEnvironment = scriptEnvironment;
 	}
 	
-	public ScriptEnvironment executionEnvironment() {
+	public ScriptEnvironment scriptEnvironment() {
 		return scriptEnvironment;
 	}
 

@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.resource.script;
+
+import jj.script.Continuable;
+import jj.script.ContinuationPendingKey;
+import jj.script.ScriptEnvironment;
 
 /**
  * @author jason
@@ -21,33 +25,26 @@ package jj.script;
  */
 public class RequiredModule implements Continuable {
 	
+	private final ScriptEnvironment parent;
+	
 	private final String identifier;
-	
-	private final String baseName;
-	
-	private final ScriptContext parentScriptContext;
 	
 	private ContinuationPendingKey pendingKey;
 
 	public RequiredModule(
-		final String identifier, 
-		final CurrentScriptContext context
+		final ScriptEnvironment parent,
+		final String identifier
 	) {
+		this.parent = parent;
 		this.identifier = identifier;
-		this.baseName = context.baseName();
-		this.parentScriptContext = context.save();
-	}
-	
-	String baseName() {
-		return baseName;
-	}
-	
-	ScriptContext parentContext() {
-		return parentScriptContext;
 	}
 	
 	String identifier() {
 		return identifier;
+	}
+	
+	ScriptEnvironment parent() {
+		return parent;
 	}
 	
 	@Override
@@ -65,6 +62,6 @@ public class RequiredModule implements Continuable {
 	
 	@Override
 	public String toString() {
-		return "required module " + identifier + " under " + baseName;
+		return "required module " + identifier + " under " + parent.baseName();
 	}
 }

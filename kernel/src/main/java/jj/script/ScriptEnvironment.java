@@ -60,4 +60,9 @@ public interface ScriptEnvironment extends Resource {
 	 */
 	ScriptableObject newObject();
 
+	/**
+	 * @return
+	 */
+	Object exports();
+
 }

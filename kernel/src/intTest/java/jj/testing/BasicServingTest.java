@@ -111,7 +111,7 @@ public class BasicServingTest {
 	}
 	
 	@Rule
-	public JJAppTest app = new JJAppTest(App.path1);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.path1);
 	
 	static interface Namer {
 		String name(int i);

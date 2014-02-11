@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webtest;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.openqa.selenium.WebDriver;
+package jj.resource.script;
 
 /**
  * @author jason
  *
  */
-public class LetsWriteATest {
-	
-	@Rule
-	public WebDriverRule webDriverRule = new WebDriverRule();
+public class RequiredModuleException extends RuntimeException {
 
-	@Test
-	public void test() throws Exception {
-		WebDriver webDriver = webDriverRule.get("http://localhost:8080/");
-		Thread.sleep(250);
-		
-		// need to incorporate the "modern" version of this (JayChat!)
-		
-		// webDriverRule.takeScreenshot();
+	private static final long serialVersionUID = 5207653702478305981L;
+
+	private static String message(final String attemptedModuleIdentifier) {
+		return "could not require " + attemptedModuleIdentifier;
+	}
+	
+	public RequiredModuleException(final String attemptedModuleIdentifier) {
+		super(message(attemptedModuleIdentifier));
+	}
+	
+	public RequiredModuleException(final String attemptedModuleIdentifier, final Throwable cause) {
+		super(message(attemptedModuleIdentifier), cause);
 	}
 }

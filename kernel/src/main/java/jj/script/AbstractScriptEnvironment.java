@@ -127,6 +127,16 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			return context.evaluateString(scope(), "module.exports", "returning exports");
 		}
 	}
+	
+	/**
+	 * @return a pendingKey if the completion of the initialization task should resume something
+	 * or null if nothing
+	 * <p>
+	 * maybe more things will be on this list later or the mechanism may expand
+	 */
+	protected ContinuationPendingKey pendingKey() {
+		return null;
+	}
 
 	public String toString() {
 		return new StringBuilder(getClass().getSimpleName())

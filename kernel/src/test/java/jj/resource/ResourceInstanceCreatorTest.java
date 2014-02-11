@@ -35,12 +35,13 @@ import jj.resource.css.CssResource;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.HtmlResource;
 import jj.resource.property.PropertiesResource;
-import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
+import jj.resource.script.RequiredModule;
 import jj.resource.script.ScriptResource;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.spec.SpecResource;
 import jj.resource.stat.ic.StaticResource;
+import jj.script.ContinuationPendingKey;
 import jj.script.RhinoContext;
 
 import org.junit.Before;
@@ -180,7 +181,8 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 		given(resourceFinder.loadResource(ScriptResource.class, "index.js")).willReturn(sr);
 		given(resourceFinder.findResource(dse)).willReturn(dse);
 		given(rhinoContext.newObject(any(ScriptableObject.class))).willReturn(new NativeObject());
-		
-		doCreate(ModuleScriptEnvironment.class, "index", new ModuleParent(dse));
+		RequiredModule requiredModule = new RequiredModule(dse, "index");
+		requiredModule.pendingKey(new ContinuationPendingKey());
+		doCreate(ModuleScriptEnvironment.class, "index", requiredModule);
 	}
 }

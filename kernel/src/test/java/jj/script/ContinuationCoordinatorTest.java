@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.jjmessage.JJMessage;
+import jj.resource.script.RequiredModule;
 
 import org.junit.Before;
 import org.junit.Test;

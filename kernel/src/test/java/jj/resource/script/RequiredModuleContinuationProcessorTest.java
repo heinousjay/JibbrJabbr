@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.resource.script;
 
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-
-import jj.engine.RequiredModuleException;
 import jj.execution.IOTask;
 import jj.execution.MockJJExecutor;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
+import jj.resource.script.RequiredModule;
+import jj.resource.script.RequiredModuleContinuationProcessor;
+import jj.script.ContinuationPendingKey;
+import jj.script.ContinuationState;
+import jj.script.DependsOnScriptEnvironmentInitialization;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,37 +50,33 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	String module = "module";
 	
-	@Mock CurrentScriptContext context;
-	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
-	MockJJExecutor executors;
+	MockJJExecutor executor;
 	
 	@Mock ResourceFinder finder;
 	
 	@Mock ContinuationState continuationState;
 	
+	@Mock DependsOnScriptEnvironmentInitialization scriptEnvironmentInitializer;
+	
 	RequiredModule requiredModule;
 
 	RequiredModuleContinuationProcessor processor;
 	
-	@Mock ScriptRunnerInternal scriptRunner;
-	
-	@Mock ModuleScriptEnvironment scriptEnvironment;
+	@Mock ModuleScriptEnvironment moduleScriptEnvironment;
 	
 	@Before
 	public void before() {
 		
 		pendingKey = new ContinuationPendingKey();
 		
-		executors = new MockJJExecutor();
+		executor = new MockJJExecutor();
 		
-		given(context.baseName()).willReturn(baseName);
-		given(context.webSocketConnectionHost()).willReturn(documentScriptEnvironment);
+		processor = new RequiredModuleContinuationProcessor(executor, finder, scriptEnvironmentInitializer);
 		
-		processor = new RequiredModuleContinuationProcessor(context, executors, scriptRunner, finder);
-		
-		requiredModule = new RequiredModule(module, context);
+		requiredModule = new RequiredModule(documentScriptEnvironment, module);
+		requiredModule.pendingKey(pendingKey);
 		
 		given(continuationState.continuableAs(RequiredModule.class)).willReturn(requiredModule);
 	}
@@ -87,39 +85,38 @@ public class RequiredModuleContinuationProcessorTest {
 	public void testFirstRequireOfModule() throws Exception {
 		
 		// given
-		given(finder.loadResource(eq(ModuleScriptEnvironment.class), eq(module), any(ModuleParent.class))).willReturn(scriptEnvironment);
+		given(finder.loadResource(ModuleScriptEnvironment.class, module, requiredModule)).willReturn(moduleScriptEnvironment);
 		
 		// when
 		processor.process(continuationState);
 		
 		// then
 		// prove that an IO task was submitted
-		assertThat(executors.tasks.size(), is(1));
-		assertThat(executors.tasks.get(0), is(instanceOf(IOTask.class)));
+		assertThat(executor.tasks.size(), is(1));
+		assertThat(executor.tasks.get(0), is(instanceOf(IOTask.class)));
 		
 		// and run it
-		executors.runUntilIdle();
+		executor.runUntilIdle();
 		
 		// then
-		verify(scriptRunner).submit(requiredModule, scriptEnvironment);
+		// we validate it happened because it's the only signal we get.  the parent is
+		verify(finder).loadResource(ModuleScriptEnvironment.class, module, requiredModule);
 	}
 	
 	@Test
 	public void testFirstRequireOfModuleNotFoundError() throws Exception {
 		
-		// given
-		requiredModule.pendingKey(pendingKey);
-		
 		// when
 		processor.process(continuationState);
-		executors.runUntilIdle();
-		
+		executor.runUntilIdle();
+		// this shit is broken!
 		// then
-		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), eq(pendingKey), any(RequiredModuleException.class));
+		assertThat(executor.pendingKey, is(pendingKey));
+		assertThat(executor.result, is(instanceOf(RequiredModuleException.class)));
 	}
 	
 	private void givenAScriptEnvironment() {
-		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(module), any(ModuleParent.class))).willReturn(scriptEnvironment);
+		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(module), any(RequiredModule.class))).willReturn(moduleScriptEnvironment);
 	}
 	
 	@Test
@@ -128,30 +125,15 @@ public class RequiredModuleContinuationProcessorTest {
 		// given
 		ScriptableObject exports = mock(ScriptableObject.class);
 		
-		given(scriptEnvironment.exports()).willReturn(exports);
-		given(scriptEnvironment.initialized()).willReturn(true);
-		givenAScriptEnvironment();
-		
-		requiredModule.pendingKey(pendingKey);
-		
-		// when
-		processor.process(continuationState);
-		
-		// then
-		verify(scriptRunner).submit(anyString(), any(ScriptContext.class), eq(pendingKey), eq(exports));
-	}
-	
-	@Test
-	public void testRequireOfObseleteModule() {
-		
-		// given
+		given(moduleScriptEnvironment.exports()).willReturn(exports);
+		given(moduleScriptEnvironment.initialized()).willReturn(true);
 		givenAScriptEnvironment();
 		
 		// when
 		processor.process(continuationState);
 		
-		// then
-		verify(scriptRunner).submit(requiredModule, scriptEnvironment);
+		assertThat(executor.pendingKey, is(pendingKey));
+		assertThat(executor.result, is((Object)exports));
 	}
 
 }

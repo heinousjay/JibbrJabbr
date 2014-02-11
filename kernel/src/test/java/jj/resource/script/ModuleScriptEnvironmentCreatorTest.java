@@ -23,6 +23,7 @@ import java.nio.file.Path;
 
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -34,12 +35,13 @@ import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.ResourceMaker;
-import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironmentCreator;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
+import jj.script.ContinuationPendingKey;
 import jj.script.MockRhinoContextProvider;
+import jj.script.MockableScriptEnvironmentInitializer;
 import jj.script.ScriptEnvironment;
 
 /**
@@ -56,12 +58,16 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
 	@Mock Publisher publisher;
-	ModuleParent parent;
+	RequiredModule requiredModule;
 	// lil ugly! but this satisfies things internally
 	@Mock(extraInterfaces={ScriptEnvironment.class}) AbstractResource scriptEnvironment;
 	MockRhinoContextProvider contextProvider;
 	
+	@Mock MockableScriptEnvironmentInitializer initializer;
+	
 	@Mock ResourceInstanceCreator mockCreator;
+	
+	@Mock Script script;
 	
 
 	@Override
@@ -72,12 +78,12 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	@Override
 	protected Object[] args() {
 		
-		return new Object[] {parent};
+		return new Object[] {requiredModule};
 	}
 	
 	@Override
 	protected void before() throws Exception {
-		parent = new ModuleParent((ScriptEnvironment)scriptEnvironment);
+		
 		given(resourceFinder.findResource(scriptEnvironment)).willReturn(scriptEnvironment);
 	}
 	
@@ -89,9 +95,12 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	}
 	
 	private void givenModuleScriptEnvironmentResources(String baseName) throws Exception {
+		requiredModule = new RequiredModule((ScriptEnvironment)scriptEnvironment, baseName);
+		requiredModule.pendingKey(new ContinuationPendingKey());
+		ScriptResource scriptResource = resourceMaker.makeScript(ScriptResourceType.Module.suffix(baseName));
+		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(baseName))).willReturn(scriptResource);
 		
-		ScriptResource serverResource = resourceMaker.makeScript(ScriptResourceType.Module.suffix(baseName));
-		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Module.suffix(baseName))).willReturn(serverResource);
+		given(contextProvider.context.compileString(anyString(), anyString())).willReturn(script);
 	}
 
 	@Override
@@ -100,14 +109,20 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		givenMinimalServices();
 		givenModuleScriptEnvironmentResources("helpers");
 		
-		ModuleScriptEnvironment result = new ModuleScriptEnvironment(cacheKey(), baseName(), parent, publisher, contextProvider, api, resourceFinder);
+		ModuleScriptEnvironment result = new ModuleScriptEnvironment(cacheKey(), baseName(), requiredModule, publisher, contextProvider, api, resourceFinder);
 		
 		return result;
 	}
 
 	@Override
 	protected ModuleScriptEnvironmentCreator toTest() {
-		return new ModuleScriptEnvironmentCreator(creator);
+		return new ModuleScriptEnvironmentCreator(initializer, creator);
+	}
+	
+	@Override
+	protected void resourceAssertions(ModuleScriptEnvironment resource) throws Exception {
+		// it was initialized.  yay
+		verify(initializer).initializeScript(resource);
 	}
 	
 	@Test
@@ -118,11 +133,11 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		
 		ModuleScriptEnvironmentCreator msec = toTest();
 		
-		assertThat(msec.uri("baseName", new ModuleParent(se)).toString(), is("parentUri#baseName"));
+		assertThat(msec.uri("baseName", new RequiredModule(se, "baseName")).toString(), is("parentUri#baseName"));
 	}
 	
 	@Test
-	public void testRequiresModuleParentForCreation() throws Exception {
+	public void testRequiresArgumentForCreation() throws Exception {
 		
 		boolean caught = false;
 		try {
@@ -144,7 +159,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		
 		caught = false;
 		try {
-			toTest().create(baseName(), new ModuleParent(mock(ScriptEnvironment.class)));
+			toTest().create(baseName(), new RequiredModule(mock(ScriptEnvironment.class), baseName()));
 		} catch (AssertionError ae) {
 			caught = true;
 		}
@@ -153,7 +168,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		
 		caught = false;
 		try {
-			toTest().create(baseName(), new ModuleParent(mock(ScriptEnvironment.class)), new Object());
+			toTest().create(baseName(), new RequiredModule(mock(ScriptEnvironment.class), ""), new Object());
 		} catch (AssertionError ae) {
 			caught = true;
 		}
@@ -164,8 +179,8 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	
 	@Test
 	public void testCreationHandlesArguments() throws Exception {
-		new ModuleScriptEnvironmentCreator(mockCreator).create(baseName(), parent);
-		verify(mockCreator).createResource(eq(ModuleScriptEnvironment.class), any(ResourceCacheKey.class), eq(baseName()), any(Path.class), eq(parent));
+		new ModuleScriptEnvironmentCreator(initializer, mockCreator).create(baseName(), requiredModule);
+		verify(mockCreator).createResource(eq(ModuleScriptEnvironment.class), any(ResourceCacheKey.class), eq(baseName()), any(Path.class), eq(requiredModule));
 	}
 
 }

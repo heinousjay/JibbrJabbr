@@ -16,13 +16,19 @@
 package jj.webtest;
 
 import java.io.File;
+import java.io.IOException;
+
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import com.google.common.io.Files;
 
 /**
  * supplies a configured webdriver
@@ -73,6 +79,15 @@ public class WebDriverRule implements TestRule {
 				}
 			}
 		};
+	}
+	
+	public void takeScreenshot() throws IOException {
+		
+		assert (current != null) : "didn't open a driver!";
+		
+		File file = ((TakesScreenshot)current).getScreenshotAs(OutputType.FILE);
+		
+		Files.copy(file, new File("screenshot-" + System.nanoTime() + ".png"));
 	}
 
 	public WebDriver get(final String url) {

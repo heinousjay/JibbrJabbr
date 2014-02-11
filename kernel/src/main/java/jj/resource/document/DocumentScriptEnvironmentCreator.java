@@ -22,20 +22,22 @@ import java.nio.file.Paths;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
-import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
+import jj.script.AbstractScriptEnvironmentCreator;
+import jj.script.ScriptEnvironmentInitializer;
 
 /**
  * @author jason
  *
  */
 @Singleton
-public class DocumentScriptEnvironmentCreator extends AbstractResourceCreator<DocumentScriptEnvironment> {
+public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<DocumentScriptEnvironment> {
 	
 	private final ResourceInstanceCreator creator;
 	
 	@Inject
-	DocumentScriptEnvironmentCreator(final ResourceInstanceCreator creator) {
+	DocumentScriptEnvironmentCreator(final ScriptEnvironmentInitializer initializer, final ResourceInstanceCreator creator) {
+		super(initializer);
 		this.creator = creator;
 	}
 
@@ -50,7 +52,7 @@ public class DocumentScriptEnvironmentCreator extends AbstractResourceCreator<Do
 	}
 
 	@Override
-	public DocumentScriptEnvironment create(String baseName, Object... args) throws IOException {
+	protected DocumentScriptEnvironment createScriptEnvironment(String baseName, Object... args) throws IOException {
 		DocumentScriptEnvironment dse = creator.createResource(DocumentScriptEnvironment.class, cacheKey(baseName), baseName, Paths.get("/"), args);
 		
 		// perform the initial execution immediately

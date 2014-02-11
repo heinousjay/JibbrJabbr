@@ -1,6 +1,6 @@
 package jj.script;
 
-interface ContinuationProcessor {
+public interface ContinuationProcessor {
 	
 	void process(ContinuationState continuationState);
 }

@@ -1,4 +1,6 @@
+var caller = require('modules/module1');
+
 $(function() {
 	
-	require('modules/module1').callMe();
+	caller.callMe();
 });

@@ -22,11 +22,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.ResourceFinder;
-import jj.resource.script.ModuleParent;
 import jj.resource.script.ModuleScriptEnvironment;
-import jj.script.CurrentScriptContext;
+import jj.resource.script.RequiredModule;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.RequiredModule;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -41,7 +39,6 @@ class RequireFunction extends BaseFunction {
 
 	private static final long serialVersionUID = -3809338081179905958L;
 	
-	private final CurrentScriptContext context;
 	private final CurrentScriptEnvironment env;
 	private final ResourceFinder resourceFinder;
 	// we just need this to have a base upon which to determine location
@@ -49,11 +46,9 @@ class RequireFunction extends BaseFunction {
 	
 	@Inject
 	RequireFunction(
-		final CurrentScriptContext context,
 		final CurrentScriptEnvironment env,
 		final ResourceFinder resourceFinder
 	) {
-		this.context = context;
 		this.env = env;
 		this.resourceFinder = resourceFinder;
 	}
@@ -77,11 +72,13 @@ class RequireFunction extends BaseFunction {
 		
 		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]), String.valueOf(args[1]));
 		
+		RequiredModule requiredModule = new RequiredModule(env.currentRootScriptEnvironment(), moduleIdentifier);
+		
 		ModuleScriptEnvironment scriptEnvironment =
 			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
 				moduleIdentifier,
-				new ModuleParent(context.rootScriptEnvironment())
+				requiredModule
 			);
 		
 		
@@ -93,7 +90,7 @@ class RequireFunction extends BaseFunction {
 		// violence, any problem can be solved by using MOAR!
 		
 		if (scriptEnvironment == null || !scriptEnvironment.initialized()) {
-			throw env.preparedContinuation(new RequiredModule(moduleIdentifier, context));
+			throw env.preparedContinuation(requiredModule);
 		}
 		
 		return scriptEnvironment.exports();

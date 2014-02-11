@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.script;
+package jj.script;
 
-import jj.script.ScriptEnvironment;
+import jj.execution.JJExecutor;
 
 /**
- * type-safe argument carrier for resource creation.  a regrettable necessity,
- * but a cheap one
+ * just raises the visibility of some methods for testing
  * 
  * @author jason
  *
  */
-public class ModuleParent {
-	
-	private final ScriptEnvironment scriptEnvironment;
+public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentInitializer {
 
-	public ModuleParent(final ScriptEnvironment scriptEnvironment) {
-		this.scriptEnvironment = scriptEnvironment;
+	/**
+	 * @param executor
+	 * @param continuationCoordinator
+	 */
+	public MockableScriptEnvironmentInitializer(JJExecutor executor, ContinuationCoordinator continuationCoordinator) {
+		super(executor, continuationCoordinator);
 	}
-	
-	ScriptEnvironment scriptEnvironment() {
-		return scriptEnvironment;
-	}
+
 	
 	@Override
-	public String toString() {
-		return scriptEnvironment.baseName();
+	public void initializeScript(AbstractScriptEnvironment se) {
+		super.initializeScript(se);
+	}
+	
+	public void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
+		
 	}
 }

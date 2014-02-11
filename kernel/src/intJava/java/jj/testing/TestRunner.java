@@ -164,7 +164,7 @@ class TestRunner {
 		}
 	}
 	
-	private final JJAppTest app;
+	private final JibbrJabbrTestServer app;
 	private final TestHttpRequest request;
 	private final TestHttpResponse response;
 	private final TestJJEngineHttpHandler handler;
@@ -172,7 +172,7 @@ class TestRunner {
 	
 	@Inject
 	TestRunner(
-		final JJAppTest app,
+		final JibbrJabbrTestServer app,
 		final TestHttpRequest request,
 		final TestHttpResponse response,
 		final TestJJEngineHttpHandler handler,

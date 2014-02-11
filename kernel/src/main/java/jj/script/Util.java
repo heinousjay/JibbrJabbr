@@ -24,9 +24,9 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-public class Util {
+public enum Util {
 	
-	private Util() {}
+	;
 	
 	public static String toJavaString(final Object fromScript) {
 		try {

@@ -22,24 +22,23 @@ import java.nio.file.Paths;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
-import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
+import jj.script.AbstractScriptEnvironmentCreator;
+import jj.script.ScriptEnvironmentInitializer;
 
 /**
  * @author jason
  *
  */
 @Singleton
-public class ModuleScriptEnvironmentCreator extends AbstractResourceCreator<ModuleScriptEnvironment> {
+public class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ModuleScriptEnvironment> {
 	
-	/**
-	 * 
-	 */
-	private static final String ARG_ERROR = "ModuleScriptEnvironmentCreator requires a ModuleParent argument";
+	private static final String ARG_ERROR = "ModuleScriptEnvironmentCreator requires a RequiredModule argument";
 	private final ResourceInstanceCreator creator;
 	
 	@Inject
-	ModuleScriptEnvironmentCreator(final ResourceInstanceCreator creator) {
+	ModuleScriptEnvironmentCreator(final ScriptEnvironmentInitializer initializer, final ResourceInstanceCreator creator) {
+		super(initializer);
 		this.creator = creator;
 	}
 
@@ -54,27 +53,27 @@ public class ModuleScriptEnvironmentCreator extends AbstractResourceCreator<Modu
 	}
 
 	@Override
-	public ModuleScriptEnvironment create(String baseName, Object... args) throws IOException {
+	protected ModuleScriptEnvironment createScriptEnvironment(String moduleIdentifier, Object... args) throws IOException {
 		
-		assert args.length == 1 && args[0] instanceof ModuleParent : ARG_ERROR;
+		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
 		
 		return creator.createResource(
 			ModuleScriptEnvironment.class,
-			cacheKey(baseName, args),
-			baseName,
+			cacheKey(moduleIdentifier, args),
+			moduleIdentifier,
 			Paths.get("/"),
 			args
 		);
 	}
 	
 	@Override
-	protected URI uri(String baseName, Object... args) {
+	protected URI uri(String moduleIdentifier, Object... args) {
 		
-		assert args.length == 1 && args[0] instanceof ModuleParent : ARG_ERROR;
+		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
 		
-		ModuleParent parent = (ModuleParent)args[0];
+		RequiredModule requiredModule = (RequiredModule)args[0];
 		
-		return URI.create(parent + "#" + baseName);
+		return URI.create(requiredModule.parent().baseName() + "#" + moduleIdentifier);
 	}
 
 }

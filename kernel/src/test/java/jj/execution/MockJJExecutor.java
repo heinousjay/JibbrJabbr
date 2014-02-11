@@ -22,6 +22,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import jj.script.ContinuationPendingKey;
+
 /**
  * @author jason
  *
@@ -42,6 +44,15 @@ public class MockJJExecutor implements JJExecutor {
 		assert(!tasks.isEmpty());
 		
 		tasks.remove(0).run();
+	}
+	
+	public ContinuationPendingKey pendingKey;
+	public Object result;
+	
+	@Override
+	public void resume(ContinuationPendingKey pendingKey, Object result) {
+		this.pendingKey = pendingKey;
+		this.result = result;
 	}
 	
 	@Override

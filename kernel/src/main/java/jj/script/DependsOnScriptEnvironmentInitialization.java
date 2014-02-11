@@ -13,25 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.engine;
+package jj.script;
 
 /**
+ * Inject this component to hitch a continuation to the
+ * initialization of a script environment
+ * 
  * @author jason
  *
  */
-public class RequiredModuleException extends RuntimeException {
+public interface DependsOnScriptEnvironmentInitialization {
 
-	private static final long serialVersionUID = 5207653702478305981L;
+	/**
+	 * register here to have a pendingKey resumed when a scriptEnvironment has transitioned to initialized
+	 * @param scriptEnvironment
+	 * @param pendingKey
+	 */
+	void resumeOnInitialization(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey);
 
-	private static String message(final String attemptedModuleIdentifier) {
-		return "could not require " + attemptedModuleIdentifier;
-	}
-	
-	public RequiredModuleException(final String attemptedModuleIdentifier) {
-		super(message(attemptedModuleIdentifier));
-	}
-	
-	public RequiredModuleException(final String attemptedModuleIdentifier, final Throwable cause) {
-		super(message(attemptedModuleIdentifier), cause);
-	}
 }
