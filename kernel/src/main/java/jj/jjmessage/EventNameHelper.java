@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.jjmessage;
 
-import jj.jjmessage.Event;
-import jj.jjmessage.JJMessage;
-import jj.jjmessage.JJMessage.Type;
 
 /**
  * common functions for making a consistent event name
@@ -30,7 +27,7 @@ public class EventNameHelper {
 	private static final String FORMAT = "%s-%s(%s)";
 	
 	public static String makeEventName(JJMessage eventMessage) {
-		assert eventMessage != null && eventMessage.type() == Type.Event : "only event messages can be made into event names";
+		assert eventMessage != null && eventMessage.type() == JJMessage.Type.Event : "only event messages can be made into event names";
 		Event event = eventMessage.event();
 		return makeEventName(event.context, event.selector, event.type);
 	}

@@ -10,14 +10,9 @@ import jj.resource.config.ConfigResourceCreator;
 import jj.resource.css.CssResource;
 import jj.resource.css.CssResourceCreator;
 import jj.resource.document.DocumentProcessingModule;
-import jj.resource.document.HtmlResource;
-import jj.resource.document.HtmlResourceCreator;
 import jj.resource.property.PropertiesResource;
 import jj.resource.property.PropertiesResourceCreator;
-import jj.resource.script.ModuleScriptEnvironment;
-import jj.resource.script.ModuleScriptEnvironmentCreator;
-import jj.resource.script.ScriptResource;
-import jj.resource.script.ScriptResourceCreator;
+import jj.resource.script.ScriptResourceModule;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.sha1.Sha1ResourceCreator;
 import jj.resource.spec.SpecResource;
@@ -47,27 +42,19 @@ public class ResourceModule extends JJModule {
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
 		addShutdownListenerBinding().to(ResourceCacheImpl.class);
 		
-		ResourceCreatorBinder bindCreation = new ResourceCreatorBinder(binder());
+		bindCreation().of(AssetResource.class).to(AssetResourceCreator.class);
 		
-		bindCreation.of(AssetResource.class).to(AssetResourceCreator.class);
+		bindCreation().of(ConfigResource.class).to(ConfigResourceCreator.class);
 		
-		bindCreation.of(ConfigResource.class).to(ConfigResourceCreator.class);
+		bindCreation().of(CssResource.class).to(CssResourceCreator.class);
 		
-		bindCreation.of(CssResource.class).to(CssResourceCreator.class);
+		bindCreation().of(Sha1Resource.class).to(Sha1ResourceCreator.class);
 		
-		bindCreation.of(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		bindCreation().of(SpecResource.class).to(SpecResourceCreator.class);
 		
-		bindCreation.of(SpecResource.class).to(SpecResourceCreator.class);
+		bindCreation().of(StaticResource.class).to(StaticResourceCreator.class);
 		
-		bindCreation.of(StaticResource.class).to(StaticResourceCreator.class);
-		
-		bindCreation.of(PropertiesResource.class).to(PropertiesResourceCreator.class);
-
-		
-		bindCreation.of(HtmlResource.class).to(HtmlResourceCreator.class);
-		bindCreation.of(ScriptResource.class).to(ScriptResourceCreator.class);
-		bindCreation.of(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
-		
+		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
 		
@@ -80,6 +67,7 @@ public class ResourceModule extends JJModule {
 		}
 		
 		install(new DocumentProcessingModule());
+		install(new ScriptResourceModule());
 		
 	}
 }

@@ -54,11 +54,8 @@ public class ServablesTest {
 	@Before
 	public void before() {
 		
-		given(assetServable.type()).willReturn(AssetResource.class);
 		given(assetServable.isMatchingRequest(otherMatch)).willReturn(true);
-		given(cssServable.type()).willReturn(CssResource.class);
 		given(cssServable.isMatchingRequest(cssMatch)).willReturn(true);
-		given(staticServable.type()).willReturn(StaticResource.class);
 		given(staticServable.isMatchingRequest(otherMatch)).willReturn(true);
 		given(staticServable.isMatchingRequest(cssMatch)).willReturn(true);
 		

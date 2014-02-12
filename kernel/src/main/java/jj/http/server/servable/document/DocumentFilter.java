@@ -10,7 +10,7 @@ package jj.http.server.servable.document;
  * @author jason
  *
  */
-interface DocumentFilter {
+public interface DocumentFilter {
 	
 	/**
 	 * flag indicating this needs to do IO

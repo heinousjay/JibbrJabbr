@@ -92,9 +92,4 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 		
 		return result;
 	}
-
-	@Override
-	public Class<ScriptResource> type() {
-		return ScriptResource.class;
-	}
 }

@@ -71,11 +71,6 @@ public class ServableTest extends ServableTestBase {
 		public Resource loadResource(URIMatch match) {
 			return null;
 		}
-
-		@Override
-		public Class<Resource> type() {
-			return Resource.class;
-		}
 		
 	}
 	

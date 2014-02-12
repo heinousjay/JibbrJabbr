@@ -104,14 +104,34 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 			);
 		
 		
-		// if we have an up-to-date script execution environment, just return exports,
-		// otherwise we need a continuation to start processing it properly,
-		// mainly because if we don't do this as its own top call, then any
+		// if we find a ModuleScriptEnvironment, return the exports, even
+		// if it is still being initialized.  this will happen in circular
+		// dependency scenarios.  MAKE IT CLEAR IN THE DOCS that this can
+		// happen.  node does the same thing so it's fair
+		
+		// on the continuation side, the system does wait for initialization to
+		// finish before restarting the waiting task, because if multiple requests
+		// for the same non-existent module result in continuations, then it's
+		// probably a lot of requests hitting the same uninitialized script at
+		// once
+		
+		// it may be possible to determine the circular invocation and break it by
+		// returning only in that case, thereby allowing most required modules
+		// to be complete on parent resumption, but i'm not yet sure what that would
+		// take
+		
+		// not sure what can guard against a cycle in this environment, though.
+		// would involve that execution trace concept for sure
+		
+		// if there is no ModuleScriptEnvironment found, then we need a 
+		// continuation to start processing it properly
+		
+		// this is because if we don't do this as its own top call, then any
 		// continuation inside the module will fail because there will be the
 		// pending top call caused by this function.  continuations are like
 		// violence, any problem can be solved by using MOAR!
 		
-		if (scriptEnvironment == null || !scriptEnvironment.initialized()) {
+		if (scriptEnvironment == null) {
 			throw env.preparedContinuation(requiredModule);
 		}
 		

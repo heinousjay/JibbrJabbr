@@ -117,7 +117,7 @@ public class ContinuationCoordinatorTest {
 	public void testInitialExecutionWithContinuation() {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
-		continuationState.continuableAs(Continuable.class).pendingKey(pendingKey);
+		continuationState.continuableAs(JJMessage.class).pendingKey(pendingKey);
 		
 		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
 
@@ -152,7 +152,7 @@ public class ContinuationCoordinatorTest {
 	public void testFunctionExecutionWithContinuation() {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
-		continuationState.continuableAs(Continuable.class).pendingKey(pendingKey);
+		continuationState.continuableAs(JJMessage.class).pendingKey(pendingKey);
 		
 		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, function, args);
 		
@@ -191,7 +191,7 @@ public class ContinuationCoordinatorTest {
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
-		continuationState.continuableAs(Continuable.class).pendingKey(pendingKey);
+		continuationState.continuableAs(JJMessage.class).pendingKey(pendingKey);
 		
 		ContinuationPendingKey result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		

@@ -60,9 +60,4 @@ class CssServable extends Servable<CssResource> {
 		}
 		return result;
 	}
-
-	@Override
-	public Class<CssResource> type() {
-		return CssResource.class;
-	}
 }

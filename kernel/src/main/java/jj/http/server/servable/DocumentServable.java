@@ -95,9 +95,4 @@ class DocumentServable extends Servable<HtmlResource> {
 	public HtmlResource loadResource(URIMatch match) {
 		return resourceFinder.loadResource(HtmlResource.class, match.baseName);
 	}
-
-	@Override
-	public Class<HtmlResource> type() {
-		return HtmlResource.class;
-	}
 }

@@ -22,10 +22,10 @@ import static org.mockito.BDDMockito.*;
 import jj.engine.EventSelection;
 import jj.http.server.ConnectionEventExecutor;
 import jj.http.server.WebSocketConnection;
+import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.EventMessageProcessor;
-import jj.script.EventNameHelper;
 import jj.script.ScriptJSON;
 
 import org.junit.Test;

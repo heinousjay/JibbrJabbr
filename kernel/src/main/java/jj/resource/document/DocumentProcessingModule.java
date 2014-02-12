@@ -23,7 +23,6 @@ import jj.JJModule;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
-import jj.resource.ResourceCreatorBinder;
 
 /**
  * FIXME: WebSocketMessageProcessor binding doesn't really make any sense!
@@ -57,10 +56,8 @@ public class DocumentProcessingModule extends JJModule {
 		bindProcessing.of(JJMessage.Type.Element).to(ElementMessageProcessor.class);
 		bindProcessing.of(JJMessage.Type.Result).to(ResultMessageProcessor.class);
 		
-		
-		ResourceCreatorBinder bindCreation = new ResourceCreatorBinder(binder());
-		
-		bindCreation.of(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
+		bindCreation().of(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
+		bindCreation().of(HtmlResource.class).to(HtmlResourceCreator.class);
 		
 		bind(WebSocketMessageProcessor.class).to(DocumentWebSocketMessageProcessors.class);
 	}

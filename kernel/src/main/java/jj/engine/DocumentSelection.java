@@ -3,10 +3,10 @@ package jj.engine;
 import java.util.Collections;
 import java.util.Map;
 
+import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.EventNameHelper;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

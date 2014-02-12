@@ -25,9 +25,9 @@ import jj.engine.EventSelection;
 import jj.http.server.ConnectionEventExecutor;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
+import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.EventNameHelper;
 import jj.script.ScriptJSON;
 
 /**

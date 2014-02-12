@@ -44,9 +44,4 @@ class AssetServable extends Servable<AssetResource> {
 		return resourceFinder.loadResource(AssetResource.class, match.baseName);
 	}
 
-	@Override
-	public Class<AssetResource> type() {
-		return AssetResource.class;
-	}
-
 }

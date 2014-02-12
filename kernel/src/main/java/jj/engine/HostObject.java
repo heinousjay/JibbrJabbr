@@ -7,7 +7,7 @@ import org.mozilla.javascript.Scriptable;
  * @author jason
  *
  */
-interface HostObject extends Scriptable {
+public interface HostObject extends Scriptable {
 
 	String name();
 	

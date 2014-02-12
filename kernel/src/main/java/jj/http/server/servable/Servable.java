@@ -50,8 +50,6 @@ public abstract class Servable<T extends Resource> {
 	 */
 	public abstract boolean isMatchingRequest(final URIMatch uriMatch);
 	
-	public abstract Class<T> type();
-	
 	@IOThread
 	public abstract RequestProcessor makeRequestProcessor(
 		final HttpRequest request,

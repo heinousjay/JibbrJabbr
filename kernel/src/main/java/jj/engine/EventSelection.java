@@ -1,9 +1,10 @@
 package jj.engine;
 
 import jj.http.server.CurrentWebSocketConnection;
+import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.EventNameHelper;
+
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.Callable;
 

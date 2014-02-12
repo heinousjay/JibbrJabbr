@@ -75,9 +75,4 @@ public class StaticServable extends Servable<StaticResource> {
 		return resourceFinder.loadResource(StaticResource.class, match.baseName);
 	}
 
-	@Override
-	public Class<StaticResource> type() {
-		return StaticResource.class;
-	}
-
 }

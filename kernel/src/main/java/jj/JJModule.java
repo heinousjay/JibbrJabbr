@@ -16,6 +16,10 @@
 package jj;
 
 import jj.conversion.Converter;
+import jj.engine.HostObject;
+import jj.http.server.servable.document.DocumentFilter;
+import jj.resource.ResourceCreatorBinder;
+import jj.script.ContinuationProcessorBinder;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
@@ -28,9 +32,15 @@ import com.google.inject.multibindings.Multibinder;
  */
 public abstract class JJModule extends AbstractModule {
 	
+	private ResourceCreatorBinder bindCreation;
+	
+	private ContinuationProcessorBinder dispatch;
+	
 	private Multibinder<JJServerStartupListener> startupListeners;
 	private Multibinder<JJServerShutdownListener> shutdownListeners;
 	private Multibinder<Converter<?, ?>> converters;
+	private Multibinder<DocumentFilter> filters;
+	private Multibinder<HostObject> hostObjects;
 
 	protected LinkedBindingBuilder<JJServerStartupListener> addStartupListenerBinding() {
 		if (startupListeners == null) {
@@ -52,5 +62,32 @@ public abstract class JJModule extends AbstractModule {
 		}
 		return converters.addBinding();
 	}
+	
+	protected LinkedBindingBuilder<DocumentFilter> addFilterBinding() {
+		if (filters == null) {
+			filters = Multibinder.newSetBinder(binder(), DocumentFilter.class);
+		}
+		return filters.addBinding();
+	}
+	
+	protected LinkedBindingBuilder<HostObject> addHostObjectBinding() {
+		if (hostObjects == null) {
+			hostObjects = Multibinder.newSetBinder(binder(), HostObject.class);
+		}
+		return hostObjects.addBinding();
+	}
+	
+	protected ResourceCreatorBinder bindCreation() {
+		if (bindCreation == null) {
+			bindCreation = new ResourceCreatorBinder(binder());
+		}
+		return bindCreation;
+	}
 
+	protected ContinuationProcessorBinder dispatch() {
+		if (dispatch == null) {
+			dispatch = new ContinuationProcessorBinder(binder());
+		}
+		return dispatch;
+	}
 }
