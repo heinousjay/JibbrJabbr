@@ -16,7 +16,7 @@
 package jj.resource;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
@@ -24,6 +24,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
+import jj.configuration.Configuration;
+import jj.execution.ExecutionConfiguration;
 import jj.resource.document.HtmlResource;
 import jj.resource.stat.ic.StaticResource;
 
@@ -58,19 +60,38 @@ public class ResourceCacheTest extends RealResourceBase {
 	
 	ResourceCacheImpl rc;
 	
+	@Mock Configuration configuration;
+	@Mock ExecutionConfiguration executionCongfiguration;
+	
 	@Before
 	public void before() {
+		
+		given(configuration.get(ExecutionConfiguration.class)).willReturn(executionCongfiguration);
+		given(executionCongfiguration.ioThreads()).willReturn(4);
 		
 		HashMap<Class<? extends Resource>, ResourceCreator<? extends Resource>> map = new HashMap<>();
 		map.put(StaticResource.class, src);
 		map.put(HtmlResource.class, hrc);
-		rc = new ResourceCacheImpl(new ResourceCreators(map));
+		rc = new ResourceCacheImpl(new ResourceCreators(map), configuration);
 		
 		sKey = new ResourceCacheKey(StaticResource.class, uri);
 		hKey = new ResourceCacheKey(HtmlResource.class, uri);
 		
 		given(src.cacheKey(uri)).willReturn(sKey);
 		given(hrc.cacheKey(uri)).willReturn(hKey);
+	}
+	
+	@Test
+	public void testStartupBehavior() throws Exception {
+		
+		rc.putIfAbsent(sKey, hr);
+		rc.start();
+		
+		assertThat(rc.get(sKey), is((Resource)hr));
+		rc.stop();
+		rc.start();
+		assertThat(rc.get(sKey), is(nullValue()));
+		
 	}
 
 	@Test

@@ -20,7 +20,7 @@ import jj.JJServerShutdownListener;
  *
  */
 @Singleton
-public class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdownListener {
+class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdownListener {
 	
 	public static boolean isIOThread() {
 		return flag.get() != null;
@@ -30,7 +30,8 @@ public class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerS
 
 	// watch service eats one thread
 	// plus half the processors
-	public static final int WORKER_COUNT = 1 + Math.max(2, (int)(Runtime.getRuntime().availableProcessors() * 0.5));
+	// gonna flip this around! get our values from the configuration system woo
+	private static final int WORKER_COUNT = 1 + Math.max(2, (int)(Runtime.getRuntime().availableProcessors() * 0.5));
 
 	
 	@Inject

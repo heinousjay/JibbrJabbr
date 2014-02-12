@@ -123,7 +123,8 @@ public class ResourceWatchServiceImplTest {
 		map.put(StaticResource.class, StaticResourceMaker.fake(configuration));
 		map.put(HtmlResource.class, HtmlResourceMaker.fake(configuration));
 		
-		resourceCache = new ResourceCacheImpl(new ResourceCreators(map));
+		// we can pass null, so long as we never call start
+		resourceCache = new ResourceCacheImpl(new ResourceCreators(map), null);
 	}
 	
 	@After

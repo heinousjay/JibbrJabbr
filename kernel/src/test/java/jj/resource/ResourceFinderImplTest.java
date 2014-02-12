@@ -86,7 +86,8 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		
 		resourceCreators = new ResourceCreators(resourceCreatorsMap);
 		
-		resourceCache = new ResourceCacheImpl(resourceCreators);
+		// you can pass null, if you never call start it won't matter
+		resourceCache = new ResourceCacheImpl(resourceCreators, null);
 		
 		given(executors.isIOThread()).willReturn(true);
 		

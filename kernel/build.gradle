@@ -21,6 +21,9 @@ dependencies {
 
 test {
 	maxParallelForks = Runtime.getRuntime().availableProcessors() / 2
+	
+	minHeapSize = "128m"
+	maxHeapSize = "512m"
 }
 
 task integrationTest(type: Test, dependsOn: intTestClasses) {
@@ -39,6 +42,9 @@ task integrationTest(type: Test, dependsOn: intTestClasses) {
 	
 	reports.html.destination = new File(reports.html.destination.parentFile, name)
 	reports.junitXml.destination = new File(reports.junitXml.destination, name)
+	
+	minHeapSize = "128m"
+	maxHeapSize = "512m"
 }
 
 integrationTest.shouldRunAfter test
