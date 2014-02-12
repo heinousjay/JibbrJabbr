@@ -49,7 +49,6 @@ import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
-import jj.resource.script.RootScriptEnvironment;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.script.AbstractScriptEnvironment;
@@ -66,7 +65,7 @@ import jj.script.RhinoContext;
 @Singleton
 public class DocumentScriptEnvironment
 	extends AbstractScriptEnvironment
-	implements RootScriptEnvironment, WebSocketConnectionHost, ResourceAware {
+	implements WebSocketConnectionHost, ResourceAware {
 	
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	

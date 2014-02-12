@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import jj.execution.IOThread;
 import jj.logging.EmergencyLogger;
 import jj.resource.ResourceCacheKey;
-import jj.resource.script.RootScriptEnvironment;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.RhinoContext;
 
@@ -38,7 +37,7 @@ import jj.script.RhinoContext;
  * @author jason
  *
  */
-public class APIBootstrapScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
+public class APIBootstrapScriptEnvironment extends AbstractScriptEnvironment {
 
 	@Override
 	public Scriptable scope() {
