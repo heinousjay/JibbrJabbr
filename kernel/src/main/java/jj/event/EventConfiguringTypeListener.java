@@ -163,6 +163,11 @@ class EventConfiguringTypeListener implements TypeListener {
 			// hanging onto event types is okay, they'll get reused
 			parameterType = method.getParameterTypes()[0].getName();
 		}
+		
+		@Override
+		public String toString() {
+			return method.toString();
+		}
 	}
 
 	/**
@@ -255,6 +260,7 @@ class EventConfiguringTypeListener implements TypeListener {
 			final CtClass clazz = classPool.get(type.toString());
 			
 			if (clazz.hasAnnotation(Subscriber.class)) {
+				
 				subscribers.put(name, new ArrayList<MethodInfo>());
 				for (CtMethod method : clazz.getMethods()) {
 					if (
