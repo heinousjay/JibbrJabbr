@@ -15,7 +15,7 @@
  */
 package jj.execution;
 
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Future;
 
 import jj.script.ScriptEnvironment;
 
@@ -33,7 +33,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableT
 	}
 	
 	@Override
-	protected final ScheduledExecutorService executor(final ExecutorBundle bundle) {
-		return bundle.scriptExecutorFactory.executorFor(scriptEnvironment);
+	Future<?> addRunnableToExecutor(ExecutorBundle executors, Runnable runnable) {
+		return executors.scriptExecutorFactory.executorFor(scriptEnvironment).submit(runnable);
 	}
 }

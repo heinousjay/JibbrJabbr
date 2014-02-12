@@ -31,7 +31,7 @@ class JJExecutorImpl implements JJExecutor {
 	
 	private static final long MAX_QUEUED_TIME = TimeUnit.SECONDS.toMillis(20);
 
-	private final ExecutorBundle bundle;
+	private final ExecutorBundle executors;
 	private final CurrentTask currentTask;
 	private final Logger logger;
 	
@@ -60,7 +60,7 @@ class JJExecutorImpl implements JJExecutor {
 		final CurrentTask currentTask,
 		final @EmergencyLogger Logger logger
 	) {
-		this.bundle = bundle;
+		this.executors = bundle;
 		this.currentTask = currentTask;
 		this.logger = logger;
 		
@@ -111,7 +111,7 @@ class JJExecutorImpl implements JJExecutor {
 		task.enqueue(MAX_QUEUED_TIME);
 		queuedTasks.add(task);
 		
-		return task.executor(bundle).submit(new Runnable() {
+		return task.addRunnableToExecutor(executors, new Runnable() {
 			
 			@Override
 			public void run() {
@@ -135,7 +135,7 @@ class JJExecutorImpl implements JJExecutor {
 	
 	@Override
 	public boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
-		return bundle.scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
+		return executors.scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
 	}
 
 	public boolean isIOThread() {

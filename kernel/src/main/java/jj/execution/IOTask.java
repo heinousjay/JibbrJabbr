@@ -15,7 +15,7 @@
  */
 package jj.execution;
 
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * @author jason
@@ -26,11 +26,10 @@ public abstract class IOTask extends JJTask {
 	protected IOTask(String name) {
 		super(name);
 	}
-
+	
 	@Override
-	ScheduledExecutorService executor(ExecutorBundle executors) {
-		
-		return executors.ioExecutor;
+	Future<?> addRunnableToExecutor(ExecutorBundle executors, Runnable runnable) {
+		return executors.ioExecutor.submit(runnable);
 	}
 
 }

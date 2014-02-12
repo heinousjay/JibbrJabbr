@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -74,7 +75,7 @@ public class JJExecutorImplTest {
 		given(scriptExecutorFactory.executorFor(scriptEnvironment)).willReturn(scriptExecutor);
 	}
 	
-	private void runTask(ScheduledExecutorService service) {
+	private void runTask(ExecutorService service) {
 		verify(service, atLeastOnce()).submit(runnableCaptor.capture());
 		runnableCaptor.getValue().run();
 	}

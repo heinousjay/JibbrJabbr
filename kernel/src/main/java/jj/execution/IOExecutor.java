@@ -1,10 +1,11 @@
 package jj.execution;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -13,33 +14,24 @@ import javax.inject.Singleton;
 import jj.JJServerShutdownListener;
 
 /**
- * You should almost certainly not depend on this class.  depend on
- * {@link JJExecutor} instead. if there is something you need exposed,
- * add it to the JJExecutors class.
+ * 
  * @author jason
  *
  */
 @Singleton
-class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdownListener {
+class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownListener {
 	
 	public static boolean isIOThread() {
 		return flag.get() != null;
 	}
 	
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
-
-	// watch service eats one thread
-	// plus half the processors
-	// gonna flip this around! get our values from the configuration system woo
-	private static final int WORKER_COUNT = 1 + Math.max(2, (int)(Runtime.getRuntime().availableProcessors() * 0.5));
-
 	
 	@Inject
 	public IOExecutor(
 		final UncaughtExceptionHandler uncaughtExceptionHandler
 	) {
-		super(
-			WORKER_COUNT,
+		super(1, 20, 20L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), 
 			new ThreadFactory() {
 				
 				private final AtomicInteger id = new AtomicInteger();
@@ -61,7 +53,7 @@ class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdown
 					thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
 					return thread;
 				}
-			},
+			}, 
 			new RejectedExecutionHandler() {
 				
 				@Override
@@ -72,6 +64,9 @@ class IOExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdown
 			}
 		);
 	}
+	
+	// listen for the "CONFIGURATION LOADED!" event, and reconfigure yourself!  the only parameter that can really be controlled
+	// is the maximum number of worker threads.
 
 	@Override
 	public void stop() {

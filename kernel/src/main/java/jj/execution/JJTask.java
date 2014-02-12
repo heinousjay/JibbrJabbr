@@ -16,7 +16,7 @@
 package jj.execution;
 
 import java.util.concurrent.Delayed;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,7 +53,7 @@ public abstract class JJTask implements Delayed {
 
 	protected abstract void run() throws Exception;
 	
-	abstract ScheduledExecutorService executor(ExecutorBundle executors);
+	abstract Future<?> addRunnableToExecutor(ExecutorBundle executors, Runnable runnable);
 	
 	String name() {
 		return name;
