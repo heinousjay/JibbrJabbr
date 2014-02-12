@@ -15,6 +15,7 @@
  */
 package jj.script;
 
+import jj.event.Publisher;
 import jj.execution.JJExecutor;
 
 /**
@@ -29,8 +30,8 @@ public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentIniti
 	 * @param executor
 	 * @param continuationCoordinator
 	 */
-	public MockableScriptEnvironmentInitializer(JJExecutor executor, ContinuationCoordinator continuationCoordinator) {
-		super(executor, continuationCoordinator);
+	public MockableScriptEnvironmentInitializer(JJExecutor executor, ContinuationCoordinator continuationCoordinator, Publisher publisher) {
+		super(executor, continuationCoordinator, publisher);
 	}
 
 	

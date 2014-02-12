@@ -18,6 +18,7 @@ package jj.script;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
+import jj.event.Publisher;
 import jj.execution.JJTask;
 import jj.execution.MockJJExecutor;
 import jj.execution.ResumableTask;
@@ -26,6 +27,8 @@ import jj.execution.TaskHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -48,13 +51,16 @@ public class ScriptEnvironmentInitializerTest {
 	
 	@Mock AbstractScriptEnvironment scriptEnvironment;
 	
+	@Mock Publisher publisher;
+	@Captor ArgumentCaptor<ScriptEnvironmentInitialized> eventCaptor;
+	
 	@Before
 	public void before() {
 		pendingKey1 = new ContinuationPendingKey();
 		pendingKey2 = new ContinuationPendingKey();
 		executor = new MockJJExecutor();
 		executor.isScriptThread = true;
-		sei = new ScriptEnvironmentInitializer(executor, continuationCoordinator);
+		sei = new ScriptEnvironmentInitializer(executor, continuationCoordinator, publisher);
 	}
 	
 	@Test
@@ -91,6 +97,8 @@ public class ScriptEnvironmentInitializerTest {
 		
 		verify(continuationCoordinator).resumeContinuation(scriptEnvironment, pendingKey2, result);
 		verify(scriptEnvironment).initialized(true);
+		verify(publisher).publish(eventCaptor.capture());
+		assertThat(eventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));
 		assertThat(TaskHelper.pendingKey(resumable), is(nullValue()));
 		
 	}

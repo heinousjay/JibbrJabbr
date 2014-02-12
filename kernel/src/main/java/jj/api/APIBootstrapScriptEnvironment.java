@@ -24,7 +24,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
-import jj.event.Publisher;
 import jj.execution.IOThread;
 import jj.logging.EmergencyLogger;
 import jj.resource.ResourceCacheKey;
@@ -89,12 +88,11 @@ public class APIBootstrapScriptEnvironment extends AbstractScriptEnvironment imp
 	 */
 	APIBootstrapScriptEnvironment(
 		final ResourceCacheKey cacheKey,
-		final Publisher publisher,
 		final @EmergencyLogger Logger logger,
 		final Provider<RhinoContext> contextProvider,
 		final API api
 	) {
-		super(cacheKey, publisher, contextProvider);
+		super(cacheKey, contextProvider);
 
 		
 		global = api.global();

@@ -37,7 +37,6 @@ import jj.CurrentResource;
 import jj.ResourceAware;
 import jj.SHA1Helper;
 import jj.engine.EngineAPI;
-import jj.event.Publisher;
 import jj.execution.IOThread;
 import jj.execution.ScriptThread;
 import jj.http.server.ConnectionBroadcastStack;
@@ -122,13 +121,12 @@ public class DocumentScriptEnvironment
 		final ResourceFinder resourceFinder,
 		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
-		final Publisher publisher,
 		final ScriptCompiler compiler,
 		final WebSocketMessageProcessor processor,
 		final CurrentDocumentRequestProcessor currentDocument,
 		final CurrentWebSocketConnection currentConnection
 	) {
-		super(cacheKey, publisher, contextProvider);
+		super(cacheKey, contextProvider);
 		this.baseName = baseName;
 		
 		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));

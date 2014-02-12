@@ -22,7 +22,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.engine.EngineAPI;
-import jj.event.Publisher;
 import jj.execution.IOThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
@@ -69,12 +68,11 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		final ResourceCacheKey cacheKey,
 		final String moduleIdentifier,
 		final RequiredModule requiredModule,
-		final Publisher publisher,
 		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
 		final ResourceFinder resourceFinder
 	) {
-		super(cacheKey, publisher, contextProvider);
+		super(cacheKey, contextProvider);
 		
 		this.moduleIdentifier = moduleIdentifier;
 		

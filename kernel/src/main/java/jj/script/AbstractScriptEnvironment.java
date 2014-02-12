@@ -25,7 +25,6 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.Closer;
-import jj.event.Publisher;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceCacheKey;
 
@@ -34,9 +33,6 @@ import jj.resource.ResourceCacheKey;
  *
  */
 public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
-
-
-	protected final Publisher publisher;
 	
 	protected final Provider<RhinoContext> contextProvider;
 	
@@ -49,11 +45,9 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 */
 	protected AbstractScriptEnvironment(
 		final ResourceCacheKey cacheKey,
-		final Publisher publisher,
 		final Provider<RhinoContext> contextProvider
 	) {
 		super(cacheKey);
-		this.publisher = publisher;
 		this.contextProvider = contextProvider;
 	}
 	
@@ -75,7 +69,6 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	public void initialized(boolean initialized) {
 		if (initialized) {
 			state = Initialized;
-			publisher.publish(new ScriptEnvironmentInitialized(this));
 		}
 	}
 

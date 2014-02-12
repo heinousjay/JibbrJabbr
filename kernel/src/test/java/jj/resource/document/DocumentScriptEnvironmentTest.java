@@ -27,7 +27,6 @@ import java.util.HashSet;
 
 import jj.Closer;
 import jj.engine.EngineAPI;
-import jj.event.Publisher;
 import jj.execution.ExecutionEvent;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.MockCurrentWebSocketConnection;
@@ -60,7 +59,6 @@ public class DocumentScriptEnvironmentTest {
 	@Mock HtmlResource html;
 	@Mock ScriptResource script;
 	@Mock ResourceFinder resourceFinder;
-	@Mock Publisher publisher;
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
 	@Mock ResourceCacheKey cacheKey;
@@ -112,7 +110,6 @@ public class DocumentScriptEnvironmentTest {
 			resourceFinder,
 			contextMaker,
 			api,
-			publisher,
 			scriptCompiler,
 			processors,
 			currentDocument,

@@ -28,7 +28,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.engine.EngineAPI;
-import jj.event.Publisher;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceCacheKey;
@@ -57,7 +56,6 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	@Mock ResourceFinder resourceFinder;
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
-	@Mock Publisher publisher;
 	RequiredModule requiredModule;
 	// lil ugly! but this satisfies things internally
 	@Mock(extraInterfaces={ScriptEnvironment.class}) AbstractResource scriptEnvironment;
@@ -109,7 +107,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 		givenMinimalServices();
 		givenModuleScriptEnvironmentResources("helpers");
 		
-		ModuleScriptEnvironment result = new ModuleScriptEnvironment(cacheKey(), baseName(), requiredModule, publisher, contextProvider, api, resourceFinder);
+		ModuleScriptEnvironment result = new ModuleScriptEnvironment(cacheKey(), baseName(), requiredModule, contextProvider, api, resourceFinder);
 		
 		return result;
 	}

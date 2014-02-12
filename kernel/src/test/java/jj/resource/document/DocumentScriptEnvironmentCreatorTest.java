@@ -23,7 +23,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.engine.EngineAPI;
-import jj.event.Publisher;
 import jj.http.server.MockCurrentWebSocketConnection;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
@@ -51,7 +50,6 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	@Mock ResourceFinder resourceFinder;
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
-	@Mock Publisher publisher;
 	@Mock ScriptCompiler compiler;
 	@Mock DocumentWebSocketMessageProcessors processors;
 	MockRhinoContextProvider contextProvider;
@@ -108,7 +106,6 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 				resourceFinder,
 				contextProvider,
 				api,
-				publisher,
 				compiler,
 				processors,
 				new CurrentDocumentRequestProcessor(),

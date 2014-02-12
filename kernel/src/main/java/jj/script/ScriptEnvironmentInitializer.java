@@ -22,6 +22,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.event.Publisher;
 import jj.execution.JJExecutor;
 import jj.execution.ScriptTask;
 
@@ -37,6 +38,8 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	private final JJExecutor executor;
 	
 	private final ContinuationCoordinator continuationCoordinator;
+	
+	private final Publisher publisher;
 	
 	private static final class TaskOrKey {
 		private final ContinuationPendingKey pendingKey;
@@ -64,10 +67,12 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Inject
 	ScriptEnvironmentInitializer(
 		final JJExecutor executor,
-		final ContinuationCoordinator continuationCoordinator
+		final ContinuationCoordinator continuationCoordinator,
+		final Publisher publisher
 	) {
 		this.executor = executor;
 		this.continuationCoordinator = continuationCoordinator;
+		this.publisher = publisher;
 	}
 	
 	void initializeScript(AbstractScriptEnvironment se) {
@@ -187,7 +192,8 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 			pendingKey = null;
 			result = null;
 			scriptEnvironment.initialized(true);
-			
+
+			publisher.publish(new ScriptEnvironmentInitialized(scriptEnvironment));
 			checkParentResumption();
 		}
 		
