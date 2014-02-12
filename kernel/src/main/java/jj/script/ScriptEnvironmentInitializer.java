@@ -164,11 +164,13 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		private void startInitialization() throws Exception {
 			state = State.Initializing;
 			scriptEnvironment.initializing(true);
-			try {
-				pendingKey = continuationCoordinator.execute(scriptEnvironment);
-			} catch (Exception e) {
-				broken();
-				throw e;
+			if (scriptEnvironment.script() != null) {
+				try {
+					pendingKey = continuationCoordinator.execute(scriptEnvironment);
+				} catch (Exception e) {
+					broken();
+					throw e;
+				}
 			}
 			
 			if (pendingKey == null) {

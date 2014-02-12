@@ -36,7 +36,7 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 		
 		T result = createScriptEnvironment(name, args);
 		
-		if (result != null && result.script() != null) {
+		if (result != null) {
 			initializer.initializeScript(result);
 		}
 		

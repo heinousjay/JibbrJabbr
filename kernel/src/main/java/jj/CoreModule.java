@@ -36,6 +36,8 @@ import jj.http.HttpModule;
  */
 public class CoreModule extends JJModule {
 	
+	// can probably live in RhinoContext, assuming that is the only entry point to the context
+	
 	// this lives here because we need to set up the context factory
 	// before anything actually creates a context, otherwise we won't
 	// get the "enhanced java access" which means exceptions will just

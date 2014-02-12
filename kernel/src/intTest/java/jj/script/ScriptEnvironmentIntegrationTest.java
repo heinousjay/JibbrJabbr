@@ -34,7 +34,6 @@ import jj.resource.script.RequiredModule;
 import jj.testing.App;
 import jj.testing.JibbrJabbrTestServer;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -51,18 +50,13 @@ public class ScriptEnvironmentIntegrationTest {
 	@Inject JJExecutor executor;
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.path1);
+	public JibbrJabbrTestServer app = 
+		new JibbrJabbrTestServer(App.path1)
+			.injectInstance(this);
 	
 	CountDownLatch latch;
 	
 	DocumentScriptEnvironment scriptEnvironment;
-	
-	@Before
-	public void before() {
-		resourceFinder = null;
-		executor = null;
-		app.inject(this);
-	}
 	
 	@Listener
 	void scriptEnvironmentInitialized(ScriptEnvironmentInitialized sei) {
@@ -77,6 +71,7 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		loadScriptEnvironment("animal");
 		
+		assertThat(scriptEnvironment.baseName(), is("animal"));
 		assertThat(scriptEnvironment.initialized(), is(true));
 		
 		// these lines just validate that the animal ScriptEnvironment correctly loaded and initialized its dependencies
@@ -94,6 +89,15 @@ public class ScriptEnvironmentIntegrationTest {
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
 		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
+	}
+	
+	@Test
+	public void test2() throws Exception {
+		
+		loadScriptEnvironment("index");
+		
+		assertThat(scriptEnvironment.baseName(), is("index"));
+		assertThat(scriptEnvironment.initialized(), is(true));
 	}
 
 	/**

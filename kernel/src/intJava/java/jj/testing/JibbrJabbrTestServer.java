@@ -18,9 +18,11 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Field;
+
+import javax.inject.Inject;
 
 import jj.StringUtils;
-
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -45,23 +47,53 @@ public class JibbrJabbrTestServer implements TestRule {
 	
 	private final String appPath;
 	
+	private boolean fileWatcher = false;
+	
+	private boolean httpServer = false;
+	
+	private Object instance;
+	
 	private Injector injector;
 	
 	/**
 	 * construct a test server with no file watching pointing to appPath
+	 * 
+	 * should that be a path? investigate
 	 * @param appPath
 	 */
 	public JibbrJabbrTestServer(final String appPath) {
-		this(appPath, false);
+		this.appPath = appPath;
 	}
 	
-	/**
-	 * construct a test server pointing to appPath, with option file watching
-	 * @param appPath
-	 * @param withFileWatch
-	 */
-	public JibbrJabbrTestServer(final String appPath, boolean withFileWatch) {
-		this.appPath = appPath;
+	public JibbrJabbrTestServer withFileWatcher() {
+		fileWatcher = true;
+		return this;
+	}
+	
+	public JibbrJabbrTestServer withHttpServer() {
+		httpServer = true;
+		return this;
+	}
+	
+	public JibbrJabbrTestServer injectInstance(Object instance) {
+		this.instance = instance;
+		return this;
+	}
+	
+	private Statement createInjectionStatement(final Statement base) {
+		return new Statement() {
+			
+			@Override
+			public void evaluate() throws Throwable {
+				if (instance != null) {
+					injector.injectMembers(instance);
+					
+					
+				}
+				base.evaluate();
+				
+			}
+		};
 	}
 	
 	@Override
@@ -69,7 +101,12 @@ public class JibbrJabbrTestServer implements TestRule {
 		
 		// we use production to eagerly instantiate the graph, since the next line will do
 		// that anyway.
-		injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(this, appPath, base, description));
+		Statement statement = base;
+		if (instance != null) {
+			statement = createInjectionStatement(base);
+		}
+		
+		injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(this, appPath, statement, description));
 		return injector.getInstance(AppStatement.class);
 	}
 	
@@ -79,10 +116,6 @@ public class JibbrJabbrTestServer implements TestRule {
 		TestHttpClient client = get(url);
 		client.dumpObjects();
 		return client;
-	}
-	
-	public void inject(Object object) {
-		injector.injectMembers(object);
 	}
 	
 	public TestHttpClient get(final String uri) throws Exception {
