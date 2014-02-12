@@ -78,7 +78,7 @@ public class RequiredModuleContinuationProcessorTest {
 		requiredModule = new RequiredModule(documentScriptEnvironment, module);
 		requiredModule.pendingKey(pendingKey);
 		
-		given(continuationState.continuableAs(RequiredModule.class)).willReturn(requiredModule);
+		given(continuationState.continuationAs(RequiredModule.class)).willReturn(requiredModule);
 	}
 	
 	@Test

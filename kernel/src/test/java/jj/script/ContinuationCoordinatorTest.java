@@ -24,6 +24,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import jj.http.client.RestRequest;
 import jj.jjmessage.JJMessage;
 import jj.resource.script.RequiredModule;
 
@@ -97,7 +98,7 @@ public class ContinuationCoordinatorTest {
 		continuationState = new ContinuationState(JJMessage.makeRetrieve(""));
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
-		Map<Class<? extends Continuable>, ContinuationProcessor> continuationProcessors = new HashMap<>();
+		Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors = new HashMap<>();
 		continuationProcessors.put(RestRequest.class, continuationProcessor1);
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
@@ -117,7 +118,7 @@ public class ContinuationCoordinatorTest {
 	public void testInitialExecutionWithContinuation() {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
-		continuationState.continuableAs(JJMessage.class).pendingKey(pendingKey);
+		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
 		
 		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
 
@@ -152,7 +153,7 @@ public class ContinuationCoordinatorTest {
 	public void testFunctionExecutionWithContinuation() {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
-		continuationState.continuableAs(JJMessage.class).pendingKey(pendingKey);
+		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
 		
 		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, function, args);
 		
@@ -191,7 +192,7 @@ public class ContinuationCoordinatorTest {
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
-		continuationState.continuableAs(JJMessage.class).pendingKey(pendingKey);
+		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
 		
 		ContinuationPendingKey result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		

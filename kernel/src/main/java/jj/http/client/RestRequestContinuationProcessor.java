@@ -1,4 +1,4 @@
-package jj.script;
+package jj.http.client;
 
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.JJExecutor;
-import jj.http.client.HttpClient;
-import jj.http.client.JJHttpClientResponse;
+import jj.script.ContinuationProcessor;
+import jj.script.ContinuationState;
 
 @Singleton
 class RestRequestContinuationProcessor implements ContinuationProcessor {
@@ -31,7 +31,7 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 
 	@Override
 	public void process(final ContinuationState continuationState) {
-		final RestRequest restRequest = continuationState.continuableAs(RestRequest.class);
+		final RestRequest restRequest = continuationState.continuationAs(RestRequest.class);
 		httpClient.execute(restRequest.request()).addListener(
 			new GenericFutureListener<Future<JJHttpClientResponse>>() {
 

@@ -24,13 +24,6 @@ import org.mozilla.javascript.Callable;
 public interface ContinuationCoordinator {
 
 	/**
-	 * initial execution of a script environment
-	 * @param scriptEnvironment
-	 * @return true if completed, false if continued
-	 */
-	ContinuationPendingKey execute(ScriptEnvironment scriptEnvironment);
-
-	/**
 	 * function execution within the context of script environment
 	 * @param scriptEnvironment
 	 * @param functionName

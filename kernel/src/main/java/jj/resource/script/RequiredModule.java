@@ -15,7 +15,7 @@
  */
 package jj.resource.script;
 
-import jj.script.Continuable;
+import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptEnvironment;
 
@@ -23,7 +23,7 @@ import jj.script.ScriptEnvironment;
  * @author jason
  *
  */
-public class RequiredModule implements Continuable {
+public class RequiredModule implements Continuation {
 	
 	private final ScriptEnvironment parent;
 	

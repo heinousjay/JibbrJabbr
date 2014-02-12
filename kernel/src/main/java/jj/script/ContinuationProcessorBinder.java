@@ -22,18 +22,18 @@ import com.google.inject.multibindings.MapBinder;
 
 public class ContinuationProcessorBinder {
 	
-	private final MapBinder<Class<? extends Continuable>, ContinuationProcessor> continuationProcessorBinder;
+	private final MapBinder<Class<? extends Continuation>, ContinuationProcessor> continuationProcessorBinder;
 	
 	public ContinuationProcessorBinder(final Binder binder) {
 		continuationProcessorBinder = MapBinder.newMapBinder(
 			binder,
-			new TypeLiteral<Class<? extends Continuable>>() {},
+			new TypeLiteral<Class<? extends Continuation>>() {},
 			new TypeLiteral<ContinuationProcessor>() {}
 		);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Continuable, U extends ContinuationProcessor> LinkedBindingBuilder<U> continuationOf(Class<T> key) {
+	public <T extends Continuation, U extends ContinuationProcessor> LinkedBindingBuilder<U> continuationOf(Class<T> key) {
 		return (LinkedBindingBuilder<U>)continuationProcessorBinder.addBinding(key);
 	}
 }

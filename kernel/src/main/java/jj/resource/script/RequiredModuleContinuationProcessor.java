@@ -77,7 +77,7 @@ public class RequiredModuleContinuationProcessor implements ContinuationProcesso
 	@Override
 	public void process(final ContinuationState continuationState) {
 		
-		final RequiredModule requiredModule = continuationState.continuableAs(RequiredModule.class);
+		final RequiredModule requiredModule = continuationState.continuationAs(RequiredModule.class);
 		
 		ModuleScriptEnvironment scriptEnvironment = 
 			finder.findResource(

@@ -2,37 +2,38 @@ package jj.script;
 
 import java.io.Serializable;
 
+
 public class ContinuationState implements Serializable {
 	
-	private final Continuable continuable;
+	private final Continuation continuation;
 	
-	private final Class<? extends Continuable> type;
+	private final Class<? extends Continuation> type;
 	
-	ContinuationState(final Continuable continuable) {
-		this.type = continuable.getClass();
-		this.continuable = continuable;
+	ContinuationState(final Continuation continuation) {
+		this.type = continuation.getClass();
+		this.continuation = continuation;
 	}
 
 	private static final long serialVersionUID = 1L;
 	
-	public Class<? extends Continuable> type() {
+	public Class<? extends Continuation> type() {
 		return type;
 	}
 	
-	public <T extends Continuable> T continuableAs(Class<T> type) {
+	public <T extends Continuation> T continuationAs(Class<T> type) {
 		assert type.isAssignableFrom(this.type);
-		return type.cast(continuable);
+		return type.cast(continuation);
 	}
 	
 	public ContinuationPendingKey pendingKey() {
-		return continuable.pendingKey();
+		return continuation.pendingKey();
 	}
 	
 	public String toString() {
 		return new StringBuilder("type: ")
 			.append(type)
 			.append(", message: ")
-			.append(continuable)
+			.append(continuation)
 			.toString();
 	}
 }

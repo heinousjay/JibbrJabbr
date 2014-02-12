@@ -37,7 +37,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	private final JJExecutor executor;
 	
-	private final ContinuationCoordinator continuationCoordinator;
+	private final ContinuationCoordinatorImpl continuationCoordinator;
 	
 	private final Publisher publisher;
 	
@@ -67,7 +67,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Inject
 	ScriptEnvironmentInitializer(
 		final JJExecutor executor,
-		final ContinuationCoordinator continuationCoordinator,
+		final ContinuationCoordinatorImpl continuationCoordinator,
 		final Publisher publisher
 	) {
 		this.executor = executor;

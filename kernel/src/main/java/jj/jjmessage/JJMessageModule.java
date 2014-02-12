@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.jjmessage;
 
-import org.mozilla.javascript.Callable;
+import jj.JJModule;
 
 /**
- * An object that holds function according to some lifetime, organized by name,
- * generally used by API objects to do what they do
- * 
  * @author jason
  *
  */
-public interface FunctionContext {
+public class JJMessageModule extends JJModule {
 
-	Callable getFunction(String name);
-
-	void addFunction(String name, Callable function);
-
-	boolean removeFunction(String name);
-
-	boolean removeFunction(String name, Callable function);
+	@Override
+	protected void configure() {
+		dispatch().continuationOf(JJMessage.class).to(JJMessageContinuationProcessor.class);
+	}
 
 }

@@ -39,7 +39,7 @@ public class CurrentScriptEnvironmentTest {
 	
 	ContinuationPendingKey pendingKey;
 	
-	Continuable continuable = new Continuable() {
+	Continuation continuation = new Continuation() {
 		
 		ContinuationPendingKey pendingKey;
 		
@@ -73,7 +73,7 @@ public class CurrentScriptEnvironmentTest {
 		rhinoContext = rcp.context;
 		cse = new CurrentScriptEnvironment(rcp);
 		
-		continuable.pendingKey(null);
+		continuation.pendingKey(null);
 	}
 	
 	@After
@@ -89,7 +89,7 @@ public class CurrentScriptEnvironmentTest {
 		
 		try (Closer closer = cse.enterScope(ase)) {
 			
-			cse.preparedContinuation(continuable);
+			cse.preparedContinuation(continuation);
 			fail("should have thrown");
 		} catch (ContinuationPending cp) {
 			verify(cp).setApplicationState(continuationStateCaptor.capture());

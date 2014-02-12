@@ -45,7 +45,7 @@ public class ScriptEnvironmentInitializerTest {
 	ContinuationPendingKey pendingKey2;
 	
 	MockJJExecutor executor;
-	@Mock ContinuationCoordinator continuationCoordinator;
+	@Mock ContinuationCoordinatorImpl continuationCoordinator;
 
 	ScriptEnvironmentInitializer sei;
 	

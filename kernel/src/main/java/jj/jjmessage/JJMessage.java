@@ -7,7 +7,7 @@ import static jj.jjmessage.JJMessage.Type.*;
 import java.util.Map;
 
 import jj.http.server.WebSocketMessage;
-import jj.script.Continuable;
+import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author jason
  *
  */
-public class JJMessage implements Continuable, WebSocketMessage {
+public class JJMessage implements Continuation, WebSocketMessage {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	

@@ -32,14 +32,14 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	
 	private final CurrentScriptEnvironment env;
 	
-	private final Map<Class<? extends Continuable>, ContinuationProcessor> continuationProcessors;
+	private final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors;
 	
 	@Inject
 	ContinuationCoordinatorImpl(
 		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptEnvironment env,
 		final @EmergencyLogger Logger log,
-		final Map<Class<? extends Continuable>, ContinuationProcessor> continuationProcessors
+		final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors
 	) {
 		this.contextProvider = contextProvider;
 		this.env = env;
@@ -64,12 +64,11 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	}
 	
 	/**
-	 * initial execution of a script environment
+	 * initial execution of a script environment.  only available to the Initializer task
 	 * @param scriptEnvironment
 	 * @return true if completed, false if continued
 	 */
-	@Override
-	public ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment) {
+	ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -171,7 +170,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			
 			processor.process(continuationState);
 			
-			return continuationState.continuableAs(Continuable.class).pendingKey();
+			return continuationState.continuationAs(Continuation.class).pendingKey();
 		}
 		return null;
 	}

@@ -30,7 +30,7 @@ public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentIniti
 	 * @param executor
 	 * @param continuationCoordinator
 	 */
-	public MockableScriptEnvironmentInitializer(JJExecutor executor, ContinuationCoordinator continuationCoordinator, Publisher publisher) {
+	public MockableScriptEnvironmentInitializer(JJExecutor executor, ContinuationCoordinatorImpl continuationCoordinator, Publisher publisher) {
 		super(executor, continuationCoordinator, publisher);
 	}
 

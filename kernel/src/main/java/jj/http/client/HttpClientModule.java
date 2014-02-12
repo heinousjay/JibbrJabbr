@@ -25,6 +25,6 @@ public class HttpClientModule extends JJModule {
 	
 	@Override
 	protected void configure() {
-		
+		dispatch().continuationOf(RestRequest.class).to(RestRequestContinuationProcessor.class);
 	}
 }

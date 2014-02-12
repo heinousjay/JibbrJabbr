@@ -19,7 +19,7 @@ package jj.script;
  * @author jason
  *
  */
-public interface Continuable {
+public interface Continuation {
 
 	void pendingKey(ContinuationPendingKey pendingKey);
 	

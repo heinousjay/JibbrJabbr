@@ -1,9 +1,10 @@
-package jj.script;
+package jj.http.client;
 
 import jj.engine.MIME;
-import jj.http.client.JJHttpClientRequest;
+import jj.script.Continuation;
+import jj.script.ContinuationPendingKey;
 
-public class RestRequest implements Continuable {
+public class RestRequest implements Continuation {
 	
 	private final JJHttpClientRequest request;
 	private ContinuationPendingKey pendingKey;

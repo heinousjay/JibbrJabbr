@@ -9,8 +9,8 @@ import javax.inject.Inject;
 
 import jj.http.client.HttpClient;
 import jj.http.client.JJHttpClientRequest;
+import jj.http.client.RestRequest;
 import jj.script.CurrentScriptEnvironment;
-import jj.script.RestRequest;
 import jj.uri.Route;
 import jj.uri.RouteFinder;
 import io.netty.handler.codec.http.HttpHeaders;

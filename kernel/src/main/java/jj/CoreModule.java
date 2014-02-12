@@ -24,6 +24,7 @@ import jj.engine.HostApiModule;
 import jj.event.EventModule;
 import jj.execution.ExecutionModule;
 import jj.jasmine.JasmineModule;
+import jj.jjmessage.JJMessageModule;
 import jj.logging.LoggingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
@@ -68,18 +69,37 @@ public class CoreModule extends JJModule {
 		// we need the logging module to configure our async logger before we do anything that might log
 		install(new LoggingModule(isTest));
 		
-		// and install our little pieces
+		// first our key pieces
 		install(new ConfigurationModule());
 		install(new ConversionModule());
 		install(new EventModule());
 		install(new ExecutionModule());
-		install(new HostApiModule());
-		install(new HttpModule(isTest));
-		install(new JasmineModule());
+		
+		// extract the Document system from here.
+		// it is a standalone feature
 		install(new ResourceModule(isTest));
 		install(new ScriptModule());
+		// everything before here (once the Document system is extracted)
+		// can be started with no configuration, and then changed on the fly
 		
-		// i feel like some of this
+		// this is second wave, in the new plan - restartable services with bridged
+		// access to the core
+		install(new HttpModule(isTest));
+		
+		// this needs to be split into pieces and contributed
+		// from places that make the most sense
+		// for instance the module system is an intrinsic service
+		// of the script feature, so the require function should come
+		// from there.  broadcast is provided by the websocket system,
+		// so it should come from there.
+		install(new HostApiModule());
+		
+		// this is part of the Document system, and should probably be renamed
+		// or at least repackaged
+		install(new JJMessageModule());
+		
+		// this is not a thing yet but it will be!
+		install(new JasmineModule());
 	}
 
 }

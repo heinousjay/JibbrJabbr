@@ -74,18 +74,18 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 * <code>throw context.prepareContinuation(...)</code>
 	 * so the compiler stays happy, but this method never returns normally
 	 * 
-	 * the continuable will be configured to restore the state of the script environment
+	 * the continuation will be configured to restore the state of the script environment
 	 * on resumption
 	 * 
-	 * @param continuable
+	 * @param continuation
 	 * @return
 	 */
-	public ContinuationPending preparedContinuation(Continuable continuable) {
+	public ContinuationPending preparedContinuation(Continuation continuation) {
 		assert current() != null : "can't perform a continuation unless a script is in context";
 		
-		ContinuationPending result = prepareContinuation(new ContinuationState(continuable));
+		ContinuationPending result = prepareContinuation(new ContinuationState(continuation));
 		ContinuationPendingKey pendingKey = innerCurrent().createContinuationContext(result);
-		continuable.pendingKey(pendingKey);
+		continuation.pendingKey(pendingKey);
 		throw result;
 	}
 
