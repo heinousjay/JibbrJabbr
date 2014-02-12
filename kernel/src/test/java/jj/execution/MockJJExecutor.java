@@ -97,11 +97,6 @@ public class MockJJExecutor implements JJExecutor {
 	}
 	
 	public boolean isScriptThread = false;
-	
-	@Override
-	public boolean isScriptThread(){
-		return isScriptThread;
-	}
 
 	@Override
 	public boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
@@ -114,11 +109,4 @@ public class MockJJExecutor implements JJExecutor {
 	public boolean isIOThread() {
 		return isIOThread;
 	}
-
-	@Override
-	public int ioPoolSize() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

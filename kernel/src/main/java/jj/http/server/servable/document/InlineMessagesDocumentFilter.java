@@ -80,7 +80,7 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 							el.attr(newAttr, bundle.getString(attr.getValue()))
 								.removeAttr(attr.getKey());
 						} catch (MissingResourceException mre) {
-							// FUCK YOU JAVA
+							// thanks java
 						}
 					}
 				}

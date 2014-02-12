@@ -134,23 +134,11 @@ class JJExecutorImpl implements JJExecutor {
 	}
 	
 	@Override
-	public boolean isScriptThread() {
-		return bundle.scriptExecutorFactory.isScriptThread();
-	}
-	
-	@Override
 	public boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
 		return bundle.scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
 	}
 
 	public boolean isIOThread() {
 		return IOExecutor.isIOThread();
-	}
-	
-	// TODO replace the use of this with configuration
-	// TODO along with that, rework the executors to be restartable
-	// so that the size configurations can change at runtime for tuning
-	public int ioPoolSize() {
-		return bundle.ioExecutor.getMaximumPoolSize();
 	}
 }

@@ -17,7 +17,6 @@ package jj.configuration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -58,22 +57,20 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 
 	@Override
 	public void start() throws Exception {
-		final CountDownLatch latch = new CountDownLatch(1);
+		
+		// i remember doing this as a Future (and being unhappy about it) because there
+		// was a deadlock
 		
 		try {
 			executors.execute(new IOTask("preloading configuration script") {
 				
 				@Override
 				public void run() {
-					try {
-						ConfigResource config = resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
-						if (config != null) {
-							log.info("Found configuration at " + config.path());
-						} else {
-							log.info("No configuration found, using defaults");
-						}
-					} finally {
-						latch.countDown();
+					ConfigResource config = resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+					if (config != null) {
+						log.info("Found configuration at {}", config.path());
+					} else {
+						log.info("No configuration found, using defaults");
 					}
 				}
 			}).get(1, SECONDS);

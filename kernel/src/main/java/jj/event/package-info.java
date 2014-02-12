@@ -19,8 +19,8 @@
  * The methods should take a single parameter, which is the event.  Publishing is done by
  * injecting the Publisher.  Events cannot be unregistered, so instances will receive events
  * across their entire lifetimes.  References are held weakly to prevent memory issues.
- * No serious processing should be done in event listeners, dispatch tasks to do any
- * work.
+ * No serious processing should be done in event listeners since you have no control over
+ * what thread is running - start a task!
  * 
  * @author jason
  *

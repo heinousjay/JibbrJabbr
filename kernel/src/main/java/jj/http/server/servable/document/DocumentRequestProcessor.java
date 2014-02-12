@@ -162,7 +162,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	@ScriptThread
 	void respond() {
 		
-		assert executor.isScriptThreadFor(documentScriptEnvironment) : "must be called in a script thread for " + baseName();
 		try {
 			executeFilters(makeFilterList(filters, false));
 		} catch (Exception e) {
