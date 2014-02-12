@@ -31,6 +31,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.Script;
 
 /**
  * @author jason
@@ -51,6 +52,8 @@ public class ScriptEnvironmentInitializerTest {
 	
 	@Mock AbstractScriptEnvironment scriptEnvironment;
 	
+	@Mock Script script;
+	
 	@Mock Publisher publisher;
 	@Captor ArgumentCaptor<ScriptEnvironmentInitialized> eventCaptor;
 	
@@ -60,6 +63,7 @@ public class ScriptEnvironmentInitializerTest {
 		pendingKey2 = new ContinuationPendingKey();
 		executor = new MockJJExecutor();
 		executor.isScriptThread = true;
+		given(scriptEnvironment.script()).willReturn(script);
 		sei = new ScriptEnvironmentInitializer(executor, continuationCoordinator, publisher);
 	}
 	
