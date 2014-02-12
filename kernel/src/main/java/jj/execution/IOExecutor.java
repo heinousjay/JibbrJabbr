@@ -31,7 +31,7 @@ class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownListener 
 	public IOExecutor(
 		final UncaughtExceptionHandler uncaughtExceptionHandler
 	) {
-		super(1, 20, 20L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), 
+		super(20, 20, 20L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), 
 			new ThreadFactory() {
 				
 				private final AtomicInteger id = new AtomicInteger();
@@ -63,6 +63,9 @@ class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownListener 
 				}
 			}
 		);
+		
+		allowCoreThreadTimeOut(true);
+		
 	}
 	
 	// listen for the "CONFIGURATION LOADED!" event, and reconfigure yourself!  the only parameter that can really be controlled

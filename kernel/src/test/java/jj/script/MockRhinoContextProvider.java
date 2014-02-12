@@ -23,7 +23,7 @@ import javax.inject.Provider;
  * @author jason
  *
  */
-public class MockRhinoContextProvider implements Provider<RhinoContext>{
+public class MockRhinoContextProvider implements Provider<RhinoContext> {
 
 	public final RhinoContext context = mock(RhinoContext.class);
 	

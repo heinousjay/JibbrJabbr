@@ -116,7 +116,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 	
 	@Test
 	public void testAssetResource() throws Exception {
-		doCreate(AssetResource.class, "jj.js", Asset.path);
+		doCreate(AssetResource.class, "jj.js", Asset.appPath);
 	}
 	
 	@Test

@@ -73,7 +73,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		given(scriptResourceCreator.type()).willReturn(ScriptResource.class);
 		given(staticResourceCreator.type()).willReturn(StaticResource.class);
 		
-		given(assetResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(Asset.path));
+		given(assetResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(Asset.appPath));
 		given(htmlResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath, ".html"));
 		given(scriptResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath));
 		given(staticResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath));

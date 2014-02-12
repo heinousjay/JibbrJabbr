@@ -132,13 +132,13 @@ class LessProcessor {
 	}
 	
 	String process(final String lessName) {
-		
-		try (RhinoContext context = context(contextProvider.get())) {
-			publisher.publish(new StartingLessProcessing(lessName));
+
+		publisher.publish(new StartingLessProcessing(lessName));
+		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			
 			Scriptable local = context.newObject(global);
 			local.setPrototype(global);
-		    local.setParentScope(null);
+			local.setParentScope(null);
 			Object result = context.evaluateString(local, "runLess('" + lessName + "');", lessName);
 			
 			if (result == Scriptable.NOT_FOUND) {
@@ -155,7 +155,7 @@ class LessProcessor {
 	
 	private ScriptableObject makeGlobal() throws IOException {
 		
-		try (RhinoContext context = context(contextProvider.get())) {
+		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			ScriptableObject global = context.initStandardObjects(true);
 			global.defineProperty("readFile", new ReadFileFunction(configuration), ScriptableObject.EMPTY);
 			global.defineProperty("name", new NameFunction(), ScriptableObject.EMPTY);
@@ -164,10 +164,5 @@ class LessProcessor {
 			global.sealObject();
 			return global;
 		}
-	}
-	
-	private RhinoContext context(RhinoContext context) {
-		context.setOptimizationLevel(0);
-		return context;
 	}
 }

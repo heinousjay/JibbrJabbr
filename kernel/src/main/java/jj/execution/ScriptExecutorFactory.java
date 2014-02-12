@@ -35,7 +35,7 @@ class ScriptExecutorFactory implements JJServerShutdownListener {
 		private final String name;
 		
 		InnerBridge() {
-			name = String.format("ScriptExecutor %s", seq.incrementAndGet());
+			name = String.format("JibbrJabbr ScriptExecutor %s", seq.incrementAndGet());
 		}
 		
 		InnerBridge(final String name) {

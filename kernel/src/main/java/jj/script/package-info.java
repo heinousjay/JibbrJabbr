@@ -39,6 +39,10 @@
  * <p>
  * Easy Peasy.  There's one more piece - ScriptTask, which supports simple restartable
  * execution via the {@link JJExecutor} API.  That's gonna move in here soon!
+ * 
+ * <p>
+ * And of course, if you just want to use Rhino, inject the RhinoContext
+ * and go to town.
  */
 package jj.script;
 

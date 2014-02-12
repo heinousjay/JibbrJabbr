@@ -54,6 +54,15 @@ public class RhinoContext implements Closeable {
 		context.setLanguageVersion(Context.VERSION_1_8);
 		context.setOptimizationLevel(-1);
 	}
+
+	/**
+	 * @param i
+	 */
+	public RhinoContext withoutContinuations() {
+		assertNotClosed();
+		context.setOptimizationLevel(0);
+		return this;
+	}
 	
 	private void assertNotClosed() {
 		assert !closed : "no performing operations on a context that has been closed!";
@@ -188,13 +197,5 @@ public class RhinoContext implements Closeable {
 			logger.error("script error resuming a continuation\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
 			throw re;
 		}
-	}
-
-	/**
-	 * @param i
-	 */
-	public void setOptimizationLevel(int i) {
-		assertNotClosed();
-		context.setOptimizationLevel(i);
 	}
 }

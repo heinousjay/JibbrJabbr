@@ -33,7 +33,7 @@ public class AssetResourceCreatorTest extends ResourceBase<AssetResource, AssetR
 	}
 	
 	protected Path path() {
-		return AssetResourceCreator.appPath;
+		return Asset.appPath;
 	}
 	
 	@Override
