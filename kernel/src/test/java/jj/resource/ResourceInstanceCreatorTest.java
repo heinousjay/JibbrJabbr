@@ -24,6 +24,8 @@ import java.util.Collections;
 import jj.configuration.Configuration;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
+import jj.execution.MockTaskRunner;
+import jj.execution.TaskRunner;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
@@ -91,6 +93,7 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 				bind(ResourceFinder.class).toInstance(resourceFinder);
 				bind(RhinoContext.class).toInstance(rhinoContext);
 				bind(WebSocketMessageProcessor.class).toInstance(processor);
+				bind(TaskRunner.class).to(MockTaskRunner.class);
 			}
 		}), logger);
 	}

@@ -33,6 +33,7 @@ import jj.http.AbstractHttpResponse;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.logging.AccessLogger;
+import jj.logging.EmergencyLogger;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import io.netty.channel.ChannelFuture;
@@ -65,6 +66,8 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private final Logger access;
 	
+	private final Logger emergency;
+	
 	/**
 	 * @param response
 	 */
@@ -72,11 +75,13 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	JJHttpServerResponse(
 		final JJHttpServerRequest request,
 		final ChannelHandlerContext ctx,
-		final @AccessLogger Logger access
+		final @AccessLogger Logger access,
+		final @EmergencyLogger Logger emergency
 	) {
 		this.request = request;
 		this.ctx = ctx;
 		this.access = access;
+		this.emergency = emergency;
 		header(HttpHeaders.Names.SERVER, SERVER_NAME);
 	}
 	
@@ -115,7 +120,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	 */
 	@Override
 	public HttpResponse error(Throwable e) {
-		log.error("response ended in error", e);
+		emergency.error("response ended in error", e);
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		return this;
 	}

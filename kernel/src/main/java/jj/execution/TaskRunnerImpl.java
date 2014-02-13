@@ -116,11 +116,15 @@ class TaskRunnerImpl implements TaskRunner {
 				queuedTasks.remove(task);
 				task.start();
 				try (Closer closer = currentTask.enterScope(task)) {
-					task.run();
-					storeIfResumable(task);
-				} catch (Throwable t) {
-					logger.error("Task [{}] ended in exception", task.name());
-					logger.error("", t);
+					try {
+						task.run();
+						storeIfResumable(task);
+					} catch (Throwable t) {
+						if (!task.errored(t)) {
+							logger.error("Task [{}] ended in exception", task.name());
+							logger.error("", t);
+						}
+					}
 				} finally {
 					task.end();
 					Thread.currentThread().setName(name);

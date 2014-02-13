@@ -33,7 +33,7 @@ import org.mozilla.javascript.Callable;
  */
 @Singleton
 public class ConnectionEventExecutor {
-	
+
 	private final TaskRunner taskRunner;
 	
 	private final ContinuationCoordinator continuationCoordinator;
@@ -52,25 +52,50 @@ public class ConnectionEventExecutor {
 	}
 	
 	public void submit(final WebSocketConnection connection, final String event, final Object...args) {
-		taskRunner.execute(new ScriptTask<WebSocketConnectionHost>("host event " + event + " on WebSocket connection", connection.webSocketConnectionHost()) {
+		taskRunner.execute(new ConnectionEventTask("host event " + event + " on WebSocket connection", connection.webSocketConnectionHost(), continuationCoordinator, args, connection, event));	
+	}
+	
 
-			@Override
-			public void run() {
-				
-				if (result == null) {
-				
-					Callable function = connection.getFunction(event);
-					// NO! is this okay?  it isn't.  need to scope this stuff to clients
-					if (function == null) function = scriptEnvironment.getFunction(event);
-					try (Closer closer = currentConnection.enterScope(connection)) {
-						pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
-					}
-					
-				} else {
-					
-					pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
-				}
+	/**
+	 * @author jason
+	 *
+	 */
+	private final class ConnectionEventTask extends ScriptTask<WebSocketConnectionHost> {
+
+		private final Object[] args;
+
+		private final WebSocketConnection connection;
+
+		private final String event;
+
+		private ConnectionEventTask(
+			String name,
+			WebSocketConnectionHost scriptEnvironment,
+			ContinuationCoordinator continuationCoordinator,
+			Object[] args,
+			WebSocketConnection connection,
+			String event
+		) {
+			super(name, scriptEnvironment, continuationCoordinator);
+			this.args = args;
+			this.connection = connection;
+			this.event = event;
+		}
+
+		@Override
+		public void begin() {
+			
+			Callable function = connection.getFunction(event);
+			// NO! is this okay?  it isn't.  need to scope this stuff to clients
+			if (function == null) function = scriptEnvironment.getFunction(event);
+			
+			if (function == null) {
+				// ???
 			}
-		});	
+			
+			try (Closer closer = currentConnection.enterScope(connection)) {
+				pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+			}
+		}
 	}
 }

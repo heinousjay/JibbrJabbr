@@ -15,7 +15,10 @@
  */
 package jj.script;
 
-import jj.Sequence;
+import javax.inject.Inject;
+
+import jj.JJ;
+import jj.SecureRandomHelper;
 import jj.StringUtils;
 
 /**
@@ -27,21 +30,33 @@ import jj.StringUtils;
  *
  */
 public class ContinuationPendingKey {
-	
-	private static Sequence ids = new Sequence();
 
 	private final String id;
 	
-	private final String toString; 
+	private final String toString;
+	
+	@Inject
+	ContinuationPendingKey(final ContinuationPendingCache cache) {
+		this.id = cache.uniqueID();
+		this.toString = makeToString();
+	}
 	
 	public ContinuationPendingKey() {
-		this(ids.next());
+		assert !JJ.isRunning : "DO NOT USE THIS CONSTRUCTOR IN THE RUNNING SYSTEM!";
+		// I'm sure that most of the time this would be fine.  it's the one-in-a-billion 
+		// or whatever shot at it being wrong that i hate
+		id = Integer.toHexString(SecureRandomHelper.nextInt());
+		toString = makeToString();
 	}
 	
 	public ContinuationPendingKey(final String id) {
 		assert !StringUtils.isEmpty(id);
 		this.id = id;
-		this.toString = "pending continuation " + id;
+		this.toString = makeToString();
+	}
+	
+	private String makeToString() {
+		return getClass().getSimpleName() + "-" + id;
 	}
 	
 	public String id() {

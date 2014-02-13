@@ -20,6 +20,9 @@ import java.util.concurrent.Future;
 import jj.execution.ResumableTask;
 
 /**
+ * The unit of execution for dealing with the script system.
+ * 
+ * 
  * @author jason
  *
  */
@@ -27,9 +30,52 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableT
 	
 	protected final T scriptEnvironment;
 	
-	protected ScriptTask(final String name, final T scriptEnvironment) {
+	protected final ContinuationCoordinator continuationCoordinator;
+	
+	protected ScriptTask(final String name, final T scriptEnvironment, final ContinuationCoordinator continuationCoordinator) {
 		super(name);
 		this.scriptEnvironment = scriptEnvironment;
+		this.continuationCoordinator = continuationCoordinator;
+	}
+	
+	@Override
+	protected final void run() throws Exception {
+		
+		if (pendingKey == null) {
+			begin();
+		} else if (result != null) {
+			resume();
+		} else {
+			throw new AssertionError("did you mess with the pendingKey and/or result?");
+		}
+		check();
+	}
+	
+	/**
+	 * Implement this method to perform initial execution of this task.
+	 * @throws Exception
+	 */
+	protected void begin() throws Exception {
+		
+	}
+	
+	/**
+	 * Implement this method to have control over resumption.  If all you do is pass the result
+	 * to the ContinuationCoordinator, don't worry about it, you're covered
+	 * @throws Exception
+	 */
+	protected void resume() throws Exception {
+		pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
+	}
+	
+	/**
+	 * Implement this method to run after completion of either the begin or resume methods.  typically
+	 * you'll check the pendingKey to see if the task is complete or not.  this will only be called if
+	 * the begin/resume methods complete successfully, otherwise the errored method will be called
+	 * @throws Exception
+	 */
+	protected void check() throws Exception {
+		
 	}
 	
 	@Override

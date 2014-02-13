@@ -60,60 +60,68 @@ public abstract class JJTask implements Delayed {
 
 	protected abstract void run() throws Exception;
 	
+	/**
+	 * called when an error occurs during task execution.  return true if you consider
+	 * the error handled
+	 */
+	protected boolean errored(Throwable cause) {
+		return false;
+	}
+	
 	protected abstract Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable);
 	
-	String name() {
+	final String name() {
 		return name;
 	}
 	
-	void enqueue(long timeoutMillis) {
+	final void enqueue(long timeoutMillis) {
 		maxTime = timeoutMillis;
 		enqueuedTime = System.currentTimeMillis();
 	}
 	
-	void start() {
+	final void start() {
 		startTime = System.currentTimeMillis();
 	}
 	
-	void end() {
+	final void end() {
 		endTime = System.currentTimeMillis();
 	}
 	
-	boolean enqueued() {
+	final boolean enqueued() {
 		return enqueuedTime > 0;
 	}
 
-	boolean started() {
+	final boolean started() {
 		return startTime > 0;
 	}
 	
-	boolean finished() {
+	final boolean finished() {
 		return endTime > 0;
 	}
 	
-	long timeInQueue() {
+	final long timeInQueue() {
 		return System.currentTimeMillis() - enqueuedTime;
 	}
 	
-	long executionTime() {
+	final long executionTime() {
 		return endTime - startTime;
 	}
 	
 	@Override
-	public long getDelay(TimeUnit unit) {
+	public final long getDelay(TimeUnit unit) {
 		return unit.convert(maxTime - (System.currentTimeMillis() - enqueuedTime), TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
-	public int compareTo(Delayed o) {
+	public final int compareTo(Delayed o) {
 		long x = getDelay(TimeUnit.MILLISECONDS);
 		long y = o.getDelay(TimeUnit.MILLISECONDS);
 		return (x < y) ? -1 : ((x == y) ? 0 : 1);
 	}
 	
 	@Override
-	public String toString() {
-		return new StringBuilder(getClass().getName()).append(" - ").append(name).toString();
+	public final String toString() {
+		return new StringBuilder(getClass().getSimpleName()).append(" - ").append(name).toString();
 	}
 	
 }

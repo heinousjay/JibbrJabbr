@@ -19,10 +19,12 @@ import static jj.script.ScriptExecutionState.*;
 
 import java.util.HashMap;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 
 import jj.Closer;
 import jj.resource.AbstractResource;
@@ -37,6 +39,12 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected final Provider<RhinoContext> contextProvider;
 	
 	protected final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
+	
+	// i really don't like doing this! but i also really don't like shoving
+	// so many dang dependencies through a super constructor.
+	// might go to setter injection instead?
+	@Inject
+	private Provider<ContinuationPendingKey> pendingKeyProvider;
 	
 	ScriptExecutionState state = Unitialized;
 	
@@ -85,7 +93,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	}
 	
 	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
-		ContinuationPendingKey key = new ContinuationPendingKey();
+		ContinuationPendingKey key = pendingKeyProvider.get();
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;
@@ -113,11 +121,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 
 	/**
 	 * @return the exports property of the module object in the script's scope.  This could be
-	 * anything at all, scripts are able to export whatever they want
+	 * anything at all, scripts are able to export whatever they want.
 	 */
 	public Object exports() {
 		try (RhinoContext context = contextProvider.get()) {
-			return context.evaluateString(scope(), "module.exports", "returning exports");
+			return scope() == null ? Undefined.instance : context.evaluateString(scope(), "module.exports", "returning exports");
 		}
 	}
 	

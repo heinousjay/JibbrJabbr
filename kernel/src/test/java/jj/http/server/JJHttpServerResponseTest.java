@@ -70,7 +70,7 @@ public class JJHttpServerResponseTest {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		request = new JJHttpServerRequest(nettyRequest, new RouteFinder(), ctx);
 		
-		response = new JJHttpServerResponse(request, ctx, logger);
+		response = new JJHttpServerResponse(request, ctx, logger, logger);
 		assertThat(response.charset(), is(UTF_8));
 	}
 
@@ -127,6 +127,18 @@ public class JJHttpServerResponseTest {
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_FOUND));
 		verifyInlineResponse();
+	}
+	
+	@Test
+	public void testError() {
+		
+		Exception e = new Exception();
+		
+		response.error(e);
+		
+		assertThat(response.status(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
+		verifyInlineResponse();
+		verify(logger).error(anyString(), eq(e));
 	}
 	
 	LoadedResource givenALoadedResource() throws IOException {

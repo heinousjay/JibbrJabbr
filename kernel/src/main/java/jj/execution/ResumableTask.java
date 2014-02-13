@@ -15,7 +15,6 @@
  */
 package jj.execution;
 
-import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 
 /**
@@ -56,7 +55,7 @@ public abstract class ResumableTask extends JJTask {
 	 * be sure to store the key for resumption
 	 * @return
 	 */
-	final ContinuationPendingKey pendingKey() {
+	public final ContinuationPendingKey pendingKey() {
 		return pendingKey;
 	}
 	
@@ -65,7 +64,7 @@ public abstract class ResumableTask extends JJTask {
 	 * do not do any processing in this method! store the value and wait to be run
 	 * @param result
 	 */
-	final void resumeWith(Object result) {
+	public final void resumeWith(Object result) {
 		this.result = result;
 	}
 }

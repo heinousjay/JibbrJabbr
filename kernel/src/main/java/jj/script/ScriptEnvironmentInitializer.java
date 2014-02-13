@@ -79,7 +79,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	}
 	
 	void initializeScript(AbstractScriptEnvironment se) {
-		taskRunner.execute(new InitializerTask("initializing ScriptEnvironment at " + se.baseName(), se));
+		taskRunner.execute(new InitializerTask("initializing ScriptEnvironment at " + se.baseName(), se, continuationCoordinator));
 	}
 	
 	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
@@ -124,69 +124,26 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(null, pendingKey));
 	}
 	
-	// this should come from the script environment
-	private enum State {
-		Uninitialized,
-		Initializing,
-		Initialized,
-		Broken
-	}
-	
 	private class InitializerTask extends ScriptTask<AbstractScriptEnvironment> {
 		
-		private State state = State.Uninitialized;
 
 		/**
 		 * @param name
 		 * @param scriptEnvironment
 		 */
-		protected InitializerTask(String name, AbstractScriptEnvironment scriptEnvironment) {
-			super(name, scriptEnvironment);
-		}
-
-		@Override
-		protected void run() throws Exception {
-			
-			try {
-				switch (state) {
-				case Uninitialized:
-					startInitialization();
-					break;
-				case Initializing:
-					continueInitialization();
-					break;
-				case Initialized:
-				case Broken:
-					throw new AssertionError("should not be called for initialized or broken script environments");
-				}
-			} catch (Throwable e) {
-				broken();
-				throw e;
-			}
+		protected InitializerTask(String name, AbstractScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
+			super(name, scriptEnvironment, continuationCoordinator);
 		}
 		
-		private void startInitialization() throws Exception {
-			state = State.Initializing;
+		protected void begin() throws Exception {
 			scriptEnvironment.initializing(true);
-			if (scriptEnvironment.script() != null) {
-				try {
-					pendingKey = continuationCoordinator.execute(scriptEnvironment);
-				} catch (Exception e) {
-					broken();
-					throw e;
-				}
-			}
 			
-			if (pendingKey == null) {
-				initialized();
-				// and we're done
+			if (scriptEnvironment.script() != null) {
+				pendingKey = ScriptEnvironmentInitializer.this.continuationCoordinator.execute(scriptEnvironment);
 			}
 		}
 		
-		private void continueInitialization() throws Exception {
-			
-			pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
-			
+		protected void check() throws Exception {
 			if (pendingKey == null) {
 				initialized();
 				// and we're done
@@ -194,27 +151,29 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		}
 		
 		private void initialized() {
-			state = State.Initialized;
 			pendingKey = null;
 			result = null;
 			scriptEnvironment.initialized(true);
 
 			publisher.publish(new ScriptEnvironmentInitialized(scriptEnvironment));
-			checkParentResumption();
+			
+			checkParentResumption(scriptEnvironment.exports());
 		}
 		
-		private void broken() {
-			state = State.Broken;
+		@Override
+		protected boolean errored(Throwable cause) {
 			pendingKey = null;
 			result = null;
-			// mark the script environment somehow
-			checkParentResumption();
+			// mark the script environment somehow!
+			checkParentResumption(cause);
+			// we want this error reported
+			return false;
 		}
 		
-		private void checkParentResumption() {
+		private void checkParentResumption(Object result) {
 			ContinuationPendingKey pendingKey = scriptEnvironment.pendingKey();
 			if (pendingKey != null) {
-				taskRunner.resume(pendingKey, scriptEnvironment.exports());
+				taskRunner.resume(pendingKey, result);
 			}
 			
 			scriptEnvironmentInitialized(scriptEnvironment);

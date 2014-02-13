@@ -110,47 +110,48 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	
 	@Override
 	public void process() {
-		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment));
+		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment, continuationCoordinator));
 	}
 	
 	private final class DocumentRequestProcessTask extends ScriptTask<DocumentScriptEnvironment> {
 		
-		/**
-		 * @param name
-		 * @param scriptEnvironment
-		 */
-		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment) {
-			super("processing document request at " + scriptEnvironment.baseName(), scriptEnvironment);
+		private boolean run = false;
+		
+		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
+			super("processing document request at " + scriptEnvironment.baseName(), scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override
-		protected void run() throws Exception {
+		protected void begin() throws Exception {
 			
 			if (!scriptEnvironment.hasServerScript()) {
 				respond();
 			} else if (!scriptEnvironment.initialized()) {
 				initializer.executeOnInitialization(scriptEnvironment, this);
 			} else {
-			
-				if (result == null) {
-					
-					Callable readyFunction = scriptEnvironment.getFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY);
-					if (readyFunction != null) {
-						try (Closer closer = currentDocument.enterScope(DocumentRequestProcessor.this)) {
-							// should make a request object wrapper of some sort.  and perhaps response too?
-							pendingKey = continuationCoordinator.execute(scriptEnvironment, readyFunction);
-						}
+				run = true;
+				Callable readyFunction = scriptEnvironment.getFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY);
+				if (readyFunction != null) {
+					try (Closer closer = currentDocument.enterScope(DocumentRequestProcessor.this)) {
+						// should make a request object wrapper of some sort.  and perhaps response too?
+						pendingKey = continuationCoordinator.execute(scriptEnvironment, readyFunction);
 					}
-					
-				} else {
-					// continuations put all their own stuff back, so we only scope our resource to the initial execution. handy!
-					pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
-				}
-				
-				if (pendingKey == null) {
-					respond();
 				}
 			}
+		}
+		
+		@Override
+		protected void check() throws Exception {
+			if (run && pendingKey == null) {
+				respond();
+			}
+		}
+		
+		@Override
+		protected boolean errored(Throwable cause) {
+			// log it and return a 500
+			httpResponse.error(cause);
+			return true;
 		}
 	}
 	

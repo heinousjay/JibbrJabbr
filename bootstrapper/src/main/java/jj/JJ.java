@@ -43,7 +43,22 @@ import java.util.regex.Pattern;
  */
 public final class JJ {
 	
+	public static final boolean isRunning;
+	
 	private static final String JJ_MAIN_CLASS = "jj.Main";
+	
+	static {
+		boolean result;
+		try {
+			// pretty sure this is right
+			Class.forName(JJ_MAIN_CLASS);
+			result = false;
+		} catch (ClassNotFoundException cnfe) {
+			result = true;
+		}
+		
+		isRunning = result;
+	}
 	
 	private static final String COMMONS_DAEMON_PROCESS_ID_KEY = "commons.daemon.process.id";
 
