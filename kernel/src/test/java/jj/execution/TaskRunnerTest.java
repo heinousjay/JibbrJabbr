@@ -25,8 +25,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.script.ScriptEnvironment;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,22 +47,22 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public class TaskRunnerTest {
 	
-	@Mock IOExecutor ioExecutor;
+	private @Mock IOExecutor ioExecutor;
 	private @Mock ScheduledExecutorService scriptExecutor;
 	
-	@Mock ScriptEnvironment scriptEnvironment;
+	private @Mock ScriptEnvironment scriptEnvironment;
 
-	ExecutorBundle bundle;
+	private ExecutorBundle bundle;
 	
-	CurrentTask currentTask;
+	private CurrentTask currentTask;
 	
-	@Mock Logger logger;
+	private @Mock Logger logger;
 	
-	TaskRunnerImpl executor;
+	private TaskRunnerImpl executor;
 	
-	@Captor ArgumentCaptor<Runnable> runnableCaptor;
+	private @Captor ArgumentCaptor<Runnable> runnableCaptor;
 	
-	String baseName = "test";
+	private String baseName = "test";
 	
 	@Before
 	public void before() {
@@ -78,7 +80,68 @@ public class TaskRunnerTest {
 	
 	private void runTask(ExecutorService service) {
 		verify(service, atLeastOnce()).submit(runnableCaptor.capture());
+		// reset before each task run so that a test can control execution
+		// one task at a time
+		reset(service);
 		runnableCaptor.getValue().run();
+	}
+	
+	// this test is to make sure that the await doesn't work from here
+	// can't really make a positive test for it but i also just trust it.
+	// this is just me making sure that it cannot fall apart
+	// TODO - investigate using a promise there and kill await! no waiting!
+	@Test
+	public void testAwaitAsserts() throws Exception {
+		
+		IOTask task1 = new IOTask("test task 1") {
+			@Override
+			protected void run() throws Exception {
+				// don't care
+			}
+		};
+		boolean asserted = false;
+		try {
+			executor.execute(task1).await();
+			fail();
+		} catch (AssertionError ae) {
+			asserted = true;
+		}
+		
+		assertTrue(asserted);
+	}
+	
+	@Test
+	public void testPromiseKeeping() {
+		
+		final AtomicInteger counter = new AtomicInteger();
+		
+		IOTask task1 = new IOTask("test task 1") {
+			@Override
+			protected void run() throws Exception {
+				counter.incrementAndGet();
+			}
+		};
+		
+		IOTask task2 = new IOTask("test task 2") {
+			@Override
+			protected void run() throws Exception {
+				counter.incrementAndGet();
+			}
+		};
+		
+		IOTask task3 = new IOTask("test task 3") {
+			@Override
+			protected void run() throws Exception {
+				counter.incrementAndGet();
+			}
+		};
+		
+		executor.execute(task1).then(task2).then(task3);
+		runTask(ioExecutor);
+		runTask(ioExecutor);
+		runTask(ioExecutor);
+		
+		assertThat(counter.get(), is(3));
 	}
 	
 	@Test
