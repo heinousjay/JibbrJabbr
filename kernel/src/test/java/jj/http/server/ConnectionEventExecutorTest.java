@@ -39,7 +39,7 @@ public class ConnectionEventExecutorTest {
 
 	@Mock WebSocketConnection connection;
 	@Mock WebSocketConnectionHost webSocketConnectionHost;
-	MockTaskRunner executor;
+	MockTaskRunner taskRunner;
 	@Mock ContinuationCoordinator continuationCoordinator;
 	@Mock Callable eventFunction;
 	@Mock Callable eventFunction2;
@@ -48,9 +48,9 @@ public class ConnectionEventExecutorTest {
 	
 	@Before
 	public void before() {
-		executor = new MockTaskRunner();
+		taskRunner = new MockTaskRunner();
 		
-		cee = new ConnectionEventExecutor(executor, continuationCoordinator, new MockCurrentWebSocketConnection());
+		cee = new ConnectionEventExecutor(taskRunner, continuationCoordinator, new MockCurrentWebSocketConnection());
 		
 		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
 	}
@@ -65,7 +65,7 @@ public class ConnectionEventExecutorTest {
 		
 		// when
 		cee.submit(connection, eventName);
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		// then
 		verify(continuationCoordinator).execute(webSocketConnectionHost, eventFunction);
@@ -79,7 +79,7 @@ public class ConnectionEventExecutorTest {
 		
 		// when
 		cee.submit(connection, eventName);
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		// then
 		verify(continuationCoordinator, times(2)).execute(webSocketConnectionHost, eventFunction);
@@ -98,7 +98,7 @@ public class ConnectionEventExecutorTest {
 		
 		// when
 		cee.submit(connection, eventName);
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		// then
 		verify(continuationCoordinator).execute(webSocketConnectionHost, eventFunction);

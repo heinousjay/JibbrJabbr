@@ -44,7 +44,7 @@ public class DocumentRequestProcessorTest {
 	Document document;
 	String baseName;
 	
-	MockTaskRunner executor;
+	MockTaskRunner taskRunner;
 	
 	@Mock DependsOnScriptEnvironmentInitialization initializer;
 	
@@ -100,7 +100,7 @@ public class DocumentRequestProcessorTest {
 		document.outputSettings().prettyPrint(false);
 		baseName = "baseName";
 
-		executor = new MockTaskRunner();
+		taskRunner = new MockTaskRunner();
 		
 		given(documentScriptEnvironment.baseName()).willReturn(baseName);
 		given(documentScriptEnvironment.document()).willReturn(document);
@@ -117,7 +117,7 @@ public class DocumentRequestProcessorTest {
 	
 	private DocumentRequestProcessor toTest(Set<DocumentFilter> filters) {
 		return new DocumentRequestProcessor(
-			executor,
+			taskRunner,
 			initializer,
 			continuationCoordinator,
 			currentDocument,
@@ -136,9 +136,9 @@ public class DocumentRequestProcessorTest {
 		
 		toTest.process();
 		
-		assertThat(executor.tasks.size(), is(1));
-		assertThat(executor.tasks.get(0), is(instanceOf(ScriptTask.class)));
-		executor.runUntilIdle();
+		assertThat(taskRunner.tasks.size(), is(1));
+		assertThat(taskRunner.tasks.get(0), is(instanceOf(ScriptTask.class)));
+		taskRunner.runUntilIdle();
 		
 
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
@@ -155,7 +155,7 @@ public class DocumentRequestProcessorTest {
 		given(documentScriptEnvironment.hasServerScript()).willReturn(true);
 		
 		toTest.process();
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		verify(initializer).executeOnInitialization(eq(documentScriptEnvironment), any(ScriptTask.class));
 		
@@ -175,8 +175,8 @@ public class DocumentRequestProcessorTest {
 		toTest.process();
 		
 		@SuppressWarnings("unchecked")
-		ScriptTask<? extends ScriptEnvironment> task = (ScriptTask<? extends ScriptEnvironment>)executor.firstTask();
-		executor.runUntilIdle();
+		ScriptTask<? extends ScriptEnvironment> task = (ScriptTask<? extends ScriptEnvironment>)taskRunner.firstTask();
+		taskRunner.runUntilIdle();
 		
 		assertThat(TaskHelper.pendingKey(task), is(pendingKey));
 		Object result = new Object();
@@ -205,7 +205,7 @@ public class DocumentRequestProcessorTest {
 		
 		toTest.process();
 		
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		verify(continuationCoordinator).execute(documentScriptEnvironment, callable);
 		
@@ -233,7 +233,7 @@ public class DocumentRequestProcessorTest {
 		
 		// when
 		toTest.respond();
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 
 		// then
 		assertThat(filterCalls, is(6));
@@ -247,7 +247,7 @@ public class DocumentRequestProcessorTest {
 		
 		// when
 		toTest.respond();
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		// then
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);

@@ -15,17 +15,32 @@
  */
 package jj.execution;
 
+import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 
 /**
- * implement this to notify the executor system that your task can be resumed
+ * extend this class to notify the executor system that your task can be resumed
+ * 
+ * this class and some code in the TaskRunner constitute the integration of the script
+ * system with the execution system.
  * 
  * @author jason
  *
  */
 public abstract class ResumableTask extends JJTask {
 	
+	/** assign the result of any operation against the ContinuationCoordinator to this field */
 	protected ContinuationPendingKey pendingKey;
+	
+	/** 
+	 * if this field is populated when the task is run, call the resume on the ContinuationCoordinator
+	 * with the stored ContinuationPendingKey and this result, assigning any result of that operation
+	 * to the pendingKey field,
+	 * 
+	 * <pre>
+	 * pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
+	 * </pre>
+	 */
 	protected Object result;
 	
 	/**

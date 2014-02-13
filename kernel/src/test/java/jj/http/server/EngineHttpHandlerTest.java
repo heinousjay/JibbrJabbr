@@ -74,7 +74,7 @@ public class EngineHttpHandlerTest {
 	@Mock WebSocketRequestChecker webSocketRequestChecker;
 	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
-	MockTaskRunner executors;
+	MockTaskRunner taskRunner;
 
 	@Mock JJHttpServerRequest httpRequest1;
 	@Mock JJHttpServerRequest httpRequest2;
@@ -96,7 +96,7 @@ public class EngineHttpHandlerTest {
 	//given
 	@Before
 	public void before() throws Exception {
-		executors = new MockTaskRunner();
+		taskRunner = new MockTaskRunner();
 		
 		given(httpRequest1.uriMatch()).willReturn(servables.staticUri);
 		given(httpRequest2.uriMatch()).willReturn(servables.assetUri);
@@ -109,7 +109,7 @@ public class EngineHttpHandlerTest {
 		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
 		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
-		handler = new EngineHttpHandler(executors, servables.servables, injector, webSocketRequestChecker, logger);
+		handler = new EngineHttpHandler(taskRunner, servables.servables, injector, webSocketRequestChecker, logger);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -232,42 +232,42 @@ public class EngineHttpHandlerTest {
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(requestProcessor1).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest2, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(requestProcessor2).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest3, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(requestProcessor3).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(requestProcessor1, times(2)).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest2, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(requestProcessor2, times(2)).process();
 		
 		//when
 		handler.handleHttpRequest(httpRequest3, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(requestProcessor3, times(2)).process();
@@ -278,7 +278,7 @@ public class EngineHttpHandlerTest {
 		
 		//when
 		handler.handleHttpRequest(httpRequest4, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(requestProcessor3).process();
@@ -289,7 +289,7 @@ public class EngineHttpHandlerTest {
 		
 		//when
 		handler.handleHttpRequest(httpRequest5, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		// then
 		verify(httpResponse).sendNotFound();
@@ -304,7 +304,7 @@ public class EngineHttpHandlerTest {
 		
 		//when
 		handler.handleHttpRequest(httpRequest1, httpResponse);
-		executors.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		//then
 		verify(httpResponse).error(ioe);

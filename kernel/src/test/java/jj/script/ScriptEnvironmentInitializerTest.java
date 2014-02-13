@@ -45,7 +45,7 @@ public class ScriptEnvironmentInitializerTest {
 	ContinuationPendingKey pendingKey1;
 	ContinuationPendingKey pendingKey2;
 	
-	MockTaskRunner executor;
+	MockTaskRunner taskRunner;
 	@Mock ContinuationCoordinatorImpl continuationCoordinator;
 
 	ScriptEnvironmentInitializer sei;
@@ -63,21 +63,21 @@ public class ScriptEnvironmentInitializerTest {
 	public void before() {
 		pendingKey1 = new ContinuationPendingKey();
 		pendingKey2 = new ContinuationPendingKey();
-		executor = new MockTaskRunner();
+		taskRunner = new MockTaskRunner();
 		given(scriptEnvironment.script()).willReturn(script);
-		sei = new ScriptEnvironmentInitializer(executor, isScriptThread, continuationCoordinator, publisher);
+		sei = new ScriptEnvironmentInitializer(taskRunner, isScriptThread, continuationCoordinator, publisher);
 	}
 	
 	@Test
 	public void testRootScriptEnvironmentInitialization() throws Exception {
 		// this just puts the task into our greedy little hands
 		sei.initializeScript(scriptEnvironment);
-		JJTask task = executor.tasks.get(0);
+		JJTask task = taskRunner.tasks.get(0);
 		ResumableTask resumable = (ResumableTask)task;
 		
 		given(continuationCoordinator.execute(scriptEnvironment)).willReturn(pendingKey1);
 		
-		executor.runFirstTask();
+		taskRunner.runFirstTask();
 		
 		assertThat(TaskHelper.pendingKey(resumable), is(pendingKey1));
 		verify(scriptEnvironment).initializing(true);
@@ -88,8 +88,8 @@ public class ScriptEnvironmentInitializerTest {
 		given(continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey1, result)).willReturn(pendingKey2);
 		
 		// put it back!
-		executor.tasks.add(task);
-		executor.runFirstTask();
+		taskRunner.tasks.add(task);
+		taskRunner.runFirstTask();
 		
 		verify(scriptEnvironment, never()).initialized(true);
 		assertThat(TaskHelper.pendingKey(resumable), is(pendingKey2));
@@ -97,8 +97,8 @@ public class ScriptEnvironmentInitializerTest {
 		result = new Object();
 		TaskHelper.resumeWith(resumable, result);
 		
-		executor.tasks.add(task);
-		executor.runFirstTask();
+		taskRunner.tasks.add(task);
+		taskRunner.runFirstTask();
 		
 		verify(continuationCoordinator).resumeContinuation(scriptEnvironment, pendingKey2, result);
 		verify(scriptEnvironment).initialized(true);

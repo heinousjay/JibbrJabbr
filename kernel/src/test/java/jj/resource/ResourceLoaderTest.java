@@ -36,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceLoaderTest {
 
-	MockTaskRunner executor;
+	MockTaskRunner taskRunner;
 	@Mock ResourceFinder resourceFinder;
 	
 	ResourceLoader rl;
@@ -45,8 +45,8 @@ public class ResourceLoaderTest {
 	
 	@Before
 	public void before() {
-		executor = new MockTaskRunner();
-		rl = new ResourceLoader(executor, resourceFinder);
+		taskRunner = new MockTaskRunner();
+		rl = new ResourceLoader(taskRunner, resourceFinder);
 	}
 	
 	@Test
@@ -54,11 +54,11 @@ public class ResourceLoaderTest {
 		
 		rl.loadResource(task, Resource.class, "name", "a thing", new Integer(1));
 		
-		executor.runFirstTask();
+		taskRunner.runFirstTask();
 		
 		verify(resourceFinder).loadResource(Resource.class, "name", "a thing", new Integer(1));
 		
-		assertThat(executor.firstTask(), is(task));
+		assertThat(taskRunner.firstTask(), is(task));
 	}
 
 }

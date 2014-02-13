@@ -33,15 +33,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationScriptPreloaderTest {
 
-	MockTaskRunner executors = new MockTaskRunner();
+	MockTaskRunner taskRunner = new MockTaskRunner();
 	@Mock ResourceFinder resourceFinder;
 	
 	@Test
 	public void test() throws Exception {
 		
-		ConfigurationScriptPreloader csp = new ConfigurationScriptPreloader(executors, resourceFinder);
+		ConfigurationScriptPreloader csp = new ConfigurationScriptPreloader(taskRunner, resourceFinder);
 		csp.start();
-		executors.runFirstTask();
+		taskRunner.runFirstTask();
 		
 		verify(resourceFinder).loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
 	}

@@ -52,7 +52,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
-	MockTaskRunner executor;
+	MockTaskRunner taskRunner;
 	
 	@Mock ResourceFinder finder;
 	
@@ -71,9 +71,9 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		pendingKey = new ContinuationPendingKey();
 		
-		executor = new MockTaskRunner();
+		taskRunner = new MockTaskRunner();
 		
-		processor = new RequiredModuleContinuationProcessor(executor, finder, scriptEnvironmentInitializer);
+		processor = new RequiredModuleContinuationProcessor(taskRunner, finder, scriptEnvironmentInitializer);
 		
 		requiredModule = new RequiredModule(documentScriptEnvironment, module);
 		requiredModule.pendingKey(pendingKey);
@@ -92,11 +92,11 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		// then
 		// prove that an IO task was submitted
-		assertThat(executor.tasks.size(), is(1));
-		assertThat(executor.tasks.get(0), is(instanceOf(IOTask.class)));
+		assertThat(taskRunner.tasks.size(), is(1));
+		assertThat(taskRunner.tasks.get(0), is(instanceOf(IOTask.class)));
 		
 		// and run it
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		
 		// then
 		// we validate it happened because it's the only signal we get.  the parent is
@@ -108,11 +108,11 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		// when
 		processor.process(continuationState);
-		executor.runUntilIdle();
+		taskRunner.runUntilIdle();
 		// this shit is broken!
 		// then
-		assertThat(executor.pendingKey, is(pendingKey));
-		assertThat(executor.result, is(instanceOf(RequiredModuleException.class)));
+		assertThat(taskRunner.pendingKey, is(pendingKey));
+		assertThat(taskRunner.result, is(instanceOf(RequiredModuleException.class)));
 	}
 	
 	private void givenAScriptEnvironment() {
@@ -132,8 +132,8 @@ public class RequiredModuleContinuationProcessorTest {
 		// when
 		processor.process(continuationState);
 		
-		assertThat(executor.pendingKey, is(pendingKey));
-		assertThat(executor.result, is((Object)exports));
+		assertThat(taskRunner.pendingKey, is(pendingKey));
+		assertThat(taskRunner.result, is((Object)exports));
 	}
 
 }
