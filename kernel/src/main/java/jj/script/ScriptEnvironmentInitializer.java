@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import jj.event.Publisher;
 import jj.execution.TaskRunner;
-import jj.execution.ScriptTask;
 
 /**
  * initializes a script environment, so that it is ready for execution.  if possible :D
@@ -36,6 +35,8 @@ import jj.execution.ScriptTask;
 public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentInitialization {
 	
 	private final TaskRunner taskRunner;
+	
+	private final IsScriptThread isScriptThread;
 	
 	private final ContinuationCoordinatorImpl continuationCoordinator;
 	
@@ -67,10 +68,12 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Inject
 	ScriptEnvironmentInitializer(
 		final TaskRunner taskRunner,
+		final IsScriptThread isScriptThread,
 		final ContinuationCoordinatorImpl continuationCoordinator,
 		final Publisher publisher
 	) {
 		this.taskRunner = taskRunner;
+		this.isScriptThread = isScriptThread;
 		this.continuationCoordinator = continuationCoordinator;
 		this.publisher = publisher;
 	}
@@ -105,7 +108,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	public void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task) {
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
-		assert taskRunner.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
+		assert isScriptThread.forScriptEnvironment(scriptEnvironment) : "only wait on script environments from their own thread!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(task, null));
 	}
 	
@@ -117,7 +120,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Override
 	public void resumeOnInitialization(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
-		assert taskRunner.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
+		assert isScriptThread.forScriptEnvironment(scriptEnvironment) : "only wait on script environments from their own thread!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(null, pendingKey));
 	}
 	

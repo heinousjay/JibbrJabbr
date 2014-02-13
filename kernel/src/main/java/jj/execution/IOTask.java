@@ -28,8 +28,8 @@ public abstract class IOTask extends JJTask {
 	}
 	
 	@Override
-	Future<?> addRunnableToExecutor(ExecutorBundle executors, Runnable runnable) {
-		return executors.ioExecutor.submit(runnable);
+	protected final Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
+		return executors.ofType(IOExecutor.class).submit(runnable);
 	}
 
 }

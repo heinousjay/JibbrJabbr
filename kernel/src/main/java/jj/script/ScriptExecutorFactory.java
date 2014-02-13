@@ -1,4 +1,4 @@
-package jj.execution;
+package jj.script;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerShutdownListener;
-import jj.script.ScriptEnvironment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

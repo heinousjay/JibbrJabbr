@@ -1,12 +1,12 @@
-package jj.execution;
+package jj.script;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import jj.execution.ScriptExecutorFactory;
 import jj.script.ScriptEnvironment;
+import jj.script.ScriptExecutorFactory;
 
 import org.junit.Before;
 import org.junit.Test;

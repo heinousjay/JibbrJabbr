@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import jj.Closer;
 import jj.logging.EmergencyLogger;
 import jj.script.ContinuationPendingKey;
-import jj.script.ScriptEnvironment;
 
 /**
  * exposes some execution related information and
@@ -128,11 +127,6 @@ class TaskRunnerImpl implements TaskRunner {
 				}
 			}
 		});
-	}
-	
-	@Override
-	public boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
-		return executors.scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
 	}
 
 	public boolean isIOThread() {

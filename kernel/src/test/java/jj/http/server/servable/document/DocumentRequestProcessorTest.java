@@ -13,7 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jj.execution.MockTaskRunner;
-import jj.execution.ScriptTask;
 import jj.execution.TaskHelper;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -25,6 +24,7 @@ import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptEnvironment;
+import jj.script.ScriptTask;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 
@@ -138,7 +138,6 @@ public class DocumentRequestProcessorTest {
 		
 		assertThat(executor.tasks.size(), is(1));
 		assertThat(executor.tasks.get(0), is(instanceOf(ScriptTask.class)));
-		executor.isScriptThread = true;
 		executor.runUntilIdle();
 		
 
@@ -156,7 +155,6 @@ public class DocumentRequestProcessorTest {
 		given(documentScriptEnvironment.hasServerScript()).willReturn(true);
 		
 		toTest.process();
-		executor.isScriptThread = true;
 		executor.runUntilIdle();
 		
 		verify(initializer).executeOnInitialization(eq(documentScriptEnvironment), any(ScriptTask.class));
@@ -176,7 +174,6 @@ public class DocumentRequestProcessorTest {
 		
 		toTest.process();
 		
-		executor.isScriptThread = true;
 		@SuppressWarnings("unchecked")
 		ScriptTask<? extends ScriptEnvironment> task = (ScriptTask<? extends ScriptEnvironment>)executor.firstTask();
 		executor.runUntilIdle();
@@ -208,7 +205,6 @@ public class DocumentRequestProcessorTest {
 		
 		toTest.process();
 		
-		executor.isScriptThread = true;
 		executor.runUntilIdle();
 		
 		verify(continuationCoordinator).execute(documentScriptEnvironment, callable);
@@ -236,7 +232,6 @@ public class DocumentRequestProcessorTest {
 		DocumentRequestProcessor toTest = toTest(filters);
 		
 		// when
-		executor.isScriptThread = true;
 		toTest.respond();
 		executor.runUntilIdle();
 
@@ -249,9 +244,6 @@ public class DocumentRequestProcessorTest {
 	public void testWritesDocumentCorrectly() throws Exception {
 		// given
 		DocumentRequestProcessor toTest = toTest(Collections.<DocumentFilter>emptySet());
-				
-		
-		executor.isScriptThread = true;
 		
 		// when
 		toTest.respond();

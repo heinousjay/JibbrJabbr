@@ -54,6 +54,8 @@ public class ScriptEnvironmentInitializerTest {
 	
 	@Mock Script script;
 	
+	@Mock IsScriptThread isScriptThread;
+	
 	@Mock Publisher publisher;
 	@Captor ArgumentCaptor<ScriptEnvironmentInitialized> eventCaptor;
 	
@@ -62,9 +64,8 @@ public class ScriptEnvironmentInitializerTest {
 		pendingKey1 = new ContinuationPendingKey();
 		pendingKey2 = new ContinuationPendingKey();
 		executor = new MockTaskRunner();
-		executor.isScriptThread = true;
 		given(scriptEnvironment.script()).willReturn(script);
-		sei = new ScriptEnvironmentInitializer(executor, continuationCoordinator, publisher);
+		sei = new ScriptEnvironmentInitializer(executor, isScriptThread, continuationCoordinator, publisher);
 	}
 	
 	@Test

@@ -19,6 +19,8 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import jj.script.ScriptTask;
+
 /**
  * <p>
  * provides the base facilities for task management, and
@@ -37,6 +39,11 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class JJTask implements Delayed {
 	
+	protected interface ExecutorFinder {
+		
+		<T> T ofType(Class<T> executorType);
+	}
+	
 	private final String name;
 	
 	private volatile long maxTime = 0;
@@ -53,7 +60,7 @@ public abstract class JJTask implements Delayed {
 
 	protected abstract void run() throws Exception;
 	
-	abstract Future<?> addRunnableToExecutor(ExecutorBundle executors, Runnable runnable);
+	protected abstract Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable);
 	
 	String name() {
 		return name;

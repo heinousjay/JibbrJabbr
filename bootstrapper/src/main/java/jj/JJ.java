@@ -35,8 +35,8 @@ import java.util.regex.Pattern;
  * </p>
  * 
  * <p>
- * The direct dependencies of this class are limited to inner classes,
- * commons-daemon, the jj.api package, and the JDK.
+ * The direct dependencies of this class are limited to things in the 
+ * bootstrapper project and JDK classes
  * </p>
  * 
  * @author Jason Miller

@@ -15,23 +15,23 @@
  */
 package jj.script;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
- * Inject this component to hitch a continuation to the
- * initialization of a script environment
- * 
  * @author jason
  *
  */
-public interface DependsOnScriptEnvironmentInitialization {
-
-	/**
-	 * register here to have a pendingKey resumed when a scriptEnvironment has transitioned to initialized
-	 * @param scriptEnvironment
-	 * @param pendingKey
-	 */
-	void resumeOnInitialization(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey);
+@Singleton
+public class IsScriptThread {
+	private final ScriptExecutorFactory scriptExecutorFactory;
 	
-	void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task);
+	@Inject
+	IsScriptThread(final ScriptExecutorFactory scriptExecutorFactory) {
+		this.scriptExecutorFactory = scriptExecutorFactory;
+	}
 
+	public boolean forScriptEnvironment(final ScriptEnvironment scriptEnvironment) {
+		return scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
+	}
 }

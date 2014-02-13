@@ -31,7 +31,7 @@ public abstract class ResumableTask extends JJTask {
 	/**
 	 * @param name
 	 */
-	ResumableTask(String name) {
+	protected ResumableTask(String name) {
 		super(name);
 	}
 

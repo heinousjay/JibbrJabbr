@@ -15,6 +15,8 @@
  */
 package jj.execution;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -25,17 +27,20 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class ExecutorBundle {
+class ExecutorBundle implements JJTask.ExecutorFinder {
 	
-	final IOExecutor ioExecutor;
-	final ScriptExecutorFactory scriptExecutorFactory;
+	private final Map<Class<?>, Object> executors;
 
 	@Inject
 	ExecutorBundle(
-		final IOExecutor ioExecutor,
-		final ScriptExecutorFactory scriptExecutorFactory
+		final Map<Class<?>, Object> executors
 	) {
-		this.ioExecutor = ioExecutor;
-		this.scriptExecutorFactory = scriptExecutorFactory;
+		this.executors = executors;
+	}
+
+	@Override
+	public <T> T ofType(Class<T> executorType) {
+		assert executors.containsKey(executorType);
+		return executorType.cast(executors.get(executorType));
 	}
 }

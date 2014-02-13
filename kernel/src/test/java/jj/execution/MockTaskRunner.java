@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import jj.script.ContinuationPendingKey;
-import jj.script.ScriptEnvironment;
 
 /**
  * @author jason
@@ -94,13 +93,6 @@ public class MockTaskRunner implements TaskRunner {
 				return null;
 			}
 		};
-	}
-	
-	public boolean isScriptThread = false;
-
-	@Override
-	public boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
-		return isScriptThread;
 	}
 	
 	public boolean isIOThread = false;

@@ -17,6 +17,7 @@ package jj;
 
 import jj.conversion.Converter;
 import jj.engine.HostObject;
+import jj.execution.ExecutorBinder;
 import jj.http.server.servable.document.DocumentFilter;
 import jj.resource.ResourceCreatorBinder;
 import jj.script.ContinuationProcessorBinder;
@@ -35,6 +36,8 @@ public abstract class JJModule extends AbstractModule {
 	private ResourceCreatorBinder bindCreation;
 	
 	private ContinuationProcessorBinder dispatch;
+	
+	private ExecutorBinder executors;
 	
 	private Multibinder<JJServerStartupListener> startupListeners;
 	private Multibinder<JJServerShutdownListener> shutdownListeners;
@@ -89,5 +92,12 @@ public abstract class JJModule extends AbstractModule {
 			dispatch = new ContinuationProcessorBinder(binder());
 		}
 		return dispatch;
+	}
+	
+	protected ExecutorBinder bindTaskRunner() {
+		if (executors == null) {
+			executors = new ExecutorBinder(binder());
+		}
+		return executors;
 	}
 }

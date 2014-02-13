@@ -15,23 +15,25 @@
  */
 package jj.script;
 
+import java.util.concurrent.Future;
+
+import jj.execution.ResumableTask;
 
 /**
- * Inject this component to hitch a continuation to the
- * initialization of a script environment
- * 
  * @author jason
  *
  */
-public interface DependsOnScriptEnvironmentInitialization {
-
-	/**
-	 * register here to have a pendingKey resumed when a scriptEnvironment has transitioned to initialized
-	 * @param scriptEnvironment
-	 * @param pendingKey
-	 */
-	void resumeOnInitialization(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey);
+public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableTask {
 	
-	void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task);
-
+	protected final T scriptEnvironment;
+	
+	protected ScriptTask(final String name, final T scriptEnvironment) {
+		super(name);
+		this.scriptEnvironment = scriptEnvironment;
+	}
+	
+	@Override
+	protected final Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
+		return executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment).submit(runnable);
+	}
 }

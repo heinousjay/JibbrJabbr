@@ -20,19 +20,20 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptEnvironment;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
@@ -44,15 +45,14 @@ import org.slf4j.Logger;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class JJExecutorImplTest {
+public class TaskRunnerTest {
 	
 	@Mock IOExecutor ioExecutor;
-	@Mock ScriptExecutorFactory scriptExecutorFactory;
-	@Mock ScheduledExecutorService scriptExecutor;
+	private @Mock ScheduledExecutorService scriptExecutor;
 	
 	@Mock ScriptEnvironment scriptEnvironment;
 
-	@InjectMocks ExecutorBundle bundle;
+	ExecutorBundle bundle;
 	
 	CurrentTask currentTask;
 	
@@ -69,39 +69,18 @@ public class JJExecutorImplTest {
 		
 		currentTask = new CurrentTask();
 		
+		Map<Class<?>, Object> executors = new HashMap<>();
+		executors.put(IOExecutor.class, ioExecutor);
+		bundle = new ExecutorBundle(executors);
+		
 		executor = new TaskRunnerImpl(bundle, currentTask, logger);
 		
 		given(scriptEnvironment.baseName()).willReturn(baseName);
-		given(scriptExecutorFactory.executorFor(scriptEnvironment)).willReturn(scriptExecutor);
 	}
 	
 	private void runTask(ExecutorService service) {
 		verify(service, atLeastOnce()).submit(runnableCaptor.capture());
 		runnableCaptor.getValue().run();
-	}
-	
-	@Test
-	public void testExecuteScriptTask() {
-		
-		// kind og a 
-		
-		final AtomicBoolean flag = new AtomicBoolean(false);
-		
-		ScriptTask<ScriptEnvironment> task = new ScriptTask<ScriptEnvironment>("test task", scriptEnvironment) {
-			
-			@Override
-			protected void run() {
-				flag.set(currentTask.current() == this);
-			}
-		};
-
-		assertThat(currentTask.current(), is(nullValue()));
-		
-		executor.execute(task);
-		runTask(scriptExecutor);
-		
-		assertThat(flag.get(), is(true));
-		assertThat(currentTask.current(), is(nullValue()));
 	}
 	
 	@Test
@@ -130,14 +109,6 @@ public class JJExecutorImplTest {
 		
 		final Exception toThrow = new Exception();
 		
-		executor.execute(new ScriptTask<ScriptEnvironment>("test task", scriptEnvironment) {
-			
-			@Override
-			protected void run() throws Exception {
-				throw toThrow;
-			}
-		});
-		
 		executor.execute(new IOTask("test task") {
 			
 			@Override
@@ -146,20 +117,15 @@ public class JJExecutorImplTest {
 			}
 		});
 		
-		runTask(scriptExecutor);
-		
 		runTask(ioExecutor);
 		
-		verify(logger, times(2)).error(anyString(), eq(toThrow));
+		verify(logger).error(anyString(), eq(toThrow));
 	}
 	
-	private final class ResumableScriptTask extends ScriptTask<ScriptEnvironment> {
-
-		int count = 0;
+	
+	private int count = 0;
+	private final ResumableTask resumableTask = new ResumableTask("") {
 		
-		ResumableScriptTask(ScriptEnvironment scriptEnvironment) {
-			super("who needs a name", scriptEnvironment);
-		}
 
 		@Override
 		protected void run() throws Exception {
@@ -168,24 +134,27 @@ public class JJExecutorImplTest {
 				pendingKey = null;
 			}
 		}
-	}
+		
+		@Override
+		protected Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
+			return executors.ofType(IOExecutor.class).submit(runnable);
+		}
+	}; 
 	
 	@Test
 	public void testResumableTask() {
 		
-		ResumableScriptTask task = new ResumableScriptTask(scriptEnvironment);
+		executor.execute(resumableTask);
 		
-		executor.execute(task);
+		runTask(ioExecutor);
 		
-		runTask(scriptExecutor);
+		executor.resume(resumableTask.pendingKey(), "whatever");
 		
-		executor.resume(task.pendingKey(), "whatever");
+		runTask(ioExecutor);
 		
-		runTask(scriptExecutor);
-		
-		assertThat("whatever", is(task.result));
-		assertThat(task.pendingKey, is(nullValue()));
-		assertThat(task.count, is(2));
+		assertThat("whatever", is(resumableTask.result));
+		assertThat(resumableTask.pendingKey, is(nullValue()));
+		assertThat(count, is(2));
 		
 	}
 }

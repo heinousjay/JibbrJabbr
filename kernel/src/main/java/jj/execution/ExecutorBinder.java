@@ -15,25 +15,26 @@
  */
 package jj.execution;
 
-import java.util.concurrent.Future;
-
-import jj.script.ScriptEnvironment;
+import com.google.inject.Binder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.TypeLiteral;
 
 /**
  * @author jason
  *
  */
-public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableTask {
+public class ExecutorBinder {
 	
-	protected final T scriptEnvironment;
-	
-	protected ScriptTask(final String name, final T scriptEnvironment) {
-		super(name);
-		this.scriptEnvironment = scriptEnvironment;
+	private MapBinder<Class<?>, Object> executorBinder;
+
+	/**
+	 * 
+	 */
+	public ExecutorBinder(final Binder binder) {
+		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
 	}
-	
-	@Override
-	Future<?> addRunnableToExecutor(ExecutorBundle executors, Runnable runnable) {
-		return executors.scriptExecutorFactory.executorFor(scriptEnvironment).submit(runnable);
+
+	public void toExecutor(Class<?> executor) {
+		executorBinder.addBinding(executor).to(executor);
 	}
 }

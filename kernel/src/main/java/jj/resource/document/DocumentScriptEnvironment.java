@@ -38,7 +38,6 @@ import jj.ResourceAware;
 import jj.SHA1Helper;
 import jj.engine.EngineAPI;
 import jj.execution.IOThread;
-import jj.execution.ScriptThread;
 import jj.http.server.ConnectionBroadcastStack;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
@@ -54,6 +53,7 @@ import jj.resource.script.ScriptResourceType;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ContinuationPendingKey;
 import jj.script.RhinoContext;
+import jj.script.ScriptThread;
 
 /**
  * Represents a document script, and manages all of the attendant resources

@@ -11,5 +11,9 @@ public class ScriptModule extends JJModule {
 		bind(DependsOnScriptEnvironmentInitialization.class).to(ScriptEnvironmentInitializer.class);
 		
 		bind(ContinuationCoordinator.class).to(ContinuationCoordinatorImpl.class);
+		
+		addShutdownListenerBinding().to(ScriptExecutorFactory.class);
+		
+		bindTaskRunner().toExecutor(ScriptExecutorFactory.class);
 	}
 }

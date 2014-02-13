@@ -20,8 +20,8 @@ import javax.inject.Singleton;
 
 import jj.Closer;
 import jj.execution.TaskRunner;
-import jj.execution.ScriptTask;
 import jj.script.ContinuationCoordinator;
+import jj.script.ScriptTask;
 
 import org.mozilla.javascript.Callable;
 
