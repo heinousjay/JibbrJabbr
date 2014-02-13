@@ -17,7 +17,8 @@ package jj.script;
 
 import java.util.concurrent.Future;
 
-import jj.execution.ResumableTask;
+import jj.execution.JJTask;
+import jj.execution.TaskRunner;
 
 /**
  * The unit of execution for dealing with the script system.
@@ -26,11 +27,25 @@ import jj.execution.ResumableTask;
  * @author jason
  *
  */
-public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableTask {
+public abstract class ScriptTask<T extends ScriptEnvironment> extends JJTask {
 	
 	protected final T scriptEnvironment;
 	
 	protected final ContinuationCoordinator continuationCoordinator;
+	
+	/** assign the result of any operation against the ContinuationCoordinator to this field */
+	protected ContinuationPendingKey pendingKey;
+	
+	/** 
+	 * if this field is populated when the task is run, call the resume on the ContinuationCoordinator
+	 * with the stored ContinuationPendingKey and this result, assigning any result of that operation
+	 * to the pendingKey field,
+	 * 
+	 * <pre>
+	 * pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
+	 * </pre>
+	 */
+	protected Object result;
 	
 	protected ScriptTask(final String name, final T scriptEnvironment, final ContinuationCoordinator continuationCoordinator) {
 		super(name);
@@ -84,5 +99,24 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableT
 	@Override
 	protected final Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
 		return executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment).submit(runnable);
+	}
+
+	/**
+	 * return null if the task is completed
+	 * return the continuation pendingKey if the task needs to be resumed
+	 * be sure to store the key for resumption
+	 * @return
+	 */
+	final ContinuationPendingKey pendingKey() {
+		return pendingKey;
+	}
+	
+	/**
+	 * The {@link TaskRunner} will call this with the result to be used to continue.
+	 * do not do any processing in this method! store the value and wait to be run
+	 * @param result
+	 */
+	final void resumeWith(Object result) {
+		this.result = result;
 	}
 }

@@ -23,8 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.SecureRandomHelper;
-import jj.execution.JJTask;
-import jj.execution.ResumableTask;
 import jj.execution.TaskRunner;
 
 /**
@@ -44,7 +42,7 @@ class ContinuationPendingCache {
 	/**
 	 * tasks awaiting resumption. can this be stored per executor somehow?
 	 */
-	private final ConcurrentMap<String, ResumableTask> resumableTasks = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentMap<String, ScriptTask<?>> resumableTasks = PlatformDependent.newConcurrentHashMap();
 	
 	String uniqueID() {
 		// wow.  a do...while!
@@ -56,15 +54,12 @@ class ContinuationPendingCache {
 		return result;
 	}
 	
-	void storeIfResumable(final JJTask task) {
-		if (task instanceof ResumableTask) {
-			ResumableTask resumable = (ResumableTask)task;
-			ContinuationPendingKey pendingKey = resumable.pendingKey();
-			
-			if (pendingKey != null) {
-				if (resumableTasks.putIfAbsent(pendingKey.id(), resumable) != null) {
-					throw new AssertionError("pending key is being shared!");
-				}
+	void storeIfResumable(final ScriptTask<?> task) {
+		ContinuationPendingKey pendingKey = task.pendingKey();
+		
+		if (pendingKey != null) {
+			if (resumableTasks.putIfAbsent(pendingKey.id(), task) != null) {
+				throw new AssertionError("pending key is being shared!");
 			}
 		}
 	}
@@ -72,7 +67,7 @@ class ContinuationPendingCache {
 	void resume(final ContinuationPendingKey pendingKey, final Object result) {
 		assert pendingKey != null : "attempting to resume without a pendingKey";
 		
-		ResumableTask task = resumableTasks.remove(pendingKey.id());
+		ScriptTask<?> task = resumableTasks.remove(pendingKey.id());
 		// probably not an assertion in the long run - people will at some point be sending bullshit results at this thing and
 		// we will just ignore them.  but that will be when one can do things like run with kernel assertions off :D
 		// so NOT YET

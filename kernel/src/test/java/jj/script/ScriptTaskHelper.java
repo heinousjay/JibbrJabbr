@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.script;
 
 /**
- * just working around access restrictions
- * for test purposes
- * 
  * @author jason
  *
  */
-public class TaskHelper {
+public enum ScriptTaskHelper {
 
-	/**
-	 * @param name
-	 */
-	public static void invoke(final JJTask toInvoke) throws Exception {
-		toInvoke.run();
+	;
+	
+	public static ContinuationPendingKey pendingKey(final ScriptTask<?> task) {
+		return task.pendingKey();
 	}
+	
+	public static void resumeWith(final ScriptTask<?> task, final Object result) {
+		task.resumeWith(result);
+	}
+
 }

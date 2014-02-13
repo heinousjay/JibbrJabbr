@@ -21,8 +21,6 @@ import static org.mockito.BDDMockito.*;
 import jj.event.Publisher;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
-import jj.execution.ResumableTask;
-import jj.execution.TaskHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,17 +71,17 @@ public class ScriptEnvironmentInitializerTest {
 		// this just puts the task into our greedy little hands
 		sei.initializeScript(scriptEnvironment);
 		JJTask task = taskRunner.tasks.get(0);
-		ResumableTask resumable = (ResumableTask)task;
+		ScriptTask<?> resumable = (ScriptTask<?>)task;
 		
 		given(continuationCoordinator.execute(scriptEnvironment)).willReturn(pendingKey1);
 		
 		taskRunner.runFirstTask();
 		
-		assertThat(TaskHelper.pendingKey(resumable), is(pendingKey1));
+		assertThat(ScriptTaskHelper.pendingKey(resumable), is(pendingKey1));
 		verify(scriptEnvironment).initializing(true);
 		
 		Object result = new Object();
-		TaskHelper.resumeWith(resumable, result);
+		ScriptTaskHelper.resumeWith(resumable, result);
 		
 		given(continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey1, result)).willReturn(pendingKey2);
 		
@@ -92,10 +90,10 @@ public class ScriptEnvironmentInitializerTest {
 		taskRunner.runFirstTask();
 		
 		verify(scriptEnvironment, never()).initialized(true);
-		assertThat(TaskHelper.pendingKey(resumable), is(pendingKey2));
+		assertThat(ScriptTaskHelper.pendingKey(resumable), is(pendingKey2));
 		
 		result = new Object();
-		TaskHelper.resumeWith(resumable, result);
+		ScriptTaskHelper.resumeWith(resumable, result);
 		
 		taskRunner.tasks.add(task);
 		taskRunner.runFirstTask();
@@ -104,7 +102,7 @@ public class ScriptEnvironmentInitializerTest {
 		verify(scriptEnvironment).initialized(true);
 		verify(publisher).publish(eventCaptor.capture());
 		assertThat(eventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));
-		assertThat(TaskHelper.pendingKey(resumable), is(nullValue()));
+		assertThat(ScriptTaskHelper.pendingKey(resumable), is(nullValue()));
 		
 	}
 

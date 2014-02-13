@@ -54,7 +54,7 @@ public abstract class JJTask implements Delayed {
 	
 	private volatile long endTime = 0;
 	
-	JJTask(final String name) {
+	protected JJTask(final String name) {
 		this.name = name;
 	}
 
