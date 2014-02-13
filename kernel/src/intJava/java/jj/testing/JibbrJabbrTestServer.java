@@ -18,10 +18,6 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
-
-import javax.inject.Inject;
-
 import jj.StringUtils;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;

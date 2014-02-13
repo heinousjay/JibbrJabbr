@@ -27,7 +27,7 @@ import jj.script.ScriptEnvironment;
  *
  */
 @Singleton
-class JJExecutorImpl implements JJExecutor {
+class TaskRunnerImpl implements TaskRunner {
 	
 	private static final long MAX_QUEUED_TIME = TimeUnit.SECONDS.toMillis(20);
 
@@ -55,7 +55,7 @@ class JJExecutorImpl implements JJExecutor {
 	};
 	
 	@Inject
-	JJExecutorImpl(
+	TaskRunnerImpl(
 		final ExecutorBundle bundle,
 		final CurrentTask currentTask,
 		final @EmergencyLogger Logger logger
@@ -73,11 +73,8 @@ class JJExecutorImpl implements JJExecutor {
 		this.monitorThread.start();
 	}
 	
-	/* maybe put this into the executor since resumable tasks will always be
-	 * script tasks, hence single-threaded, hence regular HashMap can be used
-	 * there..
-	 * 
-	 * also need to make a specific type for the pendingKey, not just strings.  too messy
+	/**
+	 * tasks awaiting resumption. can this be stored per executor somehow?
 	 */
 	private ConcurrentMap<ContinuationPendingKey, JJTask> resumableTasks = PlatformDependent.newConcurrentHashMap();
 	

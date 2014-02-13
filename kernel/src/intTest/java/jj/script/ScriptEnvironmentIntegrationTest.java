@@ -25,9 +25,8 @@ import javax.inject.Inject;
 
 import jj.event.Listener;
 import jj.event.Subscriber;
-import jj.execution.IOTask;
-import jj.execution.JJExecutor;
 import jj.resource.ResourceFinder;
+import jj.resource.ResourceLoader;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.RequiredModule;
@@ -47,7 +46,7 @@ import org.junit.Test;
 public class ScriptEnvironmentIntegrationTest {
 	
 	@Inject ResourceFinder resourceFinder;
-	@Inject JJExecutor executor;
+	@Inject ResourceLoader resourceLoader;
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
@@ -105,15 +104,8 @@ public class ScriptEnvironmentIntegrationTest {
 	 */
 	private void loadScriptEnvironment(final String name) throws InterruptedException {
 		latch = new CountDownLatch(1);
-		
-		executor.execute(new IOTask("loading the script") {
-			@Override
-			protected void run() throws Exception {
-				resourceFinder.loadResource(DocumentScriptEnvironment.class, name);
-			}
-		});
-		
-		assertTrue(latch.await(2, TimeUnit.SECONDS));
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, name);
+		assertTrue(latch.await(1, TimeUnit.SECONDS));
 	}
 
 }

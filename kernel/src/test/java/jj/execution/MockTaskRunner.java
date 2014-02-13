@@ -29,7 +29,7 @@ import jj.script.ScriptEnvironment;
  * @author jason
  *
  */
-public class MockJJExecutor implements JJExecutor {
+public class MockTaskRunner implements TaskRunner {
 
 	public List<JJTask> tasks = new ArrayList<>();
 	

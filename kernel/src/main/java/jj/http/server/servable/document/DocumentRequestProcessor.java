@@ -17,7 +17,7 @@ import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.ContinuationCoordinator;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.execution.IOTask;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.execution.ScriptTask;
 import jj.execution.ScriptThread;
 import jj.http.HttpRequest;
@@ -42,7 +42,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	@SuppressWarnings("serial")
 	private static class FilterList extends ArrayList<DocumentFilter> {}
 	
-	private final JJExecutor executor;
+	private final TaskRunner taskRunner;
 	
 	private final DependsOnScriptEnvironmentInitialization initializer;
 	
@@ -64,7 +64,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 
 	@Inject
 	DocumentRequestProcessor(
-		final JJExecutor executor,
+		final TaskRunner taskRunner,
 		final DependsOnScriptEnvironmentInitialization initializer,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentDocumentRequestProcessor currentDocument,
@@ -74,7 +74,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		// move this out!
 		final Set<DocumentFilter> filters
 	) {
-		this.executor = executor;
+		this.taskRunner = taskRunner;
 		this.initializer = initializer;
 		this.continuationCoordinator = continuationCoordinator;
 		this.currentDocument = currentDocument;
@@ -110,7 +110,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	
 	@Override
 	public void process() {
-		executor.execute(new DocumentRequestProcessTask(documentScriptEnvironment));
+		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment));
 	}
 	
 	private final class DocumentRequestProcessTask extends ScriptTask<DocumentScriptEnvironment> {
@@ -173,7 +173,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		if (ioFilters.isEmpty()) {
 			writeResponse();
 		} else {
-			executor.execute(new IOTask("Document filtering requiring I/O") {
+			taskRunner.execute(new IOTask("Document filtering requiring I/O") {
 				
 				@Override
 				public void run() {

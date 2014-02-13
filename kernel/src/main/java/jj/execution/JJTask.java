@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * </p>
  * 
  * <p>
- * After constructing a task instance, submit it to the {@link JJExecutor}
+ * After constructing a task instance, submit it to the {@link TaskRunner}
  * for scheduling
  * </p>
  * 

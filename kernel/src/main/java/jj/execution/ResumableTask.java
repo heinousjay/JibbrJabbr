@@ -46,7 +46,7 @@ public abstract class ResumableTask extends JJTask {
 	}
 	
 	/**
-	 * The executor will call this with the result to be used to continue.
+	 * The {@link TaskRunner} will call this with the result to be used to continue.
 	 * do not do any processing in this method! store the value and wait to be run
 	 * @param result
 	 */

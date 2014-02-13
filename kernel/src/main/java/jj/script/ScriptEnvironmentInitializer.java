@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.event.Publisher;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.execution.ScriptTask;
 
 /**
@@ -35,7 +35,7 @@ import jj.execution.ScriptTask;
 @Singleton
 public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentInitialization {
 	
-	private final JJExecutor executor;
+	private final TaskRunner taskRunner;
 	
 	private final ContinuationCoordinatorImpl continuationCoordinator;
 	
@@ -66,17 +66,17 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	 */
 	@Inject
 	ScriptEnvironmentInitializer(
-		final JJExecutor executor,
+		final TaskRunner taskRunner,
 		final ContinuationCoordinatorImpl continuationCoordinator,
 		final Publisher publisher
 	) {
-		this.executor = executor;
+		this.taskRunner = taskRunner;
 		this.continuationCoordinator = continuationCoordinator;
 		this.publisher = publisher;
 	}
 	
 	void initializeScript(AbstractScriptEnvironment se) {
-		executor.execute(new InitializerTask("initializing ScriptEnvironment at " + se.baseName(), se));
+		taskRunner.execute(new InitializerTask("initializing ScriptEnvironment at " + se.baseName(), se));
 	}
 	
 	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
@@ -84,9 +84,9 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		if (tasksOrKeys != null) {
 			for (TaskOrKey taskOrKey : tasksOrKeys) {
 				if (taskOrKey.task != null) {
-					executor.execute(taskOrKey.task);
+					taskRunner.execute(taskOrKey.task);
 				} else if (taskOrKey.pendingKey != null) { 
-					executor.resume(taskOrKey.pendingKey, scriptEnvironment.exports());
+					taskRunner.resume(taskOrKey.pendingKey, scriptEnvironment.exports());
 				} else {
 					throw new AssertionError("taskOrKey list was not maintained properly!");
 				}
@@ -105,7 +105,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	public void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task) {
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
-		assert executor.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
+		assert taskRunner.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(task, null));
 	}
 	
@@ -117,7 +117,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Override
 	public void resumeOnInitialization(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
-		assert executor.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
+		assert taskRunner.isScriptThreadFor(scriptEnvironment) : "only wait on script environments from their own thread!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(null, pendingKey));
 	}
 	
@@ -143,6 +143,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 
 		@Override
 		protected void run() throws Exception {
+			
 			try {
 				switch (state) {
 				case Uninitialized:
@@ -210,7 +211,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		private void checkParentResumption() {
 			ContinuationPendingKey pendingKey = scriptEnvironment.pendingKey();
 			if (pendingKey != null) {
-				executor.resume(pendingKey, scriptEnvironment.exports());
+				taskRunner.resume(pendingKey, scriptEnvironment.exports());
 			}
 			
 			scriptEnvironmentInitialized(scriptEnvironment);

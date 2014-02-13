@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.resource;
 
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
+import static org.hamcrest.Matchers.is;
+import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
-import jj.resource.ResourceFinder;
-import jj.resource.config.ConfigResource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,20 +31,34 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author jason
  *
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ConfigurationScriptPreloaderTest {
 
-	MockTaskRunner executors = new MockTaskRunner();
+
+@RunWith(MockitoJUnitRunner.class)
+public class ResourceLoaderTest {
+
+	MockTaskRunner executor;
 	@Mock ResourceFinder resourceFinder;
+	
+	ResourceLoader rl;
+	
+	@Mock JJTask task;
+	
+	@Before
+	public void before() {
+		executor = new MockTaskRunner();
+		rl = new ResourceLoader(executor, resourceFinder);
+	}
 	
 	@Test
 	public void test() throws Exception {
 		
-		ConfigurationScriptPreloader csp = new ConfigurationScriptPreloader(executors, resourceFinder);
-		csp.start();
-		executors.runFirstTask();
+		rl.loadResource(task, Resource.class, "name", "a thing", new Integer(1));
 		
-		verify(resourceFinder).loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+		executor.runFirstTask();
+		
+		verify(resourceFinder).loadResource(Resource.class, "name", "a thing", new Integer(1));
+		
+		assertThat(executor.firstTask(), is(task));
 	}
 
 }

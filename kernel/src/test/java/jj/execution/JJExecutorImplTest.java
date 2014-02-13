@@ -58,7 +58,7 @@ public class JJExecutorImplTest {
 	
 	@Mock Logger logger;
 	
-	JJExecutorImpl executor;
+	TaskRunnerImpl executor;
 	
 	@Captor ArgumentCaptor<Runnable> runnableCaptor;
 	
@@ -69,7 +69,7 @@ public class JJExecutorImplTest {
 		
 		currentTask = new CurrentTask();
 		
-		executor = new JJExecutorImpl(bundle, currentTask, logger);
+		executor = new TaskRunnerImpl(bundle, currentTask, logger);
 		
 		given(scriptEnvironment.baseName()).willReturn(baseName);
 		given(scriptExecutorFactory.executorFor(scriptEnvironment)).willReturn(scriptExecutor);

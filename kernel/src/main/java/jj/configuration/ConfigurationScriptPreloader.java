@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.JJServerStartupListener;
 import jj.execution.IOTask;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 
@@ -43,15 +43,15 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 	
 	private final Logger log = LoggerFactory.getLogger(ConfigurationScriptPreloader.class);
 	
-	private final JJExecutor executors;
+	private final TaskRunner taskRunner;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
 	ConfigurationScriptPreloader(
-		final JJExecutor executors,
+		final TaskRunner taskRunner,
 		final ResourceFinder resourceFinder
 	) {
-		this.executors = executors;
+		this.taskRunner = taskRunner;
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -62,7 +62,7 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 		// was a deadlock
 		
 		try {
-			executors.execute(new IOTask("preloading configuration script") {
+			taskRunner.execute(new IOTask("preloading configuration script") {
 				
 				@Override
 				public void run() {

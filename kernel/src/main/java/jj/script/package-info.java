@@ -32,13 +32,13 @@
  * then be notified with the Continuation instance, and it can do
  * as it needs to, restarting the execution by passing the
  * {@link ContinuationPendingKey} that was assigned ({@link Continuation#pendingKey()} to
- * {@link JJExecutor#resume(ContinuationPendingKey, Object)}, along
+ * {@link TaskRunner#resume(ContinuationPendingKey, Object)}, along
  * with whatever result should be used as the return value of the
  * continued function.
  * 
  * <p>
  * Easy Peasy.  There's one more piece - ScriptTask, which supports simple restartable
- * execution via the {@link JJExecutor} API.  That's gonna move in here soon!
+ * execution via the {@link TaskRunner} API.  That's gonna move in here soon!
  * 
  * <p>
  * And of course, if you just want to use Rhino, inject the RhinoContext
@@ -46,5 +46,5 @@
  */
 package jj.script;
 
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.resource.script.ScriptResource;

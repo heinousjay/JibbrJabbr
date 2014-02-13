@@ -9,23 +9,23 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
 
 @Singleton
 class RestRequestContinuationProcessor implements ContinuationProcessor {
 
-	private final JJExecutor executor;
+	private final TaskRunner taskRunner;
 	
 	private final HttpClient httpClient;
 	
 	@Inject
 	RestRequestContinuationProcessor(
 		final HttpClient httpClient,
-		final JJExecutor executor
+		final TaskRunner taskRunner
 	) {
-		this.executor = executor;
+		this.taskRunner = taskRunner;
 		this.httpClient = httpClient;
 	}
 
@@ -39,11 +39,11 @@ class RestRequestContinuationProcessor implements ContinuationProcessor {
 				public void operationComplete(final Future<JJHttpClientResponse> future) throws Exception {
 					
 					try {
-						executor.resume(restRequest.pendingKey(), future.get());
+						taskRunner.resume(restRequest.pendingKey(), future.get());
 					} catch (InterruptedException | CancellationException e) {
 						// ignore this, we're shutting down
 					} catch (ExecutionException e) {
-						executor.resume(restRequest.pendingKey(), e.getCause());
+						taskRunner.resume(restRequest.pendingKey(), e.getCause());
 					}
 				}
 			}

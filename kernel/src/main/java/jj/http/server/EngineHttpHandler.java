@@ -23,7 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 
 import jj.execution.IOTask;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
@@ -43,7 +43,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	
 	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
 	
-	private final JJExecutor executors;
+	private final TaskRunner taskRunner;
 	
 	private final Servables servables;
 	
@@ -55,13 +55,13 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	
 	@Inject
 	EngineHttpHandler( 
-		final JJExecutor executors,
+		final TaskRunner taskRunner,
 		final Servables servables,
 		final Injector parentInjector,
 		final WebSocketRequestChecker webSocketRequestChecker,
 		final @EmergencyLogger Logger logger
 	) {
-		this.executors = executors;
+		this.taskRunner = taskRunner;
 		this.servables = servables;
 		this.parentInjector = parentInjector;
 		this.webSocketRequestChecker = webSocketRequestChecker;
@@ -137,7 +137,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		final List<Servable<? extends Resource>> list = servables.findMatchingServables(request.uriMatch());
 		
 		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
-		executors.execute(new IOTask("JJEngine core processing") {
+		taskRunner.execute(new IOTask("JJEngine core processing") {
 			@Override
 			public void run() {
 				try {

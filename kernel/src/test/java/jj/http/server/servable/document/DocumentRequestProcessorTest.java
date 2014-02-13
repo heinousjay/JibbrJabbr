@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import jj.execution.MockJJExecutor;
+import jj.execution.MockTaskRunner;
 import jj.execution.ScriptTask;
 import jj.execution.TaskHelper;
 import jj.http.HttpRequest;
@@ -44,7 +44,7 @@ public class DocumentRequestProcessorTest {
 	Document document;
 	String baseName;
 	
-	MockJJExecutor executor;
+	MockTaskRunner executor;
 	
 	@Mock DependsOnScriptEnvironmentInitialization initializer;
 	
@@ -100,7 +100,7 @@ public class DocumentRequestProcessorTest {
 		document.outputSettings().prettyPrint(false);
 		baseName = "baseName";
 
-		executor = new MockJJExecutor();
+		executor = new MockTaskRunner();
 		
 		given(documentScriptEnvironment.baseName()).willReturn(baseName);
 		given(documentScriptEnvironment.document()).willReturn(document);

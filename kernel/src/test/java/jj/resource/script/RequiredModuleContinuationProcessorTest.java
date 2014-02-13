@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import jj.execution.IOTask;
-import jj.execution.MockJJExecutor;
+import jj.execution.MockTaskRunner;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
@@ -52,7 +52,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
-	MockJJExecutor executor;
+	MockTaskRunner executor;
 	
 	@Mock ResourceFinder finder;
 	
@@ -71,7 +71,7 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		pendingKey = new ContinuationPendingKey();
 		
-		executor = new MockJJExecutor();
+		executor = new MockTaskRunner();
 		
 		processor = new RequiredModuleContinuationProcessor(executor, finder, scriptEnvironmentInitializer);
 		

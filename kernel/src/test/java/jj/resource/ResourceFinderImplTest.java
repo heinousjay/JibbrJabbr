@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.resource.asset.Asset;
 import jj.resource.asset.AssetResource;
 import jj.resource.document.HtmlResource;
@@ -34,7 +34,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	ResourceCache resourceCache;
 	ResourceCreators resourceCreators;
 	@Mock ResourceWatchService resourceWatchService;
-	@Mock JJExecutor executors;
+	@Mock TaskRunner taskRunner;
 	@Mock Logger logger;
 	
 	@Mock AbstractResourceCreator<AssetResource> assetResourceCreator;
@@ -89,9 +89,9 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		// you can pass null, if you never call start it won't matter
 		resourceCache = new ResourceCacheImpl(resourceCreators, null);
 		
-		given(executors.isIOThread()).willReturn(true);
+		given(taskRunner.isIOThread()).willReturn(true);
 		
-		rfi = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, executors);
+		rfi = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, taskRunner);
 	}
 	
 	@Test
@@ -105,14 +105,14 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		// when
 		HtmlResource result1 = rfi.findResource(HtmlResource.class, "internal/no-worky");
 		
-		given(executors.isIOThread()).willReturn(true);
+		given(taskRunner.isIOThread()).willReturn(true);
 		ScriptResource result2 = rfi.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 		
-		given(executors.isIOThread()).willReturn(false);
+		given(taskRunner.isIOThread()).willReturn(false);
 		ScriptResource result3 = rfi.findResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 		
 		// loading again with no changes should result in no changes
-		given(executors.isIOThread()).willReturn(true);
+		given(taskRunner.isIOThread()).willReturn(true);
 		ScriptResource result4 = rfi.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 		
 		// then
@@ -128,7 +128,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		verify(resourceWatchService).watch(result2);
 
 		// given
-		given(executors.isIOThread()).willReturn(true);
+		given(taskRunner.isIOThread()).willReturn(true);
 	}
 	
 	@Test

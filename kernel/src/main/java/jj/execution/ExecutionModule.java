@@ -34,7 +34,7 @@ public class ExecutionModule extends JJModule {
 		
 		// a good place to break apart crafty circular dependencies.  this is
 		// the most popular object in the system.  for good reason.
-		bind(JJExecutor.class).to(JJExecutorImpl.class);
+		bind(TaskRunner.class).to(TaskRunnerImpl.class);
 		
 		bind(UncaughtExceptionHandler.class).to(JJUncaughtExceptionHandler.class);
 		

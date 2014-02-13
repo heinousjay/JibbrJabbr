@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
 import jj.event.Publisher;
 import jj.execution.JJTask;
-import jj.execution.MockJJExecutor;
+import jj.execution.MockTaskRunner;
 import jj.execution.ResumableTask;
 import jj.execution.TaskHelper;
 
@@ -45,7 +45,7 @@ public class ScriptEnvironmentInitializerTest {
 	ContinuationPendingKey pendingKey1;
 	ContinuationPendingKey pendingKey2;
 	
-	MockJJExecutor executor;
+	MockTaskRunner executor;
 	@Mock ContinuationCoordinatorImpl continuationCoordinator;
 
 	ScriptEnvironmentInitializer sei;
@@ -61,7 +61,7 @@ public class ScriptEnvironmentInitializerTest {
 	public void before() {
 		pendingKey1 = new ContinuationPendingKey();
 		pendingKey2 = new ContinuationPendingKey();
-		executor = new MockJJExecutor();
+		executor = new MockTaskRunner();
 		executor.isScriptThread = true;
 		given(scriptEnvironment.script()).willReturn(script);
 		sei = new ScriptEnvironmentInitializer(executor, continuationCoordinator, publisher);

@@ -10,7 +10,7 @@ import jj.script.ScriptEnvironment;
  * @author jason
  *
  */
-public interface JJExecutor {
+public interface TaskRunner {
 	
 	void resume(final ContinuationPendingKey pendingKey, final Object result);
 	

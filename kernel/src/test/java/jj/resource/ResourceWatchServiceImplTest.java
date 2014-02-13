@@ -37,8 +37,8 @@ import java.util.concurrent.Executors;
 
 import jj.configuration.Configuration;
 import jj.execution.IOTask;
-import jj.execution.JJExecutor;
-import jj.execution.MockJJExecutor;
+import jj.execution.TaskRunner;
+import jj.execution.MockTaskRunner;
 import jj.execution.TaskHelper;
 import jj.http.server.servable.document.DocumentConfiguration;
 import jj.http.server.servable.document.MockDocumentConfiguration;
@@ -80,7 +80,7 @@ public class ResourceWatchServiceImplTest {
 	ResourceCacheImpl resourceCache;
 	@Mock ResourceFinder resourceFinder;
 	ExecutorService executorService;
-	@Mock JJExecutor executors;
+	@Mock TaskRunner taskRunner;
 	@Mock Logger logger;
 	
 	ResourceWatchServiceImpl rwsi;
@@ -101,7 +101,7 @@ public class ResourceWatchServiceImplTest {
 		
 		
 		executorService = Executors.newCachedThreadPool();
-		given(executors.execute(any(IOTask.class))).willAnswer(new Answer<Void>() {
+		given(taskRunner.execute(any(IOTask.class))).willAnswer(new Answer<Void>() {
 
 			@Override
 			public Void answer(final InvocationOnMock invocation) throws Throwable {
@@ -210,7 +210,7 @@ public class ResourceWatchServiceImplTest {
 		
 		int fileCount = resourceCache.size() - 1;
 		
-		rwsi = new ResourceWatchServiceImpl(resourceCache, resourceFinder, executors);
+		rwsi = new ResourceWatchServiceImpl(resourceCache, resourceFinder, taskRunner);
 
 		// when 
 		rwsi.start();

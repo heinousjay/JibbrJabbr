@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 
 import com.google.inject.Injector;
 
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.EngineHttpHandler;
@@ -38,18 +38,18 @@ import jj.logging.EmergencyLogger;
 public class TestJJEngineHttpHandler extends EngineHttpHandler {
 
 	/**
-	 * @param executors
+	 * @param taskRunner
 	 * @param resourceTypes
 	 */
 	@Inject
 	TestJJEngineHttpHandler(
-		final JJExecutor executors,
+		final TaskRunner taskRunner,
 		final Servables servables,
 		final Injector injector,
 		final WebSocketRequestChecker webSocketUriChecker,
 		final @EmergencyLogger Logger logger
 	) {
-		super(executors, servables, injector, webSocketUriChecker, logger);
+		super(taskRunner, servables, injector, webSocketUriChecker, logger);
 	}
 
 	@Override

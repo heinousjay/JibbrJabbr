@@ -16,7 +16,7 @@
 package jj.script;
 
 import jj.event.Publisher;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 
 /**
  * just raises the visibility of some methods for testing
@@ -27,11 +27,11 @@ import jj.execution.JJExecutor;
 public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentInitializer {
 
 	/**
-	 * @param executor
+	 * @param taskRunner
 	 * @param continuationCoordinator
 	 */
-	public MockableScriptEnvironmentInitializer(JJExecutor executor, ContinuationCoordinatorImpl continuationCoordinator, Publisher publisher) {
-		super(executor, continuationCoordinator, publisher);
+	public MockableScriptEnvironmentInitializer(TaskRunner taskRunner, ContinuationCoordinatorImpl continuationCoordinator, Publisher publisher) {
+		super(taskRunner, continuationCoordinator, publisher);
 	}
 
 	

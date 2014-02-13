@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.IOTask;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.resource.ResourceFinder;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
@@ -35,7 +35,7 @@ import jj.script.DependsOnScriptEnvironmentInitialization;
 // FIXME make this not public!
 public class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
-	private final JJExecutor executors;
+	private final TaskRunner taskRunner;
 	
 	private final ResourceFinder finder;
 	
@@ -43,18 +43,18 @@ public class RequiredModuleContinuationProcessor implements ContinuationProcesso
 	
 	@Inject
 	RequiredModuleContinuationProcessor(
-		final JJExecutor executors,
+		final TaskRunner taskRunner,
 		final ResourceFinder finder,
 		final DependsOnScriptEnvironmentInitialization initializer
 	) {
-		this.executors = executors;
+		this.taskRunner = taskRunner;
 		this.finder = finder;
 		this.initializer = initializer;
 	}
 	
 	private void loadEnvironment(final RequiredModule requiredModule) {
 		
-		executors.execute(
+		taskRunner.execute(
 			new IOTask("loading module [" + requiredModule.identifier() + "] from [" + requiredModule.parent().baseName() + "]") {
 			
 				@Override
@@ -67,7 +67,7 @@ public class RequiredModuleContinuationProcessor implements ContinuationProcesso
 					// so we only restart the parent when it's busted
 					if (scriptEnvironment == null) {
 						
-						executors.resume(requiredModule.pendingKey(), new RequiredModuleException(requiredModule.identifier()));
+						taskRunner.resume(requiredModule.pendingKey(), new RequiredModuleException(requiredModule.identifier()));
 					}
 				}
 			}
@@ -98,7 +98,7 @@ public class RequiredModuleContinuationProcessor implements ContinuationProcesso
 		else {
 			
 			// if broken, restart with an error!
-			executors.resume(requiredModule.pendingKey(), scriptEnvironment.exports());
+			taskRunner.resume(requiredModule.pendingKey(), scriptEnvironment.exports());
 		}
 	}
 }

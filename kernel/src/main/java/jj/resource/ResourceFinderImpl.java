@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.execution.IOThread;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 
 /**
  * coordinates access to the resource cache for the outside
@@ -27,19 +27,19 @@ class ResourceFinderImpl implements ResourceFinder {
 	
 	private final ResourceWatchService resourceWatchService;
 	
-	private final JJExecutor executors;
+	private final TaskRunner taskRunner;
 	
 	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
 		final ResourceCreators resourceCreators,
 		final ResourceWatchService resourceWatchService,
-		final JJExecutor executors
+		final TaskRunner taskRunner
 	) {
 		this.resourceCache = resourceCache;
 		this.resourceCreators = resourceCreators;
 		this.resourceWatchService = resourceWatchService;
-		this.executors = executors;
+		this.taskRunner = taskRunner;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -73,7 +73,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		String baseName,
 		Object... args
 	) {
-		assert executors.isIOThread() : "Can only call loadResource from an I/O thread";
+		assert taskRunner.isIOThread() : "Can only call loadResource from an I/O thread";
 		
 		ResourceCreator<T> resourceCreator = resourceCreators.get(resourceClass);
 		

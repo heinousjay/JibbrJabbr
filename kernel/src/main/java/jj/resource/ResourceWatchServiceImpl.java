@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
 import jj.execution.IOTask;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 
 /**
  * watches for file changes on resources we've already loaded
@@ -39,17 +39,17 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	
 	private final ResourceFinder resourceFinder;
 	
-	private final JJExecutor executors;
+	private final TaskRunner taskRunner;
 	
 	@Inject
 	ResourceWatchServiceImpl(
 		final ResourceCache resourceCache,
 		final ResourceFinder resourceFinder,
-		final JJExecutor executors
+		final TaskRunner taskRunner
 	) throws IOException {
 		this.resourceCache = resourceCache;
 		this.resourceFinder = resourceFinder;
-		this.executors = executors;
+		this.taskRunner = taskRunner;
 		watcher = FileSystems.getDefault().newWatchService();
 	}
 
@@ -65,7 +65,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	
 	@Override
 	public void start() {
-		executors.execute(loop);
+		taskRunner.execute(loop);
 	}
 	
 	@Override
@@ -102,7 +102,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 			// the resources are reloaded as a separate task so we don't clog up
 			// the reloader thread doing other work
 			resource.kill();
-			executors.execute(
+			taskRunner.execute(
 				new IOTask(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.cacheKey()) {
 
 

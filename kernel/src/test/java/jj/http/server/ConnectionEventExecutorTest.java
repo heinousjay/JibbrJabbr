@@ -19,7 +19,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import jj.execution.MockJJExecutor;
+import jj.execution.MockTaskRunner;
 import jj.jjmessage.EventNameHelper;
 import jj.script.ContinuationCoordinator;
 
@@ -39,7 +39,7 @@ public class ConnectionEventExecutorTest {
 
 	@Mock WebSocketConnection connection;
 	@Mock WebSocketConnectionHost webSocketConnectionHost;
-	MockJJExecutor executor;
+	MockTaskRunner executor;
 	@Mock ContinuationCoordinator continuationCoordinator;
 	@Mock Callable eventFunction;
 	@Mock Callable eventFunction2;
@@ -48,7 +48,7 @@ public class ConnectionEventExecutorTest {
 	
 	@Before
 	public void before() {
-		executor = new MockJJExecutor();
+		executor = new MockTaskRunner();
 		
 		cee = new ConnectionEventExecutor(executor, continuationCoordinator, new MockCurrentWebSocketConnection());
 		

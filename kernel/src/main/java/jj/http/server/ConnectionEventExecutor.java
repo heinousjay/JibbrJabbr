@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.Closer;
-import jj.execution.JJExecutor;
+import jj.execution.TaskRunner;
 import jj.execution.ScriptTask;
 import jj.script.ContinuationCoordinator;
 
@@ -34,7 +34,7 @@ import org.mozilla.javascript.Callable;
 @Singleton
 public class ConnectionEventExecutor {
 	
-	private final JJExecutor executor;
+	private final TaskRunner taskRunner;
 	
 	private final ContinuationCoordinator continuationCoordinator;
 	
@@ -42,17 +42,17 @@ public class ConnectionEventExecutor {
 
 	@Inject
 	ConnectionEventExecutor(
-		final JJExecutor executor,
+		final TaskRunner taskRunner,
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentWebSocketConnection currentConnection
 	) {
-		this.executor = executor;
+		this.taskRunner = taskRunner;
 		this.continuationCoordinator = continuationCoordinator;
 		this.currentConnection = currentConnection;
 	}
 	
 	public void submit(final WebSocketConnection connection, final String event, final Object...args) {
-		executor.execute(new ScriptTask<WebSocketConnectionHost>("host event " + event + " on WebSocket connection", connection.webSocketConnectionHost()) {
+		taskRunner.execute(new ScriptTask<WebSocketConnectionHost>("host event " + event + " on WebSocket connection", connection.webSocketConnectionHost()) {
 
 			@Override
 			public void run() {
