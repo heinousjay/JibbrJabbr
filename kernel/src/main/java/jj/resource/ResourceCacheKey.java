@@ -38,7 +38,7 @@ public class ResourceCacheKey {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return toString.equals(String.valueOf(obj));
+		return obj instanceof ResourceCacheKey && toString.equals(String.valueOf(obj));
 	}
 	
 	@Override

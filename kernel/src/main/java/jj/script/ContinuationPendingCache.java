@@ -31,6 +31,14 @@ import jj.execution.TaskRunner;
  */
 @Singleton
 class ContinuationPendingCache {
+	
+	// does this require an inner task to clean up the the map?
+	// on the presumption that spots can be reserved and abandoned
+	// due to errors or malice
+	
+	// that would mean changing the value to be a tuple
+	// not convinced its necessary yet.  maybe once i've declared
+	// a ServerTask + executor it will be time
 
 	private final TaskRunner taskRunner;
 	
@@ -38,6 +46,15 @@ class ContinuationPendingCache {
 	ContinuationPendingCache(final TaskRunner taskRunner) {
 		this.taskRunner = taskRunner;
 	}
+	
+	private final ScriptTask<ScriptEnvironment> sentinel = 
+		new ScriptTask<ScriptEnvironment>("", null, null) {
+		
+			@Override
+			protected void begin() throws Exception {
+				// will never be run
+			}
+		};
 	
 	/**
 	 * tasks awaiting resumption. can this be stored per executor somehow?
@@ -49,17 +66,17 @@ class ContinuationPendingCache {
 		String result;
 		do {
 			result = Integer.toHexString(SecureRandomHelper.nextInt());
-		} while (resumableTasks.containsKey(result));
+		} while (resumableTasks.putIfAbsent(result, sentinel) != null);
 		
 		return result;
 	}
 	
-	void storeIfResumable(final ScriptTask<?> task) {
+	void storeForContinuation(final ScriptTask<?> task) {
 		ContinuationPendingKey pendingKey = task.pendingKey();
 		
 		if (pendingKey != null) {
-			if (resumableTasks.putIfAbsent(pendingKey.id(), task) != null) {
-				throw new AssertionError("pending key is being shared!");
+			if (!resumableTasks.replace(pendingKey.id(), sentinel, task)) {
+				throw new AssertionError("pending key being stored was not reserved or already in use!");
 			}
 		}
 	}
@@ -72,6 +89,7 @@ class ContinuationPendingCache {
 		// we will just ignore them.  but that will be when one can do things like run with kernel assertions off :D
 		// so NOT YET
 		assert task != null : "asked to resume a nonexistent task";
+		assert task != sentinel : "key reserved was never stored";
 		task.resumeWith(result);
 		
 		taskRunner.execute(task);

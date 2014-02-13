@@ -66,7 +66,7 @@ public class ScriptEnvironmentIntegrationTest {
 	}
 	
 	@Test
-	public void test() throws Exception {
+	public void test1() throws Exception {
 		
 		loadScriptEnvironment("animal");
 		
@@ -97,6 +97,18 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		assertThat(scriptEnvironment.baseName(), is("index"));
 		assertThat(scriptEnvironment.initialized(), is(true));
+	}
+	
+	@Test
+	public void test3() throws Exception {
+		
+		loadScriptEnvironment("deep/nested");
+		
+		assertThat(scriptEnvironment.baseName(), is("deep/nested"));
+		assertThat(scriptEnvironment.initialized(), is(true));
+		
+		ModuleScriptEnvironment mse =
+			resourceFinder.findResource(ModuleScriptEnvironment.class, "deep/module", new RequiredModule(scriptEnvironment, "deep/module"));
 	}
 
 	/**

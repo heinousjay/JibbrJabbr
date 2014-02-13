@@ -31,6 +31,10 @@ import jj.StringUtils;
  */
 public class ContinuationPendingKey {
 
+	/**
+	 * MUST BE UNPREDICTABLE as this is exposed to
+	 * the outside world
+	 */
 	private final String id;
 	
 	private final String toString;
@@ -45,9 +49,11 @@ public class ContinuationPendingKey {
 	}
 	
 	public ContinuationPendingKey() {
-		assert !JJ.isRunning : "DO NOT USE THIS CONSTRUCTOR IN THE RUNNING SYSTEM!";
-		// I'm sure that most of the time this would be fine.  it's the one-in-a-billion 
-		// or whatever shot at it being wrong that i hate
+		assert !JJ.isRunning : "DO NOT USE THIS CONSTRUCTOR IN THE RUNNING SYSTEM!  TEST ONLY!";
+		// I'm sure that most of the time this would be fine instead of bothering to ensure the key is
+		// unique within the system.  it's the one-in-a-billion 
+		// or whatever shot at it being wrong that i hate leaving in there.  the key to robust behavior
+		// is leaving none of this to chance
 		id = Integer.toHexString(SecureRandomHelper.nextInt());
 		toString = makeToString();
 		cache = new ContinuationPendingKeyResultExtractorHelper();

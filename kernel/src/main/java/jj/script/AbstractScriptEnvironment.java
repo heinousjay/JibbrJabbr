@@ -40,9 +40,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	protected final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
-	// i really don't like doing this! but i also really don't like shoving
-	// so many dang dependencies through a super constructor.
-	// might go to setter injection instead?
+	// field injection!  this only works because i'm not testing it yet haha
 	@Inject
 	private Provider<ContinuationPendingKey> pendingKeyProvider;
 	

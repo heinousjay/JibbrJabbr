@@ -120,7 +120,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	
 	@Override
 	public void awaitContinuation(ScriptTask<? extends ScriptEnvironment> task) {
-		cache.storeIfResumable(task);
+		cache.storeForContinuation(task);
 	}
 	
 	/**
