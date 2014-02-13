@@ -16,17 +16,17 @@
 package jj.resource.document;
 
 import static org.mockito.BDDMockito.*;
-import jj.execution.TaskRunner;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ResultMessageProcessor;
+import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptJSON;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -37,17 +37,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResultMessageProcessorTest {
 
-	@Mock TaskRunner taskRunner;
+	@Mock ContinuationCoordinator continuationCoordinator;
 	@Mock ScriptJSON json;
 	@Mock WebSocketConnection connection;
 	
-	ResultMessageProcessor rmp;
-	
-	@Before
-	public void before() {
-		
-		rmp = new ResultMessageProcessor(taskRunner, json);
-	}
+	@InjectMocks ResultMessageProcessor rmp;
 	
 	@Test
 	public void testHandle() {
@@ -57,7 +51,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(taskRunner).resume(new ContinuationPendingKey(id), value);
+		verify(continuationCoordinator).resume(new ContinuationPendingKey(id), value);
 	}
 	
 	@Test
@@ -68,7 +62,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(taskRunner).resume(new ContinuationPendingKey(id), value);
+		verify(continuationCoordinator).resume(new ContinuationPendingKey(id), value);
 	}
 
 }

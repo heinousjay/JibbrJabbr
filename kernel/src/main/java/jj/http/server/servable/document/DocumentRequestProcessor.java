@@ -141,7 +141,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		}
 		
 		@Override
-		protected void check() throws Exception {
+		protected void complete() throws Exception {
 			if (run && pendingKey == null) {
 				respond();
 			}

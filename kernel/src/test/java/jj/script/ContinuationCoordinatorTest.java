@@ -84,6 +84,8 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock ContinuationProcessor continuationProcessor3;
 	
+	@Mock ContinuationPendingCache cache;
+	
 	@Before
 	public void before() {
 		
@@ -103,7 +105,7 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, logger, continuationProcessors);
+		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, logger, continuationProcessors, cache);
 	}
 	
 	@Test

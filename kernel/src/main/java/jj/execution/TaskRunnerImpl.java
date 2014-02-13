@@ -1,8 +1,5 @@
 package jj.execution;
 
-import io.netty.util.internal.PlatformDependent;
-
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +11,6 @@ import org.slf4j.Logger;
 
 import jj.Closer;
 import jj.logging.EmergencyLogger;
-import jj.script.ContinuationPendingKey;
 
 /**
  * exposes some execution related information and
@@ -72,35 +68,6 @@ class TaskRunnerImpl implements TaskRunner {
 		this.monitorThread.start();
 	}
 	
-	/**
-	 * tasks awaiting resumption. can this be stored per executor somehow?
-	 */
-	private ConcurrentMap<ContinuationPendingKey, JJTask> resumableTasks = PlatformDependent.newConcurrentHashMap();
-	
-	private void storeIfResumable(final JJTask task) {
-		if (task instanceof ResumableTask) {
-			ContinuationPendingKey pendingKey = ((ResumableTask)task).pendingKey();
-			
-			if (pendingKey != null) {
-				if (resumableTasks.putIfAbsent(pendingKey, task) != null) {
-					throw new AssertionError("pending key is being shared!");
-				}
-			}
-		}
-	}
-	
-	public void resume(final ContinuationPendingKey pendingKey, final Object result) {
-		assert pendingKey != null : "attempting to resume without a pendingKey";
-		
-		JJTask task = resumableTasks.remove(pendingKey);
-		// probably not an assertion in the long run - people will at some point be sending bullshit results at this thing and
-		// we will just ignore them.  but that will be when one can do things like run with kernel assertions off :D
-		// so NOT YET
-		assert task != null : "asked to resume a nonexistent task";
-		((ResumableTask)task).resumeWith(result);
-		execute(task);
-	}
-	
 	@Override
 	public Future<?> execute(final JJTask task) {
 		
@@ -118,7 +85,6 @@ class TaskRunnerImpl implements TaskRunner {
 				try (Closer closer = currentTask.enterScope(task)) {
 					try {
 						task.run();
-						storeIfResumable(task);
 					} catch (Throwable t) {
 						if (!task.errored(t)) {
 							logger.error("Task [{}] ended in exception", task.name());

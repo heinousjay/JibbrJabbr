@@ -53,14 +53,6 @@ public class MockTaskRunner implements TaskRunner {
 		tasks.remove(0).run();
 	}
 	
-	public ContinuationPendingKey pendingKey;
-	public Object result;
-	
-	@Override
-	public void resume(ContinuationPendingKey pendingKey, Object result) {
-		this.pendingKey = pendingKey;
-		this.result = result;
-	}
 	
 	@Override
 	public Future<Void> execute(final JJTask task) {

@@ -48,16 +48,19 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableT
 		} else {
 			throw new AssertionError("did you mess with the pendingKey and/or result?");
 		}
-		check();
+		
+		if (pendingKey == null) {
+			complete();
+		} else {
+			continuationCoordinator.awaitContinuation(this);
+		}
 	}
 	
 	/**
 	 * Implement this method to perform initial execution of this task.
 	 * @throws Exception
 	 */
-	protected void begin() throws Exception {
-		
-	}
+	protected abstract void begin() throws Exception;
 	
 	/**
 	 * Implement this method to have control over resumption.  If all you do is pass the result
@@ -69,12 +72,12 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends ResumableT
 	}
 	
 	/**
-	 * Implement this method to run after completion of either the begin or resume methods.  typically
-	 * you'll check the pendingKey to see if the task is complete or not.  this will only be called if
-	 * the begin/resume methods complete successfully, otherwise the errored method will be called
+	 * Implement this method to run after completion of either the begin or resume methods, when no
+	 * continuation is pending. this will only be called if the begin/resume methods complete 
+	 * successfully, otherwise the errored method will be called
 	 * @throws Exception
 	 */
-	protected void check() throws Exception {
+	protected void complete() throws Exception {
 		
 	}
 	

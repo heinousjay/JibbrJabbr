@@ -89,7 +89,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 				if (taskOrKey.task != null) {
 					taskRunner.execute(taskOrKey.task);
 				} else if (taskOrKey.pendingKey != null) { 
-					taskRunner.resume(taskOrKey.pendingKey, scriptEnvironment.exports());
+					taskOrKey.pendingKey.resume(scriptEnvironment.exports());
 				} else {
 					throw new AssertionError("taskOrKey list was not maintained properly!");
 				}
@@ -143,7 +143,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 			}
 		}
 		
-		protected void check() throws Exception {
+		protected void complete() throws Exception {
 			if (pendingKey == null) {
 				initialized();
 				// and we're done
@@ -173,7 +173,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		private void checkParentResumption(Object result) {
 			ContinuationPendingKey pendingKey = scriptEnvironment.pendingKey();
 			if (pendingKey != null) {
-				taskRunner.resume(pendingKey, result);
+				pendingKey.resume(result);
 			}
 			
 			scriptEnvironmentInitialized(scriptEnvironment);

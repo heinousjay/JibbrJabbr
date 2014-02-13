@@ -15,22 +15,16 @@
  */
 package jj.resource.document;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.*;
 import jj.engine.EventSelection;
-import jj.execution.TaskRunner;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.resource.document.ElementMessageProcessor;
-
-
+import jj.script.ContinuationCoordinator;
+import jj.script.ContinuationPendingKey;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -41,28 +35,25 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ElementMessageProcessorTest {
+	
+	@Mock ContinuationCoordinator continuationCoordinator;
 
-	@Mock TaskRunner taskRunner;
 	@Mock WebSocketConnection connection;
 	
 	@InjectMocks ElementMessageProcessor emp;
-	
-	@Captor ArgumentCaptor<EventSelection> eventSelection;
 	
 	@Test
 	public void test() {
 		
 		//given
 		JJMessage jqm = MessageMaker.makeElement("id", "selector");
+		jqm.pendingKey(new ContinuationPendingKey());
 		
 		//when
 		emp.handle(connection, jqm);
 		
 		//then
-		verify(taskRunner).resume(eq(jqm.pendingKey()), eventSelection.capture());
-		
-		// this is goofy
-		assertThat(eventSelection.getValue(), is(notNullValue()));
+		verify(continuationCoordinator).resume(eq(jqm.pendingKey()), isA(EventSelection.class));
 	}
 
 }

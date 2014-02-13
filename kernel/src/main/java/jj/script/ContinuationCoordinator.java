@@ -40,5 +40,18 @@ public interface ContinuationCoordinator {
 	 * @return true if completed, false if continued
 	 */
 	ContinuationPendingKey resumeContinuation(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey, Object result);
+	
+	/**
+	 * Resume a continuation, for use by code that constructs its own ContinuationPendingKey, such as from a network message
+	 * @param pendingKey
+	 * @param result
+	 */
+	void resume(ContinuationPendingKey pendingKey, Object result);
+	
+	/**
+	 * Pass a task instance in to await a continuation
+	 * @param task
+	 */
+	void awaitContinuation(ScriptTask<? extends ScriptEnvironment> task);
 
 }

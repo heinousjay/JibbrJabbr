@@ -34,17 +34,21 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	
 	private final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors;
 	
+	private final ContinuationPendingCache cache;
+	
 	@Inject
 	ContinuationCoordinatorImpl(
 		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptEnvironment env,
 		final @EmergencyLogger Logger log,
-		final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors
+		final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors,
+		final ContinuationPendingCache cache
 	) {
 		this.contextProvider = contextProvider;
 		this.env = env;
 		this.log = log;
 		this.continuationProcessors = continuationProcessors;
+		this.cache = cache;
 	}
 	
 	private void log(final Exception e, final ScriptEnvironment scriptEnvironment) {
@@ -114,6 +118,11 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		return null;
 	}
 	
+	@Override
+	public void awaitContinuation(ScriptTask<? extends ScriptEnvironment> task) {
+		cache.storeIfResumable(task);
+	}
+	
 	/**
 	 * Resumes a continuation that was previously saved from an execution in this class
 	 * @param pendingKey
@@ -147,6 +156,17 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptEnvironment, pendingKey);
 		log.error("helpful stacktrace", new Exception());
 		return null;
+	}
+	
+	/**
+	 * Kinda weird that this is in here, but it's a convenience for now
+	 * TODO decide if this is okay here
+	 * @param pendingKey
+	 * @param result
+	 */
+	@Override
+	public void resume(final ContinuationPendingKey pendingKey, final Object result) {
+		cache.resume(pendingKey, result);
 	}
 	
 	private ContinuationState extractContinuationState(final ContinuationPending continuation) {

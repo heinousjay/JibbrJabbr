@@ -19,10 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.EventSelection;
-import jj.execution.TaskRunner;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
+import jj.script.ContinuationCoordinator;
 import jj.script.CurrentScriptEnvironment;
 
 /**
@@ -33,23 +33,27 @@ import jj.script.CurrentScriptEnvironment;
  */
 @Singleton
 class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
-
-	private final TaskRunner taskRunner;
+	
+	private final ContinuationCoordinator continuationCoordinator;
 	
 	private final CurrentWebSocketConnection currentConnection;
 	
 	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	ElementMessageProcessor(final TaskRunner taskRunner, final CurrentWebSocketConnection connection, final CurrentScriptEnvironment env) {
-		this.taskRunner = taskRunner;
+	ElementMessageProcessor(
+		final ContinuationCoordinator continuationCoordinator,
+		final CurrentWebSocketConnection connection,
+		final CurrentScriptEnvironment env
+	) {
+		this.continuationCoordinator = continuationCoordinator;
 		this.currentConnection = connection;
 		this.env = env;
 	}
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
-		taskRunner.resume(message.pendingKey(), new EventSelection(message.element().selector, currentConnection, env));
+		continuationCoordinator.resume(message.pendingKey(), new EventSelection(message.element().selector, currentConnection, env));
 	}
 
 }

@@ -23,11 +23,9 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import jj.script.ContinuationPendingKey;
 import jj.script.ScriptEnvironment;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,41 +118,5 @@ public class TaskRunnerTest {
 		runTask(ioExecutor);
 		
 		verify(logger).error(anyString(), eq(toThrow));
-	}
-	
-	
-	private int count = 0;
-	private final ResumableTask resumableTask = new ResumableTask("") {
-		
-
-		@Override
-		protected void run() throws Exception {
-			pendingKey = new ContinuationPendingKey();
-			if (count++ > 0) {
-				pendingKey = null;
-			}
-		}
-		
-		@Override
-		protected Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-			return executors.ofType(IOExecutor.class).submit(runnable);
-		}
-	}; 
-	
-	@Test
-	public void testResumableTask() {
-		
-		executor.execute(resumableTask);
-		
-		runTask(ioExecutor);
-		
-		executor.resume(resumableTask.pendingKey(), "whatever");
-		
-		runTask(ioExecutor);
-		
-		assertThat("whatever", is(resumableTask.result));
-		assertThat(resumableTask.pendingKey, is(nullValue()));
-		assertThat(count, is(2));
-		
 	}
 }

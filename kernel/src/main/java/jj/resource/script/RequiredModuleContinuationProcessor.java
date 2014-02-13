@@ -67,7 +67,7 @@ public class RequiredModuleContinuationProcessor implements ContinuationProcesso
 					// so we only restart the parent when it's busted
 					if (scriptEnvironment == null) {
 						
-						taskRunner.resume(requiredModule.pendingKey(), new RequiredModuleException(requiredModule.identifier()));
+						requiredModule.pendingKey().resume(new RequiredModuleException(requiredModule.identifier()));
 					}
 				}
 			}
@@ -98,7 +98,7 @@ public class RequiredModuleContinuationProcessor implements ContinuationProcesso
 		else {
 			
 			// if broken, restart with an error!
-			taskRunner.resume(requiredModule.pendingKey(), scriptEnvironment.exports());
+			requiredModule.pendingKey().resume(scriptEnvironment.exports());
 		}
 	}
 }

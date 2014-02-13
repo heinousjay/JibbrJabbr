@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import jj.execution.IOTask;
 import jj.execution.MockTaskRunner;
 import jj.resource.ResourceFinder;
@@ -27,6 +28,7 @@ import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.RequiredModule;
 import jj.resource.script.RequiredModuleContinuationProcessor;
 import jj.script.ContinuationPendingKey;
+import jj.script.ContinuationPendingKeyResultExtractor;
 import jj.script.ContinuationState;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 
@@ -109,10 +111,12 @@ public class RequiredModuleContinuationProcessorTest {
 		// when
 		processor.process(continuationState);
 		taskRunner.runUntilIdle();
-		// this shit is broken!
+		
 		// then
-		assertThat(taskRunner.pendingKey, is(pendingKey));
-		assertThat(taskRunner.result, is(instanceOf(RequiredModuleException.class)));
+		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
+		
+		assertThat(result, is(notNullValue()));
+		assertThat(result, is(instanceOf(RequiredModuleException.class)));
 	}
 	
 	private void givenAScriptEnvironment() {
@@ -132,8 +136,8 @@ public class RequiredModuleContinuationProcessorTest {
 		// when
 		processor.process(continuationState);
 		
-		assertThat(taskRunner.pendingKey, is(pendingKey));
-		assertThat(taskRunner.result, is((Object)exports));
+		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
+		assertThat(result, is((Object)exports));
 	}
 
 }

@@ -35,10 +35,13 @@ public class ContinuationPendingKey {
 	
 	private final String toString;
 	
+	private final ContinuationPendingCache cache;
+	
 	@Inject
 	ContinuationPendingKey(final ContinuationPendingCache cache) {
 		this.id = cache.uniqueID();
 		this.toString = makeToString();
+		this.cache = cache;
 	}
 	
 	public ContinuationPendingKey() {
@@ -47,12 +50,14 @@ public class ContinuationPendingKey {
 		// or whatever shot at it being wrong that i hate
 		id = Integer.toHexString(SecureRandomHelper.nextInt());
 		toString = makeToString();
+		cache = new ContinuationPendingKeyResultExtractorHelper();
 	}
 	
 	public ContinuationPendingKey(final String id) {
 		assert !StringUtils.isEmpty(id);
 		this.id = id;
 		this.toString = makeToString();
+		cache = null;
 	}
 	
 	private String makeToString() {
@@ -77,5 +82,12 @@ public class ContinuationPendingKey {
 	
 	public String toString() {
 		return toString;
+	}
+
+	/**
+	 * @param eventSelection
+	 */
+	public void resume(Object result) {
+		cache.resume(this, result);
 	}
 }

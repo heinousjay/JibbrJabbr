@@ -69,7 +69,7 @@ class ContinuationPendingCache {
 		}
 	}
 	
-	public void resume(final ContinuationPendingKey pendingKey, final Object result) {
+	void resume(final ContinuationPendingKey pendingKey, final Object result) {
 		assert pendingKey != null : "attempting to resume without a pendingKey";
 		
 		ResumableTask task = resumableTasks.remove(pendingKey.id());

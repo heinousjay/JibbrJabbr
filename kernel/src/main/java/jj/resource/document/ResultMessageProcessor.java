@@ -18,9 +18,9 @@ package jj.resource.document;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.TaskRunner;
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
+import jj.script.ContinuationCoordinator;
 import jj.script.ScriptJSON;
 
 /**
@@ -32,20 +32,20 @@ import jj.script.ScriptJSON;
 @Singleton
 class ResultMessageProcessor implements DocumentWebSocketMessageProcessor {
 
-	private final TaskRunner taskRunner;
+	private final ContinuationCoordinator continuationCoordinator;
 	
 	private final ScriptJSON json;
 	
 	@Inject
-	ResultMessageProcessor(final TaskRunner taskRunner, final ScriptJSON json) {
-		this.taskRunner = taskRunner;
+	ResultMessageProcessor(final ContinuationCoordinator continuationCoordinator, final ScriptJSON json) {
+		this.continuationCoordinator = continuationCoordinator;
 		this.json = json;
 	}
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
 		Object value = message.result().value == null ? null : json.parse(message.result().value);
-		taskRunner.resume(message.pendingKey(), value);
+		continuationCoordinator.resume(message.pendingKey(), value);
 	}
 
 }
