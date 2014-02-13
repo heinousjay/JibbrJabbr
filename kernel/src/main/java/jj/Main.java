@@ -48,6 +48,11 @@ public class Main {
 		}
 		
 		log.info("Welcome to {} version {} commit {}", Version.name, Version.version, Version.commitId);
+		if (!JJ.isRunning) {
+			log.info("******************************************************************************");
+			log.info("!!!!!!          This server is running in a nonstandard mode            !!!!!!");
+			log.info("******************************************************************************");
+		}
 	}
 	
 	private InitializationException failStartup() {
