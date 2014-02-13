@@ -27,11 +27,11 @@ public class RequiredModuleException extends RuntimeException {
 		return "could not require " + attemptedModuleIdentifier;
 	}
 	
-	public RequiredModuleException(final String attemptedModuleIdentifier) {
-		super(message(attemptedModuleIdentifier));
+	RequiredModuleException(final RequiredModule requiredModule) {
+		super(message(requiredModule.toString()));
 	}
 	
-	public RequiredModuleException(final String attemptedModuleIdentifier, final Throwable cause) {
+	RequiredModuleException(final String attemptedModuleIdentifier, final Throwable cause) {
 		super(message(attemptedModuleIdentifier), cause);
 	}
 }

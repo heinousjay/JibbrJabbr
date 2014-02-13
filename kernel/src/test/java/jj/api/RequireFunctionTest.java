@@ -17,11 +17,14 @@ package jj.api;
 
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import jj.resource.ResourceFinder;
 import jj.resource.script.ModuleScriptEnvironment;
+import jj.resource.script.RequiredModule;
 import jj.script.CurrentScriptEnvironment;
+import jj.script.ScriptEnvironment;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -43,10 +46,18 @@ public class RequireFunctionTest {
 	@Mock CurrentScriptEnvironment env;
 	@Mock ResourceFinder resourceFinder;
 	
+	@Mock ScriptEnvironment rootScriptEnvironment;
+	
 	@InjectMocks RequireFunction requireFunction;
 	
 	@Mock Scriptable scope;
 	@Captor ArgumentCaptor<String> nameCaptor;
+	@Captor ArgumentCaptor<RequiredModule> requiredModuleCaptor;
+	
+	@Before
+	public void before() {
+		given(env.currentRootScriptEnvironment()).willReturn(rootScriptEnvironment);
+	}
 
 	private void givenAnExistingModule() {
 		ModuleScriptEnvironment mse = mock(ModuleScriptEnvironment.class);
@@ -55,8 +66,10 @@ public class RequireFunctionTest {
 	}
 	
 	private void verifyIdentifierResolution(String expected) {
-		verify(resourceFinder).findResource(eq(ModuleScriptEnvironment.class), nameCaptor.capture(), anyVararg());
+		verify(resourceFinder).findResource(eq(ModuleScriptEnvironment.class), nameCaptor.capture(), requiredModuleCaptor.capture());
 		assertThat(nameCaptor.getValue(), is(expected));
+		assertThat(requiredModuleCaptor.getValue(), is(notNullValue()));
+		// should test that the RequiredModule is correct, will need a helper in that package though
 	}
 	
 	@Test

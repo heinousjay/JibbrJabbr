@@ -17,10 +17,6 @@ package jj.execution;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author jason
@@ -53,36 +49,10 @@ public class MockTaskRunner implements TaskRunner {
 	
 	
 	@Override
-	public Future<Void> execute(final JJTask task) {
+	public Promise execute(final JJTask task) {
 		tasks.add(task);
 		
-		return new Future<Void>() {
-
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return false;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				return true;
-			}
-
-			@Override
-			public Void get() throws InterruptedException, ExecutionException {
-				return null;
-			}
-
-			@Override
-			public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-				return null;
-			}
-		};
+		return task.promise().taskRunner(this);
 	}
 	
 	public boolean isIOThread = false;

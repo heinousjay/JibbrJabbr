@@ -15,8 +15,6 @@
  */
 package jj.configuration;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -73,7 +71,7 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 						log.info("No configuration found, using defaults");
 					}
 				}
-			}).get(1, SECONDS);
+			}).await();
 		} catch (TimeoutException te) {
 		// 1 second is kinda arbitrary but really
 		// if it takes any kind of time at all,

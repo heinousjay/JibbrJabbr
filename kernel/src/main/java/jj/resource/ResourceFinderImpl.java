@@ -1,12 +1,14 @@
 package jj.resource;
 
 import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jj.event.Publisher;
 import jj.execution.IOThread;
 import jj.execution.TaskRunner;
 
@@ -23,22 +25,22 @@ class ResourceFinderImpl implements ResourceFinder {
 
 	private final ResourceCache resourceCache;
 	
-	private final ResourceCreators resourceCreators;
-	
 	private final ResourceWatchService resourceWatchService;
+	
+	private final Publisher publisher;
 	
 	private final TaskRunner taskRunner;
 	
 	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
-		final ResourceCreators resourceCreators,
 		final ResourceWatchService resourceWatchService,
+		final Publisher publisher,
 		final TaskRunner taskRunner
 	) {
 		this.resourceCache = resourceCache;
-		this.resourceCreators = resourceCreators;
 		this.resourceWatchService = resourceWatchService;
+		this.publisher = publisher;
 		this.taskRunner = taskRunner;
 	}
 	
@@ -61,7 +63,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		Object... args
 	) {
 		log.trace("checking in resource cache for {} at {}", resourceClass.getSimpleName(), baseName);
-		T result = resourceClass.cast(resourceCache.get(resourceCreators.get(resourceClass).cacheKey(baseName, args)));
+		T result = resourceClass.cast(resourceCache.get(resourceCache.getCreator(resourceClass).cacheKey(baseName, args)));
 		log.trace("result {}", result);
 		return result;
 	}
@@ -75,7 +77,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	) {
 		assert taskRunner.isIOThread() : "Can only call loadResource from an I/O thread";
 		
-		ResourceCreator<T> resourceCreator = resourceCreators.get(resourceClass);
+		ResourceCreator<T> resourceCreator = resourceCache.getCreator(resourceClass);
 		
 		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
 		T result = null;
@@ -109,30 +111,34 @@ class ResourceFinderImpl implements ResourceFinder {
 		log.trace("replacing {} at {}", resourceCreator.type().getSimpleName(), cacheKey);
 		
 		T resource = resourceCreator.create(baseName, args);
+		// should a 
 		if (resource != null && !resourceCache.replace(cacheKey, result, resource)){
 			log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceCreator.type().getSimpleName(), cacheKey);
 		}
 	}
 
 	private <T extends Resource> void createResource(
-		String baseName,
+		String name,
 		ResourceCreator<T> resourceCreator,
 		ResourceCacheKey cacheKey,
-		Object... args
+		Object...arguments
 	) throws IOException {
 		
 		log.trace("loading {} at {}", resourceCreator.type().getSimpleName(), cacheKey);
 		
-		T resource = resourceCreator.create(baseName, args);
-		if (
-			resource != null &&
-			resourceCache.putIfAbsent(cacheKey, resource) == null &&
-			resource instanceof FileResource
-		) {
-			// if this was the first time we put this in the cache,
-			// we set up a file watch on it for background reloads
-			resourceWatchService.watch((FileResource)resource);
-			
+		T resource = resourceCreator.create(name, arguments);
+		if (resource == null) {
+			publisher.publish(new ResourceNotFoundEvent(resourceCreator.type(), name, arguments));
+		} else {
+			publisher.publish(new ResourceLoadedEvent(resourceCreator.type(), name, arguments));
+			if (
+				resourceCache.putIfAbsent(cacheKey, resource) == null &&
+				resource instanceof FileResource
+			) {
+				// if this was the first time we put this in the cache,
+				// we set up a file watch on it for background reloads
+				resourceWatchService.watch((FileResource)resource);
+			}
 		}
 	}
 }

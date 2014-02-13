@@ -1,7 +1,7 @@
 package jj.execution;
 
+import java.util.List;
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -24,7 +24,7 @@ import jj.logging.EmergencyLogger;
 @Singleton
 class TaskRunnerImpl implements TaskRunner {
 	
-	private static final long MAX_QUEUED_TIME = TimeUnit.SECONDS.toMillis(20);
+	private static final long MAX_QUEUED_TIME = TimeUnit.SECONDS.toMillis(10);
 
 	private final ExecutorBundle executors;
 	private final CurrentTask currentTask;
@@ -41,7 +41,7 @@ class TaskRunnerImpl implements TaskRunner {
 				while (true) {
 					JJTask task = queuedTasks.take();
 					// TODO - do something more interesting than this! after all at this point it's an issue, i'm sure
-					System.err.println(task + " has been waiting too long to execute! not sure what else to say but DAMN baby");
+					System.err.println(task + " has been waiting " + MAX_QUEUED_TIME + " milliseconds to execute.  something is broken");
 				}
 			} catch (InterruptedException e) {
 				// if we get interrupted, just end
@@ -69,12 +69,14 @@ class TaskRunnerImpl implements TaskRunner {
 	}
 	
 	@Override
-	public Future<?> execute(final JJTask task) {
+	public Promise execute(final JJTask task) {
 		
 		task.enqueue(MAX_QUEUED_TIME);
 		queuedTasks.add(task);
 		
-		return task.addRunnableToExecutor(executors, new Runnable() {
+		final Promise promise = task.promise().taskRunner(this);
+		
+		task.addRunnableToExecutor(executors, new Runnable() {
 			
 			@Override
 			public void run() {
@@ -94,9 +96,18 @@ class TaskRunnerImpl implements TaskRunner {
 				} finally {
 					task.end();
 					Thread.currentThread().setName(name);
+					
+					List<JJTask> tasks = promise.done();
+					if (tasks != null) {
+						for (JJTask t : tasks) {
+							execute(t);
+						}
+					}
 				}
 			}
 		});
+		
+		return promise;
 	}
 
 	public boolean isIOThread() {

@@ -54,6 +54,8 @@ public abstract class JJTask implements Delayed {
 	
 	private volatile long endTime = 0;
 	
+	private final Promise promise = new Promise();
+	
 	protected JJTask(final String name) {
 		this.name = name;
 	}
@@ -105,6 +107,14 @@ public abstract class JJTask implements Delayed {
 	
 	final long executionTime() {
 		return endTime - startTime;
+	}
+	
+	final void next(JJTask next) {
+		promise.then(next);
+	}
+	
+	final Promise promise() {
+		return promise;
 	}
 	
 	@Override

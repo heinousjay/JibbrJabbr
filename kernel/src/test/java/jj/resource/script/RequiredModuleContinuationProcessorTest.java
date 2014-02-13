@@ -17,12 +17,14 @@ package jj.resource.script;
 
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
-import jj.execution.IOTask;
-import jj.execution.MockTaskRunner;
 import jj.resource.ResourceFinder;
+import jj.resource.ResourceLoadedEvent;
+import jj.resource.ResourceLoader;
+import jj.resource.ResourceNotFoundEvent;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.RequiredModule;
@@ -35,6 +37,7 @@ import jj.script.DependsOnScriptEnvironmentInitialization;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.ScriptableObject;
@@ -54,7 +57,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
-	MockTaskRunner taskRunner;
+	@Mock ResourceLoader loader;
 	
 	@Mock ResourceFinder finder;
 	
@@ -64,7 +67,7 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	RequiredModule requiredModule;
 
-	RequiredModuleContinuationProcessor processor;
+	@InjectMocks RequiredModuleContinuationProcessor processor;
 	
 	@Mock ModuleScriptEnvironment moduleScriptEnvironment;
 	
@@ -73,44 +76,44 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		pendingKey = new ContinuationPendingKey();
 		
-		taskRunner = new MockTaskRunner();
-		
-		processor = new RequiredModuleContinuationProcessor(taskRunner, finder, scriptEnvironmentInitializer);
-		
 		requiredModule = new RequiredModule(documentScriptEnvironment, module);
 		requiredModule.pendingKey(pendingKey);
 		
 		given(continuationState.continuationAs(RequiredModule.class)).willReturn(requiredModule);
 	}
 	
-	@Test
-	public void testFirstRequireOfModule() throws Exception {
-		
-		// given
-		given(finder.loadResource(ModuleScriptEnvironment.class, module, requiredModule)).willReturn(moduleScriptEnvironment);
+	public void performFirstRequireOfModule() throws Exception {
 		
 		// when
 		processor.process(continuationState);
 		
-		// then
-		// prove that an IO task was submitted
-		assertThat(taskRunner.tasks.size(), is(1));
-		assertThat(taskRunner.tasks.get(0), is(instanceOf(IOTask.class)));
-		
-		// and run it
-		taskRunner.runUntilIdle();
-		
-		// then
-		// we validate it happened because it's the only signal we get.  the parent is
-		verify(finder).loadResource(ModuleScriptEnvironment.class, module, requiredModule);
+		// we validate it happened because it's the only signal we get
+		verify(finder).findResource(ModuleScriptEnvironment.class, module, requiredModule);
+		verify(loader).loadResource(ModuleScriptEnvironment.class, module, requiredModule);
 	}
 	
 	@Test
-	public void testFirstRequireOfModuleNotFoundError() throws Exception {
+	public void testFirstRequiredOfModuleFound() throws Exception {
+
+		// given
+		performFirstRequireOfModule();
 		
 		// when
-		processor.process(continuationState);
-		taskRunner.runUntilIdle();
+		processor.resourceLoaded(new ResourceLoadedEvent(ModuleScriptEnvironment.class, module, requiredModule));
+		
+		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
+		
+		assertThat(result, is(nullValue()));
+	}
+	
+	@Test
+	public void testFirstRequireOfModuleNotFound() throws Exception {
+		
+		// given
+		performFirstRequireOfModule();
+		
+		// when
+		processor.resourceNotFound(new ResourceNotFoundEvent(ModuleScriptEnvironment.class, module, requiredModule));
 		
 		// then
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);

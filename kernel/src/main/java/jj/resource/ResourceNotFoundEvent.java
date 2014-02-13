@@ -15,38 +15,13 @@
  */
 package jj.resource;
 
-import java.net.URI;
-import java.util.List;
-
 /**
  * @author jason
  *
  */
-interface ResourceCache {
-
-	/**
-	 * @param uri
-	 * @return
-	 */
-	List<Resource> findAllByUri(URI uri);
-
-	/**
-	 * @param cacheKey
-	 * @return
-	 */
-	Resource get(ResourceCacheKey cacheKey);
+public class ResourceNotFoundEvent extends ResourceEvent {
 	
-	Resource putIfAbsent(ResourceCacheKey cacheKey, Resource resource);
-	
-	<T extends Resource> ResourceCreator<T> getCreator(final Class<T> type);
-
-	/**
-	 * @param cacheKey
-	 * @param resource
-	 * @return
-	 */
-	boolean remove(ResourceCacheKey cacheKey, Resource resource);
-	
-	boolean replace(ResourceCacheKey key, Resource oldValue, Resource newValue);
-
+	public ResourceNotFoundEvent(final Class<? extends Resource> resourceClass, final String name, final Object...arguments) {
+		super(resourceClass, name, arguments);
+	}
 }

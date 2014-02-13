@@ -15,12 +15,20 @@
  */
 package jj.resource.script;
 
+import io.netty.util.internal.PlatformDependent;
+
+import java.util.concurrent.ConcurrentMap;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.IOTask;
-import jj.execution.TaskRunner;
+import jj.event.Listener;
+import jj.event.Subscriber;
+import jj.resource.ResourceEvent;
 import jj.resource.ResourceFinder;
+import jj.resource.ResourceLoadedEvent;
+import jj.resource.ResourceLoader;
+import jj.resource.ResourceNotFoundEvent;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
 import jj.script.DependsOnScriptEnvironmentInitialization;
@@ -32,46 +40,59 @@ import jj.script.DependsOnScriptEnvironmentInitialization;
  *
  */
 @Singleton
-// FIXME make this not public!
-public class RequiredModuleContinuationProcessor implements ContinuationProcessor {
+@Subscriber
+class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
-	private final TaskRunner taskRunner;
+	private final ResourceLoader resourceLoader;
 	
-	private final ResourceFinder finder;
+	private final ResourceFinder resourceFinder;
 	
 	private final DependsOnScriptEnvironmentInitialization initializer;
 	
+	private final ConcurrentMap<RequiredModule, Boolean> waiters = PlatformDependent.newConcurrentHashMap(4);
+	
 	@Inject
 	RequiredModuleContinuationProcessor(
-		final TaskRunner taskRunner,
-		final ResourceFinder finder,
+		final ResourceLoader resourceLoader,
+		final ResourceFinder resourceFinder,
 		final DependsOnScriptEnvironmentInitialization initializer
 	) {
-		this.taskRunner = taskRunner;
-		this.finder = finder;
+		this.resourceLoader = resourceLoader;
+		this.resourceFinder = resourceFinder;
 		this.initializer = initializer;
+	}
+	
+	private RequiredModule extractRequiredModule(final ResourceEvent event) {
+		RequiredModule result = null;
+		if (event.arguments.length == 1 && event.arguments[0] instanceof RequiredModule) {
+			result = (RequiredModule)event.arguments[0];
+		}
+		return result;
+	}
+	
+	@Listener
+	void resourceNotFound(final ResourceNotFoundEvent event) {
+		RequiredModule requiredModule = extractRequiredModule(event);
+		if (requiredModule != null) {
+			assert waiters.remove(requiredModule) != null : "something is crossed up in the " + getClass(); 
+			requiredModule.pendingKey().resume(new RequiredModuleException(requiredModule));
+		}
+	}
+	
+	@Listener
+	void resourceLoaded(final ResourceLoadedEvent event) {
+		RequiredModule requiredModule = extractRequiredModule(event);
+		if (requiredModule != null) {
+			Boolean result = waiters.remove(requiredModule);
+			assert result == Boolean.TRUE : "something is crossed up in the " + getClass();
+		}
 	}
 	
 	private void loadEnvironment(final RequiredModule requiredModule) {
 		
-		taskRunner.execute(
-			new IOTask("loading module [" + requiredModule.identifier() + "] from [" + requiredModule.parent().baseName() + "]") {
-			
-				@Override
-				public void run() {
-					
-					// this will restart its parent automatically if it loads successfully,
-					ModuleScriptEnvironment scriptEnvironment = 
-						finder.loadResource(ModuleScriptEnvironment.class, requiredModule.identifier(), requiredModule);
-					
-					// so we only restart the parent when it's busted
-					if (scriptEnvironment == null) {
-						
-						requiredModule.pendingKey().resume(new RequiredModuleException(requiredModule.identifier()));
-					}
-				}
-			}
-		);
+		resourceLoader.loadResource(ModuleScriptEnvironment.class, requiredModule.identifier(), requiredModule);
+		Boolean result = waiters.putIfAbsent(requiredModule, Boolean.TRUE);
+		assert (result == null) : "something is crossed up in the " + getClass();
 	}
 
 	@Override
@@ -80,7 +101,7 @@ public class RequiredModuleContinuationProcessor implements ContinuationProcesso
 		final RequiredModule requiredModule = continuationState.continuationAs(RequiredModule.class);
 		
 		ModuleScriptEnvironment scriptEnvironment = 
-			finder.findResource(
+			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
 				requiredModule.identifier(),
 				requiredModule

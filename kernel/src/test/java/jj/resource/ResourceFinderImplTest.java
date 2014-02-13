@@ -3,12 +3,14 @@ package jj.resource;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import jj.event.Publisher;
 import jj.execution.TaskRunner;
 import jj.resource.asset.Asset;
 import jj.resource.asset.AssetResource;
@@ -16,16 +18,18 @@ import jj.resource.document.HtmlResource;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
 import jj.resource.stat.ic.StaticResource;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 
 /**
- * this test is a little concrete
- * tests
+ * verifies the POWER
  * @author jason
  *
  */
@@ -33,7 +37,9 @@ public class ResourceFinderImplTest extends RealResourceBase {
 
 	ResourceCache resourceCache;
 	ResourceCreators resourceCreators;
+	
 	@Mock ResourceWatchService resourceWatchService;
+	@Mock Publisher publisher;
 	@Mock TaskRunner taskRunner;
 	@Mock Logger logger;
 	
@@ -41,6 +47,8 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	@Mock AbstractResourceCreator<HtmlResource> htmlResourceCreator;
 	@Mock AbstractResourceCreator<ScriptResource> scriptResourceCreator;
 	@Mock AbstractResourceCreator<StaticResource> staticResourceCreator;
+	
+	@Captor ArgumentCaptor<ResourceEvent> eventCaptor;
 	
 	ResourceFinder rfi;
 	
@@ -91,7 +99,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		
 		given(taskRunner.isIOThread()).willReturn(true);
 		
-		rfi = new ResourceFinderImpl(resourceCache, resourceCreators, resourceWatchService, taskRunner);
+		rfi = new ResourceFinderImpl(resourceCache, resourceWatchService, publisher, taskRunner);
 	}
 	
 	@Test
@@ -126,9 +134,11 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		verify(resourceWatchService, never()).watch(result1);
 		// watch service should only have been asked to watch this once, the first time it was created
 		verify(resourceWatchService).watch(result2);
-
-		// given
-		given(taskRunner.isIOThread()).willReturn(true);
+		
+		// and make sure we published our event
+		verify(publisher).publish(eventCaptor.capture());
+		assertThat(eventCaptor.getValue(), is(instanceOf(ResourceLoadedEvent.class)));
+		assertTrue(eventCaptor.getValue().matches(ScriptResource.class, ScriptResourceType.Server.suffix(baseName)));
 	}
 	
 	@Test

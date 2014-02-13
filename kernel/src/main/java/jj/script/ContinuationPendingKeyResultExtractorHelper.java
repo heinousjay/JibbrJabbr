@@ -17,9 +17,9 @@ package jj.script;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import jj.execution.JJTask;
+import jj.execution.Promise;
 import jj.execution.TaskRunner;
 
 /**
@@ -45,7 +45,7 @@ class ContinuationPendingKeyResultExtractorHelper extends ContinuationPendingCac
 			}
 			
 			@Override
-			public Future<?> execute(JJTask task) {
+			public Promise execute(JJTask task) {
 				throw new AssertionError("how did this get called?");
 			}
 		});

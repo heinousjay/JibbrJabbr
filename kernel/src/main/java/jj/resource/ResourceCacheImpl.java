@@ -58,6 +58,11 @@ class ResourceCacheImpl implements JJServerStartupListener, JJServerShutdownList
 	}
 	
 	@Override
+	public <T extends Resource> ResourceCreator<T> getCreator(Class<T> type) {
+		return resourceCreators.get(type);
+	}
+	
+	@Override
 	public void start() throws Exception {
 		ConcurrentMap<ResourceCacheKey, Resource> old = 
 			delegate.getAndSet(

@@ -19,8 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.IOTask;
+import jj.execution.Promise;
 import jj.execution.TaskRunner;
-import jj.execution.JJTask;
 
 /**
  * if you need to load a resource, here's a simple way to do it
@@ -40,12 +40,8 @@ public class ResourceLoader {
 		this.resourceFinder = resourceFinder;
 	}
 	
-	public void loadResource(final Class<? extends Resource> resourceClass, final String name,  final Object... arguments) {
-		loadResource(null, resourceClass, name, arguments);
-	}
-	
-	public void loadResource(final JJTask next, final Class<? extends Resource> resourceClass, final String name,  final Object... arguments) {
-		taskRunner.execute(new ResourceLoaderTask(resourceClass, name, arguments).thenRun(next));
+	public Promise loadResource(final Class<? extends Resource> resourceClass, final String name,  final Object...arguments) {
+		return taskRunner.execute(new ResourceLoaderTask(resourceClass, name, arguments));
 	}
 	
 	private final class ResourceLoaderTask extends IOTask {
@@ -53,33 +49,21 @@ public class ResourceLoader {
 		private final Class<? extends Resource> resourceClass;
 		private final String name;
 		private final Object[] arguments;
-		
-		private JJTask next;
 
 		/**
 		 * @param name
 		 */
-		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final String name, final Object... arguments) {
+		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final String name, final Object...arguments) {
 			super("Resource loader [" + resourceClass.getSimpleName() + " at " + name);
 			this.resourceClass = resourceClass;
 			this.name = name;
 			this.arguments = arguments;
 			
 		}
-		
-		// i almost feel like this should be in the base class of all tasks
-		// or possibly the return from the execute method, if i can get rid of the future
-		public ResourceLoaderTask thenRun(JJTask next) {
-			this.next = next;
-			return this;
-		}
 
 		@Override
 		protected void run() throws Exception {
 			resourceFinder.loadResource(resourceClass, name, arguments);
-			if (next != null) {
-				taskRunner.execute(next);
-			}
 		}
 	}
 }

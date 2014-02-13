@@ -15,10 +15,7 @@
  */
 package jj.resource;
 
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static org.hamcrest.Matchers.is;
-import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
 
 import org.junit.Before;
@@ -41,8 +38,6 @@ public class ResourceLoaderTest {
 	
 	ResourceLoader rl;
 	
-	@Mock JJTask task;
-	
 	@Before
 	public void before() {
 		taskRunner = new MockTaskRunner();
@@ -52,13 +47,14 @@ public class ResourceLoaderTest {
 	@Test
 	public void test() throws Exception {
 		
-		rl.loadResource(task, Resource.class, "name", "a thing", new Integer(1));
+		// kinda simple, we just make sure it's going to make its task and schedule it
+		// and that the task does the right thing
+		
+		rl.loadResource(Resource.class, "name", "a thing", new Integer(1));
 		
 		taskRunner.runFirstTask();
 		
 		verify(resourceFinder).loadResource(Resource.class, "name", "a thing", new Integer(1));
-		
-		assertThat(taskRunner.firstTask(), is(task));
 	}
 
 }

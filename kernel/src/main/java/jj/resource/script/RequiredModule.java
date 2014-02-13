@@ -15,6 +15,7 @@
  */
 package jj.resource.script;
 
+import jj.StringUtils;
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptEnvironment;
@@ -29,14 +30,19 @@ public class RequiredModule implements Continuation {
 	
 	private final String identifier;
 	
+	private final String toString;
+	
 	private ContinuationPendingKey pendingKey;
 
 	public RequiredModule(
 		final ScriptEnvironment parent,
 		final String identifier
 	) {
+		assert parent != null;
+		assert !StringUtils.isEmpty(identifier);
 		this.parent = parent;
 		this.identifier = identifier;
+		this.toString = "required module " + identifier + " under " + parent.baseName();
 	}
 	
 	String identifier() {
@@ -61,7 +67,22 @@ public class RequiredModule implements Continuation {
 	}
 	
 	@Override
+	public boolean equals(Object obj) {
+		boolean result = false;
+		if (obj instanceof RequiredModule) {
+			RequiredModule other = (RequiredModule)obj;
+			result = other.parent == this.parent && other.identifier.equals(identifier);
+		}
+		return result;
+	}
+	
+	@Override
+	public int hashCode() {
+		return toString.hashCode();
+	}
+	
+	@Override
 	public String toString() {
-		return "required module " + identifier + " under " + parent.baseName();
+		return toString;
 	}
 }
