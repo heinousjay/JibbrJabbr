@@ -32,7 +32,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		 * @param name
 		 */
 		public ActivityChecker() {
-			super("WebSocket connection activity tracker");
+			super("WebSocket connection activity checker");
 		}
 
 		@Override
@@ -44,7 +44,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 				}
 			}
 			
-			if (!Thread.interrupted()) {
+			if (!Thread.currentThread().isInterrupted()) {
 				repeat();
 			}
 		}
