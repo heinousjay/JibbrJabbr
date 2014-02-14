@@ -15,10 +15,10 @@
  */
 package jj.http.server;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.BDDMockito.*;
-
-import jj.execution.JJNioEventLoopGroup;
+import jj.execution.ServerTask;
+import jj.execution.TaskHelper;
+import jj.execution.TaskRunner;
 import jj.resource.document.DocumentScriptEnvironment;
 
 import org.junit.Test;
@@ -36,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class WebSocketConnectionTrackerTest {
 
-	@Mock JJNioEventLoopGroup eventLoopGroup;
+	@Mock TaskRunner taskRunner;
 	@InjectMocks WebSocketConnectionTracker wsct;
 	
 	@Mock WebSocketConnection connection1;
@@ -45,10 +45,10 @@ public class WebSocketConnectionTrackerTest {
 	@Mock DocumentScriptEnvironment documentScriptEnvironment1;
 	@Mock DocumentScriptEnvironment documentScriptEnvironment2;
 	
-	@Captor ArgumentCaptor<Runnable> activityTrackerCaptor;
+	@Captor ArgumentCaptor<ServerTask> activityTrackerCaptor;
 	
 	@Test
-	public void testActivityTracking() {
+	public void testActivityTracking() throws Exception {
 
 		given(connection1.webSocketConnectionHost()).willReturn(documentScriptEnvironment1);
 		given(connection2.webSocketConnectionHost()).willReturn(documentScriptEnvironment1);
@@ -61,12 +61,12 @@ public class WebSocketConnectionTrackerTest {
 		
 		wsct.start();
 		
-		verify(eventLoopGroup).scheduleAtFixedRate(activityTrackerCaptor.capture(), eq(5L), eq(5L), eq(SECONDS));
+		verify(taskRunner).execute(activityTrackerCaptor.capture());
 		
-		Runnable activityTracker = activityTrackerCaptor.getValue();
+		ServerTask activityTracker = activityTrackerCaptor.getValue();
 		
 		// when
-		activityTracker.run();
+		TaskHelper.invoke(activityTracker);
 		
 		// then
 		verify(connection1).close();

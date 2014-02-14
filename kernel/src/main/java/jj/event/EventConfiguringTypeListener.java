@@ -38,6 +38,8 @@ import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
+import jj.execution.ServerTask;
+import jj.execution.TaskRunner;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
@@ -105,13 +107,6 @@ class EventConfiguringTypeListener implements TypeListener {
 			
 			invokerClass = classPool.get("jj.event.Invoker");
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
-			
-			// this should be a task on the InternalExecutor
-			// this class can listen for the JJExecutorImpl after injection and fire a
-			// task into it.  dirty dirty but this whole class is dirty dirty
-			Thread queueCleaner = new Thread(new ListenerCleaner(), "Event System cleanup");
-			queueCleaner.setDaemon(true);
-			queueCleaner.start();
 		} catch (NotFoundException e) {
 			// this can't happen
 			throw new AssertionError(e);
@@ -125,23 +120,24 @@ class EventConfiguringTypeListener implements TypeListener {
 	 * @author jason
 	 *
 	 */
-	private final class ListenerCleaner implements Runnable {
+	private final class ListenerCleaner extends ServerTask {
+		/**
+		 * @param name
+		 */
+		public ListenerCleaner() {
+			super("Event System cleanup");
+		}
+
 		@Override
-		public void run() {
-			try {
-				while (true) {
-					Reference<?> reference = invokerInstanceQueue.remove();
-					Invoker instance = cleanupMap.remove(reference);
-					if (instance != null) {
-						for (Set<Invoker> invokerSet : invokers.values()) {
-							invokerSet.remove(instance);
-						}
+		public void run() throws Exception {
+			while (true) {
+				Reference<?> reference = invokerInstanceQueue.remove();
+				Invoker instance = cleanupMap.remove(reference);
+				if (instance != null) {
+					for (Set<Invoker> invokerSet : invokers.values()) {
+						invokerSet.remove(instance);
 					}
 				}
-			} catch (Exception e) {
-				// this shouldn't ever happen
-				System.err.println("failure cleaning up references to event listeners!");
-				e.printStackTrace();
 			}
 		}
 	}
@@ -182,8 +178,12 @@ class EventConfiguringTypeListener implements TypeListener {
 			
 			String name = injectee.getClass().getName();
 			
+			if (injectee instanceof TaskRunner) {
+				((TaskRunner)injectee).execute(new ListenerCleaner());
+			}
+			
 			if (injectee instanceof EventManager) {
-				// share state with the publisher
+				// share state with the publisher - but it can't have events.  boo
 				((EventManager)injectee).listenerMap(invokers);
 			} else if (subscribers.containsKey(name)) {
 				// create an invoker class so we aren't doing this reflectively

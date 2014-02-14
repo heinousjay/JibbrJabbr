@@ -36,7 +36,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	private final TaskRunner taskRunner;
 	
-	private final IsScriptThread isScriptThread;
+	private final IsThread isScriptThread;
 	
 	private final ContinuationCoordinatorImpl continuationCoordinator;
 	
@@ -68,7 +68,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	@Inject
 	ScriptEnvironmentInitializer(
 		final TaskRunner taskRunner,
-		final IsScriptThread isScriptThread,
+		final IsThread isScriptThread,
 		final ContinuationCoordinatorImpl continuationCoordinator,
 		final Publisher publisher
 	) {

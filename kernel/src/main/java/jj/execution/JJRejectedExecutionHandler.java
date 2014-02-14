@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.execution;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author jason
  *
  */
-@Singleton
-public class IsScriptThread {
-	private final ScriptExecutorFactory scriptExecutorFactory;
-	
-	@Inject
-	IsScriptThread(final ScriptExecutorFactory scriptExecutorFactory) {
-		this.scriptExecutorFactory = scriptExecutorFactory;
-	}
-
-	public boolean forScriptEnvironment(final ScriptEnvironment scriptEnvironment) {
-		return scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
+public class JJRejectedExecutionHandler implements RejectedExecutionHandler {
+	@Override
+	public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+		// well.. whatever.  we're about to die bb yeah
+		System.err.println(executor + " is rejecting tasks. this is a surprise if it's not a shutdown.");
 	}
 }

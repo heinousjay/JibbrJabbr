@@ -37,6 +37,7 @@ import java.util.concurrent.Executors;
 
 import jj.configuration.Configuration;
 import jj.execution.IOTask;
+import jj.execution.JJTask;
 import jj.execution.TaskRunner;
 import jj.execution.MockTaskRunner;
 import jj.execution.TaskHelper;
@@ -101,7 +102,7 @@ public class ResourceWatchServiceImplTest {
 		
 		
 		executorService = Executors.newCachedThreadPool();
-		given(taskRunner.execute(any(IOTask.class))).willAnswer(new Answer<Void>() {
+		given(taskRunner.execute(any(JJTask.class))).willAnswer(new Answer<Void>() {
 
 			@Override
 			public Void answer(final InvocationOnMock invocation) throws Throwable {
@@ -109,7 +110,7 @@ public class ResourceWatchServiceImplTest {
 
 					@Override
 					public Void call() throws Exception {
-						TaskHelper.invoke(((IOTask)invocation.getArguments()[0]));
+						TaskHelper.invoke(((JJTask)invocation.getArguments()[0]));
 						return null;
 					}
 				});

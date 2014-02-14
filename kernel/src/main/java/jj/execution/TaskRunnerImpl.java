@@ -30,21 +30,16 @@ class TaskRunnerImpl implements TaskRunner {
 	private final CurrentTask currentTask;
 	private final Logger logger;
 	
-	private final Thread monitorThread;
 	private final DelayQueue<JJTask> queuedTasks = new DelayQueue<>();
 	
-	private final Runnable monitor = new Runnable() {
+	private final ServerTask monitor = new ServerTask(getClass().getSimpleName() + " execution monitor") {
 		
 		@Override
-		public void run() {
-			try {
-				while (true) {
-					JJTask task = queuedTasks.take();
-					// TODO - do something more interesting than this! after all at this point it's an issue, i'm sure
-					System.err.println(task + " has been waiting " + MAX_QUEUED_TIME + " milliseconds to execute.  something is broken");
-				}
-			} catch (InterruptedException e) {
-				// if we get interrupted, just end
+		public void run() throws Exception {
+			while (true) {
+				JJTask task = queuedTasks.take();
+				// TODO - do something more interesting than this! after all at this point it's an issue, i'm sure
+				System.err.println(task + " has been waiting " + MAX_QUEUED_TIME + " milliseconds to execute.  something is broken");
 			}
 		}
 	};
@@ -59,13 +54,7 @@ class TaskRunnerImpl implements TaskRunner {
 		this.currentTask = currentTask;
 		this.logger = logger;
 		
-		// TODO - make a new set of executors for internal stuff,
-		// like this, the file watcher, and there's another lil daemon out there somewhere
-		// and just make InternalTask to handle them
-		// should allow unlimited thread of execution
-		this.monitorThread = new Thread(monitor, "Task execution monitor");
-		this.monitorThread.setDaemon(true);
-		this.monitorThread.start();
+		execute(monitor);
 	}
 	
 	@Override
@@ -80,27 +69,32 @@ class TaskRunnerImpl implements TaskRunner {
 			
 			@Override
 			public void run() {
+				boolean interrupted = false;
 				String name = Thread.currentThread().getName();
 				Thread.currentThread().setName(name + " - " + task.name());
 				queuedTasks.remove(task);
 				task.start();
 				try (Closer closer = currentTask.enterScope(task)) {
-					try {
-						task.run();
-					} catch (Throwable t) {
-						if (!task.errored(t)) {
-							logger.error("Task [{}] ended in exception", task.name());
-							logger.error("", t);
-						}
+					task.run();
+				} catch (InterruptedException ie) {
+					interrupted = true;
+				} catch (Throwable t) {
+					if (!task.errored(t)) {
+						logger.error("Task [{}] ended in exception", task.name());
+						logger.error("", t);
 					}
+
 				} finally {
 					task.end();
 					Thread.currentThread().setName(name);
 					
-					List<JJTask> tasks = promise.done();
-					if (tasks != null) {
-						for (JJTask t : tasks) {
-							execute(t);
+					// interruption means shutdown, don't bother keeping promises now
+					if (!interrupted) {
+						List<JJTask> tasks = promise.done();
+						if (tasks != null) {
+							for (JJTask t : tasks) {
+								execute(t);
+							}
 						}
 					}
 				}
@@ -108,9 +102,5 @@ class TaskRunnerImpl implements TaskRunner {
 		});
 		
 		return promise;
-	}
-
-	public boolean isIOThread() {
-		return IOExecutor.isIOThread();
 	}
 }

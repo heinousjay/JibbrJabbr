@@ -18,10 +18,13 @@ package jj.execution;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 /**
  * @author jason
  *
  */
+@Singleton
 public class MockTaskRunner implements TaskRunner {
 
 	public List<JJTask> tasks = new ArrayList<>();
@@ -34,9 +37,6 @@ public class MockTaskRunner implements TaskRunner {
 		}
 	}
 
-	/**
-	 * @return
-	 */
 	public JJTask firstTask() {
 		return tasks.get(0);
 	}
@@ -47,18 +47,29 @@ public class MockTaskRunner implements TaskRunner {
 		tasks.remove(0).run();
 	}
 	
+	public void runFirstTaskInDaemon() throws Exception {
+		assert(!tasks.isEmpty());
+		
+		Thread t = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					tasks.remove(0).run();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		t.setDaemon(true);
+		t.start();
+	}
+	
 	
 	@Override
 	public Promise execute(final JJTask task) {
 		tasks.add(task);
 		
 		return task.promise().taskRunner(this);
-	}
-	
-	public boolean isIOThread = false;
-
-	@Override
-	public boolean isIOThread() {
-		return isIOThread;
 	}
 }

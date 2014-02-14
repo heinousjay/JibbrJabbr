@@ -6,7 +6,7 @@ import java.util.PropertyResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.TaskRunner;
+import jj.execution.IsThread;
 import jj.resource.ResourceFinder;
 import jj.resource.property.PropertiesResource;
 
@@ -42,15 +42,15 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 	
 	private final ResourceFinder resourceFinder;
 	
-	private final TaskRunner taskRunner;
+	private final IsThread isThread;
 	
 	@Inject
 	InlineMessagesDocumentFilter(
 		final ResourceFinder resourceFinder,
-		final TaskRunner taskRunner
+		final IsThread isThread
 	) {
 		this.resourceFinder = resourceFinder;
-		this.taskRunner = taskRunner;
+		this.isThread = isThread;
 	}
 	
 	@Override
@@ -59,7 +59,7 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		String baseName = documentRequestProcessor.baseName();
 		
 		PropertiesResource resource = 
-			taskRunner.isIOThread() ?	
+			isThread.forIO() ?	
 			resourceFinder.loadResource(PropertiesResource.class, baseName) :
 			resourceFinder.findResource(PropertiesResource.class, baseName);
 			

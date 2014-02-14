@@ -16,7 +16,6 @@
 package jj.execution;
 
 import java.util.concurrent.Delayed;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import jj.script.ScriptTask;
@@ -52,7 +51,7 @@ public abstract class JJTask implements Delayed {
 	
 	private volatile long startTime = 0;
 	
-	private volatile long endTime = 0;
+	private volatile long executionTime = 0;
 	
 	private final Promise promise = new Promise();
 	
@@ -70,23 +69,26 @@ public abstract class JJTask implements Delayed {
 		return false;
 	}
 	
-	protected abstract Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable);
+	protected abstract void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable);
 	
 	final String name() {
 		return name;
 	}
 	
 	final void enqueue(long timeoutMillis) {
+		executionTime = 0;
+		startTime = 0;
 		maxTime = timeoutMillis;
 		enqueuedTime = System.currentTimeMillis();
 	}
 	
 	final void start() {
+		enqueuedTime = 0;
 		startTime = System.currentTimeMillis();
 	}
 	
 	final void end() {
-		endTime = System.currentTimeMillis();
+		executionTime = System.currentTimeMillis() - startTime;
 	}
 	
 	final boolean enqueued() {
@@ -98,7 +100,7 @@ public abstract class JJTask implements Delayed {
 	}
 	
 	final boolean finished() {
-		return endTime > 0;
+		return executionTime > 0;
 	}
 	
 	final long timeInQueue() {
@@ -106,7 +108,7 @@ public abstract class JJTask implements Delayed {
 	}
 	
 	final long executionTime() {
-		return endTime - startTime;
+		return executionTime;
 	}
 	
 	final void next(JJTask next) {

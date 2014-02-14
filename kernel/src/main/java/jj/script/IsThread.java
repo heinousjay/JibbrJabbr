@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.script;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author jason
  *
  */
-public abstract class IOTask extends JJTask {
+@Singleton
+public class IsThread {
+	private final ScriptExecutorFactory scriptExecutorFactory;
 	
-	protected IOTask(String name) {
-		super(name);
-	}
-	
-	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(IOExecutor.class).submit(runnable);
+	@Inject
+	IsThread(final ScriptExecutorFactory scriptExecutorFactory) {
+		this.scriptExecutorFactory = scriptExecutorFactory;
 	}
 
+	public boolean forScriptEnvironment(final ScriptEnvironment scriptEnvironment) {
+		return scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
+	}
 }

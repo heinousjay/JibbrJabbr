@@ -32,7 +32,7 @@ public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentIniti
 	 */
 	public MockableScriptEnvironmentInitializer(
 		TaskRunner taskRunner,
-		IsScriptThread isScriptThread,
+		IsThread isScriptThread,
 		ContinuationCoordinatorImpl continuationCoordinator,
 		Publisher publisher
 	) {

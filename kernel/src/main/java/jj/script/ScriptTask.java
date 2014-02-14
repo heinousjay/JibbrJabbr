@@ -15,8 +15,6 @@
  */
 package jj.script;
 
-import java.util.concurrent.Future;
-
 import jj.execution.JJTask;
 import jj.execution.TaskRunner;
 
@@ -97,8 +95,8 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends JJTask {
 	}
 	
 	@Override
-	protected final Future<?> addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		return executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment).submit(runnable);
+	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
+		executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment).submit(runnable);
 	}
 
 	/**

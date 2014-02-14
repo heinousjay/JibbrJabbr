@@ -31,6 +31,8 @@ import jj.event.help.Event;
 import jj.event.help.EventSub;
 import jj.event.help.IEvent;
 import jj.event.help.Sub;
+import jj.execution.MockTaskRunner;
+import jj.execution.TaskRunner;
 import jj.logging.EmergencyLogger;
 
 import org.junit.Test;
@@ -57,6 +59,8 @@ public class EventSystemTest {
 	final Exception toThrow = new Exception();
 	@Mock Logger logger;
 	
+	MockTaskRunner taskRunner;
+	
 	@Singleton
 	public static class EventManagerChild extends EventManager {
 		
@@ -76,10 +80,13 @@ public class EventSystemTest {
 	}
 	
 	@Test
-	public void test() throws InterruptedException {
+	public void test() throws Exception {
 		
 		EventManagerChild pub = impl();
+		
 		System.gc();
+		
+		taskRunner.runFirstTaskInDaemon();
 		// it needs some small amount of time
 		Thread.sleep(100);
 		// verify the listeners are all unregistered so
@@ -101,9 +108,13 @@ public class EventSystemTest {
 			@Override
 			protected void configure() {
 				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
+				bind(TaskRunner.class).to(MockTaskRunner.class);
 				bind(Exception.class).toInstance(toThrow);
 			}
 		});
+		
+		taskRunner = injector.getInstance(MockTaskRunner.class);
+		
 		EventManagerChild pub = injector.getInstance(EventManagerChild.class);
 		
 		// publishing with nothing listening is fine

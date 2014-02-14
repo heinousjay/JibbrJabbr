@@ -58,9 +58,7 @@ public class WebDriverRule implements TestRule {
 	
 	private PhantomJSDriver current = null;
 	
-	public WebDriverRule() {
-		System.err.println("CREATED BITCHES");
-	}
+	public WebDriverRule() {}
 	
 	@Override
 	public Statement apply(final Statement base, final Description description) {

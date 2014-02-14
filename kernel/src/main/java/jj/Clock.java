@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj;
+
+import javax.inject.Singleton;
 
 /**
+ * Mockable time
+ * 
  * @author jason
  *
  */
-public abstract class IOTask extends JJTask {
-	
-	protected IOTask(String name) {
-		super(name);
-	}
-	
-	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(IOExecutor.class).submit(runnable);
-	}
+@Singleton
+public class Clock {
 
+	public long time() {
+		return System.currentTimeMillis();
+	}
 }

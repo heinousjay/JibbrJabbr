@@ -13,21 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author jason
  *
  */
-public abstract class IOTask extends JJTask {
-	
-	protected IOTask(String name) {
-		super(name);
-	}
+public class MockClock extends Clock {
+
+	public long time = System.currentTimeMillis();
 	
 	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(IOExecutor.class).submit(runnable);
+	public long time() {
+		return time;
 	}
-
+	
+	public MockClock advance() {
+		time++;
+		return this;
+	}
+	
+	public MockClock advance(long time, TimeUnit timeUnit) {
+		time += TimeUnit.MILLISECONDS.convert(time, timeUnit);
+		return this;
+	}
+	
+	public MockClock retreat() {
+		time--;
+		return this;
+	}
+	
+	public MockClock retreat(long time, TimeUnit timeUnit) {
+		time -= TimeUnit.MILLISECONDS.convert(time, timeUnit);
+		return this;
+	}
 }

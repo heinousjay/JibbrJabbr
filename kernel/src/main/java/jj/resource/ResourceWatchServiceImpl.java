@@ -3,7 +3,6 @@ package jj.resource;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 import java.io.IOException;
-import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
 import jj.execution.IOTask;
+import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
 
 /**
@@ -85,7 +85,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		return (WatchEvent<Path>)event;
 	}
 		
-	private final IOTask loop = new IOTask(ResourceWatchService.class.getSimpleName() + " loop") {
+	private final ServerTask loop = new ServerTask(ResourceWatchService.class.getSimpleName() + " loop") {
 
 		
 		private void remove(final AbstractResource resource) {
@@ -99,8 +99,6 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		}
 		
 		private void reload(final AbstractResource resource) {
-			// the resources are reloaded as a separate task so we don't clog up
-			// the reloader thread doing other work
 			resource.kill();
 			taskRunner.execute(
 				new IOTask(ResourceWatchService.class.getSimpleName() + " reloader for " + resource.cacheKey()) {
@@ -123,49 +121,41 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 		}
 		
 		@Override
-		public void run() {
-			try {
-				// we're a daemon thread, run till we can't run no more
-				// or get interrupted, whichever comes first
-				while (true) {
-					WatchKey watchKey = watcher.take();
-					if (watchKey.isValid()) {
-						final Path directory = (Path)watchKey.watchable();
+		public void run() throws Exception {
+			while (true) {
+				WatchKey watchKey = watcher.take();
+				if (watchKey.isValid()) {
+					final Path directory = (Path)watchKey.watchable();
+					
+					for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
 						
-						for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
-							
-							final Kind<?> kind = watchEvent.kind();
-							if (kind == OVERFLOW) {
-								log.warn("FileWatchService OVERFLOW - not sure what this means!");
-								continue; // for now. not sure what else to do
-							}
-							final WatchEvent<Path> event = cast(watchEvent);
-							final Path context = event.context();
-							final Path path = directory.resolve(context);
-							
-							if (kind == ENTRY_DELETE) {
-								for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
-									remove((AbstractResource)resource);
-								}
-							
-							} else if (kind == ENTRY_MODIFY) {
-								for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
-									reload((AbstractResource)resource);
-								}
-							}
+						final Kind<?> kind = watchEvent.kind();
+						if (kind == OVERFLOW) {
+							log.warn("FileWatchService OVERFLOW - not sure what this means!");
+							continue; // for now. not sure what else to do
 						}
+						final WatchEvent<Path> event = cast(watchEvent);
+						final Path context = event.context();
+						final Path path = directory.resolve(context);
 						
-						if (!Files.exists(directory)) {
-							watchKey.cancel();
+						if (kind == ENTRY_DELETE) {
+							for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
+								remove((AbstractResource)resource);
+							}
+						
+						} else if (kind == ENTRY_MODIFY) {
+							for (final Resource resource : resourceCache.findAllByUri(path.toUri())) {
+								reload((AbstractResource)resource);
+							}
 						}
 					}
 					
-					watchKey.reset();
+					if (!Files.exists(directory)) {
+						watchKey.cancel();
+					}
 				}
-			// this is the quit signal
-			} catch (ClosedWatchServiceException | InterruptedException e) {
-			} catch (Exception other) {
-				log.error("Exception thrown in watch service", other);
+				
+				watchKey.reset();
 			}
 		}
 	};

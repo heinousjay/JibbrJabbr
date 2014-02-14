@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.PropertyResourceBundle;
 
-import jj.execution.TaskRunner;
+import jj.execution.IsThread;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.InlineMessagesDocumentFilter;
 import jj.resource.ResourceFinder;
@@ -33,7 +33,7 @@ public class InlineMessagesDocumentFilterTest {
 	@Mock HtmlResource htmlResource;
 	Document document;
 	InlineMessagesDocumentFilter toTest;
-	@Mock TaskRunner taskRunner;
+	@Mock IsThread isThread;
 	
 	@Test
 	public void test() throws IOException {
@@ -41,7 +41,7 @@ public class InlineMessagesDocumentFilterTest {
 		// given
 		baseName = "index";
 		
-		given(taskRunner.isIOThread()).willReturn(false);
+		given(isThread.forIO()).willReturn(false);
 		
 		bundle = new PropertyResourceBundle(
 			new StringReader(
@@ -57,7 +57,7 @@ public class InlineMessagesDocumentFilterTest {
 		
 		given(resourceFinder.findResource(PropertiesResource.class, baseName)).willReturn(propertiesResource);
 		
-		toTest = new InlineMessagesDocumentFilter(resourceFinder, taskRunner);
+		toTest = new InlineMessagesDocumentFilter(resourceFinder, isThread);
 		
 		
 		// when

@@ -3,8 +3,11 @@ package jj.script;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 
+import jj.execution.JJRejectedExecutionHandler;
+import jj.execution.JJThreadFactory;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptExecutorFactory;
 
@@ -21,20 +24,15 @@ public class ScriptExecutorFactoryTest {
 	
 	@Mock ScriptEnvironment scriptEnvironment1;
 	@Mock ScriptEnvironment scriptEnvironment2;
+	
+	@Mock UncaughtExceptionHandler uncaughtExceptionHandler;
 
 	ScriptExecutorFactory scriptExecutorFactory;
 	
 	
 	@Before
 	public void before() {
-		scriptExecutorFactory = new ScriptExecutorFactory(new Thread.UncaughtExceptionHandler() {
-			
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		scriptExecutorFactory = new ScriptExecutorFactory(new JJThreadFactory(uncaughtExceptionHandler), new JJRejectedExecutionHandler());
 	}
 	
 	@Test

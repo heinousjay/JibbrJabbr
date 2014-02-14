@@ -9,6 +9,4 @@ public interface TaskRunner {
 	
 	Promise execute(final JJTask task);
 
-	boolean isIOThread();
-
 }

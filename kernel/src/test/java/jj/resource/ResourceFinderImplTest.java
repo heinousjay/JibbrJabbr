@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.event.Publisher;
-import jj.execution.TaskRunner;
+import jj.execution.IsThread;
 import jj.resource.asset.Asset;
 import jj.resource.asset.AssetResource;
 import jj.resource.document.HtmlResource;
@@ -40,7 +40,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	
 	@Mock ResourceWatchService resourceWatchService;
 	@Mock Publisher publisher;
-	@Mock TaskRunner taskRunner;
+	@Mock IsThread isThread;
 	@Mock Logger logger;
 	
 	@Mock AbstractResourceCreator<AssetResource> assetResourceCreator;
@@ -97,9 +97,9 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		// you can pass null, if you never call start it won't matter
 		resourceCache = new ResourceCacheImpl(resourceCreators, null);
 		
-		given(taskRunner.isIOThread()).willReturn(true);
+		given(isThread.forIO()).willReturn(true);
 		
-		rfi = new ResourceFinderImpl(resourceCache, resourceWatchService, publisher, taskRunner);
+		rfi = new ResourceFinderImpl(resourceCache, resourceWatchService, publisher, isThread);
 	}
 	
 	@Test
@@ -113,14 +113,14 @@ public class ResourceFinderImplTest extends RealResourceBase {
 		// when
 		HtmlResource result1 = rfi.findResource(HtmlResource.class, "internal/no-worky");
 		
-		given(taskRunner.isIOThread()).willReturn(true);
+		given(isThread.forIO()).willReturn(true);
 		ScriptResource result2 = rfi.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 		
-		given(taskRunner.isIOThread()).willReturn(false);
+		given(isThread.forIO()).willReturn(false);
 		ScriptResource result3 = rfi.findResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 		
 		// loading again with no changes should result in no changes
-		given(taskRunner.isIOThread()).willReturn(true);
+		given(isThread.forIO()).willReturn(true);
 		ScriptResource result4 = rfi.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
 		
 		// then

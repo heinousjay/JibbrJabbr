@@ -52,7 +52,7 @@ public class ScriptEnvironmentInitializerTest {
 	
 	@Mock Script script;
 	
-	@Mock IsScriptThread isScriptThread;
+	@Mock IsThread isScriptThread;
 	
 	@Mock Publisher publisher;
 	@Captor ArgumentCaptor<ScriptEnvironmentInitialized> eventCaptor;

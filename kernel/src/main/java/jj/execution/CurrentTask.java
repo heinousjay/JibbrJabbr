@@ -31,6 +31,6 @@ public class CurrentTask extends CurrentResource<JJTask> {
 	
 	public String name() {
 		JJTask task = current();
-		return task == null ? "no current task" : task.name();
+		return task == null ? null : task.name();
 	}
 }

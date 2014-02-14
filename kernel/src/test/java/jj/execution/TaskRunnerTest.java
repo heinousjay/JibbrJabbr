@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 public class TaskRunnerTest {
 	
 	private @Mock IOExecutor ioExecutor;
+	private @Mock ServerExecutor serverExecutor;
 	private @Mock ScheduledExecutorService scriptExecutor;
 	
 	private @Mock ScriptEnvironment scriptEnvironment;
@@ -71,6 +72,7 @@ public class TaskRunnerTest {
 		
 		Map<Class<?>, Object> executors = new HashMap<>();
 		executors.put(IOExecutor.class, ioExecutor);
+		executors.put(ServerExecutor.class, serverExecutor);
 		bundle = new ExecutorBundle(executors);
 		
 		executor = new TaskRunnerImpl(bundle, currentTask, logger);

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import jj.event.Publisher;
 import jj.execution.IOThread;
-import jj.execution.TaskRunner;
+import jj.execution.IsThread;
 
 /**
  * coordinates access to the resource cache for the outside
@@ -29,19 +29,19 @@ class ResourceFinderImpl implements ResourceFinder {
 	
 	private final Publisher publisher;
 	
-	private final TaskRunner taskRunner;
+	private final IsThread isThread;
 	
 	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
 		final ResourceWatchService resourceWatchService,
 		final Publisher publisher,
-		final TaskRunner taskRunner
+		final IsThread isThread
 	) {
 		this.resourceCache = resourceCache;
 		this.resourceWatchService = resourceWatchService;
 		this.publisher = publisher;
-		this.taskRunner = taskRunner;
+		this.isThread = isThread;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -75,7 +75,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		String baseName,
 		Object... args
 	) {
-		assert taskRunner.isIOThread() : "Can only call loadResource from an I/O thread";
+		assert isThread.forIO() : "Can only call loadResource from an I/O thread";
 		
 		ResourceCreator<T> resourceCreator = resourceCache.getCreator(resourceClass);
 		

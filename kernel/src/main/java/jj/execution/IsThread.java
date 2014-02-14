@@ -15,19 +15,30 @@
  */
 package jj.execution;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * @author jason
  *
  */
-public abstract class IOTask extends JJTask {
+@Singleton
+public class IsThread {
+
+	final IOExecutor ioExecutor;
+	final ServerExecutor serverExecutor;
 	
-	protected IOTask(String name) {
-		super(name);
-	}
-	
-	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(IOExecutor.class).submit(runnable);
+	@Inject
+	IsThread(final IOExecutor ioExecutor, final ServerExecutor serverExecutor) {
+		this.ioExecutor = ioExecutor;
+		this.serverExecutor = serverExecutor;
 	}
 
+	public boolean forIO() {
+		return ioExecutor.isIOThread();
+	}
+	
+	public boolean forServer() {
+		return serverExecutor.isServerThread();
+	}
 }

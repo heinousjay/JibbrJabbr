@@ -29,10 +29,10 @@ public class ExecutionModule extends JJModule {
 	protected void configure() {
 		
 		addShutdownListenerBinding().to(IOExecutor.class);
-		addShutdownListenerBinding().to(ClientExecutor.class);
+		addShutdownListenerBinding().to(ServerExecutor.class);
 
 		bindTaskRunner().toExecutor(IOExecutor.class);
-		bindTaskRunner().toExecutor(ClientExecutor.class);
+		bindTaskRunner().toExecutor(ServerExecutor.class);
 		
 		// a good place to break apart crafty circular dependencies.  this is
 		// the most popular object in the system.  for good reason.
