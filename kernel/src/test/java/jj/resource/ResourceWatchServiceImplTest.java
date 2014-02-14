@@ -35,6 +35,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 import jj.execution.IOTask;
 import jj.execution.JJTask;
@@ -74,6 +75,7 @@ public class ResourceWatchServiceImplTest {
 	String fileName = "gibberish.txt";
 	Path gibberish;
 	
+	@Mock Arguments arguments;
 	@Mock Configuration configuration;
 	
 	ResourceMaker resourceMaker;
@@ -97,7 +99,7 @@ public class ResourceWatchServiceImplTest {
 			channel.write(ByteBuffer.wrap(fileName.getBytes(UTF_8)));
 		}
 		
-		given(configuration.appPath()).willReturn(appPath);
+		given(arguments.appPath()).willReturn(appPath);
 		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
 		
 		
@@ -118,11 +120,11 @@ public class ResourceWatchServiceImplTest {
 			}
 		});
 		
-		resourceMaker = new ResourceMaker(configuration);
+		resourceMaker = new ResourceMaker(configuration, arguments);
 		
 		Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> map = new HashMap<>();
-		map.put(StaticResource.class, StaticResourceMaker.fake(configuration));
-		map.put(HtmlResource.class, HtmlResourceMaker.fake(configuration));
+		map.put(StaticResource.class, StaticResourceMaker.fake(arguments));
+		map.put(HtmlResource.class, HtmlResourceMaker.fake(arguments));
 		
 		// we can pass null, so long as we never call start
 		resourceCache = new ResourceCacheImpl(new ResourceCreators(map), null);

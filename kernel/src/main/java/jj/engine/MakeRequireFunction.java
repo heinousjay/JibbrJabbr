@@ -15,10 +15,12 @@
  */
 package jj.engine;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.RequiredModule;
@@ -40,17 +42,15 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 	
 	private static final String REQUIRE = "//require";
 	
-	private final Configuration configuration;
 	private final CurrentScriptEnvironment env;
 	private final ResourceFinder resourceFinder;
+	private final Path base = Paths.get("/requireBase");
 	
 	@Inject
 	MakeRequireFunction(
-		final Configuration configuration,
 		final CurrentScriptEnvironment env,
 		final ResourceFinder resourceFinder
 	) {
-		this.configuration = configuration;
 		this.env = env;
 		this.resourceFinder = resourceFinder;
 	}
@@ -80,10 +80,10 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 		return true;
 	}
 	
-	private String toModuleIdentifier(final String input, final String base) {
+	private String toModuleIdentifier(final String input, final String parent) {
 		// crazytimes! can probably be simplified
-		return configuration.appPath().relativize(
-			configuration.appPath().resolve(base).resolveSibling(input).normalize()
+		return base.relativize(
+			base.resolve(parent).resolveSibling(input).normalize()
 		).toString();
 	}
 	

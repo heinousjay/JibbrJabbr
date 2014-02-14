@@ -18,12 +18,11 @@ package jj.http.server.servable;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
 import io.netty.handler.codec.http.HttpHeaders;
 
 import java.io.IOException;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.execution.IOThread;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -52,8 +51,8 @@ public class ServableTest extends ServableTestBase {
 		/**
 		 * @param configuration
 		 */
-		protected ServableImpl(Configuration configuration) {
-			super(configuration);
+		protected ServableImpl(Arguments arguments) {
+			super(arguments);
 		}
 
 		@Override
@@ -80,7 +79,7 @@ public class ServableTest extends ServableTestBase {
 	
 	@Before
 	public void before() {
-		si = new ServableImpl(configuration);
+		si = new ServableImpl(arguments);
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 package jj.http.server.servable;
 
 import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -8,7 +9,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
 import jj.StringUtils;
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.execution.IOThread;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
@@ -33,11 +34,11 @@ class DocumentServable extends Servable<HtmlResource> {
 	
 	@Inject
 	DocumentServable(
-		final Configuration configuration,
+		final Arguments arguments,
 		final ResourceFinder resourceFinder,
 		final Injector parentInjector
 	) {
-		super(configuration);
+		super(arguments);
 		this.resourceFinder = resourceFinder;
 		this.parentInjector = parentInjector;
 	}

@@ -20,7 +20,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
@@ -41,10 +41,10 @@ public class StaticServable extends Servable<StaticResource> {
 	 */
 	@Inject
 	protected StaticServable(
-		final Configuration configuration,
+		final Arguments arguments,
 		final ResourceFinder resourceFinder
 	) {
-		super(configuration);
+		super(arguments);
 		this.resourceFinder = resourceFinder;
 	}
 

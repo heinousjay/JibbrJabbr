@@ -40,7 +40,7 @@ public class AssetServableTest extends ServableTestBase {
 	
 	@Before
 	public void before() {
-		as = new AssetServable(configuration, resourceFinder);
+		as = new AssetServable(arguments, resourceFinder);
 		given(resourceFinder.loadResource(AssetResource.class, uri1.baseName)).willReturn(resource);
 	}
 	

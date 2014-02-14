@@ -144,7 +144,7 @@ public class ResourceFinderImplTest extends RealResourceBase {
 	@Test
 	public void testObseleteResourceIsReloaded() throws Exception {
 		
-		ResourceMaker resourceMaker = new ResourceMaker(configuration);
+		ResourceMaker resourceMaker = new ResourceMaker(configuration, arguments);
 		
 		StaticResource staticResource1 = resourceMaker.makeStatic("index.html");
 		StaticResource staticResource2 = resourceMaker.makeStatic("index.html");

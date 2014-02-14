@@ -46,7 +46,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 	
 	@Before
 	public void before() {
-		as = new DocumentScriptServable(configuration, resourceFinder);
+		as = new DocumentScriptServable(arguments, resourceFinder);
 		given(executionEnvironment.clientScriptResource()).willReturn(scriptResource1);
 		given(executionEnvironment.sharedScriptResource()).willReturn(scriptResource2);
 		

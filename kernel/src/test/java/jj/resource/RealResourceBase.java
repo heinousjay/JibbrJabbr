@@ -23,7 +23,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -32,6 +31,7 @@ import java.nio.file.Path;
 
 import jj.BasePath;
 import jj.SHA1Helper;
+import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 import jj.resource.css.CssResource;
 
@@ -51,12 +51,13 @@ public abstract class RealResourceBase {
 	
 	protected Path appPath;
 	@Mock protected Configuration configuration;
+	@Mock protected Arguments arguments;
 	@Mock protected Logger logger;
 
 	@Before
 	public final void init() throws Exception {
 		appPath = BasePath.appPath();
-		given(configuration.appPath()).willReturn(appPath);
+		given(arguments.appPath()).willReturn(appPath);
 	}
 	
 	protected <T extends Resource> T testResource(final T resource) throws Exception {

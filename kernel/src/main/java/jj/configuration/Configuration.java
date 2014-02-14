@@ -2,13 +2,10 @@ package jj.configuration;
 
 import io.netty.util.internal.PlatformDependent;
 
-import java.nio.file.Path;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import jj.conversion.Converters;
 
 import com.google.inject.Injector;
 
@@ -19,15 +16,9 @@ import com.google.inject.Injector;
  */
 @Singleton
 public class Configuration {
-	
-	private static final String APP_PATH_ARG_NAME = "app";
 
 	private final ConcurrentMap<Class<?>, Class<? extends ConfigurationObjectBase>> configurationInterfaceToImplementation =
 		PlatformDependent.newConcurrentHashMap();
-	
-	private final Arguments arguments;
-	
-	private final Converters converters;
 	
 	private final ConfigurationClassLoader classLoader;
 	
@@ -35,13 +26,9 @@ public class Configuration {
 	
 	@Inject
 	Configuration(
-		final Arguments arguments,
-		final Converters converters,
 		final ConfigurationClassLoader classLoader,
 		final Injector injector
 	) {
-		this.arguments = arguments;
-		this.converters = converters;
 		this.classLoader = classLoader;
 		this.injector = injector;
 	}
@@ -73,10 +60,6 @@ public class Configuration {
 		}
 		
 		return configurationInterface.cast(configurationInstance);
-	}
-	
-	public Path appPath() {
-		return converters.convert(arguments.get(APP_PATH_ARG_NAME), Path.class);
 	}
 	
 	public boolean isSystemRunning() {

@@ -5,25 +5,24 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.execution.IOThread;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.resource.Resource;
 import jj.uri.URIMatch;
-
 import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable<T extends Resource> {
 	
-	protected final Configuration configuration;
+	protected final Arguments arguments;
 	
-	protected Servable(final Configuration configuration) {
-		this.configuration = configuration;
+	protected Servable(final Arguments arguments) {
+		this.arguments = arguments;
 	}
 	
 	protected Path appPath() {
-		return configuration.appPath();
+		return arguments.appPath();
 	}
 	
 	/**

@@ -44,7 +44,7 @@ public class StaticServableTest extends ServableTestBase {
 	@Before
 	public void before() {
 		
-		ss = new StaticServable(configuration, resourceFinder);
+		ss = new StaticServable(arguments, resourceFinder);
 	}
 
 	@Test

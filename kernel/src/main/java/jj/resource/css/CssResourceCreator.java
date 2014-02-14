@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 
 import jj.SHA1Helper;
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.logging.EmergencyLogger;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.Resource;
@@ -53,7 +53,7 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private static final Pattern URL = Pattern.compile("url\\((['\"])?(.+?)\\1?\\)");
 	private static final Pattern ABSOLUTE = Pattern.compile("^(?:https?:)?//");
 	
-	private final Configuration configuration;
+	private final Arguments arguments;
 	private final LessProcessor lessProcessor;
 	private final ResourceFinder resourceFinder;
 	private final Logger logger;
@@ -61,13 +61,13 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	
 	@Inject
 	CssResourceCreator(
-		final Configuration configuration,
+		final Arguments arguments,
 		final LessProcessor lessProcessor,
 		final ResourceFinder resourceFinder,
 		final @EmergencyLogger Logger logger,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.configuration = configuration;
+		this.arguments = arguments;
 		this.lessProcessor = lessProcessor;
 		this.resourceFinder = resourceFinder;
 		this.logger = logger;
@@ -101,10 +101,10 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private Path path(final String baseName, Object... args) {
 		
 		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
-			return configuration.appPath().resolve(toLess(baseName));
+			return arguments.appPath().resolve(toLess(baseName));
 			
 		}
-		return configuration.appPath().resolve(baseName);
+		return arguments.appPath().resolve(baseName);
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 					baseName = replacement.substring(1);
 				} else {
 					baseName = 
-						configuration
+						arguments
 							.appPath()
 							.relativize(resource.path().resolveSibling(replacement))
 							.normalize()

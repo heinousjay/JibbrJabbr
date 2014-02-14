@@ -78,7 +78,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	
 	@Override
 	protected CssResourceCreator toTest() {
-		return new CssResourceCreator(configuration, lessProcessor, resourceFinder, logger, creator);
+		return new CssResourceCreator(arguments, lessProcessor, resourceFinder, logger, creator);
 	}
 	
 	ResourceMaker resourceMaker;
@@ -87,8 +87,8 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	@Mock Logger logger;
 	
 	protected void before() throws Exception {
-		lessProcessor = spy(new LessProcessor(configuration, new RealRhinoContextProvider(), mock(Publisher.class)));
-		resourceMaker = new ResourceMaker(configuration, logger);
+		lessProcessor = spy(new LessProcessor(arguments, new RealRhinoContextProvider(), mock(Publisher.class)));
+		resourceMaker = new ResourceMaker(configuration, arguments, logger);
 	}
 
 	@Test

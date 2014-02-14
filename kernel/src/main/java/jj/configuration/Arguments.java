@@ -15,6 +15,7 @@
  */
 package jj.configuration;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -26,21 +27,26 @@ import javax.inject.Singleton;
 
 import jj.CommandLine;
 import jj.InitializationException;
+import jj.conversion.Converters;
 
 /**
  * @author jason
  *
  */
 @Singleton
-class Arguments {
+public class Arguments {
+	
+	private static final String APP_PATH_ARG_NAME = "app";
 	
 	private static final Pattern SPLITTER = Pattern.compile("(?<=[^\\s])=(?=[^\\s])");
 	
 	private final Map<String, String> arguments;
+	private final Converters converters;
 
 	@Inject
-	Arguments(final @CommandLine String[] arguments) {
+	Arguments(final @CommandLine String[] arguments, final Converters converters) {
 		this.arguments = readArguments(arguments);
+		this.converters = converters;
 	}
 
 	/**
@@ -65,7 +71,15 @@ class Arguments {
 		return Collections.unmodifiableMap(result);
 	}
 	
-	String get(final String name) {
+	public Path appPath() {
+		return get(APP_PATH_ARG_NAME, Path.class);
+	}
+	
+	public <T> T get(final String name, final Class<T> type) {
+		return converters.convert(arguments.get(name), type);
+	}
+	
+	public String get(final String name) {
 		return arguments.get(name);
 	}
 	

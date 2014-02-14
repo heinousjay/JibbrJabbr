@@ -86,7 +86,7 @@ public class ModuleScriptEnvironmentCreatorTest extends ResourceBase<ModuleScrip
 	}
 	
 	private void givenMinimalServices() throws Exception {
-		resourceMaker = new ResourceMaker(configuration);
+		resourceMaker = new ResourceMaker(configuration, arguments);
 		
 		contextProvider = new MockRhinoContextProvider();
 		given(contextProvider.context.newObject(any(Scriptable.class))).willReturn(local);

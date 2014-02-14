@@ -18,13 +18,7 @@ package jj.configuration;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
-import java.nio.file.Path;
-import java.util.Set;
-
-import jj.BasePath;
 import jj.configuration.Configuration;
-import jj.conversion.Converter;
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 import jj.http.server.HttpServerSocketConfiguration;
@@ -46,7 +40,6 @@ import org.slf4j.Logger;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.TypeLiteral;
 
 /**
  * @author jason
@@ -71,56 +64,33 @@ public class ConfigurationTest {
 	}
 	
 	
-	Path realPath;
-	String argument;
-	Configuration toTest;
-	ConfigurationClassLoader classLoader;
-	Set<Converter<?, ?>> converterSet;
-	Converters converters;
-	@Mock ResourceFinder resourceFinder;
-	@Mock Logger logger;
+	private Configuration toTest;
+	private ConfigurationClassLoader classLoader;
+	private @Mock ResourceFinder resourceFinder;
+	private @Mock Logger logger;
 
 	@Before 
 	public void before() throws Exception {
-
-		converterSet = ConverterSetMaker.converters();
-		converters = new Converters(converterSet);
 		
 		classLoader = new ConfigurationClassLoader();
-		realPath = BasePath.appPath();
-		argument = "app=" + realPath.toString();
 		given(resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS)).willReturn(ConfigResourceMaker.configResource());
 	}
 	
-	private Injector makeInjector(final String[] args) {
+	private Injector makeInjector() {
 		return Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
-				bind(String[].class).toInstance(args);
+				bind(Converters.class).toInstance(new Converters(ConverterSetMaker.converters()));
 				bind(ResourceFinder.class).toInstance(resourceFinder);
-				bind(new TypeLiteral<Set<Converter<?, ?>>>() {}).toInstance(converterSet);
 				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
 			}
 		});
 	}
 	
 	private Configuration config() throws Exception {
-		return config(new String[0]);
-	}
-	
-	private Configuration config(String[] args) throws Exception {
 		
-		return new Configuration(new Arguments(args), converters, classLoader, makeInjector(args));
-	}
-	
-	@Test
-	public void testAppPath() throws Exception {
-		toTest = config(new String[]{
-			argument
-		});
-		
-		assertThat(toTest.appPath(), is(realPath));
+		return new Configuration(classLoader, makeInjector());
 	}
 	
 	@Test

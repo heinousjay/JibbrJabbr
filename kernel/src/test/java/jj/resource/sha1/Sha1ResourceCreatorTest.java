@@ -36,7 +36,7 @@ public class Sha1ResourceCreatorTest extends ResourceBase<Sha1Resource, Sha1Reso
 
 	@Override
 	protected Sha1ResourceCreator toTest() {
-		return new Sha1ResourceCreator(configuration, creator);
+		return new Sha1ResourceCreator(arguments, creator);
 	}
 
 }

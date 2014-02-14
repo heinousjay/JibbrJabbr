@@ -24,7 +24,7 @@ public class CssServableTest extends ServableTestBase{
 	@Before
 	public void before() {
 		
-		cs = new CssServable(configuration, resourceFinder);
+		cs = new CssServable(arguments, resourceFinder);
 	}
 
 	@Test

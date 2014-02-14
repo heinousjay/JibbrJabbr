@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -33,15 +33,15 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 
-	private final Configuration configuration;
+	private final Arguments arguments;
 	private final ResourceInstanceCreator creator;
 	
 	@Inject
 	SpecResourceCreator(
-		final Configuration configuration,
+		final Arguments arguments,
 		final ResourceInstanceCreator creator
 	) {
-		this.configuration = configuration;
+		this.arguments = arguments;
 		this.creator = creator;
 	}
 
@@ -75,7 +75,7 @@ public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 	}
 	
 	private Path basePath() {
-		return configuration.appPath().resolveSibling("specs");
+		return arguments.appPath().resolveSibling("specs");
 	}
 
 }

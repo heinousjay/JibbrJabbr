@@ -59,6 +59,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 
 /**
+ * TODO - this could be better?
+ * 
  * @author jason
  *
  */

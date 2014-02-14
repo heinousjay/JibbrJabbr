@@ -19,6 +19,7 @@ import static org.mockito.BDDMockito.*;
 
 import org.slf4j.Logger;
 
+import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 import jj.resource.document.HtmlResource;
 import jj.resource.document.HtmlResourceMaker;
@@ -34,30 +35,30 @@ import jj.resource.stat.ic.StaticResourceMaker;
 public class ResourceMaker {
 	
 	private final Logger logger;
-	private final Configuration configuration;
+	private final Arguments arguments;
 	private final ResourceInstanceCreator creator;
 	
-	public ResourceMaker(Configuration configuration) throws Exception {
-		this.configuration = configuration;
+	public ResourceMaker(final Configuration configuration, final Arguments arguments) throws Exception {
+		this.arguments = arguments;
 		logger = mock(Logger.class);
 		creator = ResourceInstanceCreatorTest.creator(configuration, logger);
 	}
 	
-	public ResourceMaker(Configuration configuration, Logger logger) throws Exception {
-		this.configuration = configuration;
+	public ResourceMaker(Configuration configuration, final Arguments arguments, Logger logger) throws Exception {
+		this.arguments = arguments;
 		this.logger = logger;
 		creator = ResourceInstanceCreatorTest.creator(configuration, logger);
 	}
 
 	public StaticResource makeStatic(String baseName) throws Exception {
-		return StaticResourceMaker.make(configuration, creator, baseName);
+		return StaticResourceMaker.make(arguments, creator, baseName);
 	}
 	
 	public HtmlResource makeHtml(String baseName) throws Exception {
-		return HtmlResourceMaker.make(configuration, creator, baseName);
+		return HtmlResourceMaker.make(arguments, creator, baseName);
 	}
 	
 	public ScriptResource makeScript(String baseName) throws Exception {
-		return ScriptResourceMaker.make(configuration, creator, baseName);
+		return ScriptResourceMaker.make(arguments, creator, baseName);
 	}
 }

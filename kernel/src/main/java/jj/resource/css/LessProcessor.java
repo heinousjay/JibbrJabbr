@@ -32,7 +32,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.event.Publisher;
 import jj.script.RhinoContext;
 
@@ -95,18 +95,13 @@ class LessProcessor {
 		
 		private static final long serialVersionUID = -1L;
 		
-		private final Configuration configuration;
-		
-		ReadFileFunction(final Configuration configuration) {
-			this.configuration = configuration;
-		}
 		
 		@Override
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			String resourceName = String.valueOf(args[0]);
 			try {
 				publisher.publish(new LoadLessResource(resourceName));
-				return new String(Files.readAllBytes(configuration.appPath().resolve(resourceName)), UTF_8);
+				return new String(Files.readAllBytes(arguments.appPath().resolve(resourceName)), UTF_8);
 			} catch (IOException io) {
 				publisher.publish(new ErrorLoadingLessResource(resourceName, io));
 			}
@@ -115,17 +110,17 @@ class LessProcessor {
 	}
 
 	private final ScriptableObject global;
-	private final Configuration configuration;
+	private final Arguments arguments;
 	private final Provider<RhinoContext> contextProvider;
 	private final Publisher publisher;
 	
 	@Inject
 	LessProcessor(
-		final Configuration configuration,
+		final Arguments arguments,
 		final Provider<RhinoContext> contextProvider,
 		final Publisher publisher
 	) throws IOException {
-		this.configuration = configuration;
+		this.arguments = arguments;
 		this.contextProvider = contextProvider;
 		this.publisher = publisher;
 		global = makeGlobal();
@@ -157,7 +152,7 @@ class LessProcessor {
 		
 		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			ScriptableObject global = context.initStandardObjects(true);
-			global.defineProperty("readFile", new ReadFileFunction(configuration), ScriptableObject.EMPTY);
+			global.defineProperty("readFile", new ReadFileFunction(), ScriptableObject.EMPTY);
 			global.defineProperty("name", new NameFunction(), ScriptableObject.EMPTY);
 			global.defineProperty("lessOptions", new LessOptionsFunction(), ScriptableObject.EMPTY);
 			context.evaluateString(global, lessScript(), SCRIPT_NAME);

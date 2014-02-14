@@ -74,6 +74,6 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 	
 	@Override
 	protected HtmlResourceCreator toTest() {
-		return new HtmlResourceCreator(configuration, creator);
+		return new HtmlResourceCreator(arguments, creator);
 	}
 }

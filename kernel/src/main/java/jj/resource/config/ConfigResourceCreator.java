@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -33,12 +33,12 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
-	private final Configuration configuration;
+	private final Arguments configuration;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	ConfigResourceCreator(
-		final Configuration configuration,
+		final Arguments configuration,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.configuration = configuration;

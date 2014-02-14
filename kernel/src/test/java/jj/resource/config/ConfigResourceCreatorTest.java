@@ -53,6 +53,6 @@ public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, Conf
 	
 	@Override
 	protected ConfigResourceCreator toTest() {
-		return new ConfigResourceCreator(configuration, creator);
+		return new ConfigResourceCreator(arguments, creator);
 	}
 }

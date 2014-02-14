@@ -15,7 +15,7 @@
  */
 package jj.resource.document;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.document.HtmlResource;
 import jj.resource.document.HtmlResourceCreator;
@@ -25,11 +25,11 @@ import jj.resource.document.HtmlResourceCreator;
  *
  */
 public class HtmlResourceMaker {
-	public static HtmlResource make(Configuration configuration, ResourceInstanceCreator creator, String baseName) throws Exception {
-		return new HtmlResourceCreator(configuration, creator).create(baseName);
+	public static HtmlResource make(Arguments arguments, ResourceInstanceCreator creator, String baseName) throws Exception {
+		return new HtmlResourceCreator(arguments, creator).create(baseName);
 	}
 	
-	public static HtmlResourceCreator fake(Configuration configuration) {
-		return new HtmlResourceCreator(configuration, null);
+	public static HtmlResourceCreator fake(Arguments arguments) {
+		return new HtmlResourceCreator(arguments, null);
 	}
 }

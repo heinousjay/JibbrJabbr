@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
@@ -21,10 +21,10 @@ class CssServable extends Servable<CssResource> {
 	
 	@Inject
 	CssServable(
-		final Configuration configuration,
+		final Arguments arguments,
 		final ResourceFinder resourceFinder
 	) {
-		super(configuration);
+		super(arguments);
 		this.resourceFinder = resourceFinder;
 	}
 

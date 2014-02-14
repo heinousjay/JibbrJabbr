@@ -17,8 +17,15 @@ package jj.configuration;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import jj.InitializationException;
 
+import java.util.Set;
+
+import jj.InitializationException;
+import jj.conversion.Converter;
+import jj.conversion.ConverterSetMaker;
+import jj.conversion.Converters;
+
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -26,10 +33,20 @@ import org.junit.Test;
  *
  */
 public class ArgumentsTest {
+	
+	Set<Converter<?, ?>> converterSet;
+	Converters converters;
+	
+	@Before
+	public void before() {
+		converterSet = ConverterSetMaker.converters();
+		converters = new Converters(converterSet);
+	}
 
 	@Test
 	public void test() {
-		Arguments a = new Arguments(new String[] {"jay=king","ball=fancy"});
+		
+		Arguments a = new Arguments(new String[] {"jay=king","ball=fancy"}, converters);
 		
 		assertThat(a.get("jay"), is("king"));
 		assertThat(a.get("ball"), is("fancy"));
@@ -38,7 +55,7 @@ public class ArgumentsTest {
 	@Test
 	public void testError() {
 		try {
-			new Arguments(new String[] {"error= awesome","notballs=blocks","balls"});
+			new Arguments(new String[] {"error= awesome","notballs=blocks","balls"}, converters);
 			fail("should have thrown");
 		} catch (InitializationException e) {
 			assertThat(e.getMessage(), is("all arguments must be name=value pairs, the following were not understood\n[error= awesome, balls]"));

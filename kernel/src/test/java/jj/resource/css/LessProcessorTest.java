@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.event.MockPublisher;
 import jj.resource.css.LessProcessor;
 import jj.script.RealRhinoContextProvider;
@@ -46,16 +46,16 @@ public class LessProcessorTest {
 	LessProcessor underTest;
 	Path appPath;
 	String testCss;
-	@Mock Configuration configuration;
+	@Mock Arguments arguments;
 	MockPublisher publisher;
 	
 	@Before
 	public void before() throws Exception {
 		appPath = Paths.get(LessProcessorTest.class.getResource("/jj/resource/test.css").toURI()).getParent();
 		testCss = new String(Files.readAllBytes(appPath.resolve("test.css")), UTF_8);
-		given(configuration.appPath()).willReturn(appPath);
+		given(arguments.appPath()).willReturn(appPath);
 		publisher = new MockPublisher();
-		underTest = new LessProcessor(configuration, new RealRhinoContextProvider(), publisher);
+		underTest = new LessProcessor(arguments, new RealRhinoContextProvider(), publisher);
 	}
 	
 	@Test

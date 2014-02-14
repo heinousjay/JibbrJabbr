@@ -67,7 +67,7 @@ public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentS
 	private void givenMinimalServices() throws Exception {
 		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
 		
-		resourceMaker = new ResourceMaker(configuration);
+		resourceMaker = new ResourceMaker(configuration, arguments);
 		
 		contextProvider = new MockRhinoContextProvider();
 		given(contextProvider.context.newObject(any(Scriptable.class))).willReturn(local);

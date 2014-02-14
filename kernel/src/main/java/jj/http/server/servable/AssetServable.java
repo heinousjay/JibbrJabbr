@@ -1,10 +1,11 @@
 package jj.http.server.servable;
 
 import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.ResourceFinder;
 import jj.resource.asset.AssetResource;
 import jj.uri.URIMatch;
@@ -18,8 +19,8 @@ class AssetServable extends Servable<AssetResource> {
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
-	AssetServable(final Configuration configuration, final ResourceFinder resourceFinder) {
-		super(configuration);
+	AssetServable(final Arguments arguments, final ResourceFinder resourceFinder) {
+		super(arguments);
 		this.resourceFinder = resourceFinder;
 	}
 	

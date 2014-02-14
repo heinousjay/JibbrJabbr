@@ -7,22 +7,22 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
 @Singleton
 public class ScriptResourceCreator extends AbstractResourceCreator<ScriptResource> {
 
-	private final Configuration configuration;
+	private final Arguments arguments;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	ScriptResourceCreator(
-		final Configuration configuration,
+		final Arguments arguments,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.configuration = configuration;
+		this.arguments = arguments;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 	
@@ -42,7 +42,7 @@ public class ScriptResourceCreator extends AbstractResourceCreator<ScriptResourc
 	}
 
 	private Path path(String baseName, Object... args) {
-		return configuration.appPath().resolve(baseName);
+		return arguments.appPath().resolve(baseName);
 	}
 
 	@Override

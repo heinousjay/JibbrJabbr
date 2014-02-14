@@ -48,7 +48,7 @@ public class SpecResourceCreatorTest extends ResourceBase<SpecResource, SpecReso
 
 	@Override
 	protected SpecResourceCreator toTest() {
-		return new SpecResourceCreator(configuration, creator);
+		return new SpecResourceCreator(arguments, creator);
 	}
 
 	@Override

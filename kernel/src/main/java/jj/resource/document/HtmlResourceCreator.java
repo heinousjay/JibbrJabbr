@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -18,15 +18,15 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 		return baseName + ".html";
 	}
 	
-	private final Configuration configuration;
+	private final Arguments arguments;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	HtmlResourceCreator(
-		final Configuration configuration,
+		final Arguments arguments,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.configuration = configuration;
+		this.arguments = arguments;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
@@ -46,7 +46,7 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 	}
 	
 	private Path path(final String baseName, Object...args) {
-		return configuration.appPath().resolve(baseName);
+		return arguments.appPath().resolve(baseName);
 	}
 	
 	@Override

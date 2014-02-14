@@ -15,7 +15,7 @@
  */
 package jj.resource.script;
 
-import jj.configuration.Configuration;
+import jj.configuration.Arguments;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceCreator;
@@ -27,13 +27,13 @@ import jj.resource.script.ScriptResourceCreator;
 public class ScriptResourceMaker {
 
 	/**
-	 * @param configuration
+	 * @param arguments
 	 * @param creator
 	 * @param baseName
 	 * @return
 	 */
-	public static ScriptResource make(Configuration configuration, ResourceInstanceCreator creator, String baseName) throws Exception {
-		return new ScriptResourceCreator(configuration, creator).create(baseName);
+	public static ScriptResource make(Arguments arguments, ResourceInstanceCreator creator, String baseName) throws Exception {
+		return new ScriptResourceCreator(arguments, creator).create(baseName);
 	}
 
 }
