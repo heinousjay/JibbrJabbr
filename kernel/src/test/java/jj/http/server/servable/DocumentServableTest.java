@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
+import jj.configuration.AppLocation;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
@@ -27,6 +27,7 @@ import jj.uri.URIMatch;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
@@ -47,7 +48,7 @@ public class DocumentServableTest extends ServableTestBase {
 		given(parentInjector.createChildInjector(any(AbstractModule.class))).willReturn(parentInjector);
 		given(parentInjector.getInstance(DocumentRequestProcessor.class)).willReturn(requestProcessor);
 		
-		ds = new DocumentServable(arguments, resourceFinder, parentInjector);
+		ds = new DocumentServable(app, resourceFinder, parentInjector);
 	}
 	
 	@Test
@@ -69,7 +70,7 @@ public class DocumentServableTest extends ServableTestBase {
 		
 		given(request.uri()).willReturn("/");
 		given(request.uriMatch()).willReturn(new URIMatch("/index"));
-		given(resourceFinder.loadResource(DocumentScriptEnvironment.class, "index")).willReturn(resource);
+		given(resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, "index")).willReturn(resource);
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);
 		

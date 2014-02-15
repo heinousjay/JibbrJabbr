@@ -18,8 +18,12 @@ package jj.resource;
 import java.nio.file.Path;
 
 /**
- * Small extension to resources which are rooted directly in the
- * filesystem
+ * <p>
+ * Represents a {@link Resource} that lives in the filesystem
+ * somewhere
+ * 
+ * <p>
+ * Do not implement this directly, extend {@link AbstractFileResource}
  * 
  * @author jason
  *

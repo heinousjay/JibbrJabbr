@@ -21,8 +21,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.engine.EngineAPI;
-import jj.execution.IOThread;
+import jj.resource.AbstractResource;
+import jj.resource.IOThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -45,7 +47,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	private final String moduleIdentifier;
 	
-	private final ScriptEnvironment parent;
+	private final RequiredModule requiredModule;
 	
 	// the key of our parent.  gets removed on first read and is null forever after
 	private ContinuationPendingKey pendingKey;
@@ -76,18 +78,20 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		this.moduleIdentifier = moduleIdentifier;
 		
-		parent = requiredModule.parent();
+		this.requiredModule = requiredModule;
 		
 		pendingKey = requiredModule.pendingKey();
 		
-		scriptResource = resourceFinder.loadResource(ScriptResource.class, scriptName());
+		assert ((AbstractResource)requiredModule.parent()).alive(): "cannot require a module for a dead parent";
+		
+		scriptResource = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, scriptName());
 		
 		if (scriptResource == null) {
 			throw new NoSuchResourceException(moduleIdentifier);
 		}
 		
-		scriptResource.addDependent(parent);
-		parent.addDependent(this);
+		scriptResource.addDependent(requiredModule.parent());
+		requiredModule.parent().addDependent(this);
 		
 		sha1 = scriptResource.sha1();
 		scope = createLocalScope(moduleIdentifier, api.global());
@@ -121,7 +125,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 
 	@Override
-	public String baseName() {
+	public String name() {
 		return moduleIdentifier;
 	}
 
@@ -132,12 +136,12 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	@Override
 	protected Object[] creationArgs() {
-		return new Object[] { parent };
+		return new Object[] { requiredModule };
 	}
 	
 	@Override
 	public ScriptEnvironment parent() {
-		return parent;
+		return requiredModule.parent();
 	}
 
 	@Override

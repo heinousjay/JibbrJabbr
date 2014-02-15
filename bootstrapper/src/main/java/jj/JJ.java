@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  * @author Jason Miller
  */
 public final class JJ {
-	
+	// TODO MARKED FOR DEATH!! let main determine the running state
 	public static final boolean isRunning;
 	
 	private static final String JJ_MAIN_CLASS = "jj.Main";
@@ -59,8 +59,6 @@ public final class JJ {
 		
 		isRunning = result;
 	}
-	
-	private static final String COMMONS_DAEMON_PROCESS_ID_KEY = "commons.daemon.process.id";
 
 	private static final Pattern JAR_URL_PARSER = 
 		Pattern.compile("^jar:([^!]+)!.+$");
@@ -158,7 +156,7 @@ public final class JJ {
 		}).start();
 		
 		try {
-			final JJ jj = new JJ(true).init(args);
+			final JJ jj = new JJ().init(args);
 
 			jj.start();
 			
@@ -181,27 +179,12 @@ public final class JJ {
 	
 	private Class<?> mainClass;
 	private Object mainInstance;
-	private boolean daemonStart = System.getProperty(COMMONS_DAEMON_PROCESS_ID_KEY) != null;
 	
-	public JJ() {
-		if (initialized) {
-			throw new AssertionError("Already run once.");
-		}
-		
-//		for (String key : System.getProperties().stringPropertyNames()) {
-//			System.err.printf("%s = %s\n", key, System.getProperty(key));
-//		}
-	}
-	
-	private JJ(boolean internal) {
-		if (daemonStart) {
-			throw new AssertionError("Main called under a daemon");
-		}
-	}
+	private JJ() {}
 	
 	private boolean processBootstrapArgs(String[] args) {
 		// we install regardless
-		if (!daemonStart && args.length == 1 && "install".equals(args[0])) {
+		if (args.length == 1 && "install".equals(args[0])) {
 			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
 			System.out.println("⟾⟾");
 			System.out.println("⟾⟾ JibbrJabbr installed to: ");
@@ -235,13 +218,15 @@ public final class JJ {
 			throw new IllegalStateException("Already run once.");
 		}
 		initialized = true;
+		Jars systemJars = null;
+		
 		if (myJarPath != null) {
 			
 			System.out.println("Checking installation");
 			installer = new BootstrapInstaller(myJarPath);
-			if (processBootstrapArgs(args) && !daemonStart) return this;
-
-			mainClass = new BootstrapClassLoader(installer.systemPath).loadClass(JJ_MAIN_CLASS);
+			if (processBootstrapArgs(args)) return this;
+			systemJars = new Jars(installer.systemPath);
+			mainClass = new BootstrapClassLoader(systemJars).loadClass(JJ_MAIN_CLASS);
 			
 		} else {
 			System.out.println("⟾⟾⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾ ⟾⟾");
@@ -255,13 +240,28 @@ public final class JJ {
 			return this;
 		}
 		
-		makeMain(args);
+		makeMain(args, systemJars);
 		
 		return this;
 	}
 	
-	private void makeMain(String[] args) throws Exception {
+	private void makeMain(String[] args, Jars systemJars) throws Exception {
 		// counts a ticker on the console while it starts
+		
+		try { 
+			mainInstance = mainClass.getConstructor(args.getClass()).newInstance((Object)args);
+			mainClass.getMethod("systemJars", Jars.class).invoke(mainInstance, systemJars);
+		} catch (InvocationTargetException ite) {
+			messageInitError(ite.getCause());
+		} catch (Throwable t) {
+			messageInitError(t);
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	private CountDownLatch startTicker() {
 		final CountDownLatch latch = new CountDownLatch(1);
 		new Thread(new Runnable() {
 			
@@ -276,16 +276,7 @@ public final class JJ {
 				System.out.println();
 			}
 		}).start();
-		
-		try { 
-			mainInstance = mainClass.getConstructor(args.getClass(), Boolean.TYPE).newInstance(args, daemonStart);
-		} catch (InvocationTargetException ite) {
-			messageInitError(ite.getCause());
-		} catch (Throwable t) {
-			messageInitError(t);
-		} finally {
-			latch.countDown();
-		}
+		return latch;
 	}
 	
 	private void messageInitError(Throwable cause) {
@@ -296,10 +287,13 @@ public final class JJ {
 
 	public void start() throws Exception {
 		if (mainInstance != null) {
+			final CountDownLatch latch = startTicker();
 			try {
 				mainClass.getMethod("start").invoke(mainInstance);
 			} catch (InvocationTargetException ite) {
 				messageInitError(ite.getCause());
+			} finally {
+				latch.countDown();
 			}
 		}
 	}

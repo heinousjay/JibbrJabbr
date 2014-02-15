@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceEvent;
@@ -90,7 +91,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private void loadEnvironment(final RequiredModule requiredModule) {
 		
-		resourceLoader.loadResource(ModuleScriptEnvironment.class, requiredModule.identifier(), requiredModule);
+		resourceLoader.loadResource(ModuleScriptEnvironment.class, AppLocation.Virtual, requiredModule.identifier(), requiredModule);
 		Boolean result = waiters.putIfAbsent(requiredModule, Boolean.TRUE);
 		assert (result == null) : "something is crossed up in the " + getClass();
 	}
@@ -103,6 +104,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		ModuleScriptEnvironment scriptEnvironment = 
 			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
+				AppLocation.Virtual,
 				requiredModule.identifier(),
 				requiredModule
 			);

@@ -30,7 +30,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 
 import jj.SHA1Helper;
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.logging.EmergencyLogger;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.Resource;
@@ -53,7 +54,7 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private static final Pattern URL = Pattern.compile("url\\((['\"])?(.+?)\\1?\\)");
 	private static final Pattern ABSOLUTE = Pattern.compile("^(?:https?:)?//");
 	
-	private final Arguments arguments;
+	private final Application app;
 	private final LessProcessor lessProcessor;
 	private final ResourceFinder resourceFinder;
 	private final Logger logger;
@@ -61,13 +62,13 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	
 	@Inject
 	CssResourceCreator(
-		final Arguments arguments,
+		final Application app,
 		final LessProcessor lessProcessor,
 		final ResourceFinder resourceFinder,
 		final @EmergencyLogger Logger logger,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.arguments = arguments;
+		this.app = app;
 		this.lessProcessor = lessProcessor;
 		this.resourceFinder = resourceFinder;
 		this.logger = logger;
@@ -90,44 +91,45 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 			DOT_CSS.matcher(name).find();
 	}
 	
+	private boolean isLess(Object[] args) {
+		return args != null && args.length == 1 && args[0] instanceof Boolean && Boolean.TRUE.equals(args[0]);
+	}
+	
 	@Override
-	protected URI uri(String baseName, Object... args) {
-		return path(baseName, args).toUri();
+	protected URI uri(final AppLocation base, String name, Object... args) {
+		return path(base, name, isLess(args)).toUri();
 	}
 	
 	/**
 	 * takes one parameter, if Boolean.TRUE then this tries to load a .less file
 	 */
-	private Path path(final String baseName, Object... args) {
+	private Path path(final AppLocation base, final String name, boolean less) {
 		
-		if (args != null && args.length == 1 && Boolean.TRUE.equals(args[0])) {
-			return arguments.appPath().resolve(toLess(baseName));
-			
-		}
-		return arguments.appPath().resolve(baseName);
+		return less ? app.resolvePath(base, toLess(name)) : app.resolvePath(base, name);
 	}
 
 	@Override
-	public CssResource create(String baseName, Object... args) throws IOException {
-		boolean less = args.length == 1 && Boolean.TRUE.equals(args[0]);
-		
+	public CssResource create(final AppLocation base, final String name, final Object... args) throws IOException {
+		boolean less = isLess(args);
+		// this will need some help running less correctly again
+		// but i want to make it a script environment anyway
 		CssResource resource = null;
-		if (Files.exists(path(baseName, less))) {
+		if (Files.exists(path(base, name, less))) {
 		
 			resource = instanceModuleCreator.createResource(
 				CssResource.class,
-				cacheKey(baseName, less),
-				baseName,
-				path(baseName, less),
+				cacheKey(base, less ? toLess(name) : name),
+				base,
+				less ? toLess(name) : name,
 				less
 			);
 			
 			String processed = fixUris(
-				less ? lessProcessor.process(toLess(baseName)) : resource.byteBuffer.toString(UTF_8),
+				less ? lessProcessor.process(toLess(name)) : resource.byteBuffer.toString(UTF_8),
 				resource
 			);
 			resource.byteBuffer.clear().writeBytes(processed.getBytes(UTF_8));
-			resource.sha1(SHA1Helper.keyFor(resource.byteBuffer));
+			resource.sha1(SHA1Helper.keyFor(resource.byteBuffer)).uri(name);
 		}
 		return resource;
 	}
@@ -163,32 +165,32 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 			String replacement = matcher.group(2);
 			if (!ABSOLUTE.matcher(replacement).find()) {
 				
-				String baseName;
+				String name;
 				if (replacement.startsWith("/")) {
-					baseName = replacement.substring(1);
+					name = replacement.substring(1);
 				} else {
-					baseName = 
-						arguments
-							.appPath()
+					name = 
+						app
+							.path()
 							.relativize(resource.path().resolveSibling(replacement))
 							.normalize()
 							.toString();
 				
 				}
-				Resource dependency = resourceFinder.loadResource(type, baseName);
+				Resource dependency = resourceFinder.loadResource(type, AppLocation.Base, name);
 				
 				if (dependency != null) {
 					dependency.addDependent(resource);
-					URIMatch uriMatch = new URIMatch("/" + baseName);
+					URIMatch uriMatch = new URIMatch("/" + name);
 					if (!uriMatch.versioned) {
 						// we only want to replace uris that weren't already versioned
 						replacement = dependency.uri();
 					} else {
 						// replace with the absolute path
-						replacement = "/" + baseName;
+						replacement = "/" + name;
 					}
 				} else {
-					logger.warn("CSS file {} references {} (as {}), which does not exist", resource.baseName(), baseName, matcher.group());
+					logger.warn("CSS file {} references {} (as {}), which does not exist", resource.name(), name, matcher.group());
 				}
 				
 				matcher.appendReplacement(sb, prefix + replacement + suffix);

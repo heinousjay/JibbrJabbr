@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.JJServerStartupListener;
+import jj.configuration.AppLocation;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
@@ -56,8 +57,8 @@ public class SpecRunner implements JJServerStartupListener {
 	@Listener
 	void findAndExecuteSpec(final ScriptEnvironmentInitialized event) {
 		String name = event.scriptEnvironment().scriptName();
-		ScriptResource scriptResource = resourceFinder.findResource(ScriptResource.class, name);
-		SpecResource specResource = resourceFinder.findResource(SpecResource.class, name);
+		ScriptResource scriptResource = resourceFinder.findResource(ScriptResource.class, AppLocation.Base, name);
+		SpecResource specResource = resourceFinder.findResource(SpecResource.class, AppLocation.Base, name);
 		
 		if (specResource != null) {
 			

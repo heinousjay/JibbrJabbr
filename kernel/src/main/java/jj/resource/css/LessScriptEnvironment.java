@@ -64,7 +64,7 @@ public class LessScriptEnvironment extends AbstractScriptEnvironment {
 	}
 
 	@Override
-	public String baseName() {
+	public String name() {
 		// TODO Auto-generated method stub
 		return null;
 	}

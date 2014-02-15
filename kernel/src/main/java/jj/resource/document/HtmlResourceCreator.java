@@ -2,12 +2,11 @@ package jj.resource.document;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -18,15 +17,15 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 		return baseName + ".html";
 	}
 	
-	private final Arguments arguments;
+	private final Application app;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	HtmlResourceCreator(
-		final Arguments arguments,
+		final Application app,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.arguments = arguments;
+		this.app = app;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
@@ -41,16 +40,12 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 	}
 	
 	@Override
-	protected URI uri(String baseName, Object... args) {
-		return path(baseName).toUri();
-	}
-	
-	private Path path(final String baseName, Object...args) {
-		return arguments.appPath().resolve(baseName);
+	protected URI uri(final AppLocation base, final String name, final Object... args) {
+		return app.resolvePath(base, name).toUri();
 	}
 	
 	@Override
-	public HtmlResource create(final String baseName, final Object...args) throws IOException {
-		return instanceModuleCreator.createResource(HtmlResource.class, cacheKey(baseName), baseName, path(baseName));
+	public HtmlResource create(final AppLocation base, final String name, final Object...args) throws IOException {
+		return instanceModuleCreator.createResource(HtmlResource.class, cacheKey(base, name), base, name);
 	}
 }

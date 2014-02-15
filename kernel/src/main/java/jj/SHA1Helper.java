@@ -1,7 +1,6 @@
 package jj;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
@@ -9,12 +8,13 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import jj.execution.IOThread;
+import jj.resource.IOThread;
 
 /** 
  * 
@@ -80,11 +80,18 @@ public enum SHA1Helper {
 	
 	@IOThread
 	public static String keyFor(final Path path) throws IOException {
-		try (FileChannel channel = (FileChannel)Files.newByteChannel(path)) {
-			MappedByteBuffer buffer = channel.map(MapMode.READ_ONLY, 0, Files.size(path));
-			sha1.get().update(buffer);
+		try (SeekableByteChannel channel = Files.newByteChannel(path)) {
+			if (channel instanceof FileChannel) { 
+				map(path, (FileChannel)channel);
+				return toHex(sha1.get().digest());
+			} else {
+				return keyFor(Files.readAllBytes(path));
+			}
 		}
-		
-		return toHex(sha1.get().digest());
+	}
+	
+	private static void map(final Path path, final FileChannel channel) throws IOException {
+		MappedByteBuffer buffer = channel.map(MapMode.READ_ONLY, 0, Files.size(path));
+		sha1.get().update(buffer);
 	}
 }

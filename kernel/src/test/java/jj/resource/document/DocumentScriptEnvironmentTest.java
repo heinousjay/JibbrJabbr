@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 
 import jj.Closer;
+import jj.configuration.AppLocation;
 import jj.engine.EngineAPI;
 import jj.execution.ExecutionEvent;
 import jj.http.server.CurrentWebSocketConnection;
@@ -88,19 +89,19 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
-		given(resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName))).willReturn(html);
+		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, HtmlResourceCreator.resourceName(baseName))).willReturn(html);
 	}
 
 	private void givenAClientScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenASharedScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenAServerScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
 	}
 	
 	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {

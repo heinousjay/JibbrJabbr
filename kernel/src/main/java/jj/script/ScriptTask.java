@@ -59,7 +59,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends JJTask {
 		} else if (result != null) {
 			resume();
 		} else {
-			throw new AssertionError("did you mess with the pendingKey and/or result?");
+			throw new AssertionError("did you mess with the pendingKey and/or result?\npendingKey = " + pendingKey + "\nresult = " + result);
 		}
 		
 		if (pendingKey == null) {

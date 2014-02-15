@@ -19,12 +19,12 @@ import jj.resource.document.HtmlResourceCreator;
 public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlResourceCreator> {
 
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return "index.html";
 	}
 	
 	protected Path path() {
-		return appPath.resolve(baseName());
+		return appPath.resolve(name());
 	}
 	
 	@Override
@@ -47,7 +47,7 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 			}
 		});
 		
-		return new HtmlResource(configuration, logger, cacheKey(), baseName(), path());
+		return new HtmlResource(configuration, logger, cacheKey(), name(), path());
 	}
 	
 	@Override
@@ -74,6 +74,6 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 	
 	@Override
 	protected HtmlResourceCreator toTest() {
-		return new HtmlResourceCreator(arguments, creator);
+		return new HtmlResourceCreator(app, creator);
 	}
 }

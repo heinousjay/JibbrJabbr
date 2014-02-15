@@ -81,7 +81,7 @@ public class WebSocketConnection implements FunctionContext, ResourceAware {
 	}
 	
 	public String baseName() {
-		return webSocketConnectionHost().baseName();
+		return webSocketConnectionHost().name();
 	}
 	
 	public WebSocketConnectionHost webSocketConnectionHost() {

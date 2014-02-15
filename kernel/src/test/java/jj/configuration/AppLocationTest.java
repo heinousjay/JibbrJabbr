@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.configuration;
+
+import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.*;
+import static jj.configuration.AppLocation.*;
+
+import java.util.List;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public abstract class IOTask extends JJTask {
-	
-	protected IOTask(String name) {
-		super(name);
-	}
-	
-	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(IOExecutor.class).submit(runnable);
+public class AppLocationTest {
+
+	@Test
+	public void test() {
+		List<AppLocation> locations = Base.and(Private).and(Public).locations();
+		
+		assertThat(locations, contains(Base, Private, Public));
 	}
 
 }

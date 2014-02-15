@@ -21,8 +21,8 @@ import static org.mockito.BDDMockito.*;
 import jj.http.server.MockServablesRule;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.ResourceUrlDocumentFilter;
-import jj.resource.asset.AssetResource;
 import jj.resource.css.CssResource;
+import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.jsoup.Jsoup;
@@ -49,7 +49,7 @@ public class ResourceUrlDocumentFilterTest {
 	
 	@Mock CssResource cssResource;
 	@Mock StaticResource staticResource;
-	@Mock AssetResource assetResource;
+	@Mock Sha1Resource sha1Resource;
 	
 	ResourceUrlDocumentFilter filter;
 	
@@ -70,8 +70,8 @@ public class ResourceUrlDocumentFilterTest {
 		given(m.servables.loadResource(m.cssUri)).willReturn(cssResource);
 		given(cssResource.uri()).willReturn("/substitutesha" + m.cssUri.uri);
 		
-		given(m.servables.loadResource(m.assetUri)).willReturn(assetResource);
-		given(assetResource.uri()).willReturn("/substitutesha" + m.assetUri.uri);
+		given(m.servables.loadResource(m.assetUri)).willReturn(sha1Resource);
+		given(sha1Resource.uri()).willReturn("/substitutesha" + m.assetUri.uri);
 		
 		given(m.servables.loadResource(m.staticUri)).willReturn(staticResource);
 		given(staticResource.uri()).willReturn("/substitutesha" + m.staticUri.uri);

@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.JJServerStartupListener;
-import jj.execution.IOTask;
 import jj.execution.TaskRunner;
+import jj.resource.IOTask;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 
@@ -64,7 +64,7 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 				
 				@Override
 				public void run() {
-					ConfigResource config = resourceFinder.loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+					ConfigResource config = resourceFinder.loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
 					if (config != null) {
 						log.info("Found configuration at {}", config.path());
 					} else {

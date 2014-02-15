@@ -18,6 +18,8 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import jj.StringUtils;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
@@ -47,6 +49,8 @@ public class JibbrJabbrTestServer implements TestRule {
 	
 	private boolean httpServer = false;
 	
+	private int port = 0;
+	
 	private Object instance;
 	
 	private Injector injector;
@@ -68,6 +72,12 @@ public class JibbrJabbrTestServer implements TestRule {
 	
 	public JibbrJabbrTestServer withHttpServer() {
 		httpServer = true;
+		return this;
+	}
+	
+	public JibbrJabbrTestServer withHttpServerOnPort(int port) {
+		httpServer = true;
+		this.port = port;
 		return this;
 	}
 	
@@ -102,7 +112,21 @@ public class JibbrJabbrTestServer implements TestRule {
 			statement = createInjectionStatement(base);
 		}
 		
-		injector = Guice.createInjector(Stage.PRODUCTION, new TestModule(this, appPath, statement, description));
+		ArrayList<String> builder = new ArrayList<>();
+		builder.add("app=" + appPath);
+		builder.add("fileWatcher=" + fileWatcher);
+		
+		// these don't work yet!
+		builder.add("httpServer=" + httpServer);
+		if (port > 1024 && port < 65536) {
+			builder.add("port=" + port);
+		}
+		
+		injector = Guice.createInjector(
+			Stage.PRODUCTION,
+			new TestModule(this, builder.toArray(new String[builder.size()]), statement, description)
+		);
+		
 		return injector.getInstance(AppStatement.class);
 	}
 	

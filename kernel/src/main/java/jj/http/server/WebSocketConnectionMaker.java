@@ -32,6 +32,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
@@ -102,7 +103,7 @@ class WebSocketConnectionMaker {
 					
 					URIMatch uriMatch = new URIMatch(request.getUri());
 					final DocumentScriptEnvironment scriptEnvironment =
-						resourceFinder.findResource(DocumentScriptEnvironment.class, uriMatch.name);
+						resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, uriMatch.name);
 					
 					if (scriptEnvironment == null) {
 						

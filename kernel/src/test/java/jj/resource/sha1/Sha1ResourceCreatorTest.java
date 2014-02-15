@@ -21,22 +21,22 @@ public class Sha1ResourceCreatorTest extends ResourceBase<Sha1Resource, Sha1Reso
 	}
 
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return "not.real.test.sha1";
 	}
 
 	protected Path path() {
-		return appPath.resolve(baseName());
+		return appPath.resolve(name());
 	}
 
 	@Override
 	protected Sha1Resource resource() throws Exception {
-		return new Sha1Resource(cacheKey(), baseName(), path());
+		return new Sha1Resource(cacheKey(), name(), path());
 	}
 
 	@Override
 	protected Sha1ResourceCreator toTest() {
-		return new Sha1ResourceCreator(arguments, creator);
+		return new Sha1ResourceCreator(app, creator);
 	}
 
 }

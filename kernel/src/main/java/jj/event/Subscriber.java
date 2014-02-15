@@ -21,9 +21,8 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a class as subscribing to events.  This is mainly
- * to avoid introspecting every class the system loads.
- * 
- * It's intr
+ * to avoid introspecting every class the system loads and
+ * may go away.
  * 
  * @author jason
  *

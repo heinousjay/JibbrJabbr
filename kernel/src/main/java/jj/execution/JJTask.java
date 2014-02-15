@@ -18,6 +18,7 @@ package jj.execution;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
+import jj.resource.IOTask;
 import jj.script.ScriptTask;
 
 /**

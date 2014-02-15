@@ -38,11 +38,11 @@ public class RequiredModule implements Continuation {
 		final ScriptEnvironment parent,
 		final String identifier
 	) {
-		assert parent != null;
-		assert !StringUtils.isEmpty(identifier);
+		assert parent != null : "no required module without a parent!";
+		assert !StringUtils.isEmpty(identifier) : "no required module without an identifier!";
 		this.parent = parent;
 		this.identifier = identifier;
-		this.toString = "required module " + identifier + " under " + parent.baseName();
+		this.toString = "required module " + identifier + " under " + parent.name();
 	}
 	
 	String identifier() {

@@ -17,11 +17,11 @@ package jj.resource.script;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Paths;
 
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
+import jj.configuration.AppLocation;
 import jj.resource.ResourceInstanceCreator;
 import jj.script.AbstractScriptEnvironmentCreator;
 import jj.script.ScriptEnvironmentInitializer;
@@ -59,21 +59,22 @@ public class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCre
 		
 		return creator.createResource(
 			ModuleScriptEnvironment.class,
-			cacheKey(moduleIdentifier, args),
+			cacheKey(Virtual, moduleIdentifier, args),
+			Virtual,
 			moduleIdentifier,
-			Paths.get("/"),
 			args
 		);
 	}
 	
 	@Override
-	protected URI uri(String moduleIdentifier, Object... args) {
+	protected URI uri(AppLocation base, String moduleIdentifier, Object... args) {
 		
 		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
+		// assert base == Virtual : "must be virtual";
 		
 		RequiredModule requiredModule = (RequiredModule)args[0];
 		
-		return URI.create(requiredModule.parent().baseName() + "#" + moduleIdentifier);
+		return URI.create(requiredModule.parent().name() + "#" + moduleIdentifier);
 	}
 
 }

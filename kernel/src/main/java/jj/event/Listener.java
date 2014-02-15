@@ -21,17 +21,24 @@ import java.lang.annotation.Target;
 
 /**
  * <p>
- * Marks a method as an event listener.  The method
+ * Marks a method as an event listener on all injector-created instances
+ * marked as {@link Subscriber}
+ * 
+ * <p>
+ * The method
  * must take a single parameter, which is the event
  * type. The listener can be any access except private.
  * It can return anything at all (including void),
  * but the event system will disregard it.
- * </p>
  * 
  * <p>
  * Events can be any type, or any interface,
- * with the exception of {@link Object}
- * <p>
+ * with the exception of {@link Object}. Event
+ * delivery respects the class hierarchy, so subscribing
+ * to a base event will get delivery for all sub types.
+ * Due to type erasure, generic classes
+ * do not work.
+ * 
  * @author jason
  *
  */

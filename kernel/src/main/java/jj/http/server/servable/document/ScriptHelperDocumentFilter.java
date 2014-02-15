@@ -1,15 +1,16 @@
 package jj.http.server.servable.document;
 
-import static jj.resource.asset.AssetResource.*;
+import static jj.configuration.Assets.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
 import jj.resource.ResourceFinder;
-import jj.resource.asset.AssetResource;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ScriptResourceType;
+import jj.resource.stat.ic.StaticResource;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -58,7 +59,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			
 			// internal version of jquery
 			// it's versioned already, so no need for sha-ing
-			addScript(documentRequestProcessor.document(), "/" + resourceFinder.findResource(AssetResource.class, JQUERY_JS).baseName());
+			addScript(documentRequestProcessor.document(), "/" + resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JQUERY_JS).name());
 			
 			// jj script
 			String wsURI = "ws" + 
@@ -68,7 +69,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				scriptEnvironment.socketUri();
 			
 			Element jjScript = 
-				makeScriptTag(documentRequestProcessor.document(), resourceFinder.findResource(AssetResource.class, JJ_JS).uri())
+				makeScriptTag(documentRequestProcessor.document(), resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS).uri())
 				.attr("id", "jj-connector-script")
 				.attr("data-jj-socket-url", wsURI)
 				.attr(

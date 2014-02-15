@@ -22,8 +22,5 @@ public class ServableModule extends JJModule {
 		
 		// StaticServable is always second last
 		servables.addBinding().to(StaticServable.class);
-		
-		// AssetServable is always last
-		servables.addBinding().to(AssetServable.class);
 	}
 }

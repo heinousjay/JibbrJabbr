@@ -18,7 +18,7 @@ package jj.resource;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
+import jj.configuration.AppLocation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,11 +46,15 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		return AbstractFileResource.EMPTY_ARGS;
 	}
 	
-	protected ResourceCacheKey cacheKey() {
-		return toTest.cacheKey(baseName(), args());
+	protected AppLocation location() {
+		return AppLocation.Base;
 	}
 	
-	protected abstract String baseName();
+	protected ResourceCacheKey cacheKey() {
+		return toTest.cacheKey(location(), name(), args());
+	}
+	
+	protected abstract String name();
 	
 	protected abstract U resource() throws Exception;
 	
@@ -68,7 +72,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		before();
 		
-		creator = new ResourceInstanceCreator(injector, logger);
+		creator = new ResourceInstanceCreator(app, injector, logger);
 		
 		toTest = toTest();
 		
@@ -81,7 +85,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 	@Test
 	public void test() throws Exception {
 		
-		U created = toTest.create(baseName(), args()); 
+		U created = toTest.create(location(), name(), args()); 
 		
 		testResource(created);
 		

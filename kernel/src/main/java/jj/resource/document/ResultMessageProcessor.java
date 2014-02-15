@@ -18,6 +18,8 @@ package jj.resource.document;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.Undefined;
+
 import jj.http.server.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.ContinuationCoordinator;
@@ -44,7 +46,7 @@ class ResultMessageProcessor implements DocumentWebSocketMessageProcessor {
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
-		Object value = message.result().value == null ? null : json.parse(message.result().value);
+		Object value = message.result().value == null ? Undefined.instance : json.parse(message.result().value);
 		continuationCoordinator.resume(message.pendingKey(), value);
 	}
 

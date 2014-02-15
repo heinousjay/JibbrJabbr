@@ -33,12 +33,12 @@ import jj.script.RealRhinoContextProvider;
 public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, ConfigResourceCreator> {
 
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return CONFIG_JS;
 	}
 	
 	protected Path path() {
-		return appPath.resolve(baseName());
+		return appPath.resolve(name());
 	}
 	
 	@Override
@@ -53,6 +53,6 @@ public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, Conf
 	
 	@Override
 	protected ConfigResourceCreator toTest() {
-		return new ConfigResourceCreator(arguments, creator);
+		return new ConfigResourceCreator(app, creator);
 	}
 }

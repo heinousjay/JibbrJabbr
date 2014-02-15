@@ -15,7 +15,6 @@
  */
 package jj.configuration;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -35,8 +34,6 @@ import jj.conversion.Converters;
  */
 @Singleton
 public class Arguments {
-	
-	private static final String APP_PATH_ARG_NAME = "app";
 	
 	private static final Pattern SPLITTER = Pattern.compile("(?<=[^\\s])=(?=[^\\s])");
 	
@@ -71,12 +68,13 @@ public class Arguments {
 		return Collections.unmodifiableMap(result);
 	}
 	
-	public Path appPath() {
-		return get(APP_PATH_ARG_NAME, Path.class);
-	}
-	
 	public <T> T get(final String name, final Class<T> type) {
 		return converters.convert(arguments.get(name), type);
+	}
+	
+	public <T> T get(final String name, final Class<T> type, final T defaultValue) {
+		T result = get(name, type);
+		return arguments.containsKey(name) ? (result == null ? defaultValue : result) : defaultValue;
 	}
 	
 	public String get(final String name) {

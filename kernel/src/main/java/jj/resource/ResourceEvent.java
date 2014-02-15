@@ -17,27 +17,46 @@ package jj.resource;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+
+import jj.configuration.AppLocation;
+import jj.execution.ExecutionEvent;
+
 /**
  * the root of the hierarchy of resource events
  * @author jason
  *
  */
-public class ResourceEvent {
+public abstract class ResourceEvent implements ExecutionEvent {
 	
 	public final Class<? extends Resource> resourceClass;
+	public final AppLocation base;
 	public final String name;
 	public final Object[] arguments;
 	
-	protected ResourceEvent(final Class<? extends Resource> resourceClass, final String name, final Object...arguments) {
+	protected ResourceEvent(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
 		this.resourceClass = resourceClass;
+		this.base = base;
 		this.name = name;
 		this.arguments = arguments;
 	}
 	
-	public boolean matches(final Class<? extends Resource> resourceClass, final String name, final Object...arguments) {
+	public boolean matches(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
 		return this.resourceClass == resourceClass &&
+			this.base == base &&
 			this.name.equals(name) &&
 			Arrays.equals(this.arguments, arguments);
+	}
+	
+	public boolean matches(final AbstractResource resource) {
+		return matches(resource.getClass(), resource.cacheKey().base(), resource.name(), resource.creationArgs());
+	}
+	
+	protected abstract String description();
+	
+	@Override
+	public void describeTo(Logger log) {
+		log.info("{} - {} at {}/{}", description(), resourceClass, base, name);
 	}
 
 }

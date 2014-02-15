@@ -1,210 +1,136 @@
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-
+import static jj.configuration.AppLocation.*;
+import jj.configuration.AppLocation;
 import jj.event.Publisher;
-import jj.execution.IsThread;
-import jj.resource.asset.Asset;
-import jj.resource.asset.AssetResource;
-import jj.resource.document.HtmlResource;
-import jj.resource.script.ScriptResource;
-import jj.resource.script.ScriptResourceType;
+import jj.execution.CurrentTask;
+import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
+import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * verifies the POWER
- * @author jason
- *
- */
-public class ResourceFinderImplTest extends RealResourceBase {
+@RunWith(MockitoJUnitRunner.class)
+public class ResourceFinderImplTest {
+	
+	private final String name1 = "index.html";
+	private final String name2 = "output.html";
 
-	ResourceCache resourceCache;
-	ResourceCreators resourceCreators;
+	private @Mock ResourceCache resourceCache;
+	private @Mock ResourceWatchService resourceWatchService;
+	private @Mock Publisher publisher;
+	private @Mock IsThread isThread;
+	private @Mock CurrentTask currentTask;
 	
-	@Mock ResourceWatchService resourceWatchService;
-	@Mock Publisher publisher;
-	@Mock IsThread isThread;
-	@Mock Logger logger;
+	private @InjectMocks ResourceFinderImpl rfi;
 	
-	@Mock AbstractResourceCreator<AssetResource> assetResourceCreator;
-	@Mock AbstractResourceCreator<HtmlResource> htmlResourceCreator;
-	@Mock AbstractResourceCreator<ScriptResource> scriptResourceCreator;
-	@Mock AbstractResourceCreator<StaticResource> staticResourceCreator;
+	private @Mock AbstractResourceCreator<StaticResource> staticResourceCreator;
+	private @Mock AbstractResourceCreator<Sha1Resource> sha1ResourceCreator;
 	
-	@Captor ArgumentCaptor<ResourceEvent> eventCaptor;
+	private @Captor ArgumentCaptor<ResourceEvent> eventCaptor;
 	
-	ResourceFinder rfi;
+	private @Mock StaticResource staticResource1;
+	private @Mock ResourceCacheKey staticResource1Key;
+	private @Mock StaticResource staticResource2;
+	private @Mock ResourceCacheKey staticResource2Key;
 	
-	static class URIAnswer implements Answer<URI> {
+	private @Mock Sha1Resource sha1Resource1;
+	private @Mock ResourceCacheKey sha1Resource1Key;
+	private @Mock Sha1Resource sha1Resource2;
+	private @Mock ResourceCacheKey sha1Resource2Key;
+	
+	private @Mock ResourceCacheKey deadKey;
+	
+	private @Mock IOTask task;
+	
+	@Test
+	public void testFindResource() throws Exception {
 		
-		private final Path appPath;
-		private final String bonus;
+		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
+		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
 		
-		URIAnswer(final Path appPath) {
-			this.appPath = appPath;
-			bonus = null;
-		}
+		given(staticResourceCreator.cacheKey(Base, name1)).willReturn(staticResource1Key);
+		given(resourceCache.get(staticResource1Key)).willReturn(staticResource1);
+		given(sha1ResourceCreator.cacheKey(Base, name2)).willReturn(sha1Resource2Key);
+		given(resourceCache.get(sha1Resource2Key)).willReturn(sha1Resource2);
 		
-		URIAnswer(final Path appPath, final String bonus) {
-			this.appPath = appPath;
-			this.bonus = bonus;
-		}
-
-		@Override
-		public URI answer(InvocationOnMock invocation) throws Throwable {
-			return appPath.resolve(String.valueOf(invocation.getArguments()[0]) + (bonus == null ? "" : bonus)).toUri();
-		}
-	};
+		assertThat(rfi.findResource(StaticResource.class, Base, name1), is(staticResource1));
+		assertThat(rfi.findResource(StaticResource.class, Base, name2), is(nullValue()));
+		assertThat(rfi.findResource(Sha1Resource.class, Base, name2), is(sha1Resource2));
+		assertThat(rfi.findResource(Sha1Resource.class, Base, name1), is(nullValue()));
+	}
 	
-	@Before
-	public void before() throws Exception {
+	@Test
+	public void testFindResourceWithBundle() throws Exception {
 		
-		given(assetResourceCreator.type()).willReturn(AssetResource.class);
-		given(htmlResourceCreator.type()).willReturn(HtmlResource.class);
-		given(scriptResourceCreator.type()).willReturn(ScriptResource.class);
+		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
+		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
+		
+		given(staticResourceCreator.cacheKey(any(AppLocation.class), anyString())).willReturn(deadKey);
+		given(staticResourceCreator.cacheKey(Public, name1)).willReturn(staticResource1Key);
+		given(staticResourceCreator.cacheKey(Assets, name2)).willReturn(staticResource2Key);
+		given(resourceCache.get(staticResource1Key)).willReturn(staticResource1);
+		given(resourceCache.get(staticResource2Key)).willReturn(staticResource2);
+		
+		StaticResource sr = rfi.findResource(
+			StaticResource.class,
+			Public.and(Private).and(Assets),
+			name1
+		);
+		
+		assertThat(sr, is(staticResource1));
+		verify(resourceCache, never()).get(deadKey); // verifying it stopped at public
+		
+		sr = rfi.findResource(
+			StaticResource.class,
+			Public.and(Private).and(Assets),
+			name2
+		);
+		
+		assertThat(sr, is(staticResource2));
+		
+		verify(staticResourceCreator).cacheKey(Public, name2);
+		verify(staticResourceCreator).cacheKey(Private, name2);
+		verify(staticResourceCreator).cacheKey(Assets, name2);
+	}
+	
+	@Test
+	public void testLoadResourceHappyPath() throws Exception {
+		
+		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
 		given(staticResourceCreator.type()).willReturn(StaticResource.class);
+		given(staticResourceCreator.cacheKey(Base, name1)).willReturn(staticResource2Key);
+		given(staticResourceCreator.create(Base, name1)).willReturn(staticResource2);
 		
-		given(assetResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(Asset.appPath));
-		given(htmlResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath, ".html"));
-		given(scriptResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath));
-		given(staticResourceCreator.uri(anyString(), anyVararg())).willAnswer(new URIAnswer(appPath));
-		
-		Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> resourceCreatorsMap = new HashMap<>();
-		resourceCreatorsMap.put(AssetResource.class, assetResourceCreator);
-		resourceCreatorsMap.put(HtmlResource.class, htmlResourceCreator);
-		resourceCreatorsMap.put(ScriptResource.class, scriptResourceCreator);
-		resourceCreatorsMap.put(StaticResource.class, staticResourceCreator);
-		
-		resourceCreators = new ResourceCreators(resourceCreatorsMap);
-		
-		// you can pass null, if you never call start it won't matter
-		resourceCache = new ResourceCacheImpl(resourceCreators, null);
+		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
+		given(sha1ResourceCreator.type()).willReturn(Sha1Resource.class);
+		given(sha1ResourceCreator.cacheKey(Base, name2)).willReturn(sha1Resource1Key);
+		given(sha1ResourceCreator.create(Base, name2)).willReturn(sha1Resource1);
 		
 		given(isThread.forIO()).willReturn(true);
+		given(currentTask.currentAs(IOTask.class)).willReturn(task);
 		
-		rfi = new ResourceFinderImpl(resourceCache, resourceWatchService, publisher, isThread);
-	}
-	
-	@Test
-	public void test() throws IOException {
+		assertThat(rfi.findResource(StaticResource.class, Base, name1), is(nullValue()));
+		assertThat(rfi.findResource(Sha1Resource.class, Base, name2), is(nullValue()));
 		
-		// given
-		String baseName = "index";
-		ScriptResource mockScriptResource = mock(ScriptResource.class);
-		given(scriptResourceCreator.create(eq(ScriptResourceType.Server.suffix(baseName)), anyVararg())).willReturn(mockScriptResource);
+		rfi.loadResource(StaticResource.class, Base, name1);
+		rfi.loadResource(Sha1Resource.class, Base, name2);
 		
-		// when
-		HtmlResource result1 = rfi.findResource(HtmlResource.class, "internal/no-worky");
+		verify(resourceCache).putIfAbsent(staticResource2Key, staticResource2);
+		verify(resourceWatchService).watch(staticResource2);
+		verify(resourceCache).putIfAbsent(sha1Resource1Key, sha1Resource1);
+		verify(resourceWatchService).watch(sha1Resource1);
 		
-		given(isThread.forIO()).willReturn(true);
-		ScriptResource result2 = rfi.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
-		
-		given(isThread.forIO()).willReturn(false);
-		ScriptResource result3 = rfi.findResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
-		
-		// loading again with no changes should result in no changes
-		given(isThread.forIO()).willReturn(true);
-		ScriptResource result4 = rfi.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
-		
-		// then
-		assertThat(result1, is(nullValue()));
-		assertThat(result2, is(notNullValue()));
-		assertThat(result3, is(notNullValue()));
-		assertThat(result4, is(notNullValue()));
-		assertThat(result2, is(result3));
-		assertThat(result3, is(result4));
-		
-		verify(resourceWatchService, never()).watch(result1);
-		// watch service should only have been asked to watch this once, the first time it was created
-		verify(resourceWatchService).watch(result2);
-		
-		// and make sure we published our event
-		verify(publisher).publish(eventCaptor.capture());
-		assertThat(eventCaptor.getValue(), is(instanceOf(ResourceLoadedEvent.class)));
-		assertTrue(eventCaptor.getValue().matches(ScriptResource.class, ScriptResourceType.Server.suffix(baseName)));
-	}
-	
-	@Test
-	public void testObseleteResourceIsReloaded() throws Exception {
-		
-		ResourceMaker resourceMaker = new ResourceMaker(configuration, arguments);
-		
-		StaticResource staticResource1 = resourceMaker.makeStatic("index.html");
-		StaticResource staticResource2 = resourceMaker.makeStatic("index.html");
-		given(staticResourceCreator.create(eq("index.html"), anyVararg())).willReturn(staticResource1, staticResource2);
-		
-		StaticResource sr1 = rfi.loadResource(StaticResource.class, "index.html");
-		StaticResource sr2 = rfi.loadResource(StaticResource.class, "index.html");
-		((AbstractResource)staticResource1).kill();
-		
-		StaticResource sr3 = rfi.loadResource(StaticResource.class, "index.html");
-		
-		assertThat(sr1, is(staticResource1));
-		assertThat(sr2, is(staticResource1));
-		assertThat(sr3, is(staticResource2));
-	}
-	
-	@Test
-	public void testMultipleResourceForOneFile() throws IOException {
-		
-		// given
-		StaticResource mockStaticResource = mock(StaticResource.class);
-		given(staticResourceCreator.create(eq("index.html"), anyVararg())).willReturn(mockStaticResource);
-		HtmlResource mockHtmlResource = mock(HtmlResource.class);
-		given(htmlResourceCreator.create(eq("index"), anyVararg())).willReturn(mockHtmlResource);
-		
-		// when
-		StaticResource sr = rfi.loadResource(StaticResource.class, "index.html");
-		HtmlResource hr = rfi.loadResource(HtmlResource.class, "index");
-		
-		// then 
-		assertThat(sr, is(notNullValue()));
-		assertThat(hr, is(notNullValue()));
-	}
-	
-	@Test
-	public void testStaticResources() throws IOException {
-		
-		// given
-		StaticResource mockResource = mock(StaticResource.class);
-		given(staticResourceCreator.create(eq("index.html"), anyVararg())).willReturn(mockResource);
-		
-		// when
-		StaticResource resource1 = rfi.findResource(StaticResource.class, "index.html");
-		
-		// then
-		assertThat(resource1, is(nullValue()));
-		
-		// when
-		StaticResource resource2 = rfi.loadResource(StaticResource.class, "index.html");
-		
-		// then
-		assertThat(resource2, is(notNullValue()));
-		
-		// when
-		StaticResource resource3 = rfi.loadResource(StaticResource.class, "index.html");
-		
-		// then
-		assertThat(resource3, is(notNullValue()));
-		assertThat(resource2, is(sameInstance(resource3)));
-		assertThat(resource2.size(), is(resource3.size()));
-		
+		verify(publisher, times(2)).publish(eventCaptor.capture());
+		// validate the events? probably
 	}
 }

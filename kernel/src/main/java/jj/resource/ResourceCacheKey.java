@@ -17,18 +17,28 @@ package jj.resource;
 
 import java.net.URI;
 
+import jj.configuration.AppLocation;
+
 /**
  * @author jason
  *
  */
 public class ResourceCacheKey {
 	
+	private final AppLocation base;
 	private final String toString;
 	private final int hashCode;
 
-	public ResourceCacheKey(final Class<? extends Resource> type, final URI uri) {
+	public ResourceCacheKey(final Class<? extends Resource> type, final AppLocation base, final URI uri) {
+		this.base = base;
 		this.toString = type.getSimpleName().toString() + " at " + uri.toString();
 		this.hashCode = toString.hashCode();
+	}
+	
+	// used so the watch service understands which locations to watch,
+	// since there is a precedence order which i need to think through
+	AppLocation base() {
+		return base;
 	}
 	
 	@Override

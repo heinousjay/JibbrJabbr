@@ -2,27 +2,26 @@ package jj.resource.property;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
 @Singleton
 public class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResource> {
 
-	private final Arguments arguments;
+	private final Application app;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	PropertiesResourceCreator(
-		final Arguments arguments, 
+		final Application app, 
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.arguments = arguments;
+		this.app = app;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 	
@@ -37,17 +36,13 @@ public class PropertiesResourceCreator extends AbstractResourceCreator<Propertie
 	}
 	
 	@Override
-	protected URI uri(String baseName, Object... args) {
-		return path(baseName).toUri();
-	}
-
-	private Path path(String baseName, Object... args) {
-		return arguments.appPath().resolve(baseName + ".properties");
+	protected URI uri(AppLocation base, String name, Object... args) {
+		return app.resolvePath(base, name).toUri();
 	}
 
 	@Override
-	public PropertiesResource create(String baseName, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(PropertiesResource.class, cacheKey(baseName), baseName, path(baseName));
+	public PropertiesResource create(AppLocation base, String name, Object... args) throws IOException {
+		return instanceModuleCreator.createResource(PropertiesResource.class, cacheKey(base, name), base, name);
 	}
 
 }

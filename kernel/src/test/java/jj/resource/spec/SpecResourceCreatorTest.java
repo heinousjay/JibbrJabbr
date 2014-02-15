@@ -33,22 +33,22 @@ import jj.resource.spec.SpecResourceCreator;
 public class SpecResourceCreatorTest extends ResourceBase<SpecResource, SpecResourceCreator>{
 
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return "its_a_spec.js";
 	}
 
 	protected Path path() {
-		return appPath.resolveSibling("specs").resolve(baseName());
+		return appPath.resolveSibling("specs").resolve(name());
 	}
 
 	@Override
 	protected SpecResource resource() throws Exception {
-		return new SpecResource(cacheKey(), baseName(), path());
+		return new SpecResource(cacheKey(), name(), path());
 	}
 
 	@Override
 	protected SpecResourceCreator toTest() {
-		return new SpecResourceCreator(arguments, creator);
+		return new SpecResourceCreator(app, creator);
 	}
 
 	@Override

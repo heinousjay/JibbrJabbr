@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.Undefined;
 
 /**
  * @author jason
@@ -62,7 +63,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(continuationCoordinator).resume(new ContinuationPendingKey(id), value);
+		verify(continuationCoordinator).resume(new ContinuationPendingKey(id), Undefined.instance);
 	}
 
 }

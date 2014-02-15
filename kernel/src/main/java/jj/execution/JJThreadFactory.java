@@ -27,7 +27,7 @@ import javax.inject.Inject;
  */
 public class JJThreadFactory implements ThreadFactory {
 	
-	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
+	private final ThreadLocal<Boolean> flag = new ThreadLocal<>();
 	
 	private final UncaughtExceptionHandler uncaughtExceptionHandler;
 	
@@ -57,8 +57,9 @@ public class JJThreadFactory implements ThreadFactory {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				flag.set(true);
+				flag.set(Boolean.TRUE);
 				r.run();
+				flag.set(null);
 			}
 		}, name);
 		thread.setDaemon(true);
@@ -67,6 +68,6 @@ public class JJThreadFactory implements ThreadFactory {
 	}
 	
 	public boolean in() {
-		return flag.get();
+		return flag.get() == Boolean.TRUE;
 	}
 }

@@ -16,9 +16,14 @@
 package jj.event;
 
 /**
- * Inject this to publish events.  Event objects can be literally anything.
+ * <p>
+ * Inject this to publish events.  Event objects can be of any type except
+ * Object.  Due to type erasure, generics will not work unless they are reified.
+ * 
+ * <p>
  * They should probably be immutable in most circumstances but it's not
  * at all required.
+ * 
  * @author jason
  *
  */

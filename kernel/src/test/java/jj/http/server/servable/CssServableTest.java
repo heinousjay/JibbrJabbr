@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
+
+import jj.configuration.AppLocation;
 import jj.http.server.servable.CssServable;
 import jj.http.server.servable.RequestProcessor;
 import jj.resource.css.CssResource;
@@ -24,7 +26,7 @@ public class CssServableTest extends ServableTestBase{
 	@Before
 	public void before() {
 		
-		cs = new CssServable(arguments, resourceFinder);
+		cs = new CssServable(app, resourceFinder);
 	}
 
 	@Test
@@ -32,7 +34,7 @@ public class CssServableTest extends ServableTestBase{
 		
 		// given
 		given(request.uriMatch()).willReturn(new URIMatch("/style.css"));
-		given(resourceFinder.loadResource(CssResource.class, "style.css", true)).willReturn(cssResource);
+		given(resourceFinder.loadResource(CssResource.class, AppLocation.Base, "style.css", true)).willReturn(cssResource);
 		given(cssResource.path()).willReturn(appPath.resolve("style.css"));
 		
 		// then

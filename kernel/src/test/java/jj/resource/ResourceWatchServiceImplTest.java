@@ -15,265 +15,53 @@
  */
 package jj.resource;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import javax.inject.Provider;
 
 import jj.configuration.Arguments;
-import jj.configuration.Configuration;
-import jj.execution.IOTask;
-import jj.execution.JJTask;
 import jj.execution.TaskRunner;
-import jj.execution.MockTaskRunner;
-import jj.execution.TaskHelper;
-import jj.http.server.servable.document.DocumentConfiguration;
-import jj.http.server.servable.document.MockDocumentConfiguration;
-import jj.resource.document.HtmlResource;
-import jj.resource.document.HtmlResourceMaker;
-import jj.resource.stat.ic.StaticResource;
-import jj.resource.stat.ic.StaticResourceMaker;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
 
-/**
- * this test is slightly concrete, on purpose
- * 
- * 
- * @author jason
- *
- */
-@SuppressWarnings("unused")
+
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceWatchServiceImplTest {
-	
-	
-	
-	String fileName = "gibberish.txt";
-	Path gibberish;
-	
-	@Mock Arguments arguments;
-	@Mock Configuration configuration;
-	
-	ResourceMaker resourceMaker;
-	
-	ResourceCacheImpl resourceCache;
-	@Mock ResourceFinder resourceFinder;
-	ExecutorService executorService;
+
+	@Mock Provider<ResourceWatchServiceLoop> loopProvider;
+	@Mock ResourceWatchServiceLoop loop;
 	@Mock TaskRunner taskRunner;
-	@Mock Logger logger;
+	@Mock Arguments arguments;
+	@Mock FileResource resource;
 	
-	ResourceWatchServiceImpl rwsi;
-	
-	@Before
-	public void before() throws Exception {
-		
-		Path appPath = Paths.get(getClass().getResource("index.html").toURI()).getParent();
-		
-		gibberish = appPath.resolve(fileName);
-		
-		try (SeekableByteChannel channel = Files.newByteChannel(gibberish, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
-			channel.write(ByteBuffer.wrap(fileName.getBytes(UTF_8)));
-		}
-		
-		given(arguments.appPath()).willReturn(appPath);
-		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
-		
-		
-		executorService = Executors.newCachedThreadPool();
-		given(taskRunner.execute(any(JJTask.class))).willAnswer(new Answer<Void>() {
-
-			@Override
-			public Void answer(final InvocationOnMock invocation) throws Throwable {
-				executorService.submit(new Callable<Void>() {
-
-					@Override
-					public Void call() throws Exception {
-						TaskHelper.invoke(((JJTask)invocation.getArguments()[0]));
-						return null;
-					}
-				});
-				return null;
-			}
-		});
-		
-		resourceMaker = new ResourceMaker(configuration, arguments);
-		
-		Map<Class<? extends Resource>, ResourceCreator<? extends Resource>> map = new HashMap<>();
-		map.put(StaticResource.class, StaticResourceMaker.fake(arguments));
-		map.put(HtmlResource.class, HtmlResourceMaker.fake(arguments));
-		
-		// we can pass null, so long as we never call start
-		resourceCache = new ResourceCacheImpl(new ResourceCreators(map), null);
-	}
-	
-	@After
-	public void after() throws Exception {
-		
-		try {
-			Files.delete(gibberish);
-		} catch (Exception e) {}
-		
-		executorService.shutdownNow();
-	}
-	
-	private void touch(Path path) throws Exception {
-		FileTime originalFileTime = Files.getLastModifiedTime(path);
-		FileTime newFileTime;
-		do {
-			newFileTime = FileTime.fromMillis(System.currentTimeMillis());
-		} while (newFileTime.compareTo(originalFileTime) < 1);
-		
-		Files.setLastModifiedTime(path, newFileTime);
-	}
-
-	@SuppressWarnings("unchecked")
-	private CountDownLatch setUpLatch(int fileCount) {
-		final CountDownLatch latch = new CountDownLatch(fileCount);
-		
-		given(resourceFinder.loadResource(any(Class.class), anyString(), anyVararg())).willAnswer(new Answer<Resource>() {
-
-			@Override
-			public Resource answer(InvocationOnMock invocation) throws Throwable {
-				latch.countDown();
-				//System.out.println(latch.getCount());
-				//System.out.println(invocation.getArguments()[0]);
-				//System.out.println(invocation.getArguments()[1]);
-				return null;
-			}
-			
-		});
-		return latch;
-	}
-
 	@Test
-	public void test() throws Exception {
+	public void testNoRun() {
+		// given
+		given(arguments.get("fileWatcher", boolean.class, true)).willReturn(false);
 		
-		// all done in one test because it takes 10 seconds per run on the mac
+		// when
+		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(taskRunner, arguments, loopProvider);
+		service.start();
 		
-		// set up for replacements
-		
-		StaticResource sr = resourceMaker.makeStatic("index.html");
-		StaticResource sr1 = resourceMaker.makeStatic("url_replacement_output.txt");
-		StaticResource sr2 = resourceMaker.makeStatic("sox-icon.png");
-		StaticResource sr3 = resourceMaker.makeStatic("replacement.css");
-		StaticResource sr4 = resourceMaker.makeStatic("images/rox-icon.png");
-		sr2.addDependent(sr1);
-		sr1.addDependent(sr3);
-		sr1.addDependent(sr4);
-		// and test circular dependency
-		sr4.addDependent(sr1);
-		HtmlResource hr = resourceMaker.makeHtml("index.html");
-		
-		resourceCache.putIfAbsent(((AbstractResource)sr).cacheKey(), sr);
-		resourceCache.putIfAbsent(((AbstractResource)hr).cacheKey(), hr);
-		resourceCache.putIfAbsent(((AbstractResource)sr1).cacheKey(), sr1);
-		resourceCache.putIfAbsent(((AbstractResource)sr2).cacheKey(), sr2);
-		resourceCache.putIfAbsent(((AbstractResource)sr3).cacheKey(), sr3);
-		resourceCache.putIfAbsent(((AbstractResource)sr4).cacheKey(), sr4);
-		
-		// set up for removal
-		
-		StaticResource sr1_1 = resourceMaker.makeStatic(fileName);
-		StaticResource sr1_2 = resourceMaker.makeStatic("test.css");
-		StaticResource sr1_3 = resourceMaker.makeStatic("test.less");
-		StaticResource sr1_4 = resourceMaker.makeStatic("test2.less");
-		sr1_1.addDependent(sr1_2);
-		sr1_2.addDependent(sr1_3);
-		sr1_2.addDependent(sr1_4);
-		// and test circular dependency
-		sr1_4.addDependent(sr1_1);
-		resourceCache.putIfAbsent(((AbstractResource)sr1_1).cacheKey(), sr1_1);
-		resourceCache.putIfAbsent(((AbstractResource)sr1_2).cacheKey(), sr1_2);
-		resourceCache.putIfAbsent(((AbstractResource)sr1_3).cacheKey(), sr1_3);
-		resourceCache.putIfAbsent(((AbstractResource)sr1_4).cacheKey(), sr1_4);
-		
-		int fileCount = resourceCache.size() - 1;
-		
-		rwsi = new ResourceWatchServiceImpl(resourceCache, resourceFinder, taskRunner);
-
-		// when 
-		rwsi.start();
-		try {
-			rwsi.watch(sr);
-			rwsi.watch(sr1);
-			rwsi.watch(sr2);
-			rwsi.watch(sr3);
-			rwsi.watch(sr4);
-			rwsi.watch(hr);
-			rwsi.watch(sr1_1);
-			rwsi.watch(sr1_2);
-			rwsi.watch(sr1_3);
-			rwsi.watch(sr1_4);
-			
-			touch(sr.path());
-			touch(sr2.path());
-			Files.delete(gibberish);
-			
-			// we need to give it 10+ seconds on the mac.  stupid mac
-			// but if there's a watch implementation that notifies quickly,
-			// this should trip immediately.  like on the linux build server,
-			// seems to work there.  so i'm happy
-			if (!setUpLatch(fileCount).await(11, SECONDS)) {
-				fail("timed out before notified");
-			}
-			
-		} finally {
-			rwsi.stop();
-		}
-
 		// then
+		verify(loopProvider, never()).get();
+		verifyZeroInteractions(taskRunner);
+	}
+	
+	@Test
+	public void testRun() throws Exception {
+
+		given(arguments.get("fileWatcher", boolean.class, true)).willReturn(true);
+		given(loopProvider.get()).willReturn(loop);
 		
-		// replacement checks
+		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(taskRunner, arguments, loopProvider);
+		service.start();
+		service.watch(resource);
 		
-		assertTrue(((AbstractResource)hr).isObselete());
-		assertTrue(((AbstractResource)sr).isObselete());
-		assertTrue(((AbstractResource)sr1).isObselete());
-		assertTrue(((AbstractResource)sr2).isObselete());
-		assertTrue(((AbstractResource)sr3).isObselete());
-		assertTrue(((AbstractResource)sr4).isObselete());
-		
-		verify(resourceFinder).loadResource(StaticResource.class, "index.html");
-		verify(resourceFinder).loadResource(HtmlResource.class, "index.html");
-		verify(resourceFinder).loadResource(StaticResource.class, "url_replacement_output.txt");
-		verify(resourceFinder).loadResource(StaticResource.class, "sox-icon.png");
-		verify(resourceFinder).loadResource(StaticResource.class, "replacement.css");
-		verify(resourceFinder).loadResource(StaticResource.class, "images/rox-icon.png");
-		
-		// removal checks
-		
-		assertTrue(((AbstractResource)sr1_2).isObselete());
-		assertTrue(((AbstractResource)sr1_3).isObselete());
-		assertTrue(((AbstractResource)sr1_4).isObselete());
-		
-		verify(resourceFinder).loadResource(StaticResource.class, "test.css");
-		verify(resourceFinder).loadResource(StaticResource.class, "test.less");
-		verify(resourceFinder).loadResource(StaticResource.class, "test2.less");
-		
-		// verifying this to ensure that the dependency cycles didn't result in additional load requests
-		verifyNoMoreInteractions(resourceFinder);
+		verify(taskRunner).execute(loop);
+		verify(loop).watch(resource);
 	}
 }

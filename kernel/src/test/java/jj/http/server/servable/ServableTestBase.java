@@ -21,7 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.JJ;
-import jj.configuration.Arguments;
+import jj.configuration.Application;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
@@ -40,7 +40,7 @@ public abstract class ServableTestBase {
 	
 	Path appPath;
 	
-	@Mock Arguments arguments;
+	@Mock Application app;
 	@Mock ResourceFinder resourceFinder;
 	
 	@Mock HttpRequest request;
@@ -54,7 +54,7 @@ public abstract class ServableTestBase {
 		
 		appPath = Paths.get(ServableTestBase.class.getResource(path).toURI()).getParent();
 		
-		given(arguments.appPath()).willReturn(appPath);
+		given(app.path()).willReturn(appPath);
 	}
 
 }

@@ -45,12 +45,11 @@ class ResourceCacheImpl implements JJServerStartupListener, JJServerShutdownList
 	 * @param uri
 	 * @return
 	 */
-	@Override
 	public List<Resource> findAllByUri(URI uri) {
 		
 		List<Resource> result = new ArrayList<>();
 		
-		for (ResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
+		for (AbstractResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
 			Resource it = get(resourceCreator.cacheKey(uri));
 			if (it != null) result.add(it);
 		}

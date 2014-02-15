@@ -24,8 +24,8 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
-import jj.execution.IOThread;
 import jj.logging.EmergencyLogger;
+import jj.resource.IOThread;
 import jj.resource.ResourceCacheKey;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.RhinoContext;
@@ -62,7 +62,7 @@ public class APIBootstrapScriptEnvironment extends AbstractScriptEnvironment {
 	}
 
 	@Override
-	public String baseName() {
+	public String name() {
 		return "JJ API";
 	}
 

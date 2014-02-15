@@ -73,7 +73,7 @@ public class ConfigurationTest {
 	public void before() throws Exception {
 		
 		classLoader = new ConfigurationClassLoader();
-		given(resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS)).willReturn(ConfigResourceMaker.configResource());
+		given(resourceFinder.findResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS)).willReturn(ConfigResourceMaker.configResource());
 	}
 	
 	private Injector makeInjector() {

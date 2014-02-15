@@ -22,6 +22,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.logging.EmergencyLogger;
 
 import com.google.inject.AbstractModule;
@@ -37,6 +39,8 @@ import com.google.inject.ProvisionException;
  */
 @Singleton
 public class ResourceInstanceCreator {
+	
+	private final Application app;
 
 	private final Injector parentInjector;
 	
@@ -44,9 +48,11 @@ public class ResourceInstanceCreator {
 	
 	@Inject
 	ResourceInstanceCreator(
+		final Application app,
 		final Injector parentInjector,
 		final @EmergencyLogger Logger logger
 	) {
+		this.app = app;
 		this.parentInjector = parentInjector;
 		this.logger = logger;
 	}
@@ -54,10 +60,12 @@ public class ResourceInstanceCreator {
 	public <T extends Resource> T createResource(
 		final Class<T> type,
 		final ResourceCacheKey cacheKey,
-		final String baseName,
-		final Path path,
+		final AppLocation base,
+		final String name,
 		final Object...args
 	) {
+		final Path path = app.resolvePath(base, name);
+		
 		try {
 			
 			try {
@@ -68,8 +76,10 @@ public class ResourceInstanceCreator {
 						protected void configure() {
 							bind(type);
 							bind(ResourceCacheKey.class).toInstance(cacheKey);
-							bind(String.class).toInstance(baseName);
-							bind(Path.class).toInstance(path);
+							bind(String.class).toInstance(name);
+							if (path != null) {
+								bind(Path.class).toInstance(path);
+							}
 							
 							for (Object arg : args) {
 								bindInstance(arg.getClass(), arg);

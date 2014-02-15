@@ -79,7 +79,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	}
 	
 	void initializeScript(AbstractScriptEnvironment se) {
-		taskRunner.execute(new InitializerTask("initializing ScriptEnvironment at " + se.baseName(), se, continuationCoordinator));
+		taskRunner.execute(new InitializerTask("initializing ScriptEnvironment at " + se.name(), se, continuationCoordinator));
 	}
 	
 	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
@@ -136,6 +136,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		}
 		
 		protected void begin() throws Exception {
+			
 			scriptEnvironment.initializing(true);
 			
 			if (scriptEnvironment.script() != null) {
@@ -146,24 +147,21 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		protected void complete() throws Exception {
 			if (pendingKey == null) {
 				initialized();
-				// and we're done
 			}
 		}
 		
 		private void initialized() {
-			pendingKey = null;
-			result = null;
 			scriptEnvironment.initialized(true);
 
+			// and tell the world about it!
 			publisher.publish(new ScriptEnvironmentInitialized(scriptEnvironment));
-			
+			scriptEnvironmentInitialized(scriptEnvironment);
 			checkParentResumption(scriptEnvironment.exports());
 		}
 		
 		@Override
 		protected boolean errored(Throwable cause) {
-			pendingKey = null;
-			result = null;
+			cause.printStackTrace();
 			// mark the script environment somehow!
 			checkParentResumption(cause);
 			// we want this error reported
@@ -175,8 +173,6 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 			if (pendingKey != null) {
 				pendingKey.resume(result);
 			}
-			
-			scriptEnvironmentInitialized(scriptEnvironment);
 		}
 	}
 

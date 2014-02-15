@@ -17,12 +17,11 @@ package jj.resource.spec;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -33,15 +32,15 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 
-	private final Arguments arguments;
+	private final Application app;
 	private final ResourceInstanceCreator creator;
 	
 	@Inject
 	SpecResourceCreator(
-		final Arguments arguments,
+		final Application app,
 		final ResourceInstanceCreator creator
 	) {
-		this.arguments = arguments;
+		this.app = app;
 		this.creator = creator;
 	}
 
@@ -56,26 +55,18 @@ public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 	}
 
 	@Override
-	public SpecResource create(String baseName, Object... args) throws IOException {
+	public SpecResource create(AppLocation base, String name, Object... args) throws IOException {
 		return creator.createResource(
 			SpecResource.class, 
-			cacheKey(baseName),
-			baseName,
-			path(baseName)
+			cacheKey(base, name),
+			base,
+			name
 		);
 	}
 	
 	@Override
-	protected URI uri(String baseName, Object... args) {
-		return path(baseName).toUri();
-	}
-
-	private Path path(String baseName, Object... args) {
-		return basePath().resolve(baseName);
-	}
-	
-	private Path basePath() {
-		return arguments.appPath().resolveSibling("specs");
+	protected URI uri(AppLocation base, String name, Object... args) {
+		return app.resolvePath(base, name).toUri();
 	}
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.http.server;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
@@ -29,7 +29,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
  *
  */
 @Singleton
-public class JJNioEventLoopGroup extends NioEventLoopGroup {
+class JJNioEventLoopGroup extends NioEventLoopGroup {
 
 	@Inject
 	JJNioEventLoopGroup(

@@ -13,22 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.resource;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.net.URI;
 
-import jj.resource.RealResourceBase;
+import jj.configuration.AppLocation;
 
-/**
- * lil static object to encapsulate the base path for testing
- * 
- * @author jason
- *
- */
-public class BasePath {
+class MyResource extends AbstractResource {
 
-	public static Path appPath() throws Exception {
-		return Paths.get(RealResourceBase.class.getResource("/app/config.js").toURI()).getParent();
+	private final URI uri;
+	
+	protected MyResource(URI uri) {
+		super(new ResourceCacheKey(MyResource.class, AppLocation.Base, uri));
+		this.uri = uri;
+	}
+
+	@Override
+	public String name() {
+		return uri.toString();
+	}
+
+	@Override
+	public String uri() {
+		return uri.toString();
+	}
+
+	@Override
+	public String sha1() {
+		// this is not important for this test
+		return "";
+	}
+
+	@Override
+	public boolean needsReplacing() throws IOException {
+		return false;
 	}
 }

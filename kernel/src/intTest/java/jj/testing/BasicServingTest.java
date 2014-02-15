@@ -18,8 +18,7 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static jj.resource.asset.AssetResource.*;
-
+import static jj.configuration.Assets.*;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.nio.file.Files;
@@ -33,7 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jj.resource.asset.TestAssetResourceCreator;
+import jj.configuration.BlahMockAssets;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -96,11 +95,12 @@ public class BasicServingTest {
 			
 			stylesheets = work.toArray(new VerifiableRequest[work.size()]);
 			
-			TestAssetResourceCreator assetCreator = new TestAssetResourceCreator();
+			BlahMockAssets mockAssets = new BlahMockAssets();
+
 			work = new ArrayList<>();
-			work.add(new VerifiableRequest("/" + JQUERY_JS, assetCreator.toBytes(JQUERY_JS)));
-			work.add(new VerifiableRequest("/" + JJ_JS, assetCreator.toBytes(JJ_JS)));
-			work.add(new VerifiableRequest("/" + FAVICON_ICO, assetCreator.toBytes(FAVICON_ICO)));
+			work.add(new VerifiableRequest("/" + JQUERY_JS, Files.readAllBytes(mockAssets.path(JQUERY_JS))));
+			work.add(new VerifiableRequest("/" + JJ_JS, Files.readAllBytes(mockAssets.path(JJ_JS))));
+			work.add(new VerifiableRequest("/" + FAVICON_ICO, Files.readAllBytes(mockAssets.path(FAVICON_ICO))));
 			
 			assets = work.toArray(new VerifiableRequest[work.size()]);
 			

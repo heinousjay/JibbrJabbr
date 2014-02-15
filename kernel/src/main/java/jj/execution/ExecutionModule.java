@@ -27,11 +27,8 @@ public class ExecutionModule extends JJModule {
 
 	@Override
 	protected void configure() {
-		
-		addShutdownListenerBinding().to(IOExecutor.class);
-		addShutdownListenerBinding().to(ServerExecutor.class);
 
-		bindTaskRunner().toExecutor(IOExecutor.class);
+		addShutdownListenerBinding().to(ServerExecutor.class);
 		bindTaskRunner().toExecutor(ServerExecutor.class);
 		
 		// a good place to break apart crafty circular dependencies.  this is

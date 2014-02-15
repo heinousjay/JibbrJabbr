@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
+import static jj.configuration.AppLocation.*;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 
@@ -44,14 +44,14 @@ public class StaticServableTest extends ServableTestBase {
 	@Before
 	public void before() {
 		
-		ss = new StaticServable(arguments, resourceFinder);
+		ss = new StaticServable(app, resourceFinder);
 	}
 
 	@Test
 	public void testBasicOperation() throws Exception {
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/" + ZERO_TXT));
-		given(resourceFinder.loadResource(StaticResource.class, ZERO_TXT)).willReturn(resource);
+		given(resourceFinder.loadResource(StaticResource.class, Base.and(Assets), ZERO_TXT)).willReturn(resource);
 		given(resource.path()).willReturn(appPath.resolve(ZERO_TXT));
 		
 		RequestProcessor rp = ss.makeRequestProcessor(request, response);
@@ -63,7 +63,7 @@ public class StaticServableTest extends ServableTestBase {
 	public void testOutsideApplicationIsRejected() throws Exception {
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/" + NOT_ZERO_TXT));
-		given(resourceFinder.loadResource(StaticResource.class, NOT_ZERO_TXT)).willReturn(resource);
+		given(resourceFinder.loadResource(StaticResource.class, Base.and(Assets), NOT_ZERO_TXT)).willReturn(resource);
 		given(resource.path()).willReturn(appPath.resolve(NOT_ZERO_TXT));
 		
 		RequestProcessor rp = ss.makeRequestProcessor(request, response);

@@ -29,75 +29,81 @@ import java.util.regex.Pattern;
  * @author Jason Miller
  *
  */
-public final class Version {
+public abstract class Version {
 	
 	/** The name of the system */
-	public static final String name;
+	protected static final String name;
 	
 	/** The full version of the system */
-	public static final String version;
+	protected static final String version;
 	
 	/** The major version of the system */
-	public static final int major;
+	protected static final int major;
 	
 	/** The minor version of the system */
-	public static final int minor;
+	protected static final int minor;
 	
 	/** Flag indicating if this is a snapshot */
-	public static final boolean snapshot;
+	protected static final boolean snapshot;
 	
 	/** name of the repository branch for this build version */
-	public static final String branchName;
+	protected static final String branchName;
 	
 	/** user name of the person who created the commit for this build version */
-	public static final String commitUserName;
+	protected static final String commitUserName;
 	
 	/** email address of the person who created the commit for this build version */
-	public static final String commitUserEmail;
+	protected static final String commitUserEmail;
 	
 	/** id of the commit for this build version */
-	public static final String commitId;
+	protected static final String commitId;
 	
 	/** description of the commit for this build version */
-	public static final String commitDescription;
+	protected static final String commitDescription;
 	
 	/** date and time of the commit for this build version */
-	public static final Date commitDate;
+	protected static final Date commitDate;
 	
 	static {
 		// we do things this way to avoid depending on any jj internal classes in
 		// order to create these values
+		
+		
 		try (BufferedReader r = new BufferedReader(
 				new InputStreamReader(
 					Version.class.getResourceAsStream("VERSION"), StandardCharsets.UTF_8
 				)
 			)
 		) {
-			
-			name = r.readLine();
-			version = r.readLine();
-			
-			Pattern versionParser = Pattern.compile("(\\d*)\\.(\\d*)(-SNAPSHOT)?");
-			
-			Matcher matcher = versionParser.matcher(version);
-			matcher.matches();
-			major = Integer.parseInt(matcher.group(1));
-			minor = Integer.parseInt(matcher.group(2));
-			snapshot = matcher.group(3) != null;
-			
-			branchName = r.readLine();
-			
-			commitUserName = r.readLine();
-			commitUserEmail = r.readLine();
-			commitId = r.readLine();
-			commitDescription = r.readLine();
-			commitDate = new Date(Long.parseLong(r.readLine()));
+		
+		name = r.readLine();
+		version = r.readLine();
+		
+		Pattern versionParser = Pattern.compile("(\\d*)\\.(\\d*)(-SNAPSHOT)?");
+		
+		Matcher matcher = versionParser.matcher(version);
+		matcher.matches();
+		major = Integer.parseInt(matcher.group(1));
+		minor = Integer.parseInt(matcher.group(2));
+		snapshot = matcher.group(3) != null;
+		
+		branchName = r.readLine();
+		
+		commitUserName = r.readLine();
+		commitUserEmail = r.readLine();
+		commitId = r.readLine();
+		commitDescription = r.readLine();
+		commitDate = new Date(Long.parseLong(r.readLine()));
+
 
 			
 		} catch (Exception e) {
-			throw new IllegalStateException("MY JAR IS BROKEN", e);
+			throw new AssertionError("MY JAR IS BROKEN", e);
 		}
 	}
 	
-	private Version() {}
+	public abstract String name();
+	public abstract String branchName();
+	public abstract String version();
+	public abstract String commitId();
 }

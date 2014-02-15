@@ -10,11 +10,13 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+
 import jj.SHA1Helper;
-import jj.execution.IOThread;
 
 /**
- * re
+ * <p>
+ * Provides base services for {@link FileResource} instances
+ * 
  * @author jason
  *
  */
@@ -107,7 +109,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	}
 	
 	@Override
-	public String baseName() {
+	public String name() {
 		return baseName;
 	}
 

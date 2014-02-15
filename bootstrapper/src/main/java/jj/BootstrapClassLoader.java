@@ -40,15 +40,15 @@ public final class BootstrapClassLoader extends ClassLoader {
 		ALL_PERMISSIONS.setReadOnly();
 	}
 
-	private final SystemJars systemJars;
+	private final Jars systemJars;
 
-	BootstrapClassLoader(Path libPath) throws IOException {
+	BootstrapClassLoader(Jars systemJars) throws IOException {
 		// whatever loaded this class is the root of all classloaders in the system
 		super(BootstrapClassLoader.class.getClassLoader());
 		// the kernel uses assertions all over the place to ensure the state is
 		// what we expect it to be
 		setDefaultAssertionStatus(true);
-		systemJars = new SystemJars(libPath);
+		this.systemJars = systemJars;
 	}
 	
 	@Override

@@ -16,9 +16,6 @@
 package jj.resource.document;
 
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Paths;
-
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
@@ -52,19 +49,15 @@ public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentC
 	}
 
 	@Override
-	protected DocumentScriptEnvironment createScriptEnvironment(String baseName, Object... args) throws IOException {
-		DocumentScriptEnvironment dse = creator.createResource(DocumentScriptEnvironment.class, cacheKey(baseName), baseName, Paths.get("/"), args);
-		
-		// perform the initial execution immediately
-		
+	protected DocumentScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
+		DocumentScriptEnvironment dse = creator.createResource(
+			DocumentScriptEnvironment.class,
+			cacheKey(Virtual, name),
+			Virtual,
+			name,
+			args
+		);
 		
 		return dse;
 	}
-	
-	@Override
-	protected URI uri(String baseName, Object... args) {
-		// this escapes it for us
-		return Paths.get(baseName).toUri();
-	}
-
 }

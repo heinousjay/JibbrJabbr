@@ -17,24 +17,37 @@
  * <p>
  * Provides the abstraction of managing server resources, which are basically units
  * of computation for the JibbrJabbr system.
- * </p>
  * 
  * <p>
  * At the most basic level, the {@link StaticResource} represents a generic file in
  * the file system.  only metadata is kept.
- * </p>
  * 
  * <p>
  * At a more complicated level, script execution environments are composed of several
  * sub-resources used together to produce output in response to user requests.
- * </p>
  * 
  * <p>
  * The resource system keeps itself up-to-date with the filesystem in an unobtrusive,
- * constant manner
- * </p>
+ * constant manner, unless this is disabled by passing an argument of <pre>fileWatcher=false</pre>
+ * on the command line
+ * 
+ * <p>
+ * There are two main components that act as the API to the resource system, the {@link ResourceFinder}
+ * and the {@link ResourceLoader}.  The system also produces several events (which can be observed by
+ * registering as described in {@link Listener}) describing resource lifecycles, all descended from
+ * {@link ResourceEvent}, which in turn descends from {@link ExecutionEvent}
+ * 
+ * <ul>
+ * <li>{@link ResourceLoadedEvent} when a resource is loaded
+ * <li>{@link ResourceNotFoundEvent} when a resource was requested but not found
+ * <li>{@link ResourceReloadedEvent} when a resource is being reloaded
+ * <li> a remove event?
+ * <li> an error event?
+ * </ul>
+ * 
  * @author jason
  *
  */
 package jj.resource;
 import jj.resource.stat.ic.StaticResource;
+import jj.event.Listener;

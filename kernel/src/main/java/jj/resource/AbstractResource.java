@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.execution.IOThread;
+import jj.configuration.AppLocation;
 
 /**
  * internal helper for manipulating a resource.  ALL RESOURCES
@@ -47,6 +47,13 @@ public abstract class AbstractResource implements Resource {
 	@IOThread
 	boolean isObselete() throws IOException {
 		return !alive || needsReplacing();
+	}
+	
+	/**
+	 * return true from this method to be removed instead of reloaded on watch notifications 
+	 */
+	protected boolean removeOnReload() {
+		return true;
 	}
 	
 	@Override
@@ -81,6 +88,11 @@ public abstract class AbstractResource implements Resource {
 	
 	ResourceCacheKey cacheKey() {
 		return cacheKey;
+	}
+	
+	@Override
+	public AppLocation base() {
+		return cacheKey.base();
 	}
 	
 	public String toString() {

@@ -35,7 +35,6 @@ import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
 import jj.StringUtils;
 import jj.configuration.Configuration;
-import jj.execution.JJNioEventLoopGroup;
 
 /**
  * @author jason

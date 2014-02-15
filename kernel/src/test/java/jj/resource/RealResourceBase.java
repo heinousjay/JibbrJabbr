@@ -29,10 +29,11 @@ import io.netty.buffer.Unpooled;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import jj.BasePath;
+import jj.Base;
 import jj.SHA1Helper;
-import jj.configuration.Arguments;
+import jj.configuration.Application;
 import jj.configuration.Configuration;
+import jj.configuration.MockApplication;
 import jj.resource.css.CssResource;
 
 import org.hamcrest.Matchers;
@@ -51,13 +52,14 @@ public abstract class RealResourceBase {
 	
 	protected Path appPath;
 	@Mock protected Configuration configuration;
-	@Mock protected Arguments arguments;
+	protected Application app;
 	@Mock protected Logger logger;
 
 	@Before
 	public final void init() throws Exception {
-		appPath = BasePath.appPath();
-		given(arguments.appPath()).willReturn(appPath);
+		app = new MockApplication();
+		appPath = Base.appPath();
+		given(app.path()).willReturn(appPath);
 	}
 	
 	protected <T extends Resource> T testResource(final T resource) throws Exception {
@@ -75,7 +77,7 @@ public abstract class RealResourceBase {
 		// well this is weirdly ugly haha
 		final Path path = resource.path();
 		
-		assertTrue(resource.baseName() + " does not exist", Files.exists(path));
+		assertTrue(resource.name() + " does not exist", Files.exists(path));
 		
 		testNonFileResource(resource);
 		
@@ -91,8 +93,8 @@ public abstract class RealResourceBase {
 		assertThat(resource, is(instanceOf(AbstractResource.class)));
 		 
 		assertThat(resource, is(notNullValue()));
-		assertThat(resource.baseName(), is(notNullValue()));
-		assertThat(resource.baseName(), not(Matchers.startsWith("/")));
+		assertThat(resource.name(), is(notNullValue()));
+		assertThat(resource.name(), not(Matchers.startsWith("/")));
 		assertThat(((AbstractResource)resource).needsReplacing(), is(false));
 		
 		if (!(resource instanceof CssResource) && (resource instanceof LoadedResource)) { 

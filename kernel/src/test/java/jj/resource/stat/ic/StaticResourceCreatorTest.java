@@ -28,22 +28,22 @@ import jj.resource.stat.ic.StaticResourceCreator;
 public class StaticResourceCreatorTest extends ResourceBase<StaticResource, StaticResourceCreator> {
 
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return "helpers/jquery.fancybox-media.js";
 	}
 
 	protected Path path() {
-		return appPath.resolve(baseName());
+		return appPath.resolve(name());
 	}
 
 	@Override
 	protected StaticResource resource() throws Exception {
-		return new StaticResource(cacheKey(), path(), baseName());
+		return new StaticResource(cacheKey(), path(), name());
 	}
 
 	@Override
 	protected StaticResourceCreator toTest() {
-		return new StaticResourceCreator(arguments, creator);
+		return new StaticResourceCreator(app, creator);
 	}
 
 }

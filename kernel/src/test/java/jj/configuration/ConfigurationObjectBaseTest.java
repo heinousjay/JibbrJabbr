@@ -123,7 +123,7 @@ public class ConfigurationObjectBaseTest {
 		
 		ConfigResource resource = ConfigResourceMaker.configResource();
 		
-		given(resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS)).willReturn(resource);
+		given(resourceFinder.findResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS)).willReturn(resource);
 	}
 
 	@Test

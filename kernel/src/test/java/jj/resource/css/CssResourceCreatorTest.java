@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.SHA1Helper;
+import jj.configuration.AppLocation;
 import jj.event.Publisher;
 import jj.resource.Resource;
 import jj.resource.ResourceBase;
@@ -51,34 +52,34 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	private static final String SOX_ICON = "../jj/resource/sox-icon.png";
 	
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return "../jj/resource/test.css";
 	}
 	
 	protected ResourceCacheKey cacheKey(String baseName) {
-		return new ResourceCacheKey(CssResource.class, path(baseName).toUri());
+		return new ResourceCacheKey(CssResource.class, AppLocation.Base, path(baseName).toUri());
 	}
 	
 	protected Path path() {
-		return path(baseName());
+		return path(name());
 	}
 	
 	protected Path path(String baseName) {
-		return appPath.resolve(baseName);
+		return appPath.resolve(baseName).normalize();
 	}
 	
 	@Override
 	protected CssResource resource() throws Exception {
-		return resource(baseName());
+		return resource(name());
 	}
 	
-	protected CssResource resource(String baseName) throws Exception {
-		return new CssResource(cacheKey(baseName), baseName, path(baseName), false);
+	protected CssResource resource(String name) throws Exception {
+		return new CssResource(cacheKey(name), name, path(name), false);
 	}
 	
 	@Override
 	protected CssResourceCreator toTest() {
-		return new CssResourceCreator(arguments, lessProcessor, resourceFinder, logger, creator);
+		return new CssResourceCreator(app, lessProcessor, resourceFinder, logger, creator);
 	}
 	
 	ResourceMaker resourceMaker;
@@ -87,20 +88,20 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	@Mock Logger logger;
 	
 	protected void before() throws Exception {
-		lessProcessor = spy(new LessProcessor(arguments, new RealRhinoContextProvider(), mock(Publisher.class)));
-		resourceMaker = new ResourceMaker(configuration, arguments, logger);
+		lessProcessor = spy(new LessProcessor(app, new RealRhinoContextProvider(), mock(Publisher.class)));
+		resourceMaker = new ResourceMaker(configuration, app, logger);
 	}
 
 	@Test
 	public void testCreation() throws Exception {
 		
-		CssResource css = toTest.create(baseName());
+		CssResource css = toTest.create(location(), name());
 		assertThat(css.sha1(), is(SHA1Helper.keyFor(Files.readAllBytes(css.path()))));
 		
-		CssResource less = toTest.create(baseName(), true);
+		CssResource less = toTest.create(location(), name(), true);
 		
 		// just to prove that one of these was actually less processed
-		verify(lessProcessor).process(baseName().replace("css", "less"));
+		verify(lessProcessor).process(name().replace("css", "less"));
 		
 		// and we should end up with the same thing
 		assertThat(css.bytes().compareTo(less.bytes()), is(0));
@@ -110,23 +111,23 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	public void testProcessUrls() throws Exception {
 		
 		// given
-		CssResource testResource = toTest.create(baseName());
+		CssResource testResource = toTest.create(location(), name());
 		
-		given(resourceFinder.loadResource(CssResource.class, baseName())).willReturn(testResource);
+		given(resourceFinder.loadResource(CssResource.class, AppLocation.Base, name())).willReturn(testResource);
 		
-		StaticResource box = resourceMaker.makeStatic(BOX_ICON);
-		StaticResource rox = resourceMaker.makeStatic(ROX_ICON);
-		StaticResource sox = resourceMaker.makeStatic(SOX_ICON);
-		given(resourceFinder.loadResource(StaticResource.class, BOX_ICON)).willReturn(box);
-		given(resourceFinder.loadResource(StaticResource.class, ROX_ICON)).willReturn(rox);
-		given(resourceFinder.loadResource(StaticResource.class, SOX_ICON)).willReturn(sox);
+		StaticResource box = resourceMaker.makeStatic(AppLocation.Base, BOX_ICON);
+		StaticResource rox = resourceMaker.makeStatic(AppLocation.Base, ROX_ICON);
+		StaticResource sox = resourceMaker.makeStatic(AppLocation.Base, SOX_ICON);
+		given(resourceFinder.loadResource(StaticResource.class, AppLocation.Base, BOX_ICON)).willReturn(box);
+		given(resourceFinder.loadResource(StaticResource.class, AppLocation.Base, ROX_ICON)).willReturn(rox);
+		given(resourceFinder.loadResource(StaticResource.class, AppLocation.Base, SOX_ICON)).willReturn(sox);
 		
 		String replacement = "../jj/resource/replacement.css";
 		
 		configureInjector(resource(replacement));
 		
 		// when
-		CssResource css = toTest.create(replacement);
+		CssResource css = toTest.create(location(), replacement);
 		
 		// then
 		assertThat(css, is(notNullValue()));
@@ -140,10 +141,10 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		css.bytes().readBytes(bytes);
 		
 		// if this starts failing, maybe a dependency changed, so check the output
-		// System.out.println(css.bytes().toString(java.nio.charset.StandardCharsets.UTF_8));
+		//System.out.println(css.bytes().toString(java.nio.charset.StandardCharsets.UTF_8));
 		
 		assertThat(bytes, is(Files.readAllBytes(testResource.path().resolveSibling("url_replacement_output.txt"))));
 		
-		verify(logger).warn(anyString(), eq(css.baseName()), eq("../jj/resource/not-found-thing.jpg"), eq("url(not-found-thing.jpg)"));
+		verify(logger).warn(anyString(), eq(css.name()), eq("../jj/resource/not-found-thing.jpg"), eq("url(not-found-thing.jpg)"));
 	}
 }

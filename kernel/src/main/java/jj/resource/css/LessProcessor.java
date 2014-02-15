@@ -32,7 +32,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.configuration.Arguments;
+import jj.configuration.Application;
 import jj.event.Publisher;
 import jj.script.RhinoContext;
 
@@ -101,7 +101,7 @@ class LessProcessor {
 			String resourceName = String.valueOf(args[0]);
 			try {
 				publisher.publish(new LoadLessResource(resourceName));
-				return new String(Files.readAllBytes(arguments.appPath().resolve(resourceName)), UTF_8);
+				return new String(Files.readAllBytes(app.path().resolve(resourceName)), UTF_8);
 			} catch (IOException io) {
 				publisher.publish(new ErrorLoadingLessResource(resourceName, io));
 			}
@@ -110,17 +110,17 @@ class LessProcessor {
 	}
 
 	private final ScriptableObject global;
-	private final Arguments arguments;
+	private final Application app;
 	private final Provider<RhinoContext> contextProvider;
 	private final Publisher publisher;
 	
 	@Inject
 	LessProcessor(
-		final Arguments arguments,
+		final Application app,
 		final Provider<RhinoContext> contextProvider,
 		final Publisher publisher
 	) throws IOException {
-		this.arguments = arguments;
+		this.app = app;
 		this.contextProvider = contextProvider;
 		this.publisher = publisher;
 		global = makeGlobal();

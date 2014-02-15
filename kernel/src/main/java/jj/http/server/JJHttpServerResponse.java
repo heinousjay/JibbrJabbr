@@ -50,13 +50,6 @@ import io.netty.handler.stream.ChunkedNioFile;
  */
 @Singleton
 class JJHttpServerResponse extends AbstractHttpResponse {
-	
-	private static final String SERVER_NAME = String.format(
-		"%s/%s (%s)",
-		Version.name,
-		Version.version,
-		Version.branchName
-	);
 
 	private static final Logger log = LoggerFactory.getLogger(JJHttpServerResponse.class);
 	
@@ -73,6 +66,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	 */
 	@Inject
 	JJHttpServerResponse(
+		final Version version,
 		final JJHttpServerRequest request,
 		final ChannelHandlerContext ctx,
 		final @AccessLogger Logger access,
@@ -82,7 +76,12 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		this.ctx = ctx;
 		this.access = access;
 		this.emergency = emergency;
-		header(HttpHeaders.Names.SERVER, SERVER_NAME);
+		header(HttpHeaders.Names.SERVER, String.format(
+			"%s/%s (%s)",
+			version.name(),
+			version.version(),
+			version.branchName()
+		));
 	}
 	
 	private ChannelFuture maybeClose(final ChannelFuture f) {

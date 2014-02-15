@@ -21,7 +21,6 @@ import javax.inject.Provider;
 import javax.net.SocketFactory;
 
 import jj.configuration.Configuration;
-import jj.execution.MockJJNioEventLoopGroup;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

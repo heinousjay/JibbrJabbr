@@ -10,7 +10,11 @@ import javax.inject.Singleton;
 import com.google.inject.Injector;
 
 /**
- * The central point of configuration for the system
+ * The central point of configuration for the system.  will have no direct public API,
+ * instead all communication is through events? that seems fair enough
+ * 
+ * all the lovely dynamic code is going away.  sniff sniff.  it was an interesting idea
+ * but ultimately not a good one.
  * @author jason
  *
  */

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.Closer;
+import jj.resource.IOTask;
 import jj.resource.MimeTypes;
 import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
@@ -18,7 +19,6 @@ import jj.script.ContinuationCoordinator;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
 import jj.script.ScriptThread;
-import jj.execution.IOTask;
 import jj.execution.TaskRunner;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -105,7 +105,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	}
 	
 	public String baseName() {
-		return documentScriptEnvironment.baseName();
+		return documentScriptEnvironment.name();
 	}
 	
 	@Override
@@ -118,7 +118,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		private boolean run = false;
 		
 		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
-			super("processing document request at " + scriptEnvironment.baseName(), scriptEnvironment, continuationCoordinator);
+			super("processing document request at " + scriptEnvironment.name(), scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override

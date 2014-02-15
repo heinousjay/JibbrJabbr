@@ -29,22 +29,22 @@ import jj.resource.script.ScriptResourceType;
 public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, ScriptResourceCreator> {
 
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return ScriptResourceType.Client.suffix("index");
 	}
 
 	protected Path path() {
-		return appPath.resolve(baseName());
+		return appPath.resolve(name());
 	}
 
 	@Override
 	protected ScriptResource resource() throws Exception {
-		return new ScriptResource(cacheKey(), path(), baseName());
+		return new ScriptResource(cacheKey(), path(), name());
 	}
 
 	@Override
 	protected ScriptResourceCreator toTest() {
-		return new ScriptResourceCreator(arguments, creator);
+		return new ScriptResourceCreator(app, creator);
 	}
 
 }

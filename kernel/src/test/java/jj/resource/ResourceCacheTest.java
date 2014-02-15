@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
+import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
 import jj.execution.ExecutionConfiguration;
 import jj.resource.document.HtmlResource;
@@ -48,11 +49,11 @@ public class ResourceCacheTest extends RealResourceBase {
 	
 	@Mock StaticResource sr;
 	
-	@Mock ResourceCreator<StaticResource> src;
+	@Mock AbstractResourceCreator<StaticResource> src;
 	
 	@Mock HtmlResource hr;
 	
-	@Mock ResourceCreator<HtmlResource> hrc;
+	@Mock AbstractResourceCreator<HtmlResource> hrc;
 	
 	ResourceCacheKey sKey;
 	
@@ -69,13 +70,13 @@ public class ResourceCacheTest extends RealResourceBase {
 		given(configuration.get(ExecutionConfiguration.class)).willReturn(executionCongfiguration);
 		given(executionCongfiguration.ioThreads()).willReturn(4);
 		
-		HashMap<Class<? extends Resource>, ResourceCreator<? extends Resource>> map = new HashMap<>();
+		HashMap<Class<? extends AbstractResource>, AbstractResourceCreator<? extends AbstractResource>> map = new HashMap<>();
 		map.put(StaticResource.class, src);
 		map.put(HtmlResource.class, hrc);
 		rc = new ResourceCacheImpl(new ResourceCreators(map), configuration);
 		
-		sKey = new ResourceCacheKey(StaticResource.class, uri);
-		hKey = new ResourceCacheKey(HtmlResource.class, uri);
+		sKey = new ResourceCacheKey(StaticResource.class, AppLocation.Base, uri);
+		hKey = new ResourceCacheKey(HtmlResource.class, AppLocation.Base, uri);
 		
 		given(src.cacheKey(uri)).willReturn(sKey);
 		given(hrc.cacheKey(uri)).willReturn(hKey);

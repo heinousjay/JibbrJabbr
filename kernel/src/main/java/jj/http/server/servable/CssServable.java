@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
@@ -21,10 +22,10 @@ class CssServable extends Servable<CssResource> {
 	
 	@Inject
 	CssServable(
-		final Arguments arguments,
+		final Application app,
 		final ResourceFinder resourceFinder
 	) {
-		super(arguments);
+		super(app);
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -35,9 +36,9 @@ class CssServable extends Servable<CssResource> {
 	
 	@Override
 	public CssResource loadResource(final URIMatch match) {
-		CssResource resource = resourceFinder.loadResource(CssResource.class, match.baseName, true);
+		CssResource resource = resourceFinder.loadResource(CssResource.class, AppLocation.Base, match.baseName, true);
 		if (resource == null) {
-			resource = resourceFinder.loadResource(CssResource.class, match.baseName);
+			resource = resourceFinder.loadResource(CssResource.class, AppLocation.Base, match.baseName);
 		}
 		
 		return resource;
@@ -55,7 +56,7 @@ class CssServable extends Servable<CssResource> {
 		CssResource resource = loadResource(match);
 		
 		RequestProcessor result = null;
-		if (resource != null && isServablePath(resource.path())) {
+		if (resource != null && isServableResource(resource)) {
 			result = makeStandardRequestProcessor(request, response, match, resource);
 		}
 		return result;

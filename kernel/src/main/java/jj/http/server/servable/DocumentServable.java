@@ -9,12 +9,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
 import jj.StringUtils;
-import jj.configuration.Arguments;
-import jj.execution.IOThread;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
+import jj.configuration.Assets;
+import jj.resource.IOThread;
 import jj.resource.ResourceFinder;
-import jj.resource.asset.AssetResource;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.HtmlResource;
+import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -34,11 +36,11 @@ class DocumentServable extends Servable<HtmlResource> {
 	
 	@Inject
 	DocumentServable(
-		final Arguments arguments,
+		final Application app,
 		final ResourceFinder resourceFinder,
 		final Injector parentInjector
 	) {
-		super(arguments);
+		super(app);
 		this.resourceFinder = resourceFinder;
 		this.parentInjector = parentInjector;
 	}
@@ -53,8 +55,8 @@ class DocumentServable extends Servable<HtmlResource> {
 		// since we're in the IO thread already and we might need this stuff soon, as a small
 		// optimization to avoid jumping right back into the I/O thread after dispatching this
 		// into the script thread, we just "prime the pump"
-		resourceFinder.loadResource(AssetResource.class, AssetResource.JJ_JS);
-		resourceFinder.loadResource(AssetResource.class, AssetResource.JQUERY_JS);
+		resourceFinder.loadResource(StaticResource.class, AppLocation.Assets, Assets.JJ_JS);
+		resourceFinder.loadResource(StaticResource.class, AppLocation.Assets, Assets.JQUERY_JS);
 	}
 	
 	@Override
@@ -71,7 +73,7 @@ class DocumentServable extends Servable<HtmlResource> {
 		if (StringUtils.isEmpty(request.uriMatch().extension)) {
 			
 			final DocumentScriptEnvironment dse = 
-				resourceFinder.loadResource(DocumentScriptEnvironment.class, baseName);
+				resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, baseName);
 			
 			if (dse != null) {
 				
@@ -94,6 +96,6 @@ class DocumentServable extends Servable<HtmlResource> {
 
 	@Override
 	public HtmlResource loadResource(URIMatch match) {
-		return resourceFinder.loadResource(HtmlResource.class, match.baseName);
+		return resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, match.baseName);
 	}
 }

@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.Closer;
+import jj.http.server.WebSocketConnectionHost;
 
 import org.junit.After;
 import org.junit.Before;
@@ -60,9 +61,15 @@ public class CurrentScriptEnvironmentTest {
 	
 	@Mock AbstractScriptEnvironment ase;
 	
+	@Mock WebSocketConnectionHost host;
+	
+	@Mock ChildScriptEnvironment child;
+	
 	@Mock ContinuationPending continuationPending;
 	
 	@Captor ArgumentCaptor<ContinuationState> continuationStateCaptor;
+	
+	@Mock Closer mockCloser;
 	
 	@Before
 	public void before() {
@@ -97,6 +104,40 @@ public class CurrentScriptEnvironmentTest {
 		}
 		
 		verify(ase).createContinuationContext(continuationPending);
+		
+		given(ase.restoreContextForKey(pendingKey)).willReturn(mockCloser);
+		
+		try (Closer closer = cse.enterScope(ase, pendingKey)) {
+			
+		}
+		
+		verify(mockCloser).close();
+	}
+	
+	@Test
+	public void testCurrentWebSocketConnectionHost() {
+		
+		try (Closer closer = cse.enterScope(host)) {
+			
+			assertThat(cse.current(), is((ScriptEnvironment)host));
+			assertThat(cse.currentWebSocketConnectionHost(), is(host));
+			
+		}
+		
 	}
 
+	@Test
+	public void testCurrentRootScriptEnvironment() {
+		
+		given(child.parent()).willReturn(host);
+		
+		try (Closer closer = cse.enterScope(child)) {
+			assertThat(cse.currentRootScriptEnvironment(), is((ScriptEnvironment)host));
+		}
+		
+		try (Closer closer = cse.enterScope(ase)) {
+			assertThat(cse.currentRootScriptEnvironment(), is((ScriptEnvironment)ase));
+		}
+		
+	}
 }

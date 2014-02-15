@@ -1,4 +1,4 @@
-package jj.execution;
+package jj.resource;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

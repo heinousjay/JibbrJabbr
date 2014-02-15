@@ -15,13 +15,29 @@
  */
 package jj.resource;
 
+import org.slf4j.Logger;
+
+import jj.configuration.AppLocation;
+
 /**
  * @author jason
  *
  */
 public class ResourceNotFoundEvent extends ResourceEvent {
 	
-	public ResourceNotFoundEvent(final Class<? extends Resource> resourceClass, final String name, final Object...arguments) {
-		super(resourceClass, name, arguments);
+	public ResourceNotFoundEvent(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
+		super(resourceClass, base, name, arguments);
+	}
+	
+	@Override
+	protected String description() {
+		return "resource not found";
+	}
+	
+	@Override
+	public void describeTo(Logger log) {
+		// for now, not at all.
+		// TODO enable this later, probably keep at trace level
+		//log.trace("{} - {} at {}", description(), resourceClass, name);
 	}
 }

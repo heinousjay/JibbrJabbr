@@ -6,7 +6,8 @@ import java.util.PropertyResourceBundle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.IsThread;
+import jj.configuration.AppLocation;
+import jj.resource.IsThread;
 import jj.resource.ResourceFinder;
 import jj.resource.property.PropertiesResource;
 
@@ -60,8 +61,8 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		
 		PropertiesResource resource = 
 			isThread.forIO() ?	
-			resourceFinder.loadResource(PropertiesResource.class, baseName) :
-			resourceFinder.findResource(PropertiesResource.class, baseName);
+			resourceFinder.loadResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties") :
+			resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties");
 			
 		if (resource != null) {
 			final PropertyResourceBundle bundle = resource.properties();
@@ -91,7 +92,8 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 	public boolean needsIO(final DocumentRequestProcessor documentRequestProcessor) {
 		return resourceFinder.findResource(
 			PropertiesResource.class, 
-			documentRequestProcessor.baseName()
+			AppLocation.Base,
+			documentRequestProcessor.baseName() + ".properties"
 		) == null;
 	}
 

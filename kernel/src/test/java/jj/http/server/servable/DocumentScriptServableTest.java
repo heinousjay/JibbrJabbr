@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
+import jj.configuration.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ScriptResource;
@@ -46,7 +47,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 	
 	@Before
 	public void before() {
-		as = new DocumentScriptServable(arguments, resourceFinder);
+		as = new DocumentScriptServable(app, resourceFinder);
 		given(executionEnvironment.clientScriptResource()).willReturn(scriptResource1);
 		given(executionEnvironment.sharedScriptResource()).willReturn(scriptResource2);
 		
@@ -56,10 +57,10 @@ public class DocumentScriptServableTest extends ServableTestBase {
 		
 	}
 	
-	private void configureMatch(String baseName, String uri, boolean withValidationHeader) {
+	private void configureMatch(String name, String uri, boolean withValidationHeader) {
 		match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(resourceFinder.findResource(DocumentScriptEnvironment.class, baseName)).willReturn(executionEnvironment);
+		given(resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name)).willReturn(executionEnvironment);
 		
 		if (withValidationHeader) {
 			given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);

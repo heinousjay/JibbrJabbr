@@ -18,7 +18,7 @@ package jj.resource;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.IOTask;
+import jj.configuration.AppLocation;
 import jj.execution.Promise;
 import jj.execution.TaskRunner;
 
@@ -40,22 +40,24 @@ public class ResourceLoader {
 		this.resourceFinder = resourceFinder;
 	}
 	
-	public Promise loadResource(final Class<? extends Resource> resourceClass, final String name,  final Object...arguments) {
-		return taskRunner.execute(new ResourceLoaderTask(resourceClass, name, arguments));
+	public Promise loadResource(final Class<? extends Resource> resourceClass, final AppLocation base, final String name,  final Object...arguments) {
+		return taskRunner.execute(new ResourceLoaderTask(resourceClass, base, name, arguments));
 	}
 	
 	private final class ResourceLoaderTask extends IOTask {
 		
 		private final Class<? extends Resource> resourceClass;
+		private final AppLocation base;
 		private final String name;
 		private final Object[] arguments;
 
 		/**
 		 * @param name
 		 */
-		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final String name, final Object...arguments) {
+		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
 			super("Resource loader [" + resourceClass.getSimpleName() + " at " + name);
 			this.resourceClass = resourceClass;
+			this.base = base;
 			this.name = name;
 			this.arguments = arguments;
 			
@@ -63,7 +65,7 @@ public class ResourceLoader {
 
 		@Override
 		protected void run() throws Exception {
-			resourceFinder.loadResource(resourceClass, name, arguments);
+			resourceFinder.loadResource(resourceClass, base, name, arguments);
 		}
 	}
 }

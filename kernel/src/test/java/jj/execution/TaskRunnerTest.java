@@ -15,6 +15,7 @@
  */
 package jj.execution;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
@@ -22,7 +23,6 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,7 +47,6 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public class TaskRunnerTest {
 	
-	private @Mock IOExecutor ioExecutor;
 	private @Mock ServerExecutor serverExecutor;
 	private @Mock ScheduledExecutorService scriptExecutor;
 	
@@ -71,17 +70,16 @@ public class TaskRunnerTest {
 		currentTask = new CurrentTask();
 		
 		Map<Class<?>, Object> executors = new HashMap<>();
-		executors.put(IOExecutor.class, ioExecutor);
 		executors.put(ServerExecutor.class, serverExecutor);
 		bundle = new ExecutorBundle(executors);
 		
 		executor = new TaskRunnerImpl(bundle, currentTask, logger);
 		
-		given(scriptEnvironment.baseName()).willReturn(baseName);
+		given(scriptEnvironment.name()).willReturn(baseName);
 	}
 	
-	private void runTask(ExecutorService service) {
-		verify(service, atLeastOnce()).submit(runnableCaptor.capture());
+	private void runTask(ServerExecutor service) {
+		verify(service, atLeastOnce()).submit(runnableCaptor.capture(), eq(0L), eq(MILLISECONDS));
 		// reset before each task run so that a test can control execution
 		// one task at a time
 		reset(service);
@@ -95,7 +93,7 @@ public class TaskRunnerTest {
 	@Test
 	public void testAwaitAsserts() throws Exception {
 		
-		IOTask task1 = new IOTask("test task 1") {
+		ServerTask task1 = new ServerTask("test task 1") {
 			@Override
 			protected void run() throws Exception {
 				// don't care
@@ -117,21 +115,21 @@ public class TaskRunnerTest {
 		
 		final AtomicInteger counter = new AtomicInteger();
 		
-		IOTask task1 = new IOTask("test task 1") {
+		ServerTask task1 = new ServerTask("test task 1") {
 			@Override
 			protected void run() throws Exception {
 				counter.incrementAndGet();
 			}
 		};
 		
-		IOTask task2 = new IOTask("test task 2") {
+		ServerTask task2 = new ServerTask("test task 2") {
 			@Override
 			protected void run() throws Exception {
 				counter.incrementAndGet();
 			}
 		};
 		
-		IOTask task3 = new IOTask("test task 3") {
+		ServerTask task3 = new ServerTask("test task 3") {
 			@Override
 			protected void run() throws Exception {
 				counter.incrementAndGet();
@@ -139,9 +137,9 @@ public class TaskRunnerTest {
 		};
 		
 		executor.execute(task1).then(task2).then(task3);
-		runTask(ioExecutor);
-		runTask(ioExecutor);
-		runTask(ioExecutor);
+		runTask(serverExecutor);
+		runTask(serverExecutor);
+		runTask(serverExecutor);
 		
 		assertThat(counter.get(), is(3));
 	}
@@ -151,7 +149,7 @@ public class TaskRunnerTest {
 		
 		final AtomicBoolean flag = new AtomicBoolean(false);
 		
-		IOTask task = new IOTask("test task") {
+		ServerTask task = new ServerTask("test task") {
 			@Override
 			protected void run() throws Exception {
 				flag.set(currentTask.current() == this);
@@ -161,7 +159,7 @@ public class TaskRunnerTest {
 		assertThat(currentTask.current(), is(nullValue()));
 		
 		executor.execute(task);
-		runTask(ioExecutor);
+		runTask(serverExecutor);
 		
 		assertThat(flag.get(), is(true));
 		assertThat(currentTask.current(), is(nullValue()));
@@ -172,7 +170,7 @@ public class TaskRunnerTest {
 		
 		final Exception toThrow = new Exception();
 		
-		executor.execute(new IOTask("test task") {
+		executor.execute(new ServerTask("test task") {
 			
 			@Override
 			protected void run() throws Exception {
@@ -180,7 +178,7 @@ public class TaskRunnerTest {
 			}
 		});
 		
-		runTask(ioExecutor);
+		runTask(serverExecutor);
 		
 		verify(logger).error(anyString(), eq(toThrow));
 	}

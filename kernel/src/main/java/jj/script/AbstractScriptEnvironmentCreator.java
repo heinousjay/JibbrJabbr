@@ -16,7 +16,9 @@
 package jj.script;
 
 import java.io.IOException;
+import java.net.URI;
 
+import jj.configuration.AppLocation;
 import jj.resource.AbstractResourceCreator;
 
 /**
@@ -25,6 +27,8 @@ import jj.resource.AbstractResourceCreator;
  */
 public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptEnvironment> extends AbstractResourceCreator<T> {
 	
+	protected static final AppLocation Virtual = AppLocation.Virtual;
+	
 	protected final ScriptEnvironmentInitializer initializer;
 	
 	protected AbstractScriptEnvironmentCreator(final ScriptEnvironmentInitializer initializer) {
@@ -32,7 +36,10 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 	}
 
 	@Override
-	public final T create(String name, Object... args) throws IOException {
+	public final T create(AppLocation location, String name, Object... args) throws IOException {
+		
+		// TODO enable this!
+		//assert location == AppLocation.Virtual : "all ScriptEnvironments are from the virtual location";
 		
 		T result = createScriptEnvironment(name, args);
 		
@@ -44,5 +51,12 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 	}
 	
 	protected abstract T createScriptEnvironment(String name, Object... args) throws IOException;
+	
+	@Override
+	protected URI uri(AppLocation base, String name, Object... args) {
+		// TODO enable this!
+		//assert location == AppLocation.Virtual : "all ScriptEnvironments are from the virtual location";
+		return URI.create(name);
+	}
 
 }

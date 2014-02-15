@@ -1,4 +1,4 @@
-package jj.execution;
+package jj.resource;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerShutdownListener;
+import jj.execution.JJRejectedExecutionHandler;
+import jj.execution.JJThreadFactory;
 
 /**
  * 

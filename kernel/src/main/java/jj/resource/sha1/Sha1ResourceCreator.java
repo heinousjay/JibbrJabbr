@@ -17,12 +17,11 @@ package jj.resource.sha1;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -33,15 +32,15 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 
-	private final Arguments arguments;
+	private final Application app;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	Sha1ResourceCreator(
-		final Arguments arguments,
+		final Application app,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.arguments = arguments;
+		this.app = app;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
@@ -56,17 +55,12 @@ public class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 	}
 
 	@Override
-	public Sha1Resource create(String baseName, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(Sha1Resource.class, cacheKey(baseName), baseName, path(baseName));
+	public Sha1Resource create(AppLocation base, String name, Object... args) throws IOException {
+		return instanceModuleCreator.createResource(Sha1Resource.class, cacheKey(base, name), base, name);
 	}
 	
 	@Override
-	protected URI uri(String baseName, Object... args) {
-		return path(baseName).toUri();
+	protected URI uri(AppLocation base, String name, Object... args) {
+		return app.resolvePath(base, name).toUri();
 	}
-
-	private Path path(String baseName, Object... args) {
-		return arguments.appPath().resolve(baseName);
-	}
-
 }

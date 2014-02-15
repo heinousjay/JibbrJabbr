@@ -13,36 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.asset;
+package jj.http.server;
 
-import java.nio.file.Path;
+import java.lang.Thread.UncaughtExceptionHandler;
 
-import jj.resource.ResourceBase;
-import jj.resource.asset.AssetResource;
-import jj.resource.asset.AssetResourceCreator;
+import jj.http.server.JJNioEventLoopGroup;
 
 /**
  * @author jason
  *
  */
-public class AssetResourceCreatorTest extends ResourceBase<AssetResource, AssetResourceCreator> {
-	
-	@Override
-	protected String baseName() {
-		return AssetResource.JJ_JS;
+class MockJJNioEventLoopGroup extends JJNioEventLoopGroup {
+
+	/**
+	 * @param uncaughtExceptionHandler
+	 */
+	MockJJNioEventLoopGroup() {
+		super(new UncaughtExceptionHandler() {
+			
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				e.printStackTrace();
+				throw new AssertionError(e);
+			}
+		});
 	}
-	
-	protected Path path() {
-		return Asset.appPath;
-	}
-	
-	@Override
-	protected AssetResource resource() throws Exception {
-		return new AssetResource(cacheKey(), path(), baseName());
-	}
-	
-	@Override
-	protected AssetResourceCreator toTest() {
-		return new AssetResourceCreator(creator);
-	}
+
 }

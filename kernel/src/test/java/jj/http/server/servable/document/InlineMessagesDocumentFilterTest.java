@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.PropertyResourceBundle;
 
-import jj.execution.IsThread;
+import jj.configuration.AppLocation;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.InlineMessagesDocumentFilter;
+import jj.resource.IsThread;
 import jj.resource.ResourceFinder;
 import jj.resource.document.HtmlResource;
 import jj.resource.property.PropertiesResource;
@@ -25,7 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class InlineMessagesDocumentFilterTest {
 
-	String baseName;
+	String name;
 	@Mock ResourceFinder resourceFinder;
 	@Mock PropertiesResource propertiesResource;
 	PropertyResourceBundle bundle;
@@ -39,7 +40,7 @@ public class InlineMessagesDocumentFilterTest {
 	public void test() throws IOException {
 
 		// given
-		baseName = "index";
+		name = "index";
 		
 		given(isThread.forIO()).willReturn(false);
 		
@@ -53,9 +54,9 @@ public class InlineMessagesDocumentFilterTest {
 		document = Jsoup.parse("<a id=\"test\" data-i18n-href=\"goodbye\" data-i18n-title=\"title\" data-i18n=\"hi\">HI MESSAGE HERE</a><p data-i18n=\"hi\">HI MESSAGE HERE ALSO</p>");
 		given(documentRequestProcessor.document()).willReturn(document);
 		
-		given(documentRequestProcessor.baseName()).willReturn(baseName);
+		given(documentRequestProcessor.baseName()).willReturn(name);
 		
-		given(resourceFinder.findResource(PropertiesResource.class, baseName)).willReturn(propertiesResource);
+		given(resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, name + ".properties")).willReturn(propertiesResource);
 		
 		toTest = new InlineMessagesDocumentFilter(resourceFinder, isThread);
 		

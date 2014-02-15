@@ -56,10 +56,16 @@ public class CoreModule extends JJModule {
 	
 	private final String [] args;
 	private final boolean isTest;
+	private final ResourceResolver resourceResolver;
 	
-	public CoreModule(final String [] args, final boolean isTest) {
+	public CoreModule(final String[] args) {
+		this(args, null);
+	}
+	
+	public CoreModule(final String [] args, final ResourceResolver resourceResolver) {
 		this.args = args;
-		this.isTest =isTest;
+		this.isTest = resourceResolver == null;
+		this.resourceResolver = resourceResolver == null ? new BootstrapClassPath() : resourceResolver;
 	}
 
 	@Override
@@ -67,6 +73,8 @@ public class CoreModule extends JJModule {
 		
 		// bind up the command line args
 		bind(String[].class).annotatedWith(CommandLine.class).toInstance(args);
+		bind(ResourceResolver.class).toInstance(resourceResolver);
+		bind(Version.class).to(VersionImpl.class);
 		
 		// we need the logging module to configure our async logger before we do anything that might log
 		install(new LoggingModule(isTest));
@@ -79,7 +87,7 @@ public class CoreModule extends JJModule {
 		
 		// extract the Document system from here.
 		// it is a standalone feature
-		install(new ResourceModule(isTest));
+		install(new ResourceModule());
 		install(new ScriptModule());
 		// everything before here (once the Document system is extracted)
 		// can be started with no configuration, and then changed on the fly

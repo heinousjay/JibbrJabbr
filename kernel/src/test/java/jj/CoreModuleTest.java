@@ -30,13 +30,13 @@ public class CoreModuleTest {
 	public void testRunningBuild() {
 		
 		// this should be enough to test that the core module builds
-		Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0], false)).getInstance(JJServerLifecycle.class);
+		Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0], new BootstrapClassPath())).getInstance(JJServerLifecycle.class);
 	}
 	
 	
 	@Test
 	public void testTestBuild() {
 
-		Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0], true)).getInstance(JJServerLifecycle.class);
+		Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0])).getInstance(JJServerLifecycle.class);
 	}
 }

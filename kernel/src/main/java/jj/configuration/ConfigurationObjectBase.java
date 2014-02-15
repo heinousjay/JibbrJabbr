@@ -87,7 +87,7 @@ public abstract class ConfigurationObjectBase {
 	}
 	
 	protected final ConfigResource configResource() {
-		return resourceFinder.findResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+		return resourceFinder.findResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
 	}
 	
 	void runScriptFunction() {

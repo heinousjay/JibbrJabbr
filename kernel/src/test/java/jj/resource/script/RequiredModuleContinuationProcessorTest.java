@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
+import jj.configuration.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoadedEvent;
 import jj.resource.ResourceLoader;
@@ -88,8 +89,8 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// we validate it happened because it's the only signal we get
-		verify(finder).findResource(ModuleScriptEnvironment.class, module, requiredModule);
-		verify(loader).loadResource(ModuleScriptEnvironment.class, module, requiredModule);
+		verify(finder).findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule);
+		verify(loader).loadResource(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule);
 	}
 	
 	@Test
@@ -99,7 +100,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceLoaded(new ResourceLoadedEvent(ModuleScriptEnvironment.class, module, requiredModule));
+		processor.resourceLoaded(new ResourceLoadedEvent(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
 		
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
 		
@@ -113,7 +114,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceNotFound(new ResourceNotFoundEvent(ModuleScriptEnvironment.class, module, requiredModule));
+		processor.resourceNotFound(new ResourceNotFoundEvent(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
 		
 		// then
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
@@ -123,7 +124,7 @@ public class RequiredModuleContinuationProcessorTest {
 	}
 	
 	private void givenAScriptEnvironment() {
-		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(module), any(RequiredModule.class))).willReturn(moduleScriptEnvironment);
+		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(AppLocation.Virtual), eq(module), any(RequiredModule.class))).willReturn(moduleScriptEnvironment);
 	}
 	
 	@Test

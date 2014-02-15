@@ -105,7 +105,7 @@ public class EngineHttpHandlerTest {
 		given(httpRequest5.uriMatch()).willReturn(servables.uri5);
 		
 		given(servables.staticServable.makeRequestProcessor(httpRequest1, httpResponse)).willReturn(requestProcessor1);
-		given(servables.assetServable.makeRequestProcessor(httpRequest2, httpResponse)).willReturn(requestProcessor2);
+		given(servables.staticServable.makeRequestProcessor(httpRequest2, httpResponse)).willReturn(requestProcessor2);
 		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
 		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		

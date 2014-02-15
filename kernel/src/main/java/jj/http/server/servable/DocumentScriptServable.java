@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ScriptResource;
@@ -30,8 +31,8 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 	private final ResourceFinder resourceFinder;
 
 	@Inject
-	DocumentScriptServable(final Arguments arguments, final ResourceFinder finder) {
-		super(arguments);
+	DocumentScriptServable(final Application app, final ResourceFinder finder) {
+		super(app);
 		this.resourceFinder = finder;
 	}
 	
@@ -84,7 +85,7 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 		if (match.sha1 != null && typeMatcher.matches()) {
 			
 			DocumentScriptEnvironment scriptEnvironment = 
-				resourceFinder.findResource(DocumentScriptEnvironment.class, typeMatcher.group(1));
+				resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, typeMatcher.group(1));
 			if (scriptEnvironment != null) {
 				result = typeFromExecutionEnvironment(scriptEnvironment, typeMatcher.group(2));
 			}

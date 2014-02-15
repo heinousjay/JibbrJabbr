@@ -18,12 +18,12 @@ package jj.http.server;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+import jj.Version;
 import jj.http.AbstractHttpResponse;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.JJHttpServerResponse;
@@ -39,6 +39,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,6 +64,7 @@ public class JJHttpServerResponseTest {
 	JJHttpServerRequest request;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock Logger logger;
+	@Mock Version version;
 	JJHttpServerResponse response;
 
 	@Before
@@ -70,7 +72,7 @@ public class JJHttpServerResponseTest {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		request = new JJHttpServerRequest(nettyRequest, new RouteFinder(), ctx);
 		
-		response = new JJHttpServerResponse(request, ctx, logger, logger);
+		response = new JJHttpServerResponse(version, request, ctx, logger, logger);
 		assertThat(response.charset(), is(UTF_8));
 	}
 

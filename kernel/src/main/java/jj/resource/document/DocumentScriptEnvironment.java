@@ -36,14 +36,15 @@ import jj.Closer;
 import jj.CurrentResource;
 import jj.ResourceAware;
 import jj.SHA1Helper;
+import jj.configuration.AppLocation;
 import jj.engine.EngineAPI;
-import jj.execution.IOThread;
 import jj.http.server.ConnectionBroadcastStack;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.http.server.servable.document.DocumentRequestProcessor;
+import jj.resource.IOThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -128,13 +129,13 @@ public class DocumentScriptEnvironment
 		super(cacheKey, contextProvider);
 		this.baseName = baseName;
 		
-		html = resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName));
+		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, HtmlResourceCreator.resourceName(baseName));
 		
 		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName + ".html");
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Client.suffix(baseName));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Shared.suffix(baseName));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(baseName));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(baseName));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(baseName));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -173,7 +174,7 @@ public class DocumentScriptEnvironment
 	}
 
 	@Override
-	public String baseName() {
+	public String name() {
 		return baseName;
 	}
 	
@@ -235,6 +236,12 @@ public class DocumentScriptEnvironment
 	public boolean needsReplacing() throws IOException {
 		// this never goes out of scope on its own
 		// dependency tracking handles it all 
+		return false;
+	}
+	
+	@Override
+	protected boolean removeOnReload() {
+		// we're a root environment! reload away, please
 		return false;
 	}
 	

@@ -16,26 +16,29 @@
 package jj.api;
 
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Paths;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
+import jj.script.AbstractScriptEnvironmentCreator;
+import jj.script.ScriptEnvironmentInitializer;
 
 /**
+ * not sure this is sticking around... API may just become a registry of InternalModuleScriptEnvironment things.  might
  * @author jason
  *
  */
 @Singleton
-public class APIBootstrapScriptEnvironmentCreator extends AbstractResourceCreator<APIBootstrapScriptEnvironment> {
+public class APIBootstrapScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<APIBootstrapScriptEnvironment> {
 	
 	private final ResourceInstanceCreator creator;
 	
 	@Inject
-	APIBootstrapScriptEnvironmentCreator(final ResourceInstanceCreator creator) {
+	APIBootstrapScriptEnvironmentCreator(
+		final ResourceInstanceCreator creator,
+		final ScriptEnvironmentInitializer initializer
+	) {
+		super(initializer);
 		this.creator = creator;
 	}
 	
@@ -52,14 +55,8 @@ public class APIBootstrapScriptEnvironmentCreator extends AbstractResourceCreato
 	}
 
 	@Override
-	public APIBootstrapScriptEnvironment create(String baseName, Object... args) throws IOException {
-		return creator.createResource(APIBootstrapScriptEnvironment.class, cacheKey(baseName, args), baseName, Paths.get("/"), args);
-	}
-
-	@Override
-	protected URI uri(String baseName, Object... args) {
-		// TODO Auto-generated method stub
-		return null;
+	public APIBootstrapScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
+		return creator.createResource(APIBootstrapScriptEnvironment.class, cacheKey(Virtual, name, args), Virtual, name, args);
 	}
 
 }

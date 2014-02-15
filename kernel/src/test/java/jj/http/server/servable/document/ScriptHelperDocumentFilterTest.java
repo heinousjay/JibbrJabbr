@@ -3,22 +3,23 @@ package jj.http.server.servable.document;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.resource.asset.AssetResource.*;
+import static jj.configuration.Assets.*;
 
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
+import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
 import jj.http.HttpRequest;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.ScriptHelperDocumentFilter;
 import jj.jjmessage.JJMessage;
 import jj.resource.ResourceFinder;
-import jj.resource.asset.AssetResource;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.script.ScriptResource;
 import jj.resource.script.ScriptResourceType;
+import jj.resource.stat.ic.StaticResource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -42,8 +43,8 @@ public class ScriptHelperDocumentFilterTest {
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	@Mock ScriptResource scriptResource;
 	@Mock HttpRequest httpRequest;
-	@Mock AssetResource jqueryJs;
-	@Mock AssetResource jjJs;
+	@Mock StaticResource jqueryJs;
+	@Mock StaticResource jjJs;
 	Document document;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 
@@ -72,13 +73,13 @@ public class ScriptHelperDocumentFilterTest {
 		given(documentRequestProcessor.document()).willReturn(document);
 		given(documentRequestProcessor.httpRequest()).willReturn(httpRequest);
 		
-		given(resourceFinder.findResource(AssetResource.class, JQUERY_JS))
+		given(resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JQUERY_JS))
 			.willReturn(jqueryJs);
-		given(resourceFinder.findResource(AssetResource.class, JJ_JS))
+		given(resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS))
 			.willReturn(jjJs);
 		
 		given(jqueryJs.uri()).willReturn(JQUERY_URI);
-		given(jqueryJs.baseName()).willReturn(JQUERY_JS);
+		given(jqueryJs.name()).willReturn(JQUERY_JS);
 		
 		given(jjJs.sha1()).willReturn(JJ_SHA);
 		given(jjJs.uri()).willReturn(JJ_URI);

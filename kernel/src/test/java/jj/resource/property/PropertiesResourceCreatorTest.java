@@ -28,22 +28,22 @@ import jj.resource.property.PropertiesResourceCreator;
 public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResource, PropertiesResourceCreator> {
 
 	@Override
-	protected String baseName() {
+	protected String name() {
 		return "index";
 	}
 
 	protected Path path() {
-		return appPath.resolve(baseName() + ".properties");
+		return appPath.resolve(name() + ".properties");
 	}
 
 	@Override
 	protected PropertiesResource resource() throws Exception {
-		return new PropertiesResource(cacheKey(), path(), baseName());
+		return new PropertiesResource(cacheKey(), path(), name());
 	}
 
 	@Override
 	protected PropertiesResourceCreator toTest() {
-		return new PropertiesResourceCreator(arguments, creator);
+		return new PropertiesResourceCreator(app, creator);
 	}
 
 

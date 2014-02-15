@@ -40,7 +40,7 @@ import org.junit.Test;
  * @author jason
  *
  */
-public class SystemJarsTest {
+public class JarsTest {
 	
 	Path baseDir;
 	Map<String, String> jarFsPropertiesMap;
@@ -74,7 +74,7 @@ public class SystemJarsTest {
 			"/META-INF/MANIFEST.MF"
 		));
 		
-		baseDir = Files.createTempDirectory(SystemJarsTest.class.getSimpleName().toLowerCase());
+		baseDir = Files.createTempDirectory(JarsTest.class.getSimpleName().toLowerCase());
 		
 		urisByJar = new HashMap<>();
 		for (String jarName : filesByJar.keySet()) {
@@ -140,19 +140,19 @@ public class SystemJarsTest {
 
 	@Test
 	public void test() throws IOException {
-		SystemJars sj = new SystemJars(baseDir);
+		Jars jars = new Jars(baseDir);
 		
 		for (String jarName : filesByJar.keySet()) {
 			for (String file : filesByJar.get(jarName)) {
-				Path path = sj.pathForFile(file);
+				Path path = jars.pathForFile(file);
 				if (file.startsWith("/META-INF")) {
 					assertThat(path, is(nullValue()));
 				} else {
 					assertThat(path, is(notNullValue()));
 					assertThat(path.toUri().toString(), containsString(jarName));
-					assertThat(sj.jarManifestForFile(file), is(notNullValue()));
-					assertThat(sj.codeSourceForFile(file), is(notNullValue()));
-					assertThat(sj.codeSourceForFile(file).getLocation(), is(urisByJar.get(jarName).toURL()));
+					assertThat(jars.jarManifestForFile(file), is(notNullValue()));
+					assertThat(jars.codeSourceForFile(file), is(notNullValue()));
+					assertThat(jars.codeSourceForFile(file).getLocation(), is(urisByJar.get(jarName).toURL()));
 				}
 				
 			}

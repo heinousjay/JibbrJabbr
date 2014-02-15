@@ -1,7 +1,8 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
+
+import jj.configuration.AppLocation;
 
 /**
  * represents the ability to create a resource given a baseName and
@@ -31,12 +32,7 @@ interface ResourceCreator<T extends Resource> {
 	 * Produce a cache key for given resource by its creation args
 	 * @return
 	 */
-	ResourceCacheKey cacheKey(final String baseName, final Object...args);
-	
-	/**
-	 * Produce a cache key for a given resource by its URI
-	 */
-	ResourceCacheKey cacheKey(final URI uri);
+	ResourceCacheKey cacheKey(final AppLocation base, final String name, final Object...args);
 	
 	/**
 	 * create the given resource
@@ -45,5 +41,5 @@ interface ResourceCreator<T extends Resource> {
 	 * @return
 	 * @throws IOException
 	 */
-	T create(final String baseName, final Object...args) throws IOException;
+	T create(final AppLocation base, final String name, final Object...args) throws IOException;
 }

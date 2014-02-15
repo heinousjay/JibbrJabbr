@@ -103,7 +103,7 @@ public class DocumentRequestProcessorTest {
 
 		taskRunner = new MockTaskRunner();
 		
-		given(documentScriptEnvironment.baseName()).willReturn(baseName);
+		given(documentScriptEnvironment.name()).willReturn(baseName);
 		given(documentScriptEnvironment.document()).willReturn(document);
 		
 		given(httpRequest.uri()).willReturn("/");

@@ -22,10 +22,12 @@ import io.netty.handler.codec.http.HttpHeaders;
 
 import java.io.IOException;
 
-import jj.configuration.Arguments;
-import jj.execution.IOThread;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
+import jj.resource.FileResource;
+import jj.resource.IOThread;
 import jj.resource.Resource;
 import jj.uri.URIMatch;
 
@@ -51,8 +53,8 @@ public class ServableTest extends ServableTestBase {
 		/**
 		 * @param configuration
 		 */
-		protected ServableImpl(Arguments arguments) {
-			super(arguments);
+		protected ServableImpl(Application app) {
+			super(app);
 		}
 
 		@Override
@@ -73,20 +75,26 @@ public class ServableTest extends ServableTestBase {
 		
 	}
 	
-	@Mock Resource resource;
+	@Mock FileResource resource;
 	
 	ServableImpl si;
 	
 	@Before
 	public void before() {
-		si = new ServableImpl(arguments);
+		si = new ServableImpl(app);
 	}
 
 	@Test
 	public void testIsServablePath() {
 		
-		assertThat(si.isServablePath(appPath.resolve("index.html")), is(true));
-		assertThat(si.isServablePath(appPath.resolve("../not-servable/index.html")), is(false));
+		given(resource.path()).willReturn(appPath.resolve("index.html"));
+		given(resource.base()).willReturn(AppLocation.Public);
+		
+		assertThat(si.isServableResource(resource), is(true));
+		
+		given(resource.path()).willReturn(appPath.resolve("../not-servable/index.html"));
+		
+		assertThat(si.isServableResource(resource), is(false));
 		
 	}
 	

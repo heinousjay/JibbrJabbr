@@ -1,3 +1,6 @@
+package jj;
+
+import javax.inject.Singleton;
 /*
  *    Copyright 2012 Jason Miller
  *
@@ -13,28 +16,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
-
-import java.lang.Thread.UncaughtExceptionHandler;
 
 /**
  * @author jason
  *
  */
-public class MockJJNioEventLoopGroup extends JJNioEventLoopGroup {
+@Singleton
+public class VersionImpl extends Version {
 
-	/**
-	 * @param uncaughtExceptionHandler
-	 */
-	public MockJJNioEventLoopGroup() {
-		super(new UncaughtExceptionHandler() {
-			
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				e.printStackTrace();
-				throw new AssertionError(e);
-			}
-		});
+	@Override
+	public String name() {
+		return name;
 	}
 
+	@Override
+	public String branchName() {
+		return branchName;
+	}
+
+	@Override
+	public String version() {
+		return version;
+	}
+
+	@Override
+	public String commitId() {
+		return commitId;
+	}
 }

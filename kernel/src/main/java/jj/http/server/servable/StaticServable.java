@@ -15,12 +15,14 @@
  */
 package jj.http.server.servable;
 
+import static jj.configuration.AppLocation.*;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.Application;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
@@ -41,10 +43,10 @@ public class StaticServable extends Servable<StaticResource> {
 	 */
 	@Inject
 	protected StaticServable(
-		final Arguments arguments,
+		final Application app,
 		final ResourceFinder resourceFinder
 	) {
-		super(arguments);
+		super(app);
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -62,7 +64,7 @@ public class StaticServable extends Servable<StaticResource> {
 		final HttpResponse response
 	) throws IOException {
 		final StaticResource resource = loadResource(request.uriMatch());
-		if (resource != null && isServablePath(resource.path())) {
+		if (resource != null && isServableResource(resource)) {
 			return makeStandardRequestProcessor(request, response, request.uriMatch(), resource);
 		}
 		
@@ -72,7 +74,7 @@ public class StaticServable extends Servable<StaticResource> {
 
 	@Override
 	public StaticResource loadResource(URIMatch match) {
-		return resourceFinder.loadResource(StaticResource.class, match.baseName);
+		return resourceFinder.loadResource(StaticResource.class, Base.and(Assets), match.baseName);
 	}
 
 }

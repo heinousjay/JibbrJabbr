@@ -43,7 +43,7 @@ public class ConfigurationScriptPreloaderTest {
 		csp.start();
 		taskRunner.runFirstTask();
 		
-		verify(resourceFinder).loadResource(ConfigResource.class, ConfigResource.CONFIG_JS);
+		verify(resourceFinder).loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
 	}
 
 }

@@ -13,32 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.configuration;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jj.BootstrapClassPath;
 
 /**
  * @author jason
  *
  */
-@Singleton
-public class IsThread {
+public class MockAssets extends Assets {
 
-	final IOExecutor ioExecutor;
-	final ServerExecutor serverExecutor;
-	
-	@Inject
-	IsThread(final IOExecutor ioExecutor, final ServerExecutor serverExecutor) {
-		this.ioExecutor = ioExecutor;
-		this.serverExecutor = serverExecutor;
+	/**
+	 * @param resolver
+	 */
+	public MockAssets() {
+		super(new BootstrapClassPath());
 	}
 
-	public boolean forIO() {
-		return ioExecutor.isIOThread();
-	}
-	
-	public boolean forServer() {
-		return serverExecutor.isServerThread();
-	}
 }

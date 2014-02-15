@@ -18,6 +18,7 @@ package jj.api;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
+import jj.configuration.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.RequiredModule;
@@ -62,11 +63,11 @@ public class RequireFunctionTest {
 	private void givenAnExistingModule() {
 		ModuleScriptEnvironment mse = mock(ModuleScriptEnvironment.class);
 		given(mse.initialized()).willReturn(true);
-		given(resourceFinder.findResource(eq(ModuleScriptEnvironment.class), anyString(), anyVararg())).willReturn(mse);
+		given(resourceFinder.findResource(eq(ModuleScriptEnvironment.class), eq(AppLocation.Virtual), anyString(), anyVararg())).willReturn(mse);
 	}
 	
 	private void verifyIdentifierResolution(String expected) {
-		verify(resourceFinder).findResource(eq(ModuleScriptEnvironment.class), nameCaptor.capture(), requiredModuleCaptor.capture());
+		verify(resourceFinder).findResource(eq(ModuleScriptEnvironment.class), eq(AppLocation.Virtual), nameCaptor.capture(), requiredModuleCaptor.capture());
 		assertThat(nameCaptor.getValue(), is(expected));
 		assertThat(requiredModuleCaptor.getValue(), is(notNullValue()));
 		// should test that the RequiredModule is correct, will need a helper in that package though

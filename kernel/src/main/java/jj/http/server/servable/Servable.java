@@ -1,28 +1,33 @@
 package jj.http.server.servable;
 
+
+import static jj.configuration.AppLocation.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
-import jj.configuration.Arguments;
-import jj.execution.IOThread;
+import jj.configuration.Application;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
+import jj.resource.FileResource;
+import jj.resource.IOThread;
 import jj.resource.Resource;
 import jj.uri.URIMatch;
 import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable<T extends Resource> {
 	
-	protected final Arguments arguments;
+	protected final Application app;
 	
-	protected Servable(final Arguments arguments) {
-		this.arguments = arguments;
+	protected Servable(final Application app) {
+		this.app = app;
 	}
 	
+	// TODO probably removing this?
 	protected Path appPath() {
-		return arguments.appPath();
+		return app.path();
 	}
 	
 	/**
@@ -32,9 +37,13 @@ public abstract class Servable<T extends Resource> {
 	 * @return
 	 */
 	@IOThread
-	protected boolean isServablePath(final Path path) {
-		final Path normalized = path.normalize();
-		return Files.exists(normalized, LinkOption.NOFOLLOW_LINKS) && normalized.startsWith(appPath());
+	protected boolean isServableResource(final FileResource resource) {
+		boolean result = (resource.base() == Assets || resource.base() == Virtual);
+		if (result == false) {
+			final Path normalized = resource.path().normalize();
+			result = Files.exists(normalized, LinkOption.NOFOLLOW_LINKS) && normalized.startsWith(appPath());
+		}
+		return result;
 	}
 	
 	/**

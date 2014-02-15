@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.resource.script.ModuleScriptEnvironment;
 import jj.resource.script.RequiredModule;
@@ -77,6 +78,7 @@ class RequireFunction extends BaseFunction {
 		ModuleScriptEnvironment scriptEnvironment =
 			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
+				AppLocation.Virtual,
 				moduleIdentifier,
 				requiredModule
 			);

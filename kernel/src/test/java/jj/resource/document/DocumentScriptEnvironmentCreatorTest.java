@@ -16,109 +16,41 @@
 package jj.resource.document;
 
 import static org.mockito.BDDMockito.*;
-
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-
-import jj.engine.EngineAPI;
-import jj.http.server.MockCurrentWebSocketConnection;
-import jj.http.server.servable.document.DocumentConfiguration;
-import jj.http.server.servable.document.MockDocumentConfiguration;
-import jj.resource.ResourceBase;
-import jj.resource.ResourceFinder;
-import jj.resource.ResourceMaker;
+import org.mockito.runners.MockitoJUnitRunner;
+import jj.configuration.AppLocation;
+import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceInstanceCreator;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.DocumentScriptEnvironmentCreator;
-import jj.resource.document.HtmlResource;
-import jj.resource.script.ScriptResource;
-import jj.resource.script.ScriptResourceType;
-import jj.script.MockRhinoContextProvider;
-import jj.script.MockableScriptEnvironmentInitializer;
 
-/**
- * this test only validates that the creator is getting all of the necessary stuff to the resource. there needs to
- * be a separate test for creating a resource to validate it works as expected
- * 
- * @author jason
- *
- */
-public class DocumentScriptEnvironmentCreatorTest extends ResourceBase<DocumentScriptEnvironment, DocumentScriptEnvironmentCreator> {
+@RunWith(MockitoJUnitRunner.class)
+public class DocumentScriptEnvironmentCreatorTest {
 
-	ResourceMaker resourceMaker;
-	@Mock ResourceFinder resourceFinder;
-	@Mock EngineAPI api;
-	@Mock ScriptableObject local;
-	@Mock ScriptCompiler compiler;
-	@Mock DocumentWebSocketMessageProcessors processors;
-	MockRhinoContextProvider contextProvider;
+	private @Mock ResourceInstanceCreator creator;
 	
-	@Mock Script script;
+	private DocumentScriptEnvironmentCreator toTest;
 	
-	@Mock MockableScriptEnvironmentInitializer initializer;
-	
-
-	@Override
-	protected String baseName() {
-		return "index";
+	@Before
+	public void before() {
+		toTest = new DocumentScriptEnvironmentCreator(null, creator);
 	}
 	
-	private void givenMinimalServices() throws Exception {
-		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
+	@Test
+	public void test() throws Exception {
 		
-		resourceMaker = new ResourceMaker(configuration, arguments);
+		String name = "index";
 		
-		contextProvider = new MockRhinoContextProvider();
-		given(contextProvider.context.newObject(any(Scriptable.class))).willReturn(local);
+		toTest.createScriptEnvironment(name);
+		
+		verify(creator).createResource(
+			eq(DocumentScriptEnvironment.class),
+			any(ResourceCacheKey.class),
+			eq(AppLocation.Virtual),
+			eq(name)
+		);
 	}
-	
-	private void givenDocumentScriptEnvironmentResources(String baseName) throws Exception {
-		HtmlResource htmlResource = resourceMaker.makeHtml(HtmlResourceCreator.resourceName(baseName));
-		given(resourceFinder.loadResource(HtmlResource.class, HtmlResourceCreator.resourceName(baseName))).willReturn(htmlResource);
-		
-		ScriptResource serverResource = resourceMaker.makeScript(ScriptResourceType.Server.suffix(baseName));
-		given(resourceFinder.loadResource(ScriptResource.class, ScriptResourceType.Server.suffix(baseName))).willReturn(serverResource);
-		
-		given(compiler.compile(
-			any(ScriptableObject.class),
-			any(ScriptResource.class),
-			any(ScriptResource.class),
-			eq(serverResource)
-		)).willReturn(script);
-	}
-	
-	@Override
-	protected void resourceAssertions(DocumentScriptEnvironment resource) throws Exception {
-		verify(initializer).initializeScript(resource);
-	}
-
-	@Override
-	protected DocumentScriptEnvironment resource() throws Exception {
-		
-		givenMinimalServices();
-		givenDocumentScriptEnvironmentResources(baseName());
-		
-		DocumentScriptEnvironment result = 
-			new DocumentScriptEnvironment(
-				cacheKey(),
-				baseName(),
-				resourceFinder,
-				contextProvider,
-				api,
-				compiler,
-				processors,
-				new CurrentDocumentRequestProcessor(),
-				new MockCurrentWebSocketConnection()
-			);
-		
-		return result;
-	}
-
-
-	@Override
-	protected DocumentScriptEnvironmentCreator toTest() {
-		return new DocumentScriptEnvironmentCreator(initializer, creator);
-	}
-
 }

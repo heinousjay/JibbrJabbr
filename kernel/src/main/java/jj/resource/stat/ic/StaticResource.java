@@ -23,8 +23,8 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.execution.IOThread;
 import jj.resource.AbstractFileResource;
+import jj.resource.IOThread;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
 import jj.resource.TransferableResource;

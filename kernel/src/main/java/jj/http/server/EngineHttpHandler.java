@@ -22,7 +22,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 
-import jj.execution.IOTask;
 import jj.execution.TaskRunner;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -30,6 +29,7 @@ import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
 import jj.logging.EmergencyLogger;
+import jj.resource.IOTask;
 import jj.resource.Resource;
 
 /**

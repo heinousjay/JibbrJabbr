@@ -23,7 +23,6 @@ import java.util.List;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
 import jj.resource.Resource;
-import jj.resource.asset.AssetResource;
 import jj.resource.css.CssResource;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
@@ -48,7 +47,6 @@ public class MockServablesRule implements TestRule {
 	public final URIMatch uri5 = new URIMatch("/5");
 	
 	@Mock public Servable<StaticResource> staticServable;
-	@Mock public Servable<AssetResource> assetServable;
 	@Mock public Servable<CssResource> cssServable;
 	
 	@Mock public Servables servables;
@@ -57,7 +55,6 @@ public class MockServablesRule implements TestRule {
 	private void init() {
 		
 		staticServable = mock(Servable.class);
-		assetServable = mock(Servable.class);
 		cssServable = mock(Servable.class);
 		servables = mock(Servables.class);
 	}
@@ -80,13 +77,13 @@ public class MockServablesRule implements TestRule {
 					.willReturn(asList(staticServable));
 				
 				given(servables.findMatchingServables(assetUri))
-					.willReturn(asList(assetServable));
+					.willReturn(asList(staticServable));
 				
 				given(servables.findMatchingServables(cssUri))
 					.willReturn(asList(cssServable));
 				
 				given(servables.findMatchingServables(uri4))
-					.willReturn(asList(assetServable, cssServable));
+					.willReturn(asList(staticServable, cssServable));
 				
 				given(servables.findMatchingServables(uri5))
 					.willReturn(asList(cssServable));

@@ -17,12 +17,11 @@ package jj.resource.config;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -33,15 +32,15 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class ConfigResourceCreator extends AbstractResourceCreator<ConfigResource> {
 	
-	private final Arguments configuration;
+	private final Application app;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	ConfigResourceCreator(
-		final Arguments configuration,
+		final Application app,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.configuration = configuration;
+		this.app = app;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
@@ -56,17 +55,13 @@ public class ConfigResourceCreator extends AbstractResourceCreator<ConfigResourc
 	}
 	
 	@Override
-	protected URI uri(String baseName, Object... args) {
-		return path(baseName).toUri();
-	}
-	
-	private Path path(String baseName, Object... args) {
-		return canLoad(baseName) ? configuration.appPath().resolve(baseName) : null;
+	protected URI uri(AppLocation base, String name, Object... args) {
+		return app.resolvePath(base, name).toUri();
 	}
 
 	@Override
-	public ConfigResource create(String baseName, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(ConfigResource.class, cacheKey(baseName), baseName, path(baseName));
+	public ConfigResource create(AppLocation base, String name, Object... args) throws IOException {
+		return instanceModuleCreator.createResource(ConfigResource.class, cacheKey(base, name), base, name);
 	}
 
 }

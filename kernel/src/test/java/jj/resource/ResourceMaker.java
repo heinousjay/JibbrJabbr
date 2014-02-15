@@ -19,7 +19,8 @@ import static org.mockito.BDDMockito.*;
 
 import org.slf4j.Logger;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.configuration.Configuration;
 import jj.resource.document.HtmlResource;
 import jj.resource.document.HtmlResourceMaker;
@@ -35,30 +36,30 @@ import jj.resource.stat.ic.StaticResourceMaker;
 public class ResourceMaker {
 	
 	private final Logger logger;
-	private final Arguments arguments;
+	private final Application app;
 	private final ResourceInstanceCreator creator;
 	
-	public ResourceMaker(final Configuration configuration, final Arguments arguments) throws Exception {
-		this.arguments = arguments;
+	public ResourceMaker(final Configuration configuration, final Application app) throws Exception {
+		this.app = app;
 		logger = mock(Logger.class);
-		creator = ResourceInstanceCreatorTest.creator(configuration, logger);
+		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);
 	}
 	
-	public ResourceMaker(Configuration configuration, final Arguments arguments, Logger logger) throws Exception {
-		this.arguments = arguments;
+	public ResourceMaker(Configuration configuration, final Application app, Logger logger) throws Exception {
+		this.app = app;
 		this.logger = logger;
-		creator = ResourceInstanceCreatorTest.creator(configuration, logger);
+		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);
 	}
 
-	public StaticResource makeStatic(String baseName) throws Exception {
-		return StaticResourceMaker.make(arguments, creator, baseName);
+	public StaticResource makeStatic(AppLocation base, String name) throws Exception {
+		return StaticResourceMaker.make(app, creator, base, name);
 	}
 	
-	public HtmlResource makeHtml(String baseName) throws Exception {
-		return HtmlResourceMaker.make(arguments, creator, baseName);
+	public HtmlResource makeHtml(AppLocation base, String name) throws Exception {
+		return HtmlResourceMaker.make(app, creator, base, name);
 	}
 	
-	public ScriptResource makeScript(String baseName) throws Exception {
-		return ScriptResourceMaker.make(arguments, creator, baseName);
+	public ScriptResource makeScript(AppLocation base, String name) throws Exception {
+		return ScriptResourceMaker.make(app, creator, base, name);
 	}
 }

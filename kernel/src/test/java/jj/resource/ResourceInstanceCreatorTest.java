@@ -15,59 +15,46 @@
  */
 package jj.resource;
 
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.Date;
 
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.configuration.Configuration;
-import jj.engine.EngineAPI;
-import jj.event.Publisher;
-import jj.execution.MockTaskRunner;
-import jj.execution.TaskRunner;
-import jj.http.server.WebSocketMessageProcessor;
-import jj.http.server.servable.document.DocumentConfiguration;
-import jj.http.server.servable.document.MockDocumentConfiguration;
 import jj.logging.EmergencyLogger;
-import jj.resource.asset.Asset;
-import jj.resource.asset.AssetResource;
-import jj.resource.config.ConfigResource;
-import jj.resource.css.CssResource;
-import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.HtmlResource;
-import jj.resource.property.PropertiesResource;
-import jj.resource.script.ModuleScriptEnvironment;
-import jj.resource.script.RequiredModule;
-import jj.resource.script.ScriptResource;
-import jj.resource.sha1.Sha1Resource;
-import jj.resource.spec.SpecResource;
 import jj.resource.stat.ic.StaticResource;
-import jj.script.ContinuationPendingKey;
-import jj.script.RhinoContext;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 
-/**
- * TODO - this could be better?
- * 
- * @author jason
- *
- */
-public class ResourceInstanceCreatorTest extends RealResourceBase {
+@RunWith(MockitoJUnitRunner.class)
+public class ResourceInstanceCreatorTest  {
 	
-	public static ResourceInstanceCreator creator(final Configuration configuration, final Logger logger) {
-		return new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
+	// TODO kill this off.  too much concrete stuff
+	public static ResourceInstanceCreator creator(
+		final Application app,
+		final Configuration configuration,
+		final Logger logger
+	) {
+		return new ResourceInstanceCreator(app, Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
@@ -77,117 +64,89 @@ public class ResourceInstanceCreatorTest extends RealResourceBase {
 		}), logger);
 	}
 	
-	@Mock Publisher publisher;
-	@Mock EngineAPI api;
-	@Mock ResourceFinder resourceFinder;
-	@Mock RhinoContext rhinoContext;
-	@Mock WebSocketMessageProcessor processor;
+	@Mock Application app;
+	@Mock Injector injector;
+	@Mock Logger logger;
 	
-	private ResourceInstanceCreator makeCreator(final Configuration configuration, final Logger logger) {
-		return new ResourceInstanceCreator(Guice.createInjector(new AbstractModule() {
-			
-			@Override
-			protected void configure() {
-				bind(Configuration.class).toInstance(configuration);
-				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
-				bind(Publisher.class).toInstance(publisher);
-				bind(EngineAPI.class).toInstance(api);
-				bind(ResourceFinder.class).toInstance(resourceFinder);
-				bind(RhinoContext.class).toInstance(rhinoContext);
-				bind(WebSocketMessageProcessor.class).toInstance(processor);
-				bind(TaskRunner.class).to(MockTaskRunner.class);
-			}
-		}), logger);
-	}
+	@Captor ArgumentCaptor<AbstractModule> moduleCaptor;
 	
-	ResourceInstanceCreator rimc;
+	@InjectMocks ResourceInstanceCreator rimc;
+	
+	@Mock ResourceCacheKey cacheKey;
 	
 	@Before
 	public void before() {
-		rimc = makeCreator(configuration, logger);
+		given(injector.createChildInjector(any(AbstractModule.class))).willReturn(injector);
 	}
 	
-	private <T extends Resource> T doCreate(Class<T> type, String baseName, Object...args) throws Exception {
-		Path path = appPath.resolve(baseName);
+	@Test
+	public void testPathCreation() {
 		
-		return doCreate(type, baseName, path, args);
-	}
-	
-	private <T extends Resource> T doCreate(Class<T> type, String baseName, Path path, Object...args) throws Exception {
-		ResourceCacheKey cacheKey = new ResourceCacheKey(type, path.toUri());
+		String name = "name";
+		Path path = Paths.get("/");
 		
-		return testResource(rimc.createResource(type, cacheKey, baseName, path, args));
+		given(app.resolvePath(AppLocation.Base, name)).willReturn(path);
+		
+		rimc.createResource(StaticResource.class, cacheKey, AppLocation.Base, name);
+		
+		verify(app).resolvePath(AppLocation.Base, name);
+		verify(injector).createChildInjector(moduleCaptor.capture());
+		verify(injector).getInstance(StaticResource.class);
+		
+		Injector testInjector = Guice.createInjector(moduleCaptor.getValue());
+		
+		assertThat(testInjector.getInstance(ResourceCacheKey.class), is(cacheKey));
+		assertThat(testInjector.getInstance(String.class), is(name));
+		assertThat(testInjector.getInstance(Path.class), is(path));
 	}
 	
-	@Test
-	public void testAssetResource() throws Exception {
-		doCreate(AssetResource.class, "jj.js", Asset.appPath);
-	}
-	
-	@Test
-	public void testConfigResource() throws Exception {
-		given(rhinoContext.callFunction(any(Function.class), any(Scriptable.class), any(Scriptable.class), anyVararg()))
-			.willReturn(Collections.EMPTY_MAP);
-		doCreate(ConfigResource.class, ConfigResource.CONFIG_JS);
-	}
-	
-	@Test
-	public void testCssResource() throws Exception {
-		doCreate(CssResource.class, "style.css", appPath.resolve("style.less"), true);
-		doCreate(CssResource.class, "style.css", appPath.resolve("../jj/resource/test.css"));
-	}
-	
-	@Test
-	public void testHtmlResource() throws Exception {
-		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
-		doCreate(HtmlResource.class, "index.html");
-	}
-	
-	@Test
-	public void testPropertiesResource() throws Exception {
-		doCreate(PropertiesResource.class, "index.properties");
-	}
-	
-	@Test
-	public void testScriptResource() throws Exception {
-		doCreate(ScriptResource.class, "helpers.js");
-	}
-	
-	@Test
-	public void testSha1Resource() throws Exception {
-		doCreate(Sha1Resource.class, "not.real.test.sha1");
-	}
-	
-	@Test
-	public void testSpecResource() throws Exception {
-		doCreate(SpecResource.class, "its_a_spec.js", appPath.resolveSibling("specs").resolve("its_a_spec.js"));
-	}
+	public static class TestResource implements Resource {
 
-	@Test
-	public void testStaticResource() throws Exception {
-		doCreate(StaticResource.class, "index.html");
-	}
-	
-	@Test
-	public void testDocumentScriptEnvironment() throws Exception {
-		HtmlResource hr = mock(HtmlResource.class);
-		given(resourceFinder.loadResource(HtmlResource.class, "index.html")).willReturn(hr);
-		given(api.global()).willReturn(new NativeObject());
+		@Override
+		public AppLocation base() {
+			return null;
+		}
 		
-		doCreate(DocumentScriptEnvironment.class, "index", Paths.get("/"));
+		@Override
+		public String name() {
+			return null;
+		}
+
+		@Override
+		public String uri() {
+			return null;
+		}
+
+		@Override
+		public String sha1() {
+			return null;
+		}
+
+		@Override
+		public void addDependent(Resource dependent) {
+		}
+		
 	}
 	
 	@Test
-	public void testModuleScriptEnvironment() throws Exception {
-		DocumentScriptEnvironment dse = mock(DocumentScriptEnvironment.class);
-		ScriptResource sr = mock(ScriptResource.class);
-		given(sr.script()).willReturn("");
-		given(api.global()).willReturn(new NativeObject());
-		given(resourceFinder.loadResource(ScriptResource.class, "index.js")).willReturn(sr);
-		given(resourceFinder.findResource(dse)).willReturn(dse);
-		given(rhinoContext.newObject(any(ScriptableObject.class))).willReturn(new NativeObject());
-		RequiredModule requiredModule = new RequiredModule(dse, "index");
-		requiredModule.pendingKey(new ContinuationPendingKey());
-		doCreate(ModuleScriptEnvironment.class, "index", requiredModule);
+	public void testVirtualCreationAndArgs() {
+		
+		final String name = "name";
+		final Integer one = Integer.valueOf(1);
+		final Date date = new Date();
+		
+		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one, date);
+		
+		verify(app).resolvePath(AppLocation.Virtual, name);
+		verify(injector).createChildInjector(moduleCaptor.capture());
+		verify(injector).getInstance(TestResource.class);
+		
+		Injector testInjector = Guice.createInjector(moduleCaptor.getValue());
+		
+		assertThat(testInjector.getInstance(ResourceCacheKey.class), is(cacheKey));
+		assertThat(testInjector.getInstance(String.class), is(name));
+		assertThat(testInjector.getExistingBinding(Key.get(Path.class)), is(nullValue()));
+		assertThat(testInjector.getInstance(Integer.class), is(one));
+		assertThat(testInjector.getInstance(Date.class), is(date));
 	}
 }

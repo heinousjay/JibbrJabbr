@@ -16,6 +16,7 @@
 package jj.resource;
 
 import static org.mockito.BDDMockito.*;
+import jj.configuration.AppLocation;
 import jj.execution.MockTaskRunner;
 
 import org.junit.Before;
@@ -50,11 +51,11 @@ public class ResourceLoaderTest {
 		// kinda simple, we just make sure it's going to make its task and schedule it
 		// and that the task does the right thing
 		
-		rl.loadResource(Resource.class, "name", "a thing", new Integer(1));
+		rl.loadResource(Resource.class, AppLocation.Base, "name", "a thing", new Integer(1));
 		
 		taskRunner.runFirstTask();
 		
-		verify(resourceFinder).loadResource(Resource.class, "name", "a thing", new Integer(1));
+		verify(resourceFinder).loadResource(Resource.class, AppLocation.Base, "name", "a thing", new Integer(1));
 	}
 
 }

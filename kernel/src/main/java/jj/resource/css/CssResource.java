@@ -12,9 +12,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.SHA1Helper;
-import jj.execution.IOThread;
 import jj.resource.AbstractResource;
 import jj.resource.FileResource;
+import jj.resource.IOThread;
 import jj.resource.LoadedResource;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
@@ -74,7 +74,7 @@ public class CssResource extends AbstractResource implements FileResource, Loade
 	}
 
 	@Override
-	public String baseName() {
+	public String name() {
 		return baseName;
 	}
 	
@@ -102,8 +102,12 @@ public class CssResource extends AbstractResource implements FileResource, Loade
 	
 	CssResource sha1(String sha1) {
 		this.sha1 = sha1;
-		uri = "/" + sha1 + "/" + baseName;
 		toString = getClass().getSimpleName() + ":" + sha1 + " at " + path;
+		return this;
+	}
+	
+	CssResource uri(String uri) {
+		this.uri = "/" + sha1 + "/" + uri;
 		return this;
 	}
 	
@@ -115,5 +119,12 @@ public class CssResource extends AbstractResource implements FileResource, Loade
 	@Override
 	protected Object[] creationArgs() {
 		return less ? LESS_ARG : null;
+	}
+	
+	@Override
+	protected boolean removeOnReload() {
+		// we are (for now) the root of the css system.  i feel like things
+		// will change a bit in here
+		return false;
 	}
 }

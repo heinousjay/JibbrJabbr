@@ -15,7 +15,8 @@
  */
 package jj.resource.stat.ic;
 
-import jj.configuration.Arguments;
+import jj.configuration.AppLocation;
+import jj.configuration.Application;
 import jj.resource.ResourceInstanceCreator;
 
 /**
@@ -23,11 +24,11 @@ import jj.resource.ResourceInstanceCreator;
  *
  */
 public class StaticResourceMaker {
-	public static StaticResource make(Arguments arguments, ResourceInstanceCreator creator, String baseName) throws Exception {
-		return new StaticResourceCreator(arguments, creator).create(baseName);
+	public static StaticResource make(Application app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
+		return new StaticResourceCreator(app, creator).create(base, name);
 	}
 	
-	public static StaticResourceCreator fake(Arguments arguments) {
-		return new StaticResourceCreator(arguments, null);
+	public static StaticResourceCreator fake(Application app) {
+		return new StaticResourceCreator(app, null);
 	}
 }

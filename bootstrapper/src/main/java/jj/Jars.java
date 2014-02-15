@@ -33,14 +33,15 @@ import java.util.Map;
 import java.util.jar.Manifest;
 
 /**
+ * <p>
+ * Component to wrap up a directory full of jars so the contents of those jars can
+ * be accessed efficiently
  * 
- * manages the system jars that make up JibbrJabbr, exposes a simple
- * interface to get to their files and related information
  * 
  * @author jason
  *
  */
-class SystemJars {
+public class Jars implements ResourceResolver {
 	
 	private static final String META_INF = "/META-INF";
 	private static final String MANIFEST_PATH = META_INF + "/MANIFEST.MF";
@@ -65,12 +66,19 @@ class SystemJars {
 	
 	private final Map<FileSystem, CodeSource> codeSources;
 	
-	SystemJars(final Path libPath) throws IOException {
+	/**
+	 * A path pointing to a directory, presumably full of jars
+	 * @param libPath
+	 * @throws IOException
+	 */
+	public Jars(final Path libPath) throws IOException {
+		assert Files.isDirectory(libPath) : "this component is to read and index a directory of jars";
 		this.libPath = libPath;
-		this.jars = makeJarsMap();
+		this.jars = indexJars();
 		this.codeSources = makeCodeSources();
 	}
 	
+	@Override
 	public Path pathForFile(String file) throws IOException {
 		FileSystemNode fs = jarsForFile(file);
 		
@@ -185,7 +193,7 @@ class SystemJars {
 		return Collections.unmodifiableMap(result);
 	}
 	
-	private Map<String, FileSystemNode> makeJarsMap() throws IOException {
+	private Map<String, FileSystemNode> indexJars() throws IOException {
 		
 		Map<String, FileSystemNode> result = new HashMap<>();
 		

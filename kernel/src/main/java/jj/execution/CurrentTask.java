@@ -33,4 +33,8 @@ public class CurrentTask extends CurrentResource<JJTask> {
 		JJTask task = current();
 		return task == null ? null : task.name();
 	}
+	
+	public <T extends JJTask> T currentAs(Class<T> type) {
+		return type.cast(current());
+	}
 }

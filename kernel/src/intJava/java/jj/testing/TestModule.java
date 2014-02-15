@@ -38,13 +38,13 @@ import jj.JJModule;
 class TestModule extends JJModule {
 	
 	private final JibbrJabbrTestServer testServer;
-	private final String appPath;
+	private final String[] args;
 	private final Statement base;
 	private final Description description;
 	
-	TestModule(final JibbrJabbrTestServer testServer, final String appPath, final Statement base, final Description description) {
+	TestModule(final JibbrJabbrTestServer testServer, final String[] args, final Statement base, final Description description) {
 		this.testServer = testServer;
-		this.appPath = appPath;
+		this.args = args;
 		this.base = base;
 		this.description = description;
 	}
@@ -65,6 +65,6 @@ class TestModule extends JJModule {
 		
 		bind(Channel.class).toInstance(mock(Channel.class));
 		
-		install(new CoreModule(new String[]{"app=" + appPath}, true));
+		install(new CoreModule(args));
 	}
 }

@@ -16,6 +16,7 @@
 package jj.jasmine;
 
 import static org.mockito.BDDMockito.*;
+import jj.configuration.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.resource.script.ScriptResource;
 import jj.resource.spec.SpecResource;
@@ -47,8 +48,8 @@ public class SpecRunnerTest {
 	public void test() {
 		
 		given(scriptEnvironment.scriptName()).willReturn("whatever.js");
-		given(resourceFinder.findResource(ScriptResource.class, scriptEnvironment.scriptName())).willReturn(scriptResource);
-		given(resourceFinder.findResource(SpecResource.class, scriptEnvironment.scriptName())).willReturn(specResource);
+		given(resourceFinder.findResource(ScriptResource.class, AppLocation.Base, scriptEnvironment.scriptName())).willReturn(scriptResource);
+		given(resourceFinder.findResource(SpecResource.class, AppLocation.Base, scriptEnvironment.scriptName())).willReturn(specResource);
 		
 		specRunner.findAndExecuteSpec(new ScriptEnvironmentInitialized(scriptEnvironment));
 		
