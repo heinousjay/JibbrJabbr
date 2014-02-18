@@ -17,6 +17,10 @@ package jj.configuration;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import jj.BootstrapClassPath;
 
 import org.junit.Test;
@@ -29,9 +33,17 @@ public class AssetsTest {
 
 	@Test
 	public void test() {
-		Assets assets = new Assets(new BootstrapClassPath());
+		Set<String> paths = new HashSet<>();
+		paths.add("/jj/assets");
+		
+		Assets assets = new Assets(new BootstrapClassPath(), paths);
 		
 		assertThat(assets.path("jj.js"), is(notNullValue()));
+		
+		// NEEDS A BETTER TEST
+		assertThat(assets.path("jj1.js"), is(Assets.NOT_FOUND));
+		
+		
 	}
 
 }
