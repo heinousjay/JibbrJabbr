@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jj.css.CssResource;
 import jj.resource.Resource;
-import jj.resource.css.CssResource;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;

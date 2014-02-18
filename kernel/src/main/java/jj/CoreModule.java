@@ -20,6 +20,7 @@ import org.mozilla.javascript.ContextFactory;
 
 import jj.configuration.ConfigurationModule;
 import jj.conversion.ConversionModule;
+import jj.css.CssModule;
 import jj.engine.HostApiModule;
 import jj.event.EventModule;
 import jj.execution.ExecutionModule;
@@ -110,6 +111,8 @@ public class CoreModule extends JJModule {
 		
 		// this is not a thing yet but it will be!
 		install(new JasmineModule());
+		
+		install(new CssModule());
 	}
 
 }

@@ -32,8 +32,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jj.configuration.BlahMockAssets;
-
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -95,12 +93,12 @@ public class BasicServingTest {
 			
 			stylesheets = work.toArray(new VerifiableRequest[work.size()]);
 			
-			BlahMockAssets mockAssets = new BlahMockAssets();
+			
 
 			work = new ArrayList<>();
-			work.add(new VerifiableRequest("/" + JQUERY_JS, Files.readAllBytes(mockAssets.path(JQUERY_JS))));
-			work.add(new VerifiableRequest("/" + JJ_JS, Files.readAllBytes(mockAssets.path(JJ_JS))));
-			work.add(new VerifiableRequest("/" + FAVICON_ICO, Files.readAllBytes(mockAssets.path(FAVICON_ICO))));
+			work.add(new VerifiableRequest("/" + JQUERY_JS, assetBytes(JQUERY_JS)));
+			work.add(new VerifiableRequest("/" + JJ_JS, assetBytes(JJ_JS)));
+			work.add(new VerifiableRequest("/" + FAVICON_ICO, assetBytes(FAVICON_ICO)));
 			
 			assets = work.toArray(new VerifiableRequest[work.size()]);
 			
@@ -108,6 +106,10 @@ public class BasicServingTest {
 			e.printStackTrace();
 			throw new AssertionError("failed!", e);
 		}
+	}
+	
+	private static byte[] assetBytes(String asset) throws Exception {
+		return Files.readAllBytes(Paths.get(BasicServingTest.class.getResource("/jj/assets/" + asset).toURI()));
 	}
 	
 	@Rule

@@ -7,12 +7,13 @@ import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
+import jj.css.CssResource;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
-import jj.resource.css.CssResource;
 import jj.uri.URIMatch;
 
+// TODO! move this to the css package
 @Singleton
 class CssServable extends Servable<CssResource> {
 	

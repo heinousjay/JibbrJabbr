@@ -34,7 +34,7 @@ import jj.SHA1Helper;
 import jj.configuration.Application;
 import jj.configuration.Configuration;
 import jj.configuration.MockApplication;
-import jj.resource.css.CssResource;
+import jj.css.CssResource;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;

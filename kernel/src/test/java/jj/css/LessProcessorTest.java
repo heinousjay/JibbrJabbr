@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.css;
+package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
@@ -26,8 +26,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.configuration.Application;
+import jj.css.FinishedLessProcessing;
+import jj.css.LessProcessor;
+import jj.css.LoadLessResource;
+import jj.css.StartingLessProcessing;
 import jj.event.MockPublisher;
-import jj.resource.css.LessProcessor;
 import jj.script.RealRhinoContextProvider;
 
 import org.junit.Before;

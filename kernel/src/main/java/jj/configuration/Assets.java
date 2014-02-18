@@ -15,9 +15,10 @@
  */
 package jj.configuration;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashSet;
+import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -40,33 +41,39 @@ public class Assets {
 	public static final String JQUERY_JS_MAP = "jquery-2.0.3.min.map";
 	public static final String FAVICON_ICO = "favicon.ico";
 	public static final String ERROR_404 = "errors/404.html";
-	public static final Set<String> ASSETS;
 	
-	static {
-		Set<String> assets = new HashSet<>();
-		assets.add(JJ_JS);
-		assets.add(JQUERY_JS_DEV);
-		assets.add(JQUERY_JS);
-		assets.add(JQUERY_JS_MAP);
-		assets.add(FAVICON_ICO);
-		assets.add(ERROR_404);
-		ASSETS = Collections.unmodifiableSet(assets);
-	}
+	static final Path NOT_FOUND = Paths.get("/jj/assets/not-found-sentinel/");
 	
 	private final ResourceResolver resolver;
 	
+	private final Set<String> paths;
+	
 	@Inject
-	Assets(final ResourceResolver resolver) {
+	Assets(final ResourceResolver resolver, final Set<String> paths) {
 		this.resolver = resolver;
+		this.paths = paths;
 	}
 
 	public Path path(String name) {
 		Path result = null;
 		try {
-			result = resolver.pathForFile("/jj/assets/").resolve(name);
+			Iterator<String> iterator = paths.iterator();
+			while (result == null && iterator.hasNext()) {
+				Path path = resolver.pathForFile(iterator.next()).resolve(name);
+				if (Files.exists(path)) {
+					result = path;
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		// this is sort of an ugly solution but we have to return a path that doesn't
+		// exist so we can be happy
+		if (result == null) {
+			result = NOT_FOUND;
+		}
+		
 		return result;
 	}
 }

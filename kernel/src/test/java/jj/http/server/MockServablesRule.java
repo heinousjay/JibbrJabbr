@@ -20,10 +20,10 @@ import static org.mockito.BDDMockito.*;
 import java.util.Arrays;
 import java.util.List;
 
+import jj.css.CssResource;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
 import jj.resource.Resource;
-import jj.resource.css.CssResource;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 

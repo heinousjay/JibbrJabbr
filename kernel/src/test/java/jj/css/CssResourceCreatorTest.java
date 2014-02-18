@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.css;
+package jj.css;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -25,15 +25,15 @@ import java.nio.file.Path;
 
 import jj.SHA1Helper;
 import jj.configuration.AppLocation;
+import jj.css.CssResource;
+import jj.css.CssResourceCreator;
+import jj.css.LessProcessor;
 import jj.event.Publisher;
 import jj.resource.Resource;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceMaker;
-import jj.resource.css.CssResource;
-import jj.resource.css.CssResourceCreator;
-import jj.resource.css.LessProcessor;
 import jj.resource.stat.ic.StaticResource;
 import jj.script.RealRhinoContextProvider;
 

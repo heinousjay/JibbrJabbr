@@ -3,8 +3,6 @@ package jj.resource;
 import jj.JJModule;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceCreator;
-import jj.resource.css.CssResource;
-import jj.resource.css.CssResourceCreator;
 import jj.resource.document.DocumentProcessingModule;
 import jj.resource.property.PropertiesResource;
 import jj.resource.property.PropertiesResourceCreator;
@@ -41,8 +39,6 @@ public class ResourceModule extends JJModule {
 		
 		
 		bindCreation().of(ConfigResource.class).to(ConfigResourceCreator.class);
-		
-		bindCreation().of(CssResource.class).to(CssResourceCreator.class);
 		
 		bindCreation().of(Sha1Resource.class).to(Sha1ResourceCreator.class);
 		

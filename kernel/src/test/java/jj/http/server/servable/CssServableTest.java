@@ -7,9 +7,9 @@ import static org.mockito.BDDMockito.*;
 import java.io.IOException;
 
 import jj.configuration.AppLocation;
+import jj.css.CssResource;
 import jj.http.server.servable.CssServable;
 import jj.http.server.servable.RequestProcessor;
-import jj.resource.css.CssResource;
 import jj.uri.URIMatch;
 
 import org.junit.Before;

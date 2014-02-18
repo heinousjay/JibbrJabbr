@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.css;
+package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

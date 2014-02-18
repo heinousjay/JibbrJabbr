@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.css;
+package jj.css;
 
 import org.slf4j.Logger;
 
@@ -23,16 +23,16 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-public class LoadLessResource implements ExecutionEvent {
+public class FinishedLessProcessing implements ExecutionEvent {
 
-	private final String name;
+	private final String lessName;
 	
-	LoadLessResource(final String name) {
-		this.name = name;
+	FinishedLessProcessing(final String lessName) {
+		this.lessName = lessName;
 	}
 
 	@Override
 	public void describeTo(Logger log) {
-		log.debug("loading less resource {}", name);
+		log.debug("finished processing less resource {}", lessName);
 	}
 }

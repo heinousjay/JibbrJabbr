@@ -1,4 +1,4 @@
-package jj.resource.css;
+package jj.css;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

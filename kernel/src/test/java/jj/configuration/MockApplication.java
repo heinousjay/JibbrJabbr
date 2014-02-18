@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.BootstrapClassPath;
 import jj.configuration.Application;
 import jj.configuration.Arguments;
 
@@ -36,12 +35,12 @@ public class MockApplication extends Application {
 	 * @param arguments
 	 */
 	public MockApplication() {
-		super(mock(Arguments.class), new Assets(new BootstrapClassPath()));
+		super(mock(Arguments.class), new MockAssets());
 		basePath = Base.path;
 	}
 	
 	public MockApplication(final Path basePath) {
-		super(mock(Arguments.class), new Assets(new BootstrapClassPath()));
+		super(mock(Arguments.class), new MockAssets());
 		this.basePath = basePath;
 	}
 

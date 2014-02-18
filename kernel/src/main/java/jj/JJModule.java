@@ -44,6 +44,7 @@ public abstract class JJModule extends AbstractModule {
 	private Multibinder<Converter<?, ?>> converters;
 	private Multibinder<DocumentFilter> filters;
 	private Multibinder<HostObject> hostObjects;
+	private Multibinder<String> assetPaths;
 
 	protected LinkedBindingBuilder<JJServerStartupListener> addStartupListenerBinding() {
 		if (startupListeners == null) {
@@ -78,6 +79,14 @@ public abstract class JJModule extends AbstractModule {
 			hostObjects = Multibinder.newSetBinder(binder(), HostObject.class);
 		}
 		return hostObjects.addBinding();
+	}
+	
+	protected void addAssetPath(String path) {
+		if (assetPaths == null) {
+			assetPaths = Multibinder.newSetBinder(binder(), String.class);
+		}
+
+		assetPaths.addBinding().toInstance(path);
 	}
 	
 	protected ResourceCreatorBinder bindCreation() {

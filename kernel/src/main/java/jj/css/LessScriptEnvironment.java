@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.css;
+package jj.css;
 
 import java.io.IOException;
 
@@ -33,16 +33,16 @@ import jj.script.RhinoContext;
  */
 public class LessScriptEnvironment extends AbstractScriptEnvironment {
 
-	/**
-	 * @param cacheKey
-	 * @param contextProvider
-	 */
+	private Scriptable scope;
+	
 	@Inject
 	public LessScriptEnvironment(
-		ResourceCacheKey cacheKey,
-		Provider<RhinoContext> contextProvider
+		final ResourceCacheKey cacheKey,
+		final Provider<RhinoContext> contextProvider
 	) {
 		super(cacheKey, contextProvider);
+		
+		
 	}
 
 	@Override

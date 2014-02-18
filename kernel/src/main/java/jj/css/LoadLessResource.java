@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.css;
+package jj.css;
 
 import org.slf4j.Logger;
 
@@ -23,19 +23,16 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-public class ErrorLoadingLessResource implements ExecutionEvent {
-	
+public class LoadLessResource implements ExecutionEvent {
+
 	private final String name;
-	private final Throwable cause;
 	
-	ErrorLoadingLessResource(final String name, final Throwable cause) {
+	LoadLessResource(final String name) {
 		this.name = name;
-		this.cause = cause;
 	}
-	
+
 	@Override
 	public void describeTo(Logger log) {
-		log.error("error loading less resource {}", name);
-		log.error("", cause);
+		log.debug("loading less resource {}", name);
 	}
 }

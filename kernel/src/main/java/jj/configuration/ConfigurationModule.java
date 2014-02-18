@@ -25,6 +25,9 @@ public class ConfigurationModule extends JJModule {
 
 	@Override
 	protected void configure() {
+		
+		addAssetPath("/jj/assets/");
+		
 		addStartupListenerBinding().to(ConfigurationScriptPreloader.class);
 	}
 

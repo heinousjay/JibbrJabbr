@@ -15,6 +15,9 @@
  */
 package jj.configuration;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jj.BootstrapClassPath;
 
 /**
@@ -22,12 +25,19 @@ import jj.BootstrapClassPath;
  *
  */
 public class MockAssets extends Assets {
+	
+	private static final Set<String> paths = new HashSet<>();
+	
+	static {
+		paths.add("/jj/assets");
+	}
 
 	/**
 	 * @param resolver
 	 */
 	public MockAssets() {
-		super(new BootstrapClassPath());
+		
+		super(new BootstrapClassPath(), paths);
 	}
 
 }

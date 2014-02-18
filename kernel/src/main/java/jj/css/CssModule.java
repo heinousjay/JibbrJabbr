@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.css;
+package jj.css;
 
-import org.slf4j.Logger;
-
-import jj.execution.ExecutionEvent;
+import jj.JJModule;
 
 /**
  * @author jason
  *
  */
-public class FinishedLessProcessing implements ExecutionEvent {
-
-	private final String lessName;
-	
-	FinishedLessProcessing(final String lessName) {
-		this.lessName = lessName;
-	}
+public class CssModule extends JJModule {
 
 	@Override
-	public void describeTo(Logger log) {
-		log.debug("finished processing less resource {}", lessName);
+	protected void configure() {
+		
+		bindCreation().of(CssResource.class).to(CssResourceCreator.class);
 	}
+
 }

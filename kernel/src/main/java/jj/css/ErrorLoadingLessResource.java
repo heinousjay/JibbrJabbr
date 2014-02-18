@@ -13,24 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.css;
 
-import jj.BootstrapClassPath;
+import org.slf4j.Logger;
+
+import jj.execution.ExecutionEvent;
 
 /**
- * working around a classpath mismatch.  need to reformulate some stuff,
- * i think this is going back into its own project because i wanna make it
- * into a module anyway
  * @author jason
  *
  */
-public class BlahMockAssets extends Assets {
-
-	/**
-	 * @param resolver
-	 */
-	public BlahMockAssets() {
-		super(new BootstrapClassPath());
+public class ErrorLoadingLessResource implements ExecutionEvent {
+	
+	private final String name;
+	private final Throwable cause;
+	
+	ErrorLoadingLessResource(final String name, final Throwable cause) {
+		this.name = name;
+		this.cause = cause;
 	}
-
+	
+	@Override
+	public void describeTo(Logger log) {
+		log.error("error loading less resource {}", name);
+		log.error("", cause);
+	}
 }

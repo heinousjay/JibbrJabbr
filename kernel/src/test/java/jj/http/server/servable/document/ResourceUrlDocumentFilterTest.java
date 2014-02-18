@@ -18,10 +18,10 @@ package jj.http.server.servable.document;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
+import jj.css.CssResource;
 import jj.http.server.MockServablesRule;
 import jj.http.server.servable.document.DocumentRequestProcessor;
 import jj.http.server.servable.document.ResourceUrlDocumentFilter;
-import jj.resource.css.CssResource;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 
