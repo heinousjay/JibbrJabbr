@@ -123,7 +123,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 */
 	public Object exports() {
 		try (RhinoContext context = contextProvider.get()) {
-			return scope() == null ? Undefined.instance : context.evaluateString(scope(), "module.exports", "returning exports");
+			return scope() == null ? Undefined.instance : context.evaluateString(scope(), "module.exports", "evaluating exports");
 		}
 	}
 	
