@@ -48,7 +48,7 @@ class EventManager implements Publisher {
 	}
 	
 	// TODO - should this be a ServerTask?
-	// i think yes
+	// i think yes but i am not sure - maybe each invocation is a server task?
 	private void invoke(final Object event, final Class<?> clazz) {
 		if (clazz != null && clazz != Object.class) {
 			if (listenerMap.containsKey(clazz)) {
