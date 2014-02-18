@@ -41,10 +41,10 @@ public abstract class AbstractResource implements Resource {
 		this.cacheKey = cacheKey;
 	}
 	
-	@IOThread
+	@ResourceThread
 	public abstract boolean needsReplacing() throws IOException;
 
-	@IOThread
+	@ResourceThread
 	boolean isObselete() throws IOException {
 		return !alive || needsReplacing();
 	}

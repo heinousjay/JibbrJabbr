@@ -50,7 +50,7 @@ public interface ResourceFinder {
 	 * @param args
 	 * @return
 	 */
-	@IOThread
+	@ResourceThread
 	<T extends Resource> T loadResource(Class<T> resourceClass, AppLocation base, String name, Object...args);
 	
 	/**
@@ -63,6 +63,6 @@ public interface ResourceFinder {
 	 * @param args
 	 * @return
 	 */
-	@IOThread
+	@ResourceThread
 	<T extends Resource> T loadResource(Class<T> resourceClass, AppLocationBundle bundle, String name, Object...args);
 }

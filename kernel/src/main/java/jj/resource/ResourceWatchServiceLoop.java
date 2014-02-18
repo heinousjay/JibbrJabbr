@@ -63,7 +63,7 @@ class ResourceWatchServiceLoop extends ServerTask {
 	private void reload(final AbstractResource resource) {
 		resource.kill();
 		taskRunner.execute(
-			new IOTask(getClass().getSimpleName() + " reloader for " + resource.cacheKey()) {
+			new ResourceTask(getClass().getSimpleName() + " reloader for " + resource.cacheKey()) {
 
 
 				@Override

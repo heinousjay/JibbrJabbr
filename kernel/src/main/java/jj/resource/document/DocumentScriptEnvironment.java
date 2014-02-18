@@ -44,7 +44,7 @@ import jj.http.server.WebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -232,7 +232,7 @@ public class DocumentScriptEnvironment
 	}
 
 	@Override
-	@IOThread
+	@ResourceThread
 	public boolean needsReplacing() throws IOException {
 		// this never goes out of scope on its own
 		// dependency tracking handles it all 

@@ -51,3 +51,4 @@
 package jj.resource;
 import jj.resource.stat.ic.StaticResource;
 import jj.event.Listener;
+import jj.execution.ExecutionEvent;

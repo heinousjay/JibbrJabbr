@@ -12,7 +12,7 @@ import jj.StringUtils;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Assets;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.ResourceFinder;
 import jj.resource.document.DocumentScriptEnvironment;
 import jj.resource.document.HtmlResource;
@@ -60,7 +60,7 @@ class DocumentServable extends Servable<HtmlResource> {
 	}
 	
 	@Override
-	@IOThread
+	@ResourceThread
 	public RequestProcessor makeRequestProcessor(
 		final HttpRequest request,
 		final HttpResponse response

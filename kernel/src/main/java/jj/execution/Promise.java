@@ -87,7 +87,8 @@ public class Promise {
 	}
 	
 	/**
-	 * Waits for the promised task completion for 1 second.  Only callable from one place in this system
+	 * Waits for the promised task completion for 1 second.  Only callable from one place in this system,
+	 * which i am considering refactoring out of existence entirely
 	 * @throws TimeoutException
 	 */
 	public void await() throws TimeoutException, InterruptedException {

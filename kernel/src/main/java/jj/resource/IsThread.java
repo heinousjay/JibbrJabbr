@@ -25,14 +25,14 @@ import javax.inject.Singleton;
 @Singleton
 public class IsThread {
 
-	final IOExecutor ioExecutor;
+	final ResourceExecutor resourceExecutor;
 	
 	@Inject
-	IsThread(final IOExecutor ioExecutor) {
-		this.ioExecutor = ioExecutor;
+	IsThread(final ResourceExecutor resourceExecutor) {
+		this.resourceExecutor = resourceExecutor;
 	}
 
-	public boolean forIO() {
-		return ioExecutor.isIOThread();
+	public boolean forResourceTask() {
+		return resourceExecutor.isResourceThread();
 	}
 }

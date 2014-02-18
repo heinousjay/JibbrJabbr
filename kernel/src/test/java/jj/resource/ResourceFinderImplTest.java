@@ -50,7 +50,7 @@ public class ResourceFinderImplTest {
 	
 	private @Mock ResourceCacheKey deadKey;
 	
-	private @Mock IOTask task;
+	private @Mock ResourceTask task;
 	
 	@Test
 	public void testFindResource() throws Exception {
@@ -116,8 +116,8 @@ public class ResourceFinderImplTest {
 		given(sha1ResourceCreator.cacheKey(Base, name2)).willReturn(sha1Resource1Key);
 		given(sha1ResourceCreator.create(Base, name2)).willReturn(sha1Resource1);
 		
-		given(isThread.forIO()).willReturn(true);
-		given(currentTask.currentAs(IOTask.class)).willReturn(task);
+		given(isThread.forResourceTask()).willReturn(true);
+		given(currentTask.currentAs(ResourceTask.class)).willReturn(task);
 		
 		assertThat(rfi.findResource(StaticResource.class, Base, name1), is(nullValue()));
 		assertThat(rfi.findResource(Sha1Resource.class, Base, name2), is(nullValue()));

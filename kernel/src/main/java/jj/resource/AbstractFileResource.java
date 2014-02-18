@@ -39,7 +39,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	private String sha1;
 	private String uri;
 	
-	@IOThread
+	@ResourceThread
 	protected AbstractFileResource(
 		final ResourceCacheKey cacheKey,
 		final String baseName,
@@ -48,7 +48,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 		this(cacheKey, baseName, path, true);
 	}
 	
-	@IOThread
+	@ResourceThread
 	protected AbstractFileResource(
 		final ResourceCacheKey cacheKey,
 		final String baseName,
@@ -134,7 +134,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	}
 	
 	@Override
-	@IOThread
+	@ResourceThread
 	public boolean needsReplacing() throws IOException {
 		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}

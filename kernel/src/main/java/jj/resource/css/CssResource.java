@@ -14,7 +14,7 @@ import javax.inject.Singleton;
 import jj.SHA1Helper;
 import jj.resource.AbstractResource;
 import jj.resource.FileResource;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.LoadedResource;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
@@ -111,7 +111,7 @@ public class CssResource extends AbstractResource implements FileResource, Loade
 		return this;
 	}
 	
-	@IOThread
+	@ResourceThread
 	public boolean needsReplacing() throws IOException {
 		return lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}

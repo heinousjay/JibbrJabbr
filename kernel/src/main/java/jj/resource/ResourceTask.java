@@ -25,17 +25,17 @@ import jj.execution.JJTask;
  * @author jason
  *
  */
-public abstract class IOTask extends JJTask {
+public abstract class ResourceTask extends JJTask {
 	
 	private final CountDownLatch completionLatch = new CountDownLatch(1);
 	
-	protected IOTask(String name) {
+	protected ResourceTask(String name) {
 		super(name);
 	}
 	
 	@Override
 	protected final void addRunnableToExecutor(ExecutorFinder executors, final Runnable runnable) {
-		executors.ofType(IOExecutor.class).submit(new Runnable() {
+		executors.ofType(ResourceExecutor.class).submit(new Runnable() {
 			
 			@Override
 			public void run() {
@@ -48,6 +48,10 @@ public abstract class IOTask extends JJTask {
 		});
 	}
 
+	/**
+	 * this is only intended for synchronizing resource creation but maybe will be useful in
+	 * some less stuff?
+	 */
 	void await() {
 		try {
 			completionLatch.await(2, SECONDS);

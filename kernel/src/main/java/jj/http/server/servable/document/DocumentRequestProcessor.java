@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.Closer;
-import jj.resource.IOTask;
+import jj.resource.ResourceTask;
 import jj.resource.MimeTypes;
 import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.resource.document.DocumentScriptEnvironment;
@@ -174,7 +174,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		if (ioFilters.isEmpty()) {
 			writeResponse();
 		} else {
-			taskRunner.execute(new IOTask("Document filtering requiring I/O") {
+			taskRunner.execute(new ResourceTask("Document filtering requiring I/O") {
 				
 				@Override
 				public void run() {

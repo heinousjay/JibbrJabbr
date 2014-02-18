@@ -42,7 +42,7 @@ public class InlineMessagesDocumentFilterTest {
 		// given
 		name = "index";
 		
-		given(isThread.forIO()).willReturn(false);
+		given(isThread.forResourceTask()).willReturn(false);
 		
 		bundle = new PropertyResourceBundle(
 			new StringReader(

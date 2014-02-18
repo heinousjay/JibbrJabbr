@@ -23,7 +23,6 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,17 +37,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
-/**
- * @author jason
- *
- */
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class TaskRunnerTest {
 	
 	private @Mock ServerExecutor serverExecutor;
-	private @Mock ScheduledExecutorService scriptExecutor;
 	
 	private @Mock ScriptEnvironment scriptEnvironment;
 

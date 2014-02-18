@@ -47,6 +47,8 @@ class EventManager implements Publisher {
 		this.listenerMap = listenerMap;
 	}
 	
+	// TODO - should this be a ServerTask?
+	// i think yes
 	private void invoke(final Object event, final Class<?> clazz) {
 		if (clazz != null && clazz != Object.class) {
 			if (listenerMap.containsKey(clazz)) {

@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 import jj.configuration.AppLocation;
 import jj.engine.EngineAPI;
 import jj.resource.AbstractResource;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
@@ -152,7 +152,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 
 	@Override
-	@IOThread
+	@ResourceThread
 	public boolean needsReplacing() throws IOException {
 		// we are obselete when our script is
 		// but we don't listen as a dependent, our parent

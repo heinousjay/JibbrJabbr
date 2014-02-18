@@ -60,7 +60,7 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		String baseName = documentRequestProcessor.baseName();
 		
 		PropertiesResource resource = 
-			isThread.forIO() ?	
+			isThread.forResourceTask() ?	
 			resourceFinder.loadResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties") :
 			resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties");
 			

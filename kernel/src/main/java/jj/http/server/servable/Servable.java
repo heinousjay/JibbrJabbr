@@ -12,7 +12,7 @@ import jj.configuration.Application;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.resource.FileResource;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.Resource;
 import jj.uri.URIMatch;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -36,7 +36,7 @@ public abstract class Servable<T extends Resource> {
 	 * @param result
 	 * @return
 	 */
-	@IOThread
+	@ResourceThread
 	protected boolean isServableResource(final FileResource resource) {
 		boolean result = (resource.base() == Assets || resource.base() == Virtual);
 		if (result == false) {
@@ -58,7 +58,7 @@ public abstract class Servable<T extends Resource> {
 	 */
 	public abstract boolean isMatchingRequest(final URIMatch uriMatch);
 	
-	@IOThread
+	@ResourceThread
 	public abstract RequestProcessor makeRequestProcessor(
 		final HttpRequest request,
 		final HttpResponse response

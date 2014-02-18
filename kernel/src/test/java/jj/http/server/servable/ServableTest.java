@@ -27,7 +27,7 @@ import jj.configuration.Application;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.resource.FileResource;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.Resource;
 import jj.uri.URIMatch;
 
@@ -63,7 +63,7 @@ public class ServableTest extends ServableTestBase {
 		}
 
 		@Override
-		@IOThread
+		@ResourceThread
 		public RequestProcessor makeRequestProcessor(HttpRequest request, HttpResponse response) throws IOException {
 			return null;
 		}

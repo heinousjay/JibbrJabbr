@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 
 /** 
  * 
@@ -78,7 +78,7 @@ public enum SHA1Helper {
 		return toHex(sha1.get().digest());
 	}
 	
-	@IOThread
+	@ResourceThread
 	public static String keyFor(final Path path) throws IOException {
 		try (SeekableByteChannel channel = Files.newByteChannel(path)) {
 			if (channel instanceof FileChannel) { 

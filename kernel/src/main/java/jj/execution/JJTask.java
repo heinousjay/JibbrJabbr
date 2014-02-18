@@ -18,14 +18,14 @@ package jj.execution;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
-import jj.resource.IOTask;
+import jj.resource.ResourceTask;
 import jj.script.ScriptTask;
 
 /**
  * <p>
  * provides the base facilities for task management, and
  * an API for task construction.  Only derive from this directly
- * if making a new type of task, otherwise {@link IOTask} or
+ * if making a new type of task, otherwise {@link ResourceTask} or
  * {@link ScriptTask} are what you're looking for.
  * </p>
  * 

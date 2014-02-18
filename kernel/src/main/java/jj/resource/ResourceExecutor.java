@@ -17,16 +17,16 @@ import jj.execution.JJThreadFactory;
  *
  */
 @Singleton
-class IOExecutor extends ThreadPoolExecutor implements JJServerShutdownListener {
+class ResourceExecutor extends ThreadPoolExecutor implements JJServerShutdownListener {
 	
-	public boolean isIOThread() {
+	public boolean isResourceThread() {
 		return threadFactory.in();
 	}
 	
 	private final JJThreadFactory threadFactory;
 	
 	@Inject
-	public IOExecutor(
+	public ResourceExecutor(
 		final JJThreadFactory threadFactory,
 		final JJRejectedExecutionHandler handler
 	) {

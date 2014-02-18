@@ -29,7 +29,7 @@ import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
 import jj.logging.EmergencyLogger;
-import jj.resource.IOTask;
+import jj.resource.ResourceTask;
 import jj.resource.Resource;
 
 /**
@@ -137,7 +137,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		final List<Servable<? extends Resource>> list = servables.findMatchingServables(request.uriMatch());
 		
 		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
-		taskRunner.execute(new IOTask("JJEngine core processing") {
+		taskRunner.execute(new ResourceTask("JJEngine core processing") {
 			@Override
 			public void run() {
 				try {

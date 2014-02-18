@@ -25,7 +25,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 
 import jj.logging.EmergencyLogger;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.ResourceCacheKey;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.RhinoContext;
@@ -72,7 +72,7 @@ public class APIBootstrapScriptEnvironment extends AbstractScriptEnvironment {
 	}
 
 	@Override
-	@IOThread
+	@ResourceThread
 	public boolean needsReplacing() throws IOException {
 		// replacing happens from dependencies
 		return false;

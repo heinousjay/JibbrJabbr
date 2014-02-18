@@ -44,7 +44,7 @@ public class ResourceLoader {
 		return taskRunner.execute(new ResourceLoaderTask(resourceClass, base, name, arguments));
 	}
 	
-	private final class ResourceLoaderTask extends IOTask {
+	private final class ResourceLoaderTask extends ResourceTask {
 		
 		private final Class<? extends Resource> resourceClass;
 		private final AppLocation base;

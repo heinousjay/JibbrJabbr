@@ -28,7 +28,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	// TODO pick a central logger for this stuff
 	private final Logger log = LoggerFactory.getLogger(ResourceFinderImpl.class);
 	
-	private final ConcurrentMap<ResourceCacheKey, IOTask> resourcesInProgress = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentMap<ResourceCacheKey, ResourceTask> resourcesInProgress = PlatformDependent.newConcurrentHashMap();
 
 	private final ResourceCache resourceCache;
 	
@@ -101,7 +101,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		return result;
 	}
 	
-	@IOThread
+	@ResourceThread
 	@Override
 	public  <T extends Resource> T loadResource(
 		final Class<T> resourceClass,
@@ -109,7 +109,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		String name,
 		Object...arguments
 	) {
-		assert isThread.forIO() : "Can only call loadResource from an I/O thread";
+		assert isThread.forResourceTask() : "Can only call loadResource from an I/O thread";
 		
 		ResourceCreator<T> resourceCreator = resourceCache.getCreator(resourceClass);
 		
@@ -138,14 +138,14 @@ class ResourceFinderImpl implements ResourceFinder {
 	}
 	
 	private void acquire(ResourceCacheKey slot) {
-		IOTask owner = resourcesInProgress.putIfAbsent(slot, currentTask.currentAs(IOTask.class));
+		ResourceTask owner = resourcesInProgress.putIfAbsent(slot, currentTask.currentAs(ResourceTask.class));
 		if (owner != null) {
 			owner.await();
 		}
 	}
 	
 	private void release(ResourceCacheKey slot) {
-		resourcesInProgress.remove(slot, currentTask.currentAs(IOTask.class));
+		resourcesInProgress.remove(slot, currentTask.currentAs(ResourceTask.class));
 	}
 
 	private <T extends Resource> void replaceResource(

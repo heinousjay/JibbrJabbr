@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.AbstractFileResource;
-import jj.resource.IOThread;
+import jj.resource.ResourceThread;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
 import jj.resource.TransferableResource;
@@ -55,13 +55,13 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	}
 	
 	@Override
-	@IOThread
+	@ResourceThread
 	public FileChannel fileChannel() throws IOException {
 		return FileChannel.open(path);
 	}
 	
 	@Override
-	@IOThread
+	@ResourceThread
 	public RandomAccessFile randomAccessFile() throws IOException {
 		return new RandomAccessFile(path.toFile(), "r");
 	}
