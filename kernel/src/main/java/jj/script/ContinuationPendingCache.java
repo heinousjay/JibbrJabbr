@@ -76,7 +76,7 @@ class ContinuationPendingCache {
 		
 		if (pendingKey != null) {
 			if (!resumableTasks.replace(pendingKey.id(), sentinel, task)) {
-				throw new AssertionError("pending key being stored was not reserved or already in use!");
+				throw new AssertionError("pending key being stored was not reserved or is already in use!");
 			}
 		}
 	}

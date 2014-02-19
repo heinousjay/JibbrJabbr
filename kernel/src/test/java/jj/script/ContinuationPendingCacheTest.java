@@ -16,6 +16,7 @@
 package jj.script;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -42,10 +43,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ContinuationPendingCacheTest {
 	
-	// KEY_COUNT % STRESS_LEVEL must be 0
-	
-	private static final int KEY_COUNT = 20000;
-	private static final int STRESS_LEVEL = 10;
+	// just trying to make sure that the concurrency is done correctly
+
+	private static final int STRESS_LEVEL = Runtime.getRuntime().availableProcessors(); // total number of threads to use for the test
+	private static final int STRIDE = 400;
+	private static final int KEY_COUNT = STRESS_LEVEL * STRIDE;
 	
 	private static final class HelperTask extends ScriptTask<ScriptEnvironment> {
 
@@ -79,6 +81,7 @@ public class ContinuationPendingCacheTest {
 	
 	@Before
 	public void before() {
+		System.out.println(KEY_COUNT + " keys on " + STRESS_LEVEL + " threads");
 		assertThat(KEY_COUNT % STRESS_LEVEL, is(0));
 		
 		tasks = new HelperTask[KEY_COUNT];
@@ -96,7 +99,7 @@ public class ContinuationPendingCacheTest {
 		
 		final ArrayBlockingQueue<Throwable> throwables = new ArrayBlockingQueue<>(STRESS_LEVEL);
 		final CountDownLatch latch = new CountDownLatch(STRESS_LEVEL);
-		final int stride = KEY_COUNT / STRESS_LEVEL; // 200 / 10 = 20;
+		final int stride = STRIDE; // 200 / 10 = 20;
 		
 		for (int i = 0; i < STRESS_LEVEL; ++i) {
 			final int start = i * stride; // 0 * 20 = 0, 1 * 20 = 20;
@@ -117,7 +120,7 @@ public class ContinuationPendingCacheTest {
 			}).start();
 		}
 		
-		latch.await(500, TimeUnit.MILLISECONDS);
+		assumeTrue(latch.await(2, TimeUnit.SECONDS));
 		
 		if (!throwables.isEmpty()) {
 			throw throwables.poll();
@@ -132,21 +135,28 @@ public class ContinuationPendingCacheTest {
 				
 				@Override
 				public void run() {
+					int i = start;
 					try {
-						for (int i = start; i < start + stride; ++i) {
+						for (; i < start + stride; ++i) {
+							
 							cache.resume(pendingKeys[i], result);
 							assertThat(tasks[i].result(), is(sameInstance(result)));
 							verify(taskRunner).execute(tasks[i]);
 						}
 						latch2.countDown();
 					} catch (Throwable t) {
-						
+						System.err.println(i);
+						throwables.add(t);
 					}
 				}
 			}).start();
 		}
 		
-		latch2.await(500, TimeUnit.MILLISECONDS);
+		assumeTrue(latch2.await(2, TimeUnit.SECONDS));
+		
+		if (!throwables.isEmpty()) {
+			throw throwables.poll();
+		}
 		
 		final CountDownLatch latch3 = new CountDownLatch(STRESS_LEVEL);
 		
@@ -162,13 +172,13 @@ public class ContinuationPendingCacheTest {
 						}
 						latch3.countDown();
 					} catch (Throwable t) {
-						
+						t.printStackTrace();
 					}
 				}
 			}).start();
 		}
 		
-		latch3.await(500, TimeUnit.MILLISECONDS);
+		assumeTrue(latch3.await(2, TimeUnit.SECONDS));
 		
 		if (!throwables.isEmpty()) {
 			throw throwables.poll();

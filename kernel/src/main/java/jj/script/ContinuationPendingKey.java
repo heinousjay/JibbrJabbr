@@ -22,9 +22,7 @@ import jj.SecureRandomHelper;
 import jj.StringUtils;
 
 /**
- * simple object to represent continuation pending keys
- * 
- * for now, just wraps a simple string id, which can be specified
+ * Represents a key to restarting a paused script execution
  * 
  * @author jason
  *
