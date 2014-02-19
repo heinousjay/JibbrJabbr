@@ -22,12 +22,12 @@ import org.slf4j.Logger;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Configuration;
-import jj.resource.document.HtmlResource;
-import jj.resource.document.HtmlResourceMaker;
-import jj.resource.script.ScriptResource;
-import jj.resource.script.ScriptResourceMaker;
+import jj.document.HtmlResource;
+import jj.document.HtmlResourceMaker;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
+import jj.script.resource.ScriptResource;
+import jj.script.resource.ScriptResourceMaker;
 
 /**
  * @author jason

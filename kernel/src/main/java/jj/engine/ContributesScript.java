@@ -1,6 +1,6 @@
 package jj.engine;
 
-interface ContributesScript {
+public interface ContributesScript {
 
 	public String script();
 }

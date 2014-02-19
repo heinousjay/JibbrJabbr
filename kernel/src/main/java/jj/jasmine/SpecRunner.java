@@ -26,9 +26,9 @@ import jj.configuration.AppLocation;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
-import jj.resource.script.ScriptResource;
 import jj.resource.spec.SpecResource;
 import jj.script.ScriptEnvironmentInitialized;
+import jj.script.resource.ScriptResource;
 
 /**
  * @author jason

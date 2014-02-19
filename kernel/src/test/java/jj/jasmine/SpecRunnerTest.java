@@ -18,10 +18,10 @@ package jj.jasmine;
 import static org.mockito.BDDMockito.*;
 import jj.configuration.AppLocation;
 import jj.resource.ResourceFinder;
-import jj.resource.script.ScriptResource;
 import jj.resource.spec.SpecResource;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptEnvironmentInitialized;
+import jj.script.resource.ScriptResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

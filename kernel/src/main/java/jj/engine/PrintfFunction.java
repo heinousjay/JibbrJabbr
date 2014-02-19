@@ -5,8 +5,8 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.script.ScriptResourceType;
 import jj.script.CurrentScriptEnvironment;
+import jj.script.resource.ScriptResourceType;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;

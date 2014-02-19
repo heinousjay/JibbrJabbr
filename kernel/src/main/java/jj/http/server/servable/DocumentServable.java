@@ -12,15 +12,15 @@ import jj.StringUtils;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Assets;
+import jj.document.DocumentScriptEnvironment;
+import jj.document.HtmlResource;
+import jj.document.servable.DocumentRequestProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.ResourceFinder;
-import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.document.HtmlResource;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.http.server.servable.document.DocumentRequestProcessor;
 
 @Singleton
 class DocumentServable extends Servable<HtmlResource> {

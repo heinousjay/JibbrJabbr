@@ -16,9 +16,9 @@
 package jj;
 
 import jj.conversion.Converter;
+import jj.document.servable.DocumentFilter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
-import jj.http.server.servable.document.DocumentFilter;
 import jj.resource.ResourceCreatorBinder;
 import jj.script.ContinuationProcessorBinder;
 

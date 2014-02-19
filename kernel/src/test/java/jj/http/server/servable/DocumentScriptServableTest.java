@@ -20,9 +20,9 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
 import jj.configuration.AppLocation;
+import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
-import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.script.ScriptResource;
+import jj.script.resource.ScriptResource;
 import jj.uri.URIMatch;
 
 import org.junit.Before;

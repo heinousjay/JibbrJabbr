@@ -20,10 +20,10 @@ import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
 import jj.configuration.AppLocation;
 import jj.resource.ResourceFinder;
-import jj.resource.script.ModuleScriptEnvironment;
-import jj.resource.script.RequiredModule;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
+import jj.script.resource.ModuleScriptEnvironment;
+import jj.script.resource.RequiredModule;
 
 import org.junit.Before;
 import org.junit.Test;

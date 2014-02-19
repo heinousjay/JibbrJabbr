@@ -33,9 +33,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
+import jj.document.DocumentScriptEnvironment;
 import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
-import jj.resource.document.DocumentScriptEnvironment;
 import jj.uri.URIMatch;
 
 /**

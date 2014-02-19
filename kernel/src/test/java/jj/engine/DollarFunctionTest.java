@@ -20,10 +20,10 @@ import static org.mockito.BDDMockito.given;
 import java.net.URL;
 
 import jj.Closer;
+import jj.document.CurrentDocumentRequestProcessor;
+import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.DollarFunction;
 import jj.engine.EngineAPI;
-import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.resource.document.CurrentDocumentRequestProcessor;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

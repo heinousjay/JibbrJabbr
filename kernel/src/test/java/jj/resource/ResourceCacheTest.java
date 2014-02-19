@@ -26,8 +26,8 @@ import java.util.List;
 
 import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
+import jj.document.HtmlResource;
 import jj.execution.ExecutionConfiguration;
-import jj.resource.document.HtmlResource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;

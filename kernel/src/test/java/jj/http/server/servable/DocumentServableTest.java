@@ -20,8 +20,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.configuration.AppLocation;
-import jj.http.server.servable.document.DocumentRequestProcessor;
-import jj.resource.document.DocumentScriptEnvironment;
+import jj.document.DocumentScriptEnvironment;
+import jj.document.servable.DocumentRequestProcessor;
 import jj.uri.URIMatch;
 
 import org.junit.Before;

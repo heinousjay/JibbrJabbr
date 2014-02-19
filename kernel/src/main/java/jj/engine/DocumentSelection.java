@@ -3,9 +3,9 @@ package jj.engine;
 import java.util.Collections;
 import java.util.Map;
 
+import jj.document.CurrentDocumentRequestProcessor;
 import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
-import jj.resource.document.CurrentDocumentRequestProcessor;
 import jj.script.CurrentScriptEnvironment;
 
 import org.jsoup.nodes.Element;

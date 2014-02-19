@@ -27,14 +27,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.configuration.AppLocation;
+import jj.document.DocumentScriptEnvironment;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
-import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.script.ModuleScriptEnvironment;
-import jj.resource.script.RequiredModule;
+import jj.script.resource.ModuleScriptEnvironment;
+import jj.script.resource.RequiredModule;
 import jj.testing.App;
 import jj.testing.JibbrJabbrTestServer;
 

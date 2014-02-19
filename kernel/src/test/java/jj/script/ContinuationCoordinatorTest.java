@@ -26,7 +26,7 @@ import java.util.Map;
 
 import jj.http.client.RestRequest;
 import jj.jjmessage.JJMessage;
-import jj.resource.script.RequiredModule;
+import jj.script.resource.RequiredModule;
 
 import org.junit.Before;
 import org.junit.Test;

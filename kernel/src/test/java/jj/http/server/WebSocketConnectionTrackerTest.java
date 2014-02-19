@@ -16,10 +16,10 @@
 package jj.http.server;
 
 import static org.mockito.BDDMockito.*;
+import jj.document.DocumentScriptEnvironment;
 import jj.execution.ServerTask;
 import jj.execution.TaskHelper;
 import jj.execution.TaskRunner;
-import jj.resource.document.DocumentScriptEnvironment;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

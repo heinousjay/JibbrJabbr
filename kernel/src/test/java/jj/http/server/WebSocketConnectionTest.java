@@ -22,8 +22,8 @@ import static org.mockito.BDDMockito.*;
 
 import java.net.InetSocketAddress;
 
+import jj.document.DocumentScriptEnvironment;
 import jj.jjmessage.JJMessage;
-import jj.resource.document.DocumentScriptEnvironment;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;

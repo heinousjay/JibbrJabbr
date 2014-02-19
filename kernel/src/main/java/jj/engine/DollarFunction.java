@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.document.CurrentDocumentRequestProcessor;
+import jj.document.DocumentScriptEnvironment;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
-import jj.resource.document.CurrentDocumentRequestProcessor;
-import jj.resource.document.DocumentScriptEnvironment;
 import jj.script.CurrentScriptEnvironment;
 
 import org.jsoup.nodes.Element;

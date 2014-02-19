@@ -2,7 +2,6 @@ package jj.http.server;
 
 import jj.JJModule;
 import jj.http.server.servable.ServableModule;
-import jj.http.server.servable.document.DocumentModule;
 
 public class HttpServerModule extends JJModule {
 	
@@ -25,6 +24,5 @@ public class HttpServerModule extends JJModule {
 		addStartupListenerBinding().to(WebSocketConnectionTracker.class);
 		
 		install(new ServableModule());
-		install(new DocumentModule());
 	}
 }

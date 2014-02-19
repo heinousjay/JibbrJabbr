@@ -18,7 +18,7 @@ package jj.http.server;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import jj.resource.document.DocumentScriptEnvironment;
+import jj.document.DocumentScriptEnvironment;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 import org.junit.Test;

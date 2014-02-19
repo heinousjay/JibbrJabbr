@@ -21,6 +21,7 @@ import org.mozilla.javascript.ContextFactory;
 import jj.configuration.ConfigurationModule;
 import jj.conversion.ConversionModule;
 import jj.css.CssModule;
+import jj.document.DocumentProcessingModule;
 import jj.engine.HostApiModule;
 import jj.event.EventModule;
 import jj.execution.ExecutionModule;
@@ -90,9 +91,8 @@ public class CoreModule extends JJModule {
 		// it is a standalone feature
 		install(new ResourceModule());
 		install(new ScriptModule());
-		// everything before here (once the Document system is extracted)
-		// can be started with no configuration, and then changed on the fly
-		
+
+		install(new DocumentProcessingModule());
 		// this is second wave, in the new plan - restartable services with bridged
 		// access to the core
 		install(new HttpModule(isTest));

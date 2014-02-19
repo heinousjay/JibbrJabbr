@@ -11,9 +11,9 @@ import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
+import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
-import jj.resource.document.DocumentScriptEnvironment;
-import jj.resource.script.ScriptResource;
+import jj.script.resource.ScriptResource;
 import jj.uri.URIMatch;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
