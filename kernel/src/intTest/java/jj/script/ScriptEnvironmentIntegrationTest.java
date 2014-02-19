@@ -18,6 +18,8 @@ package jj.script;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,7 +54,7 @@ public class ScriptEnvironmentIntegrationTest {
 	@Inject ResourceLoader resourceLoader;
 	
 	@Rule
-	public JibbrJabbrTestServer app = 
+	public JibbrJabbrTestServer server = 
 		new JibbrJabbrTestServer(App.path1)
 			.injectInstance(this);
 	
@@ -88,6 +90,7 @@ public class ScriptEnvironmentIntegrationTest {
 		};
 	}
 	
+	// there should be a similar test in a resource system integration test
 	@Test
 	public void testingDuplicateInitializationRequestsJoin() throws Exception {
 		
@@ -165,15 +168,16 @@ public class ScriptEnvironmentIntegrationTest {
 		assertThat(scriptEnvironment.initialized(), is(true));
 		
 		// need to run a document request first
+		assertThat(server.get("deep/nested").status(), is(HttpResponseStatus.OK));
 		
-		/*
+		
 		ModuleScriptEnvironment mse =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, "deep/module", new RequiredModule(scriptEnvironment, "deep/module"));
+			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "deep/module", new RequiredModule(scriptEnvironment, "deep/module"));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
 		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
-		*/
+		
 	}
 
 	/**

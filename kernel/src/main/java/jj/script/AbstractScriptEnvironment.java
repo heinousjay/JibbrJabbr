@@ -40,7 +40,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	protected final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
-	// field injection!  this only works because i'm not testing it yet haha
+	// field injection! 
+	// this is not my favored technique but the test has been written to
+	// accommodate it, and it saves passing yet another dependency all throughout the system,
+	// entirely through places that do not care about this.
+	/**
+	 * DO NOT OVERWRITE THE VALUE OF THIS FIELD!.  if is not final because it needs to be
+	 * injected but it should be treated as if it were final
+	 */
 	@Inject
 	private Provider<ContinuationPendingKey> pendingKeyProvider;
 	
