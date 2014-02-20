@@ -40,7 +40,7 @@ public enum SHA1Helper {
 	};
 	
 	private static String toHex(final byte[] bytes) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(bytes.length);
 		for (int i = 0; i < bytes.length; i++) {
           sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
         }
