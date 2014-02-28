@@ -13,6 +13,7 @@ Build using Gradle, for example
 `./gradlew build`
 
 then you can start the sample with
+
 `cd build/libs`
 `java -jar Jibbr-Jibbr-0.5.jar app=../../kernel/src/test/resources/app`
 
