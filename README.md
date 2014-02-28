@@ -15,7 +15,7 @@ Build using Gradle, for example
 then you can start the sample with
 
 `cd build/libs`
-`java -jar Jibbr-Jibbr-0.5.jar app=../../kernel/src/test/resources/app`
+`java -jar Jibbr-Jibbr-0.5.jar app=../../test/src/test/resources/app2/app`
 
 then browse to 
 
