@@ -48,7 +48,7 @@ public class JibbrJabbrTestServer implements TestRule {
 	
 	private boolean httpServer = false;
 	
-	private int port = 0;
+	private int httpPort = 0;
 	
 	private Object instance;
 	
@@ -69,14 +69,15 @@ public class JibbrJabbrTestServer implements TestRule {
 		return this;
 	}
 	
-	public JibbrJabbrTestServer withHttpServer() {
+	public JibbrJabbrTestServer withHttp() {
 		httpServer = true;
 		return this;
 	}
 	
-	public JibbrJabbrTestServer withHttpServerOnPort(int port) {
+	public JibbrJabbrTestServer withHttpOnPort(int port) {
+		assert (port > 1023 && port < 65536) : "http port must be between 1024-65535 inclusive";
 		httpServer = true;
-		this.port = port;
+		httpPort = port;
 		return this;
 	}
 	
@@ -119,10 +120,8 @@ public class JibbrJabbrTestServer implements TestRule {
 		builder.add("app=" + appPath);
 		builder.add("fileWatcher=" + fileWatcher);
 		builder.add("httpServer=" + httpServer);
-		
-		// this don't work yet!
-		if (port > 1024 && port < 65536) {
-			builder.add("port=" + port);
+		if (httpPort > 1023 && httpPort < 65536) {
+			builder.add("httpPort=" + httpPort);
 		}
 		
 		injector = Guice.createInjector(

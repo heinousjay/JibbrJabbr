@@ -33,12 +33,12 @@ public class LetsWriteATest {
 	@Rule
 	public JibbrJabbrTestServer server = 
 		new JibbrJabbrTestServer(App.path2)
-			.withHttpServer();
+			.withHttp();
 	
 	
 	// since we're running in the context of the embedded server, let that
 	// produce this rule so they can coordinate
-	// TODO - coordinate! logging, server port... more?
+	// TODO - coordinate! logging, server port, startup gating (ensure the server is running first!)
 	// TODO - make the logging into its own component
 	@Rule
 	public WebDriverRule webDriverRule = server.webDriverRule()

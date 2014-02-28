@@ -65,6 +65,8 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 	
 	private ServerBootstrap serverBootstrap;
 	
+	private final Arguments arguments;
+	
 	private final boolean run;
 	
 	@Inject
@@ -77,6 +79,7 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 		this.ioEventLoopGroup = ioEventLoopGroup;
 		this.initializer = initializer;
 		this.configuration = configuration;
+		this.arguments = arguments;
 		run = arguments.get("httpServer", boolean.class, true);
 	}
 	
@@ -87,54 +90,84 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 		
 			assert (serverBootstrap == null) : "cannot start an already started server";
 			
-			HttpServerSocketConfiguration config = configuration.get(HttpServerSocketConfiguration.class);
+			Binding[] bindings = getBindings();
 			
-			// TODO! port from arguments can override here!
+			makeServerBootstrap(bindings.length);
 			
-			Binding[] bindings = config.bindings();
-			if (bindings.length == 0) bindings = new Binding[] {
-				new Binding() {
-					
-					@Override
-					public int port() {
-						return 8080;
-					}
-					
-					@Override
-					public String host() {
-						return null;
-					}
-				}
-			};
-			
-			makeServerBootstrap(config, bindings);
-			
-			try {
-				for (Binding binding : bindings) {
-					
-					String host = binding.host();
-					int port = binding.port();
-					
-					if (!StringUtils.isEmpty(host)) {
-						logger.info("Binding to {}:{}", host, port);
-						serverBootstrap.bind(host, port).sync();
-					} else {
-						logger.info("Binding to {}", port);
-						serverBootstrap.bind(port).sync();
-					}
-				}
-			} catch (Exception e) {
-				serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
-				throw e;
-			}
+			bindPorts(bindings);
 			
 			logger.info("Server started");
 		}
 	}
 
-	private void makeServerBootstrap(HttpServerSocketConfiguration config, Binding[] bindings) {
-		serverBootstrap =  new ServerBootstrap()
-			.group(new NioEventLoopGroup(bindings.length, threadFactory), ioEventLoopGroup)
+	private void bindPorts(Binding[] bindings) throws Exception {
+		try {
+			for (Binding binding : bindings) {
+				
+				String host = binding.host();
+				int port = binding.port();
+				
+				if (!StringUtils.isEmpty(host)) {
+					logger.info("Binding to {}:{}", host, port);
+					serverBootstrap.bind(host, port).sync();
+				} else {
+					logger.info("Binding to {}", port);
+					serverBootstrap.bind(port).sync();
+				}
+			}
+		} catch (Exception e) {
+			serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
+			throw e;
+		}
+	}
+	
+	private Binding[] getBindings() {
+		
+		Binding[] result;
+		
+		final int overridePort = arguments.get("httpPort", int.class, -1);
+		if (overridePort > 1023 && overridePort < 65536) {
+			result = new Binding[1];
+			result[0] = new Binding() {
+				
+				@Override
+				public int port() {
+					// TODO Auto-generated method stub
+					return overridePort;
+				}
+				
+				@Override
+				public String host() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			};
+		} else {
+			result = configuration.get(HttpServerSocketConfiguration.class).bindings();
+		}
+		
+		if (result.length == 0) result = new Binding[] {
+			new Binding() {
+				
+				@Override
+				public int port() {
+					return 8080;
+				}
+				
+				@Override
+				public String host() {
+					return null;
+				}
+			}
+		};
+		
+		return result;
+	}
+
+	private void makeServerBootstrap(int bindingCount) {
+		HttpServerSocketConfiguration config = configuration.get(HttpServerSocketConfiguration.class);
+		serverBootstrap = new ServerBootstrap()
+			.group(new NioEventLoopGroup(bindingCount, threadFactory), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(initializer)
 			.option(ChannelOption.SO_KEEPALIVE, config.keepAlive())
