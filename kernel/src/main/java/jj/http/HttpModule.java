@@ -24,17 +24,11 @@ import jj.http.server.HttpServerModule;
  *
  */
 public class HttpModule extends JJModule {
-	
-	private final boolean isTest;
-	
-	public HttpModule(final boolean isTest) {
-		this.isTest = isTest;
-	}
 
 	@Override
 	protected void configure() {
 		install(new HttpClientModule());
-		install(new HttpServerModule(isTest));
+		install(new HttpServerModule());
 	}
 
 }

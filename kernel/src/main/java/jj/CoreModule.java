@@ -95,7 +95,7 @@ public class CoreModule extends JJModule {
 		install(new DocumentProcessingModule());
 		// this is second wave, in the new plan - restartable services with bridged
 		// access to the core
-		install(new HttpModule(isTest));
+		install(new HttpModule());
 		
 		// this needs to be split into pieces and contributed
 		// from places that make the most sense

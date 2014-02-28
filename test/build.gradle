@@ -69,8 +69,10 @@ configurations {
 
 dependencies {
 	
-	testCompile configurations.testPack
-	testCompile 'com.github.detro.ghostdriver:phantomjsdriver:1.1.0'
+	compile configurations.core
+	compile configurations.testPack
+	compile project(":kernel")
+	compile 'com.github.detro.ghostdriver:phantomjsdriver:1.1.0'
 	
 	phantomJS "org.jboss.arquillian.extension:arquillian-phantom-binary:1.9.2:${classifier}"
 }
@@ -95,6 +97,9 @@ test {
 	inputs.file project(':').jar.archivePath
 	
 	systemProperty 'phantomjs.binary.path', executable
+	
+	minHeapSize = "128m"
+	maxHeapSize = "512m"
 }
 
 def findApp(String path) {
@@ -123,5 +128,6 @@ task stopJibbrJabbr(dependsOn: startJibbrJabbr) << {
 
 stopJibbrJabbr.mustRunAfter test
 
-test.dependsOn startJibbrJabbr
+// maybe we worry about this in the top level... just a fast smoke test
+// test.dependsOn startJibbrJabbr
 test.dependsOn setUpPhantomJS

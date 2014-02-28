@@ -20,6 +20,7 @@ import static org.mockito.BDDMockito.*;
 import javax.inject.Provider;
 import javax.net.SocketFactory;
 
+import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 
 import org.junit.Test;
@@ -43,6 +44,8 @@ public class HttpServerTest {
 	};
 
 	@Mock Configuration configuration;
+	
+	@Mock Arguments arguments;
 	
 	HttpServerSocketConfiguration config = new HttpServerSocketConfiguration() {
 		
@@ -117,7 +120,8 @@ public class HttpServerTest {
 		
 		// given
 		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
-		HttpServer httpServer = new HttpServer(new MockJJNioEventLoopGroup(), new HttpServerChannelInitializer(engineProvider), configuration);
+		given(arguments.get("httpServer", boolean.class, true)).willReturn(true);
+		HttpServer httpServer = new HttpServer(new MockJJNioEventLoopGroup(), new HttpServerChannelInitializer(engineProvider), configuration, arguments);
 
 		try {
 			// when

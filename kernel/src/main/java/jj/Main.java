@@ -81,7 +81,8 @@ public class Main {
 		}
 		
 		Version version = injector.getInstance(Version.class);
-		
+		// this is a bit hacky!
+		System.out.println();
 		log.info("Welcome to {} version {} commit {}", version.name(), version.version(), version.commitId());
 		if (!JJ.isRunning) {
 			log.info("******************************************************************************");

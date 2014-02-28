@@ -15,6 +15,9 @@
  */
 package jj;
 
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -25,10 +28,30 @@ import java.nio.file.Paths;
  *
  */
 public class BootstrapClassPath implements ResourceResolver {
+	
+	private final FileSystem jarFs;
+	
+	public BootstrapClassPath() {
+		// in the integration tests run in the build, we are running in a jar, so we need to open that file system
+		Path jar = JJ.jarForClass(getClass());
+		if (jar != null) {
+			try {
+				jarFs = FileSystems.newFileSystem(jar, null);
+			} catch (IOException e) {
+				throw new AssertionError(e);
+			}
+		} else {
+			jarFs = null;
+		}
+		
+	}
+	
 
 	@Override
 	public Path pathForFile(String file) throws Exception {
-		return Paths.get(BootstrapClassPath.class.getResource(file).toURI());
+		return jarFs != null ?
+			jarFs.getPath(file) :
+			Paths.get(BootstrapClassPath.class.getResource(file).toURI());
 	}
 
 }

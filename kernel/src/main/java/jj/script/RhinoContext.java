@@ -15,10 +15,9 @@
  */
 package jj.script;
 
-import java.io.Closeable;
-
 import javax.inject.Inject;
 
+import jj.Closer;
 import jj.logging.EmergencyLogger;
 
 import org.mozilla.javascript.Callable;
@@ -39,7 +38,7 @@ import org.slf4j.Logger;
  * @author jason
  *
  */
-public class RhinoContext implements Closeable {
+public class RhinoContext implements Closer {
 
 	private final Context context;
 	private boolean closed = false;
@@ -47,7 +46,9 @@ public class RhinoContext implements Closeable {
 	private final Logger logger;
 	
 	@Inject
-	RhinoContext(final @EmergencyLogger Logger logger) {
+	RhinoContext(
+		final @EmergencyLogger Logger logger
+	) {
 		this.context = Context.enter();
 		this.logger = logger;
 		

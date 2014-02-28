@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head>
+		<title>ANIMAL!</title>
+	<script type="text/javascript" src="/jquery-2.0.3.min.js"></script><script type="text/javascript" src="/2079364fa72bd9d701c27a8e4309ab117eddb5af/jj.js" id="jj-connector-script" data-jj-socket-url="ws://localhost/2926dc19fb78203a0b9251026a0b256c1ec207e8/animal.socket" data-jj-startup-messages="[]"></script><script type="text/javascript" src="/2926dc19fb78203a0b9251026a0b256c1ec207e8/animal.js"></script></head>
+	
+	<body>
+		<input type="file" id="fileElem" multiple="multiple" style="display:none" />
+		<a href="/animal#" id="fileSelect">Select some files</a>
+		<div id="fileList">
+			<p>No files selected!</p>
+		</div>
+		<div id="call-me-result">called</div>
+	
+
+</body></html>

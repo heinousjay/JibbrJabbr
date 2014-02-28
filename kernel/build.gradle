@@ -1,7 +1,4 @@
-sourceSets {
-	intJava
-	intTest
-}
+
 
 dependencies {
 	
@@ -10,13 +7,6 @@ dependencies {
 	
 	testCompile configurations.testPack
 	testCompile 'com.google.inject.extensions:guice-grapher:3.0'
-	
-	intJavaCompile configurations.runtime
-	intJavaCompile configurations.testPack
-	intJavaCompile sourceSets.main.output
-	
-	intTestCompile configurations.intJavaCompile
-	intTestCompile sourceSets.intJava.output
 }
 
 test {
@@ -26,31 +16,8 @@ test {
 	maxHeapSize = "512m"
 }
 
-task integrationTest(type: Test, dependsOn: intTestClasses) {
-	
-	testSrcDirs = [
-		sourceSets.intTest.java.srcDirs.find(),
-		sourceSets.intTest.resources.srcDirs.find(),
-		project(':').sourceSets.test.resources.srcDirs.find()
-	]
-	testClassesDir = sourceSets.intTest.output.classesDir
-	
-	classpath = files(
-		sourceSets.intTest.runtimeClasspath,
-		project(':').sourceSets.test.resources.srcDirs
-	)
-	
-	reports.html.destination = new File(reports.html.destination.parentFile, name)
-	reports.junitXml.destination = new File(reports.junitXml.destination, name)
-	
-	minHeapSize = "128m"
-	maxHeapSize = "512m"
-}
-
-integrationTest.shouldRunAfter test
-
 // don't let the build proceed if tests fail... but don't require tests because hey! i like to jar it
 jar.mustRunAfter test
-jar.mustRunAfter integrationTest
+//jar.mustRunAfter integrationTest
 
-check.dependsOn integrationTest
+//check.dependsOn integrationTest

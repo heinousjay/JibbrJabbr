@@ -273,7 +273,6 @@ public final class JJ {
 						System.out.print('.');
 					}
 				} catch (InterruptedException e) {}
-				System.out.println();
 			}
 		}).start();
 		return latch;

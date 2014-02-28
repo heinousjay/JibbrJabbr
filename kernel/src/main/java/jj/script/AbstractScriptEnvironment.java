@@ -176,7 +176,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		// setting up the 'module' property as described in 
 		// the commonjs module 1.1.1 specification
 		// in the case of the top-level server script, the id
-		// will be the baseName, which fortunately happens to be
+		// will be the name, which fortunately happens to be
 		// exactly what is required
 		ScriptableObject module = context.newObject(local);
 		ScriptableObject exports = context.newObject(local);

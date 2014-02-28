@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head>
+		
+		<meta charset="UTF-8" />
+		
+		<title>API TEST SUCCESS</title>
+		<link rel="stylesheet" type="text/css" href="/a6b6fa43b8035e7f42182b3f85d054592fc31bcd/style.css" />
+		<link rel="stylesheet" type="text/css" href="/jquery.fancybox.css" />
+	</head>
+	<body>
+		<div id="container">
+		
+			<h1 id="welcome" data-i18n="welcome">WELCOME MESSAGE GOES HERE</h1>
+			
+			<section id="topic-holder"><div><span data-i18n="topic">TOPIC</span> <span id="topic"></span></div></section>
+			
+			<section id="left-pane">
+				<div id="chatbox"></div>
+				
+				<input id="userInput" type="text" maxlength="100" />
+				<button id="button1" data-i18n="button">BUTTON TEXT GOES HERE</button>
+			</section>
+			<section id="right-pane">
+				<div id="users"></div>
+			</section>
+			<div style="clear:both;"></div>
+		</div>
+
+		<script type="text/javascript" src="/jquery.scrollTo-1.4.3.1-min.js"></script>
+		<script type="text/javascript" src="/jquery.color.min.js"></script>
+		<script type="text/javascript" src="/jquery.fancybox.js"></script>
+	
+</body></html>

@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
 import jj.StringUtils;
+import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 
 /**
@@ -64,40 +65,74 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 	
 	private ServerBootstrap serverBootstrap;
 	
+	private final boolean run;
+	
 	@Inject
 	HttpServer(
 		final JJNioEventLoopGroup ioEventLoopGroup,
 		final HttpServerChannelInitializer initializer,
-		final Configuration configuration
+		final Configuration configuration,
+		final Arguments arguments
 	) {
 		this.ioEventLoopGroup = ioEventLoopGroup;
 		this.initializer = initializer;
 		this.configuration = configuration;
+		run = arguments.get("httpServer", boolean.class, true);
 	}
 	
 	@Override
 	public void start() throws Exception {
 		
-		assert (serverBootstrap == null) : "cannot start an already started server";
+		if (run) {
 		
-		HttpServerSocketConfiguration config = configuration.get(HttpServerSocketConfiguration.class);
-		
-		Binding[] bindings = config.bindings();
-		if (bindings.length == 0) bindings = new Binding[] {
-			new Binding() {
-				
-				@Override
-				public int port() {
-					return 8080;
+			assert (serverBootstrap == null) : "cannot start an already started server";
+			
+			HttpServerSocketConfiguration config = configuration.get(HttpServerSocketConfiguration.class);
+			
+			// TODO! port from arguments can override here!
+			
+			Binding[] bindings = config.bindings();
+			if (bindings.length == 0) bindings = new Binding[] {
+				new Binding() {
+					
+					@Override
+					public int port() {
+						return 8080;
+					}
+					
+					@Override
+					public String host() {
+						return null;
+					}
 				}
-				
-				@Override
-				public String host() {
-					return null;
+			};
+			
+			makeServerBootstrap(config, bindings);
+			
+			try {
+				for (Binding binding : bindings) {
+					
+					String host = binding.host();
+					int port = binding.port();
+					
+					if (!StringUtils.isEmpty(host)) {
+						logger.info("Binding to {}:{}", host, port);
+						serverBootstrap.bind(host, port).sync();
+					} else {
+						logger.info("Binding to {}", port);
+						serverBootstrap.bind(port).sync();
+					}
 				}
+			} catch (Exception e) {
+				serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
+				throw e;
 			}
-		};
-		
+			
+			logger.info("Server started");
+		}
+	}
+
+	private void makeServerBootstrap(HttpServerSocketConfiguration config, Binding[] bindings) {
 		serverBootstrap =  new ServerBootstrap()
 			.group(new NioEventLoopGroup(bindings.length, threadFactory), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
@@ -109,27 +144,6 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 			.option(ChannelOption.SO_BACKLOG, config.backlog())
 			.option(ChannelOption.SO_RCVBUF, config.receiveBufferSize())
 			.option(ChannelOption.SO_SNDBUF, config.sendBufferSize());
-		
-		try {
-			for (Binding binding : bindings) {
-				
-				String host = binding.host();
-				int port = binding.port();
-				
-				if (!StringUtils.isEmpty(host)) {
-					logger.info("Binding to {}:{}", host, port);
-					serverBootstrap.bind(host, port).sync();
-				} else {
-					logger.info("Binding to {}", port);
-					serverBootstrap.bind(port).sync();
-				}
-			}
-		} catch (Exception e) {
-			serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
-			throw e;
-		}
-		
-		logger.info("Server started");
 	}
 	
 	@Override
@@ -140,11 +154,13 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 
 	@Override
 	public void stop() {
-		assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
-		serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
-		serverBootstrap.childGroup().shutdownGracefully();
-		serverBootstrap = null;
-		logger.info("Server shut down");
+		if (run) {
+			assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
+			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
+			serverBootstrap.childGroup().shutdownGracefully();
+			serverBootstrap = null;
+			logger.info("Server shut down");
+		}
 	}
 
 }
