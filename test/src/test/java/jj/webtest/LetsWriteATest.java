@@ -31,8 +31,7 @@ import org.junit.Test;
 public class LetsWriteATest {
 	
 	@Rule
-	public JibbrJabbrTestServer server = 
-		new JibbrJabbrTestServer(App.path2)
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.path2)
 			.withHttp();
 	
 	

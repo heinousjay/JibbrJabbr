@@ -15,8 +15,13 @@
  */
 package jj.webdriver;
 
-import java.io.File;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.inject.Singleton;
 
 import jj.webdriver.URLBase.BaseURL;
@@ -34,7 +39,6 @@ import org.openqa.selenium.remote.ScreenshotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -80,6 +84,8 @@ public class WebDriverRule implements TestRule {
 	private Class<? extends PanelBase> panelBaseClass = PanelBase.class;
 	
 	private Description currentDescription = null;
+	
+	private Path screenshotDir = Paths.get("build");
 	
 	private int screenShotCount;
 	
@@ -130,7 +136,7 @@ public class WebDriverRule implements TestRule {
 					logger.error("TEST ENDED IN ERROR", t);
 					
 					if (!saveScreenshotIfFound(t)) {
-						takeScreenshot(null, makeScreenShotName("error-screenshot"));
+						takeScreenshot(makeScreenShotName("error-screenshot"));
 					}
 					
 					throw t;
@@ -159,9 +165,9 @@ public class WebDriverRule implements TestRule {
 				
 				byte[] screenshot = Base64.decodeBase64(screenshotBase64);
 				
-				File screenshotFile = new File(makeScreenShotName("error-screenshot")).getAbsoluteFile();
+				Path screenshotFile = screenshotDir.resolve(makeScreenShotName("error-screenshot"));
 				
-				Files.write(screenshot, screenshotFile);
+				Files.write(screenshotFile, screenshot);
 				logger.info("saved error state screenshot {}", screenshotFile);
 			
 			} catch (Exception ioe) {
@@ -204,6 +210,7 @@ public class WebDriverRule implements TestRule {
 	 */
 	public WebDriverRule driverProvider(Class<? extends WebDriverProvider> webDriverProvider) {
 		assertUnstarted();
+		assert webDriverProvider != null : "don't give me null!";
 		
 		this.webDriverProvider = webDriverProvider;
 		return this;
@@ -211,6 +218,7 @@ public class WebDriverRule implements TestRule {
 	
 	public WebDriverRule webElementFinder(Class<? extends WebElementFinder> webElementFinder) {
 		assertUnstarted();
+		assert webElementFinder != null : "don't give me null!";
 		
 		this.webElementFinder = webElementFinder;
 		return this;
@@ -218,8 +226,18 @@ public class WebDriverRule implements TestRule {
 	
 	public WebDriverRule panelBaseClass(Class<? extends PanelBase> panelBaseClass) {
 		assertUnstarted();
+		assert panelBaseClass != null : "don't give me null!";
 		
 		this.panelBaseClass = panelBaseClass;
+		return this;
+	}
+	
+	public WebDriverRule screenShotDir(Path screenshotDir) {
+		assertUnstarted();
+		assert screenshotDir != null : "don't give me null!";
+		assert Files.isDirectory(screenshotDir) : "must be a directory!";
+		
+		this.screenshotDir = screenshotDir;
 		return this;
 	}
 	
@@ -231,7 +249,7 @@ public class WebDriverRule implements TestRule {
 	 * @throws IOException
 	 */
 	public void takeScreenshot() throws IOException {
-		takeScreenshot(null);
+		takeScreenshot(makeScreenShotName("screenshot"));
 	}
 	
 	/**
@@ -240,28 +258,17 @@ public class WebDriverRule implements TestRule {
 	 * @param dir
 	 * @throws IOException
 	 */
-	public void takeScreenshot(File dir) throws IOException {
-		takeScreenshot(dir, makeScreenShotName("screenshot"));
-	}
-	
-	/**
-	 * Takes a screenshot of the current state of the browser, if possible according to the
-	 * current driver, and stores it in the directory given
-	 * @param dir
-	 * @throws IOException
-	 */
-	public void takeScreenshot(File dir, String screenshotName) throws IOException {
+	public void takeScreenshot(String screenshotName) throws IOException {
 		
 		assert webDriver != null : "cannot take a screenshot outside of a test";
-		assert dir == null || dir.isDirectory() : "need a directory to store the screenshot";
 		
 		if (webDriver instanceof TakesScreenshot) {
 		
-			File file = ((TakesScreenshot)webDriver).getScreenshotAs(OutputType.FILE);
+			Path screenshot = ((TakesScreenshot)webDriver).getScreenshotAs(OutputType.FILE).toPath();
+			Path restingPlace = screenshotDir.resolve(screenshotName);
+			Files.copy(screenshot, restingPlace, REPLACE_EXISTING);
 			
-			Files.copy(file, new File(dir, screenshotName));
-			
-			logger.info("saved {}", screenshotName);
+			logger.info("saved {}", restingPlace);
 		}
 	}
 
