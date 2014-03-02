@@ -17,10 +17,16 @@ package jj.webdriver;
 
 /**
  * <p>
- * A specialized type of {@link Panel} that triggers/follows navigation.
+ * A specialized type of {@link Panel} that triggers/follows navigation, and is
+ * intended to contain Panels as well as interaction method.
  * 
  * <p>
- * Extensions of this interface are required to be annotated with {@link URL}
+ * Extensions of this interface are required to be annotated with {@link URL}, which
+ * should identify the path to which this page is associated.  query strings are
+ * specified via the call to {@link WebDriverRule#get(Class, String)}.
+ * 
+ * <p>
+ * When a page is created
  * 
  * @author jason
  *

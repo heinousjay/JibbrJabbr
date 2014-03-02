@@ -15,6 +15,8 @@
  */
 package jj.webdriver;
 
+import java.net.URI;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,7 +37,10 @@ import org.slf4j.Logger;
  * <p>
  * You can extend this class to provide additional base functionality for
  * customer generators if necessary.  For the time, this class is package
- * private, which is intended to make you think about using it for anything
+ * private, which is intended to make you think about using it for anything,
+ * and also means your custom base class will have to be declared
+ * in the jj.webdriver package. More rules to document! Constructor behavior
+ * specifically.
  * 
  * 
  * @author jason
@@ -49,6 +54,8 @@ abstract class PanelBase implements Page {
 	protected final String name;
 	protected final PanelFactory panelFactory;
 	protected final URLBase urlBase;
+	
+	protected ByStack byStack = new ByStack();
 
 	PanelBase(
 		final WebDriver webDriver,
@@ -76,6 +83,10 @@ abstract class PanelBase implements Page {
 		return finder.find(webDriver, by);
 	}
 	
+	void byStack(ByStack byStack) {
+		this.byStack = byStack;
+	}
+	
 	<T extends Panel> T makePanel(Class<T> panelInterface) {
 		return panelFactory.create(panelInterface);
 	}
@@ -83,11 +94,10 @@ abstract class PanelBase implements Page {
 	<T extends Page> T navigateTo(Class<T> pageInterface) {
 		String url = pageInterface.getAnnotation(URL.class).value();
 		
-		// this is nowhere near right!
-		if (!webDriver.getCurrentUrl().endsWith(url)) {
-			// we need to navigate there!
-			webDriver.get(urlBase.resolve(url));
-		}
+		// this may not be necessary, maybe we just save it?
+		URI uri = URI.create(webDriver.getCurrentUrl());
+		System.out.println(uri.getRawPath());
+		System.out.println(url);
 		
 		return panelFactory.create(pageInterface);
 	}

@@ -20,6 +20,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+
+import jj.webdriver.URLBase.BaseURL;
 import jj.webdriver.pages.TestModel;
 import jj.webdriver.pages.TestPage;
 import jj.webdriver.pages.TestPage2;
@@ -76,7 +78,7 @@ public class PanelFactoryTest {
 					bind(WebDriver.class).toInstance(webDriver);
 					bind(WebElementFinder.class).toInstance(finder);
 					bind(Logger.class).toInstance(logger);
-					bind(String.class).annotatedWith(URLBase.BaseURL.class).toInstance("http://localhost:8080");
+					bind(String.class).annotatedWith(BaseURL.class).toInstance("http://localhost:8080");
 				}
 			},
 			new PanelMethodGeneratorsModule()
@@ -166,8 +168,8 @@ public class PanelFactoryTest {
 		t.name = "1";
 		t.email = "2";
 		
-		given(finder.find(webDriver, By.id("name"))).willReturn(webElement);
-		given(finder.find(webDriver, By.id("email"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-name"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-email"))).willReturn(webElement);
 		
 		page.testPanel().setSomeForm(t);
 		

@@ -26,6 +26,11 @@ import javassist.CtMethod;
  */
 public abstract class PanelMethodGenerator {
 	
+	/**
+	 * 
+	 */
+	protected static final String LOCAL_BY = "localBy";
+
 	protected static final Pattern makeNamePattern(String name) {
 		return Pattern.compile("^" + name + "[A-Z\\d_\\$]");
 	}
@@ -47,14 +52,57 @@ public abstract class PanelMethodGenerator {
 		return returnType.getName().equals("void") || hasPanelInterface(returnType);
 	}
 	
-	protected abstract void generate(CtMethod newMethod, CtMethod baseMethod) throws Exception;
-	
 	private boolean isPanel(CtClass type) throws Exception {
 		return type.getInterfaces().length == 1 && Panel.class.getName().equals(type.getInterfaces()[0].getName());
 	}
 	
 	private boolean isPage(CtClass type) throws Exception {
 		return type.getInterfaces().length == 1 && Page.class.getName().equals(type.getInterfaces()[0].getName());
+	}
+	
+	protected void generate(CtMethod newMethod, CtMethod baseMethod, StringBuilder sb) throws Exception {
+		// does nothing by default, since you can override generateMethod and do it all yourself
+	}
+	
+	protected void generateMethod(CtMethod newMethod, CtMethod baseMethod) throws Exception {
+		StringBuilder sb = new StringBuilder("{");
+		processBy((By)baseMethod.getAnnotation(By.class), sb);
+		generate(newMethod, baseMethod, sb);
+		generateReturn(newMethod, baseMethod, sb);
+		sb.append("}");
+		
+		setBody(newMethod, sb);
+	}
+	
+	protected void setBody(CtMethod newMethod, StringBuilder sb) throws Exception {
+		System.out.println(newMethod.getName());
+		System.out.println(sb.toString());
+		
+		newMethod.setBody(sb.toString());
+	}
+	
+	protected void generateReturn(CtMethod newMethod, CtMethod baseMethod, StringBuilder sb) throws Exception {
+		generateStandardReturn(newMethod, sb);
+	}
+	
+	protected void processBy(By by, StringBuilder sb) {
+		processBy(by, LOCAL_BY, sb);
+	}
+	
+	protected void processBy(By by, String varName, StringBuilder sb) {
+		
+		if (by != null) {
+			
+			sb.append("org.openqa.selenium.By ").append(varName).append(" = org.openqa.selenium.By.");
+			
+			if (!empty(by.value())) {
+				sb.append("id(byStack.resolve(\"").append(by.value()).append("\"));");
+			} else if (!empty(by.id())) {
+				sb.append("id(\"").append(by.id()).append("\");");
+			} else if (!empty(by.className())) {
+				sb.append("className(\"").append(by.className()).append("\");");
+			}
+		}
 	}
 	
 	protected void generateStandardReturn(CtMethod newMethod, StringBuilder sb) throws Exception {
@@ -86,13 +134,13 @@ public abstract class PanelMethodGenerator {
 		} else if (!empty(by.className())) {
 			result = "org.openqa.selenium.By.className(\"" + by.className() + "\")";
 		} else {
-			assert false : "NOT POSSIBLE!";
+			throw new AssertionError("NOT POSSIBLE!");
 		}
 		
 		return result;
 	}
 	
-	private boolean empty(String string) {
-		return string == null || "".equals(string);
+	protected boolean empty(String string) {
+		return string == null || string.isEmpty();
 	}
 }

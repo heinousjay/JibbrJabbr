@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.webdriver;
+
+import com.google.inject.Binder;
+import com.google.inject.binder.ScopedBindingBuilder;
+import com.google.inject.multibindings.Multibinder;
+
 /**
- * <p>
- * Provides test facilities to drive in-browser testing of web apps
- * 
- * <p>
- * The main entry point to this API is {@link WebDriverRule}
- * 
- * <p>
- * Customizing the behavior involves adding {@link PanelMethodGenerator}
- * classes to the generation system, and potentially extending {@link PanelBase}
- * with additional base functionality.
- * 
  * @author jason
  *
  */
-package jj.webdriver;
+class PanelMethodGeneratorBinder {
+	
+	private final Multibinder<PanelMethodGenerator> generatorBinder;
+	
+	PanelMethodGeneratorBinder(Binder binder) {
+		generatorBinder = Multibinder.newSetBinder(binder, PanelMethodGenerator.class);
+	}
+	
+	ScopedBindingBuilder to(Class<? extends PanelMethodGenerator> generator) {
+		return generatorBinder.addBinding().to(generator);
+	}
+}

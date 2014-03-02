@@ -40,17 +40,24 @@ public class SetModelMethodGenerator extends PanelMethodGenerator {
 	}
 
 	@Override
-	protected void generate(CtMethod newMethod, CtMethod baseMethod) throws Exception {
+	protected void generateMethod(CtMethod newMethod, CtMethod baseMethod) throws Exception {
 		StringBuilder sb = new StringBuilder("{");
 		
 		for (CtField field : newMethod.getParameterTypes()[0].getFields()) {
-			sb.append("set(org.openqa.selenium.By.id(\"").append(field.getName()).append("\"), $1.").append(field.getName()).append(");");
+			By by = (By)field.getAnnotation(By.class);
+			String localName = "$$byFor$$" + field.getName();
+			if (by != null) {
+				processBy(by, localName, sb);
+			} else {
+				sb.append("org.openqa.selenium.By ").append(localName).append(" = org.openqa.selenium.By.")
+					.append("id(byStack.resolve(\"").append(field.getName()).append("\"));");
+			}
+			sb.append("set(").append(localName).append(", $1.").append(field.getName()).append(");");
 		}
 		
-		sb.append("java.lang.System.out.println(($1).getClass());");
 		generateStandardReturn(newMethod, sb);
 		sb.append("}");
 		
-		newMethod.setBody(sb.toString());
+		setBody(newMethod, sb);
 	}
 }

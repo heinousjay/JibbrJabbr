@@ -57,8 +57,8 @@ import com.google.inject.TypeLiteral;
  * 
  * 	{@literal @}{@link Rule}
  * 	public WebDriverRule webDriverRule = new WebDriverRule()
- * 		.baseUrl(... project specific configuration ...)
- * 		.driverProvider(... defaults to {@link PhantomJSWebDriverProvider} ...);
+ * 		.baseUrl(... defaults to "http://localhost:8080" ...)
+ * 		.driverProvider(... required! ...);
  * 
  * 	{@literal @}{@link Test}
  * 	public void test() {
@@ -66,8 +66,12 @@ import com.google.inject.TypeLiteral;
  * 		// drive the page!
  * 	}
  * }
+ * </pre>
  * 
  * @author jason
+ *
+ * @see Panel
+ * @see Page
  *
  */
 public class WebDriverRule implements TestRule {
@@ -282,6 +286,11 @@ public class WebDriverRule implements TestRule {
 	}
 	
 	public <T extends Page> T get(final Class<T> pageInterface) {
+		
+		return get(pageInterface, null);
+	}
+	
+	public <T extends Page> T get(final Class<T> pageInterface, final String queryString) {
 		
 		assert webDriver != null : "cannot get a page outside of a test";
 		

@@ -45,14 +45,9 @@ class ClickMethodGenerator extends PanelMethodGenerator {
 			newMethod.getParameterTypes().length == 0 &&
 			isStandardReturn(newMethod);
 	}
-	
+
 	@Override
-	protected void generate(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		StringBuilder sb = new StringBuilder("{");
-		sb.append("click(").append(makeByFromMethod(baseMethod)).append(");");
-		generateStandardReturn(newMethod, sb);
-		sb.append("}");
-		
-		newMethod.setBody(sb.toString());
+	protected void generate(CtMethod newMethod, CtMethod baseMethod, StringBuilder sb) throws Exception {
+		sb.append("click(").append(LOCAL_BY).append(");");
 	}
 }

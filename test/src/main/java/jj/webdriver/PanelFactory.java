@@ -146,9 +146,21 @@ class PanelFactory {
 			CtMethod newMethod = 
 				new CtMethod(baseMethod.getReturnType(), baseMethod.getName(), baseMethod.getParameterTypes(), ctClass);
 			
-			findGenerator(newMethod, baseMethod).generate(newMethod, baseMethod);
+			PanelMethodGenerator generator = findGenerator(newMethod, baseMethod);
 			
-			ctClass.addMethod(newMethod);
+			try {
+			
+				generator.generateMethod(newMethod, baseMethod);
+			
+				ctClass.addMethod(newMethod);
+
+			} catch (Exception e) {
+				throw new AssertionError(
+					"generator " + generator.getClass().getName() + 
+					" failed to generate " + newMethod.getDeclaringClass().getInterfaces()[0].getName() + "." + newMethod.getName(),
+					e
+				);
+			}
 		}
 	}
 	

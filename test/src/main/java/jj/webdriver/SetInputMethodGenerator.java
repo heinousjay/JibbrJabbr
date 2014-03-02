@@ -36,13 +36,8 @@ class SetInputMethodGenerator extends PanelMethodGenerator {
 	}
 	
 	@Override
-	protected void generate(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		StringBuilder sb = new StringBuilder("{");
-		sb.append("set(").append(makeByFromMethod(baseMethod)).append(", $1);");
-		generateStandardReturn(newMethod, sb);
-		sb.append("}");
-		
-		newMethod.setBody(sb.toString());
+	protected void generate(CtMethod newMethod, CtMethod baseMethod, StringBuilder sb) throws Exception {
+		sb.append("set(").append(LOCAL_BY).append(", $1);");
 	}
 
 }

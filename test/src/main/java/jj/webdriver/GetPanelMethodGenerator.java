@@ -32,12 +32,22 @@ class GetPanelMethodGenerator extends PanelMethodGenerator {
 	}
 
 	@Override
-	protected void generate(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		newMethod.setBody(
-			"{" +
-				"return makePanel(" + newMethod.getReturnType().getName() + ".class);" +
-			"}"
-		);
+	protected void generateMethod(CtMethod newMethod, CtMethod baseMethod) throws Exception {
+		StringBuilder sb = new StringBuilder("{")
+			.append(newMethod.getReturnType().getName()).append(" result = makePanel(").append(newMethod.getReturnType().getName()). append(".class);");
+		
+		By by = (By)baseMethod.getAnnotation(By.class);
+		if (by != null) {
+			if (empty(by.value())) {
+				throw new AssertionError("currently, By annotations on panel getter methods can only use the default value attribute.  this may change if needed!");
+			}
+			
+			sb.append("((jj.webdriver.PanelBase)result).byStack(byStack.push(\"").append(by.value()).append("\"));");
+		}
+		
+		sb.append("return result;}");
+		
+		setBody(newMethod, sb);
 		
 	}
 

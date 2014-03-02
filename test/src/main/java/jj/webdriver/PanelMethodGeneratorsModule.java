@@ -15,29 +15,40 @@
  */
 package jj.webdriver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
 
 /**
+ * <p>
  * configuration point for page method generators
  * 
- * TODO make this configurable from the test end
  * @author jason
  *
  */
 class PanelMethodGeneratorsModule extends AbstractModule {
-
-	private Multibinder<PanelMethodGenerator> generatorBinder;
 	
+	private final List<Class<? extends PanelMethodGenerator>> generators = new ArrayList<>();
+	
+	PanelMethodGeneratorsModule add(Class<? extends PanelMethodGenerator> generator) {
+		generators.add(generator);
+		return this;
+	}
+
 	@Override
 	protected void configure() {
-		generatorBinder =
-			Multibinder.newSetBinder(binder(), PanelMethodGenerator.class);
+		PanelMethodGeneratorBinder bindPanelMethodGenerator = new PanelMethodGeneratorBinder(binder());
 		
-		generatorBinder.addBinding().to(SetInputMethodGenerator.class);
-		generatorBinder.addBinding().to(SetModelMethodGenerator.class);
-		generatorBinder.addBinding().to(ClickMethodGenerator.class);
-		generatorBinder.addBinding().to(GetPanelMethodGenerator.class);
+		bindPanelMethodGenerator.to(SetInputMethodGenerator.class);
+		bindPanelMethodGenerator.to(SetModelMethodGenerator.class);
+		bindPanelMethodGenerator.to(ClickMethodGenerator.class);
+		bindPanelMethodGenerator.to(GetPanelMethodGenerator.class);
+		
+		for (Class<? extends PanelMethodGenerator> generator : generators) {
+			bindPanelMethodGenerator.to(generator);
+		}
+		
 	}
 
 }
