@@ -24,10 +24,19 @@ then browse to
 
 The capabilities of the system are currently limited.  There 
 is a notion of modules as defined in the commonjs modules spec,
-so you can include a script using require('./whatever').  You can
-subscribe to events from the server
+so you can include a script name whatever.js in the same directory
+using 
 
-There is a basic jQuery-like API for document manipulations.
+`var whatever = require('whatever');`
+
+You can subscribe to browser events and manipulate documents using jQuery-esque syntax,
+in the server script, as in
+
+`$('#button').click(function() { $('#output').text('you clicked a button!'); }`
+
+There is an RPC mechanism that allows you to invoke in-browser javascript
+(that follows certain rules) from the server directly.  The server is
+event-driven and 100% asynchronous, however the API appears synchronous.
 
 DON'T DO ANYTHING SERIOUS WITH THIS.  It is far from production ready.
 It likely has massive security holes.  The API is barely specified,
