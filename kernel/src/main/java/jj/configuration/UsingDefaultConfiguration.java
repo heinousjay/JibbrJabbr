@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.configuration;
 
-import com.google.inject.Binder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.TypeLiteral;
+import org.slf4j.Logger;
+
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class ExecutorBinder {
-	
-	private MapBinder<Class<?>, Object> executorBinder;
+@ServerLogger
+class UsingDefaultConfiguration implements LoggedEvent {
 
-	public ExecutorBinder(final Binder binder) {
-		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
+	@Override
+	public void describeTo(Logger logger) {
+		logger.info("No configuration found, using defaults");
 	}
 
-	public void toExecutor(Class<?> executor) {
-		executorBinder.addBinding(executor).to(executor);
-	}
 }

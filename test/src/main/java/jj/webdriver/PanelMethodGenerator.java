@@ -81,10 +81,6 @@ public abstract class PanelMethodGenerator {
 	
 	protected void setBody(CtMethod newMethod, StringBuilder sb) throws Exception {
 		// log it! but don't have the right loggers yet
-		System.out.print(newMethod.getName());
-		System.out.print(" = ");
-		System.out.println(sb.toString());
-		
 		newMethod.setBody(sb.toString());
 	}
 	

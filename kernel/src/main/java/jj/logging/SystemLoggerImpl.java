@@ -1,0 +1,95 @@
+/*
+ *    Copyright 2012 Jason Miller
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package jj.logging;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.MDC;
+
+import jj.JJServerStartupListener;
+import jj.event.Listener;
+import jj.event.Subscriber;
+import jj.execution.ServerTask;
+import jj.execution.TaskRunner;
+
+/**
+ * The implementation of the centralized logging system.  Logs on its own thread
+ * 
+ * @author jason
+ *
+ */
+@Singleton
+@Subscriber
+class SystemLoggerImpl implements SystemLogger, JJServerStartupListener {
+	
+	static final String THREAD_NAME = "thread";
+
+	private static class EventBundle {
+		final LoggedEvent event;
+		final String threadName;
+		
+		EventBundle(LoggedEvent event) {
+			this.event = event;
+			this.threadName = Thread.currentThread().getName();
+		}
+	}
+	
+	private final BlockingQueue<EventBundle> events = new LinkedBlockingQueue<>();
+	
+	private final TaskRunner taskRunner;
+	
+	private final Loggers loggers;
+	
+	@Inject
+	SystemLoggerImpl(final TaskRunner taskRunner, final Loggers loggers) {
+		this.taskRunner = taskRunner;
+		this.loggers = loggers;
+	}
+
+	@Override
+	@Listener
+	public void log(LoggedEvent event) {
+		events.add(new EventBundle(event));
+	}
+
+	@Override
+	public void start() throws Exception {
+		taskRunner.execute(new ServerTask("System Logger") {
+			
+			@Override
+			protected void run() throws Exception {
+				for (;;) {
+					EventBundle bundle = events.take();
+					Logger logger = loggers.findLogger(bundle.event);
+					MDC.put(THREAD_NAME, bundle.threadName);
+					bundle.event.describeTo(logger);
+					MDC.remove(THREAD_NAME);
+				}
+			}
+		});
+	}
+
+	@Override
+	public Priority startPriority() {
+		return Priority.Highest;
+	}
+
+}

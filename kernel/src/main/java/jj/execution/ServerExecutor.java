@@ -25,7 +25,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.Clock;
-import jj.JJServerShutdownListener;
+import jj.ServerStoppingEvent;
+import jj.event.Listener;
+import jj.event.Subscriber;
 
 /**
  * Special internal executor for the various tasks the server needs done.  supports
@@ -37,7 +39,8 @@ import jj.JJServerShutdownListener;
  *
  */
 @Singleton
-class ServerExecutor extends ThreadPoolExecutor implements JJServerShutdownListener {
+@Subscriber
+class ServerExecutor extends ThreadPoolExecutor {
 	
 	private final Clock clock;
 	
@@ -117,8 +120,8 @@ class ServerExecutor extends ThreadPoolExecutor implements JJServerShutdownListe
 		submit(scheduler);
 	}
 
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		shutdownNow();
 	}
 	

@@ -30,4 +30,8 @@ public class TaskHelper {
 	public static void invoke(final JJTask toInvoke) throws Exception {
 		toInvoke.run();
 	}
+	
+	public static void markDone(final JJTask toMark) {
+		toMark.promise().done();
+	}
 }

@@ -28,7 +28,7 @@ public class ResourceLoadedEvent extends ResourceEvent {
 	}
 
 	@Override
-	protected String description() {
+	public String description() {
 		return "resource loaded";
 	}
 }

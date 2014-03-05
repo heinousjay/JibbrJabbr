@@ -2,15 +2,19 @@ package jj.script;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerShutdownListener;
+import jj.ServerStoppingEvent;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.JJRejectedExecutionHandler;
 import jj.execution.JJThreadFactory;
 
 @Singleton
-class ScriptExecutorFactory implements JJServerShutdownListener {
+@Subscriber
+class ScriptExecutorFactory {
 	
 	private final class ScriptExecutor extends ScheduledThreadPoolExecutor {
 		
@@ -52,8 +56,8 @@ class ScriptExecutorFactory implements JJServerShutdownListener {
 		return threadFactory.in();
 	}
 
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		executor.shutdownNow();
 	}
 

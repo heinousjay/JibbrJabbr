@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
-
-import com.google.inject.Binder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.TypeLiteral;
+package jj.logging;
 
 /**
  * @author jason
  *
  */
-public class ExecutorBinder {
+public interface SystemLogger {
+
+	void log(LoggedEvent event);
 	
-	private MapBinder<Class<?>, Object> executorBinder;
-
-	public ExecutorBinder(final Binder binder) {
-		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
-	}
-
-	public void toExecutor(Class<?> executor) {
-		executorBinder.addBinding(executor).to(executor);
-	}
 }

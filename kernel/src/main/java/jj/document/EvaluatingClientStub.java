@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-class EvaluatingClientStub implements ExecutionEvent {
+class EvaluatingClientStub extends ExecutionEvent {
 	
 	private final String path;
 	private final String stub;

@@ -24,11 +24,12 @@ import jj.JJModule;
  *
  */
 public class ExecutionModule extends JJModule {
+	
+	private static final String EXECUTION_TRACE_LOGGER = "execution trace";
 
 	@Override
 	protected void configure() {
 
-		addShutdownListenerBinding().to(ServerExecutor.class);
 		bindTaskRunner().toExecutor(ServerExecutor.class);
 		
 		// a good place to break apart crafty circular dependencies.  this is
@@ -37,7 +38,7 @@ public class ExecutionModule extends JJModule {
 		
 		bind(UncaughtExceptionHandler.class).to(JJUncaughtExceptionHandler.class);
 		
-		bind(ExecutionEventLogger.class).asEagerSingleton();
+		bindLoggedEvents().annotatedWith(ExecutionTraceLogger.class).toLogger(EXECUTION_TRACE_LOGGER);
 		
 	}
 

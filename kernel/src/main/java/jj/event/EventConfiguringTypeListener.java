@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -65,8 +62,6 @@ import com.google.inject.spi.TypeListener;
  *
  */
 class EventConfiguringTypeListener implements TypeListener {
-	
-	private final Logger logger = LoggerFactory.getLogger(EventConfiguringTypeListener.class);
 
 	/**
 	 * mapped from subscriber class name -> the methodinfos for the listener methods of the class. 
@@ -278,11 +273,8 @@ class EventConfiguringTypeListener implements TypeListener {
 					}
 				}
 				
-				if (subscribers.get(name).isEmpty()) {
-					logger.warn("{} is a subscriber with no subscriptions", name);
-					subscribers.remove(name);
-					clazz.detach();
-				}
+				assert !subscribers.get(name).isEmpty() : name + " is subscribing but has no listeners";
+				
 			} else {
 				clazz.detach();
 			}

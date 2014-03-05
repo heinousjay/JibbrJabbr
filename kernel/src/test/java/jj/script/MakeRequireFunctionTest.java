@@ -1,7 +1,5 @@
 package jj.script;
 
-import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
 import jj.resource.ResourceFinder;
 
 import org.junit.Test;

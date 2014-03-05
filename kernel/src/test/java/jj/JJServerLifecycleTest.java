@@ -15,25 +15,34 @@
  */
 package jj;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jj.event.Publisher;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class JJServerLifecycleTest {
 	
-	List<Integer> order = new ArrayList<>();
+	@Mock Publisher publisher;
 	
-	boolean stopped = false;
+	@Mock Version version;
+	
+	List<Integer> order = new ArrayList<>();
 	
 	class Start1 implements JJServerStartupListener {
 
@@ -87,7 +96,7 @@ public class JJServerLifecycleTest {
 		}
 	}
 	
-	class Start5 implements JJServerStartupListener, JJServerShutdownListener {
+	class Start5 implements JJServerStartupListener {
 
 		@Override
 		public void start() throws Exception {
@@ -97,11 +106,6 @@ public class JJServerLifecycleTest {
 		@Override
 		public Priority startPriority() {
 			return Priority.Lowest;
-		}
-		
-		@Override
-		public void stop() {
-			stopped = true;
 		}
 	}
 
@@ -117,22 +121,20 @@ public class JJServerLifecycleTest {
 		startups.add(new Start4());
 		startups.add(new Start1());
 		
-		Set<JJServerShutdownListener> shutdown = new HashSet<>();
-		shutdown.add(new Start5());
-		
-		JJServerLifecycle jsl = new JJServerLifecycle(startups, shutdown);
+		JJServerLifecycle jsl = new JJServerLifecycle(startups, publisher, version);
 		
 		// when
 		jsl.start();
 		
 		// then
 		assertThat(order, contains(1, 2, 3, 4, 5));
+		verify(publisher).publish(isA(ServerStartingEvent.class));
 		
 		// when
 		jsl.stop();
 		
 		// then
-		assertThat(stopped, is(true));
+		verify(publisher).publish(isA(ServerStoppingEvent.class));
 	}
 
 }

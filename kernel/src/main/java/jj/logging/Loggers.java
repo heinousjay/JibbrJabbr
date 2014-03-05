@@ -13,42 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.logging;
+
+import java.lang.annotation.Annotation;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 
-import jj.event.Listener;
-import jj.event.Subscriber;
-import jj.logging.ExecutionTraceLogger;
-
 /**
- * Simple component to log execution events to the trace log.
+ * produces Loggers for a given LoggedEvent descendent
  * 
- * No test because it's so simple. and maybe temporary
- * 
- * TODO: some sort of protocol to mark emergency events
- * TODO: move all logging to event publication? at least execution-related
- * TODO: maybe move the logging asychronous logic to here?
- * TODO: maybe scrap the whole thing
  * @author jason
  *
  */
-@Subscriber
 @Singleton
-class ExecutionEventLogger {
-	
-	private final Logger logger;
+class Loggers {
 
+	private final Map<Class<? extends Annotation>, Logger> loggers;
+	
 	@Inject
-	ExecutionEventLogger(final @ExecutionTraceLogger Logger logger) {
-		this.logger = logger;
+	Loggers(final Map<Class<? extends Annotation>, Logger> loggers) {
+		this.loggers = loggers;
 	}
 	
-	@Listener
-	void executionEvent(ExecutionEvent event) {
-		event.describeTo(logger);
+	Logger findLogger(LoggedEvent event) {
+		Logger result = null;
+		for (Class<? extends Annotation> annotation : loggers.keySet()) {
+			if (event.getClass().getAnnotation(annotation) != null) {
+				result = loggers.get(annotation);
+				break;
+			}
+		}
+		
+		assert result != null : "No logger registered for LoggedEvent " + event;
+		
+		return result;
 	}
 }

@@ -2,92 +2,78 @@ package jj.logging;
 
 import static jj.logging.LoggingModule.*;
 import static ch.qos.logback.classic.Level.*;
-
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
-import java.util.Iterator;
-
 import javax.inject.Singleton;
-
-import jj.JJServerShutdownListener;
 
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.ConsoleAppender;
 
 /**
- * ensures that all logging is done through an async appender.
- * TODO - allow external configuration
- * TODO - allow runtime adjustment
- * TODO - make this restartable
- * @author jason
+ * This class needs a wash!
  *
  */
 @Singleton
-class LogConfigurator implements JJServerShutdownListener {
+class LogConfigurator {
 	
 	private static final String NETTY_LOGGER = "io.netty";
 	
 	private static final String JJ_LOGGER = "jj";
 
-	private final Logger logger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+	private final Logger rootLogger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 	
-	private final LoggerContext context = (LoggerContext)LoggerFactory.getILoggerFactory();
-	
-	private final AsyncAppender asyncAppender;
+	private final LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
 	
 	LogConfigurator(boolean isTest) {
+		initialize();
+		
 		emergencyLogger(TRACE);
+		serverLogger(INFO);
 		
 		if (isTest) {
-			this.asyncAppender = null;
-			logger.setLevel(OFF);
+			rootLogger.setLevel(OFF);
 			testLogger(INFO);
 			traceLogger(TRACE);
-			InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-		} else {
-			this.asyncAppender = initialize();
 		}
 	}
 	
-	private AsyncAppender initialize() {
-		AsyncAppender asyncAppender = new AsyncAppender();
-		asyncAppender.setContext(context);
+	private void initialize() {
 		
-		Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
-		while (i.hasNext()) {
-			Appender<ILoggingEvent> appender = i.next();
-			logger.detachAppender(appender);
-			appender.setContext(context);
-			asyncAppender.addAppender(appender);
-		}
-		
-		asyncAppender.start();
-		
-		logger.addAppender(asyncAppender);
-		
-		// logs events specifically related to running inside a JJAppTest
-		testLogger(OFF);
-		
-		// just play with this!
-		infoAll();
-		
-		accessLogger(OFF);
-		
-		// and make sure netty logs to our log
+	    // we are not interested in auto-configuration
+	    loggerContext.reset();
+
+	    PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+	    encoder.setContext(loggerContext);
+	    encoder.setPattern("%date{HH:mm:ss.SSS} [%mdc{thread}] %-5level %logger - %message%n%rootException");
+	    encoder.start();
+
+	    ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<ILoggingEvent>();
+	    appender.setContext(loggerContext);
+	    appender.setEncoder(encoder); 
+	    appender.start();
+
+	    rootLogger.addAppender(appender);
+	    
+	    // logs events specifically related to running inside a JJAppTest
+ 		testLogger(OFF);
+ 		
+ 		// just play with this!
+ 		infoAll();
+ 		
+ 		accessLogger(OFF);
+ 		
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-		
-		return asyncAppender;
 	}
 	
 	protected void executionLogging() {
-		logger.setLevel(TRACE);
+		rootLogger.setLevel(TRACE);
 		
 		nettyLogger(OFF);
 		
@@ -113,7 +99,11 @@ class LogConfigurator implements JJServerShutdownListener {
 	}
 	
 	protected void traceLogger(Level level) {
-		((Logger)LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER)).setLevel(level);
+		((Logger)LoggerFactory.getLogger("execution trace")).setLevel(level);
+	}
+	
+	protected void serverLogger(Level level) {
+		((Logger)LoggerFactory.getLogger("server")).setLevel(level);
 	}
 	
 	protected void nettyLogger(Level level) {
@@ -125,15 +115,10 @@ class LogConfigurator implements JJServerShutdownListener {
 	}
 	
 	protected void infoAll() {
-		logger.setLevel(INFO);
+		rootLogger.setLevel(INFO);
 	}
 	
 	protected void traceAll() {
-		logger.setLevel(TRACE);
-	}
-
-	@Override
-	public void stop() {
-		if (asyncAppender != null) asyncAppender.stop();
+		rootLogger.setLevel(TRACE);
 	}
 }

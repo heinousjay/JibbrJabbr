@@ -19,6 +19,7 @@ import jj.conversion.Converter;
 import jj.document.servable.DocumentFilter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
+import jj.logging.LoggingBinder;
 import jj.resource.ResourceCreatorBinder;
 import jj.script.ContinuationProcessorBinder;
 
@@ -39,8 +40,9 @@ public abstract class JJModule extends AbstractModule {
 	
 	private ExecutorBinder executors;
 	
+	private LoggingBinder loggers;
+	
 	private Multibinder<JJServerStartupListener> startupListeners;
-	private Multibinder<JJServerShutdownListener> shutdownListeners;
 	private Multibinder<Converter<?, ?>> converters;
 	private Multibinder<DocumentFilter> filters;
 	private Multibinder<HostObject> hostObjects;
@@ -51,13 +53,6 @@ public abstract class JJModule extends AbstractModule {
 			startupListeners =  Multibinder.newSetBinder(binder(), JJServerStartupListener.class);
 		}
 		return startupListeners.addBinding();
-	}
-
-	protected LinkedBindingBuilder<JJServerShutdownListener> addShutdownListenerBinding() {
-		if (shutdownListeners == null) {
-			shutdownListeners =  Multibinder.newSetBinder(binder(), JJServerShutdownListener.class);
-		}
-		return shutdownListeners.addBinding();
 	}
 	
 	protected LinkedBindingBuilder<Converter<?, ?>> addConverterBinding() {
@@ -108,5 +103,12 @@ public abstract class JJModule extends AbstractModule {
 			executors = new ExecutorBinder(binder());
 		}
 		return executors;
+	}
+	
+	protected LoggingBinder bindLoggedEvents() {
+		if (loggers == null) {
+			loggers = new LoggingBinder(binder());
+		}
+		return loggers;
 	}
 }

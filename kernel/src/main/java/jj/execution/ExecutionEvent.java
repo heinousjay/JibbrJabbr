@@ -15,14 +15,15 @@
  */
 package jj.execution;
 
-import org.slf4j.Logger;
+import jj.logging.LoggedEvent;
 
 /**
- * @author jason
+ * Events that descend from this interface will
+ * be logged to the execution trace logger.
  *
+ * @author jason
  */
-public interface ExecutionEvent {
-	
-	void describeTo(Logger log);
-	
+@ExecutionTraceLogger
+public abstract class ExecutionEvent implements LoggedEvent {
+
 }

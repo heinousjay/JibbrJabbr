@@ -34,7 +34,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerShutdownListener;
+import jj.ServerStoppingEvent;
+import jj.event.Listener;
+import jj.event.Subscriber;
 
 /**
  * Encapsulates the JDK watch service for mockability.  this is also
@@ -47,7 +49,8 @@ import jj.JJServerShutdownListener;
  *
  */
 @Singleton
-class ResourceWatcher implements JJServerShutdownListener {
+@Subscriber
+class ResourceWatcher {
 
 	private final WatchService watcher;
 	
@@ -65,8 +68,8 @@ class ResourceWatcher implements JJServerShutdownListener {
 		directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);
 	}
 	
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		try {
 			watcher.close();
 		} catch (IOException e) {}

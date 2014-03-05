@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-class ErrorEvaluatingClientStub implements ExecutionEvent {
+class ErrorEvaluatingClientStub extends ExecutionEvent {
 
 	private final String path;
 	private final Throwable cause;

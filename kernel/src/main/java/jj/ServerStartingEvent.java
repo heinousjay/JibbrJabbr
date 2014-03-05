@@ -15,11 +15,27 @@
  */
 package jj;
 
+import jj.logging.LoggedEvent;
+
+import org.slf4j.Logger;
+
 /**
  * @author jason
  *
  */
-public interface JJServerShutdownListener {
+@ServerLogger
+public class ServerStartingEvent implements LoggedEvent {
+	
+	private final Version version;
+	
+	ServerStartingEvent(Version version) {
+		this.version = version;
+	}
 
-	void stop();
+	@Override
+	public void describeTo(Logger logger) {
+		logger.info("Welcome to {} version {} commit {}", version.name(), version.version(), version.commitId());
+		logger.info("Starting the server");
+	}
+
 }

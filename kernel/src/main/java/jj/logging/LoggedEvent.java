@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.logging;
 
-import com.google.inject.Binder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.TypeLiteral;
+import org.slf4j.Logger;
 
 /**
+ * extended by events that should be logged to some
+ * logger as determined by a system i, as yet, have not
+ * created
+ * 
  * @author jason
  *
  */
-public class ExecutorBinder {
+public interface LoggedEvent {
 	
-	private MapBinder<Class<?>, Object> executorBinder;
-
-	public ExecutorBinder(final Binder binder) {
-		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
-	}
-
-	public void toExecutor(Class<?> executor) {
-		executorBinder.addBinding(executor).to(executor);
-	}
+	void describeTo(Logger logger);
 }

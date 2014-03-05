@@ -50,7 +50,7 @@ public class ServerExecutorTest {
 	
 	@After
 	public void after() {
-		s.stop();
+		s.stop(null);
 	}
 	
 	private CountDownLatch latch;

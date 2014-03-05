@@ -61,7 +61,6 @@ class TestModule extends JJModule {
 	protected void configure() {
 		
 		addStartupListenerBinding().to(TestListener.class);
-		addShutdownListenerBinding().to(TestListener.class);
 		
 		bind(JibbrJabbrTestServer.class).toInstance(testServer);
 		

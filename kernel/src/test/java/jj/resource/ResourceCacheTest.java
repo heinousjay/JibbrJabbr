@@ -89,7 +89,7 @@ public class ResourceCacheTest extends RealResourceBase {
 		rc.start();
 		
 		assertThat(rc.get(sKey), is((Resource)hr));
-		rc.stop();
+		rc.stop(null);
 		rc.start();
 		assertThat(rc.get(sKey), is(nullValue()));
 		

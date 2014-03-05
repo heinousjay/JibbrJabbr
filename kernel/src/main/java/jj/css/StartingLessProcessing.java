@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-public class StartingLessProcessing implements ExecutionEvent {
+public class StartingLessProcessing extends ExecutionEvent {
 	
 	private final String lessName;
 	

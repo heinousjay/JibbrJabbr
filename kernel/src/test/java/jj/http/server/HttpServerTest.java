@@ -153,7 +153,7 @@ public class HttpServerTest {
 			}
 			
 		} finally {
-			httpServer.stop();
+			httpServer.stop(null);
 		}
 		
 		// given
@@ -170,7 +170,7 @@ public class HttpServerTest {
 			SocketFactory.getDefault().createSocket("localhost", 8090).close();
 			
 		} finally {
-			httpServer.stop();
+			httpServer.stop(null);
 		}
 	}
 }

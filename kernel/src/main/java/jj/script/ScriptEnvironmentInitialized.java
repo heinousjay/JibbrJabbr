@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-public class ScriptEnvironmentInitialized implements ExecutionEvent {
+public class ScriptEnvironmentInitialized extends ExecutionEvent {
 	
 	private final ScriptEnvironment scriptEnvironment;
 

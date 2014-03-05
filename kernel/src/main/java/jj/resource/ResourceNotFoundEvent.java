@@ -35,9 +35,9 @@ public class ResourceNotFoundEvent extends ResourceEvent {
 	}
 	
 	@Override
-	public void describeTo(Logger log) {
+	public void describeTo(Logger logger) {
 		// for now, not at all.
 		// TODO enable this later, probably keep at trace level
-		//log.trace("{} - {} at {}", description(), resourceClass, name);
+		//logger.trace("{} - {} at {}", description(), resourceClass, name);
 	}
 }

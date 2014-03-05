@@ -16,7 +16,6 @@
 package jj.logging;
 
 import jj.JJModule;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,6 @@ public class LoggingModule extends JJModule {
 	
 	static final String ACCESS_LOGGER = "access";
 	static final String TEST_RUNNER_LOGGER = "test runner";
-	static final String EXECUTION_TRACE_LOGGER = "execution trace";
 	static final String EMERGENCY_LOGGER = "emergency";
 	
 	private final boolean isTest;
@@ -44,7 +42,9 @@ public class LoggingModule extends JJModule {
 		
 		// this gets instantiated before anything might write to a log
 		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
-		addShutdownListenerBinding().to(LogConfigurator.class);
+		
+		bind(SystemLogger.class).to(SystemLoggerImpl.class);
+		addStartupListenerBinding().to(SystemLoggerImpl.class);
 		
 	}
 	
@@ -56,11 +56,6 @@ public class LoggingModule extends JJModule {
 	@Provides @TestRunnerLogger
 	public Logger provideTestRunnerLogger() {
 		return LoggerFactory.getLogger(TEST_RUNNER_LOGGER);
-	}
-	
-	@Provides @ExecutionTraceLogger
-	public Logger provideExecutionTraceLogger() {
-		return LoggerFactory.getLogger(EXECUTION_TRACE_LOGGER);
 	}
 	
 	@Provides @EmergencyLogger

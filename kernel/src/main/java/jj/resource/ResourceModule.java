@@ -22,18 +22,13 @@ public class ResourceModule extends JJModule {
 	protected void configure() {
 
 		bindTaskRunner().toExecutor(ResourceExecutor.class);
-		addShutdownListenerBinding().to(ResourceExecutor.class);
 		
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
-		addShutdownListenerBinding().to(ResourceCacheImpl.class);
 		
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
 		
 		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
 		addStartupListenerBinding().to(ResourceWatchServiceImpl.class);
-		
-		addShutdownListenerBinding().to(ResourceWatcher.class);
-		
 		
 		
 		bindCreation().of(ConfigResource.class).to(ConfigResourceCreator.class);
@@ -45,5 +40,7 @@ public class ResourceModule extends JJModule {
 		bindCreation().of(StaticResource.class).to(StaticResourceCreator.class);
 		
 		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
+		
+		bindLoggedEvents().annotatedWith(ResourceLogger.class).toLogger("execution trace");
 	}
 }

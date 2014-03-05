@@ -9,7 +9,6 @@ public class HttpServerModule extends JJModule {
 	protected void configure() {
 
 		addStartupListenerBinding().to(HttpServer.class);
-		addShutdownListenerBinding().to(HttpServer.class);
 		
 		addConverterBinding().to(FromObjectArrayToBinding.class);
 		

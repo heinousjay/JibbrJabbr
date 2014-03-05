@@ -3,9 +3,6 @@ package jj;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -30,8 +27,6 @@ public class Main {
 			}
 		});
 	}
-	
-	private final Logger log = LoggerFactory.getLogger(Main.class);
 	
 	private final String[] args;
 	
@@ -80,16 +75,8 @@ public class Main {
 			throw failStartup();
 		}
 		
-		Version version = injector.getInstance(Version.class);
-		// this is a bit hacky!
+		// this is a bit hacky! but it clears the line from the startup .....
 		System.out.println();
-		log.info("Welcome to {} version {} commit {}", version.name(), version.version(), version.commitId());
-		if (!JJ.isRunning) {
-			log.info("******************************************************************************");
-			log.info("!!!!!!          This server is running in a nonstandard mode            !!!!!!");
-			log.info("******************************************************************************");
-		}
-		
 	}
 	
 	public void start() throws Exception {
@@ -108,7 +95,7 @@ public class Main {
 	}
 	
 	public void dispose() {
-		// we can daemon start again!
+		// if we daemon start again?
 	}
 
 }

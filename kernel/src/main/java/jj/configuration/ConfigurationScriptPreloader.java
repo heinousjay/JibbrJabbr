@@ -15,15 +15,11 @@
  */
 package jj.configuration;
 
-import java.util.concurrent.TimeoutException;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.JJServerStartupListener;
+import jj.event.Publisher;
 import jj.execution.TaskRunner;
 import jj.resource.ResourceTask;
 import jj.resource.ResourceFinder;
@@ -39,18 +35,19 @@ import jj.resource.config.ConfigResource;
 @Singleton
 class ConfigurationScriptPreloader implements JJServerStartupListener {
 	
-	private final Logger log = LoggerFactory.getLogger(ConfigurationScriptPreloader.class);
-	
 	private final TaskRunner taskRunner;
 	private final ResourceFinder resourceFinder;
+	private final Publisher publisher;
 	
 	@Inject
 	ConfigurationScriptPreloader(
 		final TaskRunner taskRunner,
-		final ResourceFinder resourceFinder
+		final ResourceFinder resourceFinder,
+		final Publisher publisher
 	) {
 		this.taskRunner = taskRunner;
 		this.resourceFinder = resourceFinder;
+		this.publisher = publisher;
 	}
 
 	@Override
@@ -59,25 +56,18 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 		// i remember doing this as a Future (and being unhappy about it) because there
 		// was a deadlock
 		
-		try {
-			taskRunner.execute(new ResourceTask("preloading configuration script") {
-				
-				@Override
-				public void run() {
-					ConfigResource config = resourceFinder.loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
-					if (config != null) {
-						log.info("Found configuration at {}", config.path());
-					} else {
-						log.info("No configuration found, using defaults");
-					}
+		taskRunner.execute(new ResourceTask("preloading configuration script") {
+			
+			@Override
+			public void run() {
+				ConfigResource config = resourceFinder.loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
+				if (config != null) {
+					publisher.publish(new ConfigurationFoundEvent(config.path()));
+				} else {
+					publisher.publish(new UsingDefaultConfiguration());
 				}
-			}).await();
-		} catch (TimeoutException te) {
-		// 1 second is kinda arbitrary but really
-		// if it takes any kind of time at all,
-		// we're hosed
-			throw new AssertionError("timed out loading the configuration", te);
-		}
+			}
+		}); //.await(); // if this times out, something went really really wrong
 	}
 
 	@Override

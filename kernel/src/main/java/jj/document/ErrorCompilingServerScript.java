@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-class ErrorCompilingServerScript implements ExecutionEvent {
+class ErrorCompilingServerScript extends ExecutionEvent {
 
 	private final String path;
 	private final Throwable cause;

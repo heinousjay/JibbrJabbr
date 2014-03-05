@@ -25,7 +25,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerShutdownListener;
+import jj.ServerStoppingEvent;
+import jj.event.Listener;
+import jj.event.Subscriber;
 
 
 /**
@@ -35,7 +37,8 @@ import jj.JJServerShutdownListener;
  *
  */
 @Singleton
-public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJServerShutdownListener {
+@Subscriber
+public class ClientExecutor extends ScheduledThreadPoolExecutor {
 	
 	private static final ThreadLocal<Boolean> flag = new ThreadLocal<>();
 	
@@ -87,8 +90,8 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor implements JJSer
 		this.setMaximumPoolSize(WORKER_COUNT);
 	}
 
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		shutdownNow();
 	}
 }

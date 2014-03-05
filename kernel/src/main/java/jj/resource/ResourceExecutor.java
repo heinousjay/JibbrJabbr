@@ -7,7 +7,9 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerShutdownListener;
+import jj.ServerStoppingEvent;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.JJRejectedExecutionHandler;
 import jj.execution.JJThreadFactory;
 
@@ -17,7 +19,8 @@ import jj.execution.JJThreadFactory;
  *
  */
 @Singleton
-class ResourceExecutor extends ThreadPoolExecutor implements JJServerShutdownListener {
+@Subscriber
+class ResourceExecutor extends ThreadPoolExecutor {
 	
 	public boolean isResourceThread() {
 		return threadFactory.in();
@@ -43,8 +46,8 @@ class ResourceExecutor extends ThreadPoolExecutor implements JJServerShutdownLis
 	// listen for the "CONFIGURATION LOADED!" event, and reconfigure yourself!  the only parameter that can really be controlled
 	// is the maximum number of worker threads, which is also the core, which we allow to die off
 
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		shutdown();
 	}
 	

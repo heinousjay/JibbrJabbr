@@ -44,7 +44,9 @@ public class MockTaskRunner implements TaskRunner {
 	public void runFirstTask() throws Exception {
 		assert(!tasks.isEmpty());
 		
-		tasks.remove(0).run();
+		JJTask task = tasks.remove(0);
+			
+		task.run();
 	}
 	
 	public void runFirstTaskInDaemon() throws Exception {
@@ -55,7 +57,7 @@ public class MockTaskRunner implements TaskRunner {
 			@Override
 			public void run() {
 				try {
-					tasks.remove(0).run();
+					runFirstTask();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

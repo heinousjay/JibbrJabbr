@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-public class ErrorLoadingLessResource implements ExecutionEvent {
+public class ErrorLoadingLessResource extends ExecutionEvent {
 	
 	private final String name;
 	private final Throwable cause;

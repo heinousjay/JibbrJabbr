@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj;
 
-import com.google.inject.Binder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.TypeLiteral;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author jason
  *
  */
-public class ExecutorBinder {
-	
-	private MapBinder<Class<?>, Object> executorBinder;
+@Documented
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface ServerLogger {
 
-	public ExecutorBinder(final Binder binder) {
-		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
-	}
-
-	public void toExecutor(Class<?> executor) {
-		executorBinder.addBinding(executor).to(executor);
-	}
 }

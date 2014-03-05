@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-class EvaluatingSharedScript implements ExecutionEvent {
+class EvaluatingSharedScript extends ExecutionEvent {
 	
 	private final String path;
 	

@@ -79,30 +79,6 @@ public class TaskRunnerTest {
 		runnableCaptor.getValue().run();
 	}
 	
-	// this test is to make sure that the await doesn't work from here
-	// can't really make a positive test for it but i also just trust it.
-	// this is just me making sure that it cannot fall apart
-	// TODO - investigate using a promise there and kill await! no waiting!
-	@Test
-	public void testAwaitAsserts() throws Exception {
-		
-		ServerTask task1 = new ServerTask("test task 1") {
-			@Override
-			protected void run() throws Exception {
-				// don't care
-			}
-		};
-		boolean asserted = false;
-		try {
-			executor.execute(task1).await();
-			fail();
-		} catch (AssertionError ae) {
-			asserted = true;
-		}
-		
-		assertTrue(asserted);
-	}
-	
 	@Test
 	public void testPromiseKeeping() {
 		

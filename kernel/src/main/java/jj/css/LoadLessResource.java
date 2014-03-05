@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-public class LoadLessResource implements ExecutionEvent {
+public class LoadLessResource extends ExecutionEvent {
 
 	private final String name;
 	

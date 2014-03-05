@@ -12,9 +12,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
+import jj.ServerStoppingEvent;
 import jj.configuration.Configuration;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.ExecutionConfiguration;
 
 /**
@@ -24,7 +26,8 @@ import jj.execution.ExecutionConfiguration;
  *
  */
 @Singleton
-class ResourceCacheImpl implements JJServerStartupListener, JJServerShutdownListener, ResourceCache {
+@Subscriber
+class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
@@ -80,8 +83,8 @@ class ResourceCacheImpl implements JJServerStartupListener, JJServerShutdownList
 		return Priority.NearHighest;
 	}
 
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		// make sure we start fresh if we get restarted
 		delegate.get().clear();
 	}

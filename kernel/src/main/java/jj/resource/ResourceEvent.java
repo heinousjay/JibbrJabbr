@@ -20,14 +20,15 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 
 import jj.configuration.AppLocation;
-import jj.execution.ExecutionEvent;
+import jj.logging.LoggedEvent;
 
 /**
  * the root of the hierarchy of resource events
  * @author jason
  *
  */
-public abstract class ResourceEvent implements ExecutionEvent {
+@ResourceLogger
+public abstract class ResourceEvent implements LoggedEvent {
 	
 	public final Class<? extends Resource> resourceClass;
 	public final AppLocation base;

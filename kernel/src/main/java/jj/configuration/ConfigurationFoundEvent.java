@@ -13,25 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.configuration;
 
-import com.google.inject.Binder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.TypeLiteral;
+import java.nio.file.Path;
+
+import org.slf4j.Logger;
+
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class ExecutorBinder {
+@ServerLogger
+class ConfigurationFoundEvent implements LoggedEvent {
 	
-	private MapBinder<Class<?>, Object> executorBinder;
-
-	public ExecutorBinder(final Binder binder) {
-		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
+	private final Path configurationPath;
+	
+	ConfigurationFoundEvent(final Path configurationPath) {
+		this.configurationPath = configurationPath;
 	}
 
-	public void toExecutor(Class<?> executor) {
-		executorBinder.addBinding(executor).to(executor);
+	@Override
+	public void describeTo(Logger logger) {
+		logger.info("Found configuration at {}", configurationPath);
 	}
+
 }

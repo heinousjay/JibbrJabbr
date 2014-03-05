@@ -31,18 +31,21 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
+import jj.ServerStoppingEvent;
 import jj.StringUtils;
 import jj.configuration.Arguments;
 import jj.configuration.Configuration;
+import jj.event.Listener;
+import jj.event.Subscriber;
 
 /**
  * @author jason
  *
  */
 @Singleton
-class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
+@Subscriber
+class HttpServer implements JJServerStartupListener {
 	
 	private static final ThreadFactory threadFactory = new ThreadFactory() {
 		
@@ -185,8 +188,8 @@ class HttpServer implements JJServerStartupListener, JJServerShutdownListener {
 		return Priority.Lowest;
 	}
 
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		if (run) {
 			assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
 			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);

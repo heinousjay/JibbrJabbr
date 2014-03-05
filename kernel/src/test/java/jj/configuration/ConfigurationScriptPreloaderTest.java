@@ -16,11 +16,12 @@
 package jj.configuration;
 
 import static org.mockito.BDDMockito.*;
-
+import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,17 +34,40 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationScriptPreloaderTest {
 
-	MockTaskRunner taskRunner = new MockTaskRunner();
+	MockTaskRunner taskRunner;
 	@Mock ResourceFinder resourceFinder;
+	@Mock Publisher publisher;
+	
+	@Mock ConfigResource resource;
+	
+	ConfigurationScriptPreloader csp;
+	
+	@Before
+	public void before() {
+		taskRunner = new MockTaskRunner();
+		csp = new ConfigurationScriptPreloader(taskRunner, resourceFinder, publisher);
+	}
 	
 	@Test
-	public void test() throws Exception {
+	public void testDefault() throws Exception {
 		
-		ConfigurationScriptPreloader csp = new ConfigurationScriptPreloader(taskRunner, resourceFinder);
 		csp.start();
 		taskRunner.runFirstTask();
 		
 		verify(resourceFinder).loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
+		
+		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
+	}
+	
+	@Test
+	public void testFound() throws Exception {
+		
+		given(resourceFinder.loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS)).willReturn(resource);
+
+		csp.start();
+		taskRunner.runFirstTask();
+		
+		verify(publisher).publish(isA(ConfigurationFoundEvent.class));
 	}
 
 }

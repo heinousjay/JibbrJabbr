@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-class CompilingServerScript implements ExecutionEvent {
+class CompilingServerScript extends ExecutionEvent {
 
 	private final String path;
 	

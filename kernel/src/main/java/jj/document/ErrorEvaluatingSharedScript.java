@@ -23,7 +23,7 @@ import jj.execution.ExecutionEvent;
  * @author jason
  *
  */
-class ErrorEvaluatingSharedScript implements ExecutionEvent {
+class ErrorEvaluatingSharedScript extends ExecutionEvent {
 
 	private final String path;
 	private final Throwable cause;

@@ -21,8 +21,10 @@ import javax.inject.Singleton;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 
-import jj.JJServerShutdownListener;
 import jj.JJServerStartupListener;
+import jj.ServerStoppingEvent;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.logging.TestRunnerLogger;
 
 /**
@@ -30,7 +32,8 @@ import jj.logging.TestRunnerLogger;
  *
  */
 @Singleton
-public class TestListener implements JJServerStartupListener, JJServerShutdownListener {
+@Subscriber
+public class TestListener implements JJServerStartupListener {
 	
 	private final Logger testRunnerLogger;
 	private final Description description;
@@ -51,8 +54,8 @@ public class TestListener implements JJServerStartupListener, JJServerShutdownLi
 		return Priority.NearHighest;
 	}
 
-	@Override
-	public void stop() {
+	@Listener
+	public void stop(ServerStoppingEvent event) {
 		testRunnerLogger.info("{} - test end", description);
 	}
 

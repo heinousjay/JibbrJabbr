@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj;
 
-import com.google.inject.Binder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.TypeLiteral;
+import jj.logging.LoggedEvent;
+
+import org.slf4j.Logger;
 
 /**
  * @author jason
  *
  */
-public class ExecutorBinder {
+@ServerLogger
+public class ServerStoppingEvent implements LoggedEvent {
 	
-	private MapBinder<Class<?>, Object> executorBinder;
+	ServerStoppingEvent() {}
 
-	public ExecutorBinder(final Binder binder) {
-		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
+	@Override
+	public void describeTo(Logger logger) {
+		logger.info("Stopping the server");
 	}
 
-	public void toExecutor(Class<?> executor) {
-		executorBinder.addBinding(executor).to(executor);
-	}
 }
