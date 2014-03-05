@@ -35,7 +35,7 @@ import com.google.inject.Stage;
 /**
  * A test rule that supplies a context for performing
  * tests against a given HTML resource.  This rule does
- * not support parallel execution of test methods
+ * not support parallel execution of test methods! actually that might not be true anymore...
  * 
  * @author jason
  *
@@ -65,29 +65,54 @@ public class JibbrJabbrTestServer implements TestRule {
 	}
 	
 	public JibbrJabbrTestServer withFileWatcher() {
+		assertNotStarted();
+		
 		fileWatcher = true;
 		return this;
 	}
 	
 	public JibbrJabbrTestServer withHttp() {
+		assertNotStarted();
+		
 		httpServer = true;
+		
 		return this;
 	}
 	
 	public JibbrJabbrTestServer withHttpOnPort(int port) {
 		assert (port > 1023 && port < 65536) : "http port must be between 1024-65535 inclusive";
+		assertNotStarted();
+		
 		httpServer = true;
 		httpPort = port;
 		return this;
 	}
 	
 	public JibbrJabbrTestServer injectInstance(Object instance) {
+		assertNotStarted();
+		
 		this.instance = instance;
 		return this;
 	}
 	
 	public WebDriverRule webDriverRule() {
-		return new WebDriverRule();
+		assertNotStarted();
+		if (!httpServer) {
+			// todo - pick a local open port
+			withHttpOnPort(8080);
+		}
+		
+		WebDriverRule result = new WebDriverRule();
+		
+		if (httpPort != 0) {
+			result.baseUrl("http://localhost:" + httpPort);
+		}
+		
+		return result;
+	}
+	
+	public int httpPort() {
+		return httpPort;
 	}
 	
 	private Statement createInjectionStatement(final Statement base) {
@@ -104,6 +129,10 @@ public class JibbrJabbrTestServer implements TestRule {
 				
 			}
 		};
+	}
+	
+	private void assertNotStarted() {
+		assert injector == null : "server must be configured outside of runs!";
 	}
 	
 	@Override
@@ -129,7 +158,16 @@ public class JibbrJabbrTestServer implements TestRule {
 			new TestModule(this, builder.toArray(new String[builder.size()]), statement, description, httpServer)
 		);
 		
-		return injector.getInstance(AppStatement.class);
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				try {
+					injector.getInstance(AppStatement.class).evaluate();
+				} finally {
+					injector = null;
+				}
+			}
+		};
 	}
 	
 	public TestHttpClient get(final String uri) throws Exception {

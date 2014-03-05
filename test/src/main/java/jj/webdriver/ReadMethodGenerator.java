@@ -15,40 +15,33 @@
  */
 package jj.webdriver;
 
+import java.util.regex.Pattern;
+
 import javassist.CtMethod;
 
 /**
  * @author jason
  *
  */
-class GetPanelMethodGenerator extends PanelMethodGenerator {
-
+public class ReadMethodGenerator extends PanelMethodGenerator {
+	
+	private static final Pattern NAME = makeNamePattern("read");
+	
 	@Override
 	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		
-		return parametersMatchByAnnotation(0, newMethod, baseMethod) &&
-			newMethod.getReturnType().getInterfaces().length == 1 &&
-			newMethod.getReturnType().getInterfaces()[0].getName().equals(Panel.class.getName());
+		return hasBy(baseMethod) &&
+			NAME.matcher(newMethod.getName()).find() &&
+			parametersMatchByAnnotation(0, newMethod, baseMethod) &&
+			newMethod.getReturnType().getName().equals("java.lang.String");
 	}
 
 	@Override
 	protected void generateMethod(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		StringBuilder sb = new StringBuilder("{")
-			.append(newMethod.getReturnType().getName()).append(" result = makePanel(").append(newMethod.getReturnType().getName()). append(".class);");
-		
-		By by = (By)baseMethod.getAnnotation(By.class);
-		if (by != null) {
-			if (empty(by.value())) {
-				throw new AssertionError("currently, By annotations on panel getter methods can only use the default value attribute.  this may change if needed!");
-			}
-			
-			sb.append("((jj.webdriver.PanelBase)result).byStack(byStack.push(String.format(\"").append(by.value()).append("\", $args)));");
-		}
-		
-		sb.append("return result;}");
-		
+		StringBuilder sb = new StringBuilder("{");
+		processBy((By)baseMethod.getAnnotation(By.class), LOCAL_BY, 0, sb);
+		sb.append("return read(").append(LOCAL_BY).append(");");
+		sb.append("}");
 		setBody(newMethod, sb);
-		
 	}
-
+	
 }

@@ -42,7 +42,7 @@ class ClickMethodGenerator extends PanelMethodGenerator {
 	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
 		return hasBy(baseMethod) &&
 			NAME.matcher(newMethod.getName()).find() &&
-			newMethod.getParameterTypes().length == 0 &&
+			parametersMatchByAnnotation(0, newMethod, baseMethod) &&
 			isStandardReturn(newMethod);
 	}
 

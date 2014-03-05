@@ -44,6 +44,7 @@ class PanelMethodGeneratorsModule extends AbstractModule {
 		bindPanelMethodGenerator.to(SetModelMethodGenerator.class);
 		bindPanelMethodGenerator.to(ClickMethodGenerator.class);
 		bindPanelMethodGenerator.to(GetPanelMethodGenerator.class);
+		bindPanelMethodGenerator.to(ReadMethodGenerator.class);
 		
 		for (Class<? extends PanelMethodGenerator> generator : generators) {
 			bindPanelMethodGenerator.to(generator);

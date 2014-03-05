@@ -112,9 +112,23 @@ abstract class PanelBase implements Page {
 		find(by).sendKeys(value);
 	}
 	
+	String attribute(By by, String attribute) {
+		logger.info("{} {} attribute {}", name, by, attribute);
+		return find(by).getAttribute(attribute);
+	}
+	
+	String read(By by) {
+		log("read", by);
+		return find(by).getText();
+	}
+	
 	@Override
 	public final String currentUrl() {
 		return webDriver.getCurrentUrl();
+	}
+	
+	public String pageSource() {
+		return webDriver.getPageSource();
 	}
 	
 	WebDriver webDriver() {

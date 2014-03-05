@@ -55,7 +55,7 @@ public class ScriptEnvironmentIntegrationTest {
 	
 	@Rule
 	public JibbrJabbrTestServer server = 
-		new JibbrJabbrTestServer(App.path1)
+		new JibbrJabbrTestServer(App.one)
 			.injectInstance(this);
 	
 	CountDownLatch latch;

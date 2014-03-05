@@ -63,7 +63,7 @@ public class BasicServingTest {
 	public static final VerifiableRequest[] assets;
 	
 	private static VerifiableRequest makeResourceRequest(String name) throws Exception {
-		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(App.path1, name)));
+		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(App.one, name)));
 	}
 	
 	static {
@@ -112,7 +112,7 @@ public class BasicServingTest {
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.path1);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one);
 	
 	static interface Namer {
 		String name(int i);

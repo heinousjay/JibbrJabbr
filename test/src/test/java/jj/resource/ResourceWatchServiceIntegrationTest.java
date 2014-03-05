@@ -47,7 +47,7 @@ public class ResourceWatchServiceIntegrationTest {
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(App.path1)
+		new JibbrJabbrTestServer(App.one)
 		.withFileWatcher()
 		.injectInstance(this);
 	

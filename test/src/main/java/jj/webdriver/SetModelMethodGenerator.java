@@ -35,24 +35,37 @@ public class SetModelMethodGenerator extends PanelMethodGenerator {
 	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
 		return NAME.matcher(newMethod.getName()).find() &&
 			isStandardReturn(newMethod) &&
-			newMethod.getParameterTypes().length == 1 &&
-			newMethod.getParameterTypes()[0].getAnnotation(Model.class) != null;
+			newMethod.getParameterTypes().length >= 1 &&
+			newMethod.getParameterTypes()[0].getAnnotation(Model.class) != null &&
+			parametersMatchByAnnotation(1, newMethod, baseMethod);
 	}
 
 	@Override
 	protected void generateMethod(CtMethod newMethod, CtMethod baseMethod) throws Exception {
 		StringBuilder sb = new StringBuilder("{");
+		By baseBy = (By)baseMethod.getAnnotation(By.class);
+		if (baseBy != null) {
+			ByReader byReader = new ByReader(baseBy);
+			assert byReader.needsResolution() : "only the default By attribute is supported on model methods";
+			sb.append("jj.webdriver.ByStack oldByStack = byStack;")
+				.append("Object[] slicedArgs = java.util.Arrays.copyOfRange($args, ").append(1).append(", $args.length);")
+				.append("byStack = byStack.push(String.format(\"").append(byReader.value()).append("\", slicedArgs));");
+		}		
 		
 		for (CtField field : newMethod.getParameterTypes()[0].getFields()) {
 			By by = (By)field.getAnnotation(By.class);
 			String localName = "$$byFor$$" + field.getName();
 			if (by != null) {
-				processBy(by, localName, sb);
+				processBy(by, localName, -1, sb);
 			} else {
 				sb.append("org.openqa.selenium.By ").append(localName).append(" = org.openqa.selenium.By.")
 					.append("id(byStack.resolve(\"").append(field.getName()).append("\"));");
 			}
 			sb.append("set(").append(localName).append(", $1.").append(field.getName()).append(");");
+		}
+		
+		if (baseBy != null) {
+			sb.append("byStack = oldByStack;");
 		}
 		
 		generateStandardReturn(newMethod, sb);

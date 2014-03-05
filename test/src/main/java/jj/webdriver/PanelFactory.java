@@ -172,6 +172,6 @@ class PanelFactory {
 			}
 		}
 		
-		throw new AssertionError("no generator found for " + baseMethod);
+		throw new AssertionError("no generator found for " + baseMethod.getDeclaringClass().getName() + "." + baseMethod.getName());
 	}
 }

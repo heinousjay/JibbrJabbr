@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
+package jj.minimal;
 
-import static java.util.concurrent.TimeUnit.HOURS;
-import jj.App;
-
-import org.junit.Rule;
-import org.junit.Test;
+import jj.webdriver.By;
+import jj.webdriver.Page;
+import jj.webdriver.URL;
 
 /**
  * @author jason
  *
  */
-public class RunAPage {
+@URL("/")
+public interface IndexPage extends Page {
 
-	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one);
+	@By("say")
+	IndexPage setSay(String say);
 	
-	@Test
-	public void test() throws Exception {
-		TestHttpClient client = app.get("/");
-		
-		
-		System.out.println(client.contentsString(1, HOURS));
-	}
+	@By("submit")
+	IndexPage clickSubmit();
+	
+	@By("line-%d")
+	String readLine(int index);
 }

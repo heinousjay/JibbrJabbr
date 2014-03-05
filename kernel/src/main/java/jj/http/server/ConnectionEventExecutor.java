@@ -89,12 +89,10 @@ public class ConnectionEventExecutor {
 			// NO! is this okay?  it isn't.  need to scope this stuff to clients
 			if (function == null) function = scriptEnvironment.getFunction(event);
 			
-			if (function == null) {
-				// ???
-			}
-			
-			try (Closer closer = currentConnection.enterScope(connection)) {
-				pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+			if (function != null) {
+				try (Closer closer = currentConnection.enterScope(connection)) {
+					pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+				}
 			}
 		}
 	}

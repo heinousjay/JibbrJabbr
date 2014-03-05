@@ -34,4 +34,6 @@ package jj.webdriver;
 public interface Page extends Panel {
 	
 	String currentUrl();
+	
+	String pageSource();
 }

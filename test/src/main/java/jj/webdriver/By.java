@@ -21,6 +21,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Formatter;
 
 /**
  * <p>
@@ -74,11 +75,40 @@ import java.lang.annotation.Target;
  * 
  * <p>
  * Using the specific attributes is a direct setting, and the
- * ID hierarchy is no longer in effect
+ * ID hierarchy is no longer in effect.  That might change!
+ * but it might not
  * 
  * <p>
- * only id and class are implemented on purpose! but i can be
- * convinced
+ * By attributes can be defined using java format strings as detailed
+ * in {@link Formatter}. This is managed by embedding the format flags
+ * into the attribute, and defining the Panel method to take String and int
+ * parameters that match.  The details for this are in implementation but
+ * the basic idea is that the trailing parameters of the method (those not
+ * used for method-specific implementation patterns) will be used to
+ * satisfy the flags specified in the attribute, like so:
+ * 
+ *  <pre>
+ *  interface IndexPage extends {@link Page} {
+ * 
+ * 	{@literal @}By("home:%s:")
+ * 	LoginPanel loginPanel(String group);
+ * 
+ * }
+ * </pre>
+ * 
+ * called like
+ * 
+ * <pre>
+ * indexPage.loginPanel("group-name");
+ * </pre>
+ * 
+ * will result in the parameter "group-name" being substituted into
+ * the By value, which will then apply for concatenations onto By
+ * values for the various methods in the Panel.
+ * 
+ * <p>
+ * Combining these techniques gives a very flexible way to specify
+ * methods for interacting with pages.
  * 
  * @author jason
  *
@@ -95,4 +125,13 @@ public @interface By {
 	
 	/** look up the element by a matching class attribute.  only the first element found is used */
 	String className() default "";
+	
+	/** 
+	 * look up the element by a matching css selector.  you are responsible for ensuring this is only
+	 * used with compatible drivers
+	 */
+	String selector() default "";
+	
+	/** look up the element by an xpath expression */
+	String xpath() default "";
 }

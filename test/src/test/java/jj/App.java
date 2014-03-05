@@ -25,9 +25,11 @@ import java.util.Collections;
  */
 public class App {
 	
-	public static final String path1;
+	public static final String one;
 	
-	public static final String path2;
+	public static final String two;
+	
+	public static final String minimal;
 	
 	static {
 		try {
@@ -36,8 +38,9 @@ public class App {
 				System.out.println(resource);
 			}
 			
-			path1 = Paths.get(App.class.getResource("/app1/app/").toURI()).toAbsolutePath().toString();
-			path2 = Paths.get(App.class.getResource("/app2/app/").toURI()).toAbsolutePath().toString();
+			one = Paths.get(App.class.getResource("/app1/app/").toURI()).toAbsolutePath().toString();
+			two = Paths.get(App.class.getResource("/app2/app/").toURI()).toAbsolutePath().toString();
+			minimal = Paths.get(App.class.getResource("/minimal/app/").toURI()).toAbsolutePath().toString();
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

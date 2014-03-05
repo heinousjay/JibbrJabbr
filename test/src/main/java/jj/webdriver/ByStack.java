@@ -16,7 +16,7 @@
 package jj.webdriver;
 
 /**
- * maintains the current context of locators
+ * maintains the current context of locators for a {@link Panel} hierarchy
  * 
  * @author jason
  *

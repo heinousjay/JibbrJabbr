@@ -29,7 +29,7 @@ public class Grapher {
 
 	public static void main(String[] args) throws Exception {
 
-		graph("target/main.dot", Guice.createInjector(new CoreModule(args, new BootstrapClassPath())));
+		graph("build/main.dot", Guice.createInjector(new CoreModule(args, new BootstrapClassPath())));
 	}
 
 	public final static void graph(String filename, Injector inj) throws Exception {

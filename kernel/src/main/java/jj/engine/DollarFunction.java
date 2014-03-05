@@ -190,7 +190,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 				return new DocumentSelection(newSelection, element, document, env);
 			}
 			
-			if (args.containsKey(ATTR_ID)) {
+			if (args != null && args.containsKey(ATTR_ID)) {
 				// we can just return immediately, since we can make a unique selector here
 				// so fire-and-forget style
 				connection.current().send(JJMessage.makeInlineCreate(html, args));

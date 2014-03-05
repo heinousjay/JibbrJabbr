@@ -15,6 +15,7 @@
  */
 package jj.webdriver;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import javassist.CtClass;
@@ -37,8 +38,8 @@ public abstract class PanelMethodGenerator {
 
 	protected abstract boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception;
 	
-	protected boolean hasBy(CtMethod baseMethod) {
-		return baseMethod.hasAnnotation(By.class);
+	protected boolean hasBy(CtMethod baseMethod) throws Exception {
+		return baseMethod.hasAnnotation(By.class) && new ByReader((By)baseMethod.getAnnotation(By.class)) != null;
 	}
 	
 	private boolean hasPanelInterface(CtClass type) throws Exception {
@@ -64,9 +65,13 @@ public abstract class PanelMethodGenerator {
 		// does nothing by default, since you can override generateMethod and do it all yourself
 	}
 	
+	protected int sliceAt() {
+		return 0;
+	}
+	
 	protected void generateMethod(CtMethod newMethod, CtMethod baseMethod) throws Exception {
 		StringBuilder sb = new StringBuilder("{");
-		processBy((By)baseMethod.getAnnotation(By.class), sb);
+		processBy((By)baseMethod.getAnnotation(By.class), sliceAt(), sb);
 		generate(newMethod, baseMethod, sb);
 		generateReturn(newMethod, baseMethod, sb);
 		sb.append("}");
@@ -75,7 +80,9 @@ public abstract class PanelMethodGenerator {
 	}
 	
 	protected void setBody(CtMethod newMethod, StringBuilder sb) throws Exception {
-		System.out.println(newMethod.getName());
+		// log it! but don't have the right loggers yet
+		System.out.print(newMethod.getName());
+		System.out.print(" = ");
 		System.out.println(sb.toString());
 		
 		newMethod.setBody(sb.toString());
@@ -85,23 +92,48 @@ public abstract class PanelMethodGenerator {
 		generateStandardReturn(newMethod, sb);
 	}
 	
-	protected void processBy(By by, StringBuilder sb) {
-		processBy(by, LOCAL_BY, sb);
+	/**
+	 * process the {@link By} annotation into a local variable named by {@link #LOCAL_BY}, without passing
+	 * along the method args as format parameters.
+	 * @param by
+	 * @param sb
+	 */
+	protected void processBy(By by, int sliceArgs, StringBuilder sb) {
+		processBy(by, LOCAL_BY, sliceArgs, sb);
 	}
 	
-	protected void processBy(By by, String varName, StringBuilder sb) {
+	protected void processBy(By by, String varName, int sliceArgs, StringBuilder sb) {
 		
 		if (by != null) {
+			ByReader br = new ByReader(by);
+			
+			// args might get sliced for an implementation
+			if (sliceArgs > -1) {
+				sb.append("Object[] slicedArgs = java.util.Arrays.copyOfRange($args, ").append(sliceArgs).append(", $args.length);");
+			}
 			
 			sb.append("org.openqa.selenium.By ").append(varName).append(" = org.openqa.selenium.By.");
-			
-			if (!empty(by.value())) {
-				sb.append("id(byStack.resolve(\"").append(by.value()).append("\"));");
-			} else if (!empty(by.id())) {
-				sb.append("id(\"").append(by.id()).append("\");");
-			} else if (!empty(by.className())) {
-				sb.append("className(\"").append(by.className()).append("\");");
+			sb.append(br.type()).append("(");
+
+			if (br.needsResolution()) {
+				sb.append("byStack.resolve(");
 			}
+			
+			if (sliceArgs > -1) {
+				sb.append("String.format(");
+			}
+			
+			sb.append("\"").append(br.value()).append("\"");
+			
+			if (sliceArgs > -1) {
+				sb.append(", slicedArgs)");
+			}
+			
+			if (br.needsResolution()) {
+				sb.append(")");
+			}
+			
+			sb.append(");");
 		}
 	}
 	
@@ -122,25 +154,35 @@ public abstract class PanelMethodGenerator {
 		}
 	}
 	
-	protected String makeByFromMethod(CtMethod method) throws Exception {
-		By by = (By)method.getAnnotation(By.class);
-		
-		String result = "";
-		
-		if (!empty(by.value())) {
-			result = "org.openqa.selenium.By.id(\"" + by.value() + "\")";
-		} else if (!empty(by.id())) {
-			result = "org.openqa.selenium.By.id(\"" + by.id() + "\")";
-		} else if (!empty(by.className())) {
-			result = "org.openqa.selenium.By.className(\"" + by.className() + "\")";
-		} else {
-			throw new AssertionError("NOT POSSIBLE!");
-		}
-		
-		return result;
-	}
-	
 	protected boolean empty(String string) {
 		return string == null || string.isEmpty();
+	}
+
+	protected boolean parametersMatchByAnnotation(int sliceAt, CtMethod newMethod, CtMethod baseMethod) throws Exception {
+		
+		By by = (By)baseMethod.getAnnotation(By.class);
+		
+		int length = baseMethod.getParameterTypes().length;
+		CtClass[] params = Arrays.copyOfRange(baseMethod.getParameterTypes(), sliceAt, length);
+		Object[] args = new Object[params.length];
+		
+
+		boolean result = args.length == 0 || (by != null && args.length > 0);
+		
+		int index = 0;
+		for (CtClass type : params) {
+			if ("java.lang.String".equals(type.getName())) {
+				args[index++] = " ";
+			} else if ("int".equals(type.getName())) {
+				args[index++] = 0;
+			} else {
+				System.out.println("unknown type! " + type.getName());
+				result = false;
+			}
+		}
+		
+		result = result && (by == null || new ByReader(by).validateValueAsFormatterFor(args));
+		
+		return result;
 	}
 }

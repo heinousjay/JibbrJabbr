@@ -30,9 +30,15 @@ class SetInputMethodGenerator extends PanelMethodGenerator {
 	@Override
 	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
 		return NAME.matcher(newMethod.getName()).find() &&
-			newMethod.getParameterTypes().length == 1 &&
+			newMethod.getParameterTypes().length >= 1 &&
 			newMethod.getParameterTypes()[0].getName().equals("java.lang.String") &&
+			parametersMatchByAnnotation(1, newMethod, baseMethod) &&
 			isStandardReturn(newMethod);
+	}
+	
+	@Override
+	protected int sliceAt() {
+		return 1;
 	}
 	
 	@Override

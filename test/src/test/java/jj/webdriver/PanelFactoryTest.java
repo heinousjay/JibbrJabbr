@@ -42,9 +42,15 @@ import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 
 /**
+ * <p>
  * Tests that the page factory and by extension the PageBase and the
  * PageMethodGenerator set up, although individual classes there may
  * have their own tests depending upon complexity
+ * 
+ * <p>
+ * NEW PLAN! make a "TestablePageFactory" object that encapsulates the set-up
+ * and start breaking this stuff into smaller tests.  this is really the only
+ * way to validate everything but this is getting serious
  * 
  * @author jason
  *
@@ -162,7 +168,40 @@ public class PanelFactoryTest {
 	}
 	
 	@Test
-	public void testModel() {
+	public void testSetModel() {
+		
+		TestModel t = new TestModel();
+		t.name = "1";
+		t.email = "2";
+		
+		given(finder.find(webDriver, By.id("test-panel-name"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-panel-email"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-submit"))).willReturn(webElement);
+		
+		page.testPanel().setSomeForm(t).clickFormSubmit();
+		
+		verify(webElement).sendKeys("1");
+		verify(webElement).sendKeys("2");
+		verify(webElement).click();
+
+		given(finder.find(webDriver, By.id("test-panel-name"))).willReturn(null);
+		given(finder.find(webDriver, By.id("test-panel-email"))).willReturn(null);
+		given(finder.find(webDriver, By.id("test-submit"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("best-panel-name"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("best-panel-email"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("best-submit"))).willReturn(webElement);
+
+		t.name = "3";
+		t.email = "4";
+		page.bestPanel().setSomeForm(t).clickFormSubmit();
+		
+		verify(webElement).sendKeys("3");
+		verify(webElement).sendKeys("4");
+		verify(webElement, times(2)).click();
+	}
+	
+	@Test
+	public void testSetModel2() {
 		
 		TestModel t = new TestModel();
 		t.name = "1";
@@ -170,10 +209,68 @@ public class PanelFactoryTest {
 		
 		given(finder.find(webDriver, By.id("test-name"))).willReturn(webElement);
 		given(finder.find(webDriver, By.id("test-email"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-submit"))).willReturn(webElement);
 		
-		page.testPanel().setSomeForm(t);
+		page.testPanel().setSameForm(t).clickFormSubmit();
+		
 		
 		verify(webElement).sendKeys("1");
 		verify(webElement).sendKeys("2");
+		verify(webElement).click();
+		
+		given(finder.find(webDriver, By.id("test-name"))).willReturn(null);
+		given(finder.find(webDriver, By.id("test-email"))).willReturn(null);
+		given(finder.find(webDriver, By.id("test-submit"))).willReturn(null);
+		given(finder.find(webDriver, By.id("best-name"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("best-email"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("best-submit"))).willReturn(webElement);
+
+		t.name = "3";
+		t.email = "4";
+		page.bestPanel().setSameForm(t).clickFormSubmit();
+		
+		verify(webElement).sendKeys("3");
+		verify(webElement).sendKeys("4");
+		verify(webElement, times(2)).click();
+	}
+	
+	@Test
+	public void testSetModel3() {
+		
+		
+		TestModel t = new TestModel();
+		t.name = "1";
+		t.email = "2";
+		
+		given(finder.find(webDriver, By.id("test-panel-group[1]-name"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-panel-group[1]-email"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-panel-section[2]-name"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-panel-section[2]-email"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-submit-group[1]"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-submit-section[2]"))).willReturn(webElement);
+		
+		page.testPanel().setAnotherForm(t, "group", 1).clickFormSubmit("group", 1);
+		page.testPanel().setAnotherForm(t, "section", 2).clickFormSubmit("section", 2);
+		
+		verify(webElement, times(2)).sendKeys("1");
+		verify(webElement, times(2)).sendKeys("2");
+		verify(webElement, times(2)).click();
+	}
+	
+	@Test
+	public void testReadElement() {
+		
+		String value1 = "value1";
+		String value2 = "value2";
+		String value3 = "value3";
+
+		given(finder.find(webDriver, By.id("test-user-0"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-user-3"))).willReturn(webElement);
+		given(finder.find(webDriver, By.id("test-user-10"))).willReturn(webElement);
+		given(webElement.getText()).willReturn(value1, value2, value3);
+		
+		assertThat(page.testPanel().readUsers(0), is(value1));
+		assertThat(page.testPanel().readUsers(3), is(value2));
+		assertThat(page.testPanel().readUsers(10), is(value3));
 	}
 }

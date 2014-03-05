@@ -31,13 +31,13 @@ import org.junit.Test;
 public class LetsWriteATest {
 	
 	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.path2)
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.two)
 			.withHttp();
 	
 	
 	// since we're running in the context of the embedded server, let that
 	// produce this rule so they can coordinate
-	// TODO - coordinate! logging, server port, startup gating (ensure the server is running first!)
+	// TODO - coordinate! logging, server port, startup gating (might need this! jj starts fast though.  maybe it'll be okay)
 	// TODO - make the logging into its own component
 	@Rule
 	public WebDriverRule webDriverRule = server.webDriverRule()

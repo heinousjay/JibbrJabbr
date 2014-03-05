@@ -29,7 +29,7 @@ import org.junit.Test;
 public class ModuleTest {
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.path1);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one);
 	
 	@Test
 	public void moduleHierarchies() throws Exception {

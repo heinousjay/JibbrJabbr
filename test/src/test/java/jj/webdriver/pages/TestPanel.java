@@ -25,8 +25,33 @@ import jj.webdriver.Panel;
 public interface TestPanel extends Panel {
 	
 	@By("panel-")
-	TestPage2 setSomeForm(TestModel model);
+	TestPanel setSomeForm(TestModel model);
 	
+	TestPanel setSameForm(TestModel model);
+	
+	@By("submit")
+	TestPage2 clickFormSubmit();
+	
+	//@By("panel-")
 	//TestModel getSomeForm();
+	
+	//TestModel getSameForm();
+	
+	@By("panel-%s[%d]-")
+	TestPanel setAnotherForm(TestModel model, String group, int index);
+	// is this better?  honestly can't decide
+	//TestPanel setAnotherForm(String group, int index, TestModel model);
+	
+	@By("submit-%s[%d]")
+	TestPage2 clickFormSubmit(String group, int index);
+	
+	//@By("panel-%s%d-")
+	//TestModel getSomeArrayedConstruct(String group, int index);
+	
+	@By("user")
+	String readUser();
+	
+	@By("user-%d")
+	String readUsers(int index);
 
 }

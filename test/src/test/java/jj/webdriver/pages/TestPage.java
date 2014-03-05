@@ -40,4 +40,7 @@ public interface TestPage extends Page {
 	
 	@By("test-")
 	TestPanel testPanel();
+	
+	@By("best-")
+	TestPanel bestPanel();
 }
