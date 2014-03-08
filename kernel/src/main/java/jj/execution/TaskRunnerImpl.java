@@ -7,10 +7,8 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-
 import jj.Closer;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 
 /**
  * exposes some execution related information and
@@ -28,7 +26,7 @@ class TaskRunnerImpl implements TaskRunner {
 
 	private final ExecutorBundle executors;
 	private final CurrentTask currentTask;
-	private final Logger logger;
+	private final SystemLogger logger;
 	
 	private final DelayQueue<JJTask> queuedTasks = new DelayQueue<>();
 	
@@ -48,7 +46,7 @@ class TaskRunnerImpl implements TaskRunner {
 	TaskRunnerImpl(
 		final ExecutorBundle bundle,
 		final CurrentTask currentTask,
-		final @EmergencyLogger Logger logger
+		final SystemLogger logger
 	) {
 		this.executors = bundle;
 		this.currentTask = currentTask;
@@ -63,37 +61,45 @@ class TaskRunnerImpl implements TaskRunner {
 		task.enqueue(MAX_QUEUED_TIME);
 		queuedTasks.add(task);
 		
+		// sometimes, the injecting happens manually
 		final Promise promise = task.promise().taskRunner(this);
 		
 		task.addRunnableToExecutor(executors, new Runnable() {
 			
 			@Override
 			public void run() {
-				boolean interrupted = false;
-				String name = Thread.currentThread().getName();
-				Thread.currentThread().setName(name + " - " + task.name());
-				queuedTasks.remove(task);
-				task.start();
-				try (Closer closer = currentTask.enterScope(task)) {
-					task.run();
-				} catch (InterruptedException ie) {
-					interrupted = true;
-				} catch (Throwable t) {
-					if (!task.errored(t)) {
-						logger.error("Task [{}] ended in exception", task.name());
-						logger.error("", t);
-					}
-
-				} finally {
-					task.end();
-					Thread.currentThread().setName(name);
+				
+				String oldName = Thread.currentThread().getName();
+				String threadName = oldName + " - " + task.name();
+				Thread.currentThread().setName(threadName);
+				
+				try (Closer mdcCloser = logger.threadName(threadName)) {
 					
-					// interruption means shutdown, don't bother keeping promises now
-					if (!interrupted) {
-						List<JJTask> tasks = promise.done();
-						if (tasks != null) {
-							for (JJTask t : tasks) {
-								execute(t);
+					boolean interrupted = false;
+					queuedTasks.remove(task);
+					task.start();
+					
+					try (Closer closer = currentTask.enterScope(task)) {
+						task.run();
+					} catch (InterruptedException ie) {
+						interrupted = true;
+					} catch (Throwable t) {
+						if (!task.errored(t)) {
+							logger.error("Task [{}] ended in exception", task.name());
+							logger.error("", t);
+						}
+	
+					} finally {
+						task.end();
+						Thread.currentThread().setName(oldName);
+						
+						// interruption means shutdown, don't bother keeping promises
+						if (!interrupted) {
+							List<JJTask> tasks = promise.done();
+							if (tasks != null) {
+								for (JJTask t : tasks) {
+									execute(t);
+								}
 							}
 						}
 					}

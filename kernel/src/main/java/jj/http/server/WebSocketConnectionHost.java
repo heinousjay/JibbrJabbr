@@ -28,7 +28,7 @@ public interface WebSocketConnectionHost extends ScriptEnvironment, FunctionCont
 
 	void disconnected(WebSocketConnection connection);
 	
-	void message(WebSocketConnection connection, String message);
+	boolean message(WebSocketConnection connection, String message);
 	
 	void startBroadcasting();
 	

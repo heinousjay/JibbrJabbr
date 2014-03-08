@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jj.logging.SystemLogger;
 import jj.script.ScriptEnvironment;
 
 import org.junit.Before;
@@ -35,7 +36,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -49,7 +49,7 @@ public class TaskRunnerTest {
 	
 	private CurrentTask currentTask;
 	
-	private @Mock Logger logger;
+	private @Mock SystemLogger logger;
 	
 	private TaskRunnerImpl executor;
 	

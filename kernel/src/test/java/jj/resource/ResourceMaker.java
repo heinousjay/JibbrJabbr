@@ -17,13 +17,12 @@ package jj.resource;
 
 import static org.mockito.BDDMockito.*;
 
-import org.slf4j.Logger;
-
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Configuration;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceMaker;
+import jj.logging.SystemLogger;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
 import jj.script.resource.ScriptResource;
@@ -35,17 +34,17 @@ import jj.script.resource.ScriptResourceMaker;
  */
 public class ResourceMaker {
 	
-	private final Logger logger;
+	private final SystemLogger logger;
 	private final Application app;
 	private final ResourceInstanceCreator creator;
 	
 	public ResourceMaker(final Configuration configuration, final Application app) throws Exception {
 		this.app = app;
-		logger = mock(Logger.class);
+		logger = mock(SystemLogger.class);
 		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);
 	}
 	
-	public ResourceMaker(Configuration configuration, final Application app, Logger logger) throws Exception {
+	public ResourceMaker(Configuration configuration, final Application app, SystemLogger logger) throws Exception {
 		this.app = app;
 		this.logger = logger;
 		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);

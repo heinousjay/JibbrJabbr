@@ -27,6 +27,7 @@ import jj.Version;
 import jj.http.AbstractHttpResponse;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.JJHttpServerResponse;
+import jj.logging.SystemLogger;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
@@ -63,7 +64,8 @@ public class JJHttpServerResponseTest {
 	DefaultFullHttpRequest nettyRequest;
 	JJHttpServerRequest request;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
-	@Mock Logger logger;
+	@Mock Logger access;
+	@Mock SystemLogger logger;
 	@Mock Version version;
 	JJHttpServerResponse response;
 
@@ -72,7 +74,7 @@ public class JJHttpServerResponseTest {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		request = new JJHttpServerRequest(nettyRequest, new RouteFinder(), ctx);
 		
-		response = new JJHttpServerResponse(version, request, ctx, logger, logger);
+		response = new JJHttpServerResponse(version, request, ctx, access, logger);
 		assertThat(response.charset(), is(UTF_8));
 	}
 
@@ -234,8 +236,8 @@ public class JJHttpServerResponseTest {
 	public void testAccessLog() throws IOException {
 		
 		// given
-		given(logger.isInfoEnabled()).willReturn(true);
-		given(logger.isTraceEnabled()).willReturn(true);
+		given(access.isInfoEnabled()).willReturn(true);
+		given(access.isTraceEnabled()).willReturn(true);
 		String host = "hostname";
 		request.header(HttpHeaders.Names.HOST, host);
 		String location = "home";
@@ -253,7 +255,7 @@ public class JJHttpServerResponseTest {
 		// have to do this outside the verification or mockito gets all jacked up inside
 		String remoteAddress = ctx.channel().remoteAddress().toString();
 		
-		verify(logger).info(
+		verify(access).info(
 			eq("{} - - {} \"{} {} {}\" {} {} {} \"{}\""),
 			eq(remoteAddress),
 			anyString(), // the date, not going to try to make this work

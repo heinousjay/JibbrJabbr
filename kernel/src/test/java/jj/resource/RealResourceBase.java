@@ -35,13 +35,13 @@ import jj.configuration.Application;
 import jj.configuration.Configuration;
 import jj.configuration.MockApplication;
 import jj.css.CssResource;
+import jj.logging.SystemLogger;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -53,7 +53,7 @@ public abstract class RealResourceBase {
 	protected Path appPath;
 	@Mock protected Configuration configuration;
 	protected Application app;
-	@Mock protected Logger logger;
+	@Mock protected SystemLogger logger;
 
 	@Before
 	public final void init() throws Exception {

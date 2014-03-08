@@ -29,7 +29,7 @@ public class JJServerLifecycle {
 	}
 	
 	public void start() throws Exception {
-		publisher.publish(new ServerStartingEvent(version));
+		publisher.publish(new ServerStarting(version));
 		// can't do this in the constructor because Guice gets unhappy about that.
 		// and we can't just let the event do it yet.  but soon!
 		ArrayList<JJServerStartupListener> listeners = new ArrayList<>(startupListeners);
@@ -46,6 +46,6 @@ public class JJServerLifecycle {
 	}
 	
 	public void stop() {
-		publisher.publish(new ServerStoppingEvent());
+		publisher.publish(new ServerStopping());
 	}
 }

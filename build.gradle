@@ -1,3 +1,5 @@
+import java.io.File;
+
 def projectName = 'JibbrJabbr'
 
 allprojects {
@@ -137,4 +139,76 @@ jar {
 	doLast {
 		new File(destinationDir, 'system').deleteDir()
 	}
+}
+
+
+
+/**
+ * Wraps up the logic for starting/stopping a JibbrJabbr instance, given a server jar, app base, and place to
+ * redirect logs.
+ * 
+ * For now, used as a smoke test - can we start the server at all?
+ */
+class JibbrJabbrServer {
+	
+	private final ProcessBuilder pb
+	private Process p
+	private Integer exit
+	private final int port;
+	
+	public JibbrJabbrServer(File serverJar, File logDir, File appBase, int port) {
+		this.port = port;
+		pb = new ProcessBuilder('java', '-jar', serverJar.name, "app=${appBase}", "port=${port}")
+		pb.directory(serverJar.parentFile).redirectOutput(new File(logDir, 'out.log')).redirectError(new File(logDir, 'error.log'))
+	}
+	
+	public void start() {
+		if (p != null) throw new IllegalStateException("this JibbrJabbr instance was already started")
+		p = pb.start();
+		
+		// should be enough? find a better way! maybe keep trying a passed-in port every second until it accepts a connection, bail in 10 seconds?
+		
+		Thread.sleep(3000)
+	}
+	
+	public void stop() {
+		if (p == null) throw new IllegalStateException("this JibbrJabbr instance was not started")
+		try {
+			exit = p.exitValue() // may have stopped already due to error
+		} catch (IllegalThreadStateException ise) {
+			p.getOutputStream().write(3) // does this terminate it?  let's see!
+			p.getOutputStream().flush()
+			p.waitFor()
+			exit = p.exitValue()
+		}
+		p = null;
+	}
+	
+	public Integer exit() {
+		return exit;
+	}
+}
+
+def findApp(String path) {
+	def base = project(':kernel').sourceSets.test.resources.srcDirs.find();
+	
+	return new File(base, path);
+}
+
+task startJibbrJabbr(dependsOn: ':jar') {
+	
+	finalizedBy 'stopJibbrJabbr'
+	
+	ext {
+		server = new JibbrJabbrServer(jar.archivePath, buildDir, findApp('/app'), 8080);
+	}
+	
+	doLast {
+		server.start()
+	}
+}
+
+task stopJibbrJabbr(dependsOn: startJibbrJabbr) << {
+	startJibbrJabbr.server.stop()
+	println startJibbrJabbr.server.exit
 }

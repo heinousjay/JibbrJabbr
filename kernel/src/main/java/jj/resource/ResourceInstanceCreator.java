@@ -20,11 +20,9 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -44,13 +42,13 @@ public class ResourceInstanceCreator {
 
 	private final Injector parentInjector;
 	
-	private final Logger logger;
+	private final SystemLogger logger;
 	
 	@Inject
 	ResourceInstanceCreator(
 		final Application app,
 		final Injector parentInjector,
-		final @EmergencyLogger Logger logger
+		final SystemLogger logger
 	) {
 		this.app = app;
 		this.parentInjector = parentInjector;

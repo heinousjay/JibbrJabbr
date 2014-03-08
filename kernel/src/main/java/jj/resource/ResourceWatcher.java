@@ -34,7 +34,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
 
@@ -69,7 +69,7 @@ class ResourceWatcher {
 	}
 	
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		try {
 			watcher.close();
 		} catch (IOException e) {}

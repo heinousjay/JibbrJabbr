@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.configuration.Configuration;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -84,7 +84,7 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 	}
 
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		// make sure we start fresh if we get restarted
 		delegate.get().clear();
 	}

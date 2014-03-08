@@ -67,7 +67,7 @@ public class ConfigurationScriptPreloaderTest {
 		csp.start();
 		taskRunner.runFirstTask();
 		
-		verify(publisher).publish(isA(ConfigurationFoundEvent.class));
+		verify(publisher).publish(isA(ConfigurationFound.class));
 	}
 
 }

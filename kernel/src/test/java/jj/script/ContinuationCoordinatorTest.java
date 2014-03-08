@@ -26,6 +26,7 @@ import java.util.Map;
 
 import jj.http.client.RestRequest;
 import jj.jjmessage.JJMessage;
+import jj.logging.SystemLogger;
 import jj.script.resource.RequiredModule;
 
 import org.junit.Before;
@@ -38,7 +39,6 @@ import org.mozilla.javascript.ConstProperties;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
-import org.slf4j.Logger;
 
 /**
  * this class is hard to test because it mainly
@@ -68,7 +68,7 @@ public class ContinuationCoordinatorTest {
 	
 	ContinuationState continuationState;
 	
-	@Mock Logger logger;
+	@Mock SystemLogger logger;
 	
 	@Mock Callable function;
 
@@ -131,8 +131,6 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testInitialExecutionWithUnexpectedException() {
 		
-		given(logger.isErrorEnabled()).willReturn(true);
-		
 		final RuntimeException e = new RuntimeException();
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(e);
@@ -165,8 +163,6 @@ public class ContinuationCoordinatorTest {
 	
 	@Test
 	public void testFunctionExecutionWithUnexpectedException() {
-		
-		given(logger.isErrorEnabled()).willReturn(true);
 		
 		final RuntimeException e = new RuntimeException();
 		
@@ -206,8 +202,6 @@ public class ContinuationCoordinatorTest {
 	public void testContinuationResumptionWithUnexpectedException() {
 		
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
-		
-		given(logger.isErrorEnabled()).willReturn(true);
 		
 		final RuntimeException e = new RuntimeException();
 		

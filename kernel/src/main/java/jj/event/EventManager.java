@@ -21,9 +21,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.logging.EmergencyLogger;
-
-import org.slf4j.Logger;
+import jj.logging.SystemLogger;
 
 /**
  * Inject the Publisher to publish events.
@@ -34,12 +32,12 @@ import org.slf4j.Logger;
 @Singleton
 class EventManager implements Publisher {
 	
-	private final Logger logger;
+	private final SystemLogger logger;
 	
 	private Map<Class<?>, Set<Invoker>> listenerMap;
 	
 	@Inject
-	EventManager(final @EmergencyLogger Logger logger) {
+	EventManager(final SystemLogger logger) {
 		this.logger = logger;
 	}
 	

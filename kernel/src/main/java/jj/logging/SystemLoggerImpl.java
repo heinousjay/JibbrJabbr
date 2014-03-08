@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
+import jj.Closer;
 import jj.JJServerStartupListener;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -63,12 +64,8 @@ class SystemLoggerImpl implements SystemLogger, JJServerStartupListener {
 		this.taskRunner = taskRunner;
 		this.loggers = loggers;
 	}
+	
 
-	@Override
-	@Listener
-	public void log(LoggedEvent event) {
-		events.add(new EventBundle(event));
-	}
 
 	@Override
 	public void start() throws Exception {
@@ -79,12 +76,85 @@ class SystemLoggerImpl implements SystemLogger, JJServerStartupListener {
 				for (;;) {
 					EventBundle bundle = events.take();
 					Logger logger = loggers.findLogger(bundle.event);
-					MDC.put(THREAD_NAME, bundle.threadName);
-					bundle.event.describeTo(logger);
-					MDC.remove(THREAD_NAME);
+					try (Closer closer = threadName(bundle.threadName)) {
+						bundle.event.describeTo(logger);
+					}
+					
 				}
 			}
 		});
+	}
+	
+	
+
+	@Override
+	@Listener
+	public void log(LoggedEvent event) {
+		events.add(new EventBundle(event));
+	}
+	
+
+	
+	@EmergencyLogger
+	private static class Emergency implements LoggedEvent {
+		
+		private final boolean error;
+		private final String message;
+		private final Throwable t;
+		private final Object[] args;
+		
+		Emergency(boolean error, String message, Throwable t) {
+			this.error = error;
+			this.message = message;
+			this.t = t;
+			this.args = null;
+		}
+		
+		Emergency(boolean error, String message, Object...args) {
+			this.error = error;
+			this.message = message;
+			this.t = null;
+			this.args = args;
+		}
+
+		@Override
+		public void describeTo(Logger logger) {
+			if (error && t != null) {
+				logger.error(message, t);
+			} else if (error) {
+				logger.error(message, args);
+			} else {
+				logger.warn(message, args);
+			}
+		}
+		
+	}
+	
+	@Override
+	public void error(String message, Object... args) {
+		log(new Emergency(true, message, args));
+	}
+	
+	@Override
+	public void error(String message, Throwable t) {
+		log(new Emergency(true, message, t));
+	}
+	
+	@Override
+	public void warn(String message, Object... args) {
+		log(new Emergency(false, message, args));
+	}
+	
+	@Override
+	public Closer threadName(String threadName) {
+		MDC.put(THREAD_NAME, threadName);
+		return new Closer() {
+			
+			@Override
+			public void close() {
+				MDC.remove(THREAD_NAME);
+			}
+		};
 	}
 
 	@Override

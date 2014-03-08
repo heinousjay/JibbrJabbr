@@ -99,7 +99,9 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 			if ("jj-hi".equals(text)) {
 				ctx.writeAndFlush(new TextWebSocketFrame("jj-yo"));
 			} else {
-				connection.webSocketConnectionHost().message(connection, text);
+				if (!connection.webSocketConnectionHost().message(connection, text)) {
+					// TODO couldn't read the message! do what, though?
+				}
 			}
 			
 		} else if (frame instanceof PingWebSocketFrame) {

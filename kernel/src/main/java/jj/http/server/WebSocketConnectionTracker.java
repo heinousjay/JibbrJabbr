@@ -9,9 +9,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.JJServerStartupListener;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
@@ -23,8 +20,6 @@ import jj.execution.TaskRunner;
  */
 @Singleton
 public class WebSocketConnectionTracker implements JJServerStartupListener {
-	
-	private final Logger log = LoggerFactory.getLogger(WebSocketConnectionTracker.class);
 	
 	private final class ActivityChecker extends ServerTask {
 
@@ -39,7 +34,6 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		public void run() {
 			for (WebSocketConnection connection : allConnections.keySet()) {
 				if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
-					log.debug("terminating an idle connection {}", connection);
 					connection.close();
 				}
 			}

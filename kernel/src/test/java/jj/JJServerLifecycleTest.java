@@ -128,13 +128,13 @@ public class JJServerLifecycleTest {
 		
 		// then
 		assertThat(order, contains(1, 2, 3, 4, 5));
-		verify(publisher).publish(isA(ServerStartingEvent.class));
+		verify(publisher).publish(isA(ServerStarting.class));
 		
 		// when
 		jsl.stop();
 		
 		// then
-		verify(publisher).publish(isA(ServerStoppingEvent.class));
+		verify(publisher).publish(isA(ServerStopping.class));
 	}
 
 }

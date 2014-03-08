@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import java.util.HashSet;
 import java.util.Set;
 
+import jj.logging.SystemLogger;
 import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 
@@ -34,7 +35,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -47,7 +47,7 @@ public class APIImplTest {
 	
 	RealRhinoContextProvider contextProvider;
 	@Mock RequireFunction requireFunction;
-	@Mock Logger logger;
+	@Mock SystemLogger logger;
 	@Mock APIContributor apiContributor1;
 	@Mock APIContributor apiContributor2;
 	Set<APIContributor> apiContributors;

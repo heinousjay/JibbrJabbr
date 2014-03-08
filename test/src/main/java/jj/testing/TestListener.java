@@ -22,7 +22,7 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 
 import jj.JJServerStartupListener;
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.logging.TestRunnerLogger;
@@ -55,7 +55,7 @@ public class TestListener implements JJServerStartupListener {
 	}
 
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		testRunnerLogger.info("{} - test end", description);
 	}
 

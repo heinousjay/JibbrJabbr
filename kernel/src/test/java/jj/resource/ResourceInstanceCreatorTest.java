@@ -27,7 +27,7 @@ import java.util.Date;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Configuration;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
@@ -52,14 +52,14 @@ public class ResourceInstanceCreatorTest  {
 	public static ResourceInstanceCreator creator(
 		final Application app,
 		final Configuration configuration,
-		final Logger logger
+		final SystemLogger logger
 	) {
 		return new ResourceInstanceCreator(app, Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
 				bind(Configuration.class).toInstance(configuration);
-				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
+				bind(SystemLogger.class).toInstance(logger);
 			}
 		}), logger);
 	}

@@ -52,22 +52,18 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 
 	@Override
 	public void start() throws Exception {
-		
-		// i remember doing this as a Future (and being unhappy about it) because there
-		// was a deadlock
-		
 		taskRunner.execute(new ResourceTask("preloading configuration script") {
 			
 			@Override
 			public void run() {
 				ConfigResource config = resourceFinder.loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
 				if (config != null) {
-					publisher.publish(new ConfigurationFoundEvent(config.path()));
+					publisher.publish(new ConfigurationFound(config.path()));
 				} else {
 					publisher.publish(new UsingDefaultConfiguration());
 				}
 			}
-		}); //.await(); // if this times out, something went really really wrong
+		});
 	}
 
 	@Override

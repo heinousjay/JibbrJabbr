@@ -20,9 +20,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.logging.EmergencyLogger;
-
-import org.slf4j.Logger;
+import jj.logging.SystemLogger;
 
 /**
  * @author jason
@@ -31,20 +29,18 @@ import org.slf4j.Logger;
 @Singleton
 class JJUncaughtExceptionHandler implements UncaughtExceptionHandler {
 	
-	private final Logger log;
+	private final SystemLogger logger;
 	
 	@Inject
-	JJUncaughtExceptionHandler(
-		final @EmergencyLogger Logger log
-	) {
-		this.log = log;
+	JJUncaughtExceptionHandler(final SystemLogger logger) {
+		this.logger = logger;
 	}
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
 		// this is a bad failure! almost certainly an assertion
-		log.error("uncaught exception in thread {}", t);
-		log.error("", e);
+		logger.error("uncaught exception in thread {}", t);
+		logger.error("", e);
 		
 		// need to respond 500 if this is a web request.
 		// this is going to require the trace facility

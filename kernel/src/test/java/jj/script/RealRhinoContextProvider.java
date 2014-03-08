@@ -19,7 +19,7 @@ import static org.mockito.BDDMockito.*;
 
 import javax.inject.Provider;
 
-import org.slf4j.Logger;
+import jj.logging.SystemLogger;
 
 /**
  * @author jason
@@ -30,6 +30,6 @@ public class RealRhinoContextProvider implements Provider<RhinoContext> {
 	
 	@Override
 	public RhinoContext get() {
-		return new RhinoContext(mock(Logger.class));
+		return new RhinoContext(mock(SystemLogger.class));
 	}
 }

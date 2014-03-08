@@ -8,10 +8,8 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
-import org.slf4j.Logger;
-
 import jj.Closer;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 
 /**
  * Coordinates processing a continuable script, returning the 
@@ -26,7 +24,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		void run(RhinoContext context);
 	}
 	
-	private final Logger log;
+	private final SystemLogger logger;
 	
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -40,20 +38,20 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	ContinuationCoordinatorImpl(
 		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptEnvironment env,
-		final @EmergencyLogger Logger log,
+		final SystemLogger logger,
 		final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors,
 		final ContinuationPendingCache cache
 	) {
 		this.contextProvider = contextProvider;
 		this.env = env;
-		this.log = log;
+		this.logger = logger;
 		this.continuationProcessors = continuationProcessors;
 		this.cache = cache;
 	}
 	
 	private void log(final Exception e, final ScriptEnvironment scriptEnvironment) {
-		log.error("unexpected problem during script execution {}", scriptEnvironment);
-		log.error("", e);
+		logger.error("unexpected problem during script execution {}", scriptEnvironment);
+		logger.error("", e);
 	} 
 	
 	private ContinuationState execute(final ContinuationExecution execution, final ScriptEnvironment scriptEnvironment) {
@@ -113,8 +111,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			
 		}
 		
-		log.error("ignoring attempt to execute nonexistent function in context of {}", scriptEnvironment);
-		log.error("helpful stacktrace", new Exception());
+		logger.error("ignoring attempt to execute nonexistent function in context of {}", scriptEnvironment);
+		logger.error("helpful stacktrace", new Exception());
 		return null;
 	}
 	
@@ -153,8 +151,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			}, scriptEnvironment));
 		}
 		
-		log.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptEnvironment, pendingKey);
-		log.error("helpful stacktrace", new Exception());
+		logger.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptEnvironment, pendingKey);
+		logger.error("helpful stacktrace", new Exception());
 		return null;
 	}
 	

@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj;
 
-import java.nio.file.Path;
+import jj.logging.LoggedEvent;
 
 import org.slf4j.Logger;
-
-import jj.ServerLogger;
-import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
 @ServerLogger
-class ConfigurationFoundEvent implements LoggedEvent {
+public class ServerStopping implements LoggedEvent {
 	
-	private final Path configurationPath;
-	
-	ConfigurationFoundEvent(final Path configurationPath) {
-		this.configurationPath = configurationPath;
-	}
+	ServerStopping() {}
 
 	@Override
 	public void describeTo(Logger logger) {
-		logger.info("Found configuration at {}", configurationPath);
+		logger.info("Stopping the server");
 	}
 
 }

@@ -29,8 +29,6 @@ import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jj.Closer;
 import jj.CurrentResource;
@@ -71,8 +69,6 @@ public class DocumentScriptEnvironment
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	
 	// --- implementation
-	
-	private final Logger log = LoggerFactory.getLogger(DocumentScriptEnvironment.class);
 	
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
 	
@@ -314,13 +310,8 @@ public class DocumentScriptEnvironment
 	
 	@Override
 	@ScriptThread
-	public void message(WebSocketConnection connection, String message) {
-		if (!processor.process(connection, message)) {
-			log.warn("{} spoke gibberish to me: {}", 
-				connection,
-				message
-			);
-		}
+	public boolean message(WebSocketConnection connection, String message) {
+		return processor.process(connection, message);
 	}
 	
 	private static class Context<T> {

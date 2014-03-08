@@ -27,7 +27,7 @@ import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.servable.Servables;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 
 /**
  * just exposing a method for testing
@@ -47,7 +47,7 @@ public class TestJJEngineHttpHandler extends EngineHttpHandler {
 		final Servables servables,
 		final Injector injector,
 		final WebSocketRequestChecker webSocketUriChecker,
-		final @EmergencyLogger Logger logger
+		final SystemLogger logger
 	) {
 		super(taskRunner, servables, injector, webSocketUriChecker, logger);
 	}

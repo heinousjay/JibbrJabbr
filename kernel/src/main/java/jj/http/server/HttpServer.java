@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jj.JJServerStartupListener;
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.StringUtils;
 import jj.configuration.Arguments;
 import jj.configuration.Configuration;
@@ -189,7 +189,7 @@ class HttpServer implements JJServerStartupListener {
 	}
 
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		if (run) {
 			assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
 			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);

@@ -24,11 +24,11 @@ import org.slf4j.Logger;
  *
  */
 @ServerLogger
-public class ServerStartingEvent implements LoggedEvent {
+public class ServerStarting implements LoggedEvent {
 	
 	private final Version version;
 	
-	ServerStartingEvent(Version version) {
+	ServerStarting(Version version) {
 		this.version = version;
 	}
 

@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.Clock;
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
 
@@ -121,7 +121,7 @@ class ServerExecutor extends ThreadPoolExecutor {
 	}
 
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		shutdownNow();
 	}
 	

@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jj.DateFormatHelper;
 import jj.Version;
@@ -33,7 +32,7 @@ import jj.http.AbstractHttpResponse;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.logging.AccessLogger;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import io.netty.channel.ChannelFuture;
@@ -50,8 +49,6 @@ import io.netty.handler.stream.ChunkedNioFile;
  */
 @Singleton
 class JJHttpServerResponse extends AbstractHttpResponse {
-
-	private static final Logger log = LoggerFactory.getLogger(JJHttpServerResponse.class);
 	
 	private final JJHttpServerRequest request;
 	
@@ -59,7 +56,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private final Logger access;
 	
-	private final Logger emergency;
+	private final SystemLogger logger;
 	
 	/**
 	 * @param response
@@ -70,12 +67,12 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		final JJHttpServerRequest request,
 		final ChannelHandlerContext ctx,
 		final @AccessLogger Logger access,
-		final @EmergencyLogger Logger emergency
+		final SystemLogger logger
 	) {
 		this.request = request;
 		this.ctx = ctx;
 		this.access = access;
-		this.emergency = emergency;
+		this.logger = logger;
 		header(HttpHeaders.Names.SERVER, String.format(
 			"%s/%s (%s)",
 			version.name(),
@@ -119,7 +116,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	 */
 	@Override
 	public HttpResponse error(Throwable e) {
-		emergency.error("response ended in error", e);
+		logger.error("response ended in error", e);
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		return this;
 	}
@@ -146,8 +143,8 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private void log() {
 		
-		log.info(
-			"request for [{}] completed in {} milliseconds (wall time)",
+		access.info(
+			"request for [{}] completed in {} milliseconds (wall time) (stats events!)",
 			request.uri(),
 			request.wallTime()
 		);

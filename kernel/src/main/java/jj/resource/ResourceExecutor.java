@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.JJRejectedExecutionHandler;
@@ -47,7 +47,7 @@ class ResourceExecutor extends ThreadPoolExecutor {
 	// is the maximum number of worker threads, which is also the core, which we allow to die off
 
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		shutdown();
 	}
 	

@@ -51,6 +51,7 @@ class LogConfigurator {
 
 	    PatternLayoutEncoder encoder = new PatternLayoutEncoder();
 	    encoder.setContext(loggerContext);
+	    // %highlight(%-5level) %cyan(%logger{15})
 	    encoder.setPattern("%date{HH:mm:ss.SSS} [%mdc{thread}] %-5level %logger - %message%n%rootException");
 	    encoder.start();
 

@@ -19,48 +19,6 @@ def classifier = { os, arch ->
 	}
 }(System.getProperty('os.name'), System.getProperty("sun.arch.data.model"))
 
-
-
-/**
- * Wraps up the logic for starting/stopping a JibbrJabbr instance, given a server jar, app base, and place to
- * redirect logs.
- */
-class JibbrJabbrServer {
-	
-	private final ProcessBuilder pb
-	private Process p
-	private Integer exit
-	
-	public JibbrJabbrServer(File serverJar, File logDir, File appBase) {
-		pb = new ProcessBuilder('java', '-jar', serverJar.name, "app=${appBase}")
-		pb.directory(serverJar.parentFile).redirectOutput(new File(logDir, 'out.log')).redirectError(new File(logDir, 'error.log'))
-	}
-	
-	public void start() {
-		if (p != null) throw new IllegalStateException("this JibbrJabbr instance was already started")
-		p = pb.start();
-		
-		Thread.sleep(3000) // should be enough? find a better way! maybe keep trying a passed-in port every second until it accepts a connection
-	}
-	
-	public void stop() {
-		if (p == null) throw new IllegalStateException("this JibbrJabbr instance was not started")
-		try {
-			exit = p.exitValue() // may have stopped already due to error
-		} catch (IllegalThreadStateException ise) {
-			p.getOutputStream().write(3) // does this terminate it?  let's see!
-			p.getOutputStream().flush()
-			p.waitFor()
-			exit = p.exitValue()
-		}
-		p = null;
-	}
-	
-	public Integer exit() {
-		return exit;
-	}
-}
-
 configurations {
 	phantomJS {
 		transitive = false
@@ -101,32 +59,6 @@ test {
 	minHeapSize = "128m"
 	maxHeapSize = "512m"
 }
-
-def findApp(String path) {
-	def base = project(':kernel').sourceSets.test.resources.srcDirs.find();
-	
-	return new File(base, path);
-}
-
-task startJibbrJabbr(dependsOn: ':jar') {
-	
-	finalizedBy 'stopJibbrJabbr'
-	
-	ext {
-		jjs = new JibbrJabbrServer(project(':').jar.archivePath, buildDir, findApp('/app'));
-	}
-	
-	doLast {
-		jjs.start()
-	}
-}
-
-task stopJibbrJabbr(dependsOn: startJibbrJabbr) << {
-	startJibbrJabbr.jjs.stop()
-	println startJibbrJabbr.jjs.exit
-}
-
-stopJibbrJabbr.mustRunAfter test
 
 // maybe we worry about this in the top level... just a fast smoke test
 // test.dependsOn startJibbrJabbr

@@ -19,8 +19,6 @@ import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements the $ function host object, which is the primary script API to the document/client
@@ -29,8 +27,6 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 final class DollarFunction extends BaseFunction implements HostObject {
-	
-	private static Logger log = LoggerFactory.getLogger(DollarFunction.class);
 
 	// this is to match JQuery's element creation syntax and semantics
 	private static final Pattern SIMPLE_ELEMENT_CREATION = Pattern.compile("^<(\\w+)\\s*\\/?>(?:<\\/\\1>|)$");
@@ -117,12 +113,6 @@ final class DollarFunction extends BaseFunction implements HostObject {
 			return create(((CharSequence)args[0]).toString(), (Map<?, ?>)args[1]);
 		}
 		
-		// warn that we are being called with something we don't recognize. see ConsString
-		// comments above for the argument why :D
-		log.warn("called with unrecognized argument set executing {}", webSocketConnectionHost.uri());
-		for (Object arg : args) {
-			log.warn("{} of type {}", arg, arg == null ? "<null>" : arg.getClass());
-		}
 		// if nothing matches, we just return ourselves.  this allows silly constructs like
 		// $()()()()()()()()()("body")
 		// heh

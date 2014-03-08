@@ -39,7 +39,6 @@ import jj.script.RealRhinoContextProvider;
 
 import org.junit.Test;
 import org.mockito.Mock;
-import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -79,13 +78,12 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	
 	@Override
 	protected CssResourceCreator toTest() {
-		return new CssResourceCreator(app, lessProcessor, resourceFinder, logger, creator);
+		return new CssResourceCreator(app, lessProcessor, resourceFinder, creator);
 	}
 	
 	ResourceMaker resourceMaker;
 	LessProcessor lessProcessor;
 	@Mock ResourceFinder resourceFinder;
-	@Mock Logger logger;
 	
 	protected void before() throws Exception {
 		lessProcessor = spy(new LessProcessor(app, new RealRhinoContextProvider(), mock(Publisher.class)));
@@ -145,6 +143,8 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		
 		assertThat(bytes, is(Files.readAllBytes(testResource.path().resolveSibling("url_replacement_output.txt"))));
 		
-		verify(logger).warn(anyString(), eq(css.name()), eq("../jj/resource/not-found-thing.jpg"), eq("url(not-found-thing.jpg)"));
+		// this will happen another way? maybe the emergency logger will become the server logger, which guaranteed to always be at
+		// at least error? info?  maybe...
+		//verify(logger).warn(anyString(), eq(css.name()), eq("../jj/resource/not-found-thing.jpg"), eq("url(not-found-thing.jpg)"));
 	}
 }

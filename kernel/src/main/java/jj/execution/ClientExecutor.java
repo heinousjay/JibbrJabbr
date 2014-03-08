@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
 
@@ -91,7 +91,7 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor {
 	}
 
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		shutdownNow();
 	}
 }

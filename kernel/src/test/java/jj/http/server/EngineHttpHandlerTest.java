@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -32,6 +31,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.IOException;
+
 import jj.execution.MockTaskRunner;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
@@ -39,6 +39,8 @@ import jj.http.server.EngineHttpHandler;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
+import jj.logging.SystemLogger;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,8 +49,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -61,7 +61,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 @RunWith(MockitoJUnitRunner.class)
 public class EngineHttpHandlerTest {
 	
-	@Mock Logger logger;
+	@Mock SystemLogger logger;
 	@Mock ChannelHandlerContext ctx;
 	@Mock Channel channel;
 	@Mock ChannelFuture channelFuture;

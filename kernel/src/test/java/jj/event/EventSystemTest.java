@@ -33,14 +33,12 @@ import jj.event.help.IEvent;
 import jj.event.help.Sub;
 import jj.execution.MockTaskRunner;
 import jj.execution.TaskRunner;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -57,7 +55,7 @@ import com.google.inject.Injector;
 public class EventSystemTest {
 	
 	final Exception toThrow = new Exception();
-	@Mock Logger logger;
+	@Mock SystemLogger logger;
 	
 	MockTaskRunner taskRunner;
 	
@@ -65,7 +63,7 @@ public class EventSystemTest {
 	public static class EventManagerChild extends EventManager {
 		
 		@Inject
-		public EventManagerChild(final @EmergencyLogger Logger logger) {
+		public EventManagerChild(final SystemLogger logger) {
 			super(logger);
 		}
 		
@@ -107,7 +105,7 @@ public class EventSystemTest {
 			
 			@Override
 			protected void configure() {
-				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
+				bind(SystemLogger.class).toInstance(logger);
 				bind(TaskRunner.class).to(MockTaskRunner.class);
 				bind(Exception.class).toInstance(toThrow);
 			}

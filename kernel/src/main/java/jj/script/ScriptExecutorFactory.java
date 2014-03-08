@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.ServerStoppingEvent;
+import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.JJRejectedExecutionHandler;
@@ -57,7 +57,7 @@ class ScriptExecutorFactory {
 	}
 
 	@Listener
-	public void stop(ServerStoppingEvent event) {
+	public void stop(ServerStopping event) {
 		executor.shutdownNow();
 	}
 

@@ -21,15 +21,13 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class RestCallProvider {
 	
-	private final Logger log = LoggerFactory.getLogger(RestCallProvider.class);
+	//private final Logger log = LoggerFactory.getLogger(RestCallProvider.class);
 	
 	private final RouteFinder routeFinder;
 	
@@ -123,7 +121,7 @@ class RestCallProvider {
 					//.setBody(bytes);
 			}
 			
-			log.debug("performing REST request {}", request);
+			//log.debug("performing REST request {}", request);
 
 			if (!options.ignoreResult()) {
 				// TODO - handle the result in a way consistent with configuration, gets set on the RestRequest

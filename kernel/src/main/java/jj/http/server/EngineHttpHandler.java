@@ -16,8 +16,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
@@ -28,7 +26,7 @@ import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 import jj.resource.ResourceTask;
 import jj.resource.Resource;
 
@@ -51,7 +49,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	
 	private final WebSocketRequestChecker webSocketRequestChecker;
 	
-	private final Logger logger;
+	private final SystemLogger logger;
 	
 	@Inject
 	EngineHttpHandler( 
@@ -59,7 +57,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		final Servables servables,
 		final Injector parentInjector,
 		final WebSocketRequestChecker webSocketRequestChecker,
-		final @EmergencyLogger Logger logger
+		final SystemLogger logger
 	) {
 		this.taskRunner = taskRunner;
 		this.servables = servables;

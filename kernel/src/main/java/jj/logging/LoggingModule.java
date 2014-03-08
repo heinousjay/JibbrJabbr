@@ -57,10 +57,5 @@ public class LoggingModule extends JJModule {
 	public Logger provideTestRunnerLogger() {
 		return LoggerFactory.getLogger(TEST_RUNNER_LOGGER);
 	}
-	
-	@Provides @EmergencyLogger
-	public Logger provideEmergencyLogger() {
-		return LoggerFactory.getLogger(EMERGENCY_LOGGER);
-	}
 
 }

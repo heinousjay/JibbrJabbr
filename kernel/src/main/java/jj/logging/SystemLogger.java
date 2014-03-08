@@ -15,6 +15,8 @@
  */
 package jj.logging;
 
+import jj.Closer;
+
 /**
  * @author jason
  *
@@ -23,4 +25,11 @@ public interface SystemLogger {
 
 	void log(LoggedEvent event);
 	
+	Closer threadName(String threadName);
+	
+	void error(String message, Throwable t);
+	
+	void error(String message, Object...args);
+	
+	void warn(String message, Object...args);
 }

@@ -32,10 +32,12 @@ import jj.engine.ContributesScript;
 import jj.engine.EngineAPI;
 import jj.engine.EngineAPIImpl;
 import jj.engine.HostObject;
+import jj.logging.SystemLogger;
 import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -107,6 +109,8 @@ abstract class AbstractEngineApiTest {
 			return false;
 		}
 	}
+	
+	@Mock SystemLogger logger;
 
 	protected final String scriptName() {
 		return getClass().getSimpleName() + ".js";
@@ -128,7 +132,7 @@ abstract class AbstractEngineApiTest {
 		Set<HostObject> hostObjectSet = new HashSet<>();
 		Collections.addAll(hostObjectSet,  hostObjects);
 		hostObjectSet.add(new RhinoUnitHostObject());
-		return new EngineAPIImpl(new RealRhinoContextProvider(), hostObjectSet);
+		return new EngineAPIImpl(new RealRhinoContextProvider(), hostObjectSet, logger);
 	}
 
 	protected final void basicExecution(final EngineAPI host) throws Exception {

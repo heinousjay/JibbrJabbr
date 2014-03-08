@@ -6,12 +6,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import jj.logging.SystemLogger;
 import jj.script.RhinoContext;
 
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * component that sources a prepared rhino context for script execution.
@@ -23,12 +22,17 @@ class EngineAPIImpl implements EngineAPI {
 	
 	private final ScriptableObject global;
 	
-	private final Logger log = LoggerFactory.getLogger(EngineAPIImpl.class);
+	private final SystemLogger logger;
 	
 	@Inject
-	EngineAPIImpl(final Provider<RhinoContext> contextProvider, final Set<HostObject> hostObjects) {
+	EngineAPIImpl(
+		final Provider<RhinoContext> contextProvider,
+		final Set<HostObject> hostObjects,
+		final SystemLogger logger
+	) {
 		try (RhinoContext context = contextProvider.get()) {
 			global = initializeGlobalScope(context, hostObjects);
+			this.logger = logger;
 		}
 	}
 	
@@ -67,8 +71,7 @@ class EngineAPIImpl implements EngineAPI {
 				try {
 					context.evaluateString(global, script, hostObject.name());
 				} catch (RhinoException re) {
-					log.error("trouble evaluating host object {} script {}", hostObject.getClass().getName(), script);
-					log.error("received exception", re);
+					logger.error("trouble evaluating host object {} script {}", hostObject.getClass().getName(), script);
 					throw new AssertionError("bad host object!", re);
 				}
 			}

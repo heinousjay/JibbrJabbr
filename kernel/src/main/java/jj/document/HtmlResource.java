@@ -12,7 +12,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.document.servable.DocumentConfiguration;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 import jj.resource.AbstractFileResource;
 import jj.resource.ResourceCacheKey;
 
@@ -23,7 +23,6 @@ import org.jsoup.parser.ParseError;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
-import org.slf4j.Logger;
 
 /**
  * An immutable collection of information about an
@@ -68,7 +67,7 @@ public class HtmlResource extends AbstractFileResource {
 	@Inject
 	HtmlResource(
 		final Configuration configuration,
-		final @EmergencyLogger Logger logger,
+		final SystemLogger logger,
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path

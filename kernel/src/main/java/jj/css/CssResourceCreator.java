@@ -27,12 +27,9 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-
 import jj.SHA1Helper;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
-import jj.logging.EmergencyLogger;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.Resource;
 import jj.resource.ResourceFinder;
@@ -57,7 +54,6 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	private final Application app;
 	private final LessProcessor lessProcessor;
 	private final ResourceFinder resourceFinder;
-	private final Logger logger;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
@@ -65,13 +61,11 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 		final Application app,
 		final LessProcessor lessProcessor,
 		final ResourceFinder resourceFinder,
-		final @EmergencyLogger Logger logger,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.app = app;
 		this.lessProcessor = lessProcessor;
 		this.resourceFinder = resourceFinder;
-		this.logger = logger;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 
@@ -189,8 +183,6 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 						// replace with the absolute path
 						replacement = "/" + name;
 					}
-				} else {
-					logger.warn("CSS file {} references {} (as {}), which does not exist", resource.name(), name, matcher.group());
 				}
 				
 				matcher.appendReplacement(sb, prefix + replacement + suffix);

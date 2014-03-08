@@ -23,7 +23,7 @@ import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 import jj.document.servable.DocumentConfiguration;
 import jj.http.server.HttpServerSocketConfiguration;
-import jj.logging.EmergencyLogger;
+import jj.logging.SystemLogger;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceMaker;
@@ -35,8 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.EcmaError;
-import org.slf4j.Logger;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -67,7 +65,7 @@ public class ConfigurationTest {
 	private Configuration toTest;
 	private ConfigurationClassLoader classLoader;
 	private @Mock ResourceFinder resourceFinder;
-	private @Mock Logger logger;
+	private @Mock SystemLogger logger;
 
 	@Before 
 	public void before() throws Exception {
@@ -83,7 +81,7 @@ public class ConfigurationTest {
 			protected void configure() {
 				bind(Converters.class).toInstance(new Converters(ConverterSetMaker.converters()));
 				bind(ResourceFinder.class).toInstance(resourceFinder);
-				bind(Logger.class).annotatedWith(EmergencyLogger.class).toInstance(logger);
+				bind(SystemLogger.class).toInstance(logger);
 			}
 		});
 	}
