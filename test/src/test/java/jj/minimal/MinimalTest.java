@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.*;
 import jj.App;
 import jj.testing.JibbrJabbrTestServer;
 import jj.webdriver.PhantomJSWebDriverProvider;
+import jj.webdriver.WebDriverProvider;
 import jj.webdriver.WebDriverRule;
 
 import org.junit.Rule;
@@ -33,8 +34,11 @@ import org.junit.Test;
  */
 public class MinimalTest {
 	
+	// this could also be a helper class that inspects system properties or vm args or whatever
+	private static final Class<? extends WebDriverProvider> DRIVER_PROVIDER = PhantomJSWebDriverProvider.class;
+	
 	@Rule
-	public JibbrJabbrTestServer jibbrjabbr = new JibbrJabbrTestServer(App.minimal);
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.minimal);
 	
 	// asking for a WebDriverRule from the server rule automatically configures the
 	// server to start listening on 8080, and configures the rules to a base url of
@@ -42,22 +46,20 @@ public class MinimalTest {
 	// this behavior has some nuances i haven't explained here but it's all thought out
 	
 	@Rule
-	public WebDriverRule web1 = jibbrjabbr.webDriverRule()
-		.driverProvider(PhantomJSWebDriverProvider.class);
+	public WebDriverRule browser1 = server.webDriverRule()
+		.driverProvider(DRIVER_PROVIDER);
 	
 	// need two browsers?  make two web driver rules! yay!
 	
 	@Rule
-	public WebDriverRule web2 = jibbrjabbr.webDriverRule()
-		// kinda ugly supplying this twice, but all i can 
-		// think of is passing it twice into the factory anyway
-		.driverProvider(PhantomJSWebDriverProvider.class);
+	public WebDriverRule browser2 = server.webDriverRule()
+		.driverProvider(DRIVER_PROVIDER);
 
 	@Test
 	public void test() throws Exception {
 		
-		IndexPage one = web1.get(IndexPage.class);
-		IndexPage two = web2.get(IndexPage.class);
+		IndexPage one = browser1.get(IndexPage.class);
+		IndexPage two = browser2.get(IndexPage.class);
 		
 		one.setSay("something").clickSubmit();
 		two.setSay("otherthing").clickSubmit();
