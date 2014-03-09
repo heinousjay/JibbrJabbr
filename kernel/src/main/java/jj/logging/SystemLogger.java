@@ -78,7 +78,6 @@ class SystemLogger implements EmergencyLog, JJServerStartupListener {
 					EventBundle bundle = events.take();
 					Logger logger = loggers.findLogger(bundle.event);
 					try (Closer closer = threadName(bundle.threadName)) {
-						System.out.println("hi asshole " + bundle.threadName);
 						bundle.event.describeTo(logger);
 					}
 					
