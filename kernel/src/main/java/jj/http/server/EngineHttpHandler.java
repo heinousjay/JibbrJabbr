@@ -26,7 +26,7 @@ import jj.http.HttpResponse;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.resource.ResourceTask;
 import jj.resource.Resource;
 
@@ -49,7 +49,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	
 	private final WebSocketRequestChecker webSocketRequestChecker;
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	@Inject
 	EngineHttpHandler( 
@@ -57,7 +57,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		final Servables servables,
 		final Injector parentInjector,
 		final WebSocketRequestChecker webSocketRequestChecker,
-		final SystemLogger logger
+		final EmergencyLog logger
 	) {
 		this.taskRunner = taskRunner;
 		this.servables = servables;

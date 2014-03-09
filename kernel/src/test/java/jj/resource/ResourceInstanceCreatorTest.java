@@ -27,7 +27,7 @@ import java.util.Date;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Configuration;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
@@ -38,7 +38,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -52,21 +51,20 @@ public class ResourceInstanceCreatorTest  {
 	public static ResourceInstanceCreator creator(
 		final Application app,
 		final Configuration configuration,
-		final SystemLogger logger
+		final EmergencyLog logger
 	) {
 		return new ResourceInstanceCreator(app, Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
 				bind(Configuration.class).toInstance(configuration);
-				bind(SystemLogger.class).toInstance(logger);
+				bind(EmergencyLog.class).toInstance(logger);
 			}
 		}), logger);
 	}
 	
 	@Mock Application app;
 	@Mock Injector injector;
-	@Mock Logger logger;
 	
 	@Captor ArgumentCaptor<AbstractModule> moduleCaptor;
 	

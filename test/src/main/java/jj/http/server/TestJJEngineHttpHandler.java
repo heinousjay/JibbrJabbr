@@ -18,8 +18,6 @@ package jj.http.server;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-
 import com.google.inject.Injector;
 
 import jj.execution.TaskRunner;
@@ -27,7 +25,7 @@ import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.servable.Servables;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 /**
  * just exposing a method for testing
@@ -47,7 +45,7 @@ public class TestJJEngineHttpHandler extends EngineHttpHandler {
 		final Servables servables,
 		final Injector injector,
 		final WebSocketRequestChecker webSocketUriChecker,
-		final SystemLogger logger
+		final EmergencyLog logger
 	) {
 		super(taskRunner, servables, injector, webSocketUriChecker, logger);
 	}

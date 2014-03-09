@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 /**
+ * Logging services.  Exposes configuration points to allow modules to have
+ * control over their own logging, while centralizing dispatch, filtering,
+ * and configuration.
+ * 
  * @author jason
  *
  */

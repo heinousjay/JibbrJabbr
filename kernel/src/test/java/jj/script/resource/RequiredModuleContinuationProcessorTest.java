@@ -24,9 +24,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import jj.configuration.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceLoadedEvent;
+import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
-import jj.resource.ResourceNotFoundEvent;
+import jj.resource.ResourceNotFound;
 import jj.script.ContinuationPendingKey;
 import jj.script.ContinuationPendingKeyResultExtractor;
 import jj.script.ContinuationState;
@@ -98,7 +98,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceLoaded(new ResourceLoadedEvent(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
+		processor.resourceLoaded(new ResourceLoaded(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
 		
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
 		
@@ -112,7 +112,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceNotFound(new ResourceNotFoundEvent(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
+		processor.resourceNotFound(new ResourceNotFound(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
 		
 		// then
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);

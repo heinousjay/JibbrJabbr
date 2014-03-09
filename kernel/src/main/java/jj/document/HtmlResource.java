@@ -12,7 +12,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.document.servable.DocumentConfiguration;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.resource.AbstractFileResource;
 import jj.resource.ResourceCacheKey;
 
@@ -67,7 +67,7 @@ public class HtmlResource extends AbstractFileResource {
 	@Inject
 	HtmlResource(
 		final Configuration configuration,
-		final SystemLogger logger,
+		final EmergencyLog logger,
 		final ResourceCacheKey cacheKey,
 		final String baseName,
 		final Path path

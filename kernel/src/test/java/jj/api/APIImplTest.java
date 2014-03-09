@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 
@@ -47,7 +47,7 @@ public class APIImplTest {
 	
 	RealRhinoContextProvider contextProvider;
 	@Mock RequireFunction requireFunction;
-	@Mock SystemLogger logger;
+	@Mock EmergencyLog logger;
 	@Mock APIContributor apiContributor1;
 	@Mock APIContributor apiContributor2;
 	Set<APIContributor> apiContributors;

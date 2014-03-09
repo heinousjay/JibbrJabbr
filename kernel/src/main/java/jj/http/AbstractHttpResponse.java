@@ -103,11 +103,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 		}
 		return this;
 	}
-
-	/**
-	 * @param name
-	 * @return
-	 */
+	
 	@Override
 	public boolean containsHeader(String name) {
 		return response.headers().contains(name);

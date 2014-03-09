@@ -6,8 +6,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.ScriptableObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Parses a JSON string into an object suitable to be
@@ -17,8 +15,6 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public class ScriptJSON {
-	
-	private final Logger log = LoggerFactory.getLogger(ScriptJSON.class);
 	
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -41,8 +37,8 @@ public class ScriptJSON {
 		try (RhinoContext context = contextProvider.get()) {
 			return context.newJsonParser(scope).parseValue(emptyOrInput(input).trim());
 		} catch (Exception e) {
-			//log.warn("couldn't JSON.parse {}", input);
-			log.warn("", e);
+			// TODO maybe an event here? this can happen if people are feeding us crap
+			// and logging that may or may not be helpful
 			return null;
 		}
 	}

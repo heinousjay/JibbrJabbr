@@ -25,6 +25,7 @@ import javax.net.SocketFactory;
 
 import jj.configuration.Arguments;
 import jj.configuration.Configuration;
+import jj.event.Publisher;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +50,8 @@ public class HttpServerTest {
 	@Mock Configuration configuration;
 	
 	@Mock Arguments arguments;
+	
+	@Mock Publisher publisher;
 	
 	HttpServerSocketConfiguration config = new HttpServerSocketConfiguration() {
 		
@@ -135,7 +138,13 @@ public class HttpServerTest {
 		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
 		given(arguments.get("httpServer", boolean.class, true)).willReturn(true);
 		given(arguments.get("httpPort", int.class, -1)).willReturn(5678);
-		HttpServer httpServer = new HttpServer(new MockJJNioEventLoopGroup(), new HttpServerChannelInitializer(engineProvider), configuration, arguments);
+		HttpServer httpServer = new HttpServer(
+			new MockJJNioEventLoopGroup(),
+			new HttpServerChannelInitializer(engineProvider),
+			configuration,
+			arguments,
+			publisher
+		);
 		
 		try {
 			// when
@@ -158,7 +167,13 @@ public class HttpServerTest {
 		
 		// given
 		given(arguments.get("httpPort", int.class, -1)).willReturn(-1);
-		httpServer = new HttpServer(new MockJJNioEventLoopGroup(), new HttpServerChannelInitializer(engineProvider), configuration, arguments);
+		httpServer = new HttpServer(
+			new MockJJNioEventLoopGroup(),
+			new HttpServerChannelInitializer(engineProvider),
+			configuration,
+			arguments,
+			publisher
+		);
 
 		try {
 			// when

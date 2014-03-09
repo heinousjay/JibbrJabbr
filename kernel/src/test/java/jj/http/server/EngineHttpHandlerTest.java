@@ -39,7 +39,7 @@ import jj.http.server.EngineHttpHandler;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,7 +61,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 @RunWith(MockitoJUnitRunner.class)
 public class EngineHttpHandlerTest {
 	
-	@Mock SystemLogger logger;
+	@Mock EmergencyLog logger;
 	@Mock ChannelHandlerContext ctx;
 	@Mock Channel channel;
 	@Mock ChannelFuture channelFuture;

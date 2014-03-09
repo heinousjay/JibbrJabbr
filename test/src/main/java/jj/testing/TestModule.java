@@ -68,6 +68,8 @@ class TestModule extends JJModule {
 		
 		bind(Description.class).toInstance(description);
 		
+		bindLoggedEvents().annotatedWith(TestRunnerLogger.class).toLogger("test runner");
+		
 		if (!withHttpServer) {
 			bind(FullHttpRequest.class).toInstance(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"));
 			bind(Channel.class).toInstance(mock(Channel.class));

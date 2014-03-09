@@ -32,7 +32,7 @@ import jj.engine.ContributesScript;
 import jj.engine.EngineAPI;
 import jj.engine.EngineAPIImpl;
 import jj.engine.HostObject;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 
@@ -110,7 +110,7 @@ abstract class AbstractEngineApiTest {
 		}
 	}
 	
-	@Mock SystemLogger logger;
+	@Mock EmergencyLog logger;
 
 	protected final String scriptName() {
 		return getClass().getSimpleName() + ".js";

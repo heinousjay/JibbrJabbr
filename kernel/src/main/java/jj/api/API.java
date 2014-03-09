@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.script.RhinoContext;
 
 import org.mozilla.javascript.RhinoException;
@@ -41,7 +41,7 @@ class API {
 	
 	private final RequireFunction requireFunction;
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	private final ScriptableObject global;
 	
@@ -49,7 +49,7 @@ class API {
 	API(
 		final Provider<RhinoContext> contextProvider,
 		final RequireFunction requireFunction,
-		final SystemLogger logger,
+		final EmergencyLog logger,
 		final Set<APIContributor> apiContributors
 	) {
 		this.requireFunction = requireFunction;

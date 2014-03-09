@@ -110,7 +110,7 @@ public class ResourceWatchServiceIntegrationTest {
 	CountDownLatch latch;
 	
 	@Listener
-	void resourceLoaded(ResourceReloadedEvent event) {
+	void resourceLoaded(ResourceReloaded event) {
 		if (waiting != null && event.matches(waiting)) {
 			latch.countDown();
 			waiting = null;

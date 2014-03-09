@@ -20,7 +20,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 /**
  * @author jason
@@ -29,10 +29,10 @@ import jj.logging.SystemLogger;
 @Singleton
 class JJUncaughtExceptionHandler implements UncaughtExceptionHandler {
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	@Inject
-	JJUncaughtExceptionHandler(final SystemLogger logger) {
+	JJUncaughtExceptionHandler(final EmergencyLog logger) {
 		this.logger = logger;
 	}
 

@@ -13,11 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.http.server;
+
+import org.slf4j.Logger;
+
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
+
 /**
- * Classes to abstract and manage the HTTP client.  This package is mainly a sketch,
- * not a guarantee - make it top-level, and implement it as a module!
- * 
  * @author jason
  *
  */
-package jj.http.client;
+@ServerLogger
+class HttpServerStarted implements LoggedEvent {
+
+	@Override
+	public void describeTo(Logger logger) {
+		logger.info("http server started");
+	}
+
+}

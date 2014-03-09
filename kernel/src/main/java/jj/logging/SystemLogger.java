@@ -15,21 +15,154 @@
  */
 package jj.logging;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.MDC;
+
 import jj.Closer;
+import jj.JJServerStartupListener;
+import jj.event.Listener;
+import jj.event.Subscriber;
+import jj.execution.ServerTask;
+import jj.execution.TaskRunner;
 
 /**
+ * Coordinates asynchronous logging with the logging configuration system.  Also provides
+ * the implementation of the EmergencyLog for now, but that may change and/or go away
+ * 
  * @author jason
  *
  */
-public interface SystemLogger {
+@Singleton
+@Subscriber
+class SystemLogger implements EmergencyLog, JJServerStartupListener {
+	
+	static final String THREAD_NAME = "thread";
 
-	void log(LoggedEvent event);
+	private static class EventBundle {
+		final LoggedEvent event;
+		final String threadName;
+		
+		EventBundle(LoggedEvent event) {
+			this.event = event;
+			this.threadName = Thread.currentThread().getName();
+		}
+	}
 	
-	Closer threadName(String threadName);
+	private final BlockingQueue<EventBundle> events = new LinkedBlockingQueue<>();
 	
-	void error(String message, Throwable t);
+	private final TaskRunner taskRunner;
 	
-	void error(String message, Object...args);
+	private final Loggers loggers;
 	
-	void warn(String message, Object...args);
+	@Inject
+	SystemLogger(final TaskRunner taskRunner, final Loggers loggers) {
+		this.taskRunner = taskRunner;
+		this.loggers = loggers;
+	}
+	
+
+
+	@Override
+	public void start() throws Exception {
+		taskRunner.execute(new ServerTask("System Logger") {
+			
+			@Override
+			protected void run() throws Exception {
+				for (;;) {
+					EventBundle bundle = events.take();
+					Logger logger = loggers.findLogger(bundle.event);
+					try (Closer closer = threadName(bundle.threadName)) {
+						System.out.println("hi asshole " + bundle.threadName);
+						bundle.event.describeTo(logger);
+					}
+					
+				}
+			}
+		});
+	}
+	
+	private Closer threadName(String threadName) {
+		MDC.put(THREAD_NAME, threadName);
+		return new Closer() {
+			
+			@Override
+			public void close() {
+				MDC.remove(THREAD_NAME);
+			}
+		};
+	}
+	
+	/**
+	 * The actual main interface to the logging system, not intended for
+	 * direct use.  Publish some correctly annotated descendent of
+	 * LoggedEvent instead.
+	 */
+	@Listener
+	void log(LoggedEvent event) {
+		events.add(new EventBundle(event));
+	}
+	
+
+	
+	@EmergencyLogger
+	private static class Emergency implements LoggedEvent {
+		
+		private final boolean error;
+		private final String message;
+		private final Throwable t;
+		private final Object[] args;
+		
+		Emergency(boolean error, String message, Throwable t) {
+			this.error = error;
+			this.message = message;
+			this.t = t;
+			this.args = null;
+		}
+		
+		Emergency(boolean error, String message, Object...args) {
+			this.error = error;
+			this.message = message;
+			this.t = null;
+			this.args = args;
+		}
+
+		@Override
+		public void describeTo(Logger logger) {
+			if (error && t != null) {
+				logger.error(message, t);
+			} else if (error) {
+				logger.error(message, args);
+			} else {
+				logger.warn(message, args);
+			}
+		}
+		
+	}
+	
+	@Override
+	public void error(String message, Object... args) {
+		log(new Emergency(true, message, args));
+	}
+	
+	@Override
+	public void error(String message, Throwable t) {
+		log(new Emergency(true, message, t));
+	}
+	
+	@Override
+	public void warn(String message, Object... args) {
+		log(new Emergency(false, message, args));
+	}
+
+	@Override
+	public Priority startPriority() {
+		return Priority.Highest;
+	}
+
 }

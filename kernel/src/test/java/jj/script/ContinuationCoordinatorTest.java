@@ -26,7 +26,7 @@ import java.util.Map;
 
 import jj.http.client.RestRequest;
 import jj.jjmessage.JJMessage;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.script.resource.RequiredModule;
 
 import org.junit.Before;
@@ -68,7 +68,7 @@ public class ContinuationCoordinatorTest {
 	
 	ContinuationState continuationState;
 	
-	@Mock SystemLogger logger;
+	@Mock EmergencyLog logger;
 	
 	@Mock Callable function;
 

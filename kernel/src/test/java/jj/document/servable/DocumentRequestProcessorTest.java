@@ -38,7 +38,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Callable;
-import org.slf4j.Logger;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentRequestProcessorTest {
@@ -59,7 +58,6 @@ public class DocumentRequestProcessorTest {
 	CurrentDocumentRequestProcessor currentDocument;
 	
 	@Mock Channel channel;
-	@Mock Logger access;
 	
 	@Mock HttpRequest httpRequest;
 	HttpResponse httpResponse;

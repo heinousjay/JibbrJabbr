@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.logging;
+package jj.resource;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import javax.inject.Qualifier;
+import jj.configuration.AppLocation;
 
 /**
- * Annotates a Logger parameter to get the
- * Access logger instance.
  * @author jason
  *
  */
-@Qualifier
-@Documented
-@Target({ElementType.METHOD,ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface AccessLogger {
+public class ResourceReloaded extends ResourceEvent {
 
+	public ResourceReloaded(Class<? extends Resource> resourceClass, final AppLocation base, String name, Object...arguments) {
+		super(resourceClass, base, name, arguments);
+	}
+
+	@Override
+	protected String description() {
+		return "resource reloaded";
+	}
 }

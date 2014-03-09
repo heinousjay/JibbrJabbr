@@ -1,6 +1,5 @@
 package jj.logging;
 
-import static jj.logging.LoggingModule.*;
 import static ch.qos.logback.classic.Level.*;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
@@ -52,7 +51,7 @@ class LogConfigurator {
 	    PatternLayoutEncoder encoder = new PatternLayoutEncoder();
 	    encoder.setContext(loggerContext);
 	    // %highlight(%-5level) %cyan(%logger{15})
-	    encoder.setPattern("%date{HH:mm:ss.SSS} [%mdc{thread}] %-5level %logger - %message%n%rootException");
+	    encoder.setPattern("%-5level %date{HH:mm:ss.SSS} %logger: %message >> [%mdc{thread}]%n%rootException");
 	    encoder.start();
 
 	    ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<ILoggingEvent>();
@@ -68,15 +67,14 @@ class LogConfigurator {
  		// just play with this!
  		infoAll();
  		
- 		accessLogger(OFF);
+ 		accessLogger(TRACE);
  		
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+ 		logger(NETTY_LOGGER, OFF);
 	}
 	
 	protected void executionLogging() {
 		rootLogger.setLevel(TRACE);
-		
-		nettyLogger(OFF);
 		
 		jjLogger(OFF);
 		
@@ -87,32 +85,32 @@ class LogConfigurator {
 		traceLogger(TRACE);
 	}
 	
+	private void logger(String name, Level level) {
+		((Logger)LoggerFactory.getLogger(name)).setLevel(level);
+	}
+	
 	protected void emergencyLogger(Level level) {
-		((Logger)LoggerFactory.getLogger(EMERGENCY_LOGGER)).setLevel(level);
+		logger("emergency", level);
 	}
 	
 	protected void testLogger(Level level) {
-		((Logger)LoggerFactory.getLogger(TEST_RUNNER_LOGGER)).setLevel(level);
+		logger("test runner", level);
 	}
 	
 	protected void accessLogger(Level level) {
-		((Logger)LoggerFactory.getLogger(ACCESS_LOGGER)).setLevel(level);
+		logger("access", level);
 	}
 	
 	protected void traceLogger(Level level) {
-		((Logger)LoggerFactory.getLogger("execution trace")).setLevel(level);
+		logger("execution trace", level);
 	}
 	
 	protected void serverLogger(Level level) {
-		((Logger)LoggerFactory.getLogger("server")).setLevel(level);
-	}
-	
-	protected void nettyLogger(Level level) {
-		((Logger)LoggerFactory.getLogger(NETTY_LOGGER)).setLevel(level);
+		logger("server", level);
 	}
 	
 	protected void jjLogger(Level level) {
-		((Logger)LoggerFactory.getLogger(JJ_LOGGER)).setLevel(level);
+		logger(JJ_LOGGER, level);
 	}
 	
 	protected void infoAll() {

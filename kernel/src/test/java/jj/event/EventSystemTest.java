@@ -33,7 +33,7 @@ import jj.event.help.IEvent;
 import jj.event.help.Sub;
 import jj.execution.MockTaskRunner;
 import jj.execution.TaskRunner;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +55,7 @@ import com.google.inject.Injector;
 public class EventSystemTest {
 	
 	final Exception toThrow = new Exception();
-	@Mock SystemLogger logger;
+	@Mock EmergencyLog logger;
 	
 	MockTaskRunner taskRunner;
 	
@@ -63,7 +63,7 @@ public class EventSystemTest {
 	public static class EventManagerChild extends EventManager {
 		
 		@Inject
-		public EventManagerChild(final SystemLogger logger) {
+		public EventManagerChild(final EmergencyLog logger) {
 			super(logger);
 		}
 		
@@ -105,7 +105,7 @@ public class EventSystemTest {
 			
 			@Override
 			protected void configure() {
-				bind(SystemLogger.class).toInstance(logger);
+				bind(EmergencyLog.class).toInstance(logger);
 				bind(TaskRunner.class).to(MockTaskRunner.class);
 				bind(Exception.class).toInstance(toThrow);
 			}

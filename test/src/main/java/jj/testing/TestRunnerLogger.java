@@ -13,11 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.testing;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
+
 /**
- * Classes to abstract and manage the HTTP client.  This package is mainly a sketch,
- * not a guarantee - make it top-level, and implement it as a module!
- * 
  * @author jason
  *
  */
-package jj.http.client;
+@Qualifier
+@Documented
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TestRunnerLogger {
+
+}

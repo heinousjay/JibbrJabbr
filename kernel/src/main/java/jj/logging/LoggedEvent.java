@@ -18,9 +18,9 @@ package jj.logging;
 import org.slf4j.Logger;
 
 /**
- * extended by events that should be logged to some
- * logger as determined by a system i, as yet, have not
- * created
+ * implemented by events that should be logged to some
+ * logger as determined by a registered mapping of
+ * annotation -> logger name.
  * 
  * @author jason
  *

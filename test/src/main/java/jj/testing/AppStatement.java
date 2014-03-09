@@ -19,26 +19,24 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerLifecycle;
-import jj.logging.TestRunnerLogger;
 
 import org.junit.runners.model.Statement;
-import org.slf4j.Logger;
 
 @Singleton
 public class AppStatement extends Statement {
 	
 	private final JJServerLifecycle lifecycle;
-	private final Logger logger;
+	private final TestLog testLog;
 	private final Statement base;
 	
 	@Inject
 	AppStatement(
 		final JJServerLifecycle lifecycle,
-		@TestRunnerLogger Logger logger,
+		final TestLog testLog,
 		final Statement base
 	) {
 		this.lifecycle = lifecycle;
-		this.logger = logger;
+		this.testLog = testLog;
 		this.base = base;
 	}
 	
@@ -48,15 +46,15 @@ public class AppStatement extends Statement {
 	public void evaluate() throws Throwable {
 		long start = System.nanoTime();
 		try {
-			logger.info("============================================================");
-			logger.info(" Starting the server.");
+			testLog.info("============================================================");
+			testLog.info(" Starting the server.");
 			lifecycle.start();
 			base.evaluate();
 		} finally {
 			lifecycle.stop();
-			logger.info(" Server stopped.");
-			logger.info("finished in {} nanos", System.nanoTime() - start);
-			logger.info("============================================================");
+			testLog.info(" Server stopped.");
+			testLog.info("finished in {} nanos", System.nanoTime() - start);
+			testLog.info("============================================================");
 		}
 	}
 	

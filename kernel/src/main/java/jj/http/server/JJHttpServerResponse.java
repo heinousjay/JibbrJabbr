@@ -16,23 +16,15 @@
 package jj.http.server;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Date;
-import java.util.Map.Entry;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-
-import jj.DateFormatHelper;
 import jj.Version;
+import jj.event.Publisher;
 import jj.http.AbstractHttpResponse;
-import jj.http.HttpRequest;
 import jj.http.HttpResponse;
-import jj.logging.AccessLogger;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import io.netty.channel.ChannelFuture;
@@ -54,9 +46,9 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private final ChannelHandlerContext ctx;
 	
-	private final Logger access;
+	private final EmergencyLog logger;
 	
-	private final SystemLogger logger;
+	private final Publisher publisher;
 	
 	/**
 	 * @param response
@@ -66,13 +58,13 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		final Version version,
 		final JJHttpServerRequest request,
 		final ChannelHandlerContext ctx,
-		final @AccessLogger Logger access,
-		final SystemLogger logger
+		final EmergencyLog logger,
+		final Publisher publisher
 	) {
 		this.request = request;
 		this.ctx = ctx;
-		this.access = access;
 		this.logger = logger;
+		this.publisher = publisher;
 		header(HttpHeaders.Names.SERVER, String.format(
 			"%s/%s (%s)",
 			version.name(),
@@ -86,7 +78,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 			f.addListener(ChannelFutureListener.CLOSE);
 		}
 		
-		log();
+		publisher.publish(new RequestResponded(request, this));
 		
 		return f;
 	}
@@ -137,64 +129,6 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		
 		markCommitted();
 		return this;
-	}
-	
-	// move all of this to a higher-level handler
-	
-	private void log() {
-		
-		access.info(
-			"request for [{}] completed in {} milliseconds (wall time) (stats events!)",
-			request.uri(),
-			request.wallTime()
-		);
-		
-		if (access.isInfoEnabled()) {
-			access.info("{} - - {} \"{} {} {}\" {} {} {} \"{}\"", 
-				extractIP(request.remoteAddress()),
-				DateFormatHelper.nowInAccessLogFormat(),
-				request.method(),
-				request.request().getUri(),
-				request.request().getProtocolVersion(),
-				response.getStatus(),
-				extractContentLength(),
-				extractReferer(request),
-				request.header(HttpHeaders.Names.USER_AGENT)
-			);
-		}
-		
-		if (access.isTraceEnabled()) {
-			access.trace("Request Headers");
-			for (Entry<String, String> header : request.allHeaders()) {
-				access.trace(header.getKey() + " : " + header.getValue());
-			}
-			
-			access.trace("Response Headers");
-			for (Entry<String, String> header : response.headers().entries()) {
-				access.trace(header.getKey() + " : " + header.getValue());
-			}
-		}
-	}
-	
-	private String extractIP(final SocketAddress remoteAddress) {
-		
-		return (remoteAddress instanceof InetSocketAddress) ? 
-			((InetSocketAddress)remoteAddress).getAddress().getHostAddress() : 
-			remoteAddress.toString();
-	}
-	
-	private String extractReferer(final HttpRequest request) {
-		
-		return request.hasHeader(HttpHeaders.Names.REFERER) ?
-			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :
-			"-";
-	}
-	
-	private String extractContentLength() {
-		if (response.headers().contains(HttpHeaders.Names.CONTENT_LENGTH)) {
-			return String.valueOf(response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
-		}
-		return "0";
 	}
 
 	/**

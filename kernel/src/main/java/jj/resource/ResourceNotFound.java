@@ -15,20 +15,27 @@
  */
 package jj.resource;
 
+import org.slf4j.Logger;
+
 import jj.configuration.AppLocation;
 
 /**
  * @author jason
  *
  */
-public class ResourceLoadedEvent extends ResourceEvent {
-
-	public ResourceLoadedEvent(Class<? extends Resource> resourceClass, final AppLocation base, String name, Object...arguments) {
+public class ResourceNotFound extends ResourceEvent {
+	
+	public ResourceNotFound(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
 		super(resourceClass, base, name, arguments);
 	}
-
+	
 	@Override
-	public String description() {
-		return "resource loaded";
+	protected String description() {
+		return "resource not found";
+	}
+	
+	@Override
+	public void describeTo(Logger logger) {
+		logger.trace("{} - {} at {}", description(), resourceClass, name);
 	}
 }

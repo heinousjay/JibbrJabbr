@@ -13,11 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.resource;
+
+import jj.configuration.AppLocation;
+
 /**
- * Classes to abstract and manage the HTTP client.  This package is mainly a sketch,
- * not a guarantee - make it top-level, and implement it as a module!
- * 
  * @author jason
  *
  */
-package jj.http.client;
+public class ResourceLoaded extends ResourceEvent {
+
+	public ResourceLoaded(Class<? extends Resource> resourceClass, final AppLocation base, String name, Object...arguments) {
+		super(resourceClass, base, name, arguments);
+	}
+
+	@Override
+	public String description() {
+		return "resource loaded";
+	}
+}

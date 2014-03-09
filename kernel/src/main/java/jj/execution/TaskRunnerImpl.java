@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.Closer;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 /**
  * exposes some execution related information and
@@ -26,7 +26,7 @@ class TaskRunnerImpl implements TaskRunner {
 
 	private final ExecutorBundle executors;
 	private final CurrentTask currentTask;
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	private final DelayQueue<JJTask> queuedTasks = new DelayQueue<>();
 	
@@ -46,7 +46,7 @@ class TaskRunnerImpl implements TaskRunner {
 	TaskRunnerImpl(
 		final ExecutorBundle bundle,
 		final CurrentTask currentTask,
-		final SystemLogger logger
+		final EmergencyLog logger
 	) {
 		this.executors = bundle;
 		this.currentTask = currentTask;
@@ -73,7 +73,7 @@ class TaskRunnerImpl implements TaskRunner {
 				String threadName = oldName + " - " + task.name();
 				Thread.currentThread().setName(threadName);
 				
-				try (Closer mdcCloser = logger.threadName(threadName)) {
+				
 					
 					boolean interrupted = false;
 					queuedTasks.remove(task);
@@ -103,7 +103,7 @@ class TaskRunnerImpl implements TaskRunner {
 							}
 						}
 					}
-				}
+
 			}
 		});
 		

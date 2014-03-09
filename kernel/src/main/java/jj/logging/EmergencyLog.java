@@ -13,11 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.logging;
+
 /**
- * Classes to abstract and manage the HTTP client.  This package is mainly a sketch,
- * not a guarantee - make it top-level, and implement it as a module!
+ * <p>
+ * A component to log emergencies that haven't yet been / may not
+ * ever be converted to events.  Uses the event system internally.
+ * Points of use of this class should be considered carefully as
+ * events.  This may be a temporary measure on the road to doing
+ * that conversion, but i wanted to make sure that errors were going
+ * to be logged all the time while i figured that angle out
  * 
  * @author jason
  *
  */
-package jj.http.client;
+public interface EmergencyLog {
+	
+	
+	void error(String message, Throwable t);
+	
+	void error(String message, Object...args);
+	
+	void warn(String message, Object...args);
+}

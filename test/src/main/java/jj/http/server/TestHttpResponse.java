@@ -16,6 +16,7 @@
 package jj.http.server;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -27,19 +28,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
-import jj.logging.TestRunnerLogger;
 import jj.resource.MimeTypes;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
+import jj.testing.TestLog;
 import jj.http.AbstractHttpResponse;
 import jj.http.HttpResponse;
-
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -51,15 +50,15 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	private int id = 0;
 	
-	private final Logger testRunnerLogger;
+	private final TestLog testLog;
 	
 	private final AtomicBoolean gotOnce = new AtomicBoolean(true);
 	
 	@Inject
 	TestHttpResponse(
-		final @TestRunnerLogger Logger testRunnerLogger
+		final TestLog testLog
 	) {
-		this.testRunnerLogger = testRunnerLogger;
+		this.testLog = testLog;
 	}
 	
 	void id(int id) {
@@ -79,7 +78,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	public TestHttpResponse end() {
 		markCommitted();
-		testRunnerLogger.debug("end called on {}", this);
+		testLog.trace("request ended");
 		processResponse();
 		ended = true;
 		return this;
@@ -95,7 +94,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	private volatile Throwable error = null;
 
 	public TestHttpResponse error(Throwable t) {
-		testRunnerLogger.error("request errored", t);
+		testLog.info("request errored", t);
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		error = t;
 		return this;

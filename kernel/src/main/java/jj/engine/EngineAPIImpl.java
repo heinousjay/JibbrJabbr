@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.script.RhinoContext;
 
 import org.mozilla.javascript.RhinoException;
@@ -22,13 +22,13 @@ class EngineAPIImpl implements EngineAPI {
 	
 	private final ScriptableObject global;
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	@Inject
 	EngineAPIImpl(
 		final Provider<RhinoContext> contextProvider,
 		final Set<HostObject> hostObjects,
-		final SystemLogger logger
+		final EmergencyLog logger
 	) {
 		try (RhinoContext context = contextProvider.get()) {
 			global = initializeGlobalScope(context, hostObjects);

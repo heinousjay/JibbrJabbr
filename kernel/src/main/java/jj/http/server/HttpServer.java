@@ -28,15 +28,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.JJServerStartupListener;
 import jj.ServerStopping;
 import jj.StringUtils;
 import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 import jj.event.Listener;
+import jj.event.Publisher;
 import jj.event.Subscriber;
 
 /**
@@ -58,8 +56,6 @@ class HttpServer implements JJServerStartupListener {
 		}
 	};
 	
-	private final Logger logger = LoggerFactory.getLogger(HttpServer.class);
-	
 	private final JJNioEventLoopGroup ioEventLoopGroup;
 	
 	private final HttpServerChannelInitializer initializer;
@@ -70,6 +66,8 @@ class HttpServer implements JJServerStartupListener {
 	
 	private final Arguments arguments;
 	
+	private final Publisher publisher;
+	
 	private final boolean run;
 	
 	@Inject
@@ -77,12 +75,14 @@ class HttpServer implements JJServerStartupListener {
 		final JJNioEventLoopGroup ioEventLoopGroup,
 		final HttpServerChannelInitializer initializer,
 		final Configuration configuration,
-		final Arguments arguments
+		final Arguments arguments,
+		final Publisher publisher
 	) {
 		this.ioEventLoopGroup = ioEventLoopGroup;
 		this.initializer = initializer;
 		this.configuration = configuration;
 		this.arguments = arguments;
+		this.publisher = publisher;
 		run = arguments.get("httpServer", boolean.class, true);
 	}
 	
@@ -99,7 +99,7 @@ class HttpServer implements JJServerStartupListener {
 			
 			bindPorts(bindings);
 			
-			logger.info("Server started");
+			publisher.publish(new HttpServerStarted());
 		}
 	}
 
@@ -111,10 +111,10 @@ class HttpServer implements JJServerStartupListener {
 				int port = binding.port();
 				
 				if (!StringUtils.isEmpty(host)) {
-					logger.info("Binding to {}:{}", host, port);
+					publisher.publish(new BindingHttpServer(host, port));
 					serverBootstrap.bind(host, port).sync();
 				} else {
-					logger.info("Binding to {}", port);
+					publisher.publish(new BindingHttpServer(null, port));
 					serverBootstrap.bind(port).sync();
 				}
 			}
@@ -195,7 +195,7 @@ class HttpServer implements JJServerStartupListener {
 			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
 			serverBootstrap.childGroup().shutdownGracefully();
 			serverBootstrap = null;
-			logger.info("Server shut down");
+			publisher.publish(new HttpServerStopped());
 		}
 	}
 

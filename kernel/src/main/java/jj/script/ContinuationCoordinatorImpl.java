@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
 import jj.Closer;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 /**
  * Coordinates processing a continuable script, returning the 
@@ -24,7 +24,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		void run(RhinoContext context);
 	}
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -38,7 +38,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	ContinuationCoordinatorImpl(
 		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptEnvironment env,
-		final SystemLogger logger,
+		final EmergencyLog logger,
 		final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors,
 		final ContinuationPendingCache cache
 	) {

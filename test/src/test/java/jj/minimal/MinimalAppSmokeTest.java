@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author jason
  *
  */
-public class MinimalTest {
+public class MinimalAppSmokeTest {
 	
 	// this could also be a helper class that inspects system properties or vm args or whatever
 	private static final Class<? extends WebDriverProvider> DRIVER_PROVIDER = PhantomJSWebDriverProvider.class;

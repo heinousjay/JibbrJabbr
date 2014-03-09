@@ -18,9 +18,6 @@ package jj.jasmine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.JJServerStartupListener;
 import jj.configuration.AppLocation;
 import jj.event.Listener;
@@ -37,8 +34,6 @@ import jj.script.resource.ScriptResource;
 @Singleton
 @Subscriber
 public class SpecRunner implements JJServerStartupListener {
-	
-	private final Logger logger = LoggerFactory.getLogger(SpecRunner.class);
 
 	private final ResourceFinder resourceFinder;
 	
@@ -66,8 +61,6 @@ public class SpecRunner implements JJServerStartupListener {
 			
 			scriptResource.addDependent(specResource);
 			specResource.addDependent(scriptResource);
-			
-			logger.info("running a spec!");
 		}
 	}
 

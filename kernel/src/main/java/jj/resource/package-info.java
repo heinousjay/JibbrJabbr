@@ -38,9 +38,9 @@
  * {@link ResourceEvent}, which in turn descends from {@link ExecutionEvent}
  * 
  * <ul>
- * <li>{@link ResourceLoadedEvent} when a resource is loaded
- * <li>{@link ResourceNotFoundEvent} when a resource was requested but not found
- * <li>{@link ResourceReloadedEvent} when a resource is being reloaded
+ * <li>{@link ResourceLoaded} when a resource is loaded
+ * <li>{@link ResourceNotFound} when a resource was requested but not found
+ * <li>{@link ResourceReloaded} when a resource is being reloaded
  * <li> a remove event?
  * <li> an error event?
  * </ul>

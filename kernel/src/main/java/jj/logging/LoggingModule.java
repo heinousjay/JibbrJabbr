@@ -16,20 +16,12 @@
 package jj.logging;
 
 import jj.JJModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Provides;
 
 /**
  * @author jason
  *
  */
 public class LoggingModule extends JJModule {
-	
-	static final String ACCESS_LOGGER = "access";
-	static final String TEST_RUNNER_LOGGER = "test runner";
-	static final String EMERGENCY_LOGGER = "emergency";
 	
 	private final boolean isTest;
 	
@@ -41,21 +33,12 @@ public class LoggingModule extends JJModule {
 	protected void configure() {
 		
 		// this gets instantiated before anything might write to a log
+		// actually that won't matter anymore soon! yay! the "test" parameter can get killed off
 		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
 		
-		bind(SystemLogger.class).to(SystemLoggerImpl.class);
-		addStartupListenerBinding().to(SystemLoggerImpl.class);
+		bind(EmergencyLog.class).to(SystemLogger.class);
+		addStartupListenerBinding().to(SystemLogger.class);
 		
-	}
-	
-	@Provides @AccessLogger
-	public Logger provideAccessLogger() {
-		return LoggerFactory.getLogger(ACCESS_LOGGER);
-	}
-	
-	@Provides @TestRunnerLogger
-	public Logger provideTestRunnerLogger() {
-		return LoggerFactory.getLogger(TEST_RUNNER_LOGGER);
 	}
 
 }

@@ -22,7 +22,7 @@ import jj.configuration.Application;
 import jj.configuration.Configuration;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceMaker;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
 import jj.script.resource.ScriptResource;
@@ -34,17 +34,17 @@ import jj.script.resource.ScriptResourceMaker;
  */
 public class ResourceMaker {
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	private final Application app;
 	private final ResourceInstanceCreator creator;
 	
 	public ResourceMaker(final Configuration configuration, final Application app) throws Exception {
 		this.app = app;
-		logger = mock(SystemLogger.class);
+		logger = mock(EmergencyLog.class);
 		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);
 	}
 	
-	public ResourceMaker(Configuration configuration, final Application app, SystemLogger logger) throws Exception {
+	public ResourceMaker(Configuration configuration, final Application app, EmergencyLog logger) throws Exception {
 		this.app = app;
 		this.logger = logger;
 		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);

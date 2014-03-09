@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.http.server;
 
 import org.slf4j.Logger;
 
-import jj.configuration.AppLocation;
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class ResourceNotFoundEvent extends ResourceEvent {
+@ServerLogger
+class BindingHttpServer implements LoggedEvent {
 	
-	public ResourceNotFoundEvent(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
-		super(resourceClass, base, name, arguments);
+	private final String host;
+	private final int port;
+	
+	BindingHttpServer(String host, int port) {
+		this.host = host;
+		this.port = port;
 	}
-	
-	@Override
-	protected String description() {
-		return "resource not found";
-	}
-	
+
 	@Override
 	public void describeTo(Logger logger) {
-		// for now, not at all.
-		// TODO enable this later, probably keep at trace level
-		//logger.trace("{} - {} at {}", description(), resourceClass, name);
+		if (host == null) {
+			logger.info("Binding to {}", port);
+		} else {
+			logger.info("Binding to {}:{}", host, port);
+		}
 	}
+
 }

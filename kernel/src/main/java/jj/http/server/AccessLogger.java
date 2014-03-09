@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.http.server;
 
-import jj.configuration.AppLocation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Annotates a Logger parameter to get the
+ * Access logger instance.
  * @author jason
  *
  */
-public class ResourceReloadedEvent extends ResourceEvent {
+@Documented
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@interface AccessLogger {
 
-	public ResourceReloadedEvent(Class<? extends Resource> resourceClass, final AppLocation base, String name, Object...arguments) {
-		super(resourceClass, base, name, arguments);
-	}
-
-	@Override
-	protected String description() {
-		return "resource reloaded";
-	}
 }

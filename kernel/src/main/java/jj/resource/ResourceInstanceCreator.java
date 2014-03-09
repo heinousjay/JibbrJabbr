@@ -22,7 +22,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -42,13 +42,13 @@ public class ResourceInstanceCreator {
 
 	private final Injector parentInjector;
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	@Inject
 	ResourceInstanceCreator(
 		final Application app,
 		final Injector parentInjector,
-		final SystemLogger logger
+		final EmergencyLog logger
 	) {
 		this.app = app;
 		this.parentInjector = parentInjector;

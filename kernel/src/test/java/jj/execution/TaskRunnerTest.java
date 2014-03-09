@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.script.ScriptEnvironment;
 
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class TaskRunnerTest {
 	
 	private CurrentTask currentTask;
 	
-	private @Mock SystemLogger logger;
+	private @Mock EmergencyLog logger;
 	
 	private TaskRunnerImpl executor;
 	

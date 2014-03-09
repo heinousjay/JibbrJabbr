@@ -27,9 +27,9 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceEvent;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceLoadedEvent;
+import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
-import jj.resource.ResourceNotFoundEvent;
+import jj.resource.ResourceNotFound;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
 import jj.script.DependsOnScriptEnvironmentInitialization;
@@ -72,7 +72,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	}
 	
 	@Listener
-	void resourceNotFound(final ResourceNotFoundEvent event) {
+	void resourceNotFound(final ResourceNotFound event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null) {
 			assert waiters.remove(requiredModule) != null : "something is crossed up in the " + getClass(); 
@@ -81,7 +81,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	}
 	
 	@Listener
-	void resourceLoaded(final ResourceLoadedEvent event) {
+	void resourceLoaded(final ResourceLoaded event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null) {
 			Boolean result = waiters.remove(requiredModule);

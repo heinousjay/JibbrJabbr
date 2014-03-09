@@ -19,13 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.junit.runner.Description;
-import org.slf4j.Logger;
-
 import jj.JJServerStartupListener;
 import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
-import jj.logging.TestRunnerLogger;
 
 /**
  * @author jason
@@ -35,18 +32,18 @@ import jj.logging.TestRunnerLogger;
 @Subscriber
 public class TestListener implements JJServerStartupListener {
 	
-	private final Logger testRunnerLogger;
+	private final TestLog testLog;
 	private final Description description;
 	
 	@Inject
-	TestListener(final @TestRunnerLogger Logger testRunnerLogger, final Description description) {
-		this.testRunnerLogger = testRunnerLogger;
+	TestListener(final TestLog testLog, final Description description) {
+		this.testLog = testLog;
 		this.description = description;
 	}
 
 	@Override
 	public void start() throws Exception {
-		testRunnerLogger.info("{} - test start", description);
+		testLog.info("{} - test start", description);
 	}
 	
 	@Override
@@ -56,7 +53,7 @@ public class TestListener implements JJServerStartupListener {
 
 	@Listener
 	public void stop(ServerStopping event) {
-		testRunnerLogger.info("{} - test end", description);
+		testLog.info("{} - test end", description);
 	}
 
 }

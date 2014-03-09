@@ -8,9 +8,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jj.configuration.AppLocation;
 import jj.configuration.AppLocation.AppLocationBundle;
 import jj.event.Publisher;
@@ -24,9 +21,6 @@ import jj.execution.CurrentTask;
  */
 @Singleton
 class ResourceFinderImpl implements ResourceFinder {
-	
-	// TODO pick a central logger for this stuff
-	private final Logger log = LoggerFactory.getLogger(ResourceFinderImpl.class);
 	
 	private final ConcurrentMap<ResourceCacheKey, ResourceTask> resourcesInProgress = PlatformDependent.newConcurrentHashMap();
 
@@ -128,8 +122,7 @@ class ResourceFinderImpl implements ResourceFinder {
 			result = resourceClass.cast(resourceCache.get(cacheKey));
 		
 		} catch (Exception e) {
-			log.error("trouble loading {} at  {}", resourceClass.getSimpleName(), cacheKey);
-			log.error("", e);
+			publisher.publish(new ResourceError(resourceClass, base, name, arguments, e));
 		} finally {
 			release(cacheKey);
 		}
@@ -160,14 +153,11 @@ class ResourceFinderImpl implements ResourceFinder {
 		T resource = resourceCreator.create(base, name, arguments);
 		
 		if (resource == null) {
-			publisher.publish(new ResourceNotFoundEvent(resourceCreator.type(), base, name, arguments));
+			publisher.publish(new ResourceNotFound(resourceCreator.type(), base, name, arguments));
 		} else {
 			if (resourceCache.replace(cacheKey, result, resource)) {
-				publisher.publish(new ResourceReloadedEvent(resource.getClass(), base, name, arguments));
-			} else {
-				System.err.println("resource replacement failed for " + resource);
-				log.warn("{} at {} replacement failed, someone snuck in behind me?", resourceCreator.type().getSimpleName(), cacheKey);
-			}
+				publisher.publish(new ResourceReloaded(resource.getClass(), base, name, arguments));
+			} // else we wasted our time, something else replaced it already
 		} 
 	}
 
@@ -181,9 +171,9 @@ class ResourceFinderImpl implements ResourceFinder {
 		
 		T resource = resourceCreator.create(base, name, arguments);
 		if (resource == null) {
-			publisher.publish(new ResourceNotFoundEvent(resourceCreator.type(), base, name, arguments));
+			publisher.publish(new ResourceNotFound(resourceCreator.type(), base, name, arguments));
 		} else {
-			publisher.publish(new ResourceLoadedEvent(resourceCreator.type(), base, name, arguments));
+			publisher.publish(new ResourceLoaded(resourceCreator.type(), base, name, arguments));
 			if (
 				resourceCache.putIfAbsent(cacheKey, resource) == null &&
 				resource instanceof FileResource

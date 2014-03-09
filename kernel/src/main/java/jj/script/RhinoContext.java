@@ -18,7 +18,7 @@ package jj.script;
 import javax.inject.Inject;
 
 import jj.Closer;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
@@ -42,11 +42,11 @@ public class RhinoContext implements Closer {
 	private final Context context;
 	private boolean closed = false;
 	
-	private final SystemLogger logger;
+	private final EmergencyLog logger;
 	
 	@Inject
 	RhinoContext(
-		final SystemLogger logger
+		final EmergencyLog logger
 	) {
 		this.context = Context.enter();
 		this.logger = logger;

@@ -13,24 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.logging;
+package jj.resource;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.slf4j.Logger;
 
-import javax.inject.Qualifier;
+import jj.configuration.AppLocation;
 
 /**
  * @author jason
  *
  */
-@Qualifier
-@Documented
-@Target({ElementType.METHOD,ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TestRunnerLogger {
+public class ResourceError extends ResourceEvent {
+
+	private final Throwable t;
+	
+	ResourceError(Class<? extends Resource> resourceClass, AppLocation base, String name, Object[] arguments, Throwable t) {
+		super(resourceClass, base, name, arguments);
+		this.t = t;
+	}
+
+	@Override
+	protected String description() {
+		return "error loading resource";
+	}
+	
+	@Override
+	public void describeTo(Logger logger) {
+		logger.error("{} - {} at {}/{}", description(), resourceClass, base, name);
+		logger.error("", t);
+	}
 
 }

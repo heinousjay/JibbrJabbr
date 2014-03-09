@@ -23,7 +23,7 @@ import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 import jj.document.servable.DocumentConfiguration;
 import jj.http.server.HttpServerSocketConfiguration;
-import jj.logging.SystemLogger;
+import jj.logging.EmergencyLog;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceMaker;
@@ -65,7 +65,7 @@ public class ConfigurationTest {
 	private Configuration toTest;
 	private ConfigurationClassLoader classLoader;
 	private @Mock ResourceFinder resourceFinder;
-	private @Mock SystemLogger logger;
+	private @Mock EmergencyLog logger;
 
 	@Before 
 	public void before() throws Exception {
@@ -81,7 +81,7 @@ public class ConfigurationTest {
 			protected void configure() {
 				bind(Converters.class).toInstance(new Converters(ConverterSetMaker.converters()));
 				bind(ResourceFinder.class).toInstance(resourceFinder);
-				bind(SystemLogger.class).toInstance(logger);
+				bind(EmergencyLog.class).toInstance(logger);
 			}
 		});
 	}
