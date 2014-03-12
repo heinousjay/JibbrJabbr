@@ -13,7 +13,7 @@ public class ScriptModule extends JJModule {
 		
 		bind(ContinuationCoordinator.class).to(ContinuationCoordinatorImpl.class);
 		
-		bindTaskRunner().toExecutor(ScriptExecutorFactory.class);
+		bindExecutor(ScriptExecutorFactory.class);
 		
 		addHostObjectBinding().to(MakeRequireFunction.class);
 		

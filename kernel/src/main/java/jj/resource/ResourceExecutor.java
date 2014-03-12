@@ -34,7 +34,7 @@ class ResourceExecutor extends ThreadPoolExecutor {
 		final JJRejectedExecutionHandler handler
 	) {
 		super(20, 20, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), 
-			threadFactory.namePattern("JibbrJabbr I/O Thread %d"), 
+			threadFactory.namePattern("JibbrJabbr Resource Thread %d"), 
 			handler
 		);
 		this.threadFactory = threadFactory;

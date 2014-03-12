@@ -30,7 +30,7 @@ public class ExecutionModule extends JJModule {
 	@Override
 	protected void configure() {
 
-		bindTaskRunner().toExecutor(ServerExecutor.class);
+		bindExecutor(ServerExecutor.class);
 		
 		// a good place to break apart crafty circular dependencies.  this is
 		// the most popular object in the system.  for good reason.

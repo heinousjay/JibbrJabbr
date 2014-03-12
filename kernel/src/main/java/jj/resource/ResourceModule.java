@@ -21,7 +21,7 @@ public class ResourceModule extends JJModule {
 	@Override
 	protected void configure() {
 
-		bindTaskRunner().toExecutor(ResourceExecutor.class);
+		bindExecutor(ResourceExecutor.class);
 		
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
 		

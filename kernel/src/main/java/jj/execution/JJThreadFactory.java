@@ -58,8 +58,11 @@ public class JJThreadFactory implements ThreadFactory {
 			@Override
 			public void run() {
 				flag.set(Boolean.TRUE);
-				r.run();
-				flag.set(null);
+				try {
+					r.run();
+				} finally {
+					flag.set(null);
+				}
 			}
 		}, name);
 		thread.setDaemon(true);

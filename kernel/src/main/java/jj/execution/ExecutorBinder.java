@@ -31,7 +31,7 @@ public class ExecutorBinder {
 		executorBinder = MapBinder.newMapBinder(binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<Object>() {});
 	}
 
-	public void toExecutor(Class<?> executor) {
+	public void addExecutor(Class<?> executor) {
 		executorBinder.addBinding(executor).to(executor);
 	}
 }

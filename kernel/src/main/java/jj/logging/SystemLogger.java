@@ -86,7 +86,8 @@ class SystemLogger implements EmergencyLog, JJServerStartupListener {
 		});
 	}
 	
-	private Closer threadName(String threadName) {
+	// package private because it is exposed in a test class
+	Closer threadName(String threadName) {
 		MDC.put(THREAD_NAME, threadName);
 		return new Closer() {
 			

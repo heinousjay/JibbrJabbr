@@ -81,6 +81,7 @@ public class CoreModule extends JJModule {
 		bindLoggedEvents().annotatedWith(ServerLogger.class).toLogger("server");
 		
 		// we need the logging module to configure our async logger before we do anything that might log
+		// this is no longer true! but who cares!
 		install(new LoggingModule(isTest));
 		
 		// first our key pieces

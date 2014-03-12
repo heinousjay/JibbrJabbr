@@ -98,11 +98,11 @@ public abstract class JJModule extends AbstractModule {
 		return dispatch;
 	}
 	
-	protected ExecutorBinder bindTaskRunner() {
+	protected void bindExecutor(Class<?> executor) {
 		if (executors == null) {
 			executors = new ExecutorBinder(binder());
 		}
-		return executors;
+		executors.addExecutor(executor);
 	}
 	
 	protected LoggingBinder bindLoggedEvents() {
