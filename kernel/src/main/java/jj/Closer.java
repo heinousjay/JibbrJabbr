@@ -16,9 +16,7 @@
 package jj;
 
 /**
- * A simple name to enable using try-with-resources to enclose system resource scopes
- * such as the currently executing ScriptEnvironment or the current WebSocketConnection
- * or Document being processed
+ * Try-with-resources with no exceptions by default
  * @author jason
  *
  */
