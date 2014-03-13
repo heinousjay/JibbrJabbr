@@ -49,7 +49,7 @@ public class Assets {
 	private final Set<String> paths;
 	
 	@Inject
-	Assets(final ResourceResolver resolver, final Set<String> paths) {
+	Assets(final ResourceResolver resolver, final @AssetPaths Set<String> paths) {
 		this.resolver = resolver;
 		this.paths = paths;
 	}

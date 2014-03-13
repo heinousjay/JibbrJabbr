@@ -15,8 +15,8 @@
  */
 package jj;
 
+import jj.configuration.AssetPaths;
 import jj.conversion.Converter;
-import jj.document.servable.DocumentFilter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
 import jj.logging.LoggingBinder;
@@ -34,9 +34,9 @@ import com.google.inject.multibindings.Multibinder;
  */
 public abstract class JJModule extends AbstractModule {
 	
-	private ResourceCreatorBinder bindCreation;
+	private ResourceCreatorBinder resources;
 	
-	private ContinuationProcessorBinder dispatch;
+	private ContinuationProcessorBinder continuationProcessors;
 	
 	private ExecutorBinder executors;
 	
@@ -44,7 +44,6 @@ public abstract class JJModule extends AbstractModule {
 	
 	private Multibinder<JJServerStartupListener> startupListeners;
 	private Multibinder<Converter<?, ?>> converters;
-	private Multibinder<DocumentFilter> filters;
 	private Multibinder<HostObject> hostObjects;
 	private Multibinder<String> assetPaths;
 
@@ -62,13 +61,6 @@ public abstract class JJModule extends AbstractModule {
 		return converters.addBinding();
 	}
 	
-	protected LinkedBindingBuilder<DocumentFilter> addFilterBinding() {
-		if (filters == null) {
-			filters = Multibinder.newSetBinder(binder(), DocumentFilter.class);
-		}
-		return filters.addBinding();
-	}
-	
 	protected LinkedBindingBuilder<HostObject> addHostObjectBinding() {
 		if (hostObjects == null) {
 			hostObjects = Multibinder.newSetBinder(binder(), HostObject.class);
@@ -78,24 +70,24 @@ public abstract class JJModule extends AbstractModule {
 	
 	protected void addAssetPath(String path) {
 		if (assetPaths == null) {
-			assetPaths = Multibinder.newSetBinder(binder(), String.class);
+			assetPaths = Multibinder.newSetBinder(binder(), String.class, AssetPaths.class);
 		}
 
 		assetPaths.addBinding().toInstance(path);
 	}
 	
 	protected ResourceCreatorBinder bindCreation() {
-		if (bindCreation == null) {
-			bindCreation = new ResourceCreatorBinder(binder());
+		if (resources == null) {
+			resources = new ResourceCreatorBinder(binder());
 		}
-		return bindCreation;
+		return resources;
 	}
 
 	protected ContinuationProcessorBinder dispatch() {
-		if (dispatch == null) {
-			dispatch = new ContinuationProcessorBinder(binder());
+		if (continuationProcessors == null) {
+			continuationProcessors = new ContinuationProcessorBinder(binder());
 		}
-		return dispatch;
+		return continuationProcessors;
 	}
 	
 	protected void bindExecutor(Class<?> executor) {

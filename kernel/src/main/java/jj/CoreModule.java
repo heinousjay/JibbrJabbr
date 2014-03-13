@@ -18,6 +18,7 @@ package jj;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 
+import jj.configuration.CommandLine;
 import jj.configuration.ConfigurationModule;
 import jj.conversion.ConversionModule;
 import jj.css.CssModule;

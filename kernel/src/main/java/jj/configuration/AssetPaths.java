@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.configuration;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -24,8 +24,6 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
- * Specifies the command line arguments as the original String[]
- * 
  * @author jason
  *
  */
@@ -33,6 +31,6 @@ import javax.inject.Qualifier;
 @Documented
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CommandLine {
+public @interface AssetPaths {
 
 }
