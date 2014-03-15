@@ -15,10 +15,21 @@
  */
 package jj;
 
+import static org.junit.Assert.*;
+
+import java.lang.annotation.Annotation;
+import java.util.Map;
+
+import jj.logging.EmergencyLogger;
+
 import org.junit.Test;
+import org.slf4j.Logger;
 
 import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Stage;
+import com.google.inject.TypeLiteral;
 
 /**
  * @author jason
@@ -30,13 +41,23 @@ public class CoreModuleTest {
 	public void testRunningBuild() {
 		
 		// this should be enough to test that the core module builds
-		Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0], new BootstrapClassPath())).getInstance(JJServerLifecycle.class);
+		Injector injector = Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0], new BootstrapClassPath()));
+		
+		// force it to try to instantiate everything
+		injector.getInstance(JJServerLifecycle.class);
+		
+		// and for now this lives here - a vital inventory! we must have the emergency logger configured or we
+		// will lose errors and have no idea what is broken
+		Map<Class<? extends Annotation>, Logger> loggers = 
+			injector.getInstance(Key.get(new TypeLiteral<Map<Class<? extends Annotation>, Logger>>() {}));
+		
+		assertTrue(loggers.containsKey(EmergencyLogger.class));
 	}
 	
 	
 	@Test
 	public void testTestBuild() {
-
+// almost not a thing! wheee!
 		Guice.createInjector(Stage.PRODUCTION, new CoreModule(new String[0])).getInstance(JJServerLifecycle.class);
 	}
 }

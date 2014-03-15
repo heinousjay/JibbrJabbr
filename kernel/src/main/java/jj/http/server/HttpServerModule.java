@@ -14,7 +14,7 @@ public class HttpServerModule extends JJModule {
 		
 		addStartupListenerBinding().to(WebSocketConnectionTracker.class);
 		
-		bindLoggedEvents().annotatedWith(AccessLogger.class).toLogger("access");
+		bindLoggedEvents().annotatedWith(AccessLogger.class).toLogger(AccessLogger.NAME);
 		
 		install(new ServableModule());
 	}

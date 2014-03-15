@@ -39,6 +39,8 @@ public class LoggingModule extends JJModule {
 		bind(EmergencyLog.class).to(SystemLogger.class);
 		addStartupListenerBinding().to(SystemLogger.class);
 		
+		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
+		
 	}
 
 }

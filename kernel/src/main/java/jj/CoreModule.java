@@ -79,7 +79,7 @@ public class CoreModule extends JJModule {
 		bind(ResourceResolver.class).toInstance(resourceResolver);
 		bind(Version.class).to(VersionImpl.class);
 		
-		bindLoggedEvents().annotatedWith(ServerLogger.class).toLogger("server");
+		bindLoggedEvents().annotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		
 		// we need the logging module to configure our async logger before we do anything that might log
 		// this is no longer true! but who cares!

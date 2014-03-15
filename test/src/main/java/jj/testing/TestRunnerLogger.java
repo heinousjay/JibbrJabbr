@@ -33,4 +33,9 @@ import javax.inject.Qualifier;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestRunnerLogger {
 
+	/**
+	 * 
+	 */
+	public static final String NAME = "test runner";
+
 }

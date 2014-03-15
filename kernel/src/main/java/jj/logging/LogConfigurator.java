@@ -90,7 +90,7 @@ class LogConfigurator {
 	}
 	
 	protected void emergencyLogger(Level level) {
-		logger("emergency", level);
+		logger(EmergencyLogger.NAME, level);
 	}
 	
 	protected void testLogger(Level level) {

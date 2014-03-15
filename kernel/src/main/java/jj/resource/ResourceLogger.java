@@ -32,4 +32,9 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface ResourceLogger {
 
+	/**
+	 * 
+	 */
+	public static final String NAME = "resource system";
+
 }

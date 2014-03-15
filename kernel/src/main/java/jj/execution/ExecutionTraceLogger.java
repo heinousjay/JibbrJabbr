@@ -39,4 +39,6 @@ import org.slf4j.Logger;
 @Inherited
 public @interface ExecutionTraceLogger {
 
+	public static final String NAME = "execution trace";
+
 }

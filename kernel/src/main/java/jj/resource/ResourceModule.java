@@ -41,6 +41,6 @@ public class ResourceModule extends JJModule {
 		
 		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		
-		bindLoggedEvents().annotatedWith(ResourceLogger.class).toLogger("execution trace");
+		bindLoggedEvents().annotatedWith(ResourceLogger.class).toLogger(ResourceLogger.NAME);
 	}
 }

@@ -25,8 +25,6 @@ import jj.JJModule;
  */
 public class ExecutionModule extends JJModule {
 	
-	private static final String EXECUTION_TRACE_LOGGER = "execution trace";
-
 	@Override
 	protected void configure() {
 
@@ -38,7 +36,7 @@ public class ExecutionModule extends JJModule {
 		
 		bind(UncaughtExceptionHandler.class).to(JJUncaughtExceptionHandler.class);
 		
-		bindLoggedEvents().annotatedWith(ExecutionTraceLogger.class).toLogger(EXECUTION_TRACE_LOGGER);
+		bindLoggedEvents().annotatedWith(ExecutionTraceLogger.class).toLogger(ExecutionTraceLogger.NAME);
 		
 	}
 

@@ -32,4 +32,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @interface AccessLogger {
 
+	public static final String NAME = "access";
+
 }

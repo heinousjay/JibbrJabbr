@@ -31,5 +31,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface ServerLogger {
+	
+	public static final String NAME = "server";
 
 }
