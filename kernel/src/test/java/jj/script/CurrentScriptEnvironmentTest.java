@@ -61,7 +61,7 @@ public class CurrentScriptEnvironmentTest {
 	
 	@Mock AbstractScriptEnvironment ase;
 	
-	@Mock WebSocketConnectionHost host;
+	@Mock(extraInterfaces = {ScriptEnvironment.class}) WebSocketConnectionHost host;
 	
 	@Mock ChildScriptEnvironment child;
 	
@@ -117,7 +117,7 @@ public class CurrentScriptEnvironmentTest {
 	@Test
 	public void testCurrentWebSocketConnectionHost() {
 		
-		try (Closer closer = cse.enterScope(host)) {
+		try (Closer closer = cse.enterScope((ScriptEnvironment)host)) {
 			
 			assertThat(cse.current(), is((ScriptEnvironment)host));
 			assertThat(cse.currentWebSocketConnectionHost(), is(host));
@@ -129,7 +129,7 @@ public class CurrentScriptEnvironmentTest {
 	@Test
 	public void testCurrentRootScriptEnvironment() {
 		
-		given(child.parent()).willReturn(host);
+		given(child.parent()).willReturn((ScriptEnvironment)host);
 		
 		try (Closer closer = cse.enterScope(child)) {
 			assertThat(cse.currentRootScriptEnvironment(), is((ScriptEnvironment)host));

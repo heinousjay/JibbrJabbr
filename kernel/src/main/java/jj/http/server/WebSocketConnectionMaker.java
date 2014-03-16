@@ -105,6 +105,7 @@ class WebSocketConnectionMaker {
 					final DocumentScriptEnvironment scriptEnvironment =
 						resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, uriMatch.name);
 					// TODO - really?  haha.  externalize this, multibinder style
+					// WebSocketConnectionHostBinder!
 					final WebSocketConnectionHost host = scriptEnvironment;
 					
 					if (scriptEnvironment == null) {
