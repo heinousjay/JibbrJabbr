@@ -104,6 +104,8 @@ class WebSocketConnectionMaker {
 					URIMatch uriMatch = new URIMatch(request.getUri());
 					final DocumentScriptEnvironment scriptEnvironment =
 						resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, uriMatch.name);
+					// TODO - really?  haha.  externalize this, multibinder style
+					final WebSocketConnectionHost host = scriptEnvironment;
 					
 					if (scriptEnvironment == null) {
 						
