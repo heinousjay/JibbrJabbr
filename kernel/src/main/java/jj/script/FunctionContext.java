@@ -18,8 +18,8 @@ package jj.script;
 import org.mozilla.javascript.Callable;
 
 /**
- * An object that holds function according to some lifetime, organized by name,
- * generally used by API objects to do what they do
+ * An object that holds script functions according to some lifetime,
+ * organized by name, for example to be registered as event listeners
  * 
  * @author jason
  *

@@ -22,8 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
-import jj.engine.ContributesScript;
-import jj.engine.HostObject;
 import jj.resource.ResourceFinder;
 import jj.script.resource.ModuleScriptEnvironment;
 import jj.script.resource.RequiredModule;
@@ -37,48 +35,23 @@ import org.mozilla.javascript.Scriptable;
  *
  */
 @Singleton
-class MakeRequireFunction extends BaseFunction implements HostObject, ContributesScript {
+class RequireInnerFunction extends BaseFunction {
 
 	private static final long serialVersionUID = -3809338081179905958L;
 	
-	private static final String REQUIRE = "//require";
-	
 	private final CurrentScriptEnvironment env;
 	private final ResourceFinder resourceFinder;
+	
+	// just used for calculating paths
 	private final Path base = Paths.get("/requireBase");
 	
 	@Inject
-	MakeRequireFunction(
+	RequireInnerFunction(
 		final CurrentScriptEnvironment env,
 		final ResourceFinder resourceFinder
 	) {
 		this.env = env;
 		this.resourceFinder = resourceFinder;
-	}
-
-	@Override
-	public String name() {
-		return REQUIRE;
-	}
-
-	@Override
-	public boolean constant() {
-		return true;
-	}
-
-	@Override
-	public boolean readonly() {
-		return true;
-	}
-
-	@Override
-	public boolean permanent() {
-		return true;
-	}
-
-	@Override
-	public boolean dontenum() {
-		return true;
 	}
 	
 	private String toModuleIdentifier(final String input, final String parent) {
@@ -142,24 +115,7 @@ class MakeRequireFunction extends BaseFunction implements HostObject, Contribute
 	
 	@Override
 	public Scriptable construct(Context cx, Scriptable scope, Object[] args) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String script() {
-		// the require function as a user API is 
-		// actually created individually in each 
-		// scope when the scope is created by 
-		// calling this function
-		return "global['//makeRequire'] = function(module) {" +
-					"return function(id) {" +
-					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
-					"var result = global['" + REQUIRE + "'](id, module.id); " +
-					"if (result['getCause']) { " +
-						"throw result;" + 
-					"} " +
-					"return result;" +
-				"}}";
+		throw new AssertionError("do not attempt to construct this function");
 	}
 
 }

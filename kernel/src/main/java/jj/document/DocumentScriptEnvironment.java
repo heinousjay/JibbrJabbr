@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.jsoup.nodes.Document;
@@ -44,12 +43,10 @@ import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ContinuationPendingKey;
-import jj.script.RhinoContext;
 import jj.script.ScriptThread;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceType;
@@ -112,17 +109,16 @@ public class DocumentScriptEnvironment
 	 */
 	@Inject
 	DocumentScriptEnvironment(
-		final ResourceCacheKey cacheKey,
+		final Dependencies dependencies,
 		final String baseName,
 		final ResourceFinder resourceFinder,
-		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
 		final ScriptCompiler compiler,
 		final WebSocketMessageProcessor processor,
 		final CurrentDocumentRequestProcessor currentDocument,
 		final CurrentWebSocketConnection currentConnection
 	) {
-		super(cacheKey, contextProvider);
+		super(dependencies);
 		this.baseName = baseName;
 		
 		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, HtmlResourceCreator.resourceName(baseName));

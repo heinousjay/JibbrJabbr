@@ -15,6 +15,8 @@
  */
 package jj.script.resource;
 
+import java.net.URI;
+
 import jj.StringUtils;
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
@@ -51,6 +53,10 @@ public class RequiredModule implements Continuation {
 	
 	ScriptEnvironment parent() {
 		return parent;
+	}
+	
+	URI uri() {
+		return URI.create(parent.name() + "#" + identifier);
 	}
 	
 	@Override

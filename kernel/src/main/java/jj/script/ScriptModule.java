@@ -15,8 +15,6 @@ public class ScriptModule extends JJModule {
 		
 		bindExecutor(ScriptExecutorFactory.class);
 		
-		addHostObjectBinding().to(MakeRequireFunction.class);
-		
 		install(new ScriptResourceModule());
 	}
 }

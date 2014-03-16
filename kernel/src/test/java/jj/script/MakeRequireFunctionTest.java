@@ -15,12 +15,12 @@ public class MakeRequireFunctionTest {
 	@Mock CurrentScriptEnvironment env;
 	@Mock ResourceFinder resourceFinder;
 	
-	@InjectMocks MakeRequireFunction mrf;
+	@InjectMocks RequireInnerFunction mrf;
 	
 	
 	@Test
 	public void test() {
-		System.out.println(mrf.script());
+		// hi!
 	}
 
 }

@@ -31,7 +31,7 @@ import jj.script.ScriptEnvironmentInitializer;
  *
  */
 @Singleton
-public class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ModuleScriptEnvironment> {
+class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ModuleScriptEnvironment> {
 	
 	private static final String ARG_ERROR = "ModuleScriptEnvironmentCreator requires a RequiredModule argument";
 	private final ResourceInstanceCreator creator;
@@ -70,11 +70,10 @@ public class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCre
 	protected URI uri(AppLocation base, String moduleIdentifier, Object... args) {
 		
 		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
-		// assert base == Virtual : "must be virtual";
 		
 		RequiredModule requiredModule = (RequiredModule)args[0];
 		
-		return URI.create(requiredModule.parent().name() + "#" + moduleIdentifier);
+		return requiredModule.uri();
 	}
 
 }

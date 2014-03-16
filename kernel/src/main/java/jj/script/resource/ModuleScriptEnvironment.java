@@ -15,13 +15,15 @@
  */
 package jj.script.resource;
 
+
+import static jj.configuration.AppLocation.*;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
 import jj.engine.EngineAPI;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceThread;
@@ -49,7 +51,8 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	private final RequiredModule requiredModule;
 	
-	// the key of our parent.  gets removed on first read and is null forever after
+	// the key to restarting whatever included this.  gets removed on first read and is null forever after
+	// maybe not a good spot? it's not necessarily the same as the overall root environment
 	private ContinuationPendingKey pendingKey;
 	
 	private final ScriptableObject scope;
@@ -67,14 +70,14 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	 */
 	@Inject
 	ModuleScriptEnvironment(
-		final ResourceCacheKey cacheKey,
+		final Dependencies dependencies,
 		final String moduleIdentifier,
 		final RequiredModule requiredModule,
-		final Provider<RhinoContext> contextProvider,
 		final EngineAPI api,
-		final ResourceFinder resourceFinder
+		final ResourceFinder resourceFinder,
+		final InjectorBridgeFunction injectorBridge
 	) {
-		super(cacheKey, contextProvider);
+		super(dependencies);
 		
 		this.moduleIdentifier = moduleIdentifier;
 		
@@ -84,7 +87,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		assert ((AbstractResource)requiredModule.parent()).alive(): "cannot require a module for a dead parent";
 		
-		scriptResource = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, scriptName());
+		scriptResource = resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), scriptName());
 		
 		if (scriptResource == null) {
 			throw new NoSuchResourceException(moduleIdentifier);
@@ -95,6 +98,10 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		sha1 = scriptResource.sha1();
 		scope = createLocalScope(moduleIdentifier, api.global());
+		
+		if (scriptResource.base() == Assets) {
+			scope.defineProperty(InjectorBridgeFunction.NAME, injectorBridge, ScriptableObject.CONST);
+		}
 		
 		try (RhinoContext context = contextProvider.get()) {
 			

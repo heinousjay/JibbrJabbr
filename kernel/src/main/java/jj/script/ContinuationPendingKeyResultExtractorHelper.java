@@ -23,8 +23,7 @@ import jj.execution.Promise;
 import jj.execution.TaskRunner;
 
 /**
- * A helper for testing the script system.  not part of the API, despite being public.
- * ignore this!
+ * A helper for testing the script system.
  * 
  * @author jason
  *

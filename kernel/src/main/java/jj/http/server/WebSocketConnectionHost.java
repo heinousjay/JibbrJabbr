@@ -21,6 +21,7 @@ import jj.script.ScriptEnvironment;
 /**
  * @author jason
  *
+ *TODO!!! replace ScriptEnvironment with Resource.  These may not be script environments, that should be explicit
  */
 public interface WebSocketConnectionHost extends ScriptEnvironment, FunctionContext {
 

@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
@@ -36,20 +37,33 @@ import jj.resource.ResourceCacheKey;
  */
 public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
 	
+	@Singleton
+	public static class Dependencies {
+		
+		final ResourceCacheKey cacheKey;
+		final Provider<RhinoContext> contextProvider;
+		final Provider<ContinuationPendingKey> pendingKeyProvider;
+		final RequireInnerFunction requireInnerFunction;
+		
+		@Inject
+		Dependencies(
+			final ResourceCacheKey cacheKey,
+			final Provider<RhinoContext> contextProvider,
+			final Provider<ContinuationPendingKey> pendingKeyProvider,
+			final RequireInnerFunction requireInnerFunction
+		) {
+			this.cacheKey = cacheKey;
+			this.contextProvider = contextProvider;
+			this.pendingKeyProvider = pendingKeyProvider;
+			this.requireInnerFunction = requireInnerFunction;
+		}
+	}
+	
 	protected final Provider<RhinoContext> contextProvider;
 	
 	protected final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
-	// field injection! 
-	// this is not my favored technique but the test has been written to
-	// accommodate it, and it saves passing yet another dependency all throughout the system,
-	// entirely through places that do not care about this.
-	/**
-	 * DO NOT OVERWRITE THE VALUE OF THIS FIELD!.  if is not final because it needs to be
-	 * injected but it should be treated as if it were final
-	 */
-	@Inject
-	private Provider<ContinuationPendingKey> pendingKeyProvider;
+	private final Dependencies dependencies;
 	
 	ScriptExecutionState state = Unitialized;
 	
@@ -57,12 +71,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * @param cacheKey
 	 */
 	protected AbstractScriptEnvironment(
-		final ResourceCacheKey cacheKey,
-		final Provider<RhinoContext> contextProvider
+		Dependencies dependencies
 	) {
-		super(cacheKey);
-		this.contextProvider = contextProvider;
+		super(dependencies.cacheKey);
+		this.contextProvider = dependencies.contextProvider;
+		this.dependencies = dependencies;
 	}
+	
+	//protected abstract void initializeScopes();
 	
 	@Override
 	public ScriptableObject newObject() {
@@ -98,7 +114,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	}
 	
 	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
-		ContinuationPendingKey key = pendingKeyProvider.get();
+		ContinuationPendingKey key = dependencies.pendingKeyProvider.get();
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;
@@ -162,6 +178,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			// scope that provides a server-wide API installation - effectively sealing the
 			// API to prevent it from being manipulated and allowing it to be shared in a safe
 			// manner
+			// but fuck it.  forget it.  GOODBYE BITCHES
 			ScriptableObject local = context.newObject(global);
 			local.setPrototype(global);
 			local.setParentScope(null);
@@ -172,6 +189,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		}
 	}
 
+	// move this to a
 	protected void configureModuleObjects(final String moduleIdentifier, RhinoContext context, ScriptableObject local) {
 		// setting up the 'module' property as described in 
 		// the commonjs module 1.1.1 specification
@@ -182,15 +200,30 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		ScriptableObject exports = context.newObject(local);
 		module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
 		module.defineProperty("exports", exports, ScriptableObject.EMPTY);
+		module.defineProperty("//requireInner", dependencies.requireInnerFunction, ScriptableObject.CONST);
 		
 		local.defineProperty("module", module, ScriptableObject.CONST);
 		local.defineProperty("exports", exports, ScriptableObject.CONST);
+		
 		
 		// define the require method and the exports object here as well.
 		// follow the node.js concept of module.exports === exports, and
 		// assigning to module.exports changes the exports object,
 		// potentially to a function
-		Object require = context.evaluateString(local, "global['//makeRequire'](module);", "making require");
+		ScriptableObject require = (ScriptableObject)context.evaluateString(
+			local,  
+			"(function(module) {" +
+				"return function(id) {" +
+				"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
+				"var result = module['//requireInner'](id, module.id); " +
+				"if (result['getCause']) { " +
+					"throw result;" + 
+				"} " +
+				"return result;" +
+			"}})(module);",
+			"making require"
+		);
+		
 		local.defineProperty(
 			"require",
 			require,

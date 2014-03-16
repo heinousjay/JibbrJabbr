@@ -44,6 +44,7 @@ import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.ContinuationPendingKey;
+import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceType;
@@ -68,11 +69,13 @@ public class DocumentScriptEnvironmentTest {
 	@Mock ResourceFinder resourceFinder;
 	@Mock EngineAPI api;
 	@Mock ScriptableObject local;
-	@Mock ResourceCacheKey cacheKey;
 	@Mock ScriptCompiler scriptCompiler;
 	@Mock DocumentWebSocketMessageProcessors processors;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
+	
+	ResourceCacheKey cacheKey;
 	MockRhinoContextProvider contextMaker;
+	MockAbstractScriptEnvironmentDependencies dependencies;
 	
 	@Mock WebSocketConnection connection;
 	
@@ -84,7 +87,11 @@ public class DocumentScriptEnvironmentTest {
 
 	@Before
 	public void before() throws Exception {
-		contextMaker = new MockRhinoContextProvider();
+		dependencies = new MockAbstractScriptEnvironmentDependencies();
+		
+		cacheKey = dependencies.resourceCacheKey();
+		
+		contextMaker = dependencies.rhinoContextProvider();
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
 		
 		given(script.path()).willReturn(Paths.get("/"));
@@ -112,10 +119,9 @@ public class DocumentScriptEnvironmentTest {
 	
 	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {
 		return new DocumentScriptEnvironment(
-			cacheKey,
+			dependencies,
 			baseName,
 			resourceFinder,
-			contextMaker,
 			api,
 			scriptCompiler,
 			processors,
@@ -327,6 +333,9 @@ public class DocumentScriptEnvironmentTest {
 	
 	@Test
 	public void testConnectionBroadcastingWithContinuationAndNesting() throws Exception {
+		
+		// TODO!! this should be externalized behavior since it will be common to all
+		// web socket connection hosts!
 		
 		DocumentScriptEnvironment result = givenAConnectedDocumentScriptEnvironment();
 		HashSet<WebSocketConnection> iterated1 = makeSet();

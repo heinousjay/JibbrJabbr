@@ -28,6 +28,7 @@ import jj.http.server.WebSocketConnection;
 import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
+import jj.script.ScriptEnvironment;
 import jj.script.ScriptJSON;
 
 /**
@@ -58,7 +59,8 @@ class EventMessageProcessor implements DocumentWebSocketMessageProcessor {
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
 		
-		ScriptableObject event = connection.webSocketConnectionHost().newObject();
+		// this cast is always true here
+		ScriptableObject event = ((ScriptEnvironment)connection.webSocketConnectionHost()).newObject();
 		
 		EventSelection target = new EventSelection(message.event().target, currentConnection, env);
 		event.defineProperty("target", target, ScriptableObject.CONST);

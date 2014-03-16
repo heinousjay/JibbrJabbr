@@ -20,11 +20,10 @@ import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-
 import javax.inject.Provider;
 
 import jj.resource.ResourceCacheKey;
+import jj.script.AbstractScriptEnvironment.Dependencies;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,8 +40,8 @@ public class AbstractScriptEnvironmentTest {
 	
 	private class MyScriptEnvironment extends AbstractScriptEnvironment {
 		
-		protected MyScriptEnvironment(ResourceCacheKey cacheKey, Provider<RhinoContext> contextProvider) {
-			super(cacheKey, contextProvider);
+		protected MyScriptEnvironment(Dependencies dependencies) {
+			super(dependencies);
 		}
 
 		@Override
@@ -91,6 +90,7 @@ public class AbstractScriptEnvironmentTest {
 	@Mock ResourceCacheKey cacheKey;
 	@Mock Provider<RhinoContext> contextProvider;
 	@Mock Provider<ContinuationPendingKey> pendingKeyProvider;
+	@Mock RequireInnerFunction makeRequireFunction;
 	
 	MyScriptEnvironment ase;
 	
@@ -102,12 +102,9 @@ public class AbstractScriptEnvironmentTest {
 
 	@Before
 	public void before() throws Exception {
-		ase = new MyScriptEnvironment(cacheKey, contextProvider);
-		
-		// mockito doesn't seem to want to handle this injection.  boo
-		Field field = AbstractScriptEnvironment.class.getDeclaredField("pendingKeyProvider");
-		field.setAccessible(true);
-		field.set(ase, pendingKeyProvider);
+		ase = new MyScriptEnvironment(
+			new Dependencies(cacheKey, contextProvider, pendingKeyProvider, makeRequireFunction)
+		);
 	}
 	
 	@Test
