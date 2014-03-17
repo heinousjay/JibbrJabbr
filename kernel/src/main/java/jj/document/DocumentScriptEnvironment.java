@@ -145,7 +145,8 @@ public class DocumentScriptEnvironment
 			script = null;
 		} else {
 			socketUri = uri + ".socket";
-			scope = createLocalScope(baseName, api.global());
+			scope = createChainedScope(api.global());
+			configureModuleObjects(baseName, scope);
 			
 			try {
 				script = compiler.compile(scope, clientScript, sharedScript, serverScript);

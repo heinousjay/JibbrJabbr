@@ -1,4 +1,4 @@
-// this is the minimal chat example.
+// this is the minimal chat example.  it ain't pretty!
 
 // the API is going to move behind modules soon, so there is another
 // line coming:
@@ -18,7 +18,7 @@ $(function() {
 	// the form is an object stored under the form property of the event object
 	$('#in').on('submit', function(e) {
 
-		// first, clear the field
+		// first, clear the field.  this is kinda ++minimal, but classy
 		$('#say').val('');
 
 		// generate an id (this is really only for testing purposes, 
@@ -27,7 +27,7 @@ $(function() {
 		var id = 'line-' + (++seed);
 
 		// and then broadcast to all connected clients.  basically, broadcast executes its function argument
-		// once in the context of all connected clients. soon there will also be a predicate system
+		// once in the context of all connected clients. soon there will also be a predicate system.
 		broadcast(function() {
 
 			// to add a div to the chat list with the context

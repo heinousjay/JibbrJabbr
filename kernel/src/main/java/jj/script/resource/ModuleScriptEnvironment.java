@@ -21,14 +21,12 @@ import static jj.configuration.AppLocation.*;
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.engine.EngineAPI;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ChildScriptEnvironment;
@@ -97,7 +95,8 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		requiredModule.parent().addDependent(this);
 		
 		sha1 = scriptResource.sha1();
-		scope = createLocalScope(moduleIdentifier, api.global());
+		scope = createChainedScope(api.global());
+		configureModuleObjects(moduleIdentifier, scope);
 		
 		if (scriptResource.base() == Assets) {
 			scope.defineProperty(InjectorBridgeFunction.NAME, injectorBridge, ScriptableObject.CONST);

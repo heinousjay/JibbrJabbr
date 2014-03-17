@@ -36,6 +36,8 @@ import com.google.inject.Injector;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class InjectorBridgeFunctionTest {
+	
+	public static final String NAME = InjectorBridgeFunction.NAME;
 
 	@Mock Injector injector;
 	

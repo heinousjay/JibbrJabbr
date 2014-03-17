@@ -38,6 +38,15 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(RequireInnerFunction.class)
 		);
 	}
+
+	public MockAbstractScriptEnvironmentDependencies(RealRhinoContextProvider rhinoContextProvider) {
+		super(
+			mock(ResourceCacheKey.class),
+			rhinoContextProvider,
+			mock(MockPendingKeyProvider.class),
+			mock(RequireInnerFunction.class)
+		);
+	}
 	
 	public ResourceCacheKey resourceCacheKey() {
 		return cacheKey;

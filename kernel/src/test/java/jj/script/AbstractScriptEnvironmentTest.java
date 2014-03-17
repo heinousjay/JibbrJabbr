@@ -136,5 +136,10 @@ public class AbstractScriptEnvironmentTest {
 		
 		assertThat(ase.continuationPending(pendingKey), is(continuationPending));
 	}
+	
+	@Test
+	public void testCreateChainedScope() {
+		
+	}
 
 }

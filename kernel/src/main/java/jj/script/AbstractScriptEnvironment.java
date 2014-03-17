@@ -37,6 +37,9 @@ import jj.resource.ResourceCacheKey;
  */
 public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
 	
+	// bundles up the dependencies for this object, so that descendents don't need to
+	// to be updated when this changes, cause it just might change more!
+	// package-private access on the fields for testing
 	@Singleton
 	public static class Dependencies {
 		
@@ -59,9 +62,12 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		}
 	}
 	
+	/**
+	 * convenience to get to a RhinoContext for script execution
+	 */
 	protected final Provider<RhinoContext> contextProvider;
 	
-	protected final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
+	private final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
 	private final Dependencies dependencies;
 	
@@ -171,64 +177,63 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			.toString();
 	}
 
-	protected ScriptableObject createLocalScope(final String moduleIdentifier, final ScriptableObject global) {
+	/**
+	 * Helper to create and attach a new scope object in a scope chain, for lookups into
+	 * @param global
+	 * @return
+	 */
+	protected ScriptableObject createChainedScope(final ScriptableObject global) {
 		try (RhinoContext context = contextProvider.get()) {
-			
-			// this technique allows for a "local" global scope that wraps a higher-level global
-			// scope that provides a server-wide API installation - effectively sealing the
-			// API to prevent it from being manipulated and allowing it to be shared in a safe
-			// manner
-			// but fuck it.  forget it.  GOODBYE BITCHES
 			ScriptableObject local = context.newObject(global);
 			local.setPrototype(global);
 			local.setParentScope(null);
-
-			configureModuleObjects(moduleIdentifier, context, local);
 			
 			return local;
 		}
 	}
 
 	// move this to a
-	protected void configureModuleObjects(final String moduleIdentifier, RhinoContext context, ScriptableObject local) {
-		// setting up the 'module' property as described in 
-		// the commonjs module 1.1.1 specification
-		// in the case of the top-level server script, the id
-		// will be the name, which fortunately happens to be
-		// exactly what is required
-		ScriptableObject module = context.newObject(local);
-		ScriptableObject exports = context.newObject(local);
-		module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
-		module.defineProperty("exports", exports, ScriptableObject.EMPTY);
-		module.defineProperty("//requireInner", dependencies.requireInnerFunction, ScriptableObject.CONST);
-		
-		local.defineProperty("module", module, ScriptableObject.CONST);
-		local.defineProperty("exports", exports, ScriptableObject.CONST);
-		
-		
-		// define the require method and the exports object here as well.
-		// follow the node.js concept of module.exports === exports, and
-		// assigning to module.exports changes the exports object,
-		// potentially to a function
-		ScriptableObject require = (ScriptableObject)context.evaluateString(
-			local,  
-			"(function(module) {" +
-				"return function(id) {" +
-				"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
-				"var result = module['//requireInner'](id, module.id); " +
-				"if (result['getCause']) { " +
-					"throw result;" + 
-				"} " +
-				"return result;" +
-			"}})(module);",
-			"making require"
-		);
-		
-		local.defineProperty(
-			"require",
-			require,
-			ScriptableObject.CONST
-		);
+	protected void configureModuleObjects(final String moduleIdentifier, ScriptableObject local) {
+		try (RhinoContext context = contextProvider.get()) {
+			// setting up the 'module' property as described in 
+			// the commonjs module 1.1.1 specification
+			// in the case of the top-level server script, the id
+			// will be the name, which fortunately happens to be
+			// exactly what is required
+			ScriptableObject module = context.newObject(local);
+			ScriptableObject exports = context.newObject(local);
+			module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
+			module.defineProperty("exports", exports, ScriptableObject.EMPTY);
+			module.defineProperty("//requireInner", dependencies.requireInnerFunction, ScriptableObject.CONST);
+			
+			local.defineProperty("module", module, ScriptableObject.CONST);
+			local.defineProperty("exports", exports, ScriptableObject.CONST);
+			
+			
+			// define the require method and the exports object here as well.
+			// follow the node.js concept of module.exports === exports, and
+			// assigning to module.exports changes the exports object,
+			// potentially to a function
+			ScriptableObject require = (ScriptableObject)context.evaluateString(
+				local,  
+				"(function(module) {" +
+					"return function(id) {" +
+					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
+					"var result = module['//requireInner'](id, module.id); " +
+					"if (result['getCause']) { " +
+						"throw result;" + 
+					"} " +
+					"return result;" +
+				"}})(module);",
+				"making require"
+			);
+			
+			local.defineProperty(
+				"require",
+				require,
+				ScriptableObject.CONST
+			);
+		}
 	}
 
 }

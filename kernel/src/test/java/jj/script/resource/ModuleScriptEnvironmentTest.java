@@ -19,17 +19,14 @@ package jj.script.resource;
 import static jj.configuration.AppLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
-import java.net.URI;
+import static org.hamcrest.Matchers.*;
 
 import jj.engine.EngineAPI;
-import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 import jj.script.ContinuationPendingKey;
+import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
 import jj.script.AbstractScriptEnvironment;
-import jj.script.RhinoContext;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +44,7 @@ public class ModuleScriptEnvironmentTest {
 	@Mock ResourceFinder resourceFinder;
 	@Mock InjectorBridgeFunction injectorBridge;
 	@Mock EngineAPI api;
+	
 	RealRhinoContextProvider contextProvider;
 	
 	String moduleIdentifier;
@@ -56,15 +54,54 @@ public class ModuleScriptEnvironmentTest {
 	
 	@Mock ScriptResource scriptResource;
 	
+	@Mock ScriptableObject global;
+	
 	ModuleScriptEnvironment mse;
 
 	@Before
 	public void before() {
+		
+		contextProvider = new RealRhinoContextProvider();
+		moduleIdentifier = "id";
+		
+		requiredModule = new RequiredModule(parent, moduleIdentifier);
+		requiredModule.pendingKey(new ContinuationPendingKey());
+		
+		given(parent.alive()).willReturn(true);
+		
+		given(resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), moduleIdentifier + ".js")).willReturn(scriptResource);
+		
+		given(api.global()).willReturn(global);
+		
+		given(scriptResource.script()).willReturn("");
+	}
+	
+	private void construct() {
+		
+		mse = new ModuleScriptEnvironment(
+			new MockAbstractScriptEnvironmentDependencies(contextProvider),
+			moduleIdentifier,
+			requiredModule,
+			api,
+			resourceFinder,
+			injectorBridge
+		);
 	}
 	
 	@Test
-	public void test() {
+	public void testNoInjectorBridge() {
+		construct();
 		
+		assertThat(mse.scope().get(InjectorBridgeFunction.NAME, mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
 
+	@Test
+	public void testWithInjectorBridge() {
+		
+		given(scriptResource.base()).willReturn(Assets);
+		
+		construct();
+		
+		assertThat(mse.scope().get(InjectorBridgeFunction.NAME, mse.scope()), is((Object)injectorBridge));
+	}
 }

@@ -16,5 +16,7 @@ public class ScriptModule extends JJModule {
 		bindExecutor(ScriptExecutorFactory.class);
 		
 		install(new ScriptResourceModule());
+		
+		addAssetPath("/jj/script/api");
 	}
 }
