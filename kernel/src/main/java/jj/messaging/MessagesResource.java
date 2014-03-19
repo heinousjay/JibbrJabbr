@@ -13,38 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.property;
+package jj.messaging;
 
-import java.nio.file.Path;
+import java.io.IOException;
 
-import jj.resource.ResourceBase;
-import jj.resource.property.PropertiesResource;
-import jj.resource.property.PropertiesResourceCreator;
+import jj.resource.AbstractResource;
+import jj.resource.ResourceCacheKey;
 
 /**
+ * <p>
+ * 
+ * 
  * @author jason
  *
  */
-public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResource, PropertiesResourceCreator> {
+public class MessagesResource extends AbstractResource {
 
-	@Override
-	protected String name() {
-		return "index";
-	}
-
-	protected Path path() {
-		return appPath.resolve(name() + ".properties");
-	}
-
-	@Override
-	protected PropertiesResource resource() throws Exception {
-		return new PropertiesResource(cacheKey(), path(), name());
+	/**
+	 * @param cacheKey
+	 */
+	protected MessagesResource(ResourceCacheKey cacheKey) {
+		super(cacheKey);
 	}
 
 	@Override
-	protected PropertiesResourceCreator toTest() {
-		return new PropertiesResourceCreator(app, creator);
+	public String name() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
+	@Override
+	public String uri() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String sha1() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean needsReplacing() throws IOException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

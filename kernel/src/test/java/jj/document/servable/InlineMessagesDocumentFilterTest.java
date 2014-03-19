@@ -5,16 +5,14 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.PropertyResourceBundle;
-
+import java.util.HashMap;
 import jj.configuration.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.InlineMessagesDocumentFilter;
+import jj.messaging.PropertiesResource;
 import jj.resource.IsThread;
 import jj.resource.ResourceFinder;
-import jj.resource.property.PropertiesResource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,7 +27,7 @@ public class InlineMessagesDocumentFilterTest {
 	String name;
 	@Mock ResourceFinder resourceFinder;
 	@Mock PropertiesResource propertiesResource;
-	PropertyResourceBundle bundle;
+	HashMap<String, String> bundle;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	@Mock HtmlResource htmlResource;
 	Document document;
@@ -44,14 +42,15 @@ public class InlineMessagesDocumentFilterTest {
 		
 		given(isThread.forResourceTask()).willReturn(false);
 		
-		bundle = new PropertyResourceBundle(
-			new StringReader(
-				"hi=Why, hello there\ngoodbye=http://www.google.com/\ntitle=this is the secret"
-			)
-		);
+		bundle = new HashMap<>();
+		bundle.put("hi", "Why, hello there");
+		bundle.put("goodbye", "http://www.google.com/");
+		bundle.put("title", "this is the secret");
+		
 		given(propertiesResource.properties()).willReturn(bundle);
 		
-		document = Jsoup.parse("<a id=\"test\" data-i18n-href=\"goodbye\" data-i18n-title=\"title\" data-i18n=\"hi\">HI MESSAGE HERE</a><p data-i18n=\"hi\">HI MESSAGE HERE ALSO</p>");
+		document = Jsoup.parse(
+			"<div data-i18n-class='missing-1' data-i18n='missing-2'></div><a id=\"test\" data-i18n-href=\"goodbye\" data-i18n-title=\"title\" data-i18n=\"hi\">HI MESSAGE HERE</a><p data-i18n=\"hi\">HI MESSAGE HERE ALSO</p>");
 		given(documentRequestProcessor.document()).willReturn(document);
 		
 		given(documentRequestProcessor.baseName()).willReturn(name);
@@ -65,6 +64,8 @@ public class InlineMessagesDocumentFilterTest {
 		toTest.filter(documentRequestProcessor);
 		
 		// then
+		assertThat(document.select("div").text(), is(String.format(InlineMessagesDocumentFilter.MISSING_KEY, "missing-2")));
+		assertThat(document.select("div").attr("class"), is(String.format(InlineMessagesDocumentFilter.MISSING_KEY, "missing-1")));
 		assertThat(document.select("a").text(), is("Why, hello there"));
 		assertThat(document.select("p").text(), is("Why, hello there"));
 		assertThat(document.select("a").attr("href"), is("http://www.google.com/"));

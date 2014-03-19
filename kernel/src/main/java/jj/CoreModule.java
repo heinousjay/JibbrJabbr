@@ -29,6 +29,7 @@ import jj.execution.ExecutionModule;
 import jj.jasmine.JasmineModule;
 import jj.jjmessage.JJMessageModule;
 import jj.logging.LoggingModule;
+import jj.messaging.MessagingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.http.HttpModule;
@@ -95,6 +96,8 @@ public class CoreModule extends JJModule {
 		// it is a standalone feature
 		install(new ResourceModule());
 		install(new ScriptModule());
+		
+		install(new MessagingModule());
 
 		install(new DocumentProcessingModule());
 		// this is second wave, in the new plan - restartable services with bridged

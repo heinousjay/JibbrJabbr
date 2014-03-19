@@ -1,4 +1,4 @@
-package jj.resource.property;
+package jj.messaging;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,7 +11,7 @@ import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
 @Singleton
-public class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResource> {
+class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResource> {
 
 	private final Application app;
 	private final ResourceInstanceCreator instanceModuleCreator;

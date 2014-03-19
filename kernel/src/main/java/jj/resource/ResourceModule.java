@@ -3,8 +3,6 @@ package jj.resource;
 import jj.JJModule;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceCreator;
-import jj.resource.property.PropertiesResource;
-import jj.resource.property.PropertiesResourceCreator;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.sha1.Sha1ResourceCreator;
 import jj.resource.spec.SpecResource;
@@ -38,8 +36,6 @@ public class ResourceModule extends JJModule {
 		bindCreation().of(SpecResource.class).to(SpecResourceCreator.class);
 		
 		bindCreation().of(StaticResource.class).to(StaticResourceCreator.class);
-		
-		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		
 		bindLoggedEvents().annotatedWith(ResourceLogger.class).toLogger(ResourceLogger.NAME);
 	}

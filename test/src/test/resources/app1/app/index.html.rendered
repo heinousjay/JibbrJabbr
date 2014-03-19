@@ -9,15 +9,15 @@
 	<body>
 		<div id="container">
 		
-			<h1 id="welcome" data-i18n="welcome">WELCOME MESSAGE GOES HERE</h1>
+			<h1 id="welcome">Welcome</h1>
 			
-			<section id="topic-holder"><div><span data-i18n="topic">TOPIC</span> <span id="topic"></span></div></section>
+			<section id="topic-holder"><div><span>Topic</span> <span id="topic"></span></div></section>
 			
 			<section id="left-pane">
 				<div id="chatbox"></div>
 				
 				<input id="userInput" type="text" maxlength="100" />
-				<button id="button1" data-i18n="button">BUTTON TEXT GOES HERE</button>
+				<button id="button1">Button</button>
 			</section>
 			<section id="right-pane">
 				<div id="users"></div>

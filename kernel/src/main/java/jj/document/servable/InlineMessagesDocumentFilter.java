@@ -1,19 +1,17 @@
 package jj.document.servable;
 
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
+import jj.messaging.PropertiesResource;
 import jj.resource.IsThread;
 import jj.resource.ResourceFinder;
-import jj.resource.property.PropertiesResource;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 /**
  * Performs properties substitutions in place based on attribute values.
@@ -41,6 +39,12 @@ import org.jsoup.select.Elements;
 @Singleton
 class InlineMessagesDocumentFilter implements DocumentFilter {
 	
+	static final String MISSING_KEY = "??? MISSING KEY (%s) ???";
+	
+	private static final String TEXT_KEY = "data-i18n";
+	
+	private static final String ATTRIBUTE_KEY = TEXT_KEY + "-";
+
 	private final ResourceFinder resourceFinder;
 	
 	private final IsThread isThread;
@@ -54,6 +58,10 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		this.isThread = isThread;
 	}
 	
+	private String findValue(String key, HashMap<String, String> bundle) {
+		return bundle.containsKey(key) ? bundle.get(key) : String.format(MISSING_KEY, key);
+	}
+	
 	@Override
 	public void filter(final DocumentRequestProcessor documentRequestProcessor) {
 		
@@ -65,24 +73,23 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 			resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties");
 			
 		if (resource != null) {
-			final PropertyResourceBundle bundle = resource.properties();
-			for (String key : bundle.keySet()) {
-				Elements e = documentRequestProcessor.document().select("[data-i18n=" + key + "]");
-				if (!e.isEmpty()) {
-					e.html(bundle.getString(key)).removeAttr("data-i18n");
-				}
+			final HashMap<String, String> bundle = resource.properties();
+			
+			for (final Element el : documentRequestProcessor.document().select("[" + TEXT_KEY + "]")) {
+				String key = el.attr(TEXT_KEY);
+				String value = findValue(key, bundle);
+				el.html(value).removeAttr(TEXT_KEY);
 			}
-			final String KEY = "data-i18n-";
-			for (final Element el : documentRequestProcessor.document().select("[^" + KEY + "]")) {
+			
+			for (final Element el : documentRequestProcessor.document().select("[^" + ATTRIBUTE_KEY + "]")) {
 				for (final Attribute attr : el.attributes()) {
-					if (attr.getKey().startsWith(KEY)) {
-						String newAttr = attr.getKey().substring(KEY.length());
-						try {
-							el.attr(newAttr, bundle.getString(attr.getValue()))
-								.removeAttr(attr.getKey());
-						} catch (MissingResourceException mre) {
-							// thanks java
-						}
+					if (attr.getKey().startsWith(ATTRIBUTE_KEY)) {
+						
+						String key = attr.getValue();
+						String value = findValue(key, bundle);
+						
+						String newAttr = attr.getKey().substring(ATTRIBUTE_KEY.length());
+						el.attr(newAttr, value).removeAttr(attr.getKey());
 					}
 				}
 			}
