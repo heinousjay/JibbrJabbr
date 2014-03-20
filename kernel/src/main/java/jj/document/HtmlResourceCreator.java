@@ -35,11 +35,6 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 	}
 	
 	@Override
-	public boolean canLoad(String name, Object... args) {
-		return true;
-	}
-	
-	@Override
 	protected URI uri(final AppLocation base, final String name, final Object... args) {
 		return app.resolvePath(base, name).toUri();
 	}

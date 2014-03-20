@@ -18,15 +18,6 @@ interface ResourceCreator<T extends Resource> {
 	 * @return
 	 */
 	Class<T> type();
-	
-	/**
-	 * Indicates if this creator can create a resource for the
-	 * given name and args
-	 * @param name
-	 * @param args
-	 * @return
-	 */
-	boolean canLoad(final String name, final Object...args);
 
 	/**
 	 * Produce a cache key for given resource by its creation args

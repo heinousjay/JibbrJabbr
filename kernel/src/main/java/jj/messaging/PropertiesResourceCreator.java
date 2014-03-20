@@ -31,11 +31,6 @@ class PropertiesResourceCreator extends AbstractResourceCreator<PropertiesResour
 	}
 	
 	@Override
-	public boolean canLoad(String name, Object... args) {
-		return true;
-	}
-	
-	@Override
 	protected URI uri(AppLocation base, String name, Object... args) {
 		return app.resolvePath(base, name).toUri();
 	}

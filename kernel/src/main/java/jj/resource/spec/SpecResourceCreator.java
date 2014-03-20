@@ -50,11 +50,6 @@ public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 	}
 
 	@Override
-	public boolean canLoad(String name, Object... args) {
-		return name.endsWith(".js");
-	}
-
-	@Override
 	public SpecResource create(AppLocation base, String name, Object... args) throws IOException {
 		return creator.createResource(
 			SpecResource.class, 

@@ -16,47 +16,62 @@
 package jj.messaging;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import jj.resource.AbstractResource;
 import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceFinder;
 
 /**
  * <p>
+ * Represents a collection of {@link PropertiesResource}s that are accessed in
+ * a manner similar to the {@link java.util.PropertyResourceBundle}.
  * 
+ * <p>
+ * Identify by a name and a {@link Locale}
  * 
  * @author jason
  *
  */
 public class MessagesResource extends AbstractResource {
+	
+	private final String name;
+	private final Locale locale;
 
-	/**
-	 * @param cacheKey
-	 */
-	protected MessagesResource(ResourceCacheKey cacheKey) {
+	MessagesResource(
+		final ResourceCacheKey cacheKey,
+		final String name,
+		final Locale locale,
+		final ResourceFinder resourceFinder
+	) {
 		super(cacheKey);
+		
+		this.name = name;
+		this.locale = locale;
+	}
+	
+	public Locale locale() {
+		return locale;
 	}
 
 	@Override
 	public String name() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
 	public String uri() {
-		// TODO Auto-generated method stub
-		return null;
+		return "/" + name;
 	}
 
 	@Override
 	public String sha1() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean needsReplacing() throws IOException {
-		// TODO Auto-generated method stub
+		// always replaced by dependencies
 		return false;
 	}
 

@@ -48,11 +48,6 @@ class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Mo
 	}
 
 	@Override
-	public boolean canLoad(String name, Object... args) {
-		return false;
-	}
-
-	@Override
 	protected ModuleScriptEnvironment createScriptEnvironment(String moduleIdentifier, Object... args) throws IOException {
 		
 		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;

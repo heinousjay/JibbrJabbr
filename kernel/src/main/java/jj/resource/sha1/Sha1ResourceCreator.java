@@ -50,11 +50,6 @@ public class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 	}
 
 	@Override
-	public boolean canLoad(String name, Object... args) {
-		return name.endsWith("sha1");
-	}
-
-	@Override
 	public Sha1Resource create(AppLocation base, String name, Object... args) throws IOException {
 		return instanceModuleCreator.createResource(Sha1Resource.class, cacheKey(base, name), base, name);
 	}

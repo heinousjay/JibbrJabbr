@@ -28,11 +28,6 @@ class MyResourceCreator extends AbstractResourceCreator<MyResource> {
 	}
 
 	@Override
-	public boolean canLoad(String name, Object... args) {
-		return true;
-	}
-
-	@Override
 	public MyResource create(AppLocation base, String name, Object... args) throws IOException {
 		return new MyResource(URI.create(name));
 	}
