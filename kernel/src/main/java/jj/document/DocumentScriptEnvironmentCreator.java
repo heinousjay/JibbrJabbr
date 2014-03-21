@@ -39,11 +39,6 @@ public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentC
 	}
 
 	@Override
-	public Class<DocumentScriptEnvironment> type() {
-		return DocumentScriptEnvironment.class;
-	}
-
-	@Override
 	protected DocumentScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
 		DocumentScriptEnvironment dse = creator.createResource(
 			DocumentScriptEnvironment.class,

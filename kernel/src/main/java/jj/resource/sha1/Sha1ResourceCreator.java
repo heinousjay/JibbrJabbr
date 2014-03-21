@@ -45,11 +45,6 @@ public class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
 	}
 
 	@Override
-	public Class<Sha1Resource> type() {
-		return Sha1Resource.class;
-	}
-
-	@Override
 	public Sha1Resource create(AppLocation base, String name, Object... args) throws IOException {
 		return instanceModuleCreator.createResource(Sha1Resource.class, cacheKey(base, name), base, name);
 	}

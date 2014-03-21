@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.util;
 
-import java.io.IOException;
-import java.net.URI;
+import static org.junit.Assert.*;
 
-import jj.configuration.AppLocation;
+import org.junit.Test;
 
-class MyResourceCreator extends AbstractResourceCreator<MyResource> {
+/**
+ * @author jason
+ *
+ */
+public class GenericUtilsTest {
+	
+	public static class Target<T, U> {}
+	
+	public static class Impl extends Target<String, Integer> {}
+	
 
-	@Override
-	public MyResource create(AppLocation base, String name, Object... args) throws IOException {
-		return new MyResource(URI.create(name));
+	@Test
+	public void test() {
+		
+		assertEquals(String.class, GenericUtils.extractGenericParameter(Impl.class));
+		assertEquals(Integer.class, GenericUtils.extractGenericParameter(Impl.class, 1));
 	}
 
-	@Override
-	protected URI uri(AppLocation base, String name, Object... args) {
-		return URI.create(name);
-	}
 }

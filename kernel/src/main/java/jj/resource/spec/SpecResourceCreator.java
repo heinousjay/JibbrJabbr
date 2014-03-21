@@ -45,11 +45,6 @@ public class SpecResourceCreator extends AbstractResourceCreator<SpecResource> {
 	}
 
 	@Override
-	public Class<SpecResource> type() {
-		return SpecResource.class;
-	}
-
-	@Override
 	public SpecResource create(AppLocation base, String name, Object... args) throws IOException {
 		return creator.createResource(
 			SpecResource.class, 

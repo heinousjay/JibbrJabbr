@@ -45,11 +45,6 @@ public class ConfigResourceCreator extends AbstractResourceCreator<ConfigResourc
 	}
 
 	@Override
-	public Class<ConfigResource> type() {
-		return ConfigResource.class;
-	}
-
-	@Override
 	protected URI uri(AppLocation base, String name, Object... args) {
 		return app.resolvePath(base, name).toUri();
 	}

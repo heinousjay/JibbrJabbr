@@ -45,11 +45,6 @@ public class StaticResourceCreator extends AbstractResourceCreator<StaticResourc
 	}
 	
 	@Override
-	public Class<StaticResource> type() {
-		return StaticResource.class;
-	}
-	
-	@Override
 	protected URI uri(AppLocation base, String name, Object... args) {
 		return app.resolvePath(base, name).toUri();
 	}

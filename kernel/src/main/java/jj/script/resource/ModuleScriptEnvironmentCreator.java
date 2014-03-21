@@ -43,11 +43,6 @@ class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Mo
 	}
 
 	@Override
-	public Class<ModuleScriptEnvironment> type() {
-		return ModuleScriptEnvironment.class;
-	}
-
-	@Override
 	protected ModuleScriptEnvironment createScriptEnvironment(String moduleIdentifier, Object... args) throws IOException {
 		
 		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;

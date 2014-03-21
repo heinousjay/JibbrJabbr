@@ -28,11 +28,6 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 		this.app = app;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
-
-	@Override
-	public Class<HtmlResource> type() {
-		return HtmlResource.class;
-	}
 	
 	@Override
 	protected URI uri(final AppLocation base, final String name, final Object... args) {

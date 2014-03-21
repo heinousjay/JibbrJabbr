@@ -67,11 +67,6 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 		this.resourceFinder = resourceFinder;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
-
-	@Override
-	public Class<CssResource> type() {
-		return CssResource.class;
-	}
 	
 	private String toLess(final String baseName) {
 		return DOT_CSS.matcher(baseName).replaceFirst(".less");
