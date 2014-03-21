@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * how to resolve resources
+ * resolves resources when not in the running system, ie tests
  * 
  * @author jason
  *
