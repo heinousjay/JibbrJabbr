@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.StringUtils;
 import jj.engine.EventSelection;
 import jj.http.server.ConnectionEventExecutor;
 import jj.http.server.CurrentWebSocketConnection;
@@ -30,6 +29,7 @@ import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptJSON;
+import jj.util.StringUtils;
 
 /**
  * @author jason

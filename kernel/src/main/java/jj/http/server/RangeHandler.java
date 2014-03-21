@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jj.StringUtils;
+import jj.util.StringUtils;
 import io.netty.handler.codec.http.HttpHeaders;
 
 /**

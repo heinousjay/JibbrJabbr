@@ -15,9 +15,9 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 
-import jj.DateFormatHelper;
-import jj.ResourceAware;
 import jj.script.FunctionContext;
+import jj.util.DateFormatHelper;
+import jj.util.ResourceAware;
 
 @Singleton
 public class WebSocketConnection implements FunctionContext, ResourceAware {

@@ -18,7 +18,7 @@ package jj.uri;
 import java.util.List;
 import java.util.Map;
 
-import jj.StringUtils;
+import jj.util.StringUtils;
 
 /**
  * Represents a static particle in a URI

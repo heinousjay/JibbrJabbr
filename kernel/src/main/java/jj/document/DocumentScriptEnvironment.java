@@ -29,10 +29,6 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.Closer;
-import jj.CurrentResource;
-import jj.ResourceAware;
-import jj.SHA1Helper;
 import jj.configuration.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
@@ -50,6 +46,10 @@ import jj.script.ContinuationPendingKey;
 import jj.script.ScriptThread;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceType;
+import jj.util.Closer;
+import jj.util.CurrentResource;
+import jj.util.ResourceAware;
+import jj.util.SHA1Helper;
 
 /**
  * Represents a document script, and manages all of the attendant resources

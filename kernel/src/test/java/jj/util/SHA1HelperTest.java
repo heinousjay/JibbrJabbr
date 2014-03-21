@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.util;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import jj.util.SHA1Helper;
 
 import org.junit.Test;
 

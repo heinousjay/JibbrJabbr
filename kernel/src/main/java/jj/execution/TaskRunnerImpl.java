@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Closer;
 import jj.logging.EmergencyLog;
+import jj.util.Closer;
 
 /**
  * exposes some execution related information and

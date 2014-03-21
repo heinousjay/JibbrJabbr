@@ -1,4 +1,4 @@
-package jj;
+package jj.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import io.netty.buffer.ByteBuf;

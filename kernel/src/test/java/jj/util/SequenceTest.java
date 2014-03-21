@@ -1,6 +1,7 @@
-package jj;
+package jj.util;
 
 import static org.junit.Assert.*;
+import jj.util.Sequence;
 
 import org.junit.Test;
 

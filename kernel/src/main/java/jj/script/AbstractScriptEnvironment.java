@@ -27,9 +27,9 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.Closer;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceCacheKey;
+import jj.util.Closer;
 
 /**
  * @author jason

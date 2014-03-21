@@ -17,7 +17,7 @@ package jj.execution;
 
 import javax.inject.Singleton;
 
-import jj.CurrentResource;
+import jj.util.CurrentResource;
 
 /**
  * Simple thread local container for the current task so the execution trace

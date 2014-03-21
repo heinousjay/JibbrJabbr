@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.util;
 
 /**
- * Can be implemented by resources managed by current resource, and it will
- * get notified when it is transitioned
- * 
+ * Try-with-resources with no exceptions by default
  * @author jason
  *
  */
-public interface ResourceAware {
+public interface Closer extends AutoCloseable {
 
-	void start();
-	
-	void end();
+	@Override
+	public void close();
 }

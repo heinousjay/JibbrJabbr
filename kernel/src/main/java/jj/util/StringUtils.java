@@ -13,25 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
-
-import static jj.StringUtils.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+package jj.util;
 
 /**
+ * Simple static utilities for safely handling strings that
+ * may be null.  based on commons lang but copied here to
+ * keep dependencies simple.  we bring in enough.
+ * 
  * @author jason
  *
  */
-public class StringUtilsTest {
+public enum StringUtils {
 
-	@Test
-	public void test() {
-		assertThat(isEmpty(null), is(true));
-		assertThat(isEmpty(""), is(true));
-		assertThat(isEmpty("hi"), is(false));
+	; // no instances
+	
+	/**
+	 * null safe empty check.  null is empty!
+	 * @param in
+	 * @return
+	 */
+	public static boolean isEmpty(String in) {
+		return in == null || in.isEmpty();
 	}
 
+	/**
+	 * Null safe equality check
+	 * @param uri
+	 * @param uri2
+	 * @return
+	 */
+	public static boolean equals(String uri, String uri2) {
+		return (uri == uri2) || (uri != null && uri.equals(uri2));
+	}
 }

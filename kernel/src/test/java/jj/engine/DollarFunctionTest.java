@@ -19,11 +19,11 @@ import static org.mockito.BDDMockito.given;
 
 import java.net.URL;
 
-import jj.Closer;
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.DollarFunction;
 import jj.engine.EngineAPI;
+import jj.util.Closer;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

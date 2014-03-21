@@ -18,7 +18,7 @@ package jj.uri;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jj.StringUtils;
+import jj.util.StringUtils;
 
 
 /**

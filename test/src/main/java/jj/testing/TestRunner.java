@@ -29,10 +29,10 @@ import javax.inject.Inject;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import jj.StringUtils;
 import jj.http.server.TestHttpRequest;
 import jj.http.server.TestHttpResponse;
 import jj.http.server.TestJJEngineHttpHandler;
+import jj.util.StringUtils;
 
 /**
  * @author jason

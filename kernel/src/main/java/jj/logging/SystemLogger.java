@@ -24,12 +24,12 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
-import jj.Closer;
 import jj.JJServerStartupListener;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
+import jj.util.Closer;
 
 /**
  * Coordinates asynchronous logging with the logging configuration system.  Also provides

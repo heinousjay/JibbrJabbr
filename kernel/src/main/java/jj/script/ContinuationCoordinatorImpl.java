@@ -8,8 +8,9 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
-import jj.Closer;
+
 import jj.logging.EmergencyLog;
+import jj.util.Closer;
 
 /**
  * Coordinates processing a continuable script, returning the 

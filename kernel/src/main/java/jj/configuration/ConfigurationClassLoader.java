@@ -40,7 +40,7 @@ import javassist.bytecode.annotation.Annotation;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.StringUtils;
+import jj.util.StringUtils;
 
 /**
  * @author jason

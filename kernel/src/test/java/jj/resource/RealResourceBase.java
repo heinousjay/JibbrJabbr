@@ -30,12 +30,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.SHA1Helper;
 import jj.configuration.Application;
 import jj.configuration.Configuration;
 import jj.configuration.MockApplication;
 import jj.css.CssResource;
 import jj.logging.EmergencyLog;
+import jj.util.SHA1Helper;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;

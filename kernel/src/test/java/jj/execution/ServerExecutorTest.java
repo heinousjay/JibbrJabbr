@@ -16,10 +16,11 @@
 package jj.execution;
 
 import static org.junit.Assert.*;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import jj.MockClock;
+import jj.util.MockClock;
 
 import org.junit.After;
 import org.junit.Before;

@@ -13,40 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.util;
 
-import java.util.concurrent.TimeUnit;
+import static jj.util.StringUtils.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public class MockClock extends Clock {
+public class StringUtilsTest {
 
-	public long time = System.currentTimeMillis();
-	
-	@Override
-	public long time() {
-		return time;
+	@Test
+	public void test() {
+		assertThat(isEmpty(null), is(true));
+		assertThat(isEmpty(""), is(true));
+		assertThat(isEmpty("hi"), is(false));
 	}
-	
-	public MockClock advance() {
-		time++;
-		return this;
-	}
-	
-	public MockClock advance(long time, TimeUnit timeUnit) {
-		time += TimeUnit.MILLISECONDS.convert(time, timeUnit);
-		return this;
-	}
-	
-	public MockClock retreat() {
-		time--;
-		return this;
-	}
-	
-	public MockClock retreat(long time, TimeUnit timeUnit) {
-		time -= TimeUnit.MILLISECONDS.convert(time, timeUnit);
-		return this;
-	}
+
 }

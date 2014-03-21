@@ -18,8 +18,8 @@ package jj.script;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import jj.Closer;
 import jj.http.server.WebSocketConnectionHost;
+import jj.util.Closer;
 
 import org.junit.After;
 import org.junit.Before;

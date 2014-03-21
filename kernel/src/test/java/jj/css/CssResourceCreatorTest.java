@@ -23,7 +23,6 @@ import static jj.resource.DependentsExtractor.dependents;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import jj.SHA1Helper;
 import jj.configuration.AppLocation;
 import jj.css.CssResource;
 import jj.css.CssResourceCreator;
@@ -36,6 +35,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.ResourceMaker;
 import jj.resource.stat.ic.StaticResource;
 import jj.script.RealRhinoContextProvider;
+import jj.util.SHA1Helper;
 
 import org.junit.Test;
 import org.mockito.Mock;

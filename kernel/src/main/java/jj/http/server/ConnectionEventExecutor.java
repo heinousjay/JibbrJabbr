@@ -18,10 +18,10 @@ package jj.http.server;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Closer;
 import jj.execution.TaskRunner;
 import jj.script.ContinuationCoordinator;
 import jj.script.ScriptTask;
+import jj.util.Closer;
 
 import org.mozilla.javascript.Callable;
 

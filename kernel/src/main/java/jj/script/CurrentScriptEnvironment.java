@@ -21,9 +21,9 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
 
-import jj.Closer;
-import jj.CurrentResource;
 import jj.http.server.WebSocketConnectionHost;
+import jj.util.Closer;
+import jj.util.CurrentResource;
 
 /**
  * 

@@ -17,10 +17,10 @@ package jj.script.resource;
 
 import java.net.URI;
 
-import jj.StringUtils;
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptEnvironment;
+import jj.util.StringUtils;
 
 /**
  * @author jason

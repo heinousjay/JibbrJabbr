@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
-import jj.SHA1Helper;
+import jj.util.SHA1Helper;
 
 /**
  * <p>

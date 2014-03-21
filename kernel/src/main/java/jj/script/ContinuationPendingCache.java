@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.SecureRandomHelper;
 import jj.execution.TaskRunner;
+import jj.util.SecureRandomHelper;
 
 /**
  * @author jason

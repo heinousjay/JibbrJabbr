@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.SHA1Helper;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.resource.AbstractResourceCreator;
@@ -36,6 +35,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
+import jj.util.SHA1Helper;
 
 /**
  * @author jason

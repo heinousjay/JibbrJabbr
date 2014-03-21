@@ -18,8 +18,8 @@ package jj.script;
 import javax.inject.Inject;
 
 import jj.JJ;
-import jj.SecureRandomHelper;
-import jj.StringUtils;
+import jj.util.SecureRandomHelper;
+import jj.util.StringUtils;
 
 /**
  * Represents a key to restarting a paused script execution

@@ -8,7 +8,6 @@ import javax.inject.Singleton;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
-import jj.StringUtils;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Assets;
@@ -19,6 +18,7 @@ import jj.resource.ResourceThread;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
+import jj.util.StringUtils;
 import jj.http.HttpRequest;
 import jj.http.HttpResponse;
 

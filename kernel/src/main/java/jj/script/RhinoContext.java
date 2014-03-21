@@ -17,8 +17,8 @@ package jj.script;
 
 import javax.inject.Inject;
 
-import jj.Closer;
 import jj.logging.EmergencyLog;
+import jj.util.Closer;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;

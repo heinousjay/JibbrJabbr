@@ -13,36 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.util;
+
+import java.security.SecureRandom;
 
 /**
- * Simple static utilities for safely handling strings that
- * may be null.  based on commons lang but copied here to
- * keep dependencies simple.  we bring in enough.
- * 
  * @author jason
  *
  */
-public enum StringUtils {
-
-	; // no instances
+public enum SecureRandomHelper {
 	
-	/**
-	 * null safe empty check.  null is empty!
-	 * @param in
-	 * @return
-	 */
-	public static boolean isEmpty(String in) {
-		return in == null || in.isEmpty();
-	}
-
-	/**
-	 * Null safe equality check
-	 * @param uri
-	 * @param uri2
-	 * @return
-	 */
-	public static boolean equals(String uri, String uri2) {
-		return (uri == uri2) || (uri != null && uri.equals(uri2));
+	;
+	
+	private static ThreadLocal<SecureRandom> randoms = new ThreadLocal<SecureRandom>() {
+		protected SecureRandom initialValue() {
+			return new SecureRandom();
+		};
+	};
+	
+	public static int nextInt() {
+		return randoms.get().nextInt();
 	}
 }

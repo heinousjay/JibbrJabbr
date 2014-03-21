@@ -27,9 +27,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map.Entry;
 
-import jj.Sequence;
 import jj.uri.RouteFinder;
 import jj.uri.URIMatch;
+import jj.util.Sequence;
 
 /**
  * @author jason

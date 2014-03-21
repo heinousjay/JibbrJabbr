@@ -13,26 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
+package jj.util;
 
-import javax.inject.Singleton;
+import java.util.concurrent.TimeUnit;
 
-import org.jsoup.nodes.Document;
-
-import jj.document.servable.DocumentRequestProcessor;
-import jj.util.CurrentResource;
+import jj.util.Clock;
 
 /**
- * exposes the current DocumentRequestProcessor being processed as a resource
- * so the rest of the system can get to it
  * @author jason
  *
  */
-@Singleton
-public class CurrentDocumentRequestProcessor extends CurrentResource<DocumentRequestProcessor> {
+public class MockClock extends Clock {
 
+	public long time = System.currentTimeMillis();
 	
-	public Document currentDocument() {
-		return current() == null ? null : current().document();
+	@Override
+	public long time() {
+		return time;
+	}
+	
+	public MockClock advance() {
+		time++;
+		return this;
+	}
+	
+	public MockClock advance(long time, TimeUnit timeUnit) {
+		time += TimeUnit.MILLISECONDS.convert(time, timeUnit);
+		return this;
+	}
+	
+	public MockClock retreat() {
+		time--;
+		return this;
+	}
+	
+	public MockClock retreat(long time, TimeUnit timeUnit) {
+		time -= TimeUnit.MILLISECONDS.convert(time, timeUnit);
+		return this;
 	}
 }

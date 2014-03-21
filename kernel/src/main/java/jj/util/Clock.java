@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.util;
 
-import java.security.SecureRandom;
+import javax.inject.Singleton;
 
 /**
+ * Mockable time
+ * 
  * @author jason
  *
  */
-public enum SecureRandomHelper {
-	
-	;
-	
-	private static ThreadLocal<SecureRandom> randoms = new ThreadLocal<SecureRandom>() {
-		protected SecureRandom initialValue() {
-			return new SecureRandom();
-		};
-	};
-	
-	public static int nextInt() {
-		return randoms.get().nextInt();
+@Singleton
+public class Clock {
+
+	public long time() {
+		return System.currentTimeMillis();
 	}
 }

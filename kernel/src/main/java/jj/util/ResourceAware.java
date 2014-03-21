@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
-
-import javax.inject.Singleton;
+package jj.util;
 
 /**
- * Mockable time
+ * Can be implemented by resources managed by current resource, and it will
+ * get notified when it is transitioned
  * 
  * @author jason
  *
  */
-@Singleton
-public class Clock {
+public interface ResourceAware {
 
-	public long time() {
-		return System.currentTimeMillis();
-	}
+	void start();
+	
+	void end();
 }

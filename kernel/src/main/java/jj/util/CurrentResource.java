@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
+package jj.util;
 
 /**
  * Performs the basic management of a resource with a generic closer. just a wrapper around

@@ -1,8 +1,8 @@
 package jj.jjmessage;
 
-import static jj.StringUtils.*;
 // lololololol java
 import static jj.jjmessage.JJMessage.Type.*;
+import static jj.util.StringUtils.*;
 
 import java.util.Map;
 

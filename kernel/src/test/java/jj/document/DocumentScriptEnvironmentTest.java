@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.sameInstance;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
-import jj.Closer;
 import jj.configuration.AppLocation;
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
@@ -48,6 +47,7 @@ import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceType;
+import jj.util.Closer;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

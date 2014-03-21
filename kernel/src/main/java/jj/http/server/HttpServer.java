@@ -30,12 +30,12 @@ import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
 import jj.ServerStopping;
-import jj.StringUtils;
 import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
+import jj.util.StringUtils;
 
 /**
  * @author jason

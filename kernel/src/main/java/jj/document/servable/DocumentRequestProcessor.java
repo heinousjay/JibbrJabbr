@@ -10,13 +10,13 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.Closer;
 import jj.resource.ResourceTask;
 import jj.resource.MimeTypes;
 import jj.script.ContinuationCoordinator;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
 import jj.script.ScriptThread;
+import jj.util.Closer;
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
 import jj.execution.TaskRunner;

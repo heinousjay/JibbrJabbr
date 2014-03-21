@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj;
-
 /**
- * Try-with-resources with no exceptions by default
+ * General utilities that don't really fit anywhere else
+ * 
  * @author jason
  *
  */
-public interface Closer extends AutoCloseable {
-
-	@Override
-	public void close();
-}
+package jj.util;

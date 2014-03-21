@@ -18,8 +18,8 @@ package jj.http.server;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.CurrentResource;
 import jj.script.CurrentScriptEnvironment;
+import jj.util.CurrentResource;
 
 /**
  * @author jason

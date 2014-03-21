@@ -11,13 +11,13 @@ import java.nio.file.attribute.FileTime;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.SHA1Helper;
 import jj.resource.AbstractResource;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
 import jj.resource.LoadedResource;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
+import jj.util.SHA1Helper;
 
 /**
  * <p>
