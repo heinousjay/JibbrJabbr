@@ -45,12 +45,6 @@ public abstract class AbstractResourceCreator<T extends AbstractResource> implem
 	
 	@Override
 	public ResourceCacheKey cacheKey(final AppLocation base, final String name, final Object...args) {
-		return new ResourceCacheKey(type, base, uri(base, name, args));
-	}
-	
-	ResourceCacheKey cacheKey(URI uri) {
-		// app location doesn't matter here?  not sure yet
-		// in fact i think it does and i think it's going to get passed in from the user, which is... 
-		return new ResourceCacheKey(type, AppLocation.Base, uri);
+		return new ResourceCacheKey(type, uri(base, name, args));
 	}
 }

@@ -56,7 +56,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	}
 	
 	protected ResourceCacheKey cacheKey(String baseName) {
-		return new ResourceCacheKey(CssResource.class, AppLocation.Base, path(baseName).toUri());
+		return new ResourceCacheKey(CssResource.class, path(baseName).toUri());
 	}
 	
 	protected Path path() {
@@ -73,7 +73,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	}
 	
 	protected CssResource resource(String name) throws Exception {
-		return new CssResource(cacheKey(name), name, path(name), false);
+		return new CssResource(cacheKey(name), AppLocation.Base, name, path(name), false);
 	}
 	
 	@Override

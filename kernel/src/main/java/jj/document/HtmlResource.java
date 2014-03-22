@@ -10,6 +10,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
 import jj.document.servable.DocumentConfiguration;
 import jj.logging.EmergencyLog;
@@ -69,19 +70,20 @@ public class HtmlResource extends AbstractFileResource {
 		final Configuration configuration,
 		final EmergencyLog logger,
 		final ResourceCacheKey cacheKey,
-		final String baseName,
+		final AppLocation base,
+		final String name,
 		final Path path
 	) throws IOException {
-		super(cacheKey, baseName, path);
+		super(cacheKey, base, name, path);
 		
 		DocumentConfiguration config = configuration.get(DocumentConfiguration.class);
 		
-		this.uri = baseName;
+		this.uri = name;
 		String html = byteBuffer.toString(UTF_8);
 		
 		Parser parser = Parser.htmlParser().setTrackErrors(config.showParsingErrors() ? Integer.MAX_VALUE : 0);
 		
-		this.document = parser.parseInput(html, baseName);
+		this.document = parser.parseInput(html, name);
 		
 		List<ParseError> errors = parser.getErrors();
 		if (!errors.isEmpty()) {

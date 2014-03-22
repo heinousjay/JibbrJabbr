@@ -11,6 +11,7 @@ import java.nio.file.attribute.FileTime;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
@@ -45,9 +46,9 @@ public class CssResource extends AbstractResource implements FileResource, Loade
 	private String toString;
 	
 	@Inject
-	CssResource(final ResourceCacheKey cacheKey, final String baseName, final Path path, final boolean less) throws IOException {
-		super(cacheKey);
-		this.baseName = baseName;
+	CssResource(final ResourceCacheKey cacheKey, final AppLocation base, final String name, final Path path, final boolean less) throws IOException {
+		super(cacheKey, base);
+		this.baseName = name;
 		this.path = path;
 		this.less = less;
 		this.lastModified = Files.getLastModifiedTime(this.path);

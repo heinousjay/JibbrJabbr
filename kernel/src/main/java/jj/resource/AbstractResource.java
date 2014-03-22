@@ -33,12 +33,16 @@ public abstract class AbstractResource implements Resource {
 
 	protected static final Object[] EMPTY_ARGS = {};
 	
-	private final ResourceCacheKey cacheKey;
+	protected final ResourceCacheKey cacheKey;
+	
+	protected final AppLocation base;
+	
 	final Set<AbstractResource> dependents = new HashSet<>();
 	volatile boolean alive = true;
 	
-	protected AbstractResource(final ResourceCacheKey cacheKey) {
+	protected AbstractResource(final ResourceCacheKey cacheKey, final AppLocation base) {
 		this.cacheKey = cacheKey;
+		this.base = base;
 	}
 	
 	@ResourceThread
@@ -92,7 +96,7 @@ public abstract class AbstractResource implements Resource {
 	
 	@Override
 	public AppLocation base() {
-		return cacheKey.base();
+		return base;
 	}
 	
 	public String toString() {

@@ -53,7 +53,7 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 		List<Resource> result = new ArrayList<>();
 		
 		for (AbstractResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
-			Resource it = get(resourceCreator.cacheKey(uri));
+			Resource it = get(new ResourceCacheKey(resourceCreator.type(), uri));
 			if (it != null) result.add(it);
 		}
 		return Collections.unmodifiableList(result);

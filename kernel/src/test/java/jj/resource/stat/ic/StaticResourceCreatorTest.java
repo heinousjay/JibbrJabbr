@@ -17,6 +17,7 @@ package jj.resource.stat.ic;
 
 import java.nio.file.Path;
 
+import jj.configuration.AppLocation;
 import jj.resource.ResourceBase;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceCreator;
@@ -38,7 +39,7 @@ public class StaticResourceCreatorTest extends ResourceBase<StaticResource, Stat
 
 	@Override
 	protected StaticResource resource() throws Exception {
-		return new StaticResource(cacheKey(), path(), name());
+		return new StaticResource(cacheKey(), path(), AppLocation.Base, name());
 	}
 
 	@Override

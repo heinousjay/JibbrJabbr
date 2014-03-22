@@ -11,6 +11,7 @@ import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.NodeVisitor;
 
+import jj.configuration.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceCreator;
 import jj.document.servable.DocumentConfiguration;
@@ -47,7 +48,7 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 			}
 		});
 		
-		return new HtmlResource(configuration, logger, cacheKey(), name(), path());
+		return new HtmlResource(configuration, logger, cacheKey(), AppLocation.Base, name(), path());
 	}
 	
 	@Override

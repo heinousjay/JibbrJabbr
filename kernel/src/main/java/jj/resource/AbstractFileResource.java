@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
+import jj.configuration.AppLocation;
 import jj.util.SHA1Helper;
 
 /**
@@ -42,20 +43,22 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	@ResourceThread
 	protected AbstractFileResource(
 		final ResourceCacheKey cacheKey,
-		final String baseName,
+		final AppLocation base,
+		final String name,
 		final Path path
 	) {
-		this(cacheKey, baseName, path, true);
+		this(cacheKey, base, name, path, true);
 	}
 	
 	@ResourceThread
 	protected AbstractFileResource(
 		final ResourceCacheKey cacheKey,
-		final String baseName,
+		final AppLocation base,
+		final String name,
 		final Path path,
 		final boolean keepBytes
 	) {
-		super(cacheKey);
+		super(cacheKey, base);
 		
 		try {
 		
@@ -76,7 +79,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 			
 			assert !(large && keepBytes) : TOO_LARGE_ASSERTION_ERROR;
 			
-			this.baseName = baseName;
+			this.baseName = name;
 			this.path = path;
 			this.lastModified = attributes.lastModifiedTime();
 			
@@ -101,7 +104,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 			sb.append(sha).append("/");
 		}
 		
-		uri = sb.append(baseName).toString();
+		uri = sb.append(name).toString();
 	}
 	
 	private ByteBuf readAllBytes(final Path path) throws IOException {

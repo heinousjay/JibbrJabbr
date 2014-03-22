@@ -17,6 +17,7 @@ package jj.script.resource;
 
 import java.nio.file.Path;
 
+import jj.configuration.AppLocation;
 import jj.resource.ResourceBase;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceCreator;
@@ -39,7 +40,7 @@ public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, Scri
 
 	@Override
 	protected ScriptResource resource() throws Exception {
-		return new ScriptResource(cacheKey(), path(), name());
+		return new ScriptResource(cacheKey(), path(), AppLocation.Base, name());
 	}
 
 	@Override

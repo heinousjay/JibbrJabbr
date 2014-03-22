@@ -17,6 +17,7 @@ package jj.messaging;
 
 import java.nio.file.Path;
 
+import jj.configuration.AppLocation;
 import jj.messaging.PropertiesResource;
 import jj.messaging.PropertiesResourceCreator;
 import jj.resource.ResourceBase;
@@ -38,7 +39,7 @@ public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResour
 
 	@Override
 	protected PropertiesResource resource() throws Exception {
-		return new PropertiesResource(cacheKey(), path(), name());
+		return new PropertiesResource(cacheKey(), path(), AppLocation.Base, name());
 	}
 
 	@Override

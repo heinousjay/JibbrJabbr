@@ -22,6 +22,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import jj.configuration.AppLocation;
 import jj.resource.ResourceBase;
 import jj.resource.spec.SpecResource;
 import jj.resource.spec.SpecResourceCreator;
@@ -43,7 +44,7 @@ public class SpecResourceCreatorTest extends ResourceBase<SpecResource, SpecReso
 
 	@Override
 	protected SpecResource resource() throws Exception {
-		return new SpecResource(cacheKey(), name(), path());
+		return new SpecResource(cacheKey(), AppLocation.Base, name(), path());
 	}
 
 	@Override

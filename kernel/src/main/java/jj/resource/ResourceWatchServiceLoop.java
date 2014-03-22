@@ -70,7 +70,7 @@ class ResourceWatchServiceLoop extends ServerTask {
 				public void run() {
 					resourceFinder.loadResource(
 						resource.getClass(),
-						resource.cacheKey().base(),
+						resource.base(),
 						resource.name(),
 						resource.creationArgs()
 					);

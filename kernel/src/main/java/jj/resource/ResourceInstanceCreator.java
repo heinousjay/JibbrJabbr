@@ -74,6 +74,7 @@ public class ResourceInstanceCreator {
 						protected void configure() {
 							bind(type);
 							bind(ResourceCacheKey.class).toInstance(cacheKey);
+							bind(AppLocation.class).toInstance(base);
 							bind(String.class).toInstance(name);
 							if (path != null) {
 								bind(Path.class).toInstance(path);

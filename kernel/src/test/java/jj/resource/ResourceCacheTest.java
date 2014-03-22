@@ -24,7 +24,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
-import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
 import jj.document.HtmlResource;
 import jj.execution.ExecutionConfiguration;
@@ -75,11 +74,11 @@ public class ResourceCacheTest extends RealResourceBase {
 		map.put(HtmlResource.class, hrc);
 		rc = new ResourceCacheImpl(new ResourceCreators(map), configuration);
 		
-		sKey = new ResourceCacheKey(StaticResource.class, AppLocation.Base, uri);
-		hKey = new ResourceCacheKey(HtmlResource.class, AppLocation.Base, uri);
+		given(src.type()).willReturn(StaticResource.class);
+		given(hrc.type()).willReturn(HtmlResource.class);
 		
-		given(src.cacheKey(uri)).willReturn(sKey);
-		given(hrc.cacheKey(uri)).willReturn(hKey);
+		sKey = new ResourceCacheKey(StaticResource.class, uri);
+		hKey = new ResourceCacheKey(HtmlResource.class, uri);
 	}
 	
 	@Test

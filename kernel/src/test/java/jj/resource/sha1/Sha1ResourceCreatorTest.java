@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 
+import jj.configuration.AppLocation;
 import jj.resource.ResourceBase;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.sha1.Sha1ResourceCreator;
@@ -31,7 +32,7 @@ public class Sha1ResourceCreatorTest extends ResourceBase<Sha1Resource, Sha1Reso
 
 	@Override
 	protected Sha1Resource resource() throws Exception {
-		return new Sha1Resource(cacheKey(), name(), path());
+		return new Sha1Resource(cacheKey(), AppLocation.Base, name(), path());
 	}
 
 	@Override

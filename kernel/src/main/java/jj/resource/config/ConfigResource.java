@@ -31,6 +31,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 
+import jj.configuration.AppLocation;
 import jj.resource.AbstractFileResource;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
@@ -76,7 +77,7 @@ public class ConfigResource extends AbstractFileResource {
 		final ResourceCacheKey cacheKey,
 		final Path path
 	) {
-		super(cacheKey, CONFIG_JS, path);
+		super(cacheKey, AppLocation.Base, CONFIG_JS, path);
 		Function configurationFunction;
 		try (RhinoContext context = contextProvider.get()) {
 			

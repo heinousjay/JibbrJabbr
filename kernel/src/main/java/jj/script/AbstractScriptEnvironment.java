@@ -27,6 +27,7 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
+import jj.configuration.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceCacheKey;
 import jj.util.Closer;
@@ -79,7 +80,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected AbstractScriptEnvironment(
 		Dependencies dependencies
 	) {
-		super(dependencies.cacheKey);
+		super(dependencies.cacheKey, AppLocation.Virtual);
 		this.contextProvider = dependencies.contextProvider;
 		this.dependencies = dependencies;
 	}

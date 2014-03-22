@@ -21,6 +21,7 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 
+import jj.configuration.AppLocation;
 import jj.resource.AbstractFileResource;
 import jj.resource.MimeTypes;
 import jj.resource.ResourceCacheKey;
@@ -34,8 +35,8 @@ public class SpecResource extends AbstractFileResource {
 	private final String script;
 	
 	@Inject
-	SpecResource(final ResourceCacheKey cacheKey, final String baseName, final Path path) {
-		super(cacheKey, baseName, path);
+	SpecResource(final ResourceCacheKey cacheKey, final AppLocation base, final String name, final Path path) {
+		super(cacheKey, base, name, path);
 		script = byteBuffer.toString(UTF_8);
 	}
 

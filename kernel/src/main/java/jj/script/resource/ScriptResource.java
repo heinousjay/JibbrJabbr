@@ -1,7 +1,6 @@
 package jj.script.resource;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -11,6 +10,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.AppLocation;
 import jj.resource.AbstractFileResource;
 import jj.resource.LoadedResource;
 import jj.resource.ResourceCacheKey;
@@ -24,9 +24,10 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	ScriptResource(
 		final ResourceCacheKey cacheKey,
 		final Path path,
-		final String baseName
+		final AppLocation base,
+		final String name
 	) throws IOException {
-		super(cacheKey, baseName, path);
+		super(cacheKey, base, name, path);
 		script = byteBuffer.toString(UTF_8);
 	}
 	

@@ -50,7 +50,7 @@ public abstract class ResourceEvent implements LoggedEvent {
 	}
 	
 	public boolean matches(final AbstractResource resource) {
-		return matches(resource.getClass(), resource.cacheKey().base(), resource.name(), resource.creationArgs());
+		return matches(resource.getClass(), resource.base(), resource.name(), resource.creationArgs());
 	}
 	
 	protected abstract String description();
