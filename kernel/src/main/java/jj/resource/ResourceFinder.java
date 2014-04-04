@@ -1,7 +1,6 @@
 package jj.resource;
 
-import jj.configuration.AppLocation;
-import jj.configuration.AppLocation.AppLocationBundle;
+import jj.configuration.Location;
 
 /**
  * Inject this to get resources from the filesystem
@@ -22,21 +21,7 @@ public interface ResourceFinder {
 	 * @param args
 	 * @return
 	 */
-	<T extends Resource> T findResource(Class<T> resourceClass, AppLocation base, String name, Object...args);
-	
-	/**
-	 * <p>
-	 * behaves the same as {@link #findResource(Class, AppLocation, String, Object...)} but searches
-	 * each location in the AppLocationBundle in order, returning the first one found
-	 * 
-	 * 
-	 * @param resourceClass
-	 * @param bundle
-	 * @param name
-	 * @param args
-	 * @return
-	 */
-	<T extends Resource> T findResource(Class<T> resourceClass, AppLocationBundle bundle, String name, Object...args);
+	<T extends Resource> T findResource(Class<T> resourceClass, Location base, String name, Object...args);
 	
 	/**
 	 * <p>
@@ -51,18 +36,5 @@ public interface ResourceFinder {
 	 * @return
 	 */
 	@ResourceThread
-	<T extends Resource> T loadResource(Class<T> resourceClass, AppLocation base, String name, Object...args);
-	
-	/**
-	 * <p>
-	 * behaves the same as {@link #loadResource(Class, AppLocation, String, Object...)} but searches
-	 * each location in the AppLocationBundle in order, returning the first one found
-	 * 
-	 * @param resourceClass
-	 * @param bundle
-	 * @param args
-	 * @return
-	 */
-	@ResourceThread
-	<T extends Resource> T loadResource(Class<T> resourceClass, AppLocationBundle bundle, String name, Object...args);
+	<T extends Resource> T loadResource(Class<T> resourceClass, Location base, String name, Object...args);
 }

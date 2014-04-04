@@ -15,25 +15,11 @@
  */
 package jj.configuration;
 
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.*;
-import static jj.configuration.AppLocation.*;
-
 import java.util.List;
 
-import org.junit.Test;
-
-/**
- * @author jason
- *
- */
-public class AppLocationTest {
-
-	@Test
-	public void test() {
-		List<Location> locations = Base.and(Private).and(Public).locations();
-		
-		assertThat(locations, contains((Location)Base, Private, Public));
-	}
-
+public interface Location {
+	
+	Location and(Location location);
+	
+	List<Location> locations();
 }

@@ -16,6 +16,7 @@
 package jj.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,7 +41,7 @@ import jj.script.ScriptEnvironment;
  * @author jason
  *
  */
-public enum AppLocation {
+public enum AppLocation implements Location {
 	
 	/** denotes this resource is not from the file system, such as a {@link ScriptEnvironment} */
 	Virtual(""),
@@ -61,20 +62,20 @@ public enum AppLocation {
 		this.path = path;
 	}
 	
-	public final class AppLocationBundle {
-		private final List<AppLocation> locations = new ArrayList<>();
+	public final class AppLocationBundle implements Location {
+		private final List<Location> locations = new ArrayList<>();
 		
-		AppLocationBundle(AppLocation first, AppLocation second) {
+		AppLocationBundle(Location first, Location second) {
 			locations.add(first);
 			locations.add(second);
 		}
 		
-		public AppLocationBundle and(AppLocation next) {
+		public Location and(Location next) {
 			locations.add(next);
 			return this;
 		}
 		
-		public List<AppLocation> locations() {
+		public List<Location> locations() {
 			return Collections.unmodifiableList(locations);
 		}
 		
@@ -85,8 +86,12 @@ public enum AppLocation {
 		}
 	}
 	
-	public AppLocationBundle and(AppLocation next) {
+	public Location and(Location next) {
 		return new AppLocationBundle(this, next);
+	}
+	
+	public List<Location> locations() {
+		return Collections.unmodifiableList(Arrays.asList((Location)this));
 	}
 	
 	public String path() {

@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
-import jj.configuration.AppLocation.AppLocationBundle;
+import jj.configuration.Location;
 import jj.event.Publisher;
 import jj.execution.CurrentTask;
 
@@ -52,23 +52,22 @@ class ResourceFinderImpl implements ResourceFinder {
 	@Override
 	public <T extends Resource> T findResource(
 		final Class<T> resourceClass,
-		AppLocationBundle bundle,
+		Location locations,
 		String name,
 		Object... args
 	) {
 		T result = null;
 		
-		for (AppLocation base : bundle.locations()) {
+		for (Location base : locations.locations()) {
 			result = result == null ?
-				findResource(resourceClass, base, name, args) :
+				findResource(resourceClass, (AppLocation)base, name, args) :
 				result;
 		}
 		
 		return result;
 	}
 	
-	@Override
-	public <T extends Resource> T findResource(
+	private <T extends Resource> T findResource(
 		final Class<T> resourceClass,
 		AppLocation base,
 		String name,
@@ -77,18 +76,19 @@ class ResourceFinderImpl implements ResourceFinder {
 		return resourceClass.cast(resourceCache.get(resourceCache.getCreator(resourceClass).cacheKey(base, name, args)));
 	}
 	
+	@ResourceThread
 	@Override
 	public <T extends Resource> T loadResource(
 		final Class<T> resourceClass,
-		AppLocationBundle bundle,
+		Location bundle,
 		String name,
 		Object... args
 	) {
 		T result = null;
 		
-		for (AppLocation base : bundle.locations()) {
+		for (Location base : bundle.locations()) {
 			result = result == null ?
-				loadResource(resourceClass, base, name, args) :
+				loadResource(resourceClass, (AppLocation)base, name, args) :
 				result;
 		}
 		
@@ -96,8 +96,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	}
 	
 	@ResourceThread
-	@Override
-	public  <T extends Resource> T loadResource(
+	private  <T extends Resource> T loadResource(
 		final Class<T> resourceClass,
 		AppLocation base,
 		String name,
