@@ -1,1 +1,2 @@
+rootProject.name = 'JibbrJabbr'
 include 'bootstrapper','kernel','test'
