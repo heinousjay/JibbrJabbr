@@ -28,7 +28,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-public class Application {
+public class Application implements PathResolver {
 	
 	private static final String APP_PATH_ARG_NAME = "app";
 	
@@ -60,15 +60,18 @@ public class Application {
 	 * @param name
 	 * @return
 	 */
-	public Path resolvePath(AppLocation base, String name) {
+	@Override
+	public Path resolvePath(Location base, String name) {
 		
-		switch (base) {
+		AppLocation location = (AppLocation)base;
+		
+		switch (location) {
 		case Virtual:
 			return null;
 		case Assets:
 			return assets.path(name);
 		default:
-			return path().resolve(base.path()).resolve(name);
+			return path().resolve(location.path()).resolve(name);
 		}
 	}
 }

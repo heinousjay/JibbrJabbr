@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
+import jj.configuration.Location;
 import jj.configuration.Application;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.Resource;
@@ -77,20 +78,20 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 	}
 	
 	@Override
-	protected URI uri(final AppLocation base, String name, Object... args) {
+	protected URI uri(final Location base, String name, Object... args) {
 		return path(base, name, isLess(args)).toUri();
 	}
 	
 	/**
 	 * takes one parameter, if Boolean.TRUE then this tries to load a .less file
 	 */
-	private Path path(final AppLocation base, final String name, boolean less) {
+	private Path path(final Location base, final String name, boolean less) {
 		
 		return less ? app.resolvePath(base, toLess(name)) : app.resolvePath(base, name);
 	}
 
 	@Override
-	public CssResource create(final AppLocation base, final String name, final Object... args) throws IOException {
+	public CssResource create(final Location base, final String name, final Object... args) throws IOException {
 		boolean less = isLess(args);
 		// this will need some help running less correctly again
 		// but i want to make it a script environment anyway
@@ -99,7 +100,7 @@ public class CssResourceCreator extends AbstractResourceCreator<CssResource> {
 		
 			resource = instanceModuleCreator.createResource(
 				CssResource.class,
-				cacheKey(base, less ? toLess(name) : name),
+				resourceKey(base, less ? toLess(name) : name),
 				base,
 				less ? toLess(name) : name,
 				less

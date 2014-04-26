@@ -20,8 +20,8 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.Location;
+import jj.configuration.PathResolver;
 import jj.logging.EmergencyLog;
 
 import com.google.inject.AbstractModule;
@@ -38,7 +38,7 @@ import com.google.inject.ProvisionException;
 @Singleton
 public class ResourceInstanceCreator {
 	
-	private final Application app;
+	private final PathResolver pathResolver;
 
 	private final Injector parentInjector;
 	
@@ -46,23 +46,23 @@ public class ResourceInstanceCreator {
 	
 	@Inject
 	ResourceInstanceCreator(
-		final Application app,
+		final PathResolver pathResolver,
 		final Injector parentInjector,
 		final EmergencyLog logger
 	) {
-		this.app = app;
+		this.pathResolver = pathResolver;
 		this.parentInjector = parentInjector;
 		this.logger = logger;
 	}
 	
 	public <T extends Resource> T createResource(
 		final Class<T> type,
-		final ResourceCacheKey cacheKey,
-		final AppLocation base,
+		final ResourceKey cacheKey,
+		final Location base,
 		final String name,
 		final Object...args
 	) {
-		final Path path = app.resolvePath(base, name);
+		final Path path = pathResolver.resolvePath(base, name);
 		
 		try {
 			
@@ -73,8 +73,8 @@ public class ResourceInstanceCreator {
 						@Override
 						protected void configure() {
 							bind(type);
-							bind(ResourceCacheKey.class).toInstance(cacheKey);
-							bind(AppLocation.class).toInstance(base);
+							bind(ResourceKey.class).toInstance(cacheKey);
+							bind(Location.class).toInstance(base);
 							bind(String.class).toInstance(name);
 							if (path != null) {
 								bind(Path.class).toInstance(path);

@@ -33,7 +33,7 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 	
 	private final Configuration configuration;
 	
-	private AtomicReference<ConcurrentMap<ResourceCacheKey, Resource>> delegate;
+	private AtomicReference<ConcurrentMap<ResourceKey, Resource>> delegate;
 
 	@Inject
 	ResourceCacheImpl(final ResourceCreators resourceCreators, final Configuration configuration) {
@@ -41,7 +41,7 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 		this.configuration = configuration;
 		
 		// we're going to have our config resource, at least, before we get started
-		delegate = new AtomicReference<>(PlatformDependent.<ResourceCacheKey, Resource>newConcurrentHashMap(4, 0.75F, 3));
+		delegate = new AtomicReference<>(PlatformDependent.<ResourceKey, Resource>newConcurrentHashMap(4, 0.75F, 3));
 	}
 
 	/**
@@ -53,7 +53,7 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 		List<Resource> result = new ArrayList<>();
 		
 		for (AbstractResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
-			Resource it = get(new ResourceCacheKey(resourceCreator.type(), uri));
+			Resource it = get(new ResourceKey(resourceCreator.type(), uri));
 			if (it != null) result.add(it);
 		}
 		return Collections.unmodifiableList(result);
@@ -66,9 +66,9 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 	
 	@Override
 	public void start() throws Exception {
-		ConcurrentMap<ResourceCacheKey, Resource> old = 
+		ConcurrentMap<ResourceKey, Resource> old = 
 			delegate.getAndSet(
-				PlatformDependent.<ResourceCacheKey, Resource>newConcurrentHashMap(
+				PlatformDependent.<ResourceKey, Resource>newConcurrentHashMap(
 					128,
 					0.75F,
 					configuration.get(ExecutionConfiguration.class).ioThreads()
@@ -90,22 +90,22 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 	}
 	
 	@Override
-	public Resource get(ResourceCacheKey key) {
+	public Resource get(ResourceKey key) {
 		return delegate.get().get(key);
 	}
 
 	@Override
-	public Resource putIfAbsent(ResourceCacheKey key, Resource value) {
+	public Resource putIfAbsent(ResourceKey key, Resource value) {
 		return delegate.get().putIfAbsent(key, value);
 	}
 
 	@Override
-	public boolean replace(ResourceCacheKey key, Resource oldValue, Resource newValue) {
+	public boolean replace(ResourceKey key, Resource oldValue, Resource newValue) {
 		return delegate.get().replace(key, oldValue, newValue);
 	}
 
 	@Override
-	public boolean remove(ResourceCacheKey cacheKey, Resource resource) {
+	public boolean remove(ResourceKey cacheKey, Resource resource) {
 		return delegate.get().remove(cacheKey, resource);
 	}
 	

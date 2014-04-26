@@ -20,7 +20,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.configuration.AppLocation;
+import javax.inject.Inject;
+
+import jj.configuration.Location;
 
 /**
  * internal helper for manipulating a resource.  ALL RESOURCES
@@ -30,19 +32,31 @@ import jj.configuration.AppLocation;
  *
  */
 public abstract class AbstractResource implements Resource {
+	
+	public static class Dependencies {
+		
+		protected final ResourceKey resourceKey;
+		protected final Location base;
+		
+		@Inject
+		public Dependencies(final ResourceKey resourceKey, final Location base) {
+			this.resourceKey = resourceKey;
+			this.base = base;
+		}
+	}
 
 	protected static final Object[] EMPTY_ARGS = {};
 	
-	protected final ResourceCacheKey cacheKey;
+	protected final ResourceKey cacheKey;
 	
-	protected final AppLocation base;
+	protected final Location base;
 	
 	final Set<AbstractResource> dependents = new HashSet<>();
 	volatile boolean alive = true;
 	
-	protected AbstractResource(final ResourceCacheKey cacheKey, final AppLocation base) {
-		this.cacheKey = cacheKey;
-		this.base = base;
+	protected AbstractResource(final Dependencies dependencies) {
+		this.cacheKey = dependencies.resourceKey;
+		this.base = dependencies.base;
 	}
 	
 	@ResourceThread
@@ -90,12 +104,12 @@ public abstract class AbstractResource implements Resource {
 		alive = false;
 	}
 	
-	ResourceCacheKey cacheKey() {
+	ResourceKey cacheKey() {
 		return cacheKey;
 	}
 	
 	@Override
-	public AppLocation base() {
+	public Location base() {
 		return base;
 	}
 	

@@ -39,7 +39,7 @@ import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.MockCurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.ContinuationPendingKey;
@@ -73,7 +73,7 @@ public class DocumentScriptEnvironmentTest {
 	@Mock DocumentWebSocketMessageProcessors processors;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	
-	ResourceCacheKey cacheKey;
+	ResourceKey cacheKey;
 	MockRhinoContextProvider contextMaker;
 	MockAbstractScriptEnvironmentDependencies dependencies;
 	

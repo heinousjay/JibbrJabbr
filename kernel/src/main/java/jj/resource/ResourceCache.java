@@ -34,9 +34,9 @@ interface ResourceCache {
 	 * @param cacheKey
 	 * @return
 	 */
-	Resource get(ResourceCacheKey cacheKey);
+	Resource get(ResourceKey cacheKey);
 	
-	Resource putIfAbsent(ResourceCacheKey cacheKey, Resource resource);
+	Resource putIfAbsent(ResourceKey cacheKey, Resource resource);
 	
 	<T extends Resource> ResourceCreator<T> getCreator(final Class<T> type);
 
@@ -45,8 +45,8 @@ interface ResourceCache {
 	 * @param resource
 	 * @return
 	 */
-	boolean remove(ResourceCacheKey cacheKey, Resource resource);
+	boolean remove(ResourceKey cacheKey, Resource resource);
 	
-	boolean replace(ResourceCacheKey key, Resource oldValue, Resource newValue);
+	boolean replace(ResourceKey key, Resource oldValue, Resource newValue);
 
 }

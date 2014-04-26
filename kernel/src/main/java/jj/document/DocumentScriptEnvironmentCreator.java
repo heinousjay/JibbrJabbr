@@ -42,7 +42,7 @@ public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentC
 	protected DocumentScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
 		DocumentScriptEnvironment dse = creator.createResource(
 			DocumentScriptEnvironment.class,
-			cacheKey(Virtual, name),
+			resourceKey(Virtual, name),
 			Virtual,
 			name,
 			args

@@ -12,9 +12,7 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
 import jj.resource.AbstractFileResource;
-import jj.resource.ResourceCacheKey;
 
 /**
  * 
@@ -28,12 +26,11 @@ public class PropertiesResource extends AbstractFileResource {
 	
 	@Inject
 	PropertiesResource(
-		final ResourceCacheKey cacheKey,
+		final Dependencies dependencies,
 		final Path path,
-		final AppLocation base,
 		final String name
 	) throws IOException {
-		super(cacheKey, base, name, path);
+		super(dependencies, name, path);
 		
 		Properties loader = new Properties();
 		loader.load(new StringReader(byteBuffer.toString(UTF_8)));

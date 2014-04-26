@@ -23,11 +23,9 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
 import jj.resource.AbstractFileResource;
 import jj.resource.ResourceThread;
 import jj.resource.MimeTypes;
-import jj.resource.ResourceCacheKey;
 import jj.resource.TransferableResource;
 
 /**
@@ -45,8 +43,8 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	 * @throws IOException
 	 */
 	@Inject
-	StaticResource(final ResourceCacheKey cacheKey, final Path path, final AppLocation base, final String name) throws IOException {
-		super(cacheKey, base, name, path, false);
+	StaticResource(final Dependencies dependencies, final Path path, final String name) throws IOException {
+		super(dependencies, name, path, false);
 		mime = MimeTypes.get(name);
 	}
 	

@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 import jj.logging.LoggedEvent;
 
 /**
@@ -31,18 +31,18 @@ import jj.logging.LoggedEvent;
 public abstract class ResourceEvent implements LoggedEvent {
 	
 	public final Class<? extends Resource> resourceClass;
-	public final AppLocation base;
+	public final Location base;
 	public final String name;
 	public final Object[] arguments;
 	
-	protected ResourceEvent(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
+	protected ResourceEvent(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
 		this.resourceClass = resourceClass;
 		this.base = base;
 		this.name = name;
 		this.arguments = arguments;
 	}
 	
-	public boolean matches(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
+	public boolean matches(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
 		return this.resourceClass == resourceClass &&
 			this.base == base &&
 			this.name.equals(name) &&

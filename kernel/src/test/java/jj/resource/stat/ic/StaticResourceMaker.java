@@ -16,7 +16,7 @@
 package jj.resource.stat.ic;
 
 import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.PathResolver;
 import jj.resource.ResourceInstanceCreator;
 
 /**
@@ -24,11 +24,11 @@ import jj.resource.ResourceInstanceCreator;
  *
  */
 public class StaticResourceMaker {
-	public static StaticResource make(Application app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
+	public static StaticResource make(PathResolver app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
 		return new StaticResourceCreator(app, creator).create(base, name);
 	}
 	
-	public static StaticResourceCreator fake(Application app) {
+	public static StaticResourceCreator fake(PathResolver app) {
 		return new StaticResourceCreator(app, null);
 	}
 }

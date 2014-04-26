@@ -29,7 +29,7 @@ import org.mozilla.javascript.Undefined;
 
 import jj.configuration.AppLocation;
 import jj.resource.AbstractResource;
-import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceKey;
 import jj.util.Closer;
 
 /**
@@ -42,21 +42,20 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	// to be updated when this changes, cause it just might change more!
 	// package-private access on the fields for testing
 	@Singleton
-	public static class Dependencies {
+	public static class Dependencies extends AbstractResource.Dependencies {
 		
-		final ResourceCacheKey cacheKey;
 		final Provider<RhinoContext> contextProvider;
 		final Provider<ContinuationPendingKey> pendingKeyProvider;
 		final RequireInnerFunction requireInnerFunction;
 		
 		@Inject
 		Dependencies(
-			final ResourceCacheKey cacheKey,
+			final ResourceKey cacheKey,
 			final Provider<RhinoContext> contextProvider,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction
 		) {
-			this.cacheKey = cacheKey;
+			super(cacheKey, AppLocation.Virtual);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
@@ -80,7 +79,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected AbstractScriptEnvironment(
 		Dependencies dependencies
 	) {
-		super(dependencies.cacheKey, AppLocation.Virtual);
+		super(dependencies);
 		this.contextProvider = dependencies.contextProvider;
 		this.dependencies = dependencies;
 	}

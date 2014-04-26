@@ -22,7 +22,7 @@ import jj.execution.CurrentTask;
 @Singleton
 class ResourceFinderImpl implements ResourceFinder {
 	
-	private final ConcurrentMap<ResourceCacheKey, ResourceTask> resourcesInProgress = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentMap<ResourceKey, ResourceTask> resourcesInProgress = PlatformDependent.newConcurrentHashMap();
 
 	private final ResourceCache resourceCache;
 	
@@ -60,45 +60,18 @@ class ResourceFinderImpl implements ResourceFinder {
 		
 		for (Location base : locations.locations()) {
 			result = result == null ?
-				findResource(resourceClass, (AppLocation)base, name, args) :
+				resourceClass.cast(resourceCache.get(resourceCache.getCreator(resourceClass).resourceKey(base, name, args))) :
 				result;
 		}
 		
 		return result;
 	}
 	
-	private <T extends Resource> T findResource(
-		final Class<T> resourceClass,
-		AppLocation base,
-		String name,
-		Object... args
-	) {
-		return resourceClass.cast(resourceCache.get(resourceCache.getCreator(resourceClass).cacheKey(base, name, args)));
-	}
-	
-	@ResourceThread
 	@Override
+	@ResourceThread
 	public <T extends Resource> T loadResource(
 		final Class<T> resourceClass,
 		Location bundle,
-		String name,
-		Object... args
-	) {
-		T result = null;
-		
-		for (Location base : bundle.locations()) {
-			result = result == null ?
-				loadResource(resourceClass, (AppLocation)base, name, args) :
-				result;
-		}
-		
-		return result;
-	}
-	
-	@ResourceThread
-	private  <T extends Resource> T loadResource(
-		final Class<T> resourceClass,
-		AppLocation base,
 		String name,
 		Object...arguments
 	) {
@@ -109,43 +82,50 @@ class ResourceFinderImpl implements ResourceFinder {
 		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
 		T result = null;
 		
-		ResourceCacheKey cacheKey = resourceCreator.cacheKey(base, name, arguments);
-		acquire(cacheKey);
-		try {
-			result = resourceClass.cast(resourceCache.get(cacheKey));
-			if (result == null) {
-				createResource(base, name, resourceCreator, cacheKey, arguments);
-			} else if (((AbstractResource)result).isObselete()) {
-				replaceResource(base, name, resourceCreator, result, cacheKey, arguments);
-			}
-			result = resourceClass.cast(resourceCache.get(cacheKey));
+		for (Location base : bundle.locations()) {
 		
-		} catch (Exception e) {
-			publisher.publish(new ResourceError(resourceClass, base, name, arguments, e));
-		} finally {
-			release(cacheKey);
+			ResourceKey cacheKey = resourceCreator.resourceKey(base, name, arguments);
+			acquire(cacheKey);
+			try {
+				result = resourceClass.cast(resourceCache.get(cacheKey));
+				if (result == null) {
+					createResource(base, name, resourceCreator, cacheKey, arguments);
+				} else if (((AbstractResource)result).isObselete()) {
+					replaceResource(base, name, resourceCreator, result, cacheKey, arguments);
+				}
+				result = resourceClass.cast(resourceCache.get(cacheKey));
+			
+			} catch (Exception e) {
+				publisher.publish(new ResourceError(resourceClass, base, name, arguments, e));
+			} finally {
+				release(cacheKey);
+			}
+			
+			if (result != null) {
+				break;
+			}
 		}
 		
 		return result;
 	}
 	
-	private void acquire(ResourceCacheKey slot) {
+	private void acquire(ResourceKey slot) {
 		ResourceTask owner = resourcesInProgress.putIfAbsent(slot, currentTask.currentAs(ResourceTask.class));
 		if (owner != null) {
 			owner.await();
 		}
 	}
 	
-	private void release(ResourceCacheKey slot) {
+	private void release(ResourceKey slot) {
 		resourcesInProgress.remove(slot, currentTask.currentAs(ResourceTask.class));
 	}
 
 	private <T extends Resource> void replaceResource(
-		final AppLocation base,
+		final Location base,
 		String name,
 		ResourceCreator<T> resourceCreator,
 		T result,
-		ResourceCacheKey cacheKey,
+		ResourceKey cacheKey,
 		Object...arguments
 	) throws IOException {
 		
@@ -161,10 +141,10 @@ class ResourceFinderImpl implements ResourceFinder {
 	}
 
 	private <T extends Resource> void createResource(
-		AppLocation base,
+		Location base,
 		String name,
 		ResourceCreator<T> resourceCreator,
-		ResourceCacheKey cacheKey,
+		ResourceKey cacheKey,
 		Object...arguments
 	) throws IOException {
 		

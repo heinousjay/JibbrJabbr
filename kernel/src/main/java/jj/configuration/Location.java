@@ -17,6 +17,11 @@ package jj.configuration;
 
 import java.util.List;
 
+/**
+ * Abstraction of a location of a resource
+ * @author jason
+ *
+ */
 public interface Location {
 	
 	Location and(Location location);

@@ -26,7 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import jj.configuration.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.DocumentScriptEnvironmentCreator;
-import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceKey;
 import jj.resource.ResourceInstanceCreator;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,7 +50,7 @@ public class DocumentScriptEnvironmentCreatorTest {
 		
 		verify(creator).createResource(
 			eq(DocumentScriptEnvironment.class),
-			any(ResourceCacheKey.class),
+			any(ResourceKey.class),
 			eq(AppLocation.Virtual),
 			eq(name)
 		);

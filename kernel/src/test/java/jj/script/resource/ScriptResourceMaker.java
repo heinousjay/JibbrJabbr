@@ -16,7 +16,7 @@
 package jj.script.resource;
 
 import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.PathResolver;
 import jj.resource.ResourceInstanceCreator;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceCreator;
@@ -33,7 +33,7 @@ public class ScriptResourceMaker {
 	 * @param baseName
 	 * @return
 	 */
-	public static ScriptResource make(Application app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
+	public static ScriptResource make(PathResolver app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
 		return new ScriptResourceCreator(app, creator).create(base, name);
 	}
 

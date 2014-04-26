@@ -45,9 +45,9 @@ public class MockApplication extends Application {
 	}
 
 	@Override
-	public Path resolvePath(AppLocation base, String name) {
+	public Path resolvePath(Location base, String name) {
 		if (base != AppLocation.Assets && base != AppLocation.Virtual) {
-			return basePath.resolve(base.path()).resolve(name);
+			return basePath.resolve(((AppLocation)base).path()).resolve(name);
 		}
 		return super.resolvePath(base, name);
 	}

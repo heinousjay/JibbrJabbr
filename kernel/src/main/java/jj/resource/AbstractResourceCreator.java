@@ -17,7 +17,7 @@ package jj.resource;
 
 import java.net.URI;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 import jj.util.GenericUtils;
 
 /**
@@ -29,7 +29,7 @@ import jj.util.GenericUtils;
  */
 public abstract class AbstractResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
 
-	protected abstract URI uri(final AppLocation base, final String name, final Object...args);
+	protected abstract URI uri(final Location base, final String name, final Object...args);
 	
 	private final Class<T> type;
 	
@@ -44,7 +44,7 @@ public abstract class AbstractResourceCreator<T extends AbstractResource> implem
 	}
 	
 	@Override
-	public ResourceCacheKey cacheKey(final AppLocation base, final String name, final Object...args) {
-		return new ResourceCacheKey(type, uri(base, name, args));
+	public ResourceKey resourceKey(final Location base, final String name, final Object...args) {
+		return new ResourceKey(type, uri(base, name, args));
 	}
 }

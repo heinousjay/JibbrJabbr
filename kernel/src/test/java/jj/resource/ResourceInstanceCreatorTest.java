@@ -27,6 +27,7 @@ import java.util.Date;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.configuration.Configuration;
+import jj.configuration.PathResolver;
 import jj.logging.EmergencyLog;
 import jj.resource.stat.ic.StaticResource;
 
@@ -49,7 +50,7 @@ public class ResourceInstanceCreatorTest  {
 	
 	// TODO kill this off.  too much concrete stuff
 	public static ResourceInstanceCreator creator(
-		final Application app,
+		final PathResolver app,
 		final Configuration configuration,
 		final EmergencyLog logger
 	) {
@@ -70,7 +71,7 @@ public class ResourceInstanceCreatorTest  {
 	
 	@InjectMocks ResourceInstanceCreator rimc;
 	
-	@Mock ResourceCacheKey cacheKey;
+	@Mock ResourceKey cacheKey;
 	
 	@Before
 	public void before() {
@@ -93,7 +94,7 @@ public class ResourceInstanceCreatorTest  {
 		
 		Injector testInjector = Guice.createInjector(moduleCaptor.getValue());
 		
-		assertThat(testInjector.getInstance(ResourceCacheKey.class), is(cacheKey));
+		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
 		assertThat(testInjector.getInstance(String.class), is(name));
 		assertThat(testInjector.getInstance(Path.class), is(path));
 	}
@@ -141,7 +142,7 @@ public class ResourceInstanceCreatorTest  {
 		
 		Injector testInjector = Guice.createInjector(moduleCaptor.getValue());
 		
-		assertThat(testInjector.getInstance(ResourceCacheKey.class), is(cacheKey));
+		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
 		assertThat(testInjector.getInstance(String.class), is(name));
 		assertThat(testInjector.getExistingBinding(Key.get(Path.class)), is(nullValue()));
 		assertThat(testInjector.getInstance(Integer.class), is(one));

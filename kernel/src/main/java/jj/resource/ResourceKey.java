@@ -13,37 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.spec;
+package jj.resource;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.nio.file.Path;
-
-import javax.inject.Inject;
-
-import jj.resource.AbstractFileResource;
-import jj.resource.MimeTypes;
+import java.net.URI;
 
 /**
  * @author jason
  *
  */
-public class SpecResource extends AbstractFileResource {
-
-	private final String script;
+public class ResourceKey {
 	
-	@Inject
-	SpecResource(final Dependencies dependencies, final String name, final Path path) {
-		super(dependencies, name, path);
-		script = byteBuffer.toString(UTF_8);
-	}
+	private final String toString;
+	private final int hashCode;
 
+	public ResourceKey(final Class<? extends Resource> type, final URI uri) {
+		this.toString = type.getSimpleName().toString() + " at " + uri.toString();
+		this.hashCode = toString.hashCode();
+	}
+	
 	@Override
-	public String mime() {
-		return MimeTypes.get(".js");
+	public int hashCode() {
+		return hashCode;
 	}
 	
-	public String script() {
-		return script;
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof ResourceKey && toString.equals(String.valueOf(obj));
+	}
+	
+	@Override
+	public String toString() {
+		return toString;
 	}
 }

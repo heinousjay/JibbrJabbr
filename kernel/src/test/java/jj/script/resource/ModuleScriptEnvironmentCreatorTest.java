@@ -17,7 +17,7 @@ package jj.script.resource;
 
 import static org.mockito.BDDMockito.*;
 import jj.configuration.AppLocation;
-import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceKey;
 import jj.resource.ResourceInstanceCreator;
 import jj.script.ScriptEnvironment;
 import jj.script.resource.ModuleScriptEnvironment;
@@ -60,7 +60,7 @@ public class ModuleScriptEnvironmentCreatorTest {
 		
 		verify(creator).createResource(
 			eq(ModuleScriptEnvironment.class),
-			any(ResourceCacheKey.class),
+			any(ResourceKey.class),
 			eq(AppLocation.Virtual),
 			eq(name),
 			eq(requiredModule)

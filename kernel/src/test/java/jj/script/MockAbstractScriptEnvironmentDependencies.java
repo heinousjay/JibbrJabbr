@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 
 import javax.inject.Provider;
 
-import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceKey;
 import jj.script.AbstractScriptEnvironment.Dependencies;
 
 /**
@@ -32,7 +32,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 
 	public MockAbstractScriptEnvironmentDependencies() {
 		super(
-			mock(ResourceCacheKey.class),
+			mock(ResourceKey.class),
 			new MockRhinoContextProvider(),
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class)
@@ -41,15 +41,15 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 
 	public MockAbstractScriptEnvironmentDependencies(RealRhinoContextProvider rhinoContextProvider) {
 		super(
-			mock(ResourceCacheKey.class),
+			mock(ResourceKey.class),
 			rhinoContextProvider,
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class)
 		);
 	}
 	
-	public ResourceCacheKey resourceCacheKey() {
-		return cacheKey;
+	public ResourceKey resourceCacheKey() {
+		return resourceKey;
 	}
 	
 	public MockRhinoContextProvider rhinoContextProvider() {

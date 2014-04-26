@@ -21,6 +21,8 @@ import static org.junit.Assert.*;
 
 import java.nio.file.Path;
 
+import jj.configuration.AppLocation;
+import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceCreator;
@@ -43,7 +45,7 @@ public class ConfigResourceCreatorTest extends ResourceBase<ConfigResource, Conf
 	
 	@Override
 	protected ConfigResource resource() throws Exception {
-		return new ConfigResource(new RealRhinoContextProvider(), cacheKey(), path());
+		return new ConfigResource(new RealRhinoContextProvider(), new Dependencies(cacheKey(), AppLocation.Base), path());
 	}
 	
 	@Override

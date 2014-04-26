@@ -16,7 +16,7 @@
 package jj.document;
 
 import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.PathResolver;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceCreator;
 import jj.resource.ResourceInstanceCreator;
@@ -26,11 +26,11 @@ import jj.resource.ResourceInstanceCreator;
  *
  */
 public class HtmlResourceMaker {
-	public static HtmlResource make(Application app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
+	public static HtmlResource make(PathResolver app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
 		return new HtmlResourceCreator(app, creator).create(base, name);
 	}
 	
-	public static HtmlResourceCreator fake(Application app) {
+	public static HtmlResourceCreator fake(PathResolver app) {
 		return new HtmlResourceCreator(app, null);
 	}
 }

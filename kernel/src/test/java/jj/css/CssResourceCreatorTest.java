@@ -28,9 +28,10 @@ import jj.css.CssResource;
 import jj.css.CssResourceCreator;
 import jj.css.LessProcessor;
 import jj.event.Publisher;
+import jj.resource.AbstractResource.Dependencies;
 import jj.resource.Resource;
 import jj.resource.ResourceBase;
-import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceMaker;
 import jj.resource.stat.ic.StaticResource;
@@ -55,8 +56,8 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		return "../jj/resource/test.css";
 	}
 	
-	protected ResourceCacheKey cacheKey(String baseName) {
-		return new ResourceCacheKey(CssResource.class, path(baseName).toUri());
+	protected ResourceKey cacheKey(String baseName) {
+		return new ResourceKey(CssResource.class, path(baseName).toUri());
 	}
 	
 	protected Path path() {
@@ -73,7 +74,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	}
 	
 	protected CssResource resource(String name) throws Exception {
-		return new CssResource(cacheKey(name), AppLocation.Base, name, path(name), false);
+		return new CssResource(new Dependencies(cacheKey(name), AppLocation.Base), name, path(name), false);
 	}
 	
 	@Override

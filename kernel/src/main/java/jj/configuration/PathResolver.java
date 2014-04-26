@@ -13,36 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.configuration;
 
-import java.net.URI;
+import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class ResourceCacheKey {
-	
-	private final String toString;
-	private final int hashCode;
+public interface PathResolver {
 
-	public ResourceCacheKey(final Class<? extends Resource> type, final URI uri) {
-		this.toString = type.getSimpleName().toString() + " at " + uri.toString();
-		this.hashCode = toString.hashCode();
-	}
-	
-	@Override
-	public int hashCode() {
-		return hashCode;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof ResourceCacheKey && toString.equals(String.valueOf(obj));
-	}
-	
-	@Override
-	public String toString() {
-		return toString;
-	}
+	/**
+	 * @param base
+	 * @param name
+	 * @return
+	 */
+	Path resolvePath(Location base, String name);
+
 }

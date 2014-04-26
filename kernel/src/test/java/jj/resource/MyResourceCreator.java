@@ -18,17 +18,17 @@ package jj.resource;
 import java.io.IOException;
 import java.net.URI;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 
 class MyResourceCreator extends AbstractResourceCreator<MyResource> {
 
 	@Override
-	public MyResource create(AppLocation base, String name, Object... args) throws IOException {
+	public MyResource create(Location base, String name, Object... args) throws IOException {
 		return new MyResource(URI.create(name));
 	}
 
 	@Override
-	protected URI uri(AppLocation base, String name, Object... args) {
+	protected URI uri(Location base, String name, Object... args) {
 		return URI.create(name);
 	}
 }

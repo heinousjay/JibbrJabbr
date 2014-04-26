@@ -2,11 +2,12 @@ package jj.document;
 
 import java.io.IOException;
 import java.net.URI;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.Location;
+import jj.configuration.PathResolver;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -17,12 +18,12 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 		return baseName + ".html";
 	}
 	
-	private final Application app;
+	private final PathResolver app;
 	private final ResourceInstanceCreator instanceModuleCreator;
 	
 	@Inject
 	HtmlResourceCreator(
-		final Application app,
+		final PathResolver app,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
 		this.app = app;
@@ -30,12 +31,12 @@ public class HtmlResourceCreator extends AbstractResourceCreator<HtmlResource> {
 	}
 	
 	@Override
-	protected URI uri(final AppLocation base, final String name, final Object... args) {
+	protected URI uri(final Location base, final String name, final Object... args) {
 		return app.resolvePath(base, name).toUri();
 	}
 	
 	@Override
-	public HtmlResource create(final AppLocation base, final String name, final Object...args) throws IOException {
-		return instanceModuleCreator.createResource(HtmlResource.class, cacheKey(base, name), base, name);
+	public HtmlResource create(final Location base, final String name, final Object...args) throws IOException {
+		return instanceModuleCreator.createResource(HtmlResource.class, resourceKey(base, name), base, name);
 	}
 }

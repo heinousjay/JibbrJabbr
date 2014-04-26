@@ -21,7 +21,7 @@ import java.net.URI;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 import jj.resource.ResourceInstanceCreator;
 import jj.script.AbstractScriptEnvironmentCreator;
 import jj.script.ScriptEnvironmentInitializer;
@@ -49,7 +49,7 @@ class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Mo
 		
 		return creator.createResource(
 			ModuleScriptEnvironment.class,
-			cacheKey(Virtual, moduleIdentifier, args),
+			resourceKey(Virtual, moduleIdentifier, args),
 			Virtual,
 			moduleIdentifier,
 			args
@@ -57,7 +57,7 @@ class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Mo
 	}
 	
 	@Override
-	protected URI uri(AppLocation base, String moduleIdentifier, Object... args) {
+	protected URI uri(Location base, String moduleIdentifier, Object... args) {
 		
 		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
 		

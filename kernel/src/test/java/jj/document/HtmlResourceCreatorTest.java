@@ -15,6 +15,7 @@ import jj.configuration.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceCreator;
 import jj.document.servable.DocumentConfiguration;
+import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
 
 public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlResourceCreator> {
@@ -48,7 +49,7 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 			}
 		});
 		
-		return new HtmlResource(configuration, logger, cacheKey(), AppLocation.Base, name(), path());
+		return new HtmlResource(configuration, logger, new Dependencies(cacheKey(), AppLocation.Base), name(), path());
 	}
 	
 	@Override

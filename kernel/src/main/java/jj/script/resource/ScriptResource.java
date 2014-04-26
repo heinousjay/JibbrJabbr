@@ -10,10 +10,8 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
 import jj.resource.AbstractFileResource;
 import jj.resource.LoadedResource;
-import jj.resource.ResourceCacheKey;
 
 @Singleton
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
@@ -22,12 +20,11 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	
 	@Inject
 	ScriptResource(
-		final ResourceCacheKey cacheKey,
+		final Dependencies dependencies,
 		final Path path,
-		final AppLocation base,
 		final String name
 	) throws IOException {
-		super(cacheKey, base, name, path);
+		super(dependencies, name, path);
 		script = byteBuffer.toString(UTF_8);
 	}
 	

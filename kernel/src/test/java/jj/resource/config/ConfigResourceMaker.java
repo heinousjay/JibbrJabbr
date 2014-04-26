@@ -18,7 +18,9 @@ package jj.resource.config;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.resource.ResourceCacheKey;
+import jj.configuration.AppLocation;
+import jj.resource.AbstractResource.Dependencies;
+import jj.resource.ResourceKey;
 import jj.resource.config.ConfigResource;
 import jj.script.RealRhinoContextProvider;
 
@@ -34,6 +36,10 @@ public class ConfigResourceMaker {
 		
 		Path path = Base.appPath().resolve(ConfigResource.CONFIG_JS);
 		
-		return new ConfigResource(new RealRhinoContextProvider(), new ResourceCacheKey(ConfigResource.class, path.toUri()), path);
+		return new ConfigResource(
+			new RealRhinoContextProvider(), 
+			new Dependencies(new ResourceKey(ConfigResource.class, path.toUri()), AppLocation.Base),
+			path
+		);
 	}
 }

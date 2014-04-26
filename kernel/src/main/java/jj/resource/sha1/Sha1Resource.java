@@ -27,10 +27,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
 import jj.resource.AbstractFileResource;
 import jj.resource.MimeTypes;
-import jj.resource.ResourceCacheKey;
 
 /**
  * @author jason
@@ -51,8 +49,8 @@ public class Sha1Resource extends AbstractFileResource {
 	 * @throws IOException
 	 */
 	@Inject
-	Sha1Resource(ResourceCacheKey cacheKey, AppLocation base, String name, Path path) throws IOException {
-		super(cacheKey, base, name, path);
+	Sha1Resource(final Dependencies dependencies, final String name, final Path path) throws IOException {
+		super(dependencies, name, path);
 		Matcher matcher = FORMAT.matcher(byteBuffer.toString(UTF_8));
 		if (!matcher.matches()) {
 			throw new NoSuchFileException(path.toString());

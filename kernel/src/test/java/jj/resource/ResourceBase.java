@@ -50,8 +50,8 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		return AppLocation.Base;
 	}
 	
-	protected ResourceCacheKey cacheKey() {
-		return toTest.cacheKey(location(), name(), args());
+	protected ResourceKey cacheKey() {
+		return toTest.resourceKey(location(), name(), args());
 	}
 	
 	protected abstract String name();

@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
-import jj.configuration.AppLocation;
 import jj.util.SHA1Helper;
 
 /**
@@ -42,23 +41,21 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	
 	@ResourceThread
 	protected AbstractFileResource(
-		final ResourceCacheKey cacheKey,
-		final AppLocation base,
+		final Dependencies dependencies,
 		final String name,
 		final Path path
 	) {
-		this(cacheKey, base, name, path, true);
+		this(dependencies, name, path, true);
 	}
 	
 	@ResourceThread
 	protected AbstractFileResource(
-		final ResourceCacheKey cacheKey,
-		final AppLocation base,
+		final Dependencies dependencies,
 		final String name,
 		final Path path,
 		final boolean keepBytes
 	) {
-		super(cacheKey, base);
+		super(dependencies);
 		
 		try {
 		

@@ -17,11 +17,12 @@ package jj.resource.stat.ic;
 
 import java.io.IOException;
 import java.net.URI;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.Location;
+import jj.configuration.PathResolver;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 
@@ -32,26 +33,26 @@ import jj.resource.ResourceInstanceCreator;
 @Singleton
 public class StaticResourceCreator extends AbstractResourceCreator<StaticResource> {
 
-	private final Application app;
+	private final PathResolver pathResolver;
 	private final ResourceInstanceCreator instanceModuleCreator;
 
 	@Inject
 	StaticResourceCreator(
-		final Application app,
+		final PathResolver pathResolver,
 		final ResourceInstanceCreator instanceModuleCreator
 	) {
-		this.app = app;
+		this.pathResolver = pathResolver;
 		this.instanceModuleCreator = instanceModuleCreator;
 	}
 	
 	@Override
-	protected URI uri(AppLocation base, String name, Object... args) {
-		return app.resolvePath(base, name).toUri();
+	protected URI uri(Location base, String name, Object... args) {
+		return pathResolver.resolvePath(base, name).toUri();
 	}
 
 	@Override
-	public StaticResource create(AppLocation base, String name, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(StaticResource.class, cacheKey(base, name), base, name);
+	public StaticResource create(Location base, String name, Object... args) throws IOException {
+		return instanceModuleCreator.createResource(StaticResource.class, resourceKey(base, name), base, name);
 	}
 
 }

@@ -16,10 +16,9 @@
 package jj.resource;
 
 import static org.mockito.BDDMockito.*;
-
 import jj.configuration.AppLocation;
-import jj.configuration.Application;
 import jj.configuration.Configuration;
+import jj.configuration.PathResolver;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceMaker;
 import jj.logging.EmergencyLog;
@@ -35,16 +34,16 @@ import jj.script.resource.ScriptResourceMaker;
 public class ResourceMaker {
 	
 	private final EmergencyLog logger;
-	private final Application app;
+	private final PathResolver app;
 	private final ResourceInstanceCreator creator;
 	
-	public ResourceMaker(final Configuration configuration, final Application app) throws Exception {
+	public ResourceMaker(final Configuration configuration, final PathResolver app) throws Exception {
 		this.app = app;
 		logger = mock(EmergencyLog.class);
 		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);
 	}
 	
-	public ResourceMaker(Configuration configuration, final Application app, EmergencyLog logger) throws Exception {
+	public ResourceMaker(Configuration configuration, final PathResolver app, EmergencyLog logger) throws Exception {
 		this.app = app;
 		this.logger = logger;
 		creator = ResourceInstanceCreatorTest.creator(app, configuration, logger);

@@ -17,7 +17,7 @@ package jj.resource;
 
 import org.slf4j.Logger;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 
 /**
  * @author jason
@@ -27,7 +27,7 @@ public class ResourceError extends ResourceEvent {
 
 	private final Throwable t;
 	
-	ResourceError(Class<? extends Resource> resourceClass, AppLocation base, String name, Object[] arguments, Throwable t) {
+	ResourceError(Class<? extends Resource> resourceClass, Location base, String name, Object[] arguments, Throwable t) {
 		super(resourceClass, base, name, arguments);
 		this.t = t;
 	}

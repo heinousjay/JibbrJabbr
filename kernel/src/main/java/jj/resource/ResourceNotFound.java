@@ -17,7 +17,7 @@ package jj.resource;
 
 import org.slf4j.Logger;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 
 /**
  * @author jason
@@ -25,7 +25,7 @@ import jj.configuration.AppLocation;
  */
 public class ResourceNotFound extends ResourceEvent {
 	
-	public ResourceNotFound(final Class<? extends Resource> resourceClass, final AppLocation base, final String name, final Object...arguments) {
+	public ResourceNotFound(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
 		super(resourceClass, base, name, arguments);
 	}
 	

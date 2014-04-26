@@ -1,6 +1,6 @@
 package jj.resource;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 
 
 /**
@@ -16,9 +16,9 @@ import jj.configuration.AppLocation;
 public interface Resource {
 	
 	/**
-	 * The base of this resource
+	 * The base location of this resource
 	 */
-	AppLocation base();
+	Location base();
 	
 	/**
 	 * The name of this resource

@@ -29,6 +29,8 @@ public class ConfigurationModule extends JJModule {
 		addAssetPath("/jj/assets/");
 		
 		addStartupListenerBinding().to(ConfigurationScriptPreloader.class);
+		
+		bind(PathResolver.class).to(Application.class);
 	}
 
 }

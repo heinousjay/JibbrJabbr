@@ -54,9 +54,9 @@ public class ResourceCacheTest extends RealResourceBase {
 	
 	@Mock AbstractResourceCreator<HtmlResource> hrc;
 	
-	ResourceCacheKey sKey;
+	ResourceKey sKey;
 	
-	ResourceCacheKey hKey;
+	ResourceKey hKey;
 	
 	ResourceCacheImpl rc;
 	
@@ -77,8 +77,8 @@ public class ResourceCacheTest extends RealResourceBase {
 		given(src.type()).willReturn(StaticResource.class);
 		given(hrc.type()).willReturn(HtmlResource.class);
 		
-		sKey = new ResourceCacheKey(StaticResource.class, uri);
-		hKey = new ResourceCacheKey(HtmlResource.class, uri);
+		sKey = new ResourceKey(StaticResource.class, uri);
+		hKey = new ResourceKey(HtmlResource.class, uri);
 	}
 	
 	@Test

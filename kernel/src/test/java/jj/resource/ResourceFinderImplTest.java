@@ -39,16 +39,16 @@ public class ResourceFinderImplTest {
 	private @Captor ArgumentCaptor<ResourceEvent> eventCaptor;
 	
 	private @Mock StaticResource staticResource1;
-	private @Mock ResourceCacheKey staticResource1Key;
+	private @Mock ResourceKey staticResource1Key;
 	private @Mock StaticResource staticResource2;
-	private @Mock ResourceCacheKey staticResource2Key;
+	private @Mock ResourceKey staticResource2Key;
 	
 	private @Mock Sha1Resource sha1Resource1;
-	private @Mock ResourceCacheKey sha1Resource1Key;
+	private @Mock ResourceKey sha1Resource1Key;
 	private @Mock Sha1Resource sha1Resource2;
-	private @Mock ResourceCacheKey sha1Resource2Key;
+	private @Mock ResourceKey sha1Resource2Key;
 	
-	private @Mock ResourceCacheKey deadKey;
+	private @Mock ResourceKey deadKey;
 	
 	private @Mock ResourceTask task;
 	
@@ -58,9 +58,9 @@ public class ResourceFinderImplTest {
 		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
 		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
 		
-		given(staticResourceCreator.cacheKey(Base, name1)).willReturn(staticResource1Key);
+		given(staticResourceCreator.resourceKey(Base, name1)).willReturn(staticResource1Key);
 		given(resourceCache.get(staticResource1Key)).willReturn(staticResource1);
-		given(sha1ResourceCreator.cacheKey(Base, name2)).willReturn(sha1Resource2Key);
+		given(sha1ResourceCreator.resourceKey(Base, name2)).willReturn(sha1Resource2Key);
 		given(resourceCache.get(sha1Resource2Key)).willReturn(sha1Resource2);
 		
 		assertThat(rfi.findResource(StaticResource.class, Base, name1), is(staticResource1));
@@ -75,9 +75,9 @@ public class ResourceFinderImplTest {
 		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
 		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
 		
-		given(staticResourceCreator.cacheKey(any(AppLocation.class), anyString())).willReturn(deadKey);
-		given(staticResourceCreator.cacheKey(Public, name1)).willReturn(staticResource1Key);
-		given(staticResourceCreator.cacheKey(Assets, name2)).willReturn(staticResource2Key);
+		given(staticResourceCreator.resourceKey(any(AppLocation.class), anyString())).willReturn(deadKey);
+		given(staticResourceCreator.resourceKey(Public, name1)).willReturn(staticResource1Key);
+		given(staticResourceCreator.resourceKey(Assets, name2)).willReturn(staticResource2Key);
 		given(resourceCache.get(staticResource1Key)).willReturn(staticResource1);
 		given(resourceCache.get(staticResource2Key)).willReturn(staticResource2);
 		
@@ -98,9 +98,9 @@ public class ResourceFinderImplTest {
 		
 		assertThat(sr, is(staticResource2));
 		
-		verify(staticResourceCreator).cacheKey(Public, name2);
-		verify(staticResourceCreator).cacheKey(Private, name2);
-		verify(staticResourceCreator).cacheKey(Assets, name2);
+		verify(staticResourceCreator).resourceKey(Public, name2);
+		verify(staticResourceCreator).resourceKey(Private, name2);
+		verify(staticResourceCreator).resourceKey(Assets, name2);
 	}
 	
 	@Test
@@ -108,12 +108,12 @@ public class ResourceFinderImplTest {
 		
 		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
 		given(staticResourceCreator.type()).willReturn(StaticResource.class);
-		given(staticResourceCreator.cacheKey(Base, name1)).willReturn(staticResource2Key);
+		given(staticResourceCreator.resourceKey(Base, name1)).willReturn(staticResource2Key);
 		given(staticResourceCreator.create(Base, name1)).willReturn(staticResource2);
 		
 		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
 		given(sha1ResourceCreator.type()).willReturn(Sha1Resource.class);
-		given(sha1ResourceCreator.cacheKey(Base, name2)).willReturn(sha1Resource1Key);
+		given(sha1ResourceCreator.resourceKey(Base, name2)).willReturn(sha1Resource1Key);
 		given(sha1ResourceCreator.create(Base, name2)).willReturn(sha1Resource1);
 		
 		given(isThread.forResourceTask()).willReturn(true);

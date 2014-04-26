@@ -10,13 +10,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
 import jj.document.servable.DocumentConfiguration;
 import jj.logging.EmergencyLog;
 import jj.resource.AbstractFileResource;
-import jj.resource.ResourceCacheKey;
-
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
@@ -69,12 +66,11 @@ public class HtmlResource extends AbstractFileResource {
 	HtmlResource(
 		final Configuration configuration,
 		final EmergencyLog logger,
-		final ResourceCacheKey cacheKey,
-		final AppLocation base,
+		final Dependencies dependencies,
 		final String name,
 		final Path path
 	) throws IOException {
-		super(cacheKey, base, name, path);
+		super(dependencies, name, path);
 		
 		DocumentConfiguration config = configuration.get(DocumentConfiguration.class);
 		

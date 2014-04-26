@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.configuration.AppLocation;
+import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
 import jj.resource.spec.SpecResource;
 import jj.resource.spec.SpecResourceCreator;
@@ -44,7 +45,7 @@ public class SpecResourceCreatorTest extends ResourceBase<SpecResource, SpecReso
 
 	@Override
 	protected SpecResource resource() throws Exception {
-		return new SpecResource(cacheKey(), AppLocation.Base, name(), path());
+		return new SpecResource(new Dependencies(cacheKey(), AppLocation.Base), name(), path());
 	}
 
 	@Override

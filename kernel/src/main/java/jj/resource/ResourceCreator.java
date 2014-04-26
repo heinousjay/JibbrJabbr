@@ -2,7 +2,7 @@ package jj.resource;
 
 import java.io.IOException;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 
 /**
  * represents the ability to create a resource given a baseName and
@@ -20,10 +20,10 @@ interface ResourceCreator<T extends Resource> {
 	Class<T> type();
 
 	/**
-	 * Produce a cache key for given resource by its creation args
+	 * Produce a resource key for given resource by its creation args
 	 * @return
 	 */
-	ResourceCacheKey cacheKey(final AppLocation base, final String name, final Object...args);
+	ResourceKey resourceKey(final Location base, final String name, final Object...args);
 	
 	/**
 	 * create the given resource
@@ -32,5 +32,5 @@ interface ResourceCreator<T extends Resource> {
 	 * @return
 	 * @throws IOException
 	 */
-	T create(final AppLocation base, final String name, final Object...args) throws IOException;
+	T create(final Location base, final String name, final Object...args) throws IOException;
 }

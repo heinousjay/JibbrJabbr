@@ -18,9 +18,7 @@ package jj.messaging;
 import java.io.IOException;
 import java.util.Locale;
 
-import jj.configuration.AppLocation;
 import jj.resource.AbstractResource;
-import jj.resource.ResourceCacheKey;
 import jj.resource.ResourceFinder;
 
 /**
@@ -40,13 +38,12 @@ public class MessagesResource extends AbstractResource {
 	private final Locale locale;
 
 	MessagesResource(
-		final ResourceCacheKey cacheKey,
-		final AppLocation base,
+		final Dependencies dependencies,
 		final String name,
 		final Locale locale,
 		final ResourceFinder resourceFinder
 	) {
-		super(cacheKey, base);
+		super(dependencies);
 		
 		this.name = name;
 		this.locale = locale;

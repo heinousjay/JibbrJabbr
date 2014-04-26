@@ -15,7 +15,7 @@
  */
 package jj.resource;
 
-import jj.configuration.AppLocation;
+import jj.configuration.Location;
 
 /**
  * @author jason
@@ -23,7 +23,7 @@ import jj.configuration.AppLocation;
  */
 public class ResourceReloaded extends ResourceEvent {
 
-	public ResourceReloaded(Class<? extends Resource> resourceClass, final AppLocation base, String name, Object...arguments) {
+	public ResourceReloaded(Class<? extends Resource> resourceClass, final Location base, String name, Object...arguments) {
 		super(resourceClass, base, name, arguments);
 	}
 

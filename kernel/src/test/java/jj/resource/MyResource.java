@@ -25,7 +25,7 @@ class MyResource extends AbstractResource {
 	private final URI uri;
 	
 	protected MyResource(URI uri) {
-		super(new ResourceCacheKey(MyResource.class, uri), AppLocation.Base);
+		super(new Dependencies(new ResourceKey(MyResource.class, uri), AppLocation.Base));
 		this.uri = uri;
 	}
 

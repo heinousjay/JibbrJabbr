@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.is;
 import java.io.IOException;
 import javax.inject.Provider;
 
-import jj.resource.ResourceCacheKey;
+import jj.resource.ResourceKey;
 import jj.script.AbstractScriptEnvironment.Dependencies;
 
 import org.junit.Before;
@@ -87,7 +87,7 @@ public class AbstractScriptEnvironmentTest {
 		}
 	}
 	
-	@Mock ResourceCacheKey cacheKey;
+	@Mock ResourceKey cacheKey;
 	@Mock Provider<RhinoContext> contextProvider;
 	@Mock Provider<ContinuationPendingKey> pendingKeyProvider;
 	@Mock RequireInnerFunction makeRequireFunction;
