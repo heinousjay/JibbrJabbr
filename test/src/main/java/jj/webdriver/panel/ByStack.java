@@ -13,23 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import jj.webdriver.Panel;
 
 /**
+ * maintains the current context of locators for a {@link Panel} hierarchy
+ * 
  * @author jason
  *
  */
-public class PanelMethodGeneratorTest {
-
-	@Test
-	public void test() {
-		assertTrue(PanelMethodGenerator.makeNamePattern("click").matcher("clickHi").find());
-		assertTrue(PanelMethodGenerator.makeNamePattern("set").matcher("setSomeValue").find());
-		assertTrue(PanelMethodGenerator.makeNamePattern("set").matcher("setSomeOtherValue").find());
+public class ByStack {
+	
+	private final String base;
+	
+	ByStack() {
+		base = "";
 	}
-
+	
+	private ByStack(String base) {
+		this.base = base;
+	}
+	
+	ByStack push(String value) {
+		
+		return new ByStack(base + value);
+	}
+	
+	String resolve(String input) {
+		
+		return base + input;
+	}
 }

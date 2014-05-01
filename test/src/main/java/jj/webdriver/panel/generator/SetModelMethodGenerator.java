@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel.generator;
 
 import java.util.regex.Pattern;
 
@@ -21,6 +21,11 @@ import javax.inject.Singleton;
 
 import javassist.CtField;
 import javassist.CtMethod;
+import jj.webdriver.By;
+import jj.webdriver.ByReader;
+import jj.webdriver.Model;
+import jj.webdriver.panel.ByStack;
+import jj.webdriver.panel.PanelMethodGenerator;
 
 /**
  * @author jason
@@ -47,7 +52,7 @@ public class SetModelMethodGenerator extends PanelMethodGenerator {
 		if (baseBy != null) {
 			ByReader byReader = new ByReader(baseBy);
 			assert byReader.needsResolution() : "only the default By attribute is supported on model methods";
-			sb.append("jj.webdriver.ByStack oldByStack = byStack;")
+			sb.append(ByStack.class.getName()).append(" oldByStack = byStack;")
 				.append("Object[] slicedArgs = java.util.Arrays.copyOfRange($args, ").append(1).append(", $args.length);")
 				.append("byStack = byStack.push(String.format(\"").append(byReader.value()).append("\", slicedArgs));");
 		}		

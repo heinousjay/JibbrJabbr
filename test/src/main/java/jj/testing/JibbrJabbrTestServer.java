@@ -18,6 +18,7 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 import jj.webdriver.WebDriverRule;
@@ -33,9 +34,16 @@ import com.google.inject.Injector;
 import com.google.inject.Stage;
 
 /**
- * A test rule that supplies a context for performing
- * tests against a given HTML resource.  This rule does
- * not support parallel execution of test methods! actually that might not be true anymore...
+ * <p>
+ * Test rule to encapsulate a JibbrJabbr server.
+ * 
+ * <p>
+ * The server is stood up immediately before each test
+ * method, and torn down immediately after.
+ * 
+ * <p>
+ * 
+ * 
  * 
  * @author jason
  *
@@ -55,15 +63,26 @@ public class JibbrJabbrTestServer implements TestRule {
 	private Injector injector;
 	
 	/**
-	 * construct a test server with no file watching pointing to appPath
-	 * 
-	 * should that be a path? investigate
+	 * Construct a test server, passing the appPath as
+	 * the app parameter.
 	 * @param appPath
 	 */
 	public JibbrJabbrTestServer(final String appPath) {
 		this.appPath = appPath;
 	}
 	
+	/**
+	 * 
+	 */
+	public JibbrJabbrTestServer(final URI appURI) {
+		assert "file".equals(appURI.getScheme()) : "";
+		this.appPath = appURI.getPath();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public JibbrJabbrTestServer withFileWatcher() {
 		assertNotStarted();
 		
@@ -122,8 +141,6 @@ public class JibbrJabbrTestServer implements TestRule {
 			public void evaluate() throws Throwable {
 				if (instance != null) {
 					injector.injectMembers(instance);
-					
-					
 				}
 				base.evaluate();
 				

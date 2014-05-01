@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-
-import jj.webdriver.URLBase.BaseURL;
+import jj.webdriver.Page;
+import jj.webdriver.WebElementFinder;
 import jj.webdriver.pages.TestModel;
 import jj.webdriver.pages.TestPage;
 import jj.webdriver.pages.TestPage2;
+import jj.webdriver.panel.PanelBase;
+import jj.webdriver.panel.PanelFactory;
+import jj.webdriver.panel.URLBase.BaseURL;
+import jj.webdriver.panel.generator.PanelMethodGeneratorsModule;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -102,7 +106,7 @@ public class PanelFactoryTest {
 		
 		verify(logger).info("{} created. url is {}", TEST_PAGE_NAME, "url");
 		
-		assertThat(page.getClass().getName(), is("jj.webdriver.GeneratedImplementationFor$$jj_webdriver_pages_TestPage$$"));
+		assertThat(page.getClass().getName(), is("jj.webdriver.panel.GeneratedImplementationFor$$jj_webdriver_pages_TestPage$$"));
 		
 	}
 	

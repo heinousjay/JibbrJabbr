@@ -29,3 +29,5 @@
  *
  */
 package jj.webdriver;
+import jj.webdriver.panel.PanelBase;
+import jj.webdriver.panel.PanelMethodGenerator;

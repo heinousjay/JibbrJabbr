@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
 import java.net.URI;
+
+import jj.webdriver.Page;
+import jj.webdriver.Panel;
+import jj.webdriver.URL;
+import jj.webdriver.WebElementFinder;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -46,7 +51,7 @@ import org.slf4j.Logger;
  * @author jason
  *
  */
-abstract class PanelBase implements Page {
+public abstract class PanelBase implements Page {
 	
 	protected final WebDriver webDriver;
 	protected final WebElementFinder finder;

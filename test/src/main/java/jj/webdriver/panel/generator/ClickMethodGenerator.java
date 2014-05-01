@@ -13,37 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel.generator;
 
 import java.util.regex.Pattern;
 
 import javassist.CtMethod;
+import jj.webdriver.By;
+import jj.webdriver.panel.PanelMethodGenerator;
 
 /**
+ * <p>
+ * Generates an implementation for a method matching a pattern defined as
+ * 
+ * <ul>
+ * <li>Annotated with {@link By}
+ * <li>A method name starting with "click" followed by a capital letter, a number, an underscore, or $
+ * <li>Zero parameters
+ * <li>The standard return
+ * </ul>
+ * 
  * @author jason
  *
  */
-class SetInputMethodGenerator extends PanelMethodGenerator {
+// test coverage by jj.webdriver.PageFactoryTest
+class ClickMethodGenerator extends PanelMethodGenerator {
 	
-	private static final Pattern NAME = makeNamePattern("set");
+	private static final Pattern NAME = makeNamePattern("click");
 
 	@Override
 	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		return NAME.matcher(newMethod.getName()).find() &&
-			newMethod.getParameterTypes().length >= 1 &&
-			newMethod.getParameterTypes()[0].getName().equals("java.lang.String") &&
-			parametersMatchByAnnotation(1, newMethod, baseMethod) &&
+		return hasBy(baseMethod) &&
+			NAME.matcher(newMethod.getName()).find() &&
+			parametersMatchByAnnotation(0, newMethod, baseMethod) &&
 			isStandardReturn(newMethod);
 	}
-	
-	@Override
-	protected int sliceAt() {
-		return 1;
-	}
-	
+
 	@Override
 	protected void generate(CtMethod newMethod, CtMethod baseMethod, StringBuilder sb) throws Exception {
-		sb.append("set(").append(LOCAL_BY).append(", $1);");
+		sb.append("click(").append(LOCAL_BY).append(");");
 	}
-
 }

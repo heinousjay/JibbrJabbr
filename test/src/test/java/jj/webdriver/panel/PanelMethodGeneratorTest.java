@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
-import com.google.inject.Binder;
-import com.google.inject.binder.ScopedBindingBuilder;
-import com.google.inject.multibindings.Multibinder;
+import static org.junit.Assert.*;
+import jj.webdriver.panel.PanelMethodGenerator;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-class PanelMethodGeneratorBinder {
-	
-	private final Multibinder<PanelMethodGenerator> generatorBinder;
-	
-	PanelMethodGeneratorBinder(Binder binder) {
-		generatorBinder = Multibinder.newSetBinder(binder, PanelMethodGenerator.class);
+public class PanelMethodGeneratorTest {
+
+	@Test
+	public void test() {
+		assertTrue(PanelMethodGenerator.makeNamePattern("click").matcher("clickHi").find());
+		assertTrue(PanelMethodGenerator.makeNamePattern("set").matcher("setSomeValue").find());
+		assertTrue(PanelMethodGenerator.makeNamePattern("set").matcher("setSomeOtherValue").find());
 	}
-	
-	ScopedBindingBuilder to(Class<? extends PanelMethodGenerator> generator) {
-		return generatorBinder.addBinding().to(generator);
-	}
+
 }

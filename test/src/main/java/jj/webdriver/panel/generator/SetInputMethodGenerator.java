@@ -13,35 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel.generator;
 
 import java.util.regex.Pattern;
 
 import javassist.CtMethod;
+import jj.webdriver.panel.PanelMethodGenerator;
 
 /**
  * @author jason
  *
  */
-public class ReadMethodGenerator extends PanelMethodGenerator {
+class SetInputMethodGenerator extends PanelMethodGenerator {
 	
-	private static final Pattern NAME = makeNamePattern("read");
-	
-	@Override
-	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		return hasBy(baseMethod) &&
-			NAME.matcher(newMethod.getName()).find() &&
-			parametersMatchByAnnotation(0, newMethod, baseMethod) &&
-			newMethod.getReturnType().getName().equals("java.lang.String");
-	}
+	private static final Pattern NAME = makeNamePattern("set");
 
 	@Override
-	protected void generateMethod(CtMethod newMethod, CtMethod baseMethod) throws Exception {
-		StringBuilder sb = new StringBuilder("{");
-		processBy((By)baseMethod.getAnnotation(By.class), LOCAL_BY, 0, sb);
-		sb.append("return read(").append(LOCAL_BY).append(");");
-		sb.append("}");
-		setBody(newMethod, sb);
+	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
+		return NAME.matcher(newMethod.getName()).find() &&
+			newMethod.getParameterTypes().length >= 1 &&
+			newMethod.getParameterTypes()[0].getName().equals("java.lang.String") &&
+			parametersMatchByAnnotation(1, newMethod, baseMethod) &&
+			isStandardReturn(newMethod);
 	}
 	
+	@Override
+	protected int sliceAt() {
+		return 1;
+	}
+	
+	@Override
+	protected void generate(CtMethod newMethod, CtMethod baseMethod, StringBuilder sb) throws Exception {
+		sb.append("set(").append(LOCAL_BY).append(", $1);");
+	}
+
 }

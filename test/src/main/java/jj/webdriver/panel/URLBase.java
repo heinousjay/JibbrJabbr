@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
 import static java.lang.annotation.ElementType.PARAMETER;
 
@@ -34,12 +34,12 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class URLBase {
+public class URLBase {
 	
 	@Qualifier
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(PARAMETER)
-	@interface BaseURL {}
+	public @interface BaseURL {}
 
 	private final String urlBase;
 	

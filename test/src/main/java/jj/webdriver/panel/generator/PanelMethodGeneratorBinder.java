@@ -13,33 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel.generator;
+
+import jj.webdriver.panel.PanelMethodGenerator;
+
+import com.google.inject.Binder;
+import com.google.inject.binder.ScopedBindingBuilder;
+import com.google.inject.multibindings.Multibinder;
 
 /**
- * maintains the current context of locators for a {@link Panel} hierarchy
- * 
  * @author jason
  *
  */
-class ByStack {
+class PanelMethodGeneratorBinder {
 	
-	private final String base;
+	private final Multibinder<PanelMethodGenerator> generatorBinder;
 	
-	ByStack() {
-		base = "";
+	PanelMethodGeneratorBinder(Binder binder) {
+		generatorBinder = Multibinder.newSetBinder(binder, PanelMethodGenerator.class);
 	}
 	
-	private ByStack(String base) {
-		this.base = base;
-	}
-	
-	ByStack push(String value) {
-		
-		return new ByStack(base + value);
-	}
-	
-	String resolve(String input) {
-		
-		return base + input;
+	ScopedBindingBuilder to(Class<? extends PanelMethodGenerator> generator) {
+		return generatorBinder.addBinding().to(generator);
 	}
 }

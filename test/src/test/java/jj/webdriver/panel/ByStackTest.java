@@ -13,28 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
-import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
+import jj.webdriver.panel.ByStack;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public class PointlessPanelBase extends PanelBase {
+public class ByStackTest {
 
-	/**
-	 * yeah, ugly but the IDE can generate it for you.
-	 * 
-	 * @param webDriver
-	 * @param finder
-	 * @param panelFactory
-	 * @param logger
-	 * @param urlBase
-	 */
-	public PointlessPanelBase(WebDriver webDriver, WebElementFinder finder, PanelFactory panelFactory, Logger logger, URLBase urlBase) {
-		super(webDriver, finder, panelFactory, logger, urlBase);
+	@Test
+	public void test() {
+		ByStack b = new ByStack();
+		
+		
+		assertThat(b.resolve("hi"), is("hi"));
+		ByStack b2 = b.push("first-");
+		assertThat(b2.resolve("name"), is("first-name"));
+		assertThat(b2.push("second-").resolve("name2"), is("first-second-name2"));
+		
 	}
 
 }

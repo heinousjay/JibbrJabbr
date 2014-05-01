@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel.generator;
 
 import javassist.CtMethod;
+import jj.webdriver.By;
+import jj.webdriver.Panel;
+import jj.webdriver.panel.PanelBase;
+import jj.webdriver.panel.PanelMethodGenerator;
 
 /**
  * @author jason
  *
  */
 class GetPanelMethodGenerator extends PanelMethodGenerator {
+	
+	
 
 	@Override
 	protected boolean matches(CtMethod newMethod, CtMethod baseMethod) throws Exception {
@@ -42,7 +48,7 @@ class GetPanelMethodGenerator extends PanelMethodGenerator {
 				throw new AssertionError("currently, By annotations on panel getter methods can only use the default value attribute.  this may change if needed!");
 			}
 			
-			sb.append("((jj.webdriver.PanelBase)result).byStack(byStack.push(String.format(\"").append(by.value()).append("\", $args)));");
+			sb.append("((").append(PanelBase.class.getName()).append(")result).byStack(byStack.push(String.format(\"").append(by.value()).append("\", $args)));");
 		}
 		
 		sb.append("return result;}");

@@ -13,29 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
 /**
+ * <p>
+ * 
+ * 
  * @author jason
  *
  */
-public class ByStackTest {
-
-	@Test
-	public void test() {
-		ByStack b = new ByStack();
-		
-		
-		assertThat(b.resolve("hi"), is("hi"));
-		ByStack b2 = b.push("first-");
-		assertThat(b2.resolve("name"), is("first-name"));
-		assertThat(b2.push("second-").resolve("name2"), is("first-second-name2"));
-		
-	}
-
-}
+package jj.webdriver.panel;

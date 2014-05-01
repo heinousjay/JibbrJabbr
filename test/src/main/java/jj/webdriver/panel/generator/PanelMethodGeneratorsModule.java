@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel.generator;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jj.webdriver.panel.PanelMethodGenerator;
 
 import com.google.inject.AbstractModule;
 
@@ -27,7 +29,7 @@ import com.google.inject.AbstractModule;
  * @author jason
  *
  */
-class PanelMethodGeneratorsModule extends AbstractModule {
+public class PanelMethodGeneratorsModule extends AbstractModule {
 	
 	private final List<Class<? extends PanelMethodGenerator>> generators = new ArrayList<>();
 	

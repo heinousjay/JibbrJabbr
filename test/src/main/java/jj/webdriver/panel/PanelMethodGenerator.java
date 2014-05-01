@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import javassist.CtClass;
 import javassist.CtMethod;
+import jj.webdriver.By;
+import jj.webdriver.ByReader;
+import jj.webdriver.Page;
+import jj.webdriver.Panel;
 
 /**
  * @author jason

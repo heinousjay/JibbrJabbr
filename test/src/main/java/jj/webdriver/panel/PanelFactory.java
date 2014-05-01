@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.webdriver;
+package jj.webdriver.panel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +31,10 @@ import javassist.bytecode.annotation.Annotation;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.webdriver.Page;
+import jj.webdriver.Panel;
+import jj.webdriver.URL;
+
 import com.google.inject.Injector;
 
 /**
@@ -40,7 +44,7 @@ import com.google.inject.Injector;
  *
  */
 @Singleton
-class PanelFactory {
+public class PanelFactory {
 	
 	private static final Map<Class<? extends Panel>, Class<? extends Panel>> implementations = new HashMap<>();
 	
@@ -75,7 +79,7 @@ class PanelFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	<T extends Panel> T create(final Class<T> panelInterface) {
+	public <T extends Panel> T create(final Class<T> panelInterface) {
 		
 		assert panelInterface != null : "provide a panel interface";
 		assert panelInterface.isInterface() : "panels are produced only from interfaces";
