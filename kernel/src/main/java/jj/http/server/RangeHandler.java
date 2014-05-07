@@ -57,7 +57,6 @@ class RangeHandler {
 		}
 	}
 	
-	private final HttpHeaders requestHeaders;
 	private final long responseSize;
 	private final List<Range> ranges = new ArrayList<>(2);
 	private final List<Range> originalranges = new ArrayList<>(2);
@@ -92,19 +91,17 @@ class RangeHandler {
 		final long overlapDistance,
 		final int maxRanges
 	) {
-		this.requestHeaders = requestHeaders;
 		this.responseSize = responseSize;
 		this.overlapDistance = overlapDistance;
 		this.maxRanges = maxRanges;
-		parseRanges();
+		parseRanges(requestHeaders.get(HttpHeaders.Names.RANGE));
 	}
 	
-	private void parseRanges() {
-		String value = requestHeaders.get(HttpHeaders.Names.RANGE);
-		if (value == null) {
+	private void parseRanges(String headerValue) {
+		if (headerValue == null) {
 			ranges.add(new Range(0, responseSize - 1));
-		} else if (value.startsWith(HEADER_PREFIX)) {
-			String[] candidates = SPLITTER.split(value.substring(HEADER_PREFIX.length()));
+		} else if (headerValue.startsWith(HEADER_PREFIX)) {
+			String[] candidates = SPLITTER.split(headerValue.substring(HEADER_PREFIX.length()));
 			
 			if (candidates.length > maxRanges) {
 				badRequest = true;
