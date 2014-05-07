@@ -25,6 +25,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import jj.uri.RouteFinder;
@@ -182,6 +183,12 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	@Override
 	public List<Entry<String, String>> allHeaders() {
 		return request.headers().entries();
+	}
+	
+	@Override
+	public Locale locale() {
+		// TODO make this not hard-coded! haha
+		return Locale.US;
 	}
 
 }

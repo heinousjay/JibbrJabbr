@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import jj.uri.URIMatch;
@@ -95,5 +96,7 @@ public interface HttpRequest {
 	 * @param userAgent2
 	 */
 	HttpRequest header(String name, String value);
+	
+	Locale locale();
 
 }
