@@ -21,6 +21,8 @@
  * 
  * <p>
  * Also defines a higher-level {@link MessagesResource}, which organizes a set of 
+ * {@link PropertiesResource}s according to a name and a locale, for internationalization
+ * purposes.
  * 
  * @author jason
  *

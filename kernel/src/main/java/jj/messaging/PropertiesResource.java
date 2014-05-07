@@ -5,8 +5,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -22,7 +25,7 @@ import jj.resource.AbstractFileResource;
 @Singleton
 public class PropertiesResource extends AbstractFileResource {
 	
-	private final HashMap<String, String> properties;
+	private final Map<String, String> properties;
 	
 	@Inject
 	PropertiesResource(
@@ -30,20 +33,22 @@ public class PropertiesResource extends AbstractFileResource {
 		final Path path,
 		final String name
 	) throws IOException {
-		super(dependencies, name, path);
+		super(dependencies, name, path, false);
 		
 		Properties loader = new Properties();
-		loader.load(new StringReader(byteBuffer.toString(UTF_8)));
+		loader.load(new StringReader(new String(Files.readAllBytes(path), UTF_8)));
+		Map<String, String> map = new HashMap<>();
 
-		properties = new HashMap<>();
-
-		// little ugly!
+		// little ugly! but properties are even uglier so we just use them
+		// to parse
 		for (Object key : loader.keySet()) {
-			properties.put(String.valueOf(key), String.valueOf(loader.get(key)));
+			map.put(String.valueOf(key), String.valueOf(loader.get(key)));
 		}
+		
+		properties = Collections.unmodifiableMap(map);
 	}
 	
-	public HashMap<String, String> properties() {
+	public Map<String, String> properties() {
 		return properties;
 	}
 	

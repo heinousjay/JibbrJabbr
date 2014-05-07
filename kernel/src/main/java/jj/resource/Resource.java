@@ -41,9 +41,6 @@ public interface Resource {
 	/**
 	 * Adds a dependent resource to this resource, which will propagate
 	 * reloads to the dependent
-	 * 
-	 * TODO move this to AbstractResource instead?
-	 * 
 	 * @param dependent
 	 */
 	void addDependent(Resource dependent);

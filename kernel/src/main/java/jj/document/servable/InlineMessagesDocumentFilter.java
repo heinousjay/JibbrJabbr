@@ -1,6 +1,6 @@
 package jj.document.servable;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -58,7 +58,7 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		this.isThread = isThread;
 	}
 	
-	private String findValue(String key, HashMap<String, String> bundle) {
+	private String findValue(String key, Map<String, String> bundle) {
 		return bundle.containsKey(key) ? bundle.get(key) : String.format(MISSING_KEY, key);
 	}
 	
@@ -73,7 +73,7 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 			resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties");
 			
 		if (resource != null) {
-			final HashMap<String, String> bundle = resource.properties();
+			final Map<String, String> bundle = resource.properties();
 			
 			for (final Element el : documentRequestProcessor.document().select("[" + TEXT_KEY + "]")) {
 				String key = el.attr(TEXT_KEY);
