@@ -17,6 +17,7 @@ package jj.http.server;
 
 import java.io.IOException;
 import java.util.Date;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -24,7 +25,6 @@ import jj.Version;
 import jj.event.Publisher;
 import jj.http.AbstractHttpResponse;
 import jj.http.HttpResponse;
-import jj.logging.EmergencyLog;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import io.netty.channel.ChannelFuture;
@@ -46,8 +46,6 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	
 	private final ChannelHandlerContext ctx;
 	
-	private final EmergencyLog logger;
-	
 	private final Publisher publisher;
 	
 	/**
@@ -58,12 +56,10 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		final Version version,
 		final JJHttpServerRequest request,
 		final ChannelHandlerContext ctx,
-		final EmergencyLog logger,
 		final Publisher publisher
 	) {
 		this.request = request;
 		this.ctx = ctx;
-		this.logger = logger;
 		this.publisher = publisher;
 		header(HttpHeaders.Names.SERVER, String.format(
 			"%s/%s (%s)",
@@ -103,12 +99,9 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 			.toString();
 	}
 	
-	/**
-	 * @param e
-	 */
 	@Override
-	public HttpResponse error(Throwable e) {
-		logger.error("response ended in error", e);
+	public HttpResponse error(Throwable t) {
+		publisher.publish(new RequestErrored(t));
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		return this;
 	}
@@ -125,6 +118,7 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 		maybeClose(ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT));
 		
 		// configuration can decide if we're doing zero-copy or chunking?
+		// can i even make zero-copy work again? haha
 		//maybeClose(ctx.writeAndFlush(new DefaultFileRegion(resource.fileChannel(), 0, resource.size())));
 		
 		markCommitted();

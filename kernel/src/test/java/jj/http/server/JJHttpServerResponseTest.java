@@ -28,7 +28,7 @@ import jj.event.Publisher;
 import jj.http.AbstractHttpResponse;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.JJHttpServerResponse;
-import jj.logging.EmergencyLog;
+import jj.logging.LoggedEvent;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
@@ -46,8 +46,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -64,17 +67,19 @@ public class JJHttpServerResponseTest {
 	DefaultFullHttpRequest nettyRequest;
 	JJHttpServerRequest request;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
-	@Mock EmergencyLog logger;
 	@Mock Publisher publisher;
 	@Mock Version version;
 	JJHttpServerResponse response;
+	@Mock Logger logger;
+	
+	@Captor ArgumentCaptor<LoggedEvent> eventCaptor;
 
 	@Before
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		request = new JJHttpServerRequest(nettyRequest, new RouteFinder(), ctx);
 		
-		response = new JJHttpServerResponse(version, request, ctx, logger, publisher);
+		response = new JJHttpServerResponse(version, request, ctx, publisher);
 		assertThat(response.charset(), is(UTF_8));
 	}
 
@@ -122,6 +127,27 @@ public class JJHttpServerResponseTest {
 		verify(ctx).writeAndFlush(any());
 		
 		verifyNoMoreInteractions(ctx);
+		
+		verifyRequestRespondedIsPublished();
+	}
+	
+	private void verifyRequestRespondedIsPublished() {
+		// since we ALWAYS respond, every test will call this, so
+		// we capture all publications here
+		verify(publisher, atLeastOnce()).publish(eventCaptor.capture());
+		verifyEventIsPublished(RequestResponded.class);
+	}
+	
+	private void verifyEventIsPublished(Class<?> eventType) {
+		boolean found = false;
+		for (LoggedEvent event : eventCaptor.getAllValues()) {
+			if (eventType.isInstance(event)) {
+				event.describeTo(logger);
+				found = true;
+				break;
+			}
+		}
+		assertTrue("could not verify the RequestResponded event was properly fired", found);
 	}
 	
 	@Test
@@ -142,6 +168,7 @@ public class JJHttpServerResponseTest {
 		
 		assertThat(response.status(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
 		verifyInlineResponse();
+		verifyEventIsPublished(RequestErrored.class);
 		verify(logger).error(anyString(), eq(e));
 	}
 	
@@ -202,6 +229,8 @@ public class JJHttpServerResponseTest {
 		verify(ctx).writeAndFlush(anyObject());
 		
 		verifyNoMoreInteractions(ctx);
+		
+		verifyRequestRespondedIsPublished();
 	}
 	
 	@Test
@@ -232,13 +261,13 @@ public class JJHttpServerResponseTest {
 		verifyInlineResponse();
 	}
 	
-	/*
+	
 	@Test
 	public void testAccessLog() throws IOException {
 		
 		// given
-		given(access.isInfoEnabled()).willReturn(true);
-		given(access.isTraceEnabled()).willReturn(true);
+		given(logger.isInfoEnabled()).willReturn(true);
+		given(logger.isTraceEnabled()).willReturn(true);
 		String host = "hostname";
 		request.header(HttpHeaders.Names.HOST, host);
 		String location = "home";
@@ -253,25 +282,23 @@ public class JJHttpServerResponseTest {
 			.content(bytes)
 			.end();
 		
+		verifyRequestRespondedIsPublished();
+		
 		// have to do this outside the verification or mockito gets all jacked up inside
 		String remoteAddress = ctx.channel().remoteAddress().toString();
 		
-		verify(access).info(
+		verify(logger).info(
 			eq("{} - - {} \"{} {} {}\" {} {} {} \"{}\""),
 			eq(remoteAddress),
 			anyString(), // the date, not going to try to make this work
 			eq(request.method()),
 			eq(request.request().getUri()),
 			eq(request.request().getProtocolVersion()),
-			eq(response.status()),
+			eq(response.status().code()),
 			eq("100"),
 			eq("-"),
 			isNull()
 		);
-		
-		// TODO
-		//verify(logger).trace(captor.capture());
 	}
-	*/
 
 }
