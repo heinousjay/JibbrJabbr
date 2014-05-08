@@ -16,7 +16,6 @@
 package jj.http;
 
 import jj.JJModule;
-import jj.http.client.HttpClientModule;
 import jj.http.server.HttpServerModule;
 
 /**
@@ -27,7 +26,6 @@ public class HttpModule extends JJModule {
 
 	@Override
 	protected void configure() {
-		install(new HttpClientModule());
 		install(new HttpServerModule());
 	}
 

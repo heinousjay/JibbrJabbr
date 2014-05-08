@@ -24,7 +24,6 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.http.client.RestRequest;
 import jj.jjmessage.JJMessage;
 import jj.logging.EmergencyLog;
 import jj.script.resource.RequiredModule;
@@ -101,7 +100,7 @@ public class ContinuationCoordinatorTest {
 		given(continuation.getApplicationState()).willReturn(continuationState);
 		
 		Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors = new HashMap<>();
-		continuationProcessors.put(RestRequest.class, continuationProcessor1);
+		//continuationProcessors.put(RestRequest.class, continuationProcessor1);
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		context = contextProvider.get();

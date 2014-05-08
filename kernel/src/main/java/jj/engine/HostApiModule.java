@@ -14,7 +14,6 @@ public class HostApiModule extends JJModule {
 		bind(EngineAPI.class).to(EngineAPIImpl.class);
 		
 		addHostObjectBinding().to(ClientStorage.class);
-		addHostObjectBinding().to(RestServiceFunction.class);
 		addHostObjectBinding().to(DollarFunction.class);
 		addHostObjectBinding().to(DoCallFunction.class);
 		addHostObjectBinding().to(DoInvokeFunction.class);
