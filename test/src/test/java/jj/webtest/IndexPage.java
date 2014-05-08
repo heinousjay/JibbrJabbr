@@ -17,6 +17,7 @@ package jj.webtest;
 
 import jj.webdriver.By;
 import jj.webdriver.Page;
+import jj.webdriver.Panel;
 import jj.webdriver.URL;
 
 /**
@@ -26,11 +27,16 @@ import jj.webdriver.URL;
 @URL("/chat/")
 public interface IndexPage extends Page {
 	
-	@By("user-name")
-	IndexPage setUserName(String userName);
+	public interface CreateUserModal extends Panel {
 	
-	@By("user-name-form-submit")
-	IndexPage clickUseThis();
+		@By("user-name")
+		CreateUserModal setName(String userName);
+		
+		@By("user-name-form-submit")
+		IndexPage clickUseThisExpectingSuccess();
+	}
+	
+	CreateUserModal createUserModal();
 	
 	@By("userInput")
 	IndexPage setInput(String input);

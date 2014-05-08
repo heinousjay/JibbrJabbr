@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import java.net.URI;
 import java.util.ArrayList;
 
+import jj.webdriver.WebDriverProvider;
 import jj.webdriver.WebDriverRule;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
@@ -114,14 +115,15 @@ public class JibbrJabbrTestServer implements TestRule {
 		return this;
 	}
 	
-	public WebDriverRule webDriverRule() {
+	public WebDriverRule webDriverRule(Class<? extends WebDriverProvider> webDriverProvider) {
 		assertNotStarted();
 		if (!httpServer) {
 			// todo - pick a local open port
 			withHttpOnPort(8080);
 		}
 		
-		WebDriverRule result = new WebDriverRule();
+		WebDriverRule result = 
+			new WebDriverRule().driverProvider(webDriverProvider);
 		
 		if (httpPort != 0) {
 			result.baseUrl("http://localhost:" + httpPort);

@@ -46,14 +46,12 @@ public class MinimalAppSmokeTest {
 	// this behavior has some nuances i haven't explained here but it's all thought out
 	
 	@Rule
-	public WebDriverRule browser1 = server.webDriverRule()
-		.driverProvider(DRIVER_PROVIDER);
+	public WebDriverRule browser1 = server.webDriverRule(DRIVER_PROVIDER);
 	
 	// need two browsers?  make two web driver rules! yay!
 	
 	@Rule
-	public WebDriverRule browser2 = server.webDriverRule()
-		.driverProvider(DRIVER_PROVIDER);
+	public WebDriverRule browser2 = server.webDriverRule(DRIVER_PROVIDER);
 
 	@Test
 	public void test() throws Exception {

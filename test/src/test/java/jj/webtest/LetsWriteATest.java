@@ -17,7 +17,6 @@ package jj.webtest;
 
 import jj.App;
 import jj.testing.JibbrJabbrTestServer;
-import jj.webdriver.FirefoxWebDriverProvider;
 import jj.webdriver.PhantomJSWebDriverProvider;
 import jj.webdriver.WebDriverRule;
 
@@ -35,33 +34,27 @@ public class LetsWriteATest {
 			.withHttp();
 	
 	
-	// since we're running in the context of the embedded server, let that
-	// produce this rule so they can coordinate
-	// TODO - coordinate! logging, server port, startup gating (might need this! jj starts fast though.  maybe it'll be okay)
-	// TODO - make the logging into its own component
+	/** since we're running in the context of the embedded server, let that
+	 * produce this rule so they can coordinate. this ensures the server exposes
+	 * http, and the webdriver knows the address.
+	 * if you want tests that can be moved, you have to supply a url via
+	 * {@link WebDriverRule#baseUrl(String)}
+	 * TODO - coordinate! logging, server port, startup gating (might need this! jj starts fast though.  maybe it'll be okay)
+	 * TODO - make the logging into its own component
+	 */
 	@Rule
-	public WebDriverRule webDriverRule = server.webDriverRule()
+	public WebDriverRule webDriverRule = server.webDriverRule(PhantomJSWebDriverProvider.class);
+	//FirefoxWebDriverProvider
 	
-		// normally you would be sourcing this from some project-specific configuration
-		// but for the purposes of testing the rule, we specifically want this
-		
-		.driverProvider(PhantomJSWebDriverProvider.class)
-		//.driverProvider(FirefoxWebDriverProvider.class)
-		
-		// similarly for this parameter. typically you'll be sourcing this
-		// from some project-specific system properties, but for now this is fine
-		// TODO - configure this automatically from the test server rule.
-		// but for now i am tired
-		
-		.baseUrl("http://localhost:8080");
-		//.baseUrl("https://jibbrjabbr.com");
+	// normally you would be sourcing the driver provider from some project-specific configuration
+	// but for the purposes of testing the rule, we hardcode
 
 	@Test
 	public void test() throws Exception {
 		
 		IndexPage index = webDriverRule.get(IndexPage.class);
 		
-		index.setUserName("chief").clickUseThis();
+		index.createUserModal().setName("chief").clickUseThisExpectingSuccess();
 		
 		index.setInput("/bg #5645EF 2500\n")
 			.setInput("/topic I AM A CLASSY CHIEF!").clickSay();
@@ -74,7 +67,7 @@ public class LetsWriteATest {
 		
 		IndexPage index = webDriverRule.get(IndexPage.class);
 		
-		index.setUserName("beef").clickUseThis();
+		index.createUserModal().setName("beef").clickUseThisExpectingSuccess();
 		
 		index.setInput("/bg #886655 2500\n")
 			.setInput("I AM BEEF! I AM KING OF ALL MEATS!").clickSay()
