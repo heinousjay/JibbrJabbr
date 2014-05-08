@@ -73,7 +73,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		final RequiredModule requiredModule,
 		final EngineAPI api,
 		final ResourceFinder resourceFinder,
-		final InjectorBridgeFunction injectorBridge
+		final InjectFunction injectorBridge
 	) {
 		super(dependencies);
 		
@@ -99,7 +99,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		configureModuleObjects(moduleIdentifier, scope);
 		
 		if (scriptResource.base() == Assets) {
-			scope.defineProperty(InjectorBridgeFunction.NAME, injectorBridge, ScriptableObject.CONST);
+			scope.defineProperty(InjectFunction.NAME, injectorBridge, ScriptableObject.CONST);
 		}
 		
 		try (RhinoContext context = contextProvider.get()) {

@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
-import jj.script.resource.InjectorBridgeFunction;
+import jj.script.resource.InjectFunction;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,13 +35,13 @@ import com.google.inject.Injector;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class InjectorBridgeFunctionTest {
+public class InjectFunctionTest {
 	
-	public static final String NAME = InjectorBridgeFunction.NAME;
+	public static final String NAME = InjectFunction.NAME;
 
 	@Mock Injector injector;
 	
-	@InjectMocks InjectorBridgeFunction ibf;
+	@InjectMocks InjectFunction ibf;
 	
 	@Mock ScriptEnvironment se;
 	

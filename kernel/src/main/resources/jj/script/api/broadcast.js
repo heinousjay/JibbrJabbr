@@ -1,7 +1,5 @@
-// THIS IS THE WRONG OBJECT!! but right for now. ugh.  actually in this context it's
-// fine, since we are going to be inside a current script environment ALWAYS.
-// interestingly, i wonder if the only other usage of that method is in the original broadcast function
-var env = injectorBridge('jj.script.CurrentScriptEnvironment');
+
+var env = inject('jj.script.CurrentScriptEnvironment');
 
 module.exports = function broadcast(func) {
 	

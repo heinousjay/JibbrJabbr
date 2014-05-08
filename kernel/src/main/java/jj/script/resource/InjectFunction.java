@@ -48,16 +48,16 @@ import com.google.inject.Injector;
  *
  */
 @Singleton
-class InjectorBridgeFunction extends BaseFunction {
+class InjectFunction extends BaseFunction {
 	
-	static final String NAME = "injectorBridge";
+	static final String NAME = "inject";
 
 	private static final long serialVersionUID = 1L;
 	
 	private transient final Injector injector;
 	
 	@Inject
-	InjectorBridgeFunction(final Injector injector) {
+	InjectFunction(final Injector injector) {
 		this.injector = injector;
 	}
 	

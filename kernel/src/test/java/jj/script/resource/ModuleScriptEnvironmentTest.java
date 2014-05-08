@@ -42,7 +42,7 @@ import org.mozilla.javascript.ScriptableObject;
 public class ModuleScriptEnvironmentTest {
 	
 	@Mock ResourceFinder resourceFinder;
-	@Mock InjectorBridgeFunction injectorBridge;
+	@Mock InjectFunction injectorBridge;
 	@Mock EngineAPI api;
 	
 	RealRhinoContextProvider contextProvider;
@@ -92,7 +92,7 @@ public class ModuleScriptEnvironmentTest {
 	public void testNoInjectorBridge() {
 		construct();
 		
-		assertThat(mse.scope().get(InjectorBridgeFunction.NAME, mse.scope()), is(ScriptableObject.NOT_FOUND));
+		assertThat(mse.scope().get(InjectFunction.NAME, mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
 
 	@Test
@@ -102,6 +102,6 @@ public class ModuleScriptEnvironmentTest {
 		
 		construct();
 		
-		assertThat(mse.scope().get(InjectorBridgeFunction.NAME, mse.scope()), is((Object)injectorBridge));
+		assertThat(mse.scope().get(InjectFunction.NAME, mse.scope()), is((Object)injectorBridge));
 	}
 }
