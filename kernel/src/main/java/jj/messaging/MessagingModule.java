@@ -27,6 +27,7 @@ public class MessagingModule extends JJModule {
 	protected void configure() {
 		
 		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
+		bindCreation().of(MessagesResource.class).to(MessagesResourceCreator.class);
 	}
 
 }
