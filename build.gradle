@@ -40,6 +40,12 @@ allprojects {
 			)
 		}
 	}
+	
+	test {
+		testLogging {
+			exceptionFormat = 'full'
+		}
+	}
 
 	dependencies {
 		
