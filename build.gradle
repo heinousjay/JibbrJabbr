@@ -19,6 +19,12 @@ allprojects {
 		options.encoding = 'UTF-8'
 	}
 	
+	tasks.withType(Test) {
+		testLogging {
+			exceptionFormat 'full'
+		}
+	}
+	
 	configurations {
 		core {
 			transitive = false
@@ -38,12 +44,6 @@ allprojects {
 			attributes(
 				"Implementation-Version": version
 			)
-		}
-	}
-	
-	test {
-		testLogging {
-			exceptionFormat = 'full'
 		}
 	}
 
