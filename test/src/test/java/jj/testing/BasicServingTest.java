@@ -239,8 +239,6 @@ public class BasicServingTest {
 		for (Throwable t : throwables) {
 			if (t != null) {
 				errors.add(t.getMessage());
-			} else {
-				errors.add("fuck you");
 			}
 		}
 		
