@@ -235,15 +235,25 @@ public class BasicServingTest {
 		} finally {
 			service.shutdownNow();
 		}
-		boolean failed = false;
+		List<String> errors = new ArrayList<>();
 		for (Throwable t : throwables) {
 			if (t != null) {
-				failed = true;
-				t.printStackTrace();
+				errors.add(t.getMessage());
+			} else {
+				errors.add("fuck you");
 			}
 		}
 		
-		if (failed) fail("FAILED");
+		if (!errors.isEmpty()) fail("pounded it into submission", errors);
+	}
+	
+	private void fail(String lead, List<String> errors) {
+		StringBuilder sb = new StringBuilder(lead);
+		for (String error : errors) {
+			sb.append("\n").append(error);
+		}
+		
+		throw new AssertionError(sb.toString());
 	}
 	
 	private void timePoundIt(final int threadCount, final int perClientRequestCount) throws Exception {
