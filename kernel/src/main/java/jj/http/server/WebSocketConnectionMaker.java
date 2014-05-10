@@ -16,6 +16,9 @@
 package jj.http.server;
 
 import static jj.http.server.PipelineStages.*;
+
+import java.util.Set;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -33,7 +36,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.AppLocation;
-import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.uri.URIMatch;
 
@@ -56,6 +58,8 @@ class WebSocketConnectionMaker {
 	
 	private final WebSocketServerHandshakerFactory handshakerFactory;
 	
+	private final Set<Class<? extends WebSocketConnectionHost>> webSocketConnectionHostClasses;
+	
 	@Inject
 	WebSocketConnectionMaker(
 		final WebSocketFrameHandlerCreator handlerCreator,
@@ -63,7 +67,8 @@ class WebSocketConnectionMaker {
 		final ChannelHandlerContext ctx,
 		final FullHttpRequest request,
 		final HttpResponse response,
-		final WebSocketServerHandshakerFactory handshakerFactory
+		final WebSocketServerHandshakerFactory handshakerFactory,
+		final Set<Class<? extends WebSocketConnectionHost>> webSocketConnectionHostClasses
 	) {
 		this.handlerCreator = handlerCreator;
 		this.resourceFinder = resourceFinder;
@@ -71,6 +76,7 @@ class WebSocketConnectionMaker {
 		this.request = request;
 		this.response = response;
 		this.handshakerFactory = handshakerFactory;
+		this.webSocketConnectionHostClasses = webSocketConnectionHostClasses;
 	}
 	
 	void handshakeWebsocket() {
@@ -101,13 +107,16 @@ class WebSocketConnectionMaker {
 				if (future.isSuccess()) {
 					
 					URIMatch uriMatch = new URIMatch(request.getUri());
-					final DocumentScriptEnvironment scriptEnvironment =
-						resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, uriMatch.name);
-					// TODO - really?  haha.  externalize this, multibinder style
-					// WebSocketConnectionHostBinder!
-					final WebSocketConnectionHost host = scriptEnvironment;
 					
-					if (scriptEnvironment == null) {
+
+					WebSocketConnectionHost host = null;
+					
+					for (Class<? extends WebSocketConnectionHost> hostClass : webSocketConnectionHostClasses) {
+						host = resourceFinder.findResource(hostClass, AppLocation.Virtual, uriMatch.name);
+						if (host != null) break;
+					}
+					
+					if (host == null) {
 						
 						// 1011 indicates that a server is terminating the connection because
 						// it encountered an unexpected condition that prevented it from
@@ -116,7 +125,7 @@ class WebSocketConnectionMaker {
 						// TODO: is closing here the right thing? or do we count on the client closing the connection
 						// to avoid the time_wait state? 
 					
-					} else if (!uriMatch.sha1.equals(scriptEnvironment.sha1())) {
+					} else if (!uriMatch.sha1.equals(host.sha1())) {
 						
 						ctx.writeAndFlush(new TextWebSocketFrame("jj-reload"))
 							.addListener(new ChannelFutureListener() {
@@ -137,7 +146,7 @@ class WebSocketConnectionMaker {
 						ctx.pipeline().replace(
 							JJEngine.toString(),
 							JJWebsocketHandler.toString(),
-							handlerCreator.createHandler(handshaker, scriptEnvironment)
+							handlerCreator.createHandler(handshaker, host)
 						);
 					}
 					

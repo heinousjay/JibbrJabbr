@@ -19,6 +19,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.http.server.PipelineStages.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -72,6 +76,8 @@ public class WebSocketConnectionMakerTest {
 	@Captor ArgumentCaptor<TextWebSocketFrame> textFrameCaptor;
 	@Captor ArgumentCaptor<CloseWebSocketFrame> closeFrameCaptor;
 	
+	Set<Class<? extends WebSocketConnectionHost>> webSocketConnectionHosts;
+	
 	WebSocketConnectionMaker wscm;
 
 	@Before
@@ -79,7 +85,11 @@ public class WebSocketConnectionMakerTest {
 		
 		response = mock(HttpResponse.class, AnswerWithSelf.ANSWER_WITH_SELF);
 		
-		wscm = new WebSocketConnectionMaker(handlerCreator, resourceFinder, ctx, request, response, handshakerFactory);
+		webSocketConnectionHosts = new HashSet<>();
+		webSocketConnectionHosts.add(WebSocketConnectionHost.class);
+		webSocketConnectionHosts.add(DocumentScriptEnvironment.class);
+		
+		wscm = new WebSocketConnectionMaker(handlerCreator, resourceFinder, ctx, request, response, handshakerFactory, webSocketConnectionHosts);
 	}
 	
 	@Test
@@ -127,7 +137,7 @@ public class WebSocketConnectionMakerTest {
 	}
 	
 	@Test
-	public void testObseleteScriptExecutionEnvironmentConnection() throws Exception {
+	public void testObseleteWebSocketConnectionHost() throws Exception {
 		
 		// given
 		given(ctx.channel()).willReturn(channel);

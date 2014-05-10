@@ -19,6 +19,7 @@ import jj.configuration.AssetPaths;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
+import jj.http.server.WebSocketConnectionHostBinder;
 import jj.logging.LoggingBinder;
 import jj.resource.ResourceCreatorBinder;
 import jj.script.ContinuationProcessorBinder;
@@ -41,6 +42,8 @@ public abstract class JJModule extends AbstractModule {
 	private ExecutorBinder executors;
 	
 	private LoggingBinder loggers;
+	
+	private WebSocketConnectionHostBinder webSocketConnectionHosts;
 	
 	private Multibinder<JJServerStartupListener> startupListeners;
 	private Multibinder<Converter<?, ?>> converters;
@@ -102,5 +105,12 @@ public abstract class JJModule extends AbstractModule {
 			loggers = new LoggingBinder(binder());
 		}
 		return loggers;
+	}
+	
+	protected WebSocketConnectionHostBinder bindWebSocketConnection() {
+		if (webSocketConnectionHosts == null) {
+			webSocketConnectionHosts = new WebSocketConnectionHostBinder(binder());
+		}
+		return webSocketConnectionHosts;
 	}
 }

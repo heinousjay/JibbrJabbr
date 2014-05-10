@@ -31,7 +31,7 @@ public class WebSocketConnectionHostBinder {
 		hostBinder = Multibinder.newSetBinder(binder, new TypeLiteral<Class<? extends WebSocketConnectionHost>>() {});
 	}
 	
-	public void addWebSocketConnectionHost(Class<? extends WebSocketConnectionHost> hostClass) {
+	public void toHost(Class<? extends WebSocketConnectionHost> hostClass) {
 		hostBinder.addBinding().toInstance(hostClass);
 	}
 }
