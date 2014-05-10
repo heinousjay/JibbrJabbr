@@ -1,6 +1,7 @@
 package jj.engine;
 
 
+import jj.http.server.WebSocketConnectionHost;
 import jj.script.CurrentScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
@@ -72,7 +73,7 @@ abstract class EventRegistrationFunction extends BaseFunction implements HostObj
 			throw new IllegalArgumentException(String.format("%s takes only one argument of type function", hostEvent));
 		}
 		
-		env.currentWebSocketConnectionHost().addFunction(hostEvent.toString(), (Callable)args[0]);
+		((WebSocketConnectionHost)env.current()).addFunction(hostEvent.toString(), (Callable)args[0]);
 		
 		// nothing worth returning here, chaining doesn't make sense
 		return Undefined.instance;

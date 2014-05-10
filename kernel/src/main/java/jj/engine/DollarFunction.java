@@ -89,7 +89,7 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		WebSocketConnectionHost webSocketConnectionHost = env.currentWebSocketConnectionHost();
+		WebSocketConnectionHost webSocketConnectionHost = ((WebSocketConnectionHost)env.current());
 		
 		if (args.length == 1 && (args[0] instanceof Function)) {
 			

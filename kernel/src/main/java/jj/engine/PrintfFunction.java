@@ -65,7 +65,7 @@ class PrintfFunction extends BaseFunction implements HostObject {
 				Arrays.asList(args).subList(1, args.length).toArray() :
 				EMPTY_ARGS;
 
-		LoggerFactory.getLogger(ScriptResourceType.Server.suffix(env.currentWebSocketConnectionHost().uri())).debug(
+		LoggerFactory.getLogger(ScriptResourceType.Server.suffix(env.current().uri())).debug(
 			String.format(String.valueOf(formatString), toFormat)
 		);
 		return Undefined.instance;

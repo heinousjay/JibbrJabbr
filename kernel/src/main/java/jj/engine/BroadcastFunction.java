@@ -3,7 +3,10 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.server.WebSocketConnectionHost;
 import jj.script.CurrentScriptEnvironment;
+import jj.script.ScriptEnvironment;
+
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -68,7 +71,10 @@ class BroadcastFunction extends BaseFunction implements HostObject, ContributesS
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		return env.currentWebSocketConnectionHost();
+		ScriptEnvironment se = env.current();
+		if (!(se instanceof WebSocketConnectionHost)) throw new RuntimeException("can't broadcast from here!");
+		
+		return se;
 	}
 	
 	@Override

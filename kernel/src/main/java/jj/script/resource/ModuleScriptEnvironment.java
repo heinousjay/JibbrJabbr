@@ -39,6 +39,16 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
+ * <p>
+ * Coordinates module script execution. Instances of this environment are per
+ * parent script environment, which is to say requiring the same module from
+ * two different parents will result in two independent copies.  This is not
+ * a method of communication between environments.
+ * 
+ * <p>
+ * 
+ * 
+ * 
  * @author jason
  *
  */
@@ -61,11 +71,6 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	private final Script script;
 	
-	/**
-	 * @param cacheKey
-	 * @param publisher
-	 * @param contextMaker
-	 */
 	@Inject
 	ModuleScriptEnvironment(
 		final Dependencies dependencies,
@@ -85,12 +90,15 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		assert ((AbstractResource)requiredModule.parent()).alive(): "cannot require a module for a dead parent";
 		
+		// the script is loaded from the app, and if not found there, then an API module is searched
+		// internally.  this may change!
 		scriptResource = resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), scriptName());
 		
 		if (scriptResource == null) {
 			throw new NoSuchResourceException(moduleIdentifier);
 		}
 		
+		// we need to reload each other on changes
 		scriptResource.addDependent(requiredModule.parent());
 		requiredModule.parent().addDependent(this);
 		

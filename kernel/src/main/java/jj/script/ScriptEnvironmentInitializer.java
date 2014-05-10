@@ -26,6 +26,7 @@ import jj.event.Publisher;
 import jj.execution.TaskRunner;
 
 /**
+ * <p>
  * initializes a script environment, so that it is ready for execution.  if possible :D
  * 
  * @author jason

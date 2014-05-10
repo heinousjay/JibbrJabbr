@@ -15,23 +15,28 @@
  */
 package jj.script;
 
+import jj.App;
+import jj.testing.JibbrJabbrTestServer;
+import jj.testing.TestHttpClient;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
- * A component that can organize executions around the initialization of a script
- * environment.  
- * 
  * @author jason
  *
  */
-public interface DependsOnScriptEnvironmentInitialization {
+public class APITest {
 
-	/**
-	 * register here to have a pendingKey resumed when a scriptEnvironment has transitioned to initialized
-	 * @param scriptEnvironment
-	 * @param pendingKey
-	 */
-	void resumeOnInitialization(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey);
+	@Rule
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.api);
 	
-	void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task);
-
+	@Test
+	public void test() throws Exception {
+		
+		TestHttpClient index = server.get("/");
+		
+		System.out.println(index.contentsString());
+	}
+	
 }

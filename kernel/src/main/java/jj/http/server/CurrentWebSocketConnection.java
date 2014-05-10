@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.script.CurrentScriptEnvironment;
+import jj.script.ScriptEnvironment;
 import jj.util.CurrentResource;
 
 /**
@@ -45,8 +46,12 @@ public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnect
 		// be broadcasting, and so in that case, we want to use its connection.
 		
 		WebSocketConnection current = resources.get();
-		if (env.currentWebSocketConnectionHost() != null && env.currentWebSocketConnectionHost().broadcasting()) {
-			current = env.currentWebSocketConnectionHost().currentConnection();
+		ScriptEnvironment se = env.current();
+		if (se != null && 
+			se instanceof WebSocketConnectionHost && 
+			((WebSocketConnectionHost)se).broadcasting()
+		) {
+			current = ((WebSocketConnectionHost)se).currentConnection();
 		}
 		return current;
 	}

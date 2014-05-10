@@ -15,6 +15,7 @@
  */
 package jj.resource;
 
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

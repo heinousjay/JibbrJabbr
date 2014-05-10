@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import jj.document.CurrentDocumentRequestProcessor;
+import jj.http.server.WebSocketConnectionHost;
 import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
@@ -80,7 +81,8 @@ class DocumentSelection implements Selection {
 	public Selection on(final String type, final String selector, final Callable function) {
 		document.current().addStartupJJMessage(JJMessage.makeBind(this.selector, selector, type));
 		// this is wrong! we need a way to associate the clients!
-		env.currentWebSocketConnectionHost().addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
+		// also UGLY UGLY UGLY.  but this class is going away.  maybe today!
+		((WebSocketConnectionHost)env.current()).addFunction(EventNameHelper.makeEventName(this.selector, selector, type), function);
 		return this;
 	}
 	

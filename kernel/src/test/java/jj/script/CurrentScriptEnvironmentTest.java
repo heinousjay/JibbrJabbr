@@ -113,18 +113,6 @@ public class CurrentScriptEnvironmentTest {
 		
 		verify(mockCloser).close();
 	}
-	
-	@Test
-	public void testCurrentWebSocketConnectionHost() {
-		
-		try (Closer closer = cse.enterScope((ScriptEnvironment)host)) {
-			
-			assertThat(cse.current(), is((ScriptEnvironment)host));
-			assertThat(cse.currentWebSocketConnectionHost(), is(host));
-			
-		}
-		
-	}
 
 	@Test
 	public void testCurrentRootScriptEnvironment() {
