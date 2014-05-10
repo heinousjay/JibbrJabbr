@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import jj.execution.MockTaskRunner;
 import jj.http.server.EngineHttpHandler;
-import jj.http.server.JJHttpServerRequest;
+import jj.http.server.JJHttpRequest;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
 import jj.logging.EmergencyLog;
@@ -75,11 +75,11 @@ public class EngineHttpHandlerTest {
 
 	MockTaskRunner taskRunner;
 
-	@Mock JJHttpServerRequest httpRequest1;
-	@Mock JJHttpServerRequest httpRequest2;
-	@Mock JJHttpServerRequest httpRequest3;
-	@Mock JJHttpServerRequest httpRequest4;
-	@Mock JJHttpServerRequest httpRequest5;
+	@Mock JJHttpRequest httpRequest1;
+	@Mock JJHttpRequest httpRequest2;
+	@Mock JJHttpRequest httpRequest3;
+	@Mock JJHttpRequest httpRequest4;
+	@Mock JJHttpRequest httpRequest5;
 	
 	@Mock HttpResponse httpResponse;
 	
@@ -167,9 +167,9 @@ public class EngineHttpHandlerTest {
 		verify(binder).bind(FullHttpRequest.class);
 		verify(abb).toInstance(fullHttpRequest);
 		verify(binder).bind(HttpRequest.class);
-		verify(abb).to(JJHttpServerRequest.class);
+		verify(abb).to(JJHttpRequest.class);
 		verify(binder).bind(HttpResponse.class);
-		verify(abb).to(JJHttpServerResponse.class);
+		verify(abb).to(JJHttpResponse.class);
 		verify(binder).bind(WebSocketConnectionMaker.class);
 		verify(binder).bind(WebSocketFrameHandlerCreator.class);
 		

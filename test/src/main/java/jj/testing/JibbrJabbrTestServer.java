@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 import jj.webdriver.WebDriverProvider;
 import jj.webdriver.WebDriverRule;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 
 import org.junit.rules.TestRule;
@@ -196,8 +195,6 @@ public class JibbrJabbrTestServer implements TestRule {
 		TestRunner runner = injector.createChildInjector(
 			new RequestParameterModule(HttpMethod.GET, uri)
 		).getInstance(TestRunner.class);
-		
-		runner.request().header(HttpHeaders.Names.HOST, "localhost");
 		
 		return runner.run();
 	}

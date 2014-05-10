@@ -35,10 +35,10 @@ import jj.util.DateFormatHelper;
 @AccessLogger
 class RequestResponded implements LoggedEvent {
 	
-	private final JJHttpServerRequest request;
-	private final JJHttpServerResponse response;
+	private final JJHttpRequest request;
+	private final JJHttpResponse response;
 	
-	RequestResponded(JJHttpServerRequest request, JJHttpServerResponse response) {
+	RequestResponded(JJHttpRequest request, JJHttpResponse response) {
 		this.request = request;
 		this.response = response;
 	}

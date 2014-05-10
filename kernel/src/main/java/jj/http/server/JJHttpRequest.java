@@ -11,12 +11,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 @Singleton
-class JJHttpServerRequest extends AbstractHttpRequest implements HttpRequest {
+class JJHttpRequest extends AbstractHttpRequest {
 	
 	protected final ChannelHandlerContext ctx;
 	
 	@Inject
-	JJHttpServerRequest(final FullHttpRequest request, final RouteFinder routeFinder, final ChannelHandlerContext ctx) {
+	JJHttpRequest(final FullHttpRequest request, final RouteFinder routeFinder, final ChannelHandlerContext ctx) {
 		super(request, routeFinder);
 		this.ctx = ctx;
 	}

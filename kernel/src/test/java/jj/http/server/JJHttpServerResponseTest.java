@@ -25,8 +25,8 @@ import java.nio.channels.FileChannel;
 
 import jj.Version;
 import jj.event.Publisher;
-import jj.http.server.JJHttpServerRequest;
-import jj.http.server.JJHttpServerResponse;
+import jj.http.server.JJHttpRequest;
+import jj.http.server.JJHttpResponse;
 import jj.logging.LoggedEvent;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
@@ -62,13 +62,14 @@ public class JJHttpServerResponseTest {
 	final String mime = "this is not really a mime";
 	final ByteBuf bytes = Unpooled.wrappedBuffer("this is the bytes".getBytes(UTF_8));
 	final long size = bytes.readableBytes();
+	String host = "hostname";
 	
 	DefaultFullHttpRequest nettyRequest;
-	JJHttpServerRequest request;
+	JJHttpRequest request;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock Publisher publisher;
 	@Mock Version version;
-	JJHttpServerResponse response;
+	JJHttpResponse response;
 	@Mock Logger logger;
 	
 	@Captor ArgumentCaptor<LoggedEvent> eventCaptor;
@@ -76,9 +77,10 @@ public class JJHttpServerResponseTest {
 	@Before
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		request = new JJHttpServerRequest(nettyRequest, new RouteFinder(), ctx);
+		nettyRequest.headers().add(HttpHeaders.Names.HOST, host);
+		request = new JJHttpRequest(nettyRequest, new RouteFinder(), ctx);
 		
-		response = new JJHttpServerResponse(version, request, ctx, publisher);
+		response = new JJHttpResponse(version, request, ctx, publisher);
 		assertThat(response.charset(), is(UTF_8));
 	}
 
@@ -267,8 +269,6 @@ public class JJHttpServerResponseTest {
 		// given
 		given(logger.isInfoEnabled()).willReturn(true);
 		given(logger.isTraceEnabled()).willReturn(true);
-		String host = "hostname";
-		request.header(HttpHeaders.Names.HOST, host);
 		String location = "home";
 		byte[] bytes = "this is the contents".getBytes(UTF_8);
 		long length = 100L;

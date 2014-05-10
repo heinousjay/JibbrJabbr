@@ -23,6 +23,7 @@ import javax.inject.Named;
 
 import jj.uri.RouteFinder;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
@@ -36,6 +37,12 @@ public class TestHttpRequest extends AbstractHttpRequest {
 	
 	public static final String REQUEST_URI = "Request URI";
 	
+	private static FullHttpRequest nettyRequest(HttpMethod method, String uri) {
+		FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri);
+		request.headers().add(HttpHeaders.Names.HOST, "localhost");
+		return request;
+	}
+	
 
 	@Inject
 	TestHttpRequest(
@@ -43,7 +50,7 @@ public class TestHttpRequest extends AbstractHttpRequest {
 		final HttpMethod method,
 		final @Named(REQUEST_URI) String uri
 	) {
-		super(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri), routeFinder);
+		super(nettyRequest(method, uri), routeFinder);
 	}
 
 	private final InetSocketAddress socketAddress = new InetSocketAddress(0);

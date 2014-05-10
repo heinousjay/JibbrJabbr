@@ -27,76 +27,106 @@ import java.util.Map.Entry;
 import jj.uri.URIMatch;
 
 /**
+ * Represents the incoming HTTP request
+ * 
  * @author jason
  *
  */
 public interface HttpRequest {
 
+	/**
+	 * The number of milliseconds since the request was received by the engine,
+	 * according to the wall.  This has nothing to do with how much processing
+	 * the request has received, just the latency.
+	 * @return
+	 */
 	BigDecimal wallTime();
 
+	/**
+	 * The host from the request, either from the X-Host header, or the
+	 * Host header if that is not present.
+	 * @return
+	 */
 	String host();
 
+	/**
+	 * Flag if the request is secure.  Since JibbrJabbr does not support SSL
+	 * natively, this relies on the presence of the X-Forwarded-Proto header
+	 * in the request from the proxy.  Since this is potentially spoofable,
+	 * don't use it for anything too meaningful. TODO see if spoofability is
+	 * for real-real
+	 * @return
+	 */
 	boolean secure();
 
+	/**
+	 * The absolute URI of the request
+	 * @return
+	 */
 	URI absoluteUri();
 
-	String toString();
-
 	/**
-	 * @return
+	 * {@link System#nanoTime()} when the request was received
 	 */
 	long timestamp();
 
 	/**
-	 * @return
+	 * The URI from the initial line
 	 */
 	String uri();
 	
+	/**
+	 * A {@link URIMatch} of the request's URI
+	 */
 	URIMatch uriMatch();
 
 	/**
-	 * @param ifNoneMatch
-	 * @return
+	 * check for the presence of a header.  case-insensitive
 	 */
-	boolean hasHeader(String ifNoneMatch);
+	boolean hasHeader(String headerName);
 
 	/**
-	 * @param etag
-	 * @return
+	 * The first value of the given header
 	 */
 	String header(String name);
 
 	/**
-	 * @return
+	 * A unique ID for the request
 	 */
 	String id();
 
 	/**
-	 * @return
+	 * Ehhhh this sucks.
 	 */
 	String body();
 
 	/**
-	 * @return
+	 * The character set of the request, currently just assumed to be UTF-8.
 	 */
 	Charset charset();
 
 	/**
-	 * @return
+	 * The method from the initial line
 	 */
 	HttpMethod method();
 
 	/**
-	 * @return
+	 * Every header from the request
 	 */
 	List<Entry<String, String>> allHeaders();
-
-	/**
-	 * @param userAgent
-	 * @param userAgent2
-	 */
-	HttpRequest header(String name, String value);
 	
+	/**
+	 * The locale requested.  This gets a little complicated
+	 * @return
+	 */
 	Locale locale();
-
+	
+	public interface Cookie {
+		String name();
+		String value();
+	}
+	
+	Cookie cookie(String name);
+	
+	List<Cookie> cookies();
 }

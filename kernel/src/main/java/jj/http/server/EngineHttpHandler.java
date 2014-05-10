@@ -74,8 +74,8 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 			protected void configure() {
 				bind(ChannelHandlerContext.class).toInstance(ctx);
 				bind(FullHttpRequest.class).toInstance(request);
-				bind(HttpRequest.class).to(JJHttpServerRequest.class);
-				bind(HttpResponse.class).to(JJHttpServerResponse.class);
+				bind(HttpRequest.class).to(JJHttpRequest.class);
+				bind(HttpResponse.class).to(JJHttpResponse.class);
 				bind(WebSocketConnectionMaker.class);
 				bind(WebSocketFrameHandlerCreator.class);
 			}

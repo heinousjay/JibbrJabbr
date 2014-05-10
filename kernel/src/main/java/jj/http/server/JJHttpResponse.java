@@ -38,9 +38,9 @@ import io.netty.handler.stream.ChunkedNioFile;
  *
  */
 @Singleton
-class JJHttpServerResponse extends AbstractHttpResponse {
+class JJHttpResponse extends AbstractHttpResponse {
 	
-	private final JJHttpServerRequest request;
+	private final JJHttpRequest request;
 	
 	private final ChannelHandlerContext ctx;
 	
@@ -50,9 +50,9 @@ class JJHttpServerResponse extends AbstractHttpResponse {
 	 * @param response
 	 */
 	@Inject
-	JJHttpServerResponse(
+	JJHttpResponse(
 		final Version version,
-		final JJHttpServerRequest request,
+		final JJHttpRequest request,
 		final ChannelHandlerContext ctx,
 		final Publisher publisher
 	) {

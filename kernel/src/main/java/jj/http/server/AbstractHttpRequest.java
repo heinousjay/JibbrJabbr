@@ -33,6 +33,10 @@ import jj.uri.URIMatch;
 import jj.util.Sequence;
 
 /**
+ * <p>
+ * Everything about the HttpRequest that doesn't actually require being connected to the network.  Used to
+ * expose an internal http touchpoint without running the server, for testing.
+ * 
  * @author jason
  *
  */
@@ -152,16 +156,6 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	}
 
 	/**
-	 * @param userAgent
-	 * @param userAgent2
-	 */
-	@Override
-	public HttpRequest header(String name, String value) {
-		request.headers().add(name, value);
-		return this;
-	}
-
-	/**
 	 * @return
 	 */
 	@Override
@@ -191,4 +185,15 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 		return Locale.US;
 	}
 
+	@Override
+	public Cookie cookie(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public List<Cookie> cookies() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
