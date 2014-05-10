@@ -33,8 +33,6 @@ import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 
 import jj.execution.MockTaskRunner;
-import jj.http.HttpRequest;
-import jj.http.HttpResponse;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.WebSocketConnectionMaker;
@@ -49,6 +47,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;

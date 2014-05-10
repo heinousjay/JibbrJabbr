@@ -17,12 +17,11 @@ package jj.http.server;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import jj.http.AbstractHttpRequest;
 import jj.uri.RouteFinder;
-
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;

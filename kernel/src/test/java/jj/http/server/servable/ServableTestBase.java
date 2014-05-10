@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 
 import jj.JJ;
 import jj.configuration.Application;
-import jj.http.HttpRequest;
-import jj.http.HttpResponse;
+import jj.http.server.HttpRequest;
+import jj.http.server.HttpResponse;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;

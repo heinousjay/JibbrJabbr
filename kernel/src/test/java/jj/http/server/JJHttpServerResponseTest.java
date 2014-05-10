@@ -25,7 +25,6 @@ import java.nio.channels.FileChannel;
 
 import jj.Version;
 import jj.event.Publisher;
-import jj.http.AbstractHttpResponse;
 import jj.http.server.JJHttpServerRequest;
 import jj.http.server.JJHttpServerResponse;
 import jj.logging.LoggedEvent;

@@ -19,8 +19,8 @@ import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 import jj.util.StringUtils;
-import jj.http.HttpRequest;
-import jj.http.HttpResponse;
+import jj.http.server.HttpRequest;
+import jj.http.server.HttpResponse;
 
 @Singleton
 class DocumentServable extends Servable<HtmlResource> {

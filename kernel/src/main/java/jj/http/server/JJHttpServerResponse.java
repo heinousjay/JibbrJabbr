@@ -23,8 +23,6 @@ import javax.inject.Singleton;
 
 import jj.Version;
 import jj.event.Publisher;
-import jj.http.AbstractHttpResponse;
-import jj.http.HttpResponse;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import io.netty.channel.ChannelFuture;

@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 
-import jj.http.HttpRequest;
 import jj.logging.LoggedEvent;
 import jj.util.DateFormatHelper;
 

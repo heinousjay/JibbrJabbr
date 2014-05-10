@@ -9,8 +9,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
 import jj.configuration.Application;
-import jj.http.HttpRequest;
-import jj.http.HttpResponse;
+import jj.http.server.HttpRequest;
+import jj.http.server.HttpResponse;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;

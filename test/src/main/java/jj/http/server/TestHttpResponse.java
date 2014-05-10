@@ -32,8 +32,6 @@ import jj.resource.MimeTypes;
 import jj.resource.Resource;
 import jj.resource.TransferableResource;
 import jj.testing.TestLog;
-import jj.http.AbstractHttpResponse;
-import jj.http.HttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 

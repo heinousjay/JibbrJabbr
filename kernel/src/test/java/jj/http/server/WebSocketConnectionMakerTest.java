@@ -34,7 +34,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import jj.AnswerWithSelf;
 import jj.configuration.AppLocation;
 import jj.document.DocumentScriptEnvironment;
-import jj.http.HttpResponse;
 import jj.resource.ResourceFinder;
 import jj.uri.URIMatch;
 

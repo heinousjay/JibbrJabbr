@@ -21,8 +21,6 @@ import javax.inject.Singleton;
 import com.google.inject.Injector;
 
 import jj.execution.TaskRunner;
-import jj.http.HttpRequest;
-import jj.http.HttpResponse;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.servable.Servables;
 import jj.logging.EmergencyLog;

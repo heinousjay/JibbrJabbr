@@ -8,8 +8,8 @@ import javax.inject.Singleton;
 import jj.configuration.AppLocation;
 import jj.configuration.Application;
 import jj.css.CssResource;
-import jj.http.HttpRequest;
-import jj.http.HttpResponse;
+import jj.http.server.HttpRequest;
+import jj.http.server.HttpResponse;
 import jj.resource.ResourceFinder;
 import jj.uri.URIMatch;
 
