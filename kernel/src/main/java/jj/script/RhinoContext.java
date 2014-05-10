@@ -17,7 +17,7 @@ package jj.script;
 
 import javax.inject.Inject;
 
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
 import jj.util.Closer;
 
 import org.mozilla.javascript.Callable;
@@ -42,14 +42,14 @@ public class RhinoContext implements Closer {
 	private final Context context;
 	private boolean closed = false;
 	
-	private final EmergencyLog logger;
+	private final Publisher publisher;
 	
 	@Inject
 	RhinoContext(
-		final EmergencyLog logger
+		final Publisher publisher
 	) {
 		this.context = Context.enter();
-		this.logger = logger;
+		this.publisher = publisher;
 		
 		context.setLanguageVersion(Context.VERSION_1_8);
 		context.setOptimizationLevel(-1);
@@ -99,12 +99,16 @@ public class RhinoContext implements Closer {
 		return new JsonParser(context, scope);
 	}
 	
+	private void publishRhinoException(String description, RhinoException re) {
+		publisher.publish(new ScriptError(description, re));
+	}
+	
 	public Function compileFunction(final Scriptable scope, final String source, final String sourceName) {
 		assertNotClosed();
 		try {
 			return context.compileFunction(scope, source, sourceName, 1, null);
 		} catch (RhinoException re) {
-			logger.error("script error compiling a function\n{}", re.getMessage());
+			publishRhinoException("script error compiling a function\n{}", re);
 			throw re;
 		}
 	}
@@ -121,7 +125,7 @@ public class RhinoContext implements Closer {
 		try {
 			return context.compileString(source, sourceName, 1, null);
 		} catch (RhinoException re) {
-			logger.error("script error compiling a function\n{}", re.getMessage());
+			publishRhinoException("script error compiling a function\n{}", re);
 			throw re;
 		}
 	}
@@ -137,7 +141,7 @@ public class RhinoContext implements Closer {
 		try {
 			return configurationFunction.call(context, scope, thisObj, args);
 		} catch (RhinoException re) {
-			logger.error("script error executing a function\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			publishRhinoException("script error executing a function\n{}\n{}", re);
 			throw re;
 		}
 	}
@@ -149,7 +153,7 @@ public class RhinoContext implements Closer {
 		try {
 			return context.evaluateString(scope, source, sourceName, 1, null);
 		} catch (RhinoException re) {
-			logger.error("script error evaluating a string\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			publishRhinoException("script error evaluating a string\n{}\n{}", re);
 			throw re;
 		}
 	}
@@ -163,7 +167,7 @@ public class RhinoContext implements Closer {
 		try {
 			return context.executeScriptWithContinuations(script, scope);
 		} catch (RhinoException re) {
-			logger.error("script error during execution\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			publishRhinoException("script error during execution\n{}\n{}", re);
 			throw re;
 		}
 	}
@@ -178,7 +182,7 @@ public class RhinoContext implements Closer {
 		try {
 			return context.callFunctionWithContinuations(function, scope, args);
 		} catch (RhinoException re) {
-			logger.error("script error during function execution execution\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			publishRhinoException("script error during function execution execution\n{}\n{}", re);
 			throw re;
 		}
 	}
@@ -194,7 +198,7 @@ public class RhinoContext implements Closer {
 		try {
 			return context.resumeContinuation(continuation, scope, result);
 		} catch (RhinoException re) {
-			logger.error("script error resuming a continuation\n{}\n{}", re.getMessage(), re.getScriptStackTrace());
+			publishRhinoException("script error resuming a continuation\n{}\n{}", re);
 			throw re;
 		}
 	}

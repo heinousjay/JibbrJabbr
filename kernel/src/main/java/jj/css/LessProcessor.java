@@ -32,7 +32,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.configuration.Application;
+import jj.configuration.resolution.Application;
 import jj.event.Publisher;
 import jj.script.RhinoContext;
 

@@ -13,47 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.configuration.resolution;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
+import static jj.configuration.resolution.AppLocation.*;
 
-import jj.App;
-import jj.event.Listener;
-import jj.event.Subscriber;
-import jj.testing.JibbrJabbrTestServer;
-import jj.testing.TestHttpClient;
+import java.util.List;
 
-import org.junit.Rule;
+import jj.configuration.Location;
+
 import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-@Subscriber
-public class APITest {
+public class AppLocationTest {
 
-	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.api)
-		.injectInstance(this);
-	
-	
-	
-	@Listener
-	void error(ScriptError scriptError) {
-		error = true;
-	}
-	
-	private boolean error;
-	
 	@Test
-	public void test() throws Exception {
+	public void test() {
+		List<Location> locations = Base.and(Private).and(Public).locations();
 		
-		TestHttpClient index = server.get("/");
-		
-		System.out.println(index.contentsString());
-		
-		assertFalse(error);
+		assertThat(locations, contains((Location)Base, Private, Public));
 	}
-	
+
 }

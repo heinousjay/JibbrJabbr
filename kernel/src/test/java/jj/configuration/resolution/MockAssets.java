@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.configuration.resolution;
 
-import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
+
+import jj.BootstrapClassPath;
+import jj.configuration.resolution.Assets;
 
 /**
  * @author jason
  *
  */
-public interface PathResolver {
+public class MockAssets extends Assets {
+	
+	private static final Set<String> paths = new HashSet<>();
+	
+	static {
+		paths.add("/jj/assets");
+	}
 
 	/**
-	 * @param base
-	 * @param name
-	 * @return
+	 * @param resolver
 	 */
-	Path resolvePath(Location base, String name);
+	public MockAssets() {
+		
+		super(new BootstrapClassPath(), paths);
+	}
 
 }

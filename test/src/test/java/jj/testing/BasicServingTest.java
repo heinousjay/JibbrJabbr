@@ -18,7 +18,7 @@ package jj.testing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static jj.configuration.Assets.*;
+import static jj.configuration.resolution.Assets.*;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.nio.file.Files;

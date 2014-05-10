@@ -24,10 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import jj.configuration.AppLocation;
-import jj.configuration.Application;
 import jj.configuration.Configuration;
-import jj.configuration.PathResolver;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.Application;
+import jj.configuration.resolution.PathResolver;
 import jj.logging.EmergencyLog;
 import jj.resource.stat.ic.StaticResource;
 

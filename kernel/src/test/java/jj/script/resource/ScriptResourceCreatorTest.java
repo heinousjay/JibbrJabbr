@@ -17,7 +17,7 @@ package jj.script.resource;
 
 import java.nio.file.Path;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
 import jj.script.resource.ScriptResource;

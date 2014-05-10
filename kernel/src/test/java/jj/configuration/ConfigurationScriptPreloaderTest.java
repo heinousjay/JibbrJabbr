@@ -16,6 +16,7 @@
 package jj.configuration;
 
 import static org.mockito.BDDMockito.*;
+import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 import jj.resource.ResourceFinder;

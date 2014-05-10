@@ -6,9 +6,11 @@ module.exports = function broadcast(func) {
 	// TODO - error module!
 	if (typeof func !== 'function') { throw new Error('broadcast requires a function argument'); }
 	
-	var host = env.currentWebSocketConnectionHost();
+	var host = env.current();
 	
-	if (host == null) { throw new Error('cannot broadcast without a web socket connection host in context. this is not'); }
+	if (host == null || !('startBroadcasting' in host)) { 
+		throw new Error('cannot broadcast from this context, there is no web socket connection host'); 
+	}
 	
 	host.startBroadcasting();
 

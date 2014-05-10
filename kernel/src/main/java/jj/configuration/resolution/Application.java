@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.configuration.resolution;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import jj.configuration.Arguments;
+import jj.configuration.Location;
 
 /**
  * component for determining app paths, based on the current application root.
@@ -39,10 +42,13 @@ public class Application implements PathResolver {
 	
 	private final Assets assets;
 	
+	private final APIModules apiModules;
+	
 	@Inject
-	public Application(final Arguments arguments, final Assets assets) {
+	public Application(final Arguments arguments, final Assets assets, final APIModules apiModules) {
 		this.arguments = arguments;
 		this.assets = assets;
+		this.apiModules = apiModules;
 	}
 	
 	public Path configPath() {
@@ -70,6 +76,8 @@ public class Application implements PathResolver {
 			return null;
 		case Assets:
 			return assets.path(name);
+		case APIModules:
+			return apiModules.path(name);
 		default:
 			return path().resolve(location.path()).resolve(name);
 		}

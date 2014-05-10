@@ -22,8 +22,8 @@ import io.netty.handler.codec.http.HttpHeaders;
 
 import java.io.IOException;
 
-import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.Application;
 import jj.http.server.HttpRequest;
 import jj.http.server.HttpResponse;
 import jj.resource.FileResource;

@@ -8,9 +8,9 @@ import javax.inject.Singleton;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
-import jj.configuration.AppLocation;
-import jj.configuration.Application;
-import jj.configuration.Assets;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.Application;
+import jj.configuration.resolution.Assets;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.HtmlResource;
 import jj.document.servable.DocumentRequestProcessor;

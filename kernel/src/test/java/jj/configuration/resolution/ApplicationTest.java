@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.configuration.resolution;
 
-import static jj.configuration.AppLocation.*;
+import static jj.configuration.resolution.AppLocation.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import jj.configuration.Arguments;
+import jj.configuration.resolution.APIModules;
+import jj.configuration.resolution.Application;
+import jj.configuration.resolution.Assets;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +40,7 @@ public class ApplicationTest {
 
 	@Mock private Arguments arguments;
 	@Mock private Assets assets;
+	@Mock private APIModules apiModules;
 	@InjectMocks Application app;
 	
 	@Test
@@ -47,6 +53,10 @@ public class ApplicationTest {
 		// asset resources get delegated to Assets
 		app.resolvePath(Assets, "");
 		verify(assets).path("");
+		
+		// api module resources get delegated to APIModules
+		app.resolvePath(APIModules, "");
+		verify(apiModules).path("");
 		
 		// otherwise we're doing something worth looking at
 		

@@ -1,12 +1,12 @@
 package jj.resource;
 
 import jj.JJModule;
+import jj.jasmine.SpecResource;
+import jj.jasmine.SpecResourceCreator;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceCreator;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.sha1.Sha1ResourceCreator;
-import jj.resource.spec.SpecResource;
-import jj.resource.spec.SpecResourceCreator;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceCreator;
 

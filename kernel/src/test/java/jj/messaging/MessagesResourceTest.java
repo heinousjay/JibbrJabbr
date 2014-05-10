@@ -22,7 +22,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.Locale;
 
 import jj.Base;
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;

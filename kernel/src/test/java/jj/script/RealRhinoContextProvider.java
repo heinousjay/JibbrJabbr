@@ -19,7 +19,7 @@ import static org.mockito.BDDMockito.*;
 
 import javax.inject.Provider;
 
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
 
 /**
  * @author jason
@@ -30,6 +30,6 @@ public class RealRhinoContextProvider implements Provider<RhinoContext> {
 	
 	@Override
 	public RhinoContext get() {
-		return new RhinoContext(mock(EmergencyLog.class));
+		return new RhinoContext(mock(Publisher.class));
 	}
 }

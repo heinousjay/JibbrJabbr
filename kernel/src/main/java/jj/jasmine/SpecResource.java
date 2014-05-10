@@ -13,37 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.jasmine;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.Path;
 
-import jj.BootstrapClassPath;
+import javax.inject.Inject;
 
-import org.junit.Test;
+import jj.resource.AbstractFileResource;
+import jj.resource.MimeTypes;
 
 /**
  * @author jason
  *
  */
-public class AssetsTest {
+public class SpecResource extends AbstractFileResource {
 
-	@Test
-	public void test() {
-		Set<String> paths = new HashSet<>();
-		paths.add("/jj/assets");
-		
-		Assets assets = new Assets(new BootstrapClassPath(), paths);
-		
-		assertThat(assets.path("jj.js"), is(notNullValue()));
-		
-		// NEEDS A BETTER TEST
-		assertThat(assets.path("jj1.js"), is(Assets.NOT_FOUND));
-		
-		
+	private final String script;
+	
+	@Inject
+	SpecResource(final Dependencies dependencies, final String name, final Path path) {
+		super(dependencies, name, path);
+		script = byteBuffer.toString(UTF_8);
 	}
 
+	@Override
+	public String mime() {
+		return MimeTypes.get(".js");
+	}
+	
+	public String script() {
+		return script;
+	}
 }

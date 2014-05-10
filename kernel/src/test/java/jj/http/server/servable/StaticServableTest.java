@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.AppLocation.*;
+import static jj.configuration.resolution.AppLocation.*;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 

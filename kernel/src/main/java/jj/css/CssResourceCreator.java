@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
 import jj.configuration.Location;
-import jj.configuration.Application;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.Application;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.Resource;
 import jj.resource.ResourceFinder;

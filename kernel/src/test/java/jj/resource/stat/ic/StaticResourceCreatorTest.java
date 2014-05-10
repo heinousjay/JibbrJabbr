@@ -17,7 +17,7 @@ package jj.resource.stat.ic;
 
 import java.nio.file.Path;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
 import jj.resource.stat.ic.StaticResource;

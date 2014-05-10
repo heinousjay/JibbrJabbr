@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.script.resource.ScriptResource;

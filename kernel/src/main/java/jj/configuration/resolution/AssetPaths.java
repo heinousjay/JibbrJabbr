@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
+package jj.configuration.resolution;
 
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.PathResolver;
-import jj.document.HtmlResource;
-import jj.document.HtmlResourceCreator;
-import jj.resource.ResourceInstanceCreator;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
 
 /**
  * @author jason
  *
  */
-public class HtmlResourceMaker {
-	public static HtmlResource make(PathResolver app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
-		return new HtmlResourceCreator(app, creator).create(base, name);
-	}
-	
-	public static HtmlResourceCreator fake(PathResolver app) {
-		return new HtmlResourceCreator(app, null);
-	}
+@Qualifier
+@Documented
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AssetPaths {
+
 }

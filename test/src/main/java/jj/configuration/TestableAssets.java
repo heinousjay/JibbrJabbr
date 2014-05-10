@@ -19,12 +19,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.BootstrapClassPath;
+import jj.configuration.resolution.InternalAssets;
 
 /**
  * @author jason
  *
  */
-public class TestableAssets extends Assets {
+public class TestableAssets extends InternalAssets {
 	
 	private static final Set<String> paths;
 	

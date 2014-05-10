@@ -30,9 +30,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.Application;
 import jj.configuration.Configuration;
-import jj.configuration.MockApplication;
+import jj.configuration.resolution.Application;
+import jj.configuration.resolution.MockApplication;
 import jj.css.CssResource;
 import jj.logging.EmergencyLog;
 import jj.util.SHA1Helper;

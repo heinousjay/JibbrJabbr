@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.execution.MockTaskRunner;
 
 import org.junit.Before;

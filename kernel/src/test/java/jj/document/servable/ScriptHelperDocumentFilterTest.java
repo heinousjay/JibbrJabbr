@@ -3,14 +3,14 @@ package jj.document.servable;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.Assets.*;
+import static jj.configuration.resolution.Assets.*;
 
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-import jj.configuration.AppLocation;
 import jj.configuration.Configuration;
+import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentConfiguration;
 import jj.document.servable.DocumentRequestProcessor;

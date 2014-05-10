@@ -18,7 +18,7 @@ package jj.resource;
 import java.io.IOException;
 import java.net.URI;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 
 class MyResource extends AbstractResource {
 

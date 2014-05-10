@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 
 import jj.App;
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.HtmlResource;
 import jj.event.Listener;

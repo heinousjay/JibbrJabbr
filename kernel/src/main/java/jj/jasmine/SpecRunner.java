@@ -19,11 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
-import jj.resource.spec.SpecResource;
 import jj.script.ScriptEnvironmentInitialized;
 import jj.script.resource.ScriptResource;
 

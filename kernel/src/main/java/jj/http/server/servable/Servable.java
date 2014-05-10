@@ -1,14 +1,14 @@
 package jj.http.server.servable;
 
 
-import static jj.configuration.AppLocation.*;
+import static jj.configuration.resolution.AppLocation.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
-import jj.configuration.Application;
+import jj.configuration.resolution.Application;
 import jj.http.server.HttpRequest;
 import jj.http.server.HttpResponse;
 import jj.resource.FileResource;

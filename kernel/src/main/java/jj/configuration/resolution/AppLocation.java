@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.configuration.resolution;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import jj.configuration.Location;
 import jj.script.ScriptEnvironment;
 
 /**
@@ -48,6 +49,9 @@ public enum AppLocation implements Location {
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
 	Assets(""),
+	
+	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
+	APIModules(""),
 	
 	/** the paths of the application pieces */
 	Base(""),

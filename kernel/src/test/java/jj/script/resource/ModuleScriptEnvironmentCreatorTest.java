@@ -16,7 +16,7 @@
 package jj.script.resource;
 
 import static org.mockito.BDDMockito.*;
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceInstanceCreator;
 import jj.script.ScriptEnvironment;

@@ -13,37 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.spec;
+package jj.configuration.resolution;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.nio.file.Path;
+import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import jj.resource.AbstractFileResource;
-import jj.resource.MimeTypes;
+import jj.ResourceResolver;
 
 /**
  * @author jason
  *
  */
-public class SpecResource extends AbstractFileResource {
+@Singleton
+public class APIModules extends InternalAssets {
 
-	private final String script;
 	
 	@Inject
-	SpecResource(final Dependencies dependencies, final String name, final Path path) {
-		super(dependencies, name, path);
-		script = byteBuffer.toString(UTF_8);
-	}
-
-	@Override
-	public String mime() {
-		return MimeTypes.get(".js");
-	}
-	
-	public String script() {
-		return script;
+	APIModules(final ResourceResolver resolver, final @APIPaths Set<String> paths) {
+		super(resolver, paths);
 	}
 }

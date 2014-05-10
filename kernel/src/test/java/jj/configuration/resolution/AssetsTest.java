@@ -13,47 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.configuration.resolution;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-import jj.App;
-import jj.event.Listener;
-import jj.event.Subscriber;
-import jj.testing.JibbrJabbrTestServer;
-import jj.testing.TestHttpClient;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.junit.Rule;
+import jj.BootstrapClassPath;
+import jj.configuration.resolution.Assets;
+
 import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-@Subscriber
-public class APITest {
+public class AssetsTest {
 
-	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.api)
-		.injectInstance(this);
-	
-	
-	
-	@Listener
-	void error(ScriptError scriptError) {
-		error = true;
-	}
-	
-	private boolean error;
-	
 	@Test
-	public void test() throws Exception {
+	public void test() {
+		Set<String> paths = new HashSet<>();
+		paths.add("/jj/assets");
 		
-		TestHttpClient index = server.get("/");
+		Assets assets = new Assets(new BootstrapClassPath(), paths);
 		
-		System.out.println(index.contentsString());
+		assertThat(assets.path("jj.js"), is(notNullValue()));
 		
-		assertFalse(error);
+		// NEEDS A BETTER TEST
+		assertThat(assets.path("jj1.js"), is(Assets.NOT_FOUND));
+		
+		
 	}
-	
+
 }

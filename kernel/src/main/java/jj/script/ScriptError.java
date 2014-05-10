@@ -13,24 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.script;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.mozilla.javascript.RhinoException;
+import org.slf4j.Logger;
 
-import javax.inject.Qualifier;
+import jj.logging.EmergencyLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-@Qualifier
-@Documented
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface AssetPaths {
+@EmergencyLogger
+public class ScriptError implements LoggedEvent {
+	
+	private final String description;
+	private final RhinoException re;
+	
+	ScriptError(final String description, final RhinoException re) {
+		this.description = description;
+		this.re = re;
+	}
+
+	@Override
+	public void describeTo(Logger logger) {
+		logger.error(description, re.getMessage(), re.getScriptStackTrace());
+	}
 
 }

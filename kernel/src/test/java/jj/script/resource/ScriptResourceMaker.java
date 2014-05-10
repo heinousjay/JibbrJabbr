@@ -15,8 +15,8 @@
  */
 package jj.script.resource;
 
-import jj.configuration.AppLocation;
-import jj.configuration.PathResolver;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.PathResolver;
 import jj.resource.ResourceInstanceCreator;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceCreator;

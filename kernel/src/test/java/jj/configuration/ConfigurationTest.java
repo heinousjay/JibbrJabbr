@@ -15,18 +15,24 @@
  */
 package jj.configuration;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.configuration.Configuration;
+import jj.configuration.resolution.AppLocation;
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 import jj.document.servable.DocumentConfiguration;
+import jj.event.Publisher;
 import jj.http.server.HttpServerSocketConfiguration;
-import jj.logging.EmergencyLog;
 import jj.resource.ResourceFinder;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceMaker;
+import jj.script.ScriptError;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -35,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.EcmaError;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -65,7 +72,7 @@ public class ConfigurationTest {
 	private Configuration toTest;
 	private ConfigurationClassLoader classLoader;
 	private @Mock ResourceFinder resourceFinder;
-	private @Mock EmergencyLog logger;
+	private @Mock Publisher publisher;
 
 	@Before 
 	public void before() throws Exception {
@@ -81,7 +88,7 @@ public class ConfigurationTest {
 			protected void configure() {
 				bind(Converters.class).toInstance(new Converters(ConverterSetMaker.converters()));
 				bind(ResourceFinder.class).toInstance(resourceFinder);
-				bind(EmergencyLog.class).toInstance(logger);
+				bind(Publisher.class).toInstance(publisher);
 			}
 		});
 	}
@@ -114,7 +121,7 @@ public class ConfigurationTest {
 		}
 		assertThat(error, is(notNullValue()));
 		assertThat(error.getMessage(), Matchers.startsWith("TypeError: Cannot find function fail in object [object Object]."));
-		verify(logger).error(anyString(), eq(error.getMessage()), eq(error.getScriptStackTrace()));
+		verify(publisher).publish(isA(ScriptError.class));
 	}
 	
 	@Test

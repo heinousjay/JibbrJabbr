@@ -21,7 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.JJ;
-import jj.configuration.Application;
+import jj.configuration.resolution.Application;
 import jj.http.server.HttpRequest;
 import jj.http.server.HttpResponse;
 import jj.resource.ResourceFinder;

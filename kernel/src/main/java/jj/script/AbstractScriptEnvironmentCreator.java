@@ -18,8 +18,8 @@ package jj.script;
 import java.io.IOException;
 import java.net.URI;
 
-import jj.configuration.AppLocation;
 import jj.configuration.Location;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResourceCreator;
 
 /**

@@ -13,33 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.config;
+package jj.configuration.resolution;
 
 import java.nio.file.Path;
 
-import jj.Base;
-import jj.configuration.resolution.AppLocation;
-import jj.resource.AbstractResource.Dependencies;
-import jj.resource.ResourceKey;
-import jj.resource.config.ConfigResource;
-import jj.script.RealRhinoContextProvider;
+import jj.configuration.Location;
 
 /**
- * Spits out the ConfigResource for testing
- * 
  * @author jason
  *
  */
-public class ConfigResourceMaker {
+public interface PathResolver {
 
-	public static ConfigResource configResource() throws Exception {
-		
-		Path path = Base.appPath().resolve(ConfigResource.CONFIG_JS);
-		
-		return new ConfigResource(
-			new RealRhinoContextProvider(), 
-			new Dependencies(new ResourceKey(ConfigResource.class, path.toUri()), AppLocation.Base),
-			path
-		);
-	}
+	/**
+	 * @param base
+	 * @param name
+	 * @return
+	 */
+	Path resolvePath(Location base, String name);
+
 }

@@ -6,7 +6,8 @@ import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.util.HashMap;
-import jj.configuration.AppLocation;
+
+import jj.configuration.resolution.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.InlineMessagesDocumentFilter;

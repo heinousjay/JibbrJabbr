@@ -18,7 +18,7 @@ package jj.messaging;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 import jj.Base;
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceKey;
 

@@ -23,7 +23,7 @@ import static jj.resource.DependentsExtractor.dependents;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.css.CssResource;
 import jj.css.CssResourceCreator;
 import jj.css.LessProcessor;

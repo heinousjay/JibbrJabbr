@@ -13,27 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.configuration.resolution;
 
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.*;
-import static jj.configuration.AppLocation.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import java.util.List;
-
-import org.junit.Test;
+import jj.BootstrapClassPath;
+import jj.configuration.resolution.APIModules;
 
 /**
  * @author jason
  *
  */
-public class AppLocationTest {
+public class MockAPIModules extends APIModules {
+	
+	private static final Set<String> paths = new HashSet<>();
+	
+	static {
+		paths.add("/jj/script/api");
+	}
 
-	@Test
-	public void test() {
-		List<Location> locations = Base.and(Private).and(Public).locations();
+	/**
+	 * @param resolver
+	 */
+	public MockAPIModules() {
 		
-		assertThat(locations, contains((Location)Base, Private, Public));
+		super(new BootstrapClassPath(), paths);
 	}
 
 }

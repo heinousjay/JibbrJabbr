@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.spec;
+package jj.jasmine;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -22,11 +22,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
+import jj.jasmine.SpecResource;
+import jj.jasmine.SpecResourceCreator;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
-import jj.resource.spec.SpecResource;
-import jj.resource.spec.SpecResourceCreator;
 
 /**
  * @author jason

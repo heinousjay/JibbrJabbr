@@ -13,31 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import jj.BootstrapClassPath;
-
 /**
+ * <p>
+ * The system responsible for resolving paths and making resources concrete.
+ * 
+ * <p>
+ * This is the in-code configuration for the resource system
+ * 
  * @author jason
  *
  */
-public class MockAssets extends Assets {
-	
-	private static final Set<String> paths = new HashSet<>();
-	
-	static {
-		paths.add("/jj/assets");
-	}
-
-	/**
-	 * @param resolver
-	 */
-	public MockAssets() {
-		
-		super(new BootstrapClassPath(), paths);
-	}
-
-}
+package jj.configuration.resolution;

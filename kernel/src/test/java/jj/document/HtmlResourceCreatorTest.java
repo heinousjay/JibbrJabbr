@@ -11,7 +11,7 @@ import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.NodeVisitor;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceCreator;
 import jj.document.servable.DocumentConfiguration;

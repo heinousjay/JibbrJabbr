@@ -17,5 +17,7 @@ public class HttpServerModule extends JJModule {
 		bindLoggedEvents().annotatedWith(AccessLogger.class).toLogger(AccessLogger.NAME);
 		
 		install(new ServableModule());
+		
+		addAPIModulePath("/jj/http/server/api");
 	}
 }

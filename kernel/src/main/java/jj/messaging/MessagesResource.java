@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceFinder;
 import jj.util.SHA1Helper;

@@ -15,7 +15,8 @@
  */
 package jj;
 
-import jj.configuration.AssetPaths;
+import jj.configuration.resolution.APIPaths;
+import jj.configuration.resolution.AssetPaths;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
@@ -49,6 +50,7 @@ public abstract class JJModule extends AbstractModule {
 	private Multibinder<Converter<?, ?>> converters;
 	private Multibinder<HostObject> hostObjects;
 	private Multibinder<String> assetPaths;
+	private Multibinder<String> apiPaths;
 
 	protected LinkedBindingBuilder<JJServerStartupListener> addStartupListenerBinding() {
 		if (startupListeners == null) {
@@ -77,6 +79,14 @@ public abstract class JJModule extends AbstractModule {
 		}
 
 		assetPaths.addBinding().toInstance(path);
+	}
+	
+	protected void addAPIModulePath(String path) {
+		if (apiPaths == null) {
+			apiPaths = Multibinder.newSetBinder(binder(), String.class, APIPaths.class);
+		}
+
+		apiPaths.addBinding().toInstance(path);
 	}
 	
 	protected ResourceCreatorBinder bindCreation() {

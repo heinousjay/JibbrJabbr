@@ -27,7 +27,7 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceKey;
 import jj.util.Closer;

@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.AppLocation;
-import jj.configuration.Application;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.Application;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.script.resource.ScriptResource;

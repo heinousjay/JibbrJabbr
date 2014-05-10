@@ -17,7 +17,7 @@ package jj.messaging;
 
 import java.nio.file.Path;
 
-import jj.configuration.AppLocation;
+import jj.configuration.resolution.AppLocation;
 import jj.messaging.PropertiesResource;
 import jj.messaging.PropertiesResourceCreator;
 import jj.resource.AbstractResource.Dependencies;

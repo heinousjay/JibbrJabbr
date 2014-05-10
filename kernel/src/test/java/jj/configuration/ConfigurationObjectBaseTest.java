@@ -18,6 +18,7 @@ package jj.configuration;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
+import jj.configuration.resolution.AppLocation;
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 import jj.http.server.Binding;

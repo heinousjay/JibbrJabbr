@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.configuration.Application;
+import jj.configuration.resolution.Application;
 import jj.css.FinishedLessProcessing;
 import jj.css.LessProcessor;
 import jj.css.LoadLessResource;

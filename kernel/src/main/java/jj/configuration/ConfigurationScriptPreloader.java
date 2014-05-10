@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
+import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
 import jj.execution.TaskRunner;
 import jj.resource.ResourceTask;

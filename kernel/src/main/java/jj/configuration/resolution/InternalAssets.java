@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.configuration.resolution;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,35 +21,22 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import jj.ResourceResolver;
 
 /**
- * registration point for asset directories? something like that
- * 
  * @author jason
  *
  */
-@Singleton
-public class Assets {
-	
-	public static final String JJ_JS = "jj.js";
-	public static final String JQUERY_JS_DEV = "jquery-2.0.3.js";
-	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
-	public static final String JQUERY_JS_MAP = "jquery-2.0.3.min.map";
-	public static final String FAVICON_ICO = "favicon.ico";
-	public static final String ERROR_404 = "errors/404.html";
-	
-	static final Path NOT_FOUND = Paths.get("/jj/assets/not-found-sentinel/");
-	
+public class InternalAssets {
+
+	protected static final Path NOT_FOUND = Paths.get("/jj/assets/not-found-sentinel/");
 	private final ResourceResolver resolver;
-	
 	private final Set<String> paths;
-	
-	@Inject
-	Assets(final ResourceResolver resolver, final @AssetPaths Set<String> paths) {
+
+	/**
+	 * 
+	 */
+	protected InternalAssets(final ResourceResolver resolver, final Set<String> paths) {
 		this.resolver = resolver;
 		this.paths = paths;
 	}
@@ -76,4 +63,5 @@ public class Assets {
 		
 		return result;
 	}
+
 }

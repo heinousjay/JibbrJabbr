@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.configuration.resolution;
 
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.Application;
 import jj.configuration.Arguments;
+import jj.configuration.Location;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.Application;
 
 /**
  * @author jason
@@ -35,12 +37,12 @@ public class MockApplication extends Application {
 	 * @param arguments
 	 */
 	public MockApplication() {
-		super(mock(Arguments.class), new MockAssets());
+		super(mock(Arguments.class), new MockAssets(), new MockAPIModules());
 		basePath = Base.path;
 	}
 	
 	public MockApplication(final Path basePath) {
-		super(mock(Arguments.class), new MockAssets());
+		super(mock(Arguments.class), new MockAssets(), new MockAPIModules());
 		this.basePath = basePath;
 	}
 

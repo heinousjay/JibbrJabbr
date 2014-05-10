@@ -16,17 +16,17 @@
 package jj.script.resource;
 
 
-import static jj.configuration.AppLocation.*;
+import static jj.configuration.resolution.AppLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
-
 import jj.engine.EngineAPI;
 import jj.resource.ResourceFinder;
 import jj.script.ContinuationPendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
 import jj.script.AbstractScriptEnvironment;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +69,7 @@ public class ModuleScriptEnvironmentTest {
 		
 		given(parent.alive()).willReturn(true);
 		
-		given(resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), moduleIdentifier + ".js")).willReturn(scriptResource);
+		given(resourceFinder.loadResource(ScriptResource.class, Base.and(APIModules), moduleIdentifier + ".js")).willReturn(scriptResource);
 		
 		given(api.global()).willReturn(global);
 		
@@ -98,7 +98,7 @@ public class ModuleScriptEnvironmentTest {
 	@Test
 	public void testWithInjectorBridge() {
 		
-		given(scriptResource.base()).willReturn(Assets);
+		given(scriptResource.base()).willReturn(APIModules);
 		
 		construct();
 		

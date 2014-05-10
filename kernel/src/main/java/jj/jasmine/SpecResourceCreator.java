@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.spec;
+package jj.jasmine;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Location;
-import jj.configuration.PathResolver;
+import jj.configuration.resolution.PathResolver;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.ResourceInstanceCreator;
 

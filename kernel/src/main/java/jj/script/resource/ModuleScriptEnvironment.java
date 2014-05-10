@@ -16,7 +16,7 @@
 package jj.script.resource;
 
 
-import static jj.configuration.AppLocation.*;
+import static jj.configuration.resolution.AppLocation.*;
 
 import java.io.IOException;
 
@@ -91,8 +91,8 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		assert ((AbstractResource)requiredModule.parent()).alive(): "cannot require a module for a dead parent";
 		
 		// the script is loaded from the app, and if not found there, then an API module is searched
-		// internally.  this may change!
-		scriptResource = resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), scriptName());
+		// internally.  this may change! but i like its simplicity
+		scriptResource = resourceFinder.loadResource(ScriptResource.class, Base.and(APIModules), scriptName());
 		
 		if (scriptResource == null) {
 			throw new NoSuchResourceException(moduleIdentifier);
@@ -106,7 +106,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		scope = createChainedScope(api.global());
 		configureModuleObjects(moduleIdentifier, scope);
 		
-		if (scriptResource.base() == Assets) {
+		if (scriptResource.base() == APIModules) {
 			scope.defineProperty(InjectFunction.NAME, injectorBridge, ScriptableObject.CONST);
 		}
 		
