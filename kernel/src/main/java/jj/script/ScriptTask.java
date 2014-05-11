@@ -15,6 +15,7 @@
  */
 package jj.script;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import jj.execution.JJTask;
 import jj.execution.TaskRunner;
 
@@ -96,7 +97,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends JJTask {
 	
 	@Override
 	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment).submit(runnable);
+		executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment).submit(runnable, 0, MILLISECONDS);
 	}
 
 	/**
