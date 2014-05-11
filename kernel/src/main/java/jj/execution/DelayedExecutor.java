@@ -41,10 +41,12 @@ import jj.util.Clock;
  */
 public abstract class DelayedExecutor extends ThreadPoolExecutor {
 	
-	public static class CancelKey extends WeakReference<DelayedRunnable> {
+	public static class CancelKey {
+		
+		private final WeakReference<DelayedRunnable> runnable;
 		
 		CancelKey(DelayedRunnable runnable) {
-			super(runnable);
+			this.runnable = new WeakReference<>(runnable);
 		}
 	}
 	
@@ -163,7 +165,7 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 	
 	public void cancel(CancelKey cancelKey) {
 		assert(cancelKey instanceof CancelKey) : "got a cancel key i don't understand " + cancelKey;
-		DelayedRunnable runnable = ((CancelKey)cancelKey).get();
+		DelayedRunnable runnable = ((CancelKey)cancelKey).runnable.get();
 		if (runnable != null) {
 			runnable.canceled.set(true);
 			delayedTasks.remove(runnable);

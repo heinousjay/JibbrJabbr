@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
 import static java.util.concurrent.TimeUnit.*;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 import jj.execution.DelayedExecutor.CancelKey;
@@ -67,7 +68,7 @@ public class DelayedExecutorTest {
 			1,
 			1,
 			10000, MILLISECONDS,
-			new SynchronousQueue<Runnable>(),
+			new LinkedBlockingQueue<Runnable>(),
 			new JJThreadFactory(jjUncaughtExceptionHandler).namePattern("%d"),
 			new JJRejectedExecutionHandler()
 		) {
