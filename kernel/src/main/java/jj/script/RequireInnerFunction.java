@@ -23,9 +23,9 @@ import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
 import jj.resource.ResourceFinder;
-import jj.script.resource.ModuleScriptEnvironment;
-import jj.script.resource.RequiredModule;
-import jj.script.resource.RootScriptEnvironment;
+import jj.script.module.ModuleScriptEnvironment;
+import jj.script.module.RequiredModule;
+import jj.script.module.RootScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;

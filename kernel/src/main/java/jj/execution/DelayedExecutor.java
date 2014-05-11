@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.execution;
 
-import jj.script.ScriptEnvironment;
-
-import org.mozilla.javascript.ScriptableObject;
+import java.util.concurrent.TimeUnit;
 
 /**
- * A script environment that can act as a parent for modules
  * 
  * @author jason
  *
  */
-public interface RootScriptEnvironment extends ScriptEnvironment {
+public interface DelayedExecutor {
+	
+	public interface CancelKey {}
 
-	ScriptableObject global();
+	// this needs to return a cancel key
+	CancelKey submit(Runnable runnable, long delay, TimeUnit timeUnit);
+	
+	void cancel(CancelKey cancelKey);
+
 }

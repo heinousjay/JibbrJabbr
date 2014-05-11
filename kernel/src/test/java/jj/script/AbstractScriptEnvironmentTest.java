@@ -20,10 +20,6 @@ import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
-import javax.inject.Provider;
-
-import jj.resource.ResourceKey;
-import jj.script.AbstractScriptEnvironment.Dependencies;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -87,50 +84,41 @@ public class AbstractScriptEnvironmentTest {
 		}
 	}
 	
-	@Mock ResourceKey cacheKey;
-	@Mock Provider<RhinoContext> contextProvider;
-	@Mock Provider<ContinuationPendingKey> pendingKeyProvider;
-	@Mock RequireInnerFunction makeRequireFunction;
+	MockAbstractScriptEnvironmentDependencies dependencies;
 	
 	MyScriptEnvironment ase;
 	
 	@Mock ContinuationPendingKey pendingKey;
 	@Mock ContinuationPending continuationPending;
 	
-	@Mock Scriptable scope;
-	@Mock RhinoContext context;
+	@Mock ScriptableObject scope;
+
 
 	@Before
 	public void before() throws Exception {
-		ase = new MyScriptEnvironment(
-			new Dependencies(cacheKey, contextProvider, pendingKeyProvider, makeRequireFunction)
-		);
+		ase = new MyScriptEnvironment(dependencies = new MockAbstractScriptEnvironmentDependencies());
 	}
 	
 	@Test
 	public void testNewObject() {
 		
-		given(contextProvider.get()).willReturn(context);
-		
 		ase.newObject();
 		
-		verify(context).newObject(scope);
+		verify(dependencies.rhinoContextProvider().context).newObject(scope);
 	}
 	
 	@Test
 	public void testExports() {
 		
-		given(contextProvider.get()).willReturn(context);
-		
 		ase.exports();
 		
-		verify(context).evaluateString(scope, "module.exports", "evaluating exports");
+		verify(dependencies.rhinoContextProvider().context).evaluateString(scope, "module.exports", "evaluating exports");
 	}
 
 	@Test
 	public void testPendingKey() {
 		
-		given(pendingKeyProvider.get()).willReturn(pendingKey);
+		given(dependencies.pendingKeyProvider.get()).willReturn(pendingKey);
 		
 		assertThat(ase.createContinuationContext(continuationPending), is(pendingKey));
 		
@@ -140,6 +128,43 @@ public class AbstractScriptEnvironmentTest {
 	@Test
 	public void testCreateChainedScope() {
 		
+		ScriptableObject chained = mock(ScriptableObject.class);
+		given(dependencies.rhinoContextProvider().context.newObject(scope)).willReturn(chained);
+		
+		assertThat(ase.createChainedScope(scope), is(chained));
+		
+		verify(chained).setPrototype(scope);
+		verify(chained).setParentScope(null);
+	}
+	
+	@Test
+	public void testConfigureInjectFunction() {
+		
+		assertThat(ase.configureInjectFunction(scope), is(scope));
+		verify(scope).defineProperty(InjectFunction.NAME, dependencies.injectFunction, ScriptableObject.CONST);
+		
+		final String newName = "asSomethingElse";
+		ase.configureInjectFunction(scope, newName);
+		verify(scope).defineProperty(newName, dependencies.injectFunction, ScriptableObject.CONST);
+	}
+	
+	@Mock ScriptableObject module;
+	@Mock ScriptableObject exports;
+	@Mock ScriptableObject require;
+	
+	@Test
+	public void testConfigureModuleObjects() {
+		
+		final String moduleId = "moduleIdentifier";
+		given(dependencies.rhinoContextProvider().context.newObject(scope)).willReturn(module, exports);
+		given(dependencies.rhinoContextProvider().context.evaluateString(eq(scope), anyString(), eq("making require"))).willReturn(require);
+		assertThat(ase.configureModuleObjects(moduleId, scope), is(scope));
+		
+		verify(scope).defineProperty("module", module, ScriptableObject.CONST);
+		verify(module).defineProperty("id", moduleId, ScriptableObject.CONST);
+		verify(module).defineProperty("exports", exports, ScriptableObject.EMPTY);
+		verify(scope).defineProperty("exports", exports, ScriptableObject.CONST);
+		verify(scope).defineProperty(eq("require"), eq(require), eq(ScriptableObject.CONST));
 	}
 
 }

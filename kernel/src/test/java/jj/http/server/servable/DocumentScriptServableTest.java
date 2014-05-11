@@ -22,7 +22,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
 import jj.uri.URIMatch;
 
 import org.junit.Before;

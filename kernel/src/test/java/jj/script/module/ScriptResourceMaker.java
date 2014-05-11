@@ -13,42 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.util;
+package jj.script.module;
 
-import java.util.concurrent.TimeUnit;
-
-import jj.util.Clock;
+import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.PathResolver;
+import jj.resource.ResourceInstanceCreator;
+import jj.script.module.ScriptResource;
+import jj.script.module.ScriptResourceCreator;
 
 /**
  * @author jason
  *
  */
-public class MockClock extends Clock {
+public class ScriptResourceMaker {
 
-	public long time = System.currentTimeMillis();
-	
-	@Override
-	public long time() {
-		return time;
+	/**
+	 * @param app
+	 * @param creator
+	 * @param baseName
+	 * @return
+	 */
+	public static ScriptResource make(PathResolver app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
+		return new ScriptResourceCreator(app, creator).create(base, name);
 	}
-	
-	public MockClock advance() {
-		time++;
-		return this;
-	}
-	
-	public MockClock advance(long time, TimeUnit timeUnit) {
-		this.time += TimeUnit.MILLISECONDS.convert(time, timeUnit);
-		return this;
-	}
-	
-	public MockClock retreat() {
-		time--;
-		return this;
-	}
-	
-	public MockClock retreat(long time, TimeUnit timeUnit) {
-		this.time -= TimeUnit.MILLISECONDS.convert(time, timeUnit);
-		return this;
-	}
+
 }

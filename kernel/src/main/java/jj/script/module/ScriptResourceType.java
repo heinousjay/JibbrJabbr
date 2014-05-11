@@ -13,25 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script.module;
 
 /**
  * @author jason
  *
  */
-public class RequiredModuleException extends RuntimeException {
-
-	private static final long serialVersionUID = 5207653702478305981L;
-
-	private static String message(final String attemptedModuleIdentifier) {
-		return "could not require " + attemptedModuleIdentifier;
-	}
+public enum ScriptResourceType {
+	Client {
+		@Override
+		public String suffix(String baseName)  {
+			return baseName + ".js";
+		}
+	},
 	
-	RequiredModuleException(final RequiredModule requiredModule) {
-		super(message(requiredModule.toString()));
-	}
+	Module {
+		@Override
+		public String suffix(String baseName)  {
+			return baseName + ".js";
+		}
+	},
 	
-	RequiredModuleException(final String attemptedModuleIdentifier, final Throwable cause) {
-		super(message(attemptedModuleIdentifier), cause);
-	}
+	Shared {
+		@Override
+		public String suffix(String baseName) {
+			return baseName + ".shared.js";
+		}
+	},
+	
+	Server {
+		@Override
+		public String suffix(String baseName) {
+			return baseName + ".server.js";
+		}
+	};
+	
+	public abstract String suffix(final String baseName);
 }

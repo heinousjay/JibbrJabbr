@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script.module;
 
 import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceInstanceCreator;
-import jj.script.resource.ModuleScriptEnvironment;
-import jj.script.resource.ModuleScriptEnvironmentCreator;
+import jj.script.module.ModuleScriptEnvironment;
+import jj.script.module.ModuleScriptEnvironmentCreator;
+import jj.script.module.RequiredModule;
+import jj.script.module.RootScriptEnvironment;
 
 import org.junit.Before;
 import org.junit.Test;

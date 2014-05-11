@@ -47,4 +47,5 @@
 package jj.script;
 
 import jj.execution.TaskRunner;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
+

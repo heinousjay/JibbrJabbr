@@ -24,8 +24,8 @@ import jj.document.HtmlResourceMaker;
 import jj.logging.EmergencyLog;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
-import jj.script.resource.ScriptResource;
-import jj.script.resource.ScriptResourceMaker;
+import jj.script.module.ScriptResource;
+import jj.script.module.ScriptResourceMaker;
 
 /**
  * @author jason

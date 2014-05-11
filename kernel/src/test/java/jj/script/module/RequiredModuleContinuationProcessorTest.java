@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script.module;
 
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -31,7 +31,10 @@ import jj.script.ContinuationPendingKey;
 import jj.script.ContinuationPendingKeyResultExtractor;
 import jj.script.ContinuationState;
 import jj.script.DependsOnScriptEnvironmentInitialization;
-import jj.script.resource.ModuleScriptEnvironment;
+import jj.script.module.ModuleScriptEnvironment;
+import jj.script.module.RequiredModule;
+import jj.script.module.RequiredModuleContinuationProcessor;
+import jj.script.module.RequiredModuleException;
 
 import org.junit.Before;
 import org.junit.Test;

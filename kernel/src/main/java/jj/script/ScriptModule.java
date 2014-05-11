@@ -3,7 +3,7 @@ package jj.script;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.JJModule;
-import jj.script.resource.ScriptResourceModule;
+import jj.script.module.ScriptResourceModule;
 
 
 public class ScriptModule extends JJModule {

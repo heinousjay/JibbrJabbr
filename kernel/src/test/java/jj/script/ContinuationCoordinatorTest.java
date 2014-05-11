@@ -26,7 +26,7 @@ import java.util.Map;
 
 import jj.jjmessage.JJMessage;
 import jj.logging.EmergencyLog;
-import jj.script.resource.RequiredModule;
+import jj.script.module.RequiredModule;
 
 import org.junit.Before;
 import org.junit.Test;

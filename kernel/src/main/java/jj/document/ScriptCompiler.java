@@ -27,7 +27,7 @@ import jj.engine.DoInvokeFunction;
 import jj.engine.EngineAPI;
 import jj.event.Publisher;
 import jj.script.RhinoContext;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
 
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;

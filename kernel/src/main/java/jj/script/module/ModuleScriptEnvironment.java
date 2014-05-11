@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script.module;
 
 
 import static jj.configuration.resolution.AppLocation.*;
@@ -75,8 +75,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		final Dependencies dependencies,
 		final String moduleIdentifier,
 		final RequiredModule requiredModule,
-		final ResourceFinder resourceFinder,
-		final InjectFunction injectorBridge
+		final ResourceFinder resourceFinder
 	) {
 		super(dependencies);
 		
@@ -101,11 +100,11 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		requiredModule.parent().addDependent(this);
 		
 		sha1 = scriptResource.sha1();
-		scope = createChainedScope(requiredModule.parent().global());
-		configureModuleObjects(moduleIdentifier, scope);
+		scope = configureModuleObjects(moduleIdentifier, createChainedScope(requiredModule.parent().global()));
 		
-		if (scriptResource.base() == APIModules) {
-			scope.defineProperty(InjectFunction.NAME, injectorBridge, ScriptableObject.CONST);
+		// externalize this to the parent! pass it the resource and let it decide?
+		if (scriptResource.base() == APIModules) { 
+			configureInjectFunction(scope);
 		}
 		
 		try (RhinoContext context = contextProvider.get()) {

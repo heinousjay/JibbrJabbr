@@ -16,9 +16,9 @@ import jj.document.DocumentScriptEnvironment;
 import jj.document.HtmlResource;
 import jj.event.Listener;
 import jj.event.Subscriber;
-import jj.script.resource.ModuleScriptEnvironment;
-import jj.script.resource.RequiredModule;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ModuleScriptEnvironment;
+import jj.script.module.RequiredModule;
+import jj.script.module.ScriptResource;
 import jj.testing.JibbrJabbrTestServer;
 
 import org.junit.Rule;

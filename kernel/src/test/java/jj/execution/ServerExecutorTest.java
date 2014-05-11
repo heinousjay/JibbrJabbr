@@ -16,10 +16,11 @@
 package jj.execution;
 
 import static org.junit.Assert.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
+import jj.execution.DelayedExecutor.CancelKey;
 import jj.util.MockClock;
 
 import org.junit.After;
@@ -69,9 +70,9 @@ public class ServerExecutorTest {
 		
 		latch = new CountDownLatch(1);
 		
-		s.submit(helper, 0, TimeUnit.MILLISECONDS);
+		s.submit(helper, 0, MILLISECONDS);
 		
-		assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(200, MILLISECONDS));
 	}
 	
 	@Test
@@ -79,13 +80,26 @@ public class ServerExecutorTest {
 		
 		latch = new CountDownLatch(1);
 		
-		s.submit(helper, 1, TimeUnit.MILLISECONDS);
+		s.submit(helper, 1, MILLISECONDS);
 		
-		assertFalse(latch.await(200, TimeUnit.MILLISECONDS));
+		assertFalse(latch.await(200, MILLISECONDS));
 		
 		clock.advance();
 		
-		assertTrue(latch.await(50, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(50, MILLISECONDS));
 	}
 
+	@Test
+	public void testCancelStopsExecution() throws Exception {
+		
+		latch = new CountDownLatch(1);
+		
+		CancelKey cancelKey = s.submit(helper, 1, MILLISECONDS);
+		
+		s.cancel(cancelKey);
+		
+		clock.advance(1, MILLISECONDS);
+
+		assertFalse(latch.await(200, MILLISECONDS));
+	}
 }

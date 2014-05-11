@@ -24,7 +24,7 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
 import jj.script.ScriptEnvironmentInitialized;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
 
 /**
  * @author jason

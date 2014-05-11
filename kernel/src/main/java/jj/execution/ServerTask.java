@@ -38,8 +38,12 @@ public abstract class ServerTask extends JJTask {
 	}
 
 	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(ServerExecutor.class).submit(runnable, delay(), TimeUnit.MILLISECONDS);
+	protected void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
+		findExecutor(executors).submit(runnable, delay(), TimeUnit.MILLISECONDS);
+	}
+
+	protected ServerExecutor findExecutor(ExecutorFinder executors) {
+		return executors.ofType(ServerExecutor.class);
 	}
 	
 	

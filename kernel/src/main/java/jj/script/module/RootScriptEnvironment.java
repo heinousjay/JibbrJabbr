@@ -13,40 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script.module;
+
+import jj.script.ScriptEnvironment;
+
+import org.mozilla.javascript.ScriptableObject;
 
 /**
+ * A script environment that can act as a parent for modules
+ * 
  * @author jason
  *
  */
-public enum ScriptResourceType {
-	Client {
-		@Override
-		public String suffix(String baseName)  {
-			return baseName + ".js";
-		}
-	},
-	
-	Module {
-		@Override
-		public String suffix(String baseName)  {
-			return baseName + ".js";
-		}
-	},
-	
-	Shared {
-		@Override
-		public String suffix(String baseName) {
-			return baseName + ".shared.js";
-		}
-	},
-	
-	Server {
-		@Override
-		public String suffix(String baseName) {
-			return baseName + ".server.js";
-		}
-	};
-	
-	public abstract String suffix(final String baseName);
+public interface RootScriptEnvironment extends ScriptEnvironment {
+
+	ScriptableObject global();
 }

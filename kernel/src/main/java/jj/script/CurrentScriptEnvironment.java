@@ -21,7 +21,7 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
 
-import jj.script.resource.RootScriptEnvironment;
+import jj.script.module.RootScriptEnvironment;
 import jj.util.Closer;
 import jj.util.CurrentResource;
 

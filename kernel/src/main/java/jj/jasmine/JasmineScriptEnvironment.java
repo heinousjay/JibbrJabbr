@@ -29,8 +29,8 @@ import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.Global;
 import jj.script.RhinoContext;
-import jj.script.resource.RootScriptEnvironment;
-import jj.script.resource.ScriptResource;
+import jj.script.module.RootScriptEnvironment;
+import jj.script.module.ScriptResource;
 
 /**
  * @author jason
@@ -38,9 +38,6 @@ import jj.script.resource.ScriptResource;
  */
 public class JasmineScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
 
-	/**
-	 * 
-	 */
 	private static final String JASMINE = "jasmine";
 
 	private final ScriptableObject scope;

@@ -1,4 +1,4 @@
-package jj.script.resource;
+package jj.script.module;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import io.netty.buffer.ByteBuf;

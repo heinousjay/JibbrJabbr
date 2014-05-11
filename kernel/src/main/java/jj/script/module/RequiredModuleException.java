@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
-
-import jj.JJModule;
+package jj.script.module;
 
 /**
  * @author jason
  *
  */
-public class ScriptResourceModule extends JJModule {
+public class RequiredModuleException extends RuntimeException {
 
-	@Override
-	protected void configure() {
-		
-		bindCreation().of(ScriptResource.class).to(ScriptResourceCreator.class);
-		bindCreation().of(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
-		
-		dispatch().continuationOf(RequiredModule.class).to(RequiredModuleContinuationProcessor.class);
+	private static final long serialVersionUID = 5207653702478305981L;
+
+	private static String message(final String attemptedModuleIdentifier) {
+		return "could not require " + attemptedModuleIdentifier;
 	}
-
-
+	
+	RequiredModuleException(final RequiredModule requiredModule) {
+		super(message(requiredModule.toString()));
+	}
+	
+	RequiredModuleException(final String attemptedModuleIdentifier, final Throwable cause) {
+		super(message(attemptedModuleIdentifier), cause);
+	}
 }

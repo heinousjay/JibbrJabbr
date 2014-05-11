@@ -35,7 +35,8 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(ResourceKey.class),
 			new MockRhinoContextProvider(),
 			mock(MockPendingKeyProvider.class),
-			mock(RequireInnerFunction.class)
+			mock(RequireInnerFunction.class),
+			mock(InjectFunction.class)
 		);
 	}
 
@@ -44,7 +45,8 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(ResourceKey.class),
 			rhinoContextProvider,
 			mock(MockPendingKeyProvider.class),
-			mock(RequireInnerFunction.class)
+			mock(RequireInnerFunction.class),
+			mock(InjectFunction.class)
 		);
 	}
 	

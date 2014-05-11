@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script.module;
 
 
 import static jj.configuration.resolution.AppLocation.*;
@@ -25,12 +25,17 @@ import jj.script.ContinuationPendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
 import jj.script.AbstractScriptEnvironment;
+import jj.script.module.ModuleScriptEnvironment;
+import jj.script.module.RequiredModule;
+import jj.script.module.RootScriptEnvironment;
+import jj.script.module.ScriptResource;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
@@ -41,7 +46,6 @@ import org.mozilla.javascript.ScriptableObject;
 public class ModuleScriptEnvironmentTest {
 	
 	@Mock ResourceFinder resourceFinder;
-	@Mock InjectFunction injectorBridge;
 	
 	RealRhinoContextProvider contextProvider;
 	
@@ -80,8 +84,7 @@ public class ModuleScriptEnvironmentTest {
 			new MockAbstractScriptEnvironmentDependencies(contextProvider),
 			moduleIdentifier,
 			requiredModule,
-			resourceFinder,
-			injectorBridge
+			resourceFinder
 		);
 	}
 	
@@ -89,7 +92,7 @@ public class ModuleScriptEnvironmentTest {
 	public void testNoInjectorBridge() {
 		construct();
 		
-		assertThat(mse.scope().get(InjectFunction.NAME, mse.scope()), is(ScriptableObject.NOT_FOUND));
+		assertThat(mse.scope().get("inject", mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
 
 	@Test
@@ -99,6 +102,6 @@ public class ModuleScriptEnvironmentTest {
 		
 		construct();
 		
-		assertThat(mse.scope().get(InjectFunction.NAME, mse.scope()), is((Object)injectorBridge));
+		assertThat(mse.scope().get("inject", mse.scope()), is(instanceOf(Function.class)));
 	}
 }

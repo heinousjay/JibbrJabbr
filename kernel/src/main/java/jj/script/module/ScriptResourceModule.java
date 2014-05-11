@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script.module;
 
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.PathResolver;
-import jj.resource.ResourceInstanceCreator;
-import jj.script.resource.ScriptResource;
-import jj.script.resource.ScriptResourceCreator;
+import jj.JJModule;
 
 /**
  * @author jason
  *
  */
-public class ScriptResourceMaker {
+public class ScriptResourceModule extends JJModule {
 
-	/**
-	 * @param app
-	 * @param creator
-	 * @param baseName
-	 * @return
-	 */
-	public static ScriptResource make(PathResolver app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
-		return new ScriptResourceCreator(app, creator).create(base, name);
+	@Override
+	protected void configure() {
+		
+		bindCreation().of(ScriptResource.class).to(ScriptResourceCreator.class);
+		bindCreation().of(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
+		
+		dispatch().continuationOf(RequiredModule.class).to(RequiredModuleContinuationProcessor.class);
 	}
+
 
 }

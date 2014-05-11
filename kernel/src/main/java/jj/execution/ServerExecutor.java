@@ -15,11 +15,13 @@
  */
 package jj.execution;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,11 +42,18 @@ import jj.util.Clock;
  */
 @Singleton
 @Subscriber
-class ServerExecutor extends ThreadPoolExecutor {
+class ServerExecutor extends ThreadPoolExecutor implements DelayedExecutor {
 	
 	private final Clock clock;
 	
 	private final JJThreadFactory threadFactory;
+	
+	private static class ServerCancelKey extends WeakReference<DelayedRunnable> implements CancelKey {
+		
+		ServerCancelKey(DelayedRunnable runnable) {
+			super(runnable);
+		}
+	}
 	
 	private class DelayedRunnable implements Runnable, Delayed {
 		
@@ -56,6 +65,8 @@ class ServerExecutor extends ThreadPoolExecutor {
 		
 		private final long start = clock.time();
 		
+		private final AtomicBoolean canceled = new AtomicBoolean();
+		
 		protected DelayedRunnable(Runnable runnable, long delay, TimeUnit timeUnit) {
 			this.runnable = runnable;
 			this.delay = delay;
@@ -64,7 +75,7 @@ class ServerExecutor extends ThreadPoolExecutor {
 
 		@Override
 		public void run() {
-			runnable.run();
+			if (!canceled.get()) runnable.run();
 		}
 
 		@Override
@@ -126,9 +137,21 @@ class ServerExecutor extends ThreadPoolExecutor {
 	}
 	
 	// this needs to return a cancel key
-	void submit(Runnable runnable, long delay, TimeUnit timeUnit) {
+	@Override
+	public CancelKey submit(Runnable runnable, long delay, TimeUnit timeUnit) {
 		DelayedRunnable delayed = new DelayedRunnable(runnable, delay, timeUnit);
 		delayedTasks.add(delayed);
+		return new ServerCancelKey(delayed);
+	}
+	
+	@Override
+	public void cancel(CancelKey cancelKey) {
+		assert(cancelKey instanceof ServerCancelKey) : "got a cancel key i don't understand " + cancelKey;
+		DelayedRunnable runnable = ((ServerCancelKey)cancelKey).get();
+		if (runnable != null) {
+			runnable.canceled.set(true);
+			delayedTasks.remove(runnable);
+		}
 	}
 	
 	@Override

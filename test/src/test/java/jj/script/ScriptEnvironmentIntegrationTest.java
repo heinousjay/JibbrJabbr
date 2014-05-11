@@ -34,8 +34,8 @@ import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
-import jj.script.resource.ModuleScriptEnvironment;
-import jj.script.resource.RequiredModule;
+import jj.script.module.ModuleScriptEnvironment;
+import jj.script.module.RequiredModule;
 import jj.testing.JibbrJabbrTestServer;
 
 import org.junit.Rule;

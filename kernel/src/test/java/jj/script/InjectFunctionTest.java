@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.script.CurrentScriptEnvironment;
+import jj.script.InjectFunction;
 import jj.script.ScriptEnvironment;
-import jj.script.resource.InjectFunction;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

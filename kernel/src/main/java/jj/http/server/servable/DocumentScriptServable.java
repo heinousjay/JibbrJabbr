@@ -13,7 +13,7 @@ import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
 import jj.uri.URIMatch;
 import jj.http.server.HttpRequest;
 import jj.http.server.HttpResponse;

@@ -30,7 +30,7 @@ import jj.document.EvaluatingSharedScript;
 import jj.document.ScriptCompiler;
 import jj.event.Publisher;
 import jj.script.MockRhinoContextProvider;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.http.server.WebSocketConnectionHost;
-import jj.script.resource.RootScriptEnvironment;
+import jj.script.module.RootScriptEnvironment;
 import jj.util.Closer;
 
 import org.junit.After;

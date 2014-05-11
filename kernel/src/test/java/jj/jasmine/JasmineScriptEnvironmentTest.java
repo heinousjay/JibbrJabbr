@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.APIModules;
 import jj.resource.ResourceFinder;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +47,7 @@ public class JasmineScriptEnvironmentTest {
 		given(resourceFinder.loadResource(eq(ScriptResource.class), eq(APIModules), eq("jasmine-boot.js"))).willReturn(jasmineBoot);
 		
 		JasmineScriptEnvironment jse = new JasmineScriptEnvironment(dependencies, global, resourceFinder);
+		
 		
 	}
 

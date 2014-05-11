@@ -23,7 +23,15 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
+import org.mozilla.javascript.ScriptableObject;
+
 /**
+ * Defines an injectable shared global {@link ScriptableObject}
+ * for the script runtime.  This scope is sealed against
+ * modification, wrap it locally by calling
+ * {@link AbstractScriptEnvironment#createChainedScope(ScriptableObject)}
+ * and use the resulting object as your scope instead.
+ * 
  * @author jason
  *
  */

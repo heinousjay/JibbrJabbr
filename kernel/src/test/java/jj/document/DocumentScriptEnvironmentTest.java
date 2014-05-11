@@ -45,8 +45,8 @@ import jj.resource.ResourceNotViableException;
 import jj.script.ContinuationPendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
-import jj.script.resource.ScriptResource;
-import jj.script.resource.ScriptResourceType;
+import jj.script.module.ScriptResource;
+import jj.script.module.ScriptResourceType;
 import jj.util.Closer;
 
 import org.jsoup.Jsoup;

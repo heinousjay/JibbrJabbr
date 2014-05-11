@@ -1,4 +1,4 @@
-package jj.script.resource;
+package jj.script.module;
 
 import java.io.IOException;
 import java.net.URI;

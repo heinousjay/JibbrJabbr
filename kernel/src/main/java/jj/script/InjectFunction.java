@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.resource;
+package jj.script;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

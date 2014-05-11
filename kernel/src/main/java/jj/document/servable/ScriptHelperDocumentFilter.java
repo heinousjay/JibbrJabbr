@@ -10,7 +10,7 @@ import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
-import jj.script.resource.ScriptResourceType;
+import jj.script.module.ScriptResourceType;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

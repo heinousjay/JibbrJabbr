@@ -19,8 +19,8 @@ import jj.http.server.HttpRequest;
 import jj.jjmessage.JJMessage;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
-import jj.script.resource.ScriptResource;
-import jj.script.resource.ScriptResourceType;
+import jj.script.module.ScriptResource;
+import jj.script.module.ScriptResourceType;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

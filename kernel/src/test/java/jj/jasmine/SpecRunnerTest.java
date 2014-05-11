@@ -20,7 +20,7 @@ import jj.configuration.resolution.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptEnvironmentInitialized;
-import jj.script.resource.ScriptResource;
+import jj.script.module.ScriptResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

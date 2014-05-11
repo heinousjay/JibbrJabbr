@@ -13,42 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.util;
+package jj.script;
 
-import java.util.concurrent.TimeUnit;
-
-import jj.util.Clock;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
+ * 
+ * 
  * @author jason
  *
  */
-public class MockClock extends Clock {
+@Singleton
+public class Timers {
 
-	public long time = System.currentTimeMillis();
-	
-	@Override
-	public long time() {
-		return time;
-	}
-	
-	public MockClock advance() {
-		time++;
-		return this;
-	}
-	
-	public MockClock advance(long time, TimeUnit timeUnit) {
-		this.time += TimeUnit.MILLISECONDS.convert(time, timeUnit);
-		return this;
-	}
-	
-	public MockClock retreat() {
-		time--;
-		return this;
-	}
-	
-	public MockClock retreat(long time, TimeUnit timeUnit) {
-		this.time -= TimeUnit.MILLISECONDS.convert(time, timeUnit);
-		return this;
+	@Inject
+	Timers() {
+		// TODO Auto-generated constructor stub
 	}
 }

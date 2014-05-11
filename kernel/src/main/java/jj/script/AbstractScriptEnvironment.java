@@ -47,18 +47,21 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		final Provider<RhinoContext> contextProvider;
 		final Provider<ContinuationPendingKey> pendingKeyProvider;
 		final RequireInnerFunction requireInnerFunction;
+		final InjectFunction injectFunction;
 		
 		@Inject
 		Dependencies(
 			final ResourceKey cacheKey,
 			final Provider<RhinoContext> contextProvider,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
-			final RequireInnerFunction requireInnerFunction
+			final RequireInnerFunction requireInnerFunction,
+			final InjectFunction injectFunction
 		) {
 			super(cacheKey, AppLocation.Virtual);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
+			this.injectFunction = injectFunction;
 		}
 	}
 	
@@ -178,36 +181,65 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	}
 
 	/**
-	 * Helper to create and attach a new scope object in a scope chain, for lookups into
-	 * @param global
+	 * Helper to create and attach a new scope object in a scope chain
+	 * @param parent
 	 * @return
 	 */
-	protected ScriptableObject createChainedScope(final ScriptableObject global) {
+	protected ScriptableObject createChainedScope(final ScriptableObject parent) {
 		try (RhinoContext context = contextProvider.get()) {
-			ScriptableObject local = context.newObject(global);
-			local.setPrototype(global);
+			ScriptableObject local = context.newObject(parent);
+			local.setPrototype(parent);
 			local.setParentScope(null);
 			
 			return local;
 		}
 	}
+	
+	protected ScriptableObject configureTimers(final ScriptableObject localScope) {
+		assert !localScope.isSealed() : "cannot configure timers on a sealed scope";
+		
+		try (RhinoContext context = contextProvider.get()) {
+			
+			
+		}
+		
+		return localScope;
+	}
+	
+	protected ScriptableObject configureInjectFunction(final ScriptableObject localScope) {
+		return configureInjectFunction(localScope, InjectFunction.NAME);
+	}
+	
+	protected ScriptableObject configureInjectFunction(final ScriptableObject localScope, final String name) {
+		assert !localScope.isSealed() : "cannot configure inject function on a sealed scope";
+		localScope.defineProperty(name, dependencies.injectFunction, ScriptableObject.CONST);
+		return localScope;
+	}
 
-	// move this to a
-	protected ScriptableObject configureModuleObjects(final String moduleIdentifier, ScriptableObject local) {
+	/**
+	 * Configures top-level module objects in a given scope, including a require function and assignable exports
+	 * that are made available via {@link #exports()}
+	 * @param moduleIdentifier must be fully qualified or further module resolution will fail
+	 * @param localScope must not be sealed
+	 * @return localScope, post configuration, for chaining
+	 */
+	protected ScriptableObject configureModuleObjects(final String moduleIdentifier, ScriptableObject localScope) {
+		assert !localScope.isSealed() : "cannot configure module objects on a sealed scope";
+		
 		try (RhinoContext context = contextProvider.get()) {
 			// setting up the 'module' property as described in 
 			// the commonjs module 1.1.1 specification
 			// in the case of the top-level server script, the id
 			// will be the name, which fortunately happens to be
 			// exactly what is required
-			ScriptableObject module = context.newObject(local);
-			ScriptableObject exports = context.newObject(local);
+			ScriptableObject module = context.newObject(localScope);
+			ScriptableObject exports = context.newObject(localScope);
 			module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
 			module.defineProperty("exports", exports, ScriptableObject.EMPTY);
-			module.defineProperty("//requireInner", dependencies.requireInnerFunction, ScriptableObject.CONST);
+			module.defineProperty("//requireInner", dependencies.requireInnerFunction, ScriptableObject.CONST | ScriptableObject.DONTENUM);
 			
-			local.defineProperty("module", module, ScriptableObject.CONST);
-			local.defineProperty("exports", exports, ScriptableObject.CONST);
+			localScope.defineProperty("module", module, ScriptableObject.CONST);
+			localScope.defineProperty("exports", exports, ScriptableObject.CONST);
 			
 			
 			// define the require method and the exports object here as well.
@@ -215,7 +247,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			// assigning to module.exports changes the exports object,
 			// potentially to a function
 			ScriptableObject require = (ScriptableObject)context.evaluateString(
-				local,  
+				localScope,  
 				"(function(module) {" +
 					"return function(id) {" +
 					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
@@ -228,13 +260,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 				"making require"
 			);
 			
-			local.defineProperty(
+			localScope.defineProperty(
 				"require",
 				require,
 				ScriptableObject.CONST
 			);
 		}
-		return local;
+		
+		return localScope;
 	}
 
 }

@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.script.CurrentScriptEnvironment;
-import jj.script.resource.ScriptResourceType;
+import jj.script.module.ScriptResourceType;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
