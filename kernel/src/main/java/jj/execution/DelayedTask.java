@@ -15,24 +15,36 @@
  */
 package jj.execution;
 
+import java.util.concurrent.TimeUnit;
+
+
 /**
- * A task for internal server activities.  Supports execution after a number
- * of milliseconds, denoted by overriding {@link ServerTask#delay()} with a positive
- * response. The default of 0 means to schedule immediately. a negative number means
- * to throw an AssertionError when you get scheduled and not run and print a nasty error
- * to the console, so don't
- * 
  * @author jason
  *
  */
-public abstract class ServerTask extends DelayedTask<ServerExecutor> {
+public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask {
 
-	public ServerTask(String name) {
+	protected DelayedTask(String name) {
 		super(name);
 	}
+	
+	
+	protected abstract T findExecutor(ExecutorFinder executors);
 
-	@Override
-	protected ServerExecutor findExecutor(ExecutorFinder executors) {
-		return executors.ofType(ServerExecutor.class);
+	protected long delay() {
+		return 0;
+	}
+	
+
+	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
+		findExecutor(executors).submit(runnable, delay(), TimeUnit.MILLISECONDS);
+	}
+	
+	/**
+	 * invoke this during the run if the task should be
+	 * scheduled again
+	 */
+	protected final void repeat() {
+		promise().then(this);
 	}
 }

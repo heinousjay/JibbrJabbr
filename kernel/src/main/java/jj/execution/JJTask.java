@@ -34,6 +34,11 @@ import jj.script.ScriptTask;
  * for scheduling
  * </p>
  * 
+ * <p>
+ * although this class implements {@link Delayed}, it is not schedulable.
+ * Extend {@link DelayedTask} and see {@link DelayedExecutor} if that is
+ * what you need.
+ * 
  * @author jason
  *
  */
