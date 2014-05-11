@@ -74,8 +74,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	@Listener
 	void resourceNotFound(final ResourceNotFound event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
-		if (requiredModule != null) {
-			assert waiters.remove(requiredModule) != null : "something is crossed up in the " + getClass(); 
+		if (requiredModule != null && waiters.remove(requiredModule) != null) {
 			requiredModule.pendingKey().resume(new RequiredModuleException(requiredModule));
 		}
 	}
@@ -84,8 +83,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	void resourceLoaded(final ResourceLoaded event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null) {
-			Boolean result = waiters.remove(requiredModule);
-			assert result == Boolean.TRUE : "something is crossed up in the " + getClass();
+			waiters.remove(requiredModule);
 		}
 	}
 	

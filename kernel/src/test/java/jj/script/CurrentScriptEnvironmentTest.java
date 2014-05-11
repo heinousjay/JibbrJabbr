@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.http.server.WebSocketConnectionHost;
+import jj.script.resource.RootScriptEnvironment;
 import jj.util.Closer;
 
 import org.junit.After;
@@ -59,9 +60,9 @@ public class CurrentScriptEnvironmentTest {
 	
 	RhinoContext rhinoContext;
 	
-	@Mock AbstractScriptEnvironment ase;
+	@Mock(extraInterfaces = {RootScriptEnvironment.class}) AbstractScriptEnvironment ase;
 	
-	@Mock(extraInterfaces = {ScriptEnvironment.class}) WebSocketConnectionHost host;
+	@Mock(extraInterfaces = {RootScriptEnvironment.class}) WebSocketConnectionHost host;
 	
 	@Mock ChildScriptEnvironment child;
 	

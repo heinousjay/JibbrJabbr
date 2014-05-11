@@ -19,7 +19,6 @@ import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceInstanceCreator;
-import jj.script.ScriptEnvironment;
 import jj.script.resource.ModuleScriptEnvironment;
 import jj.script.resource.ModuleScriptEnvironmentCreator;
 
@@ -45,7 +44,7 @@ public class ModuleScriptEnvironmentCreatorTest {
 	
 	private ModuleScriptEnvironmentCreator toTest;
 	
-	private @Mock ScriptEnvironment environment;
+	private @Mock RootScriptEnvironment environment;
 	
 	@Before
 	public void before() {

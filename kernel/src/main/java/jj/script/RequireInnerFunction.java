@@ -25,6 +25,7 @@ import jj.configuration.resolution.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.script.resource.ModuleScriptEnvironment;
 import jj.script.resource.RequiredModule;
+import jj.script.resource.RootScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
@@ -66,7 +67,7 @@ class RequireInnerFunction extends BaseFunction {
 		
 		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]), String.valueOf(args[1]));
 		
-		ScriptEnvironment parent = env.currentRootScriptEnvironment();
+		RootScriptEnvironment parent = env.currentRootScriptEnvironment();
 		
 		RequiredModule requiredModule = new RequiredModule(parent, moduleIdentifier);
 		

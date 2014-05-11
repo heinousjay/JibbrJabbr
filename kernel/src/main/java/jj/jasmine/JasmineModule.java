@@ -26,6 +26,8 @@ public class JasmineModule extends JJModule {
 	@Override
 	protected void configure() {
 		addStartupListenerBinding().to(SpecRunner.class);
+		
+		addAPIModulePath("/jj/jasmine/jasmine-2.0.0");
+		bindCreation().of(JasmineScriptEnvironment.class).to(JasmineScriptEnvironmentCreator.class);
 	}
-
 }

@@ -13,25 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.script;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * @author jason
  *
  */
-@Documented
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-public @interface ResourceLogger {
+@Singleton
+class GlobalStandardObjects implements Provider<ScriptableObject> {
 
-	public static final String NAME = "resource system";
+	private final ScriptableObject global;
+	
+	@Inject
+	GlobalStandardObjects(final Provider<RhinoContext> contextProvider) {
+		try (RhinoContext context = contextProvider.get()) {
+			global = context.initStandardObjects(true);
+			global.sealObject();
+		}
+	}
 
+	@Override
+	public ScriptableObject get() {
+		return global;
+	}
+
+	
 }

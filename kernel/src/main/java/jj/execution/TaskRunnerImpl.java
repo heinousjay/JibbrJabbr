@@ -85,8 +85,7 @@ class TaskRunnerImpl implements TaskRunner {
 						interrupted = true;
 					} catch (Throwable t) {
 						if (!task.errored(t)) {
-							logger.error("Task [{}] ended in exception", task.name());
-							logger.error("", t);
+							logger.error("Task [" + task.name() + "] ended in exception", t);
 						}
 	
 					} finally {

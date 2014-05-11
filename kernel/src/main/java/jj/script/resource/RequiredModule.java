@@ -19,7 +19,6 @@ import java.net.URI;
 
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
-import jj.script.ScriptEnvironment;
 import jj.util.StringUtils;
 
 /**
@@ -28,7 +27,7 @@ import jj.util.StringUtils;
  */
 public class RequiredModule implements Continuation {
 	
-	private final ScriptEnvironment parent;
+	private final RootScriptEnvironment parent;
 	
 	private final String identifier;
 	
@@ -37,7 +36,7 @@ public class RequiredModule implements Continuation {
 	private ContinuationPendingKey pendingKey;
 
 	public RequiredModule(
-		final ScriptEnvironment parent,
+		final RootScriptEnvironment parent,
 		final String identifier
 	) {
 		assert parent != null : "no required module without a parent!";
@@ -51,7 +50,7 @@ public class RequiredModule implements Continuation {
 		return identifier;
 	}
 	
-	ScriptEnvironment parent() {
+	RootScriptEnvironment parent() {
 		return parent;
 	}
 	
@@ -61,7 +60,6 @@ public class RequiredModule implements Continuation {
 	
 	@Override
 	public ContinuationPendingKey pendingKey() {
-		assert pendingKey != null;
 		return pendingKey;
 	}
 	

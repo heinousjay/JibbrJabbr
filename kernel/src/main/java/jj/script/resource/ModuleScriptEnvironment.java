@@ -23,7 +23,6 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.engine.EngineAPI;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
@@ -76,7 +75,6 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		final Dependencies dependencies,
 		final String moduleIdentifier,
 		final RequiredModule requiredModule,
-		final EngineAPI api,
 		final ResourceFinder resourceFinder,
 		final InjectFunction injectorBridge
 	) {
@@ -103,7 +101,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		requiredModule.parent().addDependent(this);
 		
 		sha1 = scriptResource.sha1();
-		scope = createChainedScope(api.global());
+		scope = createChainedScope(requiredModule.parent().global());
 		configureModuleObjects(moduleIdentifier, scope);
 		
 		if (scriptResource.base() == APIModules) {

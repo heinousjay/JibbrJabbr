@@ -20,7 +20,6 @@ import static jj.configuration.resolution.AppLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
-import jj.engine.EngineAPI;
 import jj.resource.ResourceFinder;
 import jj.script.ContinuationPendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
@@ -43,20 +42,19 @@ public class ModuleScriptEnvironmentTest {
 	
 	@Mock ResourceFinder resourceFinder;
 	@Mock InjectFunction injectorBridge;
-	@Mock EngineAPI api;
 	
 	RealRhinoContextProvider contextProvider;
 	
 	String moduleIdentifier;
 	RequiredModule requiredModule;
 	
-	@Mock AbstractScriptEnvironment parent;
+	@Mock(extraInterfaces = { RootScriptEnvironment.class }) AbstractScriptEnvironment parent;
 	
 	@Mock ScriptResource scriptResource;
 	
-	@Mock ScriptableObject global;
-	
 	ModuleScriptEnvironment mse;
+	
+	@Mock ScriptableObject global;
 
 	@Before
 	public void before() {
@@ -64,14 +62,14 @@ public class ModuleScriptEnvironmentTest {
 		contextProvider = new RealRhinoContextProvider();
 		moduleIdentifier = "id";
 		
-		requiredModule = new RequiredModule(parent, moduleIdentifier);
+		given(((RootScriptEnvironment)parent).global()).willReturn(global);
+		
+		requiredModule = new RequiredModule((RootScriptEnvironment)parent, moduleIdentifier);
 		requiredModule.pendingKey(new ContinuationPendingKey());
 		
 		given(parent.alive()).willReturn(true);
 		
 		given(resourceFinder.loadResource(ScriptResource.class, Base.and(APIModules), moduleIdentifier + ".js")).willReturn(scriptResource);
-		
-		given(api.global()).willReturn(global);
 		
 		given(scriptResource.script()).willReturn("");
 	}
@@ -82,7 +80,6 @@ public class ModuleScriptEnvironmentTest {
 			new MockAbstractScriptEnvironmentDependencies(contextProvider),
 			moduleIdentifier,
 			requiredModule,
-			api,
 			resourceFinder,
 			injectorBridge
 		);

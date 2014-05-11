@@ -193,7 +193,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	}
 
 	// move this to a
-	protected void configureModuleObjects(final String moduleIdentifier, ScriptableObject local) {
+	protected ScriptableObject configureModuleObjects(final String moduleIdentifier, ScriptableObject local) {
 		try (RhinoContext context = contextProvider.get()) {
 			// setting up the 'module' property as described in 
 			// the commonjs module 1.1.1 specification
@@ -234,6 +234,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 				ScriptableObject.CONST
 			);
 		}
+		return local;
 	}
 
 }

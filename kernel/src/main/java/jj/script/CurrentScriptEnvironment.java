@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
 
+import jj.script.resource.RootScriptEnvironment;
 import jj.util.Closer;
 import jj.util.CurrentResource;
 
@@ -105,11 +106,13 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	/**
 	 * @return
 	 */
-	public ScriptEnvironment currentRootScriptEnvironment() {
+	public RootScriptEnvironment currentRootScriptEnvironment() {
 		ScriptEnvironment current = current();
 		while (current instanceof ChildScriptEnvironment) {
 			current = ((ChildScriptEnvironment)current).parent();
 		}
-		return current;
+		assert current instanceof RootScriptEnvironment : "declare your root!";
+		
+		return (RootScriptEnvironment)current;
 	}
 }

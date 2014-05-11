@@ -44,6 +44,7 @@ import jj.resource.ResourceNotViableException;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptThread;
+import jj.script.resource.RootScriptEnvironment;
 import jj.script.resource.ScriptResource;
 import jj.script.resource.ScriptResourceType;
 import jj.util.Closer;
@@ -61,7 +62,7 @@ import jj.util.SHA1Helper;
 @Singleton
 public class DocumentScriptEnvironment
 	extends AbstractScriptEnvironment
-	implements WebSocketConnectionHost, ResourceAware {
+	implements WebSocketConnectionHost, ResourceAware, RootScriptEnvironment {
 	
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	
@@ -80,6 +81,8 @@ public class DocumentScriptEnvironment
 	private final String sha1;
 	
 	private final ScriptableObject scope;
+	
+	private final ScriptableObject global;
 	
 	private final Script script;
 	
@@ -141,12 +144,13 @@ public class DocumentScriptEnvironment
 		
 		if (serverScript == null)  {
 			socketUri = null;
+			global = null;
 			scope = null;
 			script = null;
 		} else {
 			socketUri = uri + ".socket";
-			scope = createChainedScope(api.global());
-			configureModuleObjects(baseName, scope);
+			global = api.global();
+			scope = configureModuleObjects(baseName, createChainedScope(global));
 			
 			try {
 				script = compiler.compile(scope, clientScript, sharedScript, serverScript);
@@ -189,6 +193,11 @@ public class DocumentScriptEnvironment
 	@Override
 	public Scriptable scope() {
 		return scope;
+	}
+	
+	@Override
+	public ScriptableObject global() {
+		return global;
 	}
 
 	@Override

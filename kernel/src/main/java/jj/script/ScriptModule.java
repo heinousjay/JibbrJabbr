@@ -1,5 +1,7 @@
 package jj.script;
 
+import org.mozilla.javascript.ScriptableObject;
+
 import jj.JJModule;
 import jj.script.resource.ScriptResourceModule;
 
@@ -16,5 +18,7 @@ public class ScriptModule extends JJModule {
 		bindExecutor(ScriptExecutorFactory.class);
 		
 		install(new ScriptResourceModule());
+		
+		bind(ScriptableObject.class).annotatedWith(Global.class).toProvider(GlobalStandardObjects.class);
 	}
 }
