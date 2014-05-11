@@ -15,14 +15,8 @@
  */
 package jj.execution;
 
-import java.lang.ref.WeakReference;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.Delayed;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -32,82 +26,14 @@ import jj.event.Subscriber;
 import jj.util.Clock;
 
 /**
- * Special internal executor for the various tasks the server needs done.  supports
- * a simple "run every x time units" and "run after x time units" approach to
- * scheduling.  the java stuff is nice, but works too hard for my needs and makes some
- * other things too sloppy
+ * Special internal executor for the various tasks the server needs done.
  * 
  * @author jason
  *
  */
 @Singleton
 @Subscriber
-class ServerExecutor extends ThreadPoolExecutor implements DelayedExecutor {
-	
-	private final Clock clock;
-	
-	private final JJThreadFactory threadFactory;
-	
-	private static class ServerCancelKey extends WeakReference<DelayedRunnable> implements CancelKey {
-		
-		ServerCancelKey(DelayedRunnable runnable) {
-			super(runnable);
-		}
-	}
-	
-	private class DelayedRunnable implements Runnable, Delayed {
-		
-		private final Runnable runnable;
-		
-		private final long delay;
-		
-		private final TimeUnit timeUnit;
-		
-		private final long start = clock.time();
-		
-		private final AtomicBoolean canceled = new AtomicBoolean();
-		
-		protected DelayedRunnable(Runnable runnable, long delay, TimeUnit timeUnit) {
-			this.runnable = runnable;
-			this.delay = delay;
-			this.timeUnit = timeUnit;
-		}
-
-		@Override
-		public void run() {
-			if (!canceled.get()) runnable.run();
-		}
-
-		@Override
-		public int compareTo(Delayed o) {
-			long x = getDelay(TimeUnit.MILLISECONDS);
-			long y = o.getDelay(TimeUnit.MILLISECONDS);
-			return (x < y) ? -1 : ((x == y) ? 0 : 1);
-		}
-
-		@Override
-		public long getDelay(TimeUnit unit) {
-			return unit.convert((start + delay) - clock.time(), timeUnit);
-		}
-	}
-	
-	private final DelayQueue<DelayedRunnable> delayedTasks = new DelayQueue<>();
-	
-	private final Runnable scheduler = new Runnable() {
-		
-		@Override
-		public void run() {
-			Thread.currentThread().setName(Thread.currentThread().getName() + " - ServerExecutor scheduler");
-			try {
-				while (true) {
-					DelayedRunnable runnable = delayedTasks.take();
-					submit(runnable);
-				}
-			} catch (InterruptedException e) {
-				
-			}
-		}
-	};
+class ServerExecutor extends DelayedExecutor {
 
 	@Inject
 	ServerExecutor(
@@ -115,9 +41,8 @@ class ServerExecutor extends ThreadPoolExecutor implements DelayedExecutor {
 		final JJThreadFactory threadFactory,
 		final JJRejectedExecutionHandler handler
 	) {
-		// so basically, we're looking at keeping a thread around for timer tasks and
-		// a spare for kicks
 		super(
+			clock,
 			2, // core threads, which we will always keep alive.  effectively one since the first thing we do is start a scheduler
 			Integer.MAX_VALUE, // never run out of threads for server tasks until we exhaust the machine
 			20, TimeUnit.SECONDS, // don't keep threads around too long if they aren't kept busy.  
@@ -125,33 +50,16 @@ class ServerExecutor extends ThreadPoolExecutor implements DelayedExecutor {
 			threadFactory.namePattern("JibbrJabbr Server Thread %d"),
 			handler
 		);
-		this.clock = clock;
-		this.threadFactory = threadFactory;
-		
-		submit(scheduler);
+	}
+	
+	@Override
+	protected String schedulerThreadName() {
+		return Thread.currentThread().getName() + " - " + toString() + " Scheduler";
 	}
 
 	@Listener
 	public void stop(ServerStopping event) {
 		shutdownNow();
-	}
-	
-	// this needs to return a cancel key
-	@Override
-	public CancelKey submit(Runnable runnable, long delay, TimeUnit timeUnit) {
-		DelayedRunnable delayed = new DelayedRunnable(runnable, delay, timeUnit);
-		delayedTasks.add(delayed);
-		return new ServerCancelKey(delayed);
-	}
-	
-	@Override
-	public void cancel(CancelKey cancelKey) {
-		assert(cancelKey instanceof ServerCancelKey) : "got a cancel key i don't understand " + cancelKey;
-		DelayedRunnable runnable = ((ServerCancelKey)cancelKey).get();
-		if (runnable != null) {
-			runnable.canceled.set(true);
-			delayedTasks.remove(runnable);
-		}
 	}
 	
 	@Override
