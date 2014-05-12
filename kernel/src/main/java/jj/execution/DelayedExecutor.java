@@ -41,12 +41,20 @@ import jj.util.Clock;
  */
 public abstract class DelayedExecutor extends ThreadPoolExecutor {
 	
-	public static class CancelKey {
+	public class CancelKey {
 		
 		private final WeakReference<DelayedRunnable> runnable;
 		
-		CancelKey(DelayedRunnable runnable) {
+		private CancelKey(DelayedRunnable runnable) {
 			this.runnable = new WeakReference<>(runnable);
+		}
+		
+		public void cancel() {
+			DelayedRunnable r = runnable.get();
+			if (r != null) {
+				r.canceled.set(true);
+				delayedTasks.remove(r);
+			}
 		}
 	}
 	
@@ -70,7 +78,9 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 
 		@Override
 		public void run() {
-			if (!canceled.get()) runnable.run();
+			if (!canceled.get()) { 
+				runnable.run();
+			}
 		}
 
 		@Override
@@ -121,9 +131,6 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 		final JJThreadFactory threadFactory,
 		final JJRejectedExecutionHandler handler
 	) {
-
-		// so basically, we're looking at keeping a thread around for timer tasks and
-		// a spare for kicks
 		super(
 			corePoolSize,
 			maxPoolSize,
@@ -156,20 +163,10 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 		return true;
 	}
 	
-	// this needs to return a cancel key
 	public CancelKey submit(Runnable runnable, long delay, TimeUnit timeUnit) {
 		DelayedRunnable delayed = new DelayedRunnable(runnable, delay, timeUnit);
 		delayedTasks.add(delayed);
 		return new CancelKey(delayed);
-	}
-	
-	public void cancel(CancelKey cancelKey) {
-		assert(cancelKey instanceof CancelKey) : "got a cancel key i don't understand " + cancelKey;
-		DelayedRunnable runnable = ((CancelKey)cancelKey).runnable.get();
-		if (runnable != null) {
-			runnable.canceled.set(true);
-			delayedTasks.remove(runnable);
-		}
 	}
 
 }

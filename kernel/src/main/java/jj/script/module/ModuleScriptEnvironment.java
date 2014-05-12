@@ -100,7 +100,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		requiredModule.parent().addDependent(this);
 		
 		sha1 = scriptResource.sha1();
-		scope = configureModuleObjects(moduleIdentifier, createChainedScope(requiredModule.parent().global()));
+		scope = configureTimers(configureModuleObjects(moduleIdentifier, createChainedScope(requiredModule.parent().global())));
 		
 		// externalize this to the parent! pass it the resource and let it decide?
 		if (scriptResource.base() == APIModules) { 

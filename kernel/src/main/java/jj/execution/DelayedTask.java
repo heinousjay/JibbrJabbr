@@ -17,6 +17,8 @@ package jj.execution;
 
 import java.util.concurrent.TimeUnit;
 
+import jj.execution.DelayedExecutor.CancelKey;
+
 
 /**
  * @author jason
@@ -35,9 +37,14 @@ public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask {
 		return 0;
 	}
 	
+	private volatile CancelKey cancelKey;
 
 	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		findExecutor(executors).submit(runnable, delay(), TimeUnit.MILLISECONDS);
+		cancelKey = findExecutor(executors).submit(runnable, delay(), TimeUnit.MILLISECONDS);
+	}
+
+	public final CancelKey cancelKey() {
+		return cancelKey;
 	}
 	
 	/**

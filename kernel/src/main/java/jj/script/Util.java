@@ -43,5 +43,13 @@ public enum Util {
 			return false;
 		}
 	}
+	
+	public static Integer toJavaInt(final Object fromScript) {
+		try {
+			return (Integer)Context.jsToJava(fromScript, Integer.class);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 }

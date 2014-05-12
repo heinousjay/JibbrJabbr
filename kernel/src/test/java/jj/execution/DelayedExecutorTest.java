@@ -153,7 +153,7 @@ public class DelayedExecutorTest {
 		
 		CancelKey cancelKey = de.submit(helper, 1, MILLISECONDS);
 		
-		de.cancel(cancelKey);
+		cancelKey.cancel();
 		
 		clock.advance(1, MILLISECONDS);
 
@@ -167,7 +167,7 @@ public class DelayedExecutorTest {
 		
 		CancelKey cancelKey = de.submit(helper, 1, MILLISECONDS);
 		
-		de.cancel(cancelKey);
+		cancelKey.cancel();
 		
 		clock.advance(1, MILLISECONDS);
 

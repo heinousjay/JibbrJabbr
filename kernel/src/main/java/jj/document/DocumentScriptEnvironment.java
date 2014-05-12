@@ -150,7 +150,7 @@ public class DocumentScriptEnvironment
 		} else {
 			socketUri = uri + ".socket";
 			global = api.global();
-			scope = configureModuleObjects(baseName, createChainedScope(global));
+			scope = configureTimers(configureModuleObjects(baseName, createChainedScope(global)));
 			
 			try {
 				script = compiler.compile(scope, clientScript, sharedScript, serverScript);

@@ -48,6 +48,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		final Provider<ContinuationPendingKey> pendingKeyProvider;
 		final RequireInnerFunction requireInnerFunction;
 		final InjectFunction injectFunction;
+		final Timers timers;
 		
 		@Inject
 		Dependencies(
@@ -55,13 +56,15 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Provider<RhinoContext> contextProvider,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
-			final InjectFunction injectFunction
+			final InjectFunction injectFunction,
+			final Timers timers
 		) {
 			super(cacheKey, AppLocation.Virtual);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
 			this.injectFunction = injectFunction;
+			this.timers = timers;
 		}
 	}
 	
@@ -197,12 +200,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	protected ScriptableObject configureTimers(final ScriptableObject localScope) {
 		assert !localScope.isSealed() : "cannot configure timers on a sealed scope";
-		
-		try (RhinoContext context = contextProvider.get()) {
-			
-			
-		}
-		
+		localScope.defineProperty("setInterval", dependencies.timers.setInterval, ScriptableObject.EMPTY);
+		localScope.defineProperty("setTimeout", dependencies.timers.setTimeout, ScriptableObject.EMPTY);
+		localScope.defineProperty("clearInterval", dependencies.timers.clearInterval, ScriptableObject.EMPTY);
+		localScope.defineProperty("clearTimeout", dependencies.timers.clearTimeout, ScriptableObject.EMPTY);
 		return localScope;
 	}
 	
