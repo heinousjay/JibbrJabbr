@@ -38,6 +38,9 @@ import jj.script.module.ScriptResource;
  */
 public class JasmineScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
 
+	private static final String JASMINE_BOOT = "jasmine-boot";
+	private static final String JASMINE_BOOT_JS = JASMINE_BOOT + ".js";
+
 	private static final String JASMINE = "jasmine";
 
 	private final ScriptableObject scope;
@@ -58,16 +61,18 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		
 		this.global = global;
 		
-		scope = configureModuleObjects("jasmine-boot", createChainedScope(global));
+		scope = configureModuleObjects(JASMINE_BOOT, createChainedScope(global));
 		
-		ScriptResource boot = resourceFinder.loadResource(ScriptResource.class, APIModules, "jasmine-boot.js");
+		ScriptResource boot = resourceFinder.loadResource(ScriptResource.class, APIModules, JASMINE_BOOT_JS);
 		
 		assert boot != null : "can't find the jasmine-boot script";
+		
+		boot.addDependent(this);
 		
 		sha1 = boot.sha1();
 		
 		try (RhinoContext context = contextProvider.get()) {
-			script = context.compileString(boot.script(), "jasmine-boot.js");
+			script = context.compileString(boot.script(), JASMINE_BOOT_JS);
 		}
 	}
 
@@ -88,7 +93,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 
 	@Override
 	public String scriptName() {
-		return "jasmine-boot";
+		return JASMINE_BOOT;
 	}
 
 	@Override
@@ -98,7 +103,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 
 	@Override
 	public String uri() {
-		return "/whatevs";
+		return "/jasmine-runner";
 	}
 
 	@Override
@@ -108,7 +113,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 
 	@Override
 	public boolean needsReplacing() throws IOException {
-		// driven by the underlying script
+		// driven by the underlying scripts
 		return false;
 	}
 
