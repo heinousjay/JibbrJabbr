@@ -86,7 +86,7 @@ public class WebDriverRule implements TestRule {
 	
 	private Class<? extends WebDriverProvider> webDriverProvider = null;
 	
-	private Class<? extends WebElementFinder> webElementFinder = ThreeSecondsAndDisplayedWebElementFinder.class;
+	private Class<? extends WebElementFinder> webElementFinder = ImpatientWebElementFinder.class;
 	
 	private Class<? extends PanelBase> panelBaseClass = PanelBase.class;
 	
