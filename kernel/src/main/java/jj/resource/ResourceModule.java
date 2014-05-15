@@ -28,12 +28,9 @@ public class ResourceModule extends JJModule {
 		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
 		addStartupListenerBinding().to(ResourceWatchServiceImpl.class);
 		
-		
 		bindCreation().of(ConfigResource.class).to(ConfigResourceCreator.class);
 		
 		bindCreation().of(Sha1Resource.class).to(Sha1ResourceCreator.class);
-		
-		bindCreation().of(SpecResource.class).to(SpecResourceCreator.class);
 		
 		bindCreation().of(StaticResource.class).to(StaticResourceCreator.class);
 		

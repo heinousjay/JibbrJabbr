@@ -28,6 +28,8 @@ public class JasmineModule extends JJModule {
 		addStartupListenerBinding().to(SpecRunner.class);
 		
 		addAPIModulePath("/jj/jasmine/jasmine-2.0.0");
+		
+		bindCreation().of(SpecResource.class).to(SpecResourceCreator.class);
 		bindCreation().of(JasmineScriptEnvironment.class).to(JasmineScriptEnvironmentCreator.class);
 	}
 }
