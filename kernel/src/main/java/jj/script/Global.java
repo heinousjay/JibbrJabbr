@@ -27,8 +27,8 @@ import org.mozilla.javascript.ScriptableObject;
 
 /**
  * Defines an injectable shared global {@link ScriptableObject}
- * for the script runtime.  This scope is sealed against
- * modification, wrap it locally by calling
+ * for the script runtime.  This scope is initialized with standard objects and
+ * sealed against modification.  To use it, wrap it locally by passing it to
  * {@link AbstractScriptEnvironment#createChainedScope(ScriptableObject)}
  * and use the resulting object as your scope instead.
  * 
