@@ -49,7 +49,7 @@ public class MockTaskRunner implements TaskRunner {
 		task.run();
 	}
 	
-	public void runFirstTaskInDaemon() throws Exception {
+	public Thread runFirstTaskInDaemon() throws Exception {
 		assert(!tasks.isEmpty());
 		
 		Thread t = new Thread(new Runnable() {
@@ -58,6 +58,7 @@ public class MockTaskRunner implements TaskRunner {
 			public void run() {
 				try {
 					runFirstTask();
+				} catch (InterruptedException ie) { // eat this, we are shutting it down
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -65,6 +66,8 @@ public class MockTaskRunner implements TaskRunner {
 		});
 		t.setDaemon(true);
 		t.start();
+		
+		return t;
 	}
 	
 	

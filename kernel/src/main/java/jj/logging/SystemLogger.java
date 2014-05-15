@@ -80,7 +80,6 @@ class SystemLogger implements EmergencyLog, JJServerStartupListener {
 					try (Closer closer = threadName(bundle.threadName)) {
 						bundle.event.describeTo(logger);
 					}
-					
 				}
 			}
 		});
