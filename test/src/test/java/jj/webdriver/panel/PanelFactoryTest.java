@@ -104,7 +104,7 @@ public class PanelFactoryTest {
 		assertThat(page, is(instanceOf(PanelBase.class)));
 		assertThat(page, is(instanceOf(PointlessPanelBase.class)));
 		
-		verify(logger).info("{} created. url is {}", TEST_PAGE_NAME, "url");
+		verify(logger).info("[{}] created", TEST_PAGE_NAME);
 		
 		assertThat(page.getClass().getName(), is("jj.webdriver.panel.GeneratedImplementationFor$$jj_webdriver_pages_TestPage$$"));
 		
@@ -135,7 +135,7 @@ public class PanelFactoryTest {
 		
 		assertThat(page.clickHi(), is(page));
 		
-		verify(logger).info("{} {} {}", TEST_PAGE_NAME, by, "click");
+		verify(logger).info("[{}] {} - {}", TEST_PAGE_NAME, "click", by);
 		
 		verify(finder).find(webDriver, by);
 		
@@ -149,7 +149,7 @@ public class PanelFactoryTest {
 		
 		assertThat(page.setBlast("blast"), is(page));
 		
-		verify(logger).info("{} {} {}", TEST_PAGE_NAME, by, "set blast");
+		verify(logger).info("[{}] {} - {}", TEST_PAGE_NAME, "set blast", by);
 		
 		verify(finder).find(webDriver, by);
 		

@@ -73,8 +73,8 @@ public class ByReader {
 		if (!empty(by.className())) {
 			return "className";
 		}
-		if (!empty(by.selector())) {
-			return "selector";
+		if (!empty(by.cssSelector())) {
+			return "cssSelector";
 		}
 		if (!empty(by.xpath())) {
 			return "xpath";
@@ -92,8 +92,8 @@ public class ByReader {
 		if (!empty(by.className())) {
 			return by.className();
 		}
-		if (!empty(by.selector())) {
-			return by.selector();
+		if (!empty(by.cssSelector())) {
+			return by.cssSelector();
 		}
 		if (!empty(by.xpath())) {
 			return by.xpath();
@@ -113,7 +113,7 @@ public class ByReader {
 		if (!empty(by.className())) {
 			found++;
 		}
-		if (!empty(by.selector())) {
+		if (!empty(by.cssSelector())) {
 			found++;
 		}
 		if (!empty(by.xpath())) {

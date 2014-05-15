@@ -66,7 +66,7 @@ public class ByReaderTest {
 		}
 		
 		@Override
-		public String selector() {
+		public String cssSelector() {
 			return selector;
 		}
 		
@@ -110,7 +110,7 @@ public class ByReaderTest {
 		
 		br = new ByReader(new FakeBy("", "", "", "jay", ""));
 		assertThat(br.needsResolution(), is(false));
-		assertThat(br.type(), is("selector"));
+		assertThat(br.type(), is("cssSelector"));
 		assertThat(br.validateValueAsFormatterFor(), is(true));
 		assertThat(br.value(), is("jay"));
 		

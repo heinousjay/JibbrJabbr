@@ -46,23 +46,34 @@ public abstract class PanelMethodGenerator {
 		return baseMethod.hasAnnotation(By.class) && new ByReader((By)baseMethod.getAnnotation(By.class)) != null;
 	}
 	
-	private boolean hasPanelInterface(CtClass type) throws Exception {
-		String name = type.getInterfaces()[0].getName();
-		return Panel.class.getName().equals(name) || Page.class.getName().equals(name);
+	private static final String PAGE_CLASS_NAME = Page.class.getName();
+	private static final String PANEL_CLASS_NAME = Panel.class.getName();
+	
+	private boolean hasInterface(CtClass type, String nameToCheck) throws Exception {
+		boolean result = false;
+		for (CtClass iface : type.getInterfaces()) {
+			if (nameToCheck.equals(iface.getName()) || hasInterface(iface, nameToCheck)) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+		//String name = type.getInterfaces()[0].getName();
+		//return PANEL_CLASS_NAME.equals(name) || PAGE_CLASS_NAME.equals(name);
 	}
 	
 	protected boolean isStandardReturn(CtMethod newMethod) throws Exception {
 		
 		CtClass returnType = newMethod.getReturnType();
-		return returnType.getName().equals("void") || hasPanelInterface(returnType);
+		return returnType.getName().equals("void") || isPanel(returnType);
 	}
 	
 	private boolean isPanel(CtClass type) throws Exception {
-		return type.getInterfaces().length == 1 && Panel.class.getName().equals(type.getInterfaces()[0].getName());
+		return hasInterface(type, PANEL_CLASS_NAME);
 	}
 	
 	private boolean isPage(CtClass type) throws Exception {
-		return type.getInterfaces().length == 1 && Page.class.getName().equals(type.getInterfaces()[0].getName());
+		return hasInterface(type, PAGE_CLASS_NAME);
 	}
 	
 	protected void generate(CtMethod newMethod, CtMethod baseMethod, StringBuilder sb) throws Exception {

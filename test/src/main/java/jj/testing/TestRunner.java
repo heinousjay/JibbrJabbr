@@ -189,7 +189,7 @@ class TestRunner {
 	
 	TestHttpClient run() {
 		try {
-			testLog.info("starting {}", request);
+			testLog.debug("starting {}", request);
 			handler.handleHttpRequest(request, response);
 		} catch (Throwable t) {
 			response.error(t);

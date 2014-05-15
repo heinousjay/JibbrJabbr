@@ -70,8 +70,6 @@ public class JasmineIntegrationTest {
 		ModuleScriptEnvironment jasmine =
 			resourceFinder.findResource(ModuleScriptEnvironment.class, Virtual, "jasmine", new RequiredModule(jse, "jasmine"));
 		Scriptable exports = (Scriptable)jasmine.exports();
-		
-		System.out.println("over");
 	}
 
 }

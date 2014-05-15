@@ -94,6 +94,8 @@ public class WebDriverRule implements TestRule {
 	
 	private Path screenshotDir = Paths.get("build");
 	
+	private boolean screenshotOnError = true;
+	
 	private int screenShotCount;
 	
 	private Logger logger = null;
@@ -142,7 +144,7 @@ public class WebDriverRule implements TestRule {
 					
 					logger.error("TEST ENDED IN ERROR", t);
 					
-					if (!saveScreenshotIfFound(t)) {
+					if (screenshotOnError && !saveScreenshotIfFound(t)) {
 						takeScreenshot(makeScreenShotName("error-screenshot"));
 					}
 					
@@ -302,5 +304,14 @@ public class WebDriverRule implements TestRule {
 		webDriver.get(baseUrl + pageInterface.getAnnotation(URL.class).value());
 		
 		return injector.getInstance(PanelFactory.class).create(pageInterface);
+	}
+
+	/**
+	 * @param b
+	 * @return
+	 */
+	public WebDriverRule screenshotOnError(boolean screenshotOnError) {
+		this.screenshotOnError = screenshotOnError;
+		return this;
 	}
 }

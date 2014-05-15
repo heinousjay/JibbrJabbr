@@ -76,11 +76,14 @@ public abstract class PanelBase implements Page {
 		this.name = getClass().getInterfaces()[0].getName();
 		this.urlBase = urlBase;
 		
-		logger.info("{} created. url is {}", name, currentUrl());
+		logger.info("[{}] created", name);
+		if (Page.class.isAssignableFrom(getClass().getInterfaces()[0])) {
+			logger.info("url is {}", currentUrl());
+		}
 	}
 	
 	private void log(String action, By by) {
-		logger.info("{} {} {}", name, by, action);
+		logger.info("[{}] {} - {}", name, action, by);
 	}
 	
 	private WebElement find(By by) {
@@ -98,12 +101,9 @@ public abstract class PanelBase implements Page {
 	
 	<T extends Page> T navigateTo(Class<T> pageInterface) {
 		String url = pageInterface.getAnnotation(URL.class).value();
-		
-		// this may not be necessary, maybe we just save it?
 		URI uri = URI.create(webDriver.getCurrentUrl());
-		System.out.println(uri.getRawPath());
-		System.out.println(url);
 		
+		// if the URL doesn't match, log it?
 		return panelFactory.create(pageInterface);
 	}
 	

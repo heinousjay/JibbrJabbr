@@ -104,7 +104,20 @@ import java.util.Formatter;
  * 
  * will result in the parameter "group-name" being substituted into
  * the By value, which will then apply for concatenations onto By
- * values for the various methods in the Panel.
+ * values for the various methods in the Panel. Going with the previous
+ * example:
+ * 
+ * <pre>
+ * Login login = new Login();
+ * login.username = "username";
+ * login.password = "password";
+ * 
+ * indexPage.loginPanel("group-name").setLoginInformation(login);
+ * </pre>
+ * 
+ * would result in an attempt to set the value of the element
+ * located at id = "home:group-name:username" to "username", and
+ * similarly at "home:group-name:password" to "password".
  * 
  * <p>
  * Combining these techniques gives a very flexible way to specify
@@ -130,7 +143,7 @@ public @interface By {
 	 * look up the element by a matching css selector.  you are responsible for ensuring this is only
 	 * used with compatible drivers
 	 */
-	String selector() default "";
+	String cssSelector() default "";
 	
 	/** look up the element by an xpath expression */
 	String xpath() default "";

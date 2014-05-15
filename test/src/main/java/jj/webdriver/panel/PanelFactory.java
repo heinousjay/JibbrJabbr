@@ -52,6 +52,12 @@ public class PanelFactory {
 	
 	private final ClassPool classPool = ClassPool.getDefault();
 	
+	private final CtClass objectClass = classPool.get("java.lang.Object");
+	
+	private final CtClass panelInterface = classPool.get("jj.webdriver.Panel");
+
+	private final CtClass pageInterface = classPool.get("jj.webdriver.Page");
+	
 	private final CtClass panelBase;
 	
 	private final CtConstructor panelBaseCtor;
@@ -146,24 +152,31 @@ public class PanelFactory {
 	
 	private void defineMethods(CtClass ctClass, CtClass panelCtClass) throws Exception {
 		
-		for (CtMethod baseMethod : panelCtClass.getDeclaredMethods()) {
-			CtMethod newMethod = 
-				new CtMethod(baseMethod.getReturnType(), baseMethod.getName(), baseMethod.getParameterTypes(), ctClass);
+		for (CtMethod baseMethod : panelCtClass.getMethods()) {
+			CtClass declaringClass = baseMethod.getDeclaringClass();
+			if (declaringClass != objectClass &&
+				declaringClass != panelInterface &&
+				declaringClass != pageInterface
+			) {
 			
-			PanelMethodGenerator generator = findGenerator(newMethod, baseMethod);
-			
-			try {
-			
-				generator.generateMethod(newMethod, baseMethod);
-			
-				ctClass.addMethod(newMethod);
-
-			} catch (Exception e) {
-				throw new AssertionError(
-					"generator " + generator.getClass().getName() + 
-					" failed to generate " + newMethod.getDeclaringClass().getInterfaces()[0].getName() + "." + newMethod.getName(),
-					e
-				);
+				CtMethod newMethod = 
+					new CtMethod(baseMethod.getReturnType(), baseMethod.getName(), baseMethod.getParameterTypes(), ctClass);
+				
+				PanelMethodGenerator generator = findGenerator(newMethod, baseMethod);
+				
+				try {
+				
+					generator.generateMethod(newMethod, baseMethod);
+				
+					ctClass.addMethod(newMethod);
+	
+				} catch (Exception e) {
+					throw new AssertionError(
+						"generator " + generator.getClass().getName() + 
+						" failed to generate " + newMethod.getDeclaringClass().getInterfaces()[0].getName() + "." + newMethod.getName(),
+						e
+					);
+				}
 			}
 		}
 	}

@@ -16,6 +16,7 @@
 package jj.testing;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 
@@ -23,10 +24,14 @@ import jj.event.Publisher;
 import jj.logging.LoggedEvent;
 
 /**
+ * obviously this class is ridiculous.  get rid of it
  * @author jason
  *
  */
+@Singleton
 public class TestLog {
+	
+	private enum Level { ERROR, WARN, INFO, DEBUG, TRACE }
 	
 	private final Publisher publisher;
 	
@@ -38,11 +43,11 @@ public class TestLog {
 	@TestRunnerLogger
 	private static class TestEvent implements LoggedEvent {
 
-		private final boolean trace;
+		private final Level trace;
 		private final String message;
 		private final Object[] args;
 		
-		public TestEvent(boolean trace, String message, Object[] args) {
+		public TestEvent(Level trace, String message, Object[] args) {
 			this.trace = trace;
 			this.message = message;
 			this.args = args;
@@ -50,20 +55,39 @@ public class TestLog {
 
 		@Override
 		public void describeTo(Logger logger) {
-			if (trace) {
+			switch (trace) {
+			
+			case TRACE:
 				logger.trace(message, args);
-			} else {
+				break;
+				
+			case DEBUG:
+				logger.debug(message, args);
+				break;
+				
+			case INFO:
 				logger.info(message, args);
+				break;
+				
+			case WARN:
+				logger.warn(message, args);
+				
+			case ERROR:
+				logger.error(message, args);
 			}
 		}
 	}
 	
+	public void debug(String message, Object...args) {
+		publisher.publish(new TestEvent(Level.DEBUG, message, args));
+	}
+	
 	public void info(String message, Object...args) {
-		publisher.publish(new TestEvent(false, message, args));
+		publisher.publish(new TestEvent(Level.INFO, message, args));
 	}
 	
 	public void trace(String message, Object...args) {
-		publisher.publish(new TestEvent(true, message, args));
+		publisher.publish(new TestEvent(Level.TRACE, message, args));
 	}
 
 }
