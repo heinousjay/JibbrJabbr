@@ -36,6 +36,10 @@ public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnect
 		this.env = env;
 	}
 	
+	/**
+	 * exposes the current web socket connection in place during the execution
+	 * @return
+	 */
 	public WebSocketConnection trueCurrent() {
 		return resources.get();
 	}
