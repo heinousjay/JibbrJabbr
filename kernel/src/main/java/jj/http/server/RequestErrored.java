@@ -21,7 +21,7 @@ import jj.logging.LoggedEvent;
 import org.slf4j.Logger;
 
 @EmergencyLogger
-public class RequestErrored implements LoggedEvent {
+public class RequestErrored extends LoggedEvent {
 	
 	private final Throwable t;
 	

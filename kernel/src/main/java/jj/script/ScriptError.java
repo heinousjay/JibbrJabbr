@@ -26,7 +26,7 @@ import jj.logging.LoggedEvent;
  *
  */
 @EmergencyLogger
-public class ScriptError implements LoggedEvent {
+public class ScriptError extends LoggedEvent {
 	
 	private final String description;
 	private final RhinoException re;

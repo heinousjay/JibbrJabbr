@@ -65,11 +65,11 @@ public class SystemLoggerTest {
 	CountDownLatch latch;
 	String threadName; 
 	
-	class HelperEvent1 implements LoggedEvent {
+	class HelperEvent1 extends LoggedEvent {
 
 		@Override
 		public void describeTo(Logger logger) {
-			threadName = MDC.get(SystemLogger.THREAD_NAME);
+			SystemLoggerTest.this.threadName = MDC.get(SystemLogger.THREAD_NAME);
 			latch.countDown();
 		}
 		
@@ -81,7 +81,7 @@ public class SystemLoggerTest {
 		String name = "name 1";
 		Thread.currentThread().setName(name);
 		sl.log(new HelperEvent1());
-		assertTrue(latch.await(200, MILLISECONDS)); // needs about 25 right now, get that lower!
+		assertTrue(latch.await(200, MILLISECONDS));
 		assertThat(threadName, is(name));
 	}
 

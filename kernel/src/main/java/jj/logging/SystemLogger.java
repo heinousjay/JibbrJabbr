@@ -43,18 +43,8 @@ import jj.util.Closer;
 class SystemLogger implements EmergencyLog, JJServerStartupListener {
 	
 	static final String THREAD_NAME = "thread";
-
-	private static class EventBundle {
-		final LoggedEvent event;
-		final String threadName;
-		
-		EventBundle(LoggedEvent event) {
-			this.event = event;
-			this.threadName = Thread.currentThread().getName();
-		}
-	}
 	
-	private final BlockingQueue<EventBundle> events = new LinkedBlockingQueue<>();
+	private final BlockingQueue<LoggedEvent> events = new LinkedBlockingQueue<>();
 	
 	private final TaskRunner taskRunner;
 	
@@ -75,10 +65,10 @@ class SystemLogger implements EmergencyLog, JJServerStartupListener {
 			@Override
 			protected void run() throws Exception {
 				for (;;) {
-					EventBundle bundle = events.take();
-					Logger logger = loggers.findLogger(bundle.event);
-					try (Closer closer = threadName(bundle.threadName)) {
-						bundle.event.describeTo(logger);
+					LoggedEvent event = events.take();
+					Logger logger = loggers.findLogger(event);
+					try (Closer closer = threadName(event.threadName)) {
+						event.describeTo(logger);
 					}
 				}
 			}
@@ -104,13 +94,13 @@ class SystemLogger implements EmergencyLog, JJServerStartupListener {
 	 */
 	@Listener
 	void log(LoggedEvent event) {
-		events.add(new EventBundle(event));
+		events.add(event);
 	}
 	
 
 	
 	@EmergencyLogger
-	private static class Emergency implements LoggedEvent {
+	private static class Emergency extends LoggedEvent {
 		
 		private final boolean error;
 		private final String message;

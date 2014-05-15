@@ -24,7 +24,7 @@ import org.slf4j.Logger;
  *
  */
 @ServerLogger
-public class ServerStarting implements LoggedEvent {
+public class ServerStarting extends LoggedEvent {
 	
 	private final Version version;
 	

@@ -28,7 +28,7 @@ import jj.logging.LoggedEvent;
  *
  */
 @ResourceLogger
-public abstract class ResourceEvent implements LoggedEvent {
+public abstract class ResourceEvent extends LoggedEvent {
 	
 	public final Class<? extends Resource> resourceClass;
 	public final Location base;

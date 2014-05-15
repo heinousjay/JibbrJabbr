@@ -25,7 +25,7 @@ import jj.logging.LoggedEvent;
  *
  */
 @ServerLogger
-class UsingDefaultConfiguration implements LoggedEvent {
+class UsingDefaultConfiguration extends LoggedEvent {
 
 	@Override
 	public void describeTo(Logger logger) {

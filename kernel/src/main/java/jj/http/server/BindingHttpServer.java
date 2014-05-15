@@ -25,7 +25,7 @@ import jj.logging.LoggedEvent;
  *
  */
 @ServerLogger
-class BindingHttpServer implements LoggedEvent {
+class BindingHttpServer extends LoggedEvent {
 	
 	private final String host;
 	private final int port;

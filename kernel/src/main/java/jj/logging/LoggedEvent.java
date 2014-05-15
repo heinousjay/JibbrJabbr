@@ -25,7 +25,9 @@ import org.slf4j.Logger;
  * @author jason
  *
  */
-public interface LoggedEvent {
+public abstract class LoggedEvent {
 	
-	void describeTo(Logger logger);
+	final String threadName = Thread.currentThread().getName();
+	
+	public abstract void describeTo(Logger logger);
 }

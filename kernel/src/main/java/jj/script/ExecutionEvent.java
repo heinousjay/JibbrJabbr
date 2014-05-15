@@ -24,6 +24,6 @@ import jj.logging.LoggedEvent;
  * @author jason
  */
 @ExecutionTraceLogger
-public abstract class ExecutionEvent implements LoggedEvent {
+public abstract class ExecutionEvent extends LoggedEvent {
 
 }

@@ -27,7 +27,7 @@ import jj.logging.LoggedEvent;
  *
  */
 @ServerLogger
-class ConfigurationFound implements LoggedEvent {
+class ConfigurationFound extends LoggedEvent {
 	
 	private final Path configurationPath;
 	

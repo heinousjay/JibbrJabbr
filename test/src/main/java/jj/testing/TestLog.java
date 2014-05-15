@@ -41,7 +41,7 @@ public class TestLog {
 	}
 	
 	@TestRunnerLogger
-	private static class TestEvent implements LoggedEvent {
+	private static class TestEvent extends LoggedEvent {
 
 		private final Level trace;
 		private final String message;

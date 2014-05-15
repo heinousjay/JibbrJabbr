@@ -24,7 +24,7 @@ import org.slf4j.Logger;
  *
  */
 @ServerLogger
-public class ServerStopping implements LoggedEvent {
+public class ServerStopping extends LoggedEvent {
 	
 	ServerStopping() {}
 

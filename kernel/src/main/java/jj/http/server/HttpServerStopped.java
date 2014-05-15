@@ -25,7 +25,7 @@ import jj.logging.LoggedEvent;
  *
  */
 @ServerLogger
-class HttpServerStopped implements LoggedEvent {
+class HttpServerStopped extends LoggedEvent {
 
 	@Override
 	public void describeTo(Logger logger) {

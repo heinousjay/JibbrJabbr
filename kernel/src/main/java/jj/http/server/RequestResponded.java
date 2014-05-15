@@ -33,7 +33,7 @@ import jj.util.DateFormatHelper;
  *
  */
 @AccessLogger
-class RequestResponded implements LoggedEvent {
+class RequestResponded extends LoggedEvent {
 	
 	private final JJHttpRequest request;
 	private final JJHttpResponse response;
