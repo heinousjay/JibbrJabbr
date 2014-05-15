@@ -35,9 +35,6 @@ public class ExecutionModule extends JJModule {
 		bind(TaskRunner.class).to(TaskRunnerImpl.class);
 		
 		bind(UncaughtExceptionHandler.class).to(JJUncaughtExceptionHandler.class);
-		
-		bindLoggedEvents().annotatedWith(ExecutionTraceLogger.class).toLogger(ExecutionTraceLogger.NAME);
-		
 	}
 
 }

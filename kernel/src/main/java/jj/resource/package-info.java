@@ -35,7 +35,7 @@
  * There are two main components that act as the API to the resource system, the {@link ResourceFinder}
  * and the {@link ResourceLoader}.  The system also produces several events (which can be observed by
  * registering as described in {@link Listener}) describing resource lifecycles, all descended from
- * {@link ResourceEvent}, which in turn descends from {@link ExecutionEvent}
+ * {@link ResourceEvent}
  * 
  * <ul>
  * <li>{@link ResourceLoaded} when a resource is loaded
@@ -51,4 +51,4 @@
 package jj.resource;
 import jj.resource.stat.ic.StaticResource;
 import jj.event.Listener;
-import jj.execution.ExecutionEvent;
+

@@ -1,8 +1,6 @@
 package jj.resource;
 
 import jj.JJModule;
-import jj.jasmine.SpecResource;
-import jj.jasmine.SpecResourceCreator;
 import jj.resource.config.ConfigResource;
 import jj.resource.config.ConfigResourceCreator;
 import jj.resource.sha1.Sha1Resource;

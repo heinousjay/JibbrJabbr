@@ -17,7 +17,7 @@ package jj.css;
 
 import org.slf4j.Logger;
 
-import jj.execution.ExecutionEvent;
+import jj.script.ExecutionEvent;
 
 /**
  * @author jason

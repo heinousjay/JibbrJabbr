@@ -13,17 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.script;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import jj.logging.LoggedEvent;
 
+import org.slf4j.Logger;
+
 /**
- * Events that descend from this interface will
- * be logged to the execution trace logger.
- *
+ * <p>
+ * Identifies a bound {@link Logger}, as well as {@link LoggedEvent}s that use it
+ * 
  * @author jason
+ *
  */
-@ExecutionTraceLogger
-public abstract class ExecutionEvent implements LoggedEvent {
+@Documented
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@interface ExecutionTraceLogger {
+
+	public static final String NAME = "execution trace";
 
 }

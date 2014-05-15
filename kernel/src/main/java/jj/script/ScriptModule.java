@@ -20,5 +20,7 @@ public class ScriptModule extends JJModule {
 		install(new ScriptResourceModule());
 		
 		bind(ScriptableObject.class).annotatedWith(Global.class).toProvider(GlobalStandardObjects.class);
+		
+		bindLoggedEvents().annotatedWith(ExecutionTraceLogger.class).toLogger(ExecutionTraceLogger.NAME);
 	}
 }
