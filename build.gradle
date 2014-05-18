@@ -6,10 +6,12 @@ allprojects {
 
 	repositories {
 		mavenCentral()
-		mavenLocal()
+		maven {
+			url 'https://oss.sonatype.org/content/repositories/snapshots/'
+		}
 	}
 
-	group = 'jibbrjabbr'
+	group = 'com.jibbrjabbr'
 	version = '0.5'
 	
 	sourceCompatibility = '1.7'
