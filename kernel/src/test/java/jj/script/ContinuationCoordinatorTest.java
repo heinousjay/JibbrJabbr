@@ -24,8 +24,8 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import jj.event.Publisher;
 import jj.jjmessage.JJMessage;
-import jj.logging.EmergencyLog;
 import jj.script.module.RequiredModule;
 
 import org.junit.Before;
@@ -67,7 +67,7 @@ public class ContinuationCoordinatorTest {
 	
 	ContinuationState continuationState;
 	
-	@Mock EmergencyLog logger;
+	@Mock Publisher publisher;
 	
 	@Mock Callable function;
 
@@ -104,7 +104,7 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, logger, continuationProcessors, cache);
+		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, publisher, continuationProcessors, cache);
 	}
 	
 	@Test
@@ -136,8 +136,7 @@ public class ContinuationCoordinatorTest {
 		
 		continuationCoordinator.execute(scriptEnvironment);
 		
-		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
-		verify(logger).error("", e);
+		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
 	
 	@Test
@@ -169,8 +168,7 @@ public class ContinuationCoordinatorTest {
 		
 		continuationCoordinator.execute(scriptEnvironment, function);
 		
-		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
-		verify(logger).error("", e);
+		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
 	
 	@Test
@@ -208,8 +206,7 @@ public class ContinuationCoordinatorTest {
 		
 		continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
-		verify(logger).error(unexpectedExceptionString, scriptEnvironment);
-		verify(logger).error("", e);
+		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
 
 }

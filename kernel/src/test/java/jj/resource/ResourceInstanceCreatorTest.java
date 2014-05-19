@@ -28,7 +28,6 @@ import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.PathResolver;
-import jj.logging.EmergencyLog;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
@@ -51,17 +50,15 @@ public class ResourceInstanceCreatorTest  {
 	// TODO kill this off.  too much concrete stuff
 	public static ResourceInstanceCreator creator(
 		final PathResolver app,
-		final Configuration configuration,
-		final EmergencyLog logger
+		final Configuration configuration
 	) {
 		return new ResourceInstanceCreator(app, Guice.createInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
 				bind(Configuration.class).toInstance(configuration);
-				bind(EmergencyLog.class).toInstance(logger);
 			}
-		}), logger);
+		}));
 	}
 	
 	@Mock Application app;

@@ -13,33 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.logging;
+package jj.script;
 
-import jj.JJModule;
+import org.slf4j.Logger;
+
+import jj.logging.EmergencyLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class LoggingModule extends JJModule {
+@EmergencyLogger
+public class ScriptExecutionError extends LoggedEvent {
 	
-	private final boolean isTest;
+	private final ScriptEnvironment scriptEnvironment;
+	private final Throwable t;
 	
-	public LoggingModule(final boolean isTest) {
-		this.isTest = isTest;
+	ScriptExecutionError(final ScriptEnvironment scriptEnvironment, final Throwable t) {
+		this.scriptEnvironment = scriptEnvironment;
+		this.t = t;
 	}
 
 	@Override
-	protected void configure() {
-		
-		// this gets instantiated before anything might write to a log
-		// actually that won't matter anymore soon! yay! the "test" parameter can get killed off
-		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
-		
-		addStartupListenerBinding().to(SystemLogger.class);
-		
-		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
-		
+	public void describeTo(Logger logger) {
+		logger.error("unexpected problem during script execution {}", scriptEnvironment);
+		logger.error("", t);
 	}
 
 }

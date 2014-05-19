@@ -10,15 +10,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.NodeVisitor;
+import org.mockito.Mock;
 
 import jj.configuration.resolution.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceCreator;
 import jj.document.servable.DocumentConfiguration;
+import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
 
 public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlResourceCreator> {
+	
+	@Mock Publisher publisher;
 
 	@Override
 	protected String name() {
@@ -49,7 +53,7 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 			}
 		});
 		
-		return new HtmlResource(configuration, logger, new Dependencies(cacheKey(), AppLocation.Base), name(), path());
+		return new HtmlResource(configuration, publisher, new Dependencies(cacheKey(), AppLocation.Base), name(), path());
 	}
 	
 	@Override

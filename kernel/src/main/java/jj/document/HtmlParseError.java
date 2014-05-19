@@ -13,33 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.logging;
+package jj.document;
 
-import jj.JJModule;
+import java.nio.file.Path;
+import java.util.List;
+
+import org.jsoup.parser.ParseError;
+import org.slf4j.Logger;
+
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class LoggingModule extends JJModule {
+public class HtmlParseError extends LoggedEvent {
+
+	private final Path path;
+	private final List<ParseError> errors;
 	
-	private final boolean isTest;
-	
-	public LoggingModule(final boolean isTest) {
-		this.isTest = isTest;
+	public HtmlParseError(final Path path, final List<ParseError> errors) {
+		this.path = path;
+		this.errors = errors;
 	}
 
 	@Override
-	protected void configure() {
+	public void describeTo(Logger logger) {
+		logger.warn("errors while parsing {}, your document may not behave as expected", path);
 		
-		// this gets instantiated before anything might write to a log
-		// actually that won't matter anymore soon! yay! the "test" parameter can get killed off
-		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
-		
-		addStartupListenerBinding().to(SystemLogger.class);
-		
-		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
-		
+		for (ParseError pe : errors) {
+			logger.warn("{}", pe);
+		}
+		errors.clear();
 	}
 
 }

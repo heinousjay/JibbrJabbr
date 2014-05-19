@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
 
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
 import jj.util.Closer;
 
 /**
@@ -25,7 +25,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		void run(RhinoContext context);
 	}
 	
-	private final EmergencyLog logger;
+	private final Publisher publisher;
 	
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -39,20 +39,19 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	ContinuationCoordinatorImpl(
 		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptEnvironment env,
-		final EmergencyLog logger,
+		final Publisher publisher,
 		final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors,
 		final ContinuationPendingCache cache
 	) {
 		this.contextProvider = contextProvider;
 		this.env = env;
-		this.logger = logger;
+		this.publisher = publisher;
 		this.continuationProcessors = continuationProcessors;
 		this.cache = cache;
 	}
 	
-	private void log(final Exception e, final ScriptEnvironment scriptEnvironment) {
-		logger.error("unexpected problem during script execution {}", scriptEnvironment);
-		logger.error("", e);
+	private void log(final Throwable t, final ScriptEnvironment scriptEnvironment) {
+		publisher.publish(new ScriptExecutionError(scriptEnvironment, t));
 	} 
 	
 	private ContinuationState execute(final ContinuationExecution execution, final ScriptEnvironment scriptEnvironment) {
@@ -111,9 +110,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			}, scriptEnvironment));
 			
 		}
-		
-		logger.error("ignoring attempt to execute nonexistent function in context of {}", scriptEnvironment);
-		logger.error("helpful stacktrace", new Exception());
+		publisher.publish(new CannotFindFunction(scriptEnvironment));
 		return null;
 	}
 	
@@ -152,8 +149,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			}, scriptEnvironment));
 		}
 		
-		logger.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptEnvironment, pendingKey);
-		logger.error("helpful stacktrace", new Exception());
+		publisher.publish(new CannotFindContinuation(scriptEnvironment, pendingKey));
+		
 		return null;
 	}
 	

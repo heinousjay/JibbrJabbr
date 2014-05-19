@@ -21,8 +21,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.logging.EmergencyLog;
-
 /**
  * Inject the Publisher to publish events.
  * 
@@ -32,14 +30,10 @@ import jj.logging.EmergencyLog;
 @Singleton
 class EventManager implements Publisher {
 	
-	private final EmergencyLog logger;
-	
 	private Map<Class<?>, Set<Invoker>> listenerMap;
 	
 	@Inject
-	EventManager(final EmergencyLog logger) {
-		this.logger = logger;
-	}
+	EventManager() {}
 	
 	void listenerMap(Map<Class<?>, Set<Invoker>> listenerMap) {
 		this.listenerMap = listenerMap;
@@ -52,7 +46,7 @@ class EventManager implements Publisher {
 					try {
 						invoker.invoke(event);
 					} catch (Exception e) {
-						logger.error("exception invoking event listener", e);
+						throw new AssertionError("broken event listener!", e);
 					}
 				}
 			}

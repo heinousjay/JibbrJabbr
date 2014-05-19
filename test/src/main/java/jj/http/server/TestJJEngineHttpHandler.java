@@ -20,10 +20,10 @@ import javax.inject.Singleton;
 
 import com.google.inject.Injector;
 
+import jj.event.Publisher;
 import jj.execution.TaskRunner;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.servable.Servables;
-import jj.logging.EmergencyLog;
 
 /**
  * just exposing a method for testing
@@ -43,9 +43,9 @@ public class TestJJEngineHttpHandler extends EngineHttpHandler {
 		final Servables servables,
 		final Injector injector,
 		final WebSocketRequestChecker webSocketUriChecker,
-		final EmergencyLog logger
+		final Publisher publisher
 	) {
-		super(taskRunner, servables, injector, webSocketUriChecker, logger);
+		super(taskRunner, servables, injector, webSocketUriChecker, publisher);
 	}
 
 	@Override

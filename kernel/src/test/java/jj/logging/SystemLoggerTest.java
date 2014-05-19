@@ -18,7 +18,6 @@ package jj.logging;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
 
 import java.util.concurrent.CountDownLatch;
 

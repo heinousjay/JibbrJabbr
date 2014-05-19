@@ -32,12 +32,13 @@ import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.IOException;
 
+import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.JJHttpRequest;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
-import jj.logging.EmergencyLog;
+import jj.logging.Emergency;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,7 +61,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 @RunWith(MockitoJUnitRunner.class)
 public class EngineHttpHandlerTest {
 	
-	@Mock EmergencyLog logger;
+	@Mock Publisher publisher;
 	@Mock ChannelHandlerContext ctx;
 	@Mock Channel channel;
 	@Mock ChannelFuture channelFuture;
@@ -108,7 +109,7 @@ public class EngineHttpHandlerTest {
 		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
 		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
 		
-		handler = new EngineHttpHandler(taskRunner, servables.servables, injector, webSocketRequestChecker, logger);
+		handler = new EngineHttpHandler(taskRunner, servables.servables, injector, webSocketRequestChecker, publisher);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -182,7 +183,7 @@ public class EngineHttpHandlerTest {
 		
 		IOException ioe = new IOException();
 		handler.exceptionCaught(ctx, ioe);
-		verifyNoMoreInteractions(logger);
+		verifyNoMoreInteractions(publisher);
 		verifyNoMoreInteractions(ctx);
 	}
 	
@@ -196,8 +197,8 @@ public class EngineHttpHandlerTest {
 		
 		// validate that the exception is logged because we
 		// care about that
-		verify(logger).error(anyString(), eq(t));
-		verifyNoMoreInteractions(logger);
+		verify(publisher).publish(isA(Emergency.class));
+		verifyNoMoreInteractions(publisher);
 		
 		verify(ctx).writeAndFlush(responseCaptor.capture());
 		
@@ -222,8 +223,7 @@ public class EngineHttpHandlerTest {
 		handler.exceptionCaught(ctx, t);
 		
 		//then
-		verify(logger).error(anyString(), eq(t));
-		verify(logger).error(anyString(), eq(second));
+		verify(publisher, times(2)).publish(isA(Emergency.class));
 	}
 	
 	@Test

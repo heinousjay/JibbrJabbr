@@ -6,7 +6,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
+import jj.logging.Emergency;
 import jj.script.RhinoContext;
 
 import org.mozilla.javascript.RhinoException;
@@ -22,17 +23,17 @@ class EngineAPIImpl implements EngineAPI {
 	
 	private final ScriptableObject global;
 	
-	private final EmergencyLog logger;
+	private final Publisher publisher;
 	
 	@Inject
 	EngineAPIImpl(
 		final Provider<RhinoContext> contextProvider,
 		final Set<HostObject> hostObjects,
-		final EmergencyLog logger
+		final Publisher publisher
 	) {
 		try (RhinoContext context = contextProvider.get()) {
 			global = initializeGlobalScope(context, hostObjects);
-			this.logger = logger;
+			this.publisher = publisher;
 		}
 	}
 	
@@ -71,7 +72,7 @@ class EngineAPIImpl implements EngineAPI {
 				try {
 					context.evaluateString(global, script, hostObject.name());
 				} catch (RhinoException re) {
-					logger.error("trouble evaluating host object {} script {}", hostObject.getClass().getName(), script);
+					publisher.publish(new Emergency("trouble evaluating host object {} script {}", hostObject.getClass().getName(), script));
 					throw new AssertionError("bad host object!", re);
 				}
 			}

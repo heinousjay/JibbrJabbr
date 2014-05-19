@@ -72,7 +72,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		before();
 		
-		creator = new ResourceInstanceCreator(app, injector, logger);
+		creator = new ResourceInstanceCreator(app, injector);
 		
 		toTest = toTest();
 		
@@ -92,8 +92,6 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		assertThat(created, is(resource));
 		
 		resourceAssertions(created);
-		
-		verify(logger, never()).error(anyString(), any(ResourceNotViableException.class));
 	}
 	
 	protected void resourceAssertions(U resource) throws Exception {

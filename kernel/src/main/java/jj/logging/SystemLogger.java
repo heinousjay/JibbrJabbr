@@ -40,7 +40,7 @@ import jj.util.Closer;
  */
 @Singleton
 @Subscriber
-class SystemLogger implements EmergencyLog, JJServerStartupListener {
+class SystemLogger implements JJServerStartupListener {
 	
 	static final String THREAD_NAME = "thread";
 	
@@ -55,8 +55,6 @@ class SystemLogger implements EmergencyLog, JJServerStartupListener {
 		this.taskRunner = taskRunner;
 		this.loggers = loggers;
 	}
-	
-
 
 	@Override
 	public void start() throws Exception {
@@ -99,56 +97,6 @@ class SystemLogger implements EmergencyLog, JJServerStartupListener {
 	
 
 	
-	@EmergencyLogger
-	private static class Emergency extends LoggedEvent {
-		
-		private final boolean error;
-		private final String message;
-		private final Throwable t;
-		private final Object[] args;
-		
-		Emergency(boolean error, String message, Throwable t) {
-			this.error = error;
-			this.message = message;
-			this.t = t;
-			this.args = null;
-		}
-		
-		Emergency(boolean error, String message, Object...args) {
-			this.error = error;
-			this.message = message;
-			this.t = null;
-			this.args = args;
-		}
-
-		@Override
-		public void describeTo(Logger logger) {
-			if (error && t != null) {
-				logger.error(message, t);
-			} else if (error) {
-				logger.error(message, args);
-			} else {
-				logger.warn(message, args);
-			}
-		}
-		
-	}
-	
-	@Override
-	public void error(String message, Object... args) {
-		log(new Emergency(true, message, args));
-	}
-	
-	@Override
-	public void error(String message, Throwable t) {
-		log(new Emergency(true, message, t));
-	}
-	
-	@Override
-	public void warn(String message, Object... args) {
-		log(new Emergency(false, message, args));
-	}
-
 	@Override
 	public Priority startPriority() {
 		return Priority.Highest;

@@ -290,6 +290,7 @@ public class WebDriverRule implements TestRule {
 		);
 	}
 	
+	
 	public <T extends Page> T get(final Class<T> pageInterface) {
 		
 		return get(pageInterface, null);
@@ -307,8 +308,8 @@ public class WebDriverRule implements TestRule {
 	}
 
 	/**
-	 * @param b
-	 * @return
+	 * by default, a screenshot is taken when an error occurs, if the web driver supports it.
+	 * turn that behavior off by passing false
 	 */
 	public WebDriverRule screenshotOnError(boolean screenshotOnError) {
 		this.screenshotOnError = screenshotOnError;

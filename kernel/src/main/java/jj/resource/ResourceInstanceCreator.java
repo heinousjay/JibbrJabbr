@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 
 import jj.configuration.Location;
 import jj.configuration.resolution.PathResolver;
-import jj.logging.EmergencyLog;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -42,21 +41,17 @@ public class ResourceInstanceCreator {
 
 	private final Injector parentInjector;
 	
-	private final EmergencyLog logger;
-	
 	@Inject
 	ResourceInstanceCreator(
 		final PathResolver pathResolver,
-		final Injector parentInjector,
-		final EmergencyLog logger
+		final Injector parentInjector
 	) {
 		this.pathResolver = pathResolver;
 		this.parentInjector = parentInjector;
-		this.logger = logger;
 	}
 	
 	public <T extends Resource> T createResource(
-		final Class<T> type,
+		final Class<T> resourceClass,
 		final ResourceKey cacheKey,
 		final Location base,
 		final String name,
@@ -72,7 +67,7 @@ public class ResourceInstanceCreator {
 					new AbstractModule() {
 						@Override
 						protected void configure() {
-							bind(type);
+							bind(resourceClass);
 							bind(ResourceKey.class).toInstance(cacheKey);
 							bind(Location.class).toInstance(base);
 							bind(String.class).toInstance(name);
@@ -90,13 +85,13 @@ public class ResourceInstanceCreator {
 							bind(type).toInstance((V)instance);
 						}
 					}
-				).getInstance(type);
+				).getInstance(resourceClass);
 				
 			} catch (ProvisionException | CreationException ce) {
 				
 				Throwable cause = ce.getCause();
 				
-				if (cause instanceof ResourceNotViableException) throw cause;
+				if (cause instanceof ResourceNotViableException) throw (ResourceNotViableException)cause;
 				
 				throw ce;
 			}
@@ -106,18 +101,10 @@ public class ResourceInstanceCreator {
 			// don't bother logging this, it's just a "not found"
 			return null;
 			
-		} catch (ResourceNotViableException rnve) {
-			
-			logger.error("", rnve);
-			return null;
-			
 		} catch (Exception e) {
 			
 			throw new AssertionError("unexpected exception creating a resource", e);
 			
-		} catch (Throwable t) {
-			
-			throw (Error)t;
 		}
 	}
 }

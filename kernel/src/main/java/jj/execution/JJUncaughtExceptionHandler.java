@@ -17,10 +17,12 @@ package jj.execution;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.logging.EmergencyLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jj.logging.EmergencyLogger;
 
 /**
  * @author jason
@@ -28,17 +30,13 @@ import jj.logging.EmergencyLog;
  */
 @Singleton
 class JJUncaughtExceptionHandler implements UncaughtExceptionHandler {
-	
-	private final EmergencyLog logger;
-	
-	@Inject
-	JJUncaughtExceptionHandler(final EmergencyLog logger) {
-		this.logger = logger;
-	}
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
 		// this is a bad failure! almost certainly an assertion
+		// so we just log it directly
+		Logger logger = LoggerFactory.getLogger(EmergencyLogger.NAME);
+		
 		logger.error("uncaught exception in thread {}", t);
 		logger.error("", e);
 		

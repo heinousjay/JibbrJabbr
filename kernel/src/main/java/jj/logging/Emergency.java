@@ -15,24 +15,39 @@
  */
 package jj.logging;
 
+import org.slf4j.Logger;
+
 /**
- * <p>
- * A component to log emergencies that haven't yet been / may not
- * ever be converted to events.  Uses the event system internally.
- * Points of use of this class should be considered carefully as
- * events.  This may be a temporary measure on the road to doing
- * that conversion, but i wanted to make sure that errors were going
- * to be logged all the time while i figured that angle out
- * 
+ * General emergency event if something has gone wrong
  * @author jason
  *
  */
-public interface EmergencyLog {
+@EmergencyLogger
+public class Emergency extends LoggedEvent {
 	
+	private final String message;
+	private final Throwable t;
+	private final Object[] args;
 	
-	void error(String message, Throwable t);
+	public Emergency(String message, Throwable t) {
+		this.message = message;
+		this.t = t;
+		this.args = null;
+	}
 	
-	void error(String message, Object...args);
+	public Emergency(String message, Object...args) {
+		this.message = message;
+		this.t = null;
+		this.args = args;
+	}
+
+	@Override
+	public void describeTo(Logger logger) {
+		if (t != null) {
+			logger.error(message, t);
+		} else {
+			logger.error(message, args);
+		}
+	}
 	
-	void warn(String message, Object...args);
 }

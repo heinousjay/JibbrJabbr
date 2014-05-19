@@ -16,13 +16,11 @@
 package jj.event;
 
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.event.help.BrokenListener;
@@ -33,11 +31,9 @@ import jj.event.help.IEvent;
 import jj.event.help.Sub;
 import jj.execution.MockTaskRunner;
 import jj.execution.TaskRunner;
-import jj.logging.EmergencyLog;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -55,17 +51,12 @@ import com.google.inject.Injector;
 public class EventSystemTest {
 	
 	final Exception toThrow = new Exception();
-	@Mock EmergencyLog logger;
 	
 	MockTaskRunner taskRunner;
 	
 	@Singleton
 	public static class EventManagerChild extends EventManager {
 		
-		@Inject
-		public EventManagerChild(final EmergencyLog logger) {
-			super(logger);
-		}
 		
 		Map<Class<?>, Set<Invoker>> listenerMap;
 		
@@ -78,7 +69,7 @@ public class EventSystemTest {
 	}
 	
 	@Test
-	public void test() throws Exception {
+	public void testCorrectOperation() throws Exception {
 		
 		EventManagerChild pub = impl();
 		
@@ -105,7 +96,6 @@ public class EventSystemTest {
 			
 			@Override
 			protected void configure() {
-				bind(EmergencyLog.class).toInstance(logger);
 				bind(TaskRunner.class).to(MockTaskRunner.class);
 				bind(Exception.class).toInstance(toThrow);
 			}
@@ -117,8 +107,6 @@ public class EventSystemTest {
 		
 		// publishing with nothing listening is fine
 		pub.publish(new EventSub());
-		
-		final BrokenListener brokenListener = injector.getInstance(BrokenListener.class);
 		
 		
 		Sub sub = injector.getInstance(Sub.class);
@@ -163,13 +151,8 @@ public class EventSystemTest {
 		// and after they go out of scope we should have none
 		assertThat(pub.listenerMap.size(), is(3));
 		assertThat(pub.listenerMap.get(IEvent.class).size(), is(2));
-		assertThat(pub.listenerMap.get(Event.class).size(), is(2));
+		assertThat(pub.listenerMap.get(Event.class).size(), is(1));
 		assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
-		
-		
-		// and let's test the exception gets logged and the broken listener heard the events
-		verify(logger, times(4)).error(anyString(), eq(toThrow));
-		assertThat(brokenListener.heard, is(4));
 		
 		return pub;
 	}

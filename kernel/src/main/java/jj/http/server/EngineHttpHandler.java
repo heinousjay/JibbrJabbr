@@ -20,11 +20,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 
+import jj.event.Publisher;
 import jj.execution.TaskRunner;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
-import jj.logging.EmergencyLog;
+import jj.logging.Emergency;
 import jj.resource.ResourceTask;
 import jj.resource.Resource;
 
@@ -47,7 +48,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	
 	private final WebSocketRequestChecker webSocketRequestChecker;
 	
-	private final EmergencyLog logger;
+	private final Publisher publisher;
 	
 	@Inject
 	EngineHttpHandler( 
@@ -55,13 +56,13 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		final Servables servables,
 		final Injector parentInjector,
 		final WebSocketRequestChecker webSocketRequestChecker,
-		final EmergencyLog logger
+		final Publisher publisher
 	) {
 		this.taskRunner = taskRunner;
 		this.servables = servables;
 		this.parentInjector = parentInjector;
 		this.webSocketRequestChecker = webSocketRequestChecker;
-		this.logger = logger;
+		this.publisher = publisher;
 	}
 
 	// TODO 
@@ -108,13 +109,13 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		if (!(cause instanceof IOException)) {
-			logger.error("engine caught an exception", cause);
+			publisher.publish(new Emergency("engine caught an exception", cause));
 			try {
 				ctx.writeAndFlush(
 					new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR)
 				).addListener(ChannelFutureListener.CLOSE);
 			} catch (Exception e) {
-				logger.error("additionally, an exception occurred while responding with an error", e);
+				publisher.publish(new Emergency("additionally, an exception occurred while responding with an error", e));
 			}
 		}
 	}

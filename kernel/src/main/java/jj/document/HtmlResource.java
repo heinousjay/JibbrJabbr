@@ -12,8 +12,9 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.document.servable.DocumentConfiguration;
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
 import jj.resource.AbstractFileResource;
+
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
@@ -65,7 +66,7 @@ public class HtmlResource extends AbstractFileResource {
 	@Inject
 	HtmlResource(
 		final Configuration configuration,
-		final EmergencyLog logger,
+		final Publisher publisher,
 		final Dependencies dependencies,
 		final String name,
 		final Path path
@@ -83,12 +84,7 @@ public class HtmlResource extends AbstractFileResource {
 		
 		List<ParseError> errors = parser.getErrors();
 		if (!errors.isEmpty()) {
-			logger.warn("errors while parsing {}, your document may not behave as expected", path);
-			
-			for (ParseError pe : errors) {
-				logger.warn("{}", pe);
-			}
-			errors.clear();
+			publisher.publish(new HtmlParseError(path, errors));
 		}
 		
 		if (config.removeComments()) {

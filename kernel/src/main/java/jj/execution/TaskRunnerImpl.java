@@ -7,7 +7,8 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
+import jj.logging.Emergency;
 import jj.util.Closer;
 
 /**
@@ -26,7 +27,7 @@ class TaskRunnerImpl implements TaskRunner {
 
 	private final ExecutorBundle executors;
 	private final CurrentTask currentTask;
-	private final EmergencyLog logger;
+	private final Publisher publisher;
 	
 	private final DelayQueue<JJTask> queuedTasks = new DelayQueue<>();
 	
@@ -46,11 +47,11 @@ class TaskRunnerImpl implements TaskRunner {
 	TaskRunnerImpl(
 		final ExecutorBundle bundle,
 		final CurrentTask currentTask,
-		final EmergencyLog logger
+		final Publisher publisher
 	) {
 		this.executors = bundle;
 		this.currentTask = currentTask;
-		this.logger = logger;
+		this.publisher = publisher;
 		
 		execute(monitor);
 	}
@@ -83,9 +84,11 @@ class TaskRunnerImpl implements TaskRunner {
 						task.run();
 					} catch (InterruptedException ie) {
 						interrupted = true;
+					} catch (OutOfMemoryError e) {
+						throw e; // just in case
 					} catch (Throwable t) {
 						if (!task.errored(t)) {
-							logger.error("Task [" + task.name() + "] ended in exception", t);
+							publisher.publish(new Emergency("Task [" + task.name() + "] ended in exception", t));
 						}
 	
 					} finally {

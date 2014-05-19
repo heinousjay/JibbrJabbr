@@ -34,7 +34,7 @@ import jj.configuration.Configuration;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.MockApplication;
 import jj.css.CssResource;
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
 import jj.util.SHA1Helper;
 
 import org.hamcrest.Matchers;
@@ -53,7 +53,7 @@ public abstract class RealResourceBase {
 	protected Path appPath;
 	@Mock protected Configuration configuration;
 	protected Application app;
-	@Mock protected EmergencyLog logger;
+	@Mock protected Publisher publisher;
 
 	@Before
 	public final void init() throws Exception {

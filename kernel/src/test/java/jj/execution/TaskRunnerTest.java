@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jj.logging.EmergencyLog;
+import jj.event.Publisher;
+import jj.logging.Emergency;
 import jj.script.ScriptEnvironment;
 
 import org.junit.Before;
@@ -49,7 +50,7 @@ public class TaskRunnerTest {
 	
 	private CurrentTask currentTask;
 	
-	private @Mock EmergencyLog logger;
+	private @Mock Publisher publisher;
 	
 	private TaskRunnerImpl executor;
 	
@@ -66,7 +67,7 @@ public class TaskRunnerTest {
 		executors.put(ServerExecutor.class, serverExecutor);
 		bundle = new ExecutorBundle(executors);
 		
-		executor = new TaskRunnerImpl(bundle, currentTask, logger);
+		executor = new TaskRunnerImpl(bundle, currentTask, publisher);
 		
 		given(scriptEnvironment.name()).willReturn(baseName);
 	}
@@ -149,6 +150,6 @@ public class TaskRunnerTest {
 		
 		runTask(serverExecutor);
 		
-		verify(logger).error(anyString(), eq(toThrow));
+		verify(publisher).publish(isA(Emergency.class));
 	}
 }

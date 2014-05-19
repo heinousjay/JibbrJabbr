@@ -13,33 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.logging;
+package jj.script;
 
-import jj.JJModule;
+import org.slf4j.Logger;
+
+import jj.logging.EmergencyLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class LoggingModule extends JJModule {
+@EmergencyLogger
+public class CannotFindFunction extends LoggedEvent {
+
+	private final ScriptEnvironment scriptEnvironment;
 	
-	private final boolean isTest;
-	
-	public LoggingModule(final boolean isTest) {
-		this.isTest = isTest;
+	CannotFindFunction(final ScriptEnvironment scriptEnvironment) {
+		this.scriptEnvironment = scriptEnvironment;
 	}
 
 	@Override
-	protected void configure() {
-		
-		// this gets instantiated before anything might write to a log
-		// actually that won't matter anymore soon! yay! the "test" parameter can get killed off
-		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
-		
-		addStartupListenerBinding().to(SystemLogger.class);
-		
-		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
-		
+	public void describeTo(Logger logger) {
+		logger.warn("ignoring attempt to execute nonexistent function in context of {}", scriptEnvironment);
+		logger.warn("helpful stacktrace", new Exception());
 	}
 
 }
