@@ -122,6 +122,20 @@ subprojects {
 			)
 		}
 	}
+	
+	task sourcesJar(type: Jar, dependsOn: classes) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+	}
+	
+	javadoc {
+		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PACKAGE
+	}
+	
+	task javadocJar(type: Jar, dependsOn: javadoc) {
+		classifier = 'javadoc'
+		from javadoc.destinationDir
+	}
 }
 
 // configures the jar to be the actual final build product
