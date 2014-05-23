@@ -67,7 +67,7 @@ class LogConfigurator {
  		// just play with this!
  		infoAll();
  		
- 		accessLogger(TRACE);
+ 		accessLogger(INFO);
  		
 		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
  		logger(NETTY_LOGGER, OFF);
