@@ -84,8 +84,6 @@ public class DocumentScriptEnvironment
 	
 	private final ScriptableObject global;
 	
-	private final Script script;
-	
 	private final HtmlResource html;
 	
 	private final ScriptResource clientScript;
@@ -146,14 +144,13 @@ public class DocumentScriptEnvironment
 			socketUri = null;
 			global = null;
 			scope = null;
-			script = null;
 		} else {
 			socketUri = uri + ".socket";
 			global = api.global();
 			scope = configureTimers(configureModuleObjects(baseName, createChainedScope(global)));
 			
 			try {
-				script = compiler.compile(scope, clientScript, sharedScript, serverScript);
+				compiler.compile(scope, clientScript, sharedScript, serverScript.name());
 			} catch (Exception e) {
 				throw new ResourceNotViableException(baseName, e);
 			}
@@ -202,7 +199,7 @@ public class DocumentScriptEnvironment
 
 	@Override
 	public Script script() {
-		return script;
+		return serverScript == null ? null : serverScript.script();
 	}
 
 	public Document document() {

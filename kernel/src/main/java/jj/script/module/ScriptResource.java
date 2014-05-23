@@ -8,28 +8,42 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import org.mozilla.javascript.Script;
 
 import jj.resource.AbstractFileResource;
 import jj.resource.LoadedResource;
+import jj.script.RhinoContext;
 
 @Singleton
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	
-	private final String script;
+	private final String source;
+	
+	private final Script script;
 	
 	@Inject
 	ScriptResource(
 		final Dependencies dependencies,
 		final Path path,
-		final String name
+		final String name,
+		final Provider<RhinoContext> contextProvider
 	) throws IOException {
 		super(dependencies, name, path);
-		script = byteBuffer.toString(UTF_8);
+		source = byteBuffer.toString(UTF_8);
+		try (RhinoContext context = contextProvider.get()) {
+			script = context.compileString(source, name);
+		}
 	}
 	
-	public String script() {
+	public Script script() {
 		return script;
+	}
+
+	public String source() {
+		return source;
 	}
 
 	@Override

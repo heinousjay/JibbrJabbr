@@ -30,7 +30,6 @@ import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ChildScriptEnvironment;
 import jj.script.ContinuationPendingKey;
-import jj.script.RhinoContext;
 import jj.script.ScriptEnvironment;
 
 import org.mozilla.javascript.Script;
@@ -68,8 +67,6 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	private final String sha1;
 	
-	private final Script script;
-	
 	@Inject
 	ModuleScriptEnvironment(
 		final Dependencies dependencies,
@@ -106,12 +103,6 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		if (scriptResource.base() == APIModules) { 
 			configureInjectFunction(scope);
 		}
-		
-		try (RhinoContext context = contextProvider.get()) {
-			
-			script = context.compileString(scriptResource.script(), scriptName());
-		
-		}
 	}
 	
 
@@ -122,7 +113,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 
 	@Override
 	public Script script() {
-		return script;
+		return scriptResource.script();
 	}
 
 	@Override

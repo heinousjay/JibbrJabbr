@@ -193,11 +193,11 @@ public class DocumentScriptEnvironmentTest {
 		
 		RuntimeException re = new RuntimeException();
 		
-		given(scriptCompiler.compile(local, null, script, script)).willThrow(re);
+		willThrow(re).given(scriptCompiler).compile(local, null, script, null);
 		
 		try {
 			givenADocumentScriptEnvironment(name);
-			fail();
+			fail("compilation failure should have happened!");
 		} catch (ResourceNotViableException rnve) {
 			assertThat(rnve.getMessage(), is(name));
 			assertThat(rnve.getCause(), is(sameInstance((Throwable)re)));
@@ -235,7 +235,7 @@ public class DocumentScriptEnvironmentTest {
 		
 		givenAnHtmlResource(name);
 		givenAClientScript(name);
-		given(script.script()).willReturn("");
+		given(script.source()).willReturn("");
 		givenASharedScript(name);
 		givenAServerScript(name);
 		

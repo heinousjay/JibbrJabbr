@@ -29,7 +29,6 @@ import jj.event.Publisher;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;
 
-import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
@@ -54,13 +53,12 @@ class ScriptCompiler {
 	
 
 	
-	Script compile(
+	void compile(
 		final ScriptableObject scope,
 		final ScriptResource clientScript,
 		final ScriptResource sharedScript,
-		final ScriptResource serverScript
+		final String serverScriptPath
 	) {
-		assert serverScript != null : "tried to compile without a script to compile!";
 		
 		try (RhinoContext context = contextProvider.get()) {
 			
@@ -70,7 +68,7 @@ class ScriptCompiler {
 				try {
 					context.evaluateString(
 						scope, 
-						sharedScript.script(),
+						sharedScript.source(),
 						sharedScript.path().toString()
 					);
 				} catch (RuntimeException e) {
@@ -83,21 +81,12 @@ class ScriptCompiler {
 				String clientStub = extractClientStubs(clientScript);
 				publisher.publish(new EvaluatingClientStub(clientScript.path().toString(), clientStub));
 				try {
-					context.evaluateString(scope, clientStub, "client stub for " + serverScript.path());
+					context.evaluateString(scope, clientStub, "client stub for " + serverScriptPath);
 				} catch (RuntimeException e) {
 					publisher.publish(new ErrorEvaluatingClientStub(clientScript.path().toString(), e));
 					throw e;
 				}
 			}
-		    
-			publisher.publish(new CompilingServerScript(serverScript.path().toString()));
-			try {
-				return context.compileString(serverScript.script(), serverScript.path().toString());
-			} catch (RuntimeException e) {
-				publisher.publish(new ErrorCompilingServerScript(serverScript.path().toString(), e));
-				throw e;
-			}
-		    
 		}
 	}
 	
@@ -116,7 +105,7 @@ class ScriptCompiler {
 	 */
 	private String extractClientStubs(final ScriptResource clientScript) {
 		StringBuilder stubs = new StringBuilder();
-		final String[] lines = COUNT_PATTERN.split(clientScript.script());
+		final String[] lines = COUNT_PATTERN.split(clientScript.source());
 		Matcher lastMatcher = null;
 		String previousLine = null;
 		for (String line : lines) {

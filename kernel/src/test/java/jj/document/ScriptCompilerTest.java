@@ -21,8 +21,6 @@ import static org.hamcrest.CoreMatchers.is;
 
 import java.nio.file.Paths;
 
-import jj.document.CompilingServerScript;
-import jj.document.ErrorCompilingServerScript;
 import jj.document.ErrorEvaluatingClientStub;
 import jj.document.ErrorEvaluatingSharedScript;
 import jj.document.EvaluatingClientStub;
@@ -57,7 +55,7 @@ public class ScriptCompilerTest {
 	@Mock ScriptableObject scope;
 	@Mock ScriptResource clientScript;
 	@Mock ScriptResource sharedScript;
-	@Mock ScriptResource serverScript;
+	String serverScriptName = "serverScriptName";
 	
 	@Captor ArgumentCaptor<String> clientStubCaptor;
 	
@@ -68,7 +66,7 @@ public class ScriptCompilerTest {
 		contextProvider = new MockRhinoContextProvider();
 		
 		given(clientScript.path()).willReturn(Paths.get("/"));
-		given(clientScript.script()).willReturn(
+		given(clientScript.source()).willReturn(
 			"var notStubbed = function() {\nwhatever\n}\n" +
 			"function stubWithReturn() {\nwhatever\nreturn something;\n}\n" +
 			"random stuff; is ignored;\n" +
@@ -77,7 +75,6 @@ public class ScriptCompilerTest {
 		);
 		
 		given(sharedScript.path()).willReturn(Paths.get("/"));
-		given(serverScript.path()).willReturn(Paths.get("/"));
 		
 		sc = new ScriptCompiler(contextProvider, publisher);
 	}
@@ -90,7 +87,7 @@ public class ScriptCompilerTest {
 		given(contextProvider.context.evaluateString(eq(scope), anyString(), anyString())).willThrow(re);
 		
 		try {
-			sc.compile(scope, clientScript, null, serverScript);
+			sc.compile(scope, clientScript, null, serverScriptName);
 			fail();
 		} catch (RuntimeException caught) {
 			assertThat(caught, is(re));
@@ -118,7 +115,7 @@ public class ScriptCompilerTest {
 		
 		
 		try {
-			sc.compile(scope, null, sharedScript, serverScript);
+			sc.compile(scope, null, sharedScript, serverScriptName);
 			fail();
 		} catch (RuntimeException caught) {
 			assertThat(caught, is(re));
@@ -127,31 +124,12 @@ public class ScriptCompilerTest {
 		verify(publisher).publish(isA(EvaluatingSharedScript.class));
 		verify(publisher).publish(isA(ErrorEvaluatingSharedScript.class));
 	}
-
-	@Test
-	public void testServerScript() {
-		
-		RuntimeException re = new RuntimeException();
-		
-		given(contextProvider.context.compileString(serverScript.script(), serverScript.path().toString())).willThrow(re);
-		
-		try {
-			sc.compile(scope, null, null, serverScript);
-			fail();
-		} catch (RuntimeException caught) {
-			assertThat(caught, is(re));
-		}
-		
-		verify(publisher).publish(isA(CompilingServerScript.class));
-		verify(publisher).publish(isA(ErrorCompilingServerScript.class));
-	}
 	
 	@Test
 	public void testAll() {
-		sc.compile(scope, clientScript, sharedScript, serverScript);
+		sc.compile(scope, clientScript, sharedScript, serverScriptName);
 		
 		verify(publisher).publish(isA(EvaluatingClientStub.class));
 		verify(publisher).publish(isA(EvaluatingSharedScript.class));
-		verify(publisher).publish(isA(CompilingServerScript.class));
 	}
 }

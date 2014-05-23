@@ -15,11 +15,14 @@
  */
 package jj.script.module;
 
+import static org.mockito.Mockito.*;
+
 import java.nio.file.Path;
 
 import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;
+import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
 import jj.script.module.ScriptResourceCreator;
 import jj.script.module.ScriptResourceType;
@@ -30,6 +33,8 @@ import jj.script.module.ScriptResourceType;
  */
 public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, ScriptResourceCreator> {
 
+	MockRhinoContextProvider contextProvider;
+	
 	@Override
 	protected String name() {
 		return ScriptResourceType.Client.suffix("index");
@@ -41,7 +46,12 @@ public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, Scri
 
 	@Override
 	protected ScriptResource resource() throws Exception {
-		return new ScriptResource(new Dependencies(cacheKey(), AppLocation.Base), path(), name());
+		return new ScriptResource(new Dependencies(cacheKey(), AppLocation.Base), path(), name(), contextProvider = new MockRhinoContextProvider());
+	}
+	
+	@Override
+	protected void resourceAssertions(ScriptResource resource) throws Exception {
+		verify(contextProvider.context).compileString(anyString(), eq(name()));
 	}
 
 	@Override

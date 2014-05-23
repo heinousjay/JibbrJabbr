@@ -28,7 +28,6 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.Global;
-import jj.script.RhinoContext;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
 import jj.util.SHA1Helper;
@@ -51,9 +50,9 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	
 	private final String sha1;
 	
-	private final Script bootScript;
+	private final ScriptResource boot;
 	
-	private final Script runScript;
+	private final ScriptResource run;
 	
 	@Inject
 	public JasmineScriptEnvironment(
@@ -67,8 +66,8 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		
 		scope = configureModuleObjects(JASMINE_BOOT, createChainedScope(global));
 		
-		ScriptResource boot = resourceFinder.loadResource(ScriptResource.class, APIModules, JASMINE_BOOT_JS);
-		ScriptResource run = resourceFinder.loadResource(ScriptResource.class, APIModules, JASMINE_RUN_JS);
+		boot = resourceFinder.loadResource(ScriptResource.class, APIModules, JASMINE_BOOT_JS);
+		run = resourceFinder.loadResource(ScriptResource.class, APIModules, JASMINE_RUN_JS);
 		
 		assert boot != null : "can't find the jasmine-boot script";
 		assert run != null : "can't find the jasmine-run script";
@@ -77,11 +76,6 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		run.addDependent(this);
 		
 		sha1 = SHA1Helper.keyFor(boot.sha1(), run.sha1());
-		
-		try (RhinoContext context = contextProvider.get()) {
-			bootScript = context.compileString(boot.script(), JASMINE_BOOT_JS);
-			runScript = context.compileString(run.script(), JASMINE_RUN_JS);
-		}
 	}
 
 	@Override
@@ -96,7 +90,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 
 	@Override
 	public Script script() {
-		return bootScript;
+		return boot.script();
 	}
 
 	@Override
