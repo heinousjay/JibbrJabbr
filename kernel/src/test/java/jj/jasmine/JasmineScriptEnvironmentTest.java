@@ -45,6 +45,7 @@ public class JasmineScriptEnvironmentTest {
 		dependencies = new MockAbstractScriptEnvironmentDependencies();
 		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
 		given(resourceFinder.loadResource(eq(ScriptResource.class), eq(APIModules), eq("jasmine-boot.js"))).willReturn(jasmineBoot);
+		given(resourceFinder.loadResource(eq(ScriptResource.class), eq(APIModules), eq("jasmine-run.js"))).willReturn(jasmineBoot);
 		
 		JasmineScriptEnvironment jse = new JasmineScriptEnvironment(dependencies, global, resourceFinder);
 		
