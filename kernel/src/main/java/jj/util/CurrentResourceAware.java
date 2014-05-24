@@ -16,15 +16,16 @@
 package jj.util;
 
 /**
+ * <p>
  * Can be implemented by resources managed by current resource, and it will
  * get notified when it is transitioned
  * 
  * @author jason
  *
  */
-public interface ResourceAware {
+public interface CurrentResourceAware {
 
-	void start();
+	void enteringCurrentScope();
 	
-	void end();
+	void exitedCurrentScope();
 }

@@ -37,8 +37,8 @@ public abstract class CurrentResource<RESOURCE> {
 		
 		resources.set(resource);
 		
-		if (resource instanceof ResourceAware) {
-			((ResourceAware)resource).start();
+		if (resource instanceof CurrentResourceAware) {
+			((CurrentResourceAware)resource).enteringCurrentScope();
 		}
 		
 		return new Closer() {
@@ -47,8 +47,8 @@ public abstract class CurrentResource<RESOURCE> {
 			public void close() {
 				resources.set(null);
 				
-				if (resource instanceof ResourceAware) {
-					((ResourceAware)resource).end();
+				if (resource instanceof CurrentResourceAware) {
+					((CurrentResourceAware)resource).exitedCurrentScope();
 				}
 			}
 		};

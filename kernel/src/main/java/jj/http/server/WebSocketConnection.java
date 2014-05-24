@@ -17,10 +17,10 @@ import org.mozilla.javascript.Callable;
 
 import jj.script.FunctionContext;
 import jj.util.DateFormatHelper;
-import jj.util.ResourceAware;
+import jj.util.CurrentResourceAware;
 
 @Singleton
-public class WebSocketConnection implements FunctionContext, ResourceAware {
+public class WebSocketConnection implements FunctionContext, CurrentResourceAware {
 	
 	// start off with room for three functions
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
@@ -98,12 +98,12 @@ public class WebSocketConnection implements FunctionContext, ResourceAware {
 	}
 	
 	@Override
-	public void start() {
+	public void enteringCurrentScope() {
 		// nothing to do
 	}
 	
 	@Override
-	public void end() {
+	public void exitedCurrentScope() {
 		if (!messages.isEmpty()) {
 			String message = serialize();
 			ctx.writeAndFlush(new TextWebSocketFrame(message));

@@ -17,9 +17,6 @@ package jj.document;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -32,16 +29,15 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.configuration.resolution.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
+import jj.http.server.AbstractWebSocketConnectionHost;
 import jj.http.server.ConnectionBroadcastStack;
 import jj.http.server.CurrentWebSocketConnection;
 import jj.http.server.WebSocketConnection;
-import jj.http.server.WebSocketConnectionHost;
 import jj.http.server.WebSocketMessageProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
-import jj.script.AbstractScriptEnvironment;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptThread;
 import jj.script.module.RootScriptEnvironment;
@@ -49,7 +45,7 @@ import jj.script.module.ScriptResource;
 import jj.script.module.ScriptResourceType;
 import jj.util.Closer;
 import jj.util.CurrentResource;
-import jj.util.ResourceAware;
+import jj.util.CurrentResourceAware;
 import jj.util.SHA1Helper;
 
 /**
@@ -61,16 +57,14 @@ import jj.util.SHA1Helper;
  */
 @Singleton
 public class DocumentScriptEnvironment
-	extends AbstractScriptEnvironment
-	implements WebSocketConnectionHost, ResourceAware, RootScriptEnvironment {
+	extends AbstractWebSocketConnectionHost
+	implements CurrentResourceAware, RootScriptEnvironment {
 	
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	
 	// --- implementation
 	
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
-	
-	private final HashSet<WebSocketConnection> connections = new HashSet<>(10);
 
 	private final String baseName;
 	
@@ -97,13 +91,6 @@ public class DocumentScriptEnvironment
 	private final CurrentWebSocketConnection currentConnection;
 	
 	private final HashMap<ContinuationPendingKey, Context<?>> contexts = new HashMap<>(10);
-	
-	// this and the methods that manage it should probably go into an AbstractWebSocketConnectionHost
-	// that derives from AbstractScriptEnvironment
-	// it's getting kinda springframeworkesque in a hierarchy sense but it's really just mix-ins of layers
-	// of functionality
-	// i may wait on it until i come up with another environment that wants connections
-	private ConnectionBroadcastStack broadcastStack;
 	
 	/**
 	 * @param cacheKey
@@ -245,70 +232,15 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	public void start() {
+	public void enteringCurrentScope() {
 		// nothing to do
 	}
 	
 	@Override
-	public void end() {
+	public void exitedCurrentScope() {
 		// presumably, if there is still broadcasting to be done, then it's saved
 		// away with continuation state
 		broadcastStack = null;
-	}
-	
-	@Override
-	@ScriptThread
-	public void connected(WebSocketConnection connection) {
-		connections.add(connection);
-	}
-	
-	@Override
-	@ScriptThread
-	public void disconnected(WebSocketConnection connection) {
-		connections.remove(connection);
-	}
-	
-	private Iterator<WebSocketConnection> iterator() {
-		return new HashSet<>(connections).iterator();
-	}
-	
-	// this stuff is a candidate for removal! it's kinda self contained.  maybe a connection
-	// manager component this can just instantiate on its own
-	// or maybe this can all live in the broadcastStack itself and that gets exposed?
-	
-	@Override
-	@ScriptThread
-	public void startBroadcasting() {
-		broadcastStack = new ConnectionBroadcastStack(broadcastStack, iterator());
-	}
-	
-	@Override
-	@ScriptThread
-	public boolean broadcasting() {
-		return broadcastStack != null;
-	}
-	
-	@Override
-	@ScriptThread
-	public void endBroadcasting() {
-		broadcastStack = broadcastStack.parent();
-	}
-	
-	@Override
-	@ScriptThread
-	public boolean nextConnection() {
-		assert broadcasting();
-		return broadcastStack.pop() != null;
-	}
-	
-	@Override
-	@ScriptThread
-	public WebSocketConnection currentConnection() {
-		WebSocketConnection result = null;
-		if (broadcastStack != null) {
-			result = broadcastStack.peek();
-		}
-		return result;
 	}
 	
 	@Override
