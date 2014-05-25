@@ -86,7 +86,7 @@ public class ConnectionEventExecutor {
 		public void begin() {
 			
 			Callable function = connection.getFunction(event);
-			// NO! is this okay?  it isn't.  need to scope this stuff to clients
+			
 			if (function == null) function = scriptEnvironment.getFunction(event);
 			
 			if (function != null) {
