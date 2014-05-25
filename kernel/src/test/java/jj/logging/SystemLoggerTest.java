@@ -80,7 +80,7 @@ public class SystemLoggerTest {
 		String name = "name 1";
 		Thread.currentThread().setName(name);
 		sl.log(new HelperEvent1());
-		assertTrue(latch.await(200, MILLISECONDS));
+		assertTrue(latch.await(400, MILLISECONDS));
 		assertThat(threadName, is(name));
 	}
 
