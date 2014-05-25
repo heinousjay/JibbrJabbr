@@ -17,7 +17,6 @@ package jj.event;
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,8 +29,6 @@ import javax.inject.Singleton;
  */
 @Singleton
 class EventManager implements Publisher {
-	
-	protected final AtomicInteger count = new AtomicInteger();
 	
 	private Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap;
 	
@@ -62,7 +59,6 @@ class EventManager implements Publisher {
 	
 	@Override
 	public void publish(final Object event) {
-		count.getAndIncrement();
 		invoke(event, event.getClass());
 	}
 }

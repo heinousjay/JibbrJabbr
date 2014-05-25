@@ -98,7 +98,7 @@ public class WebSocketConnection implements FunctionContext, CurrentResourceAwar
 	}
 	
 	@Override
-	public void enteringCurrentScope() {
+	public void enteredCurrentScope() {
 		// nothing to do
 	}
 	

@@ -20,8 +20,9 @@ import javax.inject.Singleton;
 import jj.util.CurrentResource;
 
 /**
- * Simple thread local container for the current task so the execution trace
- * can figure out what's what
+ * <p>
+ * Locate the currently executing task instance, for example if you
+ * need to register a promise.
  * 
  * @author jason
  *
@@ -36,5 +37,9 @@ public class CurrentTask extends CurrentResource<JJTask> {
 	
 	public <T extends JJTask> T currentAs(Class<T> type) {
 		return type.cast(current());
+	}
+
+	public <T extends JJTask> boolean currentIs(Class<T> type) {
+		return type.isInstance(current());
 	}
 }

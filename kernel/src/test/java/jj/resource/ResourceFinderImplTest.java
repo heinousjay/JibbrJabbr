@@ -28,7 +28,6 @@ public class ResourceFinderImplTest {
 	private @Mock ResourceCache resourceCache;
 	private @Mock ResourceWatchService resourceWatchService;
 	private @Mock Publisher publisher;
-	private @Mock IsThread isThread;
 	private @Mock CurrentTask currentTask;
 	
 	private @InjectMocks ResourceFinderImpl rfi;
@@ -116,7 +115,7 @@ public class ResourceFinderImplTest {
 		given(sha1ResourceCreator.resourceKey(Base, name2)).willReturn(sha1Resource1Key);
 		given(sha1ResourceCreator.create(Base, name2)).willReturn(sha1Resource1);
 		
-		given(isThread.forResourceTask()).willReturn(true);
+		given(currentTask.currentIs(ResourceTask.class)).willReturn(true);
 		given(currentTask.currentAs(ResourceTask.class)).willReturn(task);
 		
 		assertThat(rfi.findResource(StaticResource.class, Base, name1), is(nullValue()));

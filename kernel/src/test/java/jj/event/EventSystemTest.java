@@ -40,7 +40,6 @@ import jj.execution.TaskRunner;
 import jj.util.RandomHelper;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -179,12 +178,11 @@ public class EventSystemTest {
 		// thread loops 500-1000 times, on each iteration either
 		// - publishing an event
 		// - spawning a subscriber instance, of varying lifetime
-		// - running a GC
+		// occasionally the test will try to GC
 		
-		// i am not sure what to do here...  i don't know what sort of verification is
-		// needed or would even mean something
-		
-		// knowing that the 
+		// this needs more assertions, but the basics make sense right now
+		// we validate that a subscriber taken before any publishing receives
+		// each event correctly
 		
 		
 		final int threads = Runtime.getRuntime().availableProcessors();
@@ -243,7 +241,7 @@ public class EventSystemTest {
 									countIEvent.getAndIncrement();
 									break;
 								default:
-									System.out.println("unaccounted");
+									throw new AssertionError("you broke something");
 								}
 							}
 							
@@ -269,7 +267,6 @@ public class EventSystemTest {
 			assertThat(sub.countIEvent.get(), is(countIEvent.get()));
 			assertThat(sub.countEvent.get(), is(countEvent.get()));
 			assertThat(sub.countEventSub.get(), is(countEventSub.get()));
-			assertThat(sub.countIEvent.get(), is(pub.count.get()));
 			
 		} finally {
 			executor.shutdownNow();

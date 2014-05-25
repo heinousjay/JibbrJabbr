@@ -25,7 +25,13 @@ package jj.util;
  */
 public interface CurrentResourceAware {
 
-	void enteringCurrentScope();
+	/**
+	 * Called when the resource has entered the current scope
+	 */
+	void enteredCurrentScope();
 	
+	/**
+	 * Called when the resource has exited the current scope
+	 */
 	void exitedCurrentScope();
 }

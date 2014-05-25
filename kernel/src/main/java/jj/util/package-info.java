@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 /**
+ * <p>
  * General utilities that don't really fit anywhere else
+ * 
+ * <p>
+ * The various helpers keep {@link ThreadLocal}s of objects that aren't
+ * thread safe, and expose useful operations against them.
  * 
  * @author jason
  *

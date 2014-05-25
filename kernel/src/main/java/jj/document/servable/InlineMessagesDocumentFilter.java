@@ -6,9 +6,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
+import jj.execution.CurrentTask;
 import jj.messaging.PropertiesResource;
-import jj.resource.IsThread;
 import jj.resource.ResourceFinder;
+import jj.resource.ResourceTask;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Element;
@@ -47,15 +48,15 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 
 	private final ResourceFinder resourceFinder;
 	
-	private final IsThread isThread;
+	private final CurrentTask currentTask;
 	
 	@Inject
 	InlineMessagesDocumentFilter(
 		final ResourceFinder resourceFinder,
-		final IsThread isThread
+		final CurrentTask currentTask
 	) {
 		this.resourceFinder = resourceFinder;
-		this.isThread = isThread;
+		this.currentTask = currentTask;
 	}
 	
 	private String findValue(String key, Map<String, String> bundle) {
@@ -68,7 +69,7 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		String baseName = documentRequestProcessor.baseName();
 		
 		PropertiesResource resource = 
-			isThread.forResourceTask() ?	
+			currentTask.currentIs(ResourceTask.class) ?	
 			resourceFinder.loadResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties") :
 			resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties");
 			

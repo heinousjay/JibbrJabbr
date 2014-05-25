@@ -17,12 +17,14 @@ package jj.script;
 
 import org.slf4j.Logger;
 
+import jj.logging.EmergencyLogger;
 import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
+@EmergencyLogger
 public class CannotFindContinuation extends LoggedEvent {
 
 	private final ScriptEnvironment scriptEnvironment;

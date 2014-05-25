@@ -15,14 +15,25 @@
  */
 package jj.util;
 
+import jj.execution.CurrentTask;
+
 /**
- * Performs the basic management of a resource with a generic closer. just a wrapper around
- * a threadlocal to give it that nice syntax
+ * <p>
+ * Performs the basic management of a contextual resource with a generic closer. 
  * <pre>
  * try (Closer closer = resource.enterScope(..something..)) {
  *     // use that resource
  * }
  * </pre>
+ * 
+ * <p>
+ * If initialization or cleanup of the resource is needed, see {@link CurrentResourceAware}.
+ * 
+ * <p>
+ * Subclasses of this classes act as system-wide thread-scoped context locators for resources,
+ * and can be injected and queried to perform work with those resources.  For instance, the
+ * currently executing task can be obtained by calling {@link CurrentTask#current()}.
+ * 
  * @author jason
  *
  */
@@ -38,7 +49,7 @@ public abstract class CurrentResource<RESOURCE> {
 		resources.set(resource);
 		
 		if (resource instanceof CurrentResourceAware) {
-			((CurrentResourceAware)resource).enteringCurrentScope();
+			((CurrentResourceAware)resource).enteredCurrentScope();
 		}
 		
 		return new Closer() {

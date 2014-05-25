@@ -232,7 +232,7 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	public void enteringCurrentScope() {
+	public void enteredCurrentScope() {
 		// nothing to do
 	}
 	

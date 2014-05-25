@@ -40,6 +40,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DelayedExecutorTest {
 	
+	/**
+	 * 
+	 */
+	private static final int LATCH_WAIT_TIME = 200;
+
 	MockClock clock;
 	
 	@Mock JJUncaughtExceptionHandler jjUncaughtExceptionHandler;
@@ -105,7 +110,7 @@ public class DelayedExecutorTest {
 		
 		de.submit(helper, 0, MILLISECONDS);
 		
-		assertTrue(latch.await(50, MILLISECONDS));
+		assertTrue(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 	}
 	
 	@Test
@@ -115,7 +120,7 @@ public class DelayedExecutorTest {
 		
 		de.submit(helper, 0, MILLISECONDS);
 		
-		assertTrue(latch.await(50, MILLISECONDS));
+		assertTrue(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 	}
 	
 	@Test
@@ -125,11 +130,11 @@ public class DelayedExecutorTest {
 		
 		de.submit(helper, 1, MILLISECONDS);
 		
-		assertFalse(latch.await(50, MILLISECONDS));
+		assertFalse(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 		
 		clock.advance();
 		
-		assertTrue(latch.await(50, MILLISECONDS));
+		assertTrue(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 	}
 	
 	@Test
@@ -139,11 +144,11 @@ public class DelayedExecutorTest {
 		
 		de.submit(helper, 1, MILLISECONDS);
 		
-		assertFalse(latch.await(50, MILLISECONDS));
+		assertFalse(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 		
 		clock.advance();
 		
-		assertTrue(latch.await(50, MILLISECONDS));
+		assertTrue(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 	}
 
 	@Test
@@ -157,7 +162,7 @@ public class DelayedExecutorTest {
 		
 		clock.advance(1, MILLISECONDS);
 
-		assertFalse(latch.await(50, MILLISECONDS));
+		assertFalse(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 	}
 
 	@Test
@@ -171,6 +176,6 @@ public class DelayedExecutorTest {
 		
 		clock.advance(1, MILLISECONDS);
 
-		assertFalse(latch.await(50, MILLISECONDS));
+		assertFalse(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
 	}
 }

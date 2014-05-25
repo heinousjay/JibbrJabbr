@@ -11,8 +11,8 @@ import jj.configuration.resolution.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.InlineMessagesDocumentFilter;
+import jj.execution.CurrentTask;
 import jj.messaging.PropertiesResource;
-import jj.resource.IsThread;
 import jj.resource.ResourceFinder;
 
 import org.jsoup.Jsoup;
@@ -33,15 +33,13 @@ public class InlineMessagesDocumentFilterTest {
 	@Mock HtmlResource htmlResource;
 	Document document;
 	InlineMessagesDocumentFilter toTest;
-	@Mock IsThread isThread;
+	@Mock CurrentTask currentTask;
 	
 	@Test
 	public void test() throws IOException {
 
 		// given
 		name = "index";
-		
-		given(isThread.forResourceTask()).willReturn(false);
 		
 		bundle = new HashMap<>();
 		bundle.put("hi", "Why, hello there");
@@ -58,7 +56,7 @@ public class InlineMessagesDocumentFilterTest {
 		
 		given(resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, name + ".properties")).willReturn(propertiesResource);
 		
-		toTest = new InlineMessagesDocumentFilter(resourceFinder, isThread);
+		toTest = new InlineMessagesDocumentFilter(resourceFinder, currentTask);
 		
 		
 		// when

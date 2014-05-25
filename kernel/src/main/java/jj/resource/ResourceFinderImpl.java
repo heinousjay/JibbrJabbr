@@ -29,8 +29,6 @@ class ResourceFinderImpl implements ResourceFinder {
 	
 	private final Publisher publisher;
 	
-	private final IsThread isThread;
-	
 	private final CurrentTask currentTask;
 	
 	@Inject
@@ -38,13 +36,11 @@ class ResourceFinderImpl implements ResourceFinder {
 		final ResourceCache resourceCache,
 		final ResourceWatchService resourceWatchService,
 		final Publisher publisher,
-		final IsThread isThread,
 		final CurrentTask currentTask
 	) {
 		this.resourceCache = resourceCache;
 		this.resourceWatchService = resourceWatchService;
 		this.publisher = publisher;
-		this.isThread = isThread;
 		this.currentTask = currentTask;
 	}
 	
@@ -74,7 +70,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		String name,
 		Object...arguments
 	) {
-		assert isThread.forResourceTask() : "Can only call loadResource from an I/O thread";
+		assert currentTask.currentIs(ResourceTask.class) : "Can only call loadResource from a ResourceTask";
 		
 		ResourceCreator<T> resourceCreator = resourceCache.getCreator(resourceClass);
 		
