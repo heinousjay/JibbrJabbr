@@ -19,9 +19,9 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import jj.App;
 import jj.testing.JibbrJabbrTestServer;
-import jj.webdriver.PhantomJSWebDriverProvider;
 import jj.webdriver.WebDriverProvider;
 import jj.webdriver.WebDriverRule;
+import jj.webdriver.provider.PhantomJSWebDriverProvider;
 
 import org.junit.Rule;
 import org.junit.Test;

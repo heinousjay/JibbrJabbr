@@ -1,27 +1,65 @@
 import java.io.File;
 
-def rootDir = "${buildDir}/phantomjs"
-def executable = "${rootDir}/bin/phantomjs"
-def needsPermissionChange = true
-def classifier = { os, arch ->
-	if (os == 'Mac OS X') {
-		'macosx'
-	} else if (os =~ /^Windows/) {
-		needsPermissionChange = false
-		executable = "${rootDir}/phantomjs.exe"
-		'windows'
-	} else if (os == 'Linux' && arch =~ '64') {
-		'linux-64'
-	} else if (os == 'Linux') {
-		'linux-32'
-	} else {
-		'unsupported-operating-system'
-	}
-}(System.getProperty('os.name'), System.getProperty("sun.arch.data.model"))
 
-configurations {
-	phantomJS {
-		transitive = false
+apply plugin: PhantomJSSetupPlugin
+
+class PhantomJSSetupPlugin implements Plugin<Project> {
+    void apply(Project project) {
+		
+		def rootDir = "${project.buildDir}/phantomjs"
+		def executable = "${rootDir}/bin/phantomjs"
+		def needsPermissionChange = true
+		def classifier = { os, arch ->
+			if (os == 'Mac OS X') {
+				'macosx'
+			} else if (os =~ /^Windows/) {
+				needsPermissionChange = false
+				executable = "${rootDir}/phantomjs.exe"
+				'windows'
+			} else if (os == 'Linux' && arch =~ '64') {
+				'linux-64'
+			} else if (os == 'Linux') {
+				'linux-32'
+			} else {
+				'unsupported-operating-system'
+			}
+		}(System.getProperty('os.name'), System.getProperty("sun.arch.data.model"))
+		
+		project.repositories {
+			mavenCentral()
+		}
+		
+		project.afterEvaluate {
+			project.configurations.create('phantomJS')
+			project.dependencies.add('phantomJS', "org.jboss.arquillian.extension:arquillian-phantom-binary:1.9.2:${classifier}")
+		
+			project.task('setUpPhantomJS', type:Copy) {
+				
+				// there's only one jar in the file, so just get the first one
+				from project.zipTree(project.configurations.phantomJS.files.find { true })
+				include 'bin/phantomjs'
+				include 'phantomjs.exe'
+				
+				into rootDir
+				
+				if (needsPermissionChange) {
+					doLast {
+						ant.chmod(file:executable, perm:'700')
+					}
+				}
+			}
+			
+			project.tasks.withType(Test) {
+				systemProperty 'phantomjs.binary.path', executable
+				dependsOn project.tasks.setUpPhantomJS
+			}
+		}
+	}
+}
+
+repositories {
+	maven {
+		url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
 }
 
@@ -30,36 +68,12 @@ dependencies {
 	compile configurations.core
 	compile configurations.testPack
 	compile project(":kernel")
-	compile 'com.github.detro.ghostdriver:phantomjsdriver:1.1.0'
-	
-	phantomJS "org.jboss.arquillian.extension:arquillian-phantom-binary:1.9.2:${classifier}"
-}
-
-task setUpPhantomJS(type:Copy) {
-	
-	// there's only one jar in the file, so just get the first one
-	from zipTree(configurations.phantomJS.files.find { true })
-	include 'bin/phantomjs'
-	include 'phantomjs.exe'
-	
-	into rootDir
-	
-	if (needsPermissionChange) {
-		doLast {
-			ant.chmod(file:executable, perm:'700')
-		}
-	}
+	compile 'com.jibbrjabbr:pandia:0.5-SNAPSHOT'
 }
 
 test {
 	inputs.file project(':').jar.archivePath
 	
-	systemProperty 'phantomjs.binary.path', executable
-	
 	minHeapSize = "128m"
 	maxHeapSize = "512m"
 }
-
-// maybe we worry about this in the top level... just a fast smoke test
-// test.dependsOn startJibbrJabbr
-test.dependsOn setUpPhantomJS

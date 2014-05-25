@@ -17,7 +17,7 @@ package jj.webtest;
 
 import jj.App;
 import jj.testing.JibbrJabbrTestServer;
-import jj.webdriver.PhantomJSWebDriverProvider;
+import jj.webdriver.provider.PhantomJSWebDriverProvider;
 import jj.webdriver.WebDriverRule;
 
 import org.junit.Rule;
