@@ -18,11 +18,17 @@ package jj.event;
 /**
  * <p>
  * Inject this to publish events.  Event objects can be of any type except
- * Object.  Due to type erasure, generics will not work unless they are reified.
+ * Object.  Due to type erasure, generics will not work unless the type
+ * parameters are reified by subclassing.
  * 
  * <p>
- * They should probably be immutable in most circumstances but it's not
+ * Event objects should probably be immutable in most circumstances but it's not
  * at all required.
+ * 
+ * <p>
+ * If an event listener throws an error during the listener invocation, that
+ * exception will travel back through this call as an AssertionError. This implies
+ * that it is considered a programming error to write a listener that can throw.
  * 
  * @author jason
  *

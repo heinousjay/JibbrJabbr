@@ -39,6 +39,7 @@ import jj.execution.MockTaskRunner;
 import jj.execution.TaskRunner;
 import jj.util.RandomHelper;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,10 +62,8 @@ public class EventSystemTest {
 	
 	final Exception toThrow = new Exception();
 	
-	MockTaskRunner taskRunner;
-	
 	@Singleton
-	public static class EventManagerChild extends EventManager {
+	public static class EventManagerChild extends PublisherImpl {
 		
 		
 		Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap;
@@ -81,8 +80,10 @@ public class EventSystemTest {
 	
 	private EventManagerChild pub;
 	
+	private Thread publisherLoop;
+	
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		injector = Guice.createInjector(new EventModule(), new AbstractModule() {
 			
 			@Override
@@ -93,9 +94,16 @@ public class EventSystemTest {
 		});
 		
 
-		taskRunner = injector.getInstance(MockTaskRunner.class);
+		MockTaskRunner taskRunner = injector.getInstance(MockTaskRunner.class);
 		
 		pub = injector.getInstance(EventManagerChild.class);
+		
+		publisherLoop = taskRunner.runFirstTaskInDaemon();
+	}
+	
+	@After
+	public void after() {
+		publisherLoop.interrupt();
 	}
 	
 	@Test
@@ -105,7 +113,6 @@ public class EventSystemTest {
 		
 		System.gc();
 		
-		taskRunner.runFirstTaskInDaemon();
 		// it needs some small amount of time
 		Thread.sleep(100);
 		// verify the listeners are all unregistered so
@@ -113,8 +120,8 @@ public class EventSystemTest {
 		// sets for the event types
 		assertThat(pub.listenerMap.size(), is(3));
 		assertTrue("should have no IEvent listeners", pub.listenerMap.get(IEvent.class).isEmpty());
-		assertTrue("should have no IEvent listeners", pub.listenerMap.get(Event.class).isEmpty());
-		assertTrue("should have no IEvent listeners", pub.listenerMap.get(EventSub.class).isEmpty());
+		assertTrue("should have no Event listeners", pub.listenerMap.get(Event.class).isEmpty());
+		assertTrue("should have no EventSub listeners", pub.listenerMap.get(EventSub.class).isEmpty());
 		
 		// and publishing should not cause any exceptions at this point
 		pub.publish(new EventSub());
@@ -267,6 +274,17 @@ public class EventSystemTest {
 			assertThat(sub.countIEvent.get(), is(countIEvent.get()));
 			assertThat(sub.countEvent.get(), is(countEvent.get()));
 			assertThat(sub.countEventSub.get(), is(countEventSub.get()));
+			
+			System.gc();
+			
+			// it needs some small amount of time
+			Thread.sleep(100);
+			// verify the only listener still registered is the one we can reach
+			assertThat(pub.listenerMap.size(), is(3));
+			assertThat(pub.listenerMap.get(IEvent.class).size(), is(1));
+			assertThat(pub.listenerMap.get(Event.class).size(), is(1));
+			assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
+			System.out.println(sub.countIEvent.get());
 			
 		} finally {
 			executor.shutdownNow();

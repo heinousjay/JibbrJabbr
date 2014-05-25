@@ -59,6 +59,11 @@ import com.google.inject.spi.TypeListener;
  * 
  * That's a little light on the details but substantially correct.
  * </p>
+ * 
+ * <p>
+ * The implementation of this class is a little hairy, it's sort
+ * of functional in an attempt to lock as little as possible while
+ * remaining correct.
  * @author jason
  *
  */
@@ -72,10 +77,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	private final ConcurrentHashMapV8<String, List<MethodInfo>> subscribers = new ConcurrentHashMapV8<>();
 	
 	/** 
-	 * mapped from the class name of an invoker to the invoker class.  wait, what? 
-	 * well it doesn't just rely on class.forname because it needs to keep track of
-	 * which classes have already been generated so the CtClass objects can be
-	 * cleaned up
+	 * mapped from the class name of an invoker to the invoker class.
 	 */
 	private final ConcurrentHashMapV8<String, Class<? extends Invoker>> invokerClasses = new ConcurrentHashMapV8<>();
 	
@@ -95,13 +97,15 @@ class EventConfiguringTypeListener implements TypeListener {
 	private final ClassPool classPool;
 	private final CtClass invokerClass;
 	private final CtMethod invokeMethod;
+	private final CtClass weakReferenceClass;
 	
 	EventConfiguringTypeListener() {
 		try {
 			classPool = new ClassPool();
 			classPool.appendClassPath(new LoaderClassPath(ClassPoolHelper.class.getClassLoader()));
-			invokerClass = classPool.get("jj.event.Invoker");
+			invokerClass = classPool.get(Invoker.class.getName());
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
+			weakReferenceClass = classPool.get(WeakReference.class.getName());
 		} catch (NotFoundException e) {
 			// this can't happen
 			throw new AssertionError(e);
@@ -177,9 +181,9 @@ class EventConfiguringTypeListener implements TypeListener {
 				((TaskRunner)injectee).execute(new ListenerCleaner());
 			}
 			
-			if (injectee instanceof EventManager) {
+			if (injectee instanceof PublisherImpl) {
 				// share state with the publisher - but it can't have events.  boo
-				((EventManager)injectee).listenerMap(invokers);
+				((PublisherImpl)injectee).listenerMap(invokers);
 			} else if (subscribers.containsKey(name)) {
 
 				for (final MethodInfo invoked : subscribers.get(name)) {
@@ -229,7 +233,7 @@ class EventConfiguringTypeListener implements TypeListener {
 			newClass.addField(CtField.make("private final java.lang.ref.WeakReference instance;", newClass));
 			newClass.addConstructor(
 				CtNewConstructor.make(
-					new CtClass[] {classPool.get(WeakReference.class.getName())},
+					new CtClass[] { weakReferenceClass },
 					null,
 					"{this.instance = $1;}",
 					newClass
@@ -239,6 +243,7 @@ class EventConfiguringTypeListener implements TypeListener {
 			newMethod.setBody(
 				"{" +
 				injectee.getClass().getName() + " invokee = (" + injectee.getClass().getName() + ")instance.get();" +
+				// if the invokee goes out of scope, we can stop sending events to it
 				"if (invokee != null) invokee." + invoked.getName() + "((" + invoked.getParameterTypes()[0].getName() + ")$1);" +
 				"}"
 			);
@@ -282,7 +287,7 @@ class EventConfiguringTypeListener implements TypeListener {
 									method.getParameterTypes().length == 1
 								) {
 									result.add(new MethodInfo(method));
-									
+
 									invokers.computeIfAbsent(
 										Class.forName(method.getParameterTypes()[0].getName()),
 										new Fun<Class<?>, LinkedBlockingQueue<Invoker>>() {

@@ -17,6 +17,7 @@ package jj.event;
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,12 +29,12 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class EventManager implements Publisher {
+class PublisherImpl implements Publisher {
 	
 	private Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap;
 	
 	@Inject
-	EventManager() {}
+	PublisherImpl() {}
 	
 	void listenerMap(Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap) {
 		this.listenerMap = listenerMap;

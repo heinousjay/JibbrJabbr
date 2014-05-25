@@ -29,7 +29,7 @@ public class EventModule extends JJModule {
 	protected void configure() {
 		
 		bindListener(Matchers.any(), new EventConfiguringTypeListener());
-		bind(Publisher.class).to(EventManager.class);
+		bind(Publisher.class).to(PublisherImpl.class);
 	}
 
 }
