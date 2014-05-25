@@ -16,7 +16,8 @@
 package jj.event;
 
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,12 +31,14 @@ import javax.inject.Singleton;
 @Singleton
 class EventManager implements Publisher {
 	
-	private Map<Class<?>, Set<Invoker>> listenerMap;
+	protected final AtomicInteger count = new AtomicInteger();
+	
+	private Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap;
 	
 	@Inject
 	EventManager() {}
 	
-	void listenerMap(Map<Class<?>, Set<Invoker>> listenerMap) {
+	void listenerMap(Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap) {
 		this.listenerMap = listenerMap;
 	}
 	
@@ -46,7 +49,7 @@ class EventManager implements Publisher {
 					try {
 						invoker.invoke(event);
 					} catch (Exception e) {
-						throw new AssertionError("broken event listener!", e);
+						throw new AssertionError("broken event listener! " + invoker.getClass().getName(), e);
 					}
 				}
 			}
@@ -59,6 +62,7 @@ class EventManager implements Publisher {
 	
 	@Override
 	public void publish(final Object event) {
+		count.getAndIncrement();
 		invoke(event, event.getClass());
 	}
 }

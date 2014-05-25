@@ -15,26 +15,36 @@
  */
 package jj.event;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Singleton;
 
-import jj.event.help.BrokenListener;
 import jj.event.help.ChildSub;
+import jj.event.help.ConcurrentSub;
 import jj.event.help.Event;
 import jj.event.help.EventSub;
 import jj.event.help.IEvent;
 import jj.event.help.Sub;
+import jj.event.help.UnrelatedIEvent;
 import jj.execution.MockTaskRunner;
 import jj.execution.TaskRunner;
+import jj.util.RandomHelper;
 
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -58,14 +68,35 @@ public class EventSystemTest {
 	public static class EventManagerChild extends EventManager {
 		
 		
-		Map<Class<?>, Set<Invoker>> listenerMap;
+		Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap;
 		
 		
 		@Override
-		void listenerMap(Map<Class<?>, Set<Invoker>> listenerMap) {
+		void listenerMap(Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap) {
 			this.listenerMap = listenerMap;
 			super.listenerMap(listenerMap);
 		}
+	}
+	
+	private Injector injector;
+	
+	private EventManagerChild pub;
+	
+	@Before
+	public void before() {
+		injector = Guice.createInjector(new EventModule(), new AbstractModule() {
+			
+			@Override
+			protected void configure() {
+				bind(TaskRunner.class).to(MockTaskRunner.class);
+				bind(Exception.class).toInstance(toThrow);
+			}
+		});
+		
+
+		taskRunner = injector.getInstance(MockTaskRunner.class);
+		
+		pub = injector.getInstance(EventManagerChild.class);
 	}
 	
 	@Test
@@ -82,29 +113,15 @@ public class EventSystemTest {
 		// we aren't leaking memory, but we should still have
 		// sets for the event types
 		assertThat(pub.listenerMap.size(), is(3));
-		assertThat(pub.listenerMap.get(IEvent.class), is(empty()));
-		assertThat(pub.listenerMap.get(Event.class), is(empty()));
-		assertThat(pub.listenerMap.get(EventSub.class), is(empty()));
+		assertTrue("should have no IEvent listeners", pub.listenerMap.get(IEvent.class).isEmpty());
+		assertTrue("should have no IEvent listeners", pub.listenerMap.get(Event.class).isEmpty());
+		assertTrue("should have no IEvent listeners", pub.listenerMap.get(EventSub.class).isEmpty());
 		
 		// and publishing should not cause any exceptions at this point
 		pub.publish(new EventSub());
 	}
 	
 	private EventManagerChild impl() {
-		// given
-		Injector injector = Guice.createInjector(new EventModule(), new AbstractModule() {
-			
-			@Override
-			protected void configure() {
-				bind(TaskRunner.class).to(MockTaskRunner.class);
-				bind(Exception.class).toInstance(toThrow);
-			}
-		});
-		
-		taskRunner = injector.getInstance(MockTaskRunner.class);
-		
-		EventManagerChild pub = injector.getInstance(EventManagerChild.class);
-		
 		// publishing with nothing listening is fine
 		pub.publish(new EventSub());
 		
@@ -156,11 +173,108 @@ public class EventSystemTest {
 		
 		return pub;
 	}
-
-	private void write_a_concurrent_registration_and_invocation_test() {
-		// perhaps loop threads that keep creating and discarding new instances,
-		// while another set of threads publish a lot
-		// have to figure out how to make this verifiable, though
+	
+	@Test
+	public void concurrencyTest() throws Exception {
+		// thread loops 500-1000 times, on each iteration either
+		// - publishing an event
+		// - spawning a subscriber instance, of varying lifetime
+		// - running a GC
+		
+		// i am not sure what to do here...  i don't know what sort of verification is
+		// needed or would even mean something
+		
+		// knowing that the 
+		
+		
+		final int threads = Runtime.getRuntime().availableProcessors();
+		final ExecutorService executor = Executors.newFixedThreadPool(threads);
+		final LinkedBlockingQueue<Throwable> throwables = new LinkedBlockingQueue<>(threads);
+		final CountDownLatch latch = new CountDownLatch(threads);
+		final ConcurrentSub sub = injector.getInstance(ConcurrentSub.class);
+		final AtomicInteger countIEvent = new AtomicInteger();
+		final AtomicInteger countEvent = new AtomicInteger();
+		final AtomicInteger countEventSub = new AtomicInteger();
+		
+		try {
+			for (int i = 0; i < threads; ++i) {
+				executor.submit(new Runnable() {
+					
+					@Override
+					public void run() {
+						
+						try {
+							int total = RandomHelper.nextInt(500, 1001);
+							for (int i = 0; i < total; ++i) {
+								
+								if (RandomHelper.nextInt(300) == 84) { 
+									// 84 was selected at random
+									// (that's the joke)
+									System.gc();
+								}
+							
+								switch(RandomHelper.nextInt(10)) {
+								
+								case 0:
+								case 1:
+									injector.getInstance(Sub.class);
+									break;
+								case 2:
+									injector.getInstance(ConcurrentSub.class);
+									break;
+								case 3:
+								case 4:
+									injector.getInstance(ChildSub.class);
+								case 5:
+								case 6:
+									pub.publish(new EventSub());
+									countIEvent.getAndIncrement();
+									countEvent.getAndIncrement();
+									countEventSub.getAndIncrement();
+									break;
+								case 7:
+								case 8:
+									pub.publish(new Event());
+									countIEvent.getAndIncrement();
+									countEvent.getAndIncrement();
+									break;
+								case 9:
+									pub.publish(new UnrelatedIEvent());
+									countIEvent.getAndIncrement();
+									break;
+								default:
+									System.out.println("unaccounted");
+								}
+							}
+							
+						} catch (Throwable e) {
+							throwables.add(e);
+						} finally {
+							latch.countDown();
+						}
+					}
+				});
+			}
+			
+			assertTrue("timed out", latch.await(threads * 2, SECONDS));
+			if (!throwables.isEmpty()) {
+				AssertionError error = new AssertionError(throwables.size() + " test failures");
+				Throwable t;
+				while ((t = throwables.poll()) != null) {
+					error.addSuppressed(t);
+				}
+				throw error;
+			}
+			
+			assertThat(sub.countIEvent.get(), is(countIEvent.get()));
+			assertThat(sub.countEvent.get(), is(countEvent.get()));
+			assertThat(sub.countEventSub.get(), is(countEventSub.get()));
+			assertThat(sub.countIEvent.get(), is(pub.count.get()));
+			
+		} finally {
+			executor.shutdownNow();
+		}
 	}
+	
 	
 }

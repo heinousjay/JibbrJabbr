@@ -15,7 +15,8 @@
  */
 package jj.event;
 
-import io.netty.util.internal.PlatformDependent;
+import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
+import io.netty.util.internal.chmv8.ConcurrentHashMapV8.Fun;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -23,8 +24,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -37,6 +37,7 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
+import jj.util.ClassPoolHelper;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
@@ -68,7 +69,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	 * since this list stored as the value is only ever manipulated when a new type is encountered for
 	 * the first time, and is read-only after that, it doesn't need to be synchronized
 	 */
-	private final ConcurrentMap<String, List<MethodInfo>> subscribers = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentHashMapV8<String, List<MethodInfo>> subscribers = new ConcurrentHashMapV8<>();
 	
 	/** 
 	 * mapped from the class name of an invoker to the invoker class.  wait, what? 
@@ -76,7 +77,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	 * which classes have already been generated so the CtClass objects can be
 	 * cleaned up
 	 */
-	private final ConcurrentMap<String, Class<? extends Invoker>> invokerClasses = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentHashMapV8<String, Class<? extends Invoker>> invokerClasses = new ConcurrentHashMapV8<>();
 	
 	/** 
 	 * mapped from the event type -> the set of listener invokers for that event 
@@ -84,10 +85,10 @@ class EventConfiguringTypeListener implements TypeListener {
 	 * to also be concurrent, but the value itself will only ever be set once on first encounter
 	 * for a given event type and never removed after so that should do it
 	 */
-	private final ConcurrentMap<Class<?>, Set<Invoker>> invokers = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentHashMapV8<Class<?>, LinkedBlockingQueue<Invoker>> invokers = new ConcurrentHashMapV8<>();
 	
 	/** mapped from the weak reference to the instance invoked -> invoker */
-	private final ConcurrentMap<WeakReference<Object>, Invoker> cleanupMap = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentHashMapV8<WeakReference<Object>, Invoker> cleanupMap = new ConcurrentHashMapV8<>();
 	
 	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
 	
@@ -98,8 +99,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	EventConfiguringTypeListener() {
 		try {
 			classPool = new ClassPool();
-			classPool.appendClassPath(new LoaderClassPath(EventConfiguringTypeListener.class.getClassLoader()));
-			
+			classPool.appendClassPath(new LoaderClassPath(ClassPoolHelper.class.getClassLoader()));
 			invokerClass = classPool.get("jj.event.Invoker");
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
 		} catch (NotFoundException e) {
@@ -129,8 +129,8 @@ class EventConfiguringTypeListener implements TypeListener {
 				Reference<?> reference = invokerInstanceQueue.remove();
 				Invoker instance = cleanupMap.remove(reference);
 				if (instance != null) {
-					for (Set<Invoker> invokerSet : invokers.values()) {
-						invokerSet.remove(instance);
+					for (LinkedBlockingQueue<Invoker> invokerQueue : invokers.values()) {
+						invokerQueue.remove(instance);
 					}
 				}
 			}
@@ -169,10 +169,10 @@ class EventConfiguringTypeListener implements TypeListener {
 	 */
 	private final class EventWiringInjectionListener<I> implements InjectionListener<I> {
 		@Override
-		public void afterInjection(I injectee) {
+		public void afterInjection(final I injectee) {
 			
-			String name = injectee.getClass().getName();
-			
+			final String name = injectee.getClass().getName();
+
 			if (injectee instanceof TaskRunner) {
 				((TaskRunner)injectee).execute(new ListenerCleaner());
 			}
@@ -181,26 +181,38 @@ class EventConfiguringTypeListener implements TypeListener {
 				// share state with the publisher - but it can't have events.  boo
 				((EventManager)injectee).listenerMap(invokers);
 			} else if (subscribers.containsKey(name)) {
-				// create an invoker class so we aren't doing this reflectively
-				boolean cleanUp = false;
-				for (MethodInfo invoked : subscribers.get(name)) {
-					cleanUp = cleanUp || !invokerClasses.containsKey(invoked.className);
-					try {
-						
-						Class<? extends Invoker> clazz = invokerClasses.containsKey(invoked.className) ?
-							invokerClasses.get(invoked.className) :
-							makeInvokerClass(invoked.className, injectee, invoked.method);
-						
-						WeakReference<Object> reference = new WeakReference<Object>(injectee, invokerInstanceQueue);
-						Invoker invoker = clazz.getConstructor(WeakReference.class).newInstance(reference);
-						cleanupMap.put(reference, invoker);
-						invokers.get(Class.forName(invoked.parameterType)).add(invoker);
-					} catch (Exception e) {
-						throw new AssertionError(e);
-					}
-				}
-				if (cleanUp) {
-					subscribers.get(name).get(0).method.getDeclaringClass().detach();
+
+				for (final MethodInfo invoked : subscribers.get(name)) {
+					
+					cleanupMap.computeIfAbsent(
+						new WeakReference<Object>(injectee, invokerInstanceQueue),
+						new Fun<WeakReference<Object>, Invoker>() {
+
+						@Override
+						public Invoker apply(WeakReference<Object> reference) {
+							try {
+								invokerClasses.computeIfAbsent(invoked.className, new Fun<String, Class<? extends Invoker>>() {
+
+									@Override
+									public Class<? extends Invoker> apply(String className) {
+										try {
+											return makeInvokerClass(className, injectee, invoked.method);
+										} catch (Exception e) {
+											throw new AssertionError(e);
+										}
+									}
+								});
+								
+								Invoker invoker = invokerClasses.get(invoked.className).getConstructor(WeakReference.class).newInstance(reference);
+								invokers.get(Class.forName(invoked.parameterType)).offer(invoker);
+								return invoker;
+							} catch (Exception e) {
+								throw new AssertionError(e);
+							}
+						}
+					});
+					
+					
 				}
 			}
 		}
@@ -234,55 +246,71 @@ class EventConfiguringTypeListener implements TypeListener {
 			
 			Class<? extends Invoker> invokerClass = classPool.toClass(
 				newClass, 
-				EventConfiguringTypeListener.class.getClassLoader(), 
-				EventConfiguringTypeListener.class.getProtectionDomain()
+				getClass().getClassLoader(), 
+				getClass().getProtectionDomain()
 			);
-			
-			invokerClasses.putIfAbsent(className, invokerClass);
 			
 			newClass.detach();
 			
-			return invokerClasses.get(className);
+			return invokerClass;
 		}
 	}
 
 	@Override
-	public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+	public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
 		
 		String name = type.toString();
-		
+
 		try {
 			final CtClass clazz = classPool.get(type.toString());
-			
+		
 			if (clazz.hasAnnotation(Subscriber.class)) {
 				
-				subscribers.put(name, new ArrayList<MethodInfo>());
-				for (CtMethod method : clazz.getMethods()) {
-					if (
-						// should be not static, have one parameter
-						// can return anything, but it's ignored
-						method.hasAnnotation(Listener.class) &&
-						!Modifier.isStatic(method.getModifiers()) &&
-						method.getParameterTypes().length == 1
-					) {
-						subscribers.get(name).add(new MethodInfo(method));
-						Class<?> key = Class.forName(method.getParameterTypes()[0].getName());
-						if (!invokers.containsKey(key)) {
-							invokers.putIfAbsent(key, Collections.newSetFromMap(PlatformDependent.<Invoker, Boolean>newConcurrentHashMap()));
+				subscribers.computeIfAbsent(name, new Fun<String, List<MethodInfo>>() {
+	
+					@Override
+					public List<MethodInfo> apply(String name) {
+						ArrayList<MethodInfo> result = new ArrayList<>();
+						
+						try {
+							for (CtMethod method : clazz.getMethods()) {
+								if (
+									// should be not static, have one parameter
+									// can return anything, but it's ignored
+									method.hasAnnotation(Listener.class) &&
+									!Modifier.isStatic(method.getModifiers()) &&
+									method.getParameterTypes().length == 1
+								) {
+									result.add(new MethodInfo(method));
+									
+									invokers.computeIfAbsent(
+										Class.forName(method.getParameterTypes()[0].getName()),
+										new Fun<Class<?>, LinkedBlockingQueue<Invoker>>() {
+		
+											@Override
+											public LinkedBlockingQueue<Invoker>apply(Class<?> a) {
+												return new LinkedBlockingQueue<>();
+											}
+										}
+									);
+								}
+							}
+						} catch (Exception e) {
+							throw new AssertionError(type.toString(), e);
 						}
+						
+						return Collections.unmodifiableList(result);
 					}
-				}
+				});
+				
 				
 				assert !subscribers.get(name).isEmpty() : name + " is subscribing but has no listeners";
 				
 			} else {
 				clazz.detach();
 			}
-		} catch (NotFoundException nfe) {
-			// generated classes won't make it into this class pool, which
-			// really is as we want it for now
-		} catch (Exception e) {
-			throw new AssertionError(type.toString(), e);
+		} catch (NotFoundException e1) {
+			// don't care
 		}
 		
 		encounter.register(new EventWiringInjectionListener<I>());

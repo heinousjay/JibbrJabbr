@@ -61,7 +61,7 @@ class ScriptExecutor extends DelayedExecutor {
 	
 	@Override
 	protected String schedulerThreadName() {
-		return name;
+		return Thread.currentThread().getName() + name;
 	}
 
 	@Listener
