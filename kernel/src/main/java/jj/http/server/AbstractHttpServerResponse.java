@@ -39,7 +39,7 @@ import jj.resource.TransferableResource;
  * @author jason
  *
  */
-public abstract class AbstractHttpResponse implements HttpResponse {
+public abstract class AbstractHttpServerResponse implements HttpServerResponse {
 
 	public static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
 	protected final DefaultHttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
@@ -50,7 +50,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	/**
 	 * 
 	 */
-	protected AbstractHttpResponse() {
+	protected AbstractHttpServerResponse() {
 		super();
 	}
 
@@ -73,21 +73,21 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	 * @return
 	 */
 	@Override
-	public HttpResponse status(final HttpResponseStatus status) {
+	public HttpServerResponse status(final HttpResponseStatus status) {
 		assertNotCommitted();
 		response.setStatus(status);
 		return this;
 	}
 
 	@Override
-	public HttpResponse header(final String name, final String value) {
+	public HttpServerResponse header(final String name, final String value) {
 		assertNotCommitted();
 		response.headers().add(name, value);
 		return this;
 	}
 
 	@Override
-	public HttpResponse headerIfNotSet(final String name, final String value) {
+	public HttpServerResponse headerIfNotSet(final String name, final String value) {
 		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
@@ -96,7 +96,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	}
 
 	@Override
-	public HttpResponse headerIfNotSet(final String name, final long value) {
+	public HttpServerResponse headerIfNotSet(final String name, final long value) {
 		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
@@ -110,14 +110,14 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	}
 
 	@Override
-	public HttpResponse header(final String name, final Date date) {
+	public HttpServerResponse header(final String name, final Date date) {
 		assertNotCommitted();
 		response.headers().add(name, date);
 		return this;
 	}
 
 	@Override
-	public HttpResponse header(final String name, final long value) {
+	public HttpServerResponse header(final String name, final long value) {
 		assertNotCommitted();
 		response.headers().add(name, value);
 		return this;
@@ -145,14 +145,14 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	}
 
 	@Override
-	public HttpResponse content(final byte[] bytes) {
+	public HttpServerResponse content(final byte[] bytes) {
 		assertNotCommitted();
 		content().writeBytes(bytes);
 		return this;
 	}
 
 	@Override
-	public HttpResponse content(final ByteBuf buffer) {
+	public HttpServerResponse content(final ByteBuf buffer) {
 		assertNotCommitted();
 		content().writeBytes(buffer);
 		return this;
@@ -204,7 +204,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	 * @return
 	 */
 	@Override
-	public HttpResponse sendNotModified(final Resource resource) {
+	public HttpServerResponse sendNotModified(final Resource resource) {
 		return sendNotModified(resource, false);
 	}
 
@@ -216,7 +216,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	 * @return
 	 */
 	@Override
-	public HttpResponse sendNotModified(final Resource resource, boolean cache) {
+	public HttpServerResponse sendNotModified(final Resource resource, boolean cache) {
 		assertNotCommitted();
 		
 		if (cache) {
@@ -242,7 +242,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	 * @return
 	 */
 	@Override
-	public HttpResponse sendTemporaryRedirect(final Resource resource) {
+	public HttpServerResponse sendTemporaryRedirect(final Resource resource) {
 		assertNotCommitted();
 		return status(HttpResponseStatus.TEMPORARY_REDIRECT)
 			.header(HttpHeaders.Names.LOCATION, makeAbsoluteURL(resource))
@@ -250,10 +250,10 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 			.end();
 	}
 	
-	protected abstract HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException;
+	protected abstract HttpServerResponse doSendTransferableResource(TransferableResource resource) throws IOException;
 
 	@Override
-	public HttpResponse sendUncachedResource(Resource resource) throws IOException {
+	public HttpServerResponse sendUncachedResource(Resource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE);
 		if (resource instanceof TransferableResource) {
@@ -266,7 +266,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	}
 
 	@Override
-	public HttpResponse sendCachedResource(Resource resource) throws IOException {
+	public HttpServerResponse sendCachedResource(Resource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
 		if (resource instanceof TransferableResource) {
@@ -289,7 +289,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	 * @param bytes
 	 * @return
 	 */
-	protected HttpResponse sendResource(final LoadedResource resource) {
+	protected HttpServerResponse sendResource(final LoadedResource resource) {
 		return header(HttpHeaders.Names.ETAG, resource.sha1())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
 			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
@@ -304,7 +304,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
 	 * @param resource
 	 * @return
 	 */
-	protected HttpResponse sendResource(TransferableResource resource) throws IOException {
+	protected HttpServerResponse sendResource(TransferableResource resource) throws IOException {
 		header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size())
 			.header(HttpHeaders.Names.DATE, new Date());

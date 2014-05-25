@@ -20,8 +20,8 @@ import jj.util.Closer;
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
 import jj.execution.TaskRunner;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.http.server.servable.RequestProcessor;
 import jj.jjmessage.JJMessage;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -54,9 +54,9 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	
 	private final Document document;
 	
-	private final HttpRequest httpRequest;
+	private final HttpServerRequest httpRequest;
 	
-	private final HttpResponse httpResponse;
+	private final HttpServerResponse httpResponse;
 	
 	private final Set<DocumentFilter> filters;
 	
@@ -69,8 +69,8 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		final ContinuationCoordinator continuationCoordinator,
 		final CurrentDocumentRequestProcessor currentDocument,
 		final DocumentScriptEnvironment dse,
-		final HttpRequest httpRequest,
-		final HttpResponse httpResponse,
+		final HttpServerRequest httpRequest,
+		final HttpServerResponse httpResponse,
 		// move this out!
 		final Set<DocumentFilter> filters
 	) {
@@ -96,7 +96,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		return filterList;
 	}
 	
-	public HttpRequest httpRequest() {
+	public HttpServerRequest httpRequest() {
 		return httpRequest;
 	}
 	

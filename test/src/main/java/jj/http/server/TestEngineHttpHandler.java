@@ -31,14 +31,14 @@ import jj.http.server.servable.Servables;
  *
  */
 @Singleton
-public class TestJJEngineHttpHandler extends EngineHttpHandler {
+public class TestEngineHttpHandler extends EngineHttpHandler {
 
 	/**
 	 * @param taskRunner
 	 * @param resourceTypes
 	 */
 	@Inject
-	TestJJEngineHttpHandler(
+	TestEngineHttpHandler(
 		final TaskRunner taskRunner,
 		final Servables servables,
 		final Injector injector,
@@ -49,7 +49,7 @@ public class TestJJEngineHttpHandler extends EngineHttpHandler {
 	}
 
 	@Override
-	public void handleHttpRequest(HttpRequest request, HttpResponse response) throws Exception {
+	public void handleHttpRequest(HttpServerRequest request, HttpServerResponse response) throws Exception {
 		super.handleHttpRequest(request, response);
 	}
 }

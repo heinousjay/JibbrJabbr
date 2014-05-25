@@ -38,9 +38,9 @@ import io.netty.handler.stream.ChunkedNioFile;
  *
  */
 @Singleton
-class JJHttpResponse extends AbstractHttpResponse {
+class HttpServerResponseImpl extends AbstractHttpServerResponse {
 	
-	private final JJHttpRequest request;
+	private final HttpServerRequestImpl request;
 	
 	private final ChannelHandlerContext ctx;
 	
@@ -50,9 +50,9 @@ class JJHttpResponse extends AbstractHttpResponse {
 	 * @param response
 	 */
 	@Inject
-	JJHttpResponse(
+	HttpServerResponseImpl(
 		final Version version,
-		final JJHttpRequest request,
+		final HttpServerRequestImpl request,
 		final ChannelHandlerContext ctx,
 		final Publisher publisher
 	) {
@@ -78,7 +78,7 @@ class JJHttpResponse extends AbstractHttpResponse {
 	}
 	
 	@Override
-	public HttpResponse end() {
+	public HttpServerResponse end() {
 		assertNotCommitted();
 		header(HttpHeaders.Names.DATE, new Date());
 		ctx.write(response);
@@ -98,7 +98,7 @@ class JJHttpResponse extends AbstractHttpResponse {
 	}
 	
 	@Override
-	public HttpResponse error(Throwable t) {
+	public HttpServerResponse error(Throwable t) {
 		publisher.publish(new RequestErrored(t));
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		return this;
@@ -109,7 +109,7 @@ class JJHttpResponse extends AbstractHttpResponse {
 	 * 
 	 * how to test this? 
 	 */
-	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
+	protected HttpServerResponse doSendTransferableResource(TransferableResource resource) throws IOException {
 		
 		ctx.write(response);
 		ctx.write(new ChunkedNioFile(resource.fileChannel()));

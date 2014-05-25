@@ -15,8 +15,8 @@ import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.script.module.ScriptResource;
 import jj.uri.URIMatch;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 
 /**
  * handles serving the scripts associated with a document
@@ -55,8 +55,8 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final HttpRequest request,
-		final HttpResponse response
+		final HttpServerRequest request,
+		final HttpServerResponse response
 	) throws IOException {
 		final ScriptResource script = loadResource(request.uriMatch());
 		

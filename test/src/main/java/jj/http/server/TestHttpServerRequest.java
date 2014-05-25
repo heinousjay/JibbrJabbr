@@ -33,7 +33,7 @@ import io.netty.handler.codec.http.HttpVersion;
  * @author jason
  *
  */
-public class TestHttpRequest extends AbstractHttpRequest {
+public class TestHttpServerRequest extends AbstractHttpServerRequest {
 	
 	public static final String REQUEST_URI = "Request URI";
 	
@@ -45,7 +45,7 @@ public class TestHttpRequest extends AbstractHttpRequest {
 	
 
 	@Inject
-	TestHttpRequest(
+	TestHttpServerRequest(
 		final RouteFinder routeFinder,
 		final HttpMethod method,
 		final @Named(REQUEST_URI) String uri

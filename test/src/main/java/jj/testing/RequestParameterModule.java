@@ -16,7 +16,7 @@
 package jj.testing;
 
 import io.netty.handler.codec.http.HttpMethod;
-import jj.http.server.TestHttpRequest;
+import jj.http.server.TestHttpServerRequest;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -42,6 +42,6 @@ class RequestParameterModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(HttpMethod.class).toInstance(method);
-		bind(String.class).annotatedWith(Names.named(TestHttpRequest.REQUEST_URI)).toInstance(uri);
+		bind(String.class).annotatedWith(Names.named(TestHttpServerRequest.REQUEST_URI)).toInstance(uri);
 	}
 }

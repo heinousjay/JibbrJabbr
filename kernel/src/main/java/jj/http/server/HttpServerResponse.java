@@ -31,7 +31,7 @@ import jj.resource.Resource;
  * @author jason
  *
  */
-public interface HttpResponse {
+public interface HttpServerResponse {
 
 	/**
 	 * Retrieve the status of the outgoing response.  Defaults to
@@ -45,7 +45,7 @@ public interface HttpResponse {
 	 * @param status
 	 * @return
 	 */
-	HttpResponse status(HttpResponseStatus status);
+	HttpServerResponse status(HttpResponseStatus status);
 
 	/**
 	 * Set the header by name and value. This method will
@@ -54,7 +54,7 @@ public interface HttpResponse {
 	 * @param value
 	 * @return
 	 */
-	HttpResponse header(String name, String value);
+	HttpServerResponse header(String name, String value);
 	
 	/**
 	 * Set the header by name and value, if no header by this
@@ -63,7 +63,7 @@ public interface HttpResponse {
 	 * @param value
 	 * @return
 	 */
-	HttpResponse headerIfNotSet(String name, String value);
+	HttpServerResponse headerIfNotSet(String name, String value);
 
 	/**
 	 * Set the header by name and value, if no header by this
@@ -72,7 +72,7 @@ public interface HttpResponse {
 	 * @param value
 	 * @return
 	 */
-	HttpResponse headerIfNotSet(String name, long value);
+	HttpServerResponse headerIfNotSet(String name, long value);
 
 	/**
 	 * @param name
@@ -80,9 +80,9 @@ public interface HttpResponse {
 	 */
 	boolean containsHeader(String name);
 
-	HttpResponse header(String name, Date date);
+	HttpServerResponse header(String name, Date date);
 
-	HttpResponse header(String name, long value);
+	HttpServerResponse header(String name, long value);
 
 	/**
 	 * @return
@@ -91,11 +91,11 @@ public interface HttpResponse {
 
 	HttpVersion version();
 
-	HttpResponse content(byte[] bytes);
+	HttpServerResponse content(byte[] bytes);
 
-	HttpResponse content(ByteBuf buffer);
+	HttpServerResponse content(ByteBuf buffer);
 
-	HttpResponse end();
+	HttpServerResponse end();
 
 	void sendNotFound();
 
@@ -106,9 +106,9 @@ public interface HttpResponse {
 	 * @param resource
 	 * @return
 	 */
-	HttpResponse sendNotModified(Resource resource);
+	HttpServerResponse sendNotModified(Resource resource);
 
-	HttpResponse sendNotModified(Resource resource, boolean cache);
+	HttpServerResponse sendNotModified(Resource resource, boolean cache);
 
 	/**
 	 * Sends a 307 Temporary Redirect to the given resource, using the fully qualified
@@ -116,12 +116,12 @@ public interface HttpResponse {
 	 * @param resource
 	 * @return
 	 */
-	HttpResponse sendTemporaryRedirect(Resource resource);
+	HttpServerResponse sendTemporaryRedirect(Resource resource);
 
 	/**
 	 * @param e
 	 */
-	HttpResponse error(Throwable e);
+	HttpServerResponse error(Throwable e);
 
 	/**
 	 * @return
@@ -135,8 +135,8 @@ public interface HttpResponse {
 	 */
 	String contentsString();
 
-	HttpResponse sendUncachedResource(Resource resource) throws IOException;
+	HttpServerResponse sendUncachedResource(Resource resource) throws IOException;
 
-	HttpResponse sendCachedResource(Resource resource) throws IOException;
+	HttpServerResponse sendCachedResource(Resource resource) throws IOException;
 
 }

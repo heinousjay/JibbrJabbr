@@ -29,9 +29,9 @@ import javax.inject.Inject;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import jj.http.server.TestHttpRequest;
-import jj.http.server.TestHttpResponse;
-import jj.http.server.TestJJEngineHttpHandler;
+import jj.http.server.TestHttpServerRequest;
+import jj.http.server.TestHttpServerResponse;
+import jj.http.server.TestEngineHttpHandler;
 import jj.util.StringUtils;
 
 /**
@@ -163,17 +163,17 @@ class TestRunner {
 	}
 	
 	private final JibbrJabbrTestServer app;
-	private final TestHttpRequest request;
-	private final TestHttpResponse response;
-	private final TestJJEngineHttpHandler handler;
+	private final TestHttpServerRequest request;
+	private final TestHttpServerResponse response;
+	private final TestEngineHttpHandler handler;
 	private final TestLog testLog;
 	
 	@Inject
 	TestRunner(
 		final JibbrJabbrTestServer app,
-		final TestHttpRequest request,
-		final TestHttpResponse response,
-		final TestJJEngineHttpHandler handler,
+		final TestHttpServerRequest request,
+		final TestHttpServerResponse response,
+		final TestEngineHttpHandler handler,
 		final TestLog testLog
 	) {
 		this.app = app;
@@ -183,7 +183,7 @@ class TestRunner {
 		this.testLog = testLog;
 	}
 
-	TestHttpRequest request() {
+	TestHttpServerRequest request() {
 		return request;
 	}
 	

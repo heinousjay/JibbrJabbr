@@ -35,10 +35,10 @@ import jj.util.DateFormatHelper;
 @AccessLogger
 class RequestResponded extends LoggedEvent {
 	
-	private final JJHttpRequest request;
-	private final JJHttpResponse response;
+	private final HttpServerRequestImpl request;
+	private final HttpServerResponseImpl response;
 	
-	RequestResponded(JJHttpRequest request, JJHttpResponse response) {
+	RequestResponded(HttpServerRequestImpl request, HttpServerResponseImpl response) {
 		this.request = request;
 		this.response = response;
 	}
@@ -87,7 +87,7 @@ class RequestResponded extends LoggedEvent {
 			remoteAddress.toString();
 	}
 	
-	private String extractReferer(final HttpRequest request) {
+	private String extractReferer(final HttpServerRequest request) {
 		
 		return request.hasHeader(HttpHeaders.Names.REFERER) ?
 			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :

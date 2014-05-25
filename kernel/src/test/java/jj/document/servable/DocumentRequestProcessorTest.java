@@ -18,8 +18,8 @@ import jj.document.servable.DocumentFilter;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.execution.MockTaskRunner;
 import jj.execution.TaskHelper;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.resource.MimeTypes;
 import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
@@ -59,8 +59,8 @@ public class DocumentRequestProcessorTest {
 	
 	@Mock Channel channel;
 	
-	@Mock HttpRequest httpRequest;
-	HttpResponse httpResponse;
+	@Mock HttpServerRequest httpRequest;
+	HttpServerResponse httpResponse;
 	
 	ContinuationPendingKey pendingKey;
 	
@@ -108,7 +108,7 @@ public class DocumentRequestProcessorTest {
 		given(httpRequest.uri()).willReturn("/");
 		
 		// auto-stubbing the builder pattern
-		httpResponse = mock(HttpResponse.class, ANSWER_WITH_SELF);
+		httpResponse = mock(HttpServerResponse.class, ANSWER_WITH_SELF);
 		
 		pendingKey = new ContinuationPendingKey();
 		

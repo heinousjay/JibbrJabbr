@@ -9,8 +9,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
 import jj.configuration.resolution.Application;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
@@ -60,8 +60,8 @@ public abstract class Servable<T extends Resource> {
 	
 	@ResourceThread
 	public abstract RequestProcessor makeRequestProcessor(
-		final HttpRequest request,
-		final HttpResponse response
+		final HttpServerRequest request,
+		final HttpServerResponse response
 	) throws IOException;
 
 	/**
@@ -73,8 +73,8 @@ public abstract class Servable<T extends Resource> {
 	 * @param resource
 	 */
 	protected RequestProcessor makeStandardRequestProcessor(
-		final HttpRequest request,
-		final HttpResponse response,
+		final HttpServerRequest request,
+		final HttpServerResponse response,
 		final URIMatch match,
 		final Resource resource
 	) {

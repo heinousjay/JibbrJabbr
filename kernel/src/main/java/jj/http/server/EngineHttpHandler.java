@@ -69,14 +69,15 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
 		
+		
 		Injector injector = parentInjector.createChildInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
 				bind(ChannelHandlerContext.class).toInstance(ctx);
 				bind(FullHttpRequest.class).toInstance(request);
-				bind(HttpRequest.class).to(JJHttpRequest.class);
-				bind(HttpResponse.class).to(JJHttpResponse.class);
+				bind(HttpServerRequest.class).to(HttpServerRequestImpl.class);
+				bind(HttpServerResponse.class).to(HttpServerResponseImpl.class);
 				bind(WebSocketConnectionMaker.class);
 				bind(WebSocketFrameHandlerCreator.class);
 			}
@@ -94,7 +95,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		
 		if (!request.getDecoderResult().isSuccess()) {
 		
-			injector.getInstance(HttpResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
+			injector.getInstance(HttpServerResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
 		} else if (webSocketRequestChecker.isWebSocketRequest(request)) {
 			
@@ -102,7 +103,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 			
 		} else {
 			
-			handleHttpRequest(injector.getInstance(HttpRequest.class), injector.getInstance(HttpResponse.class));
+			handleHttpRequest(injector.getInstance(HttpServerRequest.class), injector.getInstance(HttpServerResponse.class));
 		}
 	}
 	
@@ -121,8 +122,8 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	}
 
 	void handleHttpRequest(
-		final HttpRequest request,
-		final HttpResponse response
+		final HttpServerRequest request,
+		final HttpServerResponse response
 	) throws Exception {
 		
 		// look up the candidate ways to service the request

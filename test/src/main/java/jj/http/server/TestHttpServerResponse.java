@@ -42,7 +42,7 @@ import org.jsoup.nodes.Document;
  * @author jason
  *
  */
-public class TestHttpResponse extends AbstractHttpResponse {
+public class TestHttpServerResponse extends AbstractHttpServerResponse {
 	
 	private final CountDownLatch latch = new CountDownLatch(1);
 	
@@ -53,7 +53,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	private final AtomicBoolean gotOnce = new AtomicBoolean(true);
 	
 	@Inject
-	TestHttpResponse(
+	TestHttpServerResponse(
 		final TestLog testLog
 	) {
 		this.testLog = testLog;
@@ -74,7 +74,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	private volatile boolean ended = false;
 	
-	public TestHttpResponse end() {
+	public TestHttpServerResponse end() {
 		markCommitted();
 		testLog.trace("request ended");
 		processResponse();
@@ -91,7 +91,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	private volatile Throwable error = null;
 
-	public TestHttpResponse error(Throwable t) {
+	public TestHttpServerResponse error(Throwable t) {
 		testLog.info("request errored", t);
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		error = t;
@@ -148,7 +148,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder(TestHttpResponse.class.getSimpleName())
+		return new StringBuilder(TestHttpServerResponse.class.getSimpleName())
 			.append("[").append(id()).append("] {")
 			.append("charset=").append(charset())
 			.append(", status=").append(status())
@@ -161,7 +161,7 @@ public class TestHttpResponse extends AbstractHttpResponse {
 	}
 
 	@Override
-	protected HttpResponse doSendTransferableResource(TransferableResource resource) throws IOException {
+	protected HttpServerResponse doSendTransferableResource(TransferableResource resource) throws IOException {
 		try (FileChannel channel = resource.fileChannel()) {
 			
 			assert channel.size() < 1_000_000L;

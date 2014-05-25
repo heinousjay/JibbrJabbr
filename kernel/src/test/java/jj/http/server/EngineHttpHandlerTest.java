@@ -35,7 +35,7 @@ import java.io.IOException;
 import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 import jj.http.server.EngineHttpHandler;
-import jj.http.server.JJHttpRequest;
+import jj.http.server.HttpServerRequestImpl;
 import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
 import jj.logging.Emergency;
@@ -76,13 +76,13 @@ public class EngineHttpHandlerTest {
 
 	MockTaskRunner taskRunner;
 
-	@Mock JJHttpRequest httpRequest1;
-	@Mock JJHttpRequest httpRequest2;
-	@Mock JJHttpRequest httpRequest3;
-	@Mock JJHttpRequest httpRequest4;
-	@Mock JJHttpRequest httpRequest5;
+	@Mock HttpServerRequestImpl httpRequest1;
+	@Mock HttpServerRequestImpl httpRequest2;
+	@Mock HttpServerRequestImpl httpRequest3;
+	@Mock HttpServerRequestImpl httpRequest4;
+	@Mock HttpServerRequestImpl httpRequest5;
 	
-	@Mock HttpResponse httpResponse;
+	@Mock HttpServerResponse httpResponse;
 	
 	@Mock RequestProcessor requestProcessor1;
 	@Mock RequestProcessor requestProcessor2;
@@ -115,8 +115,8 @@ public class EngineHttpHandlerTest {
 	@SuppressWarnings("unchecked")
 	private void prepareInjectorStubbing() {
 		// little ugly, but sets up an injector that will return our mocks
-		given(injector.getInstance(HttpRequest.class)).willReturn(httpRequest1);
-		given(injector.getInstance(HttpResponse.class)).willReturn(httpResponse);
+		given(injector.getInstance(HttpServerRequest.class)).willReturn(httpRequest1);
+		given(injector.getInstance(HttpServerResponse.class)).willReturn(httpResponse);
 		given(injector.getInstance(WebSocketConnectionMaker.class)).willReturn(webSocketConnectionMaker);
 		given(injector.createChildInjector(any(Module.class))).willReturn(injector);
 		given(binder.bind(any(Class.class))).willReturn(abb);
@@ -167,10 +167,10 @@ public class EngineHttpHandlerTest {
 		verify(abb).toInstance(ctx);
 		verify(binder).bind(FullHttpRequest.class);
 		verify(abb).toInstance(fullHttpRequest);
-		verify(binder).bind(HttpRequest.class);
-		verify(abb).to(JJHttpRequest.class);
-		verify(binder).bind(HttpResponse.class);
-		verify(abb).to(JJHttpResponse.class);
+		verify(binder).bind(HttpServerRequest.class);
+		verify(abb).to(HttpServerRequestImpl.class);
+		verify(binder).bind(HttpServerResponse.class);
+		verify(abb).to(HttpServerResponseImpl.class);
 		verify(binder).bind(WebSocketConnectionMaker.class);
 		verify(binder).bind(WebSocketFrameHandlerCreator.class);
 		

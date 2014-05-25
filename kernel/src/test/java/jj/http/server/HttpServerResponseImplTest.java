@@ -25,8 +25,8 @@ import java.nio.channels.FileChannel;
 
 import jj.Version;
 import jj.event.Publisher;
-import jj.http.server.JJHttpRequest;
-import jj.http.server.JJHttpResponse;
+import jj.http.server.HttpServerRequestImpl;
+import jj.http.server.HttpServerResponseImpl;
 import jj.logging.LoggedEvent;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
@@ -56,7 +56,7 @@ import org.slf4j.Logger;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JJHttpServerResponseTest {
+public class HttpServerResponseImplTest {
 	
 	final String sha1 = "this is not really a sha";
 	final String mime = "this is not really a mime";
@@ -65,11 +65,11 @@ public class JJHttpServerResponseTest {
 	String host = "hostname";
 	
 	DefaultFullHttpRequest nettyRequest;
-	JJHttpRequest request;
+	HttpServerRequestImpl request;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock Publisher publisher;
 	@Mock Version version;
-	JJHttpResponse response;
+	HttpServerResponseImpl response;
 	@Mock Logger logger;
 	
 	@Captor ArgumentCaptor<LoggedEvent> eventCaptor;
@@ -78,9 +78,9 @@ public class JJHttpServerResponseTest {
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		nettyRequest.headers().add(HttpHeaders.Names.HOST, host);
-		request = new JJHttpRequest(nettyRequest, new RouteFinder(), ctx);
+		request = new HttpServerRequestImpl(nettyRequest, new RouteFinder(), ctx);
 		
-		response = new JJHttpResponse(version, request, ctx, publisher);
+		response = new HttpServerResponseImpl(version, request, ctx, publisher);
 		assertThat(response.charset(), is(UTF_8));
 	}
 
@@ -91,7 +91,7 @@ public class JJHttpServerResponseTest {
 		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));
 		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
 		assertThat(response.header(HttpHeaders.Names.CONTENT_LENGTH), is(String.valueOf(size)));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(AbstractHttpResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(AbstractHttpServerResponse.MAX_AGE_ONE_YEAR));
 	}
 
 	private void testUncachedResource(Resource resource) throws IOException {
@@ -109,7 +109,7 @@ public class JJHttpServerResponseTest {
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));
 		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(AbstractHttpResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(AbstractHttpServerResponse.MAX_AGE_ONE_YEAR));
 		assertThat(response.hasNoBody(), is(true));
 	}
 

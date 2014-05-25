@@ -15,7 +15,7 @@ import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentConfiguration;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.ScriptHelperDocumentFilter;
-import jj.http.server.HttpRequest;
+import jj.http.server.HttpServerRequest;
 import jj.jjmessage.JJMessage;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
@@ -43,7 +43,7 @@ public class ScriptHelperDocumentFilterTest {
 	String webSocketUri;
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	@Mock ScriptResource scriptResource;
-	@Mock HttpRequest httpRequest;
+	@Mock HttpServerRequest httpRequest;
 	@Mock StaticResource jqueryJs;
 	@Mock StaticResource jjJs;
 	Document document;

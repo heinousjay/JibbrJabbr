@@ -24,8 +24,8 @@ import java.io.IOException;
 
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
@@ -64,7 +64,7 @@ public class ServableTest extends ServableTestBase {
 
 		@Override
 		@ResourceThread
-		public RequestProcessor makeRequestProcessor(HttpRequest request, HttpResponse response) throws IOException {
+		public RequestProcessor makeRequestProcessor(HttpServerRequest request, HttpServerResponse response) throws IOException {
 			return null;
 		}
 

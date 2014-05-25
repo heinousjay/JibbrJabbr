@@ -40,7 +40,7 @@ import jj.util.Sequence;
  * @author jason
  *
  */
-public abstract class AbstractHttpRequest implements HttpRequest {
+public abstract class AbstractHttpServerRequest implements HttpServerRequest {
 
 	private static final Sequence sequence = new Sequence();
 	
@@ -61,7 +61,7 @@ public abstract class AbstractHttpRequest implements HttpRequest {
 	/**
 	 * 
 	 */
-	protected AbstractHttpRequest(final FullHttpRequest request, final RouteFinder routeFinder) {
+	protected AbstractHttpServerRequest(final FullHttpRequest request, final RouteFinder routeFinder) {
 		this.request = request;
 		QueryStringDecoder decoder = new QueryStringDecoder(request.getUri());
 		this.uri = routeFinder.find(QueryStringDecoder.decodeComponent(decoder.path()));

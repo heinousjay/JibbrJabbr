@@ -8,8 +8,8 @@ import javax.inject.Singleton;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.css.CssResource;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.resource.ResourceFinder;
 import jj.uri.URIMatch;
 
@@ -47,8 +47,8 @@ class CssServable extends Servable<CssResource> {
 
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final HttpRequest request,
-		final HttpResponse response
+		final HttpServerRequest request,
+		final HttpServerResponse response
 	) throws IOException {
 		
 		final URIMatch match = request.uriMatch();

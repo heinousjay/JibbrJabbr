@@ -54,7 +54,7 @@ class WebSocketConnectionMaker {
 	
 	private final FullHttpRequest request;
 	
-	private final HttpResponse response;
+	private final HttpServerResponse response;
 	
 	private final WebSocketServerHandshakerFactory handshakerFactory;
 	
@@ -66,7 +66,7 @@ class WebSocketConnectionMaker {
 		final ResourceFinder resourceFinder,
 		final ChannelHandlerContext ctx,
 		final FullHttpRequest request,
-		final HttpResponse response,
+		final HttpServerResponse response,
 		final WebSocketServerHandshakerFactory handshakerFactory,
 		final Set<Class<? extends WebSocketConnectionHost>> webSocketConnectionHostClasses
 	) {

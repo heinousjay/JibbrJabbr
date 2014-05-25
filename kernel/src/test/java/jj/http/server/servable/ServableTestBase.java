@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 
 import jj.JJ;
 import jj.configuration.resolution.Application;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;
@@ -43,8 +43,8 @@ public abstract class ServableTestBase {
 	@Mock Application app;
 	@Mock ResourceFinder resourceFinder;
 	
-	@Mock HttpRequest request;
-	@Mock HttpResponse response;
+	@Mock HttpServerRequest request;
+	@Mock HttpServerResponse response;
 	
 	@Before
 	public void baseBefore() throws Exception {

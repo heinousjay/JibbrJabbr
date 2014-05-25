@@ -26,8 +26,8 @@ import jj.configuration.resolution.Application;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 
 /**
  * @author jason
@@ -60,8 +60,8 @@ public class StaticServable extends Servable<StaticResource> {
 
 	@Override
 	public RequestProcessor makeRequestProcessor(
-		final HttpRequest request,
-		final HttpResponse response
+		final HttpServerRequest request,
+		final HttpServerResponse response
 	) throws IOException {
 		final StaticResource resource = loadResource(request.uriMatch());
 		if (resource != null && isServableResource(resource)) {

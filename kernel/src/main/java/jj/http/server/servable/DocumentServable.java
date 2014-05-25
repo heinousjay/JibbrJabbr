@@ -19,8 +19,8 @@ import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.uri.URIMatch;
 import jj.util.StringUtils;
-import jj.http.server.HttpRequest;
-import jj.http.server.HttpResponse;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 
 @Singleton
 class DocumentServable extends Servable<HtmlResource> {
@@ -62,8 +62,8 @@ class DocumentServable extends Servable<HtmlResource> {
 	@Override
 	@ResourceThread
 	public RequestProcessor makeRequestProcessor(
-		final HttpRequest request,
-		final HttpResponse response
+		final HttpServerRequest request,
+		final HttpServerResponse response
 	) throws IOException {
 		
 		RequestProcessor result = null;
@@ -84,8 +84,8 @@ class DocumentServable extends Servable<HtmlResource> {
 					@Override
 					protected void configure() {
 						bind(DocumentScriptEnvironment.class).toInstance(dse);
-						bind(HttpRequest.class).toInstance(request);
-						bind(HttpResponse.class).toInstance(response);
+						bind(HttpServerRequest.class).toInstance(request);
+						bind(HttpServerResponse.class).toInstance(response);
 					}
 				}).getInstance(DocumentRequestProcessor.class);
 			}

@@ -67,7 +67,7 @@ public class WebSocketConnectionMakerTest {
 	@Mock ChannelFuture channelFuture;
 	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
 	@Mock FullHttpRequest request;
-	HttpResponse response;
+	HttpServerResponse response;
 	@Mock WebSocketServerHandshakerFactory handshakerFactory;
 	@Mock WebSocketServerHandshaker handshaker;
 	@Mock WebSocketFrameHandler frameHandler;
@@ -83,7 +83,7 @@ public class WebSocketConnectionMakerTest {
 	@Before
 	public void before() {
 		
-		response = mock(HttpResponse.class, AnswerWithSelf.ANSWER_WITH_SELF);
+		response = mock(HttpServerResponse.class, AnswerWithSelf.ANSWER_WITH_SELF);
 		
 		webSocketConnectionHosts = new HashSet<>();
 		webSocketConnectionHosts.add(WebSocketConnectionHost.class);

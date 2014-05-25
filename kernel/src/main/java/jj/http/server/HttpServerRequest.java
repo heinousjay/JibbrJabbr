@@ -32,7 +32,7 @@ import jj.uri.URIMatch;
  * @author jason
  *
  */
-public interface HttpRequest {
+public interface HttpServerRequest {
 
 	/**
 	 * The number of milliseconds since the request was received by the engine,
