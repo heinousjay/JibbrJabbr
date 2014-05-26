@@ -31,7 +31,7 @@ import io.netty.handler.codec.http.HttpHeaders;
  * @author jason
  *
  */
-class RangeHandler {
+class RangeHeaderReader {
 	
 	private static final String HEADER_PREFIX = "bytes=";
 	private static final Pattern SPLITTER = Pattern.compile(",");
@@ -70,7 +70,7 @@ class RangeHandler {
 	 * @param resource The resource being served
 	 * @param overlapDistance The amount of distance between consecutive ranges that should be coalesced
 	 */
-	RangeHandler(
+	RangeHeaderReader(
 		final HttpHeaders requestHeaders,
 		final long responseSize,
 		final long overlapDistance
@@ -85,7 +85,7 @@ class RangeHandler {
 	 * @param overlapDistance The amount of distance between consecutive ranges that should be coalesced
 	 * @param maxRanges The maximum number of ranges that can be requested before bailing
 	 */
-	RangeHandler(
+	RangeHeaderReader(
 		final HttpHeaders requestHeaders,
 		final long responseSize,
 		final long overlapDistance,

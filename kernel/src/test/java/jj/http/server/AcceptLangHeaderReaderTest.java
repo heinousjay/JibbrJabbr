@@ -16,33 +16,29 @@
 package jj.http.server;
 
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Locale;
 
+import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AcceptLangHandlerTest {
+public class AcceptLangHeaderReaderTest {
 
-	@Mock HttpHeaders requestHeaders;
+	HttpHeaders requestHeaders;
 	
-	AcceptLangHandler arh;
+	AcceptLangHeaderReader arh;
 	
 	private void establishObjects(String value) {
-		
-		given(requestHeaders.get(HttpHeaders.Names.ACCEPT_LANGUAGE)).willReturn(value);
-		arh = new AcceptLangHandler(requestHeaders);
+		requestHeaders = new DefaultHttpHeaders();
+		requestHeaders.set(HttpHeaders.Names.ACCEPT_LANGUAGE, value);
+		arh = new AcceptLangHeaderReader(requestHeaders);
 	}
 	
 	@Test

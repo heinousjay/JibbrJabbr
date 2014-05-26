@@ -38,7 +38,7 @@ import io.netty.handler.codec.http.HttpHeaders;
  * @author jason
  *
  */
-class AcceptLangHandler {
+class AcceptLangHeaderReader {
 	
 	private static final class SortableLocale implements Comparable<SortableLocale> {
 
@@ -72,7 +72,7 @@ class AcceptLangHandler {
 	private boolean badRequest = false;
 
 	// need to get a hold of the server default locale somewhere?
-	AcceptLangHandler(final HttpHeaders requestHeaders) {
+	AcceptLangHeaderReader(final HttpHeaders requestHeaders) {
 		
 		String headerValue = requestHeaders.get(HttpHeaders.Names.ACCEPT_LANGUAGE);
 		

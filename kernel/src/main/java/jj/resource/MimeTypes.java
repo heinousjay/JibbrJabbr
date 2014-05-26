@@ -36,14 +36,14 @@ public class MimeTypes {
 		Map<String, String> mimeTypesMaker = new HashMap<String, String>();
 		mimeTypesMaker.put("htm", "text/html; charset=UTF-8");
 		mimeTypesMaker.put("html", "text/html; charset=UTF-8");
-		mimeTypesMaker.put("js", "application/javascript; charset=UTF-8");
+		mimeTypesMaker.put("js", "text/javascript; charset=UTF-8");
 		mimeTypesMaker.put("css", "text/css; charset=UTF-8");
 		mimeTypesMaker.put("txt", "text/plain; charset=UTF-8");
 		mimeTypesMaker.put("sha1", "text/plain; charset=UTF-8");
 		mimeTypesMaker.put("csv", "text/csv; charset=UTF-8");
 		mimeTypesMaker.put("xml", "text/xml; charset=UTF-8");
-		mimeTypesMaker.put("xhtml", "application/xhtml+xml; charset=UTF-8");
-		mimeTypesMaker.put("json", "application/json; charset=UTF-8");
+		mimeTypesMaker.put("xhtml", "application/xhtml+xml");
+		mimeTypesMaker.put("json", "application/json");
 		mimeTypesMaker.put("pdf", "application/pdf");
 		mimeTypesMaker.put("zip", "application/zip");
 		mimeTypesMaker.put("tar", "application/x-tar");
