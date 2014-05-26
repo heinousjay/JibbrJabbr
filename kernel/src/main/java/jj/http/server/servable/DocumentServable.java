@@ -12,7 +12,6 @@ import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.Assets;
 import jj.document.DocumentScriptEnvironment;
-import jj.document.HtmlResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.ResourceFinder;
@@ -23,7 +22,7 @@ import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 
 @Singleton
-class DocumentServable extends Servable<HtmlResource> {
+class DocumentServable extends Servable<DocumentScriptEnvironment> {
 	
 	public static final String SLASH = "/";
 	public static final String DOT = ".";
@@ -68,16 +67,13 @@ class DocumentServable extends Servable<HtmlResource> {
 		
 		RequestProcessor result = null;
 		
-		String baseName = request.uriMatch().baseName;
-		
 		if (StringUtils.isEmpty(request.uriMatch().extension)) {
 			
-			final DocumentScriptEnvironment dse = 
-				resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, baseName);
+			final DocumentScriptEnvironment dse = loadResource(request.uriMatch());
 			
 			if (dse != null) {
 				
-				preloadResources(baseName);
+				preloadResources(request.uriMatch().baseName);
 			
 				result = parentInjector.createChildInjector(new AbstractModule() {
 					
@@ -95,7 +91,7 @@ class DocumentServable extends Servable<HtmlResource> {
 	}
 
 	@Override
-	public HtmlResource loadResource(URIMatch match) {
-		return resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, match.baseName);
+	public DocumentScriptEnvironment loadResource(URIMatch match) {
+		return resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, match.baseName);
 	}
 }
