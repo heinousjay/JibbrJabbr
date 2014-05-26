@@ -52,7 +52,7 @@ class RequestResponded extends LoggedEvent {
 		);
 		
 		if (logger.isInfoEnabled()) {
-			logger.info("{} - - {} \"{} {} {}\" {} {} {} \"{}\"", 
+			logger.info("{} - - {} \"{} {} {}\" {} {} {} {}", 
 				extractIP(request.remoteAddress()),
 				DateFormatHelper.nowInAccessLogFormat(),
 				request.method(),
@@ -61,7 +61,7 @@ class RequestResponded extends LoggedEvent {
 				response.status().code(),
 				extractContentLength(),
 				extractReferer(request),
-				request.header(HttpHeaders.Names.USER_AGENT)
+				extractUserAgent(request)
 			);
 		}
 		
@@ -88,9 +88,14 @@ class RequestResponded extends LoggedEvent {
 	}
 	
 	private String extractReferer(final HttpServerRequest request) {
-		
 		return request.hasHeader(HttpHeaders.Names.REFERER) ?
 			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :
+			"-";
+	}
+	
+	private String extractUserAgent(final HttpServerRequest request) {
+		return request.hasHeader(HttpHeaders.Names.USER_AGENT) ?
+			"\"" + request.header(HttpHeaders.Names.USER_AGENT) + "\"" :
 			"-";
 	}
 	

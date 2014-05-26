@@ -287,7 +287,7 @@ public class HttpServerResponseImplTest {
 		String remoteAddress = ctx.channel().remoteAddress().toString();
 		
 		verify(logger).info(
-			eq("{} - - {} \"{} {} {}\" {} {} {} \"{}\""),
+			eq("{} - - {} \"{} {} {}\" {} {} {} {}"),
 			eq(remoteAddress),
 			anyString(), // the date, not going to try to make this work
 			eq(request.method()),
@@ -296,7 +296,7 @@ public class HttpServerResponseImplTest {
 			eq(response.status().code()),
 			eq("100"),
 			eq("-"),
-			isNull()
+			eq("-")
 		);
 	}
 
