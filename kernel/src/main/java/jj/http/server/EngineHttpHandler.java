@@ -30,10 +30,9 @@ import jj.resource.ResourceTask;
 import jj.resource.Resource;
 
 /**
- * Acts as the bridge from netty into our core.
+ * Reads incoming http messages and looks for ways to respond
  * @author jason
  * 
- * TODO this needs to be made into the new style without channelRead0 as a method name.  i think that's a thing
  *
  */
 public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -65,7 +64,6 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		this.publisher = publisher;
 	}
 
-	// TODO 
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
 		
