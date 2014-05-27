@@ -19,10 +19,7 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import jj.App;
 import jj.testing.JibbrJabbrTestServer;
-import jj.webdriver.WebDriverProvider;
 import jj.webdriver.WebDriverRule;
-import jj.webdriver.provider.PhantomJSWebDriverProvider;
-
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -34,9 +31,6 @@ import org.junit.Test;
  */
 public class MinimalAppSmokeTest {
 	
-	// this could also be a helper class that inspects system properties or vm args or whatever
-	private static final Class<? extends WebDriverProvider> DRIVER_PROVIDER = PhantomJSWebDriverProvider.class;
-	
 	@Rule
 	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.minimal);
 	
@@ -46,12 +40,12 @@ public class MinimalAppSmokeTest {
 	// this behavior has some nuances i haven't explained here but it's all thought out
 	
 	@Rule
-	public WebDriverRule browser1 = server.webDriverRule(DRIVER_PROVIDER);
+	public WebDriverRule browser1 = server.webDriverRule(App.DRIVER_PROVIDER);
 	
 	// need two browsers?  make two web driver rules! yay!
 	
 	@Rule
-	public WebDriverRule browser2 = server.webDriverRule(DRIVER_PROVIDER);
+	public WebDriverRule browser2 = server.webDriverRule(App.DRIVER_PROVIDER);
 
 	@Test
 	public void test() throws Exception {

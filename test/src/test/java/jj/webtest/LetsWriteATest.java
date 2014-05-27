@@ -17,9 +17,9 @@ package jj.webtest;
 
 import jj.App;
 import jj.testing.JibbrJabbrTestServer;
-import jj.webdriver.provider.PhantomJSWebDriverProvider;
 import jj.webdriver.WebDriverRule;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,12 +43,11 @@ public class LetsWriteATest {
 	 * TODO - make the logging into its own component
 	 */
 	@Rule
-	public WebDriverRule webDriverRule = server.webDriverRule(PhantomJSWebDriverProvider.class);
-	//FirefoxWebDriverProvider
+	public WebDriverRule webDriverRule = server.webDriverRule(App.DRIVER_PROVIDER);
 	
 	// normally you would be sourcing the driver provider from some project-specific configuration
 	// but for the purposes of testing the rule, we hardcode
-
+	@Ignore
 	@Test
 	public void test() throws Exception {
 		
