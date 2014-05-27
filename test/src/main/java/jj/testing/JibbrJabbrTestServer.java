@@ -15,16 +15,11 @@
  */
 package jj.testing;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
 import java.net.URI;
 import java.util.ArrayList;
 
 import jj.webdriver.WebDriverProvider;
 import jj.webdriver.WebDriverRule;
-import io.netty.handler.codec.http.HttpMethod;
-
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -186,16 +181,5 @@ public class JibbrJabbrTestServer implements TestRule {
 				}
 			}
 		};
-	}
-	
-	public TestHttpClient get(final String uri) throws Exception {
-		assert !httpServer : "http server is running! this temporarily does not work... but soon!";
-		assertThat("supply a uri please", uri, is(notNullValue()));
-		
-		TestRunner runner = injector.createChildInjector(
-			new RequestParameterModule(HttpMethod.GET, uri)
-		).getInstance(TestRunner.class);
-		
-		return runner.run();
 	}
 }
