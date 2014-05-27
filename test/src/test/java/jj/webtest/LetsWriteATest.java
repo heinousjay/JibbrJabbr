@@ -19,7 +19,6 @@ import jj.App;
 import jj.testing.JibbrJabbrTestServer;
 import jj.webdriver.WebDriverRule;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -47,7 +46,6 @@ public class LetsWriteATest {
 	
 	// normally you would be sourcing the driver provider from some project-specific configuration
 	// but for the purposes of testing the rule, we hardcode
-	@Ignore
 	@Test
 	public void test() throws Exception {
 		
