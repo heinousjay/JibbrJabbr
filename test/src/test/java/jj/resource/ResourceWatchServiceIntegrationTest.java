@@ -16,6 +16,8 @@ import jj.document.DocumentScriptEnvironment;
 import jj.document.HtmlResource;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.http.server.EmbeddedHttpRequest;
+import jj.http.server.EmbeddedHttpServer;
 import jj.script.module.ModuleScriptEnvironment;
 import jj.script.module.RequiredModule;
 import jj.script.module.ScriptResource;
@@ -36,6 +38,8 @@ public class ResourceWatchServiceIntegrationTest {
 	
 	@Inject ResourceFinder finder;
 	
+	@Inject EmbeddedHttpServer server;
+	
 	DocumentScriptEnvironment dse;
 	HtmlResource htmlResource;
 	
@@ -53,9 +57,9 @@ public class ResourceWatchServiceIntegrationTest {
 	
 
 	@Test
-	public void test() throws Exception {
+	public void test() throws Throwable {
 		
-		assertThat(app.get("deep/nested").status().code(), is(200));
+		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
 
 		dse = finder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, "deep/nested");
 		htmlResource = finder.findResource(HtmlResource.class, AppLocation.Base, "deep/nested.html");

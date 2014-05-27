@@ -15,13 +15,18 @@
  */
 package jj.script;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
+
+import javax.inject.Inject;
 
 import jj.App;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.http.server.EmbeddedHttpRequest;
+import jj.http.server.EmbeddedHttpResponse;
+import jj.http.server.EmbeddedHttpServer;
 import jj.testing.JibbrJabbrTestServer;
-import jj.testing.TestHttpClient;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,10 +39,11 @@ import org.junit.Test;
 public class APITest {
 
 	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.api)
-		.injectInstance(this);
+	public JibbrJabbrTestServer app = 
+		new JibbrJabbrTestServer(App.api).injectInstance(this);
 	
-	
+	@Inject
+	EmbeddedHttpServer server;
 	
 	@Listener
 	void error(ScriptError scriptError) {
@@ -47,11 +53,11 @@ public class APITest {
 	private boolean error;
 	
 	@Test
-	public void test() throws Exception {
+	public void test() throws Throwable {
 		
-		TestHttpClient index = server.get("/");
+		EmbeddedHttpResponse index = server.request(new EmbeddedHttpRequest("/")).await(1, SECONDS);
 		
-		System.out.println(index.contentsString());
+		System.out.println(index.bodyContentAsString());
 		
 		assertFalse(error);
 	}

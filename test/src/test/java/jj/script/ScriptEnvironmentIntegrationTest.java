@@ -32,6 +32,8 @@ import jj.document.DocumentScriptEnvironment;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
+import jj.http.server.EmbeddedHttpRequest;
+import jj.http.server.EmbeddedHttpServer;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
 import jj.script.module.ModuleScriptEnvironment;
@@ -52,9 +54,10 @@ public class ScriptEnvironmentIntegrationTest {
 	
 	@Inject ResourceFinder resourceFinder;
 	@Inject ResourceLoader resourceLoader;
+	@Inject EmbeddedHttpServer server;
 	
 	@Rule
-	public JibbrJabbrTestServer server = 
+	public JibbrJabbrTestServer app = 
 		new JibbrJabbrTestServer(App.one)
 			.injectInstance(this);
 	
@@ -160,7 +163,7 @@ public class ScriptEnvironmentIntegrationTest {
 	}
 	
 	@Test
-	public void test3() throws Exception {
+	public void test3() throws Throwable {
 		
 		loadScriptEnvironment("deep/nested");
 		
@@ -168,7 +171,7 @@ public class ScriptEnvironmentIntegrationTest {
 		assertThat(scriptEnvironment.initialized(), is(true));
 		
 		// need to run a document request first
-		assertThat(server.get("deep/nested").status(), is(HttpResponseStatus.OK));
+		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status(), is(HttpResponseStatus.OK));
 		
 		
 		ModuleScriptEnvironment mse =
