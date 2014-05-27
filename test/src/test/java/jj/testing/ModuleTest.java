@@ -15,10 +15,19 @@
  */
 package jj.testing;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
-import jj.App;
 
+import javax.inject.Inject;
+
+import jj.App;
+import jj.http.server.EmbeddedHttpRequest;
+import jj.http.server.EmbeddedHttpResponse;
+import jj.http.server.EmbeddedHttpServer;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.parser.Parser;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -29,18 +38,17 @@ import org.junit.Test;
 public class ModuleTest {
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one).injectInstance(this);
+	
+	@Inject EmbeddedHttpServer server;
 	
 	@Test
-	public void moduleHierarchies() throws Exception {
+	public void moduleHierarchies() throws Throwable {
 		
+		EmbeddedHttpResponse client = server.request(new EmbeddedHttpRequest("/deep/nested")).await(2, SECONDS);
 		
-		TestHttpClient client = app.get("/deep/nested");
+		Document document = Parser.parse(client.bodyContentAsString(), "");
 		
-		client.dumpObjects();
-		
-		assertThat(client.document().select("title").text(), is("titled"));
-		
-		//client.dumpObjects();
+		assertThat(document.select("title").text(), is("titled"));
 	}
 }

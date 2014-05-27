@@ -16,7 +16,13 @@
 package jj.testing;
 
 import static java.util.concurrent.TimeUnit.HOURS;
+
+import javax.inject.Inject;
+
 import jj.App;
+import jj.http.server.EmbeddedHttpRequest;
+import jj.http.server.EmbeddedHttpResponse;
+import jj.http.server.EmbeddedHttpServer;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,13 +34,14 @@ import org.junit.Test;
 public class RunAPage {
 
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one).injectInstance(this);
+	
+	@Inject EmbeddedHttpServer server;
 	
 	@Test
-	public void test() throws Exception {
-		TestHttpClient client = app.get("/");
-		
-		
-		System.out.println(client.contentsString(1, HOURS));
+	public void test() throws Throwable {
+		EmbeddedHttpResponse response = server.request(new EmbeddedHttpRequest("/jj.js")).await(1, HOURS);
+
+		System.out.println(response.bodyContentAsString());
 	}
 }
