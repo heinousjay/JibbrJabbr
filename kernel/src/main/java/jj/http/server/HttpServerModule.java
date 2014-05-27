@@ -18,6 +18,8 @@ public class HttpServerModule extends JJModule {
 		
 		install(new ServableModule());
 		
+		bindExecutor(JJNioEventLoopGroup.class);
+		
 		addAPIModulePath("/jj/http/server/api");
 	}
 }
