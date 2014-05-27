@@ -1,5 +1,7 @@
 package jj.http.server;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -63,12 +65,9 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		this.webSocketRequestChecker = webSocketRequestChecker;
 		this.publisher = publisher;
 	}
-
-	@Override
-	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
-		
-		
-		Injector injector = parentInjector.createChildInjector(new AbstractModule() {
+	
+	private Injector makeInjector(final ChannelHandlerContext ctx, final FullHttpRequest request) {
+		return parentInjector.createChildInjector(new AbstractModule() {
 			
 			@Override
 			protected void configure() {
@@ -90,6 +89,14 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 				return new WebSocketServerHandshakerFactory(uri, null, false);
 			}
 		});
+	}
+
+	@Override
+	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
+
+		//long time = System.nanoTime();
+		Injector injector = makeInjector(ctx, request);
+		//System.out.println("takes " + MILLISECONDS.convert(System.nanoTime() - time, NANOSECONDS));
 		
 		if (!request.getDecoderResult().isSuccess()) {
 		
@@ -123,7 +130,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		final HttpServerRequest request,
 		final HttpServerResponse response
 	) throws Exception {
-		
+
 		// look up the candidate ways to service the request
 		// try them out to see if the request can be handled?
 		//  - TODO always in the IO thread? not sure there, maybe document servable can launch the script execution immediately
