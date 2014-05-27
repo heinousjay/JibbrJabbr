@@ -42,7 +42,7 @@ class JJNioEventLoopGroup extends NioEventLoopGroup {
 			@Override
 			public Thread newThread(Runnable r) {
 				
-				Thread thread = new Thread(r, "JibbrJabbr HTTP I/O Handler  " + id.incrementAndGet());
+				Thread thread = new Thread(r, "JibbrJabbr HTTP I/O Handler " + id.incrementAndGet());
 				thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
 				return thread;
 			}
