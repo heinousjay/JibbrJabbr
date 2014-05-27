@@ -17,9 +17,7 @@ package jj.testing;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.configuration.resolution.Assets.*;
 import io.netty.handler.codec.http.HttpResponseStatus;
