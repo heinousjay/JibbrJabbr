@@ -57,11 +57,9 @@ class ScriptExecutor extends DelayedExecutor {
 		this.threadFactory = threadFactory;
 	}
 	
-	String name = "NOT NAMED";
-	
 	@Override
 	protected String schedulerThreadName() {
-		return Thread.currentThread().getName() + name;
+		return Thread.currentThread().getName();
 	}
 
 	@Listener

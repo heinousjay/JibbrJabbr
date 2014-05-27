@@ -33,6 +33,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
+ * This is just a minor validation that the embedded server
+ * works. the idea now is to test the http server using it
+ * 
  * @author jason
  *
  */
@@ -65,8 +68,7 @@ public class EmbeddedHttpServerTest {
 				try {
 					String body = response.bodyContentAsString();
 					int contentLength = Integer.parseInt(response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
-					assertThat(body.length(), is(contentLength));
-					System.err.println(Thread.currentThread().getName());
+					assertThat(body.length(), is(contentLength)); // this only works because it's ASCII haha
 				} catch (Throwable t) {
 					testFailures.addSuppressed(t);
 				} finally {
