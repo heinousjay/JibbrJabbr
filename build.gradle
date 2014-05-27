@@ -107,6 +107,8 @@ allprojects {
 }
 
 subprojects {
+	
+	/*
 	apply plugin: 'jacoco'
 	
 	jacoco {
@@ -114,6 +116,7 @@ subprojects {
 	}
 	
 	check.dependsOn jacocoTestReport
+	*/
 	
 	jar {
 		manifest {
