@@ -75,6 +75,10 @@ public class CoreModule extends JJModule {
 	@Override
 	protected void configure() {
 		
+		CreationScope creationScope = new CreationScope();
+		bindScope(CreationScoped.class, creationScope);
+		bind(CreationScope.class).toInstance(creationScope);
+		
 		// bind up the command line args
 		bind(String[].class).annotatedWith(CommandLine.class).toInstance(args);
 		bind(ResourceResolver.class).toInstance(resourceResolver);
