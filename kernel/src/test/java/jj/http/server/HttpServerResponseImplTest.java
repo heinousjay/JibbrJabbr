@@ -91,7 +91,7 @@ public class HttpServerResponseImplTest {
 		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));
 		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
 		assertThat(response.header(HttpHeaders.Names.CONTENT_LENGTH), is(String.valueOf(size)));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(AbstractHttpServerResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
 	}
 
 	private void testUncachedResource(Resource resource) throws IOException {
@@ -109,7 +109,7 @@ public class HttpServerResponseImplTest {
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));
 		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(AbstractHttpServerResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
 		assertThat(response.hasNoBody(), is(true));
 	}
 
