@@ -17,10 +17,6 @@ package jj.testing;
 
 import static org.mockito.Mockito.mock;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
 
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -71,7 +67,6 @@ class TestModule extends JJModule {
 		bindLoggedEvents().annotatedWith(TestRunnerLogger.class).toLogger(TestRunnerLogger.NAME);
 		
 		if (!withHttpServer) {
-			bind(FullHttpRequest.class).toInstance(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"));
 			bind(Channel.class).toInstance(mock(Channel.class));
 		}
 		
