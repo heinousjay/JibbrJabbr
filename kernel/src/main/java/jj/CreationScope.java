@@ -21,7 +21,6 @@ import java.util.Map;
 import jj.util.Closer;
 
 import com.google.inject.Key;
-import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 
@@ -33,6 +32,28 @@ import com.google.inject.Scope;
  *
  */
 public class CreationScope implements Scope {
+	
+	/**
+	 * Returns a provider that always throws exception complaining that the
+	 * object in question must be seeded before it can be injected.
+	 *
+	 * @return typed provider
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Provider<T> seededKeyProvider() {
+		return (Provider<T>)SEEDED_KEY_PROVIDER;
+	}
+	
+	private static final Provider<Object> SEEDED_KEY_PROVIDER =
+		new Provider<Object>() {
+			public Object get() {
+				throw new AssertionError(
+					"scoped object should have been " +
+					"explicitly seeded in this scope by calling " +
+					"#seed(), but was not."
+				);
+			}
+		};
 
 	CreationScope() {}
 	
@@ -89,7 +110,7 @@ public class CreationScope implements Scope {
 	private <T> Map<Key<?>, Object> getScopedObjectMap(Key<T> key) {
 		Map<Key<?>, Object> scopedObjects = values.get();
 		if (scopedObjects == null) {
-			throw new OutOfScopeException("Cannot access " + key + " outside of a scoping block");
+			throw new AssertionError("Cannot access " + key + " outside of a scoping block");
 		}
 		return scopedObjects;
 	}
