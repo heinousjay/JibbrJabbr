@@ -14,7 +14,6 @@ import javax.inject.Singleton;
 
 import jj.uri.RouteFinder;
 import jj.uri.URIMatch;
-import jj.util.DateFormatHelper;
 import jj.util.Sequence;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -193,9 +192,6 @@ class HttpServerRequestImpl implements HttpServerRequest {
 
 	@Override
 	public String toString() {
-		return "httpRequest[" +
-			remoteAddress() +
-			"] started at " +
-			DateFormatHelper.basicFormat(timestamp());
+		return request.toString();
 	}
 }

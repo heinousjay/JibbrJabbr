@@ -1,6 +1,5 @@
 package jj.http.server;
 
-import static java.util.concurrent.TimeUnit.*;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -106,7 +105,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 			injector.getInstance(WebSocketConnectionMaker.class).handshakeWebsocket();
 			
 		} else {
-			
+			publisher.publish(new HttpServerRequestReceived(injector.getInstance(HttpServerRequest.class), injector.getInstance(HttpServerResponse.class)));
 			handleHttpRequest(injector.getInstance(HttpServerRequest.class), injector.getInstance(HttpServerResponse.class));
 		}
 	}
