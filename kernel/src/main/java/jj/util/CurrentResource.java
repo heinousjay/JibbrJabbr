@@ -20,7 +20,7 @@ import jj.execution.CurrentTask;
 /**
  * <p>
  * Performs the basic management of a contextual resource with a generic closer. 
- * <pre>
+ * <pre class="brush:java">
  * try (Closer closer = resource.enterScope(..something..)) {
  *     // use that resource
  * }

@@ -15,26 +15,44 @@
  */
 /**
  * <p>
- * The server's event bus. 
+ * An event bus for the system.
  * 
  * <p>
- * Annotate classes with {@link Subscriber} to indicate that instances will listen to
- * events.  Annotate event listening methods with {@link Listener}. Listener methods
- * must take a single parameter, which is the event.  Congratulations! You
- * will now receive those events.
+ * Subscribing to events works as part of the injection process, so only objects created
+ * by Guice can participate. First, annotate the class with {@link Subscriber}, then
+ * declare an instance method with any name, of any access except private, returning
+ * nothing or anything at all (the value is ignored) and that takes a single parameter of
+ * the event type you wish to receive.  Annotate this method with {@link Listener}.
+ * Congratulations! Instances of this class will now receive these events.  You can, of
+ * course, declare as many listeners as you wish.
+ * 
+ * <p>
+ * Events are delivered strictly by type, so you may need to inspect incoming events
+ * to see if you care.
  * 
  * <p>
  * You can inject {@link Publisher} to publish events to all registered listeners.
  * 
  * <p>
- * Events cannot be unregistered, so instances will receive events
- * across their entire lifetimes.  References are held weakly to prevent memory issues.
+ * Listeners cannot be unregistered, so instances will receive events
+ * across their entire lifetimes.
  * 
  * <p>
  * No serious processing should be done in event listeners since you have no control over
  * what thread is running - start a task instead! Also, throwing anything from a listener
  * method is considered a programming error, and it will cause assertion errors to be
- * thrown into unspecified parts of the system, so don't do it!
+ * thrown into unspecified parts of the system, so don't do it!  The easiest way to comply
+ * with this advice is to inject the {@link jj.execution.TaskRunner} and do something like:
+ * <pre class="brush:java">
+ * {@literal @}Listener
+ * void event(final Event event) {
+ *   taskRunner.execute(new ServerTask("processing event") { // or some other task type
+ *     public void run() throws Exception {
+ *       doSomethingInterestingWithThe(event);
+ *     }
+ *   });
+ * }
+ * </pre>
  * 
  * @author jason
  *

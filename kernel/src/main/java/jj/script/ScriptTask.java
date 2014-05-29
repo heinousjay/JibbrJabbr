@@ -39,7 +39,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 * with the stored ContinuationPendingKey and this result, assigning any result of that operation
 	 * to the pendingKey field,
 	 * 
-	 * <pre>
+	 * <pre class="brush:java">
 	 * pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
 	 * </pre>
 	 */

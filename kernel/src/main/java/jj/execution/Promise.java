@@ -50,7 +50,7 @@ public class Promise {
 	 * 
 	 * <p>
 	 * note that chaining calls currently means you are setting up tasks in sequence,
-	 * so that<pre>
+	 * so that<pre class="brush:java">
 	 * execute(task1).then(task2).then(task3);
 	 * </pre>
 	 * means that task2 starts when task1 finishes, and task3 starts when task2 is done
