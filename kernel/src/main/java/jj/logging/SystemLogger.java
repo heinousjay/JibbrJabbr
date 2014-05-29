@@ -63,6 +63,7 @@ class SystemLogger implements JJServerStartupListener {
 			@Override
 			protected void run() throws Exception {
 				for (;;) {
+					
 					LoggedEvent event = events.take();
 					Logger logger = loggers.findLogger(event);
 					try (Closer closer = threadName(event.threadName)) {
