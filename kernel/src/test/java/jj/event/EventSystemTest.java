@@ -63,7 +63,7 @@ public class EventSystemTest {
 	final Exception toThrow = new Exception();
 	
 	@Singleton
-	public static class EventManagerChild extends PublisherImpl {
+	public static class PublisherChild extends PublisherImpl {
 		
 		
 		Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap;
@@ -78,7 +78,7 @@ public class EventSystemTest {
 	
 	private Injector injector;
 	
-	private EventManagerChild pub;
+	private PublisherChild pub;
 	
 	private Thread publisherLoop;
 	
@@ -96,7 +96,7 @@ public class EventSystemTest {
 
 		MockTaskRunner taskRunner = injector.getInstance(MockTaskRunner.class);
 		
-		pub = injector.getInstance(EventManagerChild.class);
+		pub = injector.getInstance(PublisherChild.class);
 		
 		publisherLoop = taskRunner.runFirstTaskInDaemon();
 	}
@@ -109,7 +109,7 @@ public class EventSystemTest {
 	@Test
 	public void testCorrectOperation() throws Exception {
 		
-		EventManagerChild pub = impl();
+		PublisherChild pub = impl();
 		
 		System.gc();
 		
@@ -127,7 +127,7 @@ public class EventSystemTest {
 		pub.publish(new EventSub());
 	}
 	
-	private EventManagerChild impl() {
+	private PublisherChild impl() {
 		// publishing with nothing listening is fine
 		pub.publish(new EventSub());
 		
@@ -284,7 +284,6 @@ public class EventSystemTest {
 			assertThat(pub.listenerMap.get(IEvent.class).size(), is(1));
 			assertThat(pub.listenerMap.get(Event.class).size(), is(1));
 			assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
-			System.out.println(sub.countIEvent.get());
 			
 		} finally {
 			executor.shutdownNow();

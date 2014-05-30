@@ -25,19 +25,32 @@ import java.lang.annotation.Target;
  * marked as {@link Subscriber}
  * 
  * <p>
- * The method
- * must take a single parameter, which is the event
- * type. The listener can be any access except private.
- * It can return anything at all (including void),
- * but the event system will disregard it.
+ * The method must take a single parameter, which is the event type. The
+ * listener can be any access except private. It can return anything at
+ * all (including void), but the event system will disregard it.
  * 
  * <p>
- * Events can be any type, or any interface,
- * with the exception of {@link Object}. Event
- * delivery respects the class hierarchy, so subscribing
- * to a base event will get delivery for all sub types.
- * Due to type erasure, generic classes
- * do not work.
+ * Events can be any type, or any interface, with the exception of
+ * {@link Object}. Event delivery respects the class hierarchy, so
+ * subscribing to a base event will get delivery for all sub types.
+ * Due to type erasure, parameterized classes do not work.
+ * 
+ * <p>
+ * No serious processing should be done in event listeners since you have no control over
+ * what thread is running. Also, throwing anything from a listener method is considered a
+ * programming error, and it will cause assertion errors to be thrown into unspecified
+ * parts of the system, so don't do it!  The easiest way to comply with this advice is to
+ * inject the {@link jj.execution.TaskRunner} and do something like:
+ * <pre class="brush:java">
+ * {@literal @}Listener
+ * void event(final Event event) {
+ *   taskRunner.execute(new ServerTask("processing event") { // or some other task type
+ *     public void run() throws Exception {
+ *       doSomethingInterestingWithThe(event);
+ *     }
+ *   });
+ * }
+ * </pre>
  * 
  * @author jason
  *

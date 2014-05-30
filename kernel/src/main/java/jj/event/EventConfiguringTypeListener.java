@@ -32,7 +32,6 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
-import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import jj.execution.ServerTask;
@@ -61,9 +60,7 @@ import com.google.inject.spi.TypeListener;
  * </p>
  * 
  * <p>
- * The implementation of this class is a little hairy, it's sort
- * of functional in an attempt to lock as little as possible while
- * remaining correct.
+ * Breaking this up might pay some dividends?
  * @author jason
  *
  */
@@ -94,15 +91,13 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
 	
-	private final ClassPool classPool;
+	private final ClassPool classPool = ClassPoolHelper.classPool();
 	private final CtClass invokerClass;
 	private final CtMethod invokeMethod;
 	private final CtClass weakReferenceClass;
 	
 	EventConfiguringTypeListener() {
 		try {
-			classPool = new ClassPool();
-			classPool.appendClassPath(new LoaderClassPath(ClassPoolHelper.class.getClassLoader()));
 			invokerClass = classPool.get(Invoker.class.getName());
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
 			weakReferenceClass = classPool.get(WeakReference.class.getName());
@@ -174,150 +169,144 @@ class EventConfiguringTypeListener implements TypeListener {
 	private final class EventWiringInjectionListener<I> implements InjectionListener<I> {
 		@Override
 		public void afterInjection(final I injectee) {
-			
-			final String name = injectee.getClass().getName();
-
-			if (injectee instanceof TaskRunner) {
-				((TaskRunner)injectee).execute(new ListenerCleaner());
-			}
-			
-			if (injectee instanceof PublisherImpl) {
-				// share state with the publisher - but it can't have events.  boo
-				((PublisherImpl)injectee).listenerMap(invokers);
-			} else if (subscribers.containsKey(name)) {
-
-				for (final MethodInfo invoked : subscribers.get(name)) {
-					
-					cleanupMap.computeIfAbsent(
-						new WeakReference<Object>(injectee, invokerInstanceQueue),
-						new Fun<WeakReference<Object>, Invoker>() {
-
-						@Override
-						public Invoker apply(WeakReference<Object> reference) {
-							try {
-								invokerClasses.computeIfAbsent(invoked.className, new Fun<String, Class<? extends Invoker>>() {
-
-									@Override
-									public Class<? extends Invoker> apply(String className) {
-										try {
-											return makeInvokerClass(className, injectee, invoked.method);
-										} catch (Exception e) {
-											throw new AssertionError(e);
-										}
-									}
-								});
-								
-								Invoker invoker = invokerClasses.get(invoked.className).getConstructor(WeakReference.class).newInstance(reference);
-								invokers.get(Class.forName(invoked.parameterType)).offer(invoker);
-								return invoker;
-							} catch (Exception e) {
-								throw new AssertionError(e);
-							}
-						}
-					});
-					
-					
-				}
-			}
-		}
-
-		@SuppressWarnings("unchecked")
-		private Class<? extends Invoker> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
-			// might be defined already
-			try {
-				return (Class<? extends Invoker>)Class.forName(className);
-			} catch (ClassNotFoundException e) {}
-			
-			CtClass newClass = classPool.makeClass(className);
-			newClass.addInterface(invokerClass);
-			newClass.addField(CtField.make("private final java.lang.ref.WeakReference instance;", newClass));
-			newClass.addConstructor(
-				CtNewConstructor.make(
-					new CtClass[] { weakReferenceClass },
-					null,
-					"{this.instance = $1;}",
-					newClass
-				)
-			);
-			CtMethod newMethod = CtNewMethod.copy(invokeMethod, newClass, null);
-			newMethod.setBody(
-				"{" +
-				injectee.getClass().getName() + " invokee = (" + injectee.getClass().getName() + ")instance.get();" +
-				// if the invokee goes out of scope, we can stop sending events to it
-				"if (invokee != null) invokee." + invoked.getName() + "((" + invoked.getParameterTypes()[0].getName() + ")$1);" +
-				"}"
-			);
-			newClass.addMethod(newMethod);
-			
-			Class<? extends Invoker> invokerClass = classPool.toClass(
-				newClass, 
-				getClass().getClassLoader(), 
-				getClass().getProtectionDomain()
-			);
-			
-			newClass.detach();
-			
-			return invokerClass;
+			possiblySubscribeToEvents(injectee);
 		}
 	}
-
-	@Override
-	public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
-		
-		String name = type.toString();
-
-		try {
-			final CtClass clazz = classPool.get(type.toString());
-		
-			if (clazz.hasAnnotation(Subscriber.class)) {
-				
-				subscribers.computeIfAbsent(name, new Fun<String, List<MethodInfo>>() {
 	
-					@Override
-					public List<MethodInfo> apply(String name) {
-						ArrayList<MethodInfo> result = new ArrayList<>();
-						
-						try {
-							for (CtMethod method : clazz.getMethods()) {
-								if (
-									// should be not static, have one parameter
-									// can return anything, but it's ignored
-									method.hasAnnotation(Listener.class) &&
-									!Modifier.isStatic(method.getModifiers()) &&
-									method.getParameterTypes().length == 1
-								) {
-									result.add(new MethodInfo(method));
+	private void possiblySubscribeToEvents(final Object subscriber) {
+		final String name = subscriber.getClass().getName();
 
-									invokers.computeIfAbsent(
-										Class.forName(method.getParameterTypes()[0].getName()),
-										new Fun<Class<?>, LinkedBlockingQueue<Invoker>>() {
+		if (subscriber instanceof TaskRunner) {
+			((TaskRunner)subscriber).execute(new ListenerCleaner());
+		}
 		
-											@Override
-											public LinkedBlockingQueue<Invoker>apply(Class<?> a) {
-												return new LinkedBlockingQueue<>();
-											}
-										}
-									);
+		if (subscriber instanceof PublisherImpl) {
+			// share state with the publisher - but it can't have events.  boo
+			((PublisherImpl)subscriber).listenerMap(invokers);
+		} else if (subscribers.containsKey(name)) {
+
+			for (final MethodInfo invoked : subscribers.get(name)) {
+				
+				cleanupMap.computeIfAbsent(
+					new WeakReference<Object>(subscriber, invokerInstanceQueue),
+					new Fun<WeakReference<Object>, Invoker>() {
+
+					@Override
+					public Invoker apply(WeakReference<Object> reference) {
+						try {
+							invokerClasses.computeIfAbsent(invoked.className, new Fun<String, Class<? extends Invoker>>() {
+
+								@Override
+								public Class<? extends Invoker> apply(String className) {
+									try {
+										return makeInvokerClass(className, subscriber, invoked.method);
+									} catch (Exception e) {
+										throw new AssertionError(e);
+									}
 								}
-							}
+							});
+							
+							Invoker invoker = invokerClasses.get(invoked.className).getConstructor(WeakReference.class).newInstance(reference);
+							invokers.get(Class.forName(invoked.parameterType)).offer(invoker);
+							return invoker;
 						} catch (Exception e) {
-							throw new AssertionError(type.toString(), e);
+							throw new AssertionError(e);
 						}
-						
-						return Collections.unmodifiableList(result);
 					}
 				});
 				
 				
-				assert !subscribers.get(name).isEmpty() : name + " is subscribing but has no listeners";
-				
-			} else {
-				clazz.detach();
 			}
-		} catch (NotFoundException e1) {
-			// don't care
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Class<? extends Invoker> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
+		// might be defined already
+		try {
+			return (Class<? extends Invoker>)Class.forName(className);
+		} catch (ClassNotFoundException e) {}
 		
+		CtClass newClass = classPool.makeClass(className);
+		newClass.addInterface(invokerClass);
+		newClass.addField(CtField.make("private final java.lang.ref.WeakReference instance;", newClass));
+		newClass.addConstructor(
+			CtNewConstructor.make(
+				new CtClass[] { weakReferenceClass },
+				null,
+				"{this.instance = $1;}",
+				newClass
+			)
+		);
+		CtMethod newMethod = CtNewMethod.copy(invokeMethod, newClass, null);
+		newMethod.setBody(
+			"{" +
+			injectee.getClass().getName() + " invokee = (" + injectee.getClass().getName() + ")instance.get();" +
+			// if the invokee goes out of scope, we can stop sending events to it
+			"if (invokee != null) invokee." + invoked.getName() + "((" + invoked.getParameterTypes()[0].getName() + ")$1);" +
+			"}"
+		);
+		newClass.addMethod(newMethod);
+		
+		Class<? extends Invoker> invokerClass = classPool.toClass(
+			newClass, 
+			getClass().getClassLoader(), 
+			getClass().getProtectionDomain()
+		);
+		
+		newClass.detach();
+		
+		return invokerClass;
+	}
+
+	@Override
+	public <I> void hear(TypeLiteral<I> type, final TypeEncounter<I> encounter) {
+		
+		String name = type.toString();
+		
+		subscribers.computeIfAbsent(name, new Fun<String, List<MethodInfo>>() {
+
+			@Override
+			public List<MethodInfo> apply(String name) {
+				ArrayList<MethodInfo> result = new ArrayList<>();
+				
+				try {
+					CtClass clazz = classPool.get(name);
+					if (clazz.hasAnnotation(Subscriber.class)) {
+						for (CtMethod method : clazz.getMethods()) {
+							if (
+								// should be not static, have one parameter
+								// can return anything, but it's ignored
+								method.hasAnnotation(Listener.class) &&
+								!Modifier.isStatic(method.getModifiers()) &&
+								method.getParameterTypes().length == 1
+							) {
+								result.add(new MethodInfo(method));
+	
+								invokers.computeIfAbsent(
+									Class.forName(method.getParameterTypes()[0].getName()),
+									new Fun<Class<?>, LinkedBlockingQueue<Invoker>>() {
+	
+										@Override
+										public LinkedBlockingQueue<Invoker>apply(Class<?> a) {
+											return new LinkedBlockingQueue<>();
+										}
+									}
+								);
+							}
+						}
+						assert !result.isEmpty() : name + " is subscribing but has no listeners";
+					}
+				} catch (NotFoundException e1) {
+					// don't care
+				} catch (Exception e) {
+					throw new AssertionError(name, e);
+				}
+				
+				return result.isEmpty() ? null : Collections.unmodifiableList(result);
+			}
+		});
+
 		encounter.register(new EventWiringInjectionListener<I>());
 	}
 }

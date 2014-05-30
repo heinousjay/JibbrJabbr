@@ -18,6 +18,8 @@ package jj.util;
 import java.util.Random;
 
 /**
+ * wraps 
+ * 
  * @author jason
  *
  */

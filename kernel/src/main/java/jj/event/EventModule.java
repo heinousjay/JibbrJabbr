@@ -15,20 +15,36 @@
  */
 package jj.event;
 
-import com.google.inject.matcher.Matchers;
+import com.google.inject.TypeLiteral;
+import com.google.inject.matcher.AbstractMatcher;
 
 import jj.JJModule;
+import jj.execution.TaskRunner;
 
 /**
  * @author jason
  *
  */
 public class EventModule extends JJModule {
+	
+	@SuppressWarnings("rawtypes")
+	private static class SubscriberMatcher extends AbstractMatcher<TypeLiteral> {
 
+		@Override
+		public boolean matches(TypeLiteral t) {
+			Class<?> c = t.getRawType();
+			boolean result = c.isAnnotationPresent(Subscriber.class) ||
+				TaskRunner.class.isAssignableFrom(c) ||
+				Publisher.class.isAssignableFrom(c);
+			
+			return result;
+		}
+	}
+	
 	@Override
 	protected void configure() {
 		
-		bindListener(Matchers.any(), new EventConfiguringTypeListener());
+		bindListener(new SubscriberMatcher(), new EventConfiguringTypeListener());
 		bind(Publisher.class).to(PublisherImpl.class);
 	}
 

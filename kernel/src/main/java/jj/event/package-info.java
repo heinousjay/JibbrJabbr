@@ -39,10 +39,10 @@
  * 
  * <p>
  * No serious processing should be done in event listeners since you have no control over
- * what thread is running - start a task instead! Also, throwing anything from a listener
- * method is considered a programming error, and it will cause assertion errors to be
- * thrown into unspecified parts of the system, so don't do it!  The easiest way to comply
- * with this advice is to inject the {@link jj.execution.TaskRunner} and do something like:
+ * what thread is running. Also, throwing anything from a listener method is considered a
+ * programming error, and it will cause assertion errors to be thrown into unspecified
+ * parts of the system, so don't do it!  The easiest way to comply with this advice is to
+ * inject the {@link jj.execution.TaskRunner} and do something like:
  * <pre class="brush:java">
  * {@literal @}Listener
  * void event(final Event event) {

@@ -25,11 +25,6 @@ package jj.event;
  * Event objects should probably be immutable in most circumstances but it's not
  * at all required.
  * 
- * <p>
- * If an event listener throws an error during the listener invocation, that
- * exception will travel back through this call as an AssertionError. This implies
- * that it is considered a programming error to write a listener that can throw.
- * 
  * @author jason
  *
  */
