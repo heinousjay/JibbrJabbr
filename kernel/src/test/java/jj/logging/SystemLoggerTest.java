@@ -30,6 +30,7 @@ import jj.util.RandomHelper;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -97,6 +98,7 @@ public class SystemLoggerTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testUnderLoad() throws Exception {
 		// warm up runs
