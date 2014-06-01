@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,11 +67,11 @@ public class EventSystemTest {
 	public static class PublisherChild extends PublisherImpl {
 		
 		
-		Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap;
+		Map<Class<?>, ConcurrentLinkedQueue<Invoker>> listenerMap;
 		
 		
 		@Override
-		void listenerMap(Map<Class<?>, LinkedBlockingQueue<Invoker>> listenerMap) {
+		void listenerMap(Map<Class<?>, ConcurrentLinkedQueue<Invoker>> listenerMap) {
 			this.listenerMap = listenerMap;
 			super.listenerMap(listenerMap);
 		}

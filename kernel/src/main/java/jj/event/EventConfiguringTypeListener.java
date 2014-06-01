@@ -24,8 +24,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -84,7 +83,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	 * to also be concurrent, but the value itself will only ever be set once on first encounter
 	 * for a given event type and never removed after so that should do it
 	 */
-	private final ConcurrentHashMapV8<Class<?>, LinkedBlockingQueue<Invoker>> invokers = new ConcurrentHashMapV8<>();
+	private final ConcurrentHashMapV8<Class<?>, ConcurrentLinkedQueue<Invoker>> invokers = new ConcurrentHashMapV8<>();
 	
 	/** mapped from the weak reference to the instance invoked -> invoker */
 	private final ConcurrentHashMapV8<WeakReference<Object>, Invoker> cleanupMap = new ConcurrentHashMapV8<>();
@@ -128,7 +127,7 @@ class EventConfiguringTypeListener implements TypeListener {
 				Reference<?> reference = invokerInstanceQueue.remove();
 				Invoker instance = cleanupMap.remove(reference);
 				if (instance != null) {
-					for (LinkedBlockingQueue<Invoker> invokerQueue : invokers.values()) {
+					for (ConcurrentLinkedQueue<Invoker> invokerQueue : invokers.values()) {
 						invokerQueue.remove(instance);
 					}
 				}
@@ -169,54 +168,51 @@ class EventConfiguringTypeListener implements TypeListener {
 	private final class EventWiringInjectionListener<I> implements InjectionListener<I> {
 		@Override
 		public void afterInjection(final I injectee) {
-			possiblySubscribeToEvents(injectee);
+			if (injectee instanceof TaskRunner) {
+				((TaskRunner)injectee).execute(new ListenerCleaner());
+			} else if (injectee instanceof PublisherImpl) {
+				// share state with the publisher - but it can't have events.  boo
+				((PublisherImpl)injectee).listenerMap(invokers);
+			} else {
+				possiblySubscribeToEvents(injectee);
+			}
 		}
 	}
 	
 	private void possiblySubscribeToEvents(final Object subscriber) {
 		final String name = subscriber.getClass().getName();
 
-		if (subscriber instanceof TaskRunner) {
-			((TaskRunner)subscriber).execute(new ListenerCleaner());
-		}
-		
-		if (subscriber instanceof PublisherImpl) {
-			// share state with the publisher - but it can't have events.  boo
-			((PublisherImpl)subscriber).listenerMap(invokers);
-		} else if (subscribers.containsKey(name)) {
+		for (final MethodInfo invoked : subscribers.get(name)) {
+			
+			cleanupMap.computeIfAbsent(
+				new WeakReference<Object>(subscriber, invokerInstanceQueue),
+				new Fun<WeakReference<Object>, Invoker>() {
 
-			for (final MethodInfo invoked : subscribers.get(name)) {
-				
-				cleanupMap.computeIfAbsent(
-					new WeakReference<Object>(subscriber, invokerInstanceQueue),
-					new Fun<WeakReference<Object>, Invoker>() {
+				@Override
+				public Invoker apply(WeakReference<Object> reference) {
+					try {
+						invokerClasses.computeIfAbsent(invoked.className, new Fun<String, Class<? extends Invoker>>() {
 
-					@Override
-					public Invoker apply(WeakReference<Object> reference) {
-						try {
-							invokerClasses.computeIfAbsent(invoked.className, new Fun<String, Class<? extends Invoker>>() {
-
-								@Override
-								public Class<? extends Invoker> apply(String className) {
-									try {
-										return makeInvokerClass(className, subscriber, invoked.method);
-									} catch (Exception e) {
-										throw new AssertionError(e);
-									}
+							@Override
+							public Class<? extends Invoker> apply(String className) {
+								try {
+									return makeInvokerClass(className, subscriber, invoked.method);
+								} catch (Exception e) {
+									throw new AssertionError(e);
 								}
-							});
-							
-							Invoker invoker = invokerClasses.get(invoked.className).getConstructor(WeakReference.class).newInstance(reference);
-							invokers.get(Class.forName(invoked.parameterType)).offer(invoker);
-							return invoker;
-						} catch (Exception e) {
-							throw new AssertionError(e);
-						}
+							}
+						});
+						
+						Invoker invoker = invokerClasses.get(invoked.className).getConstructor(WeakReference.class).newInstance(reference);
+						invokers.get(Class.forName(invoked.parameterType)).offer(invoker);
+						return invoker;
+					} catch (Exception e) {
+						throw new AssertionError(e);
 					}
-				});
-				
-				
-			}
+				}
+			});
+			
+			
 		}
 	}
 
@@ -261,6 +257,8 @@ class EventConfiguringTypeListener implements TypeListener {
 
 	@Override
 	public <I> void hear(TypeLiteral<I> type, final TypeEncounter<I> encounter) {
+		// anything we heard here, we also want to wire
+		encounter.register(new EventWiringInjectionListener<I>());
 		
 		String name = type.toString();
 		
@@ -285,11 +283,11 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 								invokers.computeIfAbsent(
 									Class.forName(method.getParameterTypes()[0].getName()),
-									new Fun<Class<?>, LinkedBlockingQueue<Invoker>>() {
+									new Fun<Class<?>, ConcurrentLinkedQueue<Invoker>>() {
 	
 										@Override
-										public LinkedBlockingQueue<Invoker>apply(Class<?> a) {
-											return new LinkedBlockingQueue<>();
+										public ConcurrentLinkedQueue<Invoker>apply(Class<?> a) {
+											return new ConcurrentLinkedQueue<>();
 										}
 									}
 								);
@@ -306,7 +304,5 @@ class EventConfiguringTypeListener implements TypeListener {
 				return result.isEmpty() ? null : Collections.unmodifiableList(result);
 			}
 		});
-
-		encounter.register(new EventWiringInjectionListener<I>());
 	}
 }
