@@ -276,15 +276,6 @@ public class EventSystemTest {
 			assertThat(sub.countEvent.get(), is(countEvent.get()));
 			assertThat(sub.countEventSub.get(), is(countEventSub.get()));
 			
-			System.gc();
-			
-			// it needs some small amount of time
-			Thread.sleep(100);
-			// verify the only listener still registered is the one we can reach
-			assertThat(pub.listenerMap.size(), is(3));
-			assertThat(pub.listenerMap.get(IEvent.class).size(), is(1));
-			assertThat(pub.listenerMap.get(Event.class).size(), is(1));
-			assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
 			
 		} finally {
 			executor.shutdownNow();
