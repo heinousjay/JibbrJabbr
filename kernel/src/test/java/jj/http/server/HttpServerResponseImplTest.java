@@ -70,7 +70,6 @@ public class HttpServerResponseImplTest {
 	@Mock Publisher publisher;
 	@Mock Version version;
 	HttpServerResponseImpl response;
-	@Mock Logger logger;
 	
 	@Captor ArgumentCaptor<LoggedEvent> eventCaptor;
 
@@ -143,7 +142,6 @@ public class HttpServerResponseImplTest {
 		boolean found = false;
 		for (LoggedEvent event : eventCaptor.getAllValues()) {
 			if (eventType.isInstance(event)) {
-				event.describeTo(logger);
 				found = true;
 				break;
 			}
@@ -170,7 +168,6 @@ public class HttpServerResponseImplTest {
 		assertThat(response.status(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
 		verifyInlineResponse();
 		verifyEventIsPublished(RequestErrored.class);
-		verify(logger).error(anyString(), eq(e));
 	}
 	
 	LoadedResource givenALoadedResource() throws IOException {
@@ -262,7 +259,8 @@ public class HttpServerResponseImplTest {
 		verifyInlineResponse();
 	}
 	
-	
+	/*
+	 * move this to a test of the logging class
 	@Test
 	public void testAccessLog() throws IOException {
 		
@@ -299,5 +297,6 @@ public class HttpServerResponseImplTest {
 			eq("-")
 		);
 	}
+	*/
 
 }
