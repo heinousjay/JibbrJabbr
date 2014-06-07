@@ -15,6 +15,8 @@
  */
 package jj.configuration;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,6 +25,31 @@ import java.util.List;
  *
  */
 public interface Location {
+	
+	public static class Bundle implements Location {
+		
+		private final List<Location> locations = new ArrayList<>();
+		
+		public Bundle(Location first, Location second) {
+			locations.add(first);
+			locations.add(second);
+		}
+		
+		public Location and(Location next) {
+			locations.add(next);
+			return this;
+		}
+		
+		public List<Location> locations() {
+			return Collections.unmodifiableList(locations);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof Bundle &&
+				((Bundle)obj).locations.equals(locations);
+		}
+	}
 	
 	Location and(Location location);
 	

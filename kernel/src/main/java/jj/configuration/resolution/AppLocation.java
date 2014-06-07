@@ -15,7 +15,6 @@
  */
 package jj.configuration.resolution;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -66,32 +65,8 @@ public enum AppLocation implements Location {
 		this.path = path;
 	}
 	
-	public final class AppLocationBundle implements Location {
-		private final List<Location> locations = new ArrayList<>();
-		
-		AppLocationBundle(Location first, Location second) {
-			locations.add(first);
-			locations.add(second);
-		}
-		
-		public Location and(Location next) {
-			locations.add(next);
-			return this;
-		}
-		
-		public List<Location> locations() {
-			return Collections.unmodifiableList(locations);
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			return obj instanceof AppLocationBundle &&
-				((AppLocationBundle)obj).locations.equals(locations);
-		}
-	}
-	
 	public Location and(Location next) {
-		return new AppLocationBundle(this, next);
+		return new Bundle(this, next);
 	}
 	
 	public List<Location> locations() {
