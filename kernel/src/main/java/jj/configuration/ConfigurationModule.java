@@ -30,9 +30,12 @@ public class ConfigurationModule extends JJModule {
 		
 		addAssetPath("/jj/assets/");
 		
+		addAPIModulePath("/jj/configuration/api/");
+		
 		addStartupListenerBinding().to(ConfigurationScriptPreloader.class);
 		
 		bind(PathResolver.class).to(Application.class);
+		
+		bindCreation().of(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);
 	}
-
 }

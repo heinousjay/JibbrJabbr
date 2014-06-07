@@ -37,10 +37,9 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 	}
 
 	@Override
-	public final T create(Location location, String name, Object... args) throws IOException {
+	public T create(Location base, String name, Object... args) throws IOException {
 		
-		// TODO enable this!
-		//assert location == AppLocation.Virtual : "all ScriptEnvironments are from the virtual location";
+		assert base == AppLocation.Virtual : "all ScriptEnvironments are Virtual";
 		
 		T result = createScriptEnvironment(name, args);
 		
@@ -55,8 +54,7 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 	
 	@Override
 	protected URI uri(Location base, String name, Object... args) {
-		// TODO enable this!
-		//assert location == AppLocation.Virtual : "all ScriptEnvironments are from the virtual location";
+		assert base == AppLocation.Virtual : "all ScriptEnvironments are Virtual";
 		return URI.create(name);
 	}
 

@@ -52,7 +52,7 @@ public class ResourceInstanceCreator {
 	
 	public <T extends Resource> T createResource(
 		final Class<T> resourceClass,
-		final ResourceKey cacheKey,
+		final ResourceKey resourceKey,
 		final Location base,
 		final String name,
 		final Object...args
@@ -68,7 +68,7 @@ public class ResourceInstanceCreator {
 						@Override
 						protected void configure() {
 							bind(resourceClass);
-							bind(ResourceKey.class).toInstance(cacheKey);
+							bind(ResourceKey.class).toInstance(resourceKey);
 							bind(Location.class).toInstance(base);
 							bind(String.class).toInstance(name);
 							if (path != null) {
