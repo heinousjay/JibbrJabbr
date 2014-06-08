@@ -40,6 +40,7 @@ import javassist.bytecode.annotation.Annotation;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.util.ClassPoolHelper;
 import jj.util.StringUtils;
 
 /**
@@ -80,8 +81,7 @@ class ConfigurationClassLoader extends ClassLoader {
 	@Inject
 	ConfigurationClassLoader() throws Exception {
 		super(ConfigurationClassLoader.class.getClassLoader());
-		classPool = new ClassPool();
-		classPool.appendClassPath(new LoaderClassPath(getParent()));
+		classPool = ClassPoolHelper.classPool();
 		configBase = classPool.get(ConfigurationObjectBase.class.getName());
 		configBaseCtor = configBase.getConstructors()[0];
 		configBaseCtorSignature = configBaseCtor.getMethodInfo().getAttribute(SignatureAttribute.tag);
