@@ -19,9 +19,13 @@ import static jj.configuration.resolution.AppLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
+import jj.configuration.ConfigurationScriptEnvironment.ConfigurationLoaded;
+import jj.configuration.ConfigurationScriptEnvironment.ConfigurationLoading;
 import jj.event.Publisher;
 import jj.resource.ResourceFinder;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
+import jj.script.ScriptEnvironment;
+import jj.script.ScriptEnvironmentInitialized;
 import jj.script.module.ScriptResource;
 
 import org.junit.Before;
@@ -42,6 +46,7 @@ public class ConfigurationScriptEnvironmentTest {
 	@Mock ResourceFinder resourceFinder;
 	@Mock Publisher publisher;
 	@Mock ScriptableObject global;
+	@Mock ConfigurationCollector collector;
 	
 	ConfigurationScriptEnvironment cse;
 	
@@ -58,13 +63,26 @@ public class ConfigurationScriptEnvironmentTest {
 		
 		cse = new ConfigurationScriptEnvironment(
 			dependencies,
-			resourceFinder, publisher, global
+			resourceFinder, publisher, global, collector
 		);
 	}
 
 	@Test
-	public void test() {
+	public void testInitialization() {
+
+		verify(configScript).addDependent(cse);
+		verify(publisher).publish(isA(ConfigurationLoading.class));
 		
+		// make sure it only triggers on its own initialization
+		cse.scriptInitialized(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
+
+		verify(collector, never()).configurationComplete();
+		verify(publisher, never()).publish(isA(ConfigurationLoaded.class));
+		
+		cse.scriptInitialized(new ScriptEnvironmentInitialized(cse));
+		
+		verify(collector).configurationComplete();
+		verify(publisher).publish(isA(ConfigurationLoaded.class));
 	}
 
 }

@@ -1,4 +1,26 @@
-var print = require('print');
 
-print('this is the end');
-print('beautiful friend', 'the end');
+// the http-server-socket module returns an object that can configure
+// its namesake
+require('http-server-socket')
+	//SO_KEEPALIVE
+	.keepAlive(true)
+	// TCP_NODELAY
+	.tcpNoDelay(true)
+	// SO_BACKLOG
+	.backlog(1024)
+	// SO_TIMEOUT
+	.timeout(10000)
+	// SO_REUSEADDR
+	.reuseAddress(true)
+	// SO_SNDBUF
+	.sendBufferSize(65536)
+	// SO_RCVBUF
+	.receiveBufferSize(65536)
+	
+	// bind each [host], port combination
+	// you want listening.
+	// the command line argument httpPort
+	// overrides this configuration
+	// the default is to bind to all addresses
+	// on port 8080, which is also what this does
+	.bind(8080);

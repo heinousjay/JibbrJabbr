@@ -38,8 +38,12 @@ import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
 
 /**
- * Perverse! this class listens for its own initialization, since
- * that's the best way to find out when it happened. lol
+ * <p>
+ * Running environment for configuration scripts.
+ * 
+ * <p>
+ * Config scripts are kinda simple, there can be only one.
+ * 
  * 
  * @author jason
  *
@@ -63,18 +67,23 @@ public class ConfigurationScriptEnvironment extends AbstractScriptEnvironment im
 	
 	private final ScriptResource config;
 	
+	private final ConfigurationCollector collector;
+	
 	@Inject
 	ConfigurationScriptEnvironment(
 		final Dependencies dependencies,
 		final ResourceFinder resourceFinder,
 		final Publisher publisher,
-		final @Global ScriptableObject global
+		final @Global ScriptableObject global,
+		final ConfigurationCollector collector
 	) {
 		super(dependencies);
 		
 		this.publisher = publisher;
 		
 		this.global = global;
+		
+		this.collector = collector;
 		
 		scope = createChainedScope(global);
 		configureModuleObjects("configuration", scope);
@@ -89,7 +98,7 @@ public class ConfigurationScriptEnvironment extends AbstractScriptEnvironment im
 	@Listener
 	void scriptInitialized(final ScriptEnvironmentInitialized event) {
 		if (event.scriptEnvironment() == this) {
-			// do this in another thread? seems like a waste
+			collector.configurationComplete();
 			publisher.publish(new ConfigurationLoaded());
 		}
 	}

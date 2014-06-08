@@ -11,7 +11,7 @@ module.exports = {
 
 	makeIntProperty: function(base, name) {
 		return function(arg) {
-			arg = parseInt(arg)
+			arg = parseInt(arg);
 			if (isNaN(arg)) { throw new TypeError(name + ' must be an int'); }
 			collector.addConfigurationElement(base + name, new java.lang.Integer(arg));
 			return this;
