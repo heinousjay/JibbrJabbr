@@ -16,7 +16,6 @@
 package jj.configuration;
 
 import static jj.configuration.resolution.AppLocation.*;
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
 import jj.configuration.ConfigurationScriptEnvironment.ConfigurationLoaded;
