@@ -17,21 +17,62 @@ package jj.configuration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.*;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ConfigurationClassLoaderTest {
 	
-	public interface Interface1 {
+	public interface ConfigurationInterface {
 		
 		String something();
+		
+		int otherThing();
+		
+		@Default("default")
+		Object defaultedThing();
+	}
+	
+	ConfigurationClassLoader ccl;
+	@Mock ConfigurationCollector collector;
+	
+	@Before
+	public void before() throws Exception {
+		ccl = new ConfigurationClassLoader();
 	}
 
 	@Test
 	public void test() throws Exception {
-		ConfigurationClassLoader ccl = new ConfigurationClassLoader();
 		
-		assertThat(ccl.makeClassFor(Interface1.class), is(notNullValue()));
+		assertThat(ccl.makeClassFor(ConfigurationInterface.class), is(notNullValue()));
+	}
+	
+	
+	@Test
+	public void testClassCreation() throws Exception {
+		
+		System.out.println(int.class.getName());
+		
+		Class<? extends ConfigurationInterface> clazz = ccl.makeConfigurationClassFor(ConfigurationInterface.class);
+		
+		ConfigurationInterface iface1 = 
+			clazz.getConstructor(ConfigurationCollector.class)
+				.newInstance(collector);
+		
+		assertThat(iface1, is(notNullValue()));
+		
+		String base = ConfigurationInterface.class.getName() + ".";
+		given(collector.get(base + "something", String.class, null)).willReturn("something");
+		given(collector.get(base + "otherThing", Integer.class, null)).willReturn(45);
+		given(collector.get(base + "defaultedThing", Object.class, "default")).willReturn("default");
+		assertThat(iface1.something(), is("something"));
+		assertThat(iface1.otherThing(), is(45));
+		assertThat(iface1.defaultedThing(), is((Object)"default"));
 	}
 
 }

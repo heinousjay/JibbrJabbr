@@ -35,7 +35,7 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
-import jj.util.ClassPoolHelper;
+import jj.util.CodeGenHelper;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
@@ -90,7 +90,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 	private final ReferenceQueue<Object> invokerInstanceQueue = new ReferenceQueue<>();
 	
-	private final ClassPool classPool = ClassPoolHelper.classPool();
+	private final ClassPool classPool = CodeGenHelper.classPool();
 	private final CtClass invokerClass;
 	private final CtMethod invokeMethod;
 	private final CtClass weakReferenceClass;

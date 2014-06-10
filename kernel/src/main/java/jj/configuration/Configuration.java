@@ -65,8 +65,4 @@ public class Configuration {
 		
 		return configurationInterface.cast(configurationInstance);
 	}
-	
-	public boolean isSystemRunning() {
-		return true;
-	}
 }

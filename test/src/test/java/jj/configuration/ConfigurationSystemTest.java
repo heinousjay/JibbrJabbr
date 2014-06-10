@@ -76,7 +76,7 @@ public class ConfigurationSystemTest {
 		assertTrue(latch.await(2, SECONDS));
 		
 		// and let's peek into the collector to assert some stuff
-		assertThat(collector.get(httpServerSocket("keepAlive"), boolean.class), is(true));
-		assertThat(collector.get(httpServerSocket("backlog"), int.class), is(1024));
+		assertThat(collector.get(httpServerSocket("keepAlive"), boolean.class, "false"), is(true));
+		assertThat(collector.get(httpServerSocket("backlog"), int.class, "0"), is(1024));
 	}
 }

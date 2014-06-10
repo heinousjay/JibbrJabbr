@@ -152,12 +152,4 @@ public class ConfigurationTest {
 		assertThat(notAConfig.one(), is(false));
 		assertThat(notAConfig.two(), is(0));
 	}
-	
-	@Test
-	public void testIsSystemRunning() throws Exception {
-		toTest = config();
-		assertThat(toTest.isSystemRunning(), is(true));
-		assertThat(mock(Configuration.class).isSystemRunning(), is(false));
-	}
-
 }

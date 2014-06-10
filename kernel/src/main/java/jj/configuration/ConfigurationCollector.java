@@ -62,10 +62,10 @@ public class ConfigurationCollector {
 		}
 	}
 	
-	<T> T get(String key, Class<T> type) {
+	public <T> T get(String key, Class<T> type, Object defaultValue) {
 		Map<String, Object> map = current.get();
 		assert map != null : "configuration is not yet complete, cannot read!";
-		return converters.convert(map.get(key), type);
+		return converters.convert(map.containsKey(key) ? map.get(key) : defaultValue, type);
 	}
 	
 	void configurationComplete() {

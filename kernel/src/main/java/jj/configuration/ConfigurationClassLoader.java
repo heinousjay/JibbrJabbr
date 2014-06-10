@@ -15,20 +15,18 @@
  */
 package jj.configuration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static jj.util.CodeGenHelper.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
+import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
-import javassist.LoaderClassPath;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
@@ -40,7 +38,7 @@ import javassist.bytecode.annotation.Annotation;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.util.ClassPoolHelper;
+import jj.util.CodeGenHelper;
 import jj.util.StringUtils;
 
 /**
@@ -52,25 +50,17 @@ class ConfigurationClassLoader extends ClassLoader {
 	
 	private static final String INJECT_ANNOTATION = "javax.inject.Inject";
 	private static final String NAME_FORMAT = "%sGeneratedImplementationFor%s%s";
-	private static final Map<String, String> primitiveDefaults;
+	
 	
 	static {
 		registerAsParallelCapable();
-		
-		Map<String, String> builder = new HashMap<>();
-		builder.put("boolean", "false");
-		builder.put("char", "(char)0");
-		builder.put("byte", "(byte)0");
-		builder.put("short", "(short)0");
-		builder.put("int", "(int)0");
-		builder.put("long", "(long)0");
-		builder.put("float", "(float)0");
-		builder.put("double", "(double)0");
-		
-		primitiveDefaults = Collections.unmodifiableMap(builder);
 	}
 	
 	private final ClassPool classPool;
+	
+	private final CtClass[] constructionParameters;
+	
+	private final CtClass[] constructionExceptions = new CtClass[0];
 	
 	private final CtClass configBase;
 	
@@ -81,10 +71,90 @@ class ConfigurationClassLoader extends ClassLoader {
 	@Inject
 	ConfigurationClassLoader() throws Exception {
 		super(ConfigurationClassLoader.class.getClassLoader());
-		classPool = ClassPoolHelper.classPool();
+		classPool = CodeGenHelper.classPool();
+		constructionParameters = new CtClass[] { 
+			classPool.get(ConfigurationCollector.class.getName())
+		};
 		configBase = classPool.get(ConfigurationObjectBase.class.getName());
 		configBaseCtor = configBase.getConstructors()[0];
 		configBaseCtorSignature = configBaseCtor.getMethodInfo().getAttribute(SignatureAttribute.tag);
+	}
+	
+	<T> Class<? extends T> makeConfigurationClassFor(Class<T> configurationInterface) throws Exception {
+		
+		CtClass resultInterface = classPool.get(configurationInterface.getName());
+		
+		final String name = String.format(NAME_FORMAT,
+			Configuration.class.getName(),
+			configurationInterface.getSimpleName(),
+			Integer.toHexString(configurationInterface.hashCode())
+		);
+		
+		CtClass result = classPool.makeClass(name);
+		result.addInterface(resultInterface);
+		
+		// make it!
+		prepareConfigurationClassForInjection(result);
+		implementConfigurationClass(result, resultInterface);
+		
+		byte[] b = result.toBytecode();
+		
+		// no need to keep these around
+		result.detach();
+		resultInterface.detach();
+		
+		@SuppressWarnings("unchecked")
+		Class<? extends T> resultClass = (Class<? extends T>)defineClass(name, b, 0, b.length);
+		return resultClass;
+	}
+	
+	private void prepareConfigurationClassForInjection(final CtClass result) throws CannotCompileException {
+		
+		CtField collectorField = CtField.make("private final " + ConfigurationCollector.class.getName() + " collector;", result);
+		result.addField(collectorField);
+		
+		CtConstructor ctor = CtNewConstructor.make(constructionParameters, constructionExceptions, result);
+		ctor.setBody(
+			"{" +
+				"this.collector = $1;" +
+			"}"
+		);
+		result.addConstructor(ctor);
+		
+		ClassFile ccFile = result.getClassFile();
+		ConstPool constpool = ccFile.getConstPool();
+		
+		// @Inject
+		AnnotationsAttribute attribute = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+		Annotation annotation = new Annotation(INJECT_ANNOTATION, constpool);
+		attribute.addAnnotation(annotation);
+		ctor.getMethodInfo().addAttribute(attribute);
+	}
+	
+	private void implementConfigurationClass(final CtClass result, final CtClass resultInterface) throws Exception {
+		
+
+		for (CtMethod method : resultInterface.getDeclaredMethods()) {
+			CtMethod newMethod = CtNewMethod.copy(method, result, null);
+			
+			Default defaultAnnotation = (Default)method.getAnnotation(Default.class);
+			String defaultValue = defaultAnnotation != null ? "\"" + defaultAnnotation.value() + "\"" : null;
+			
+			String name = resultInterface.getName() + "." + newMethod.getName();
+			
+			Class<?> returnType = method.getReturnType().isPrimitive() ?
+				primitiveNamesToWrappers.get(method.getReturnType().getName()) :
+				Class.forName(method.getReturnType().getName());
+			
+			newMethod.setBody(
+				"{" +
+					"return ($r)collector.get(\"" + name + "\", " + returnType.getName() + ".class, " + defaultValue + ");" +
+				"}"
+			);
+			
+			result.addMethod(newMethod);
+		}
+		
 	}
 
 	@SuppressWarnings("unchecked")

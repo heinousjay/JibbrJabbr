@@ -15,9 +15,10 @@
  */
 package jj.conversion;
 
+import static jj.util.CodeGenHelper.*;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -40,50 +41,6 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class Converters {
-	
-	private static final Map<Class<?>, Class<?>> wrappersToPrimitives;
-	private static final Map<Class<?>, Class<?>> primitivesToWrappers;
-	private static final Map<Class<?>, Object> primitiveDefaults;
-	
-	static {
-		Map<Class<?>, Class<?>> builder = new HashMap<>();
-		builder.put(Boolean.class,   Boolean.TYPE);
-		builder.put(Character.class, Character.TYPE);
-		builder.put(Byte.class,      Byte.TYPE);
-		builder.put(Short.class,     Short.TYPE);
-		builder.put(Integer.class,   Integer.TYPE);
-		builder.put(Long.class,      Long.TYPE);
-		builder.put(Float.class,     Float.TYPE);
-		builder.put(Double.class,    Double.TYPE);
-		
-		wrappersToPrimitives = Collections.unmodifiableMap(builder);
-		
-		builder = new HashMap<>();
-		for (Class<?> wrapper : wrappersToPrimitives.keySet()) {
-			builder.put(wrappersToPrimitives.get(wrapper), wrapper);
-		}
-		
-		primitivesToWrappers = Collections.unmodifiableMap(builder);
-		
-		Map<Class<?>, Object> builder2 = new HashMap<>();
-		builder2.put(Boolean.TYPE,   false);
-		builder2.put(Character.TYPE, (char)0);
-		builder2.put(Byte.TYPE,      (byte)0);
-		builder2.put(Short.TYPE,     (short)0);
-		builder2.put(Integer.TYPE,   0);
-		builder2.put(Long.TYPE,      0L);
-		builder2.put(Float.TYPE,     0F);
-		builder2.put(Double.TYPE,    0.0);
-		
-		Map<Class<?>, Object> builder3 = new HashMap<>();
-		for (Class<?> type : builder2.keySet()) {
-			builder3.put(primitivesToWrappers.get(type), builder2.get(type));
-		}
-		
-		builder2.putAll(builder3);
-		
-		primitiveDefaults = Collections.unmodifiableMap(builder2);
-	}
 
 	private final Map<Class<?>, Map<Class<?>, Converter<?, ?>>> converters = new HashMap<>();
 	

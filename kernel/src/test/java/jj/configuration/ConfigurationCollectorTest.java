@@ -48,7 +48,7 @@ public class ConfigurationCollectorTest {
 		
 		collector.configurationComplete();
 		
-		assertThat(collector.get("key1", String.class), is("value1"));
+		assertThat(collector.get("key1", String.class, null), is("value1"));
 	}
 
 }
