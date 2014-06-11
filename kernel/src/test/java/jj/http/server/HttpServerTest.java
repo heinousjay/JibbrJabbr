@@ -23,7 +23,6 @@ import java.net.ConnectException;
 import javax.inject.Provider;
 import javax.net.SocketFactory;
 
-import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 import jj.event.Publisher;
 
@@ -49,7 +48,7 @@ public class HttpServerTest {
 
 	@Mock Configuration configuration;
 	
-	@Mock Arguments arguments;
+	@Mock HttpServerSwitch httpServerSwitch;
 	
 	@Mock Publisher publisher;
 	
@@ -111,13 +110,13 @@ public class HttpServerTest {
 		// TODO - may need to recast this test in any case, since it's not guaranteed that 8080/8090/5678 are available
 		
 		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
-		given(arguments.get("httpServer", boolean.class, true)).willReturn(true);
-		given(arguments.get("httpPort", int.class, -1)).willReturn(5678);
+		given(httpServerSwitch.on()).willReturn(true);
+		given(httpServerSwitch.port()).willReturn(5678);
 		HttpServer httpServer = new HttpServer(
 			new MockJJNioEventLoopGroup(),
 			new HttpServerChannelInitializer(engineProvider),
 			configuration,
-			arguments,
+			httpServerSwitch,
 			publisher
 		);
 		
@@ -141,12 +140,12 @@ public class HttpServerTest {
 		}
 		
 		// given
-		given(arguments.get("httpPort", int.class, -1)).willReturn(-1);
+		given(httpServerSwitch.port()).willReturn(-1);
 		httpServer = new HttpServer(
 			new MockJJNioEventLoopGroup(),
 			new HttpServerChannelInitializer(engineProvider),
 			configuration,
-			arguments,
+			httpServerSwitch,
 			publisher
 		);
 

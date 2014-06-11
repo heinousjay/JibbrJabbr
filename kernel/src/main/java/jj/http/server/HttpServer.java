@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
 import jj.ServerStopping;
-import jj.configuration.Arguments;
 import jj.configuration.Configuration;
 import jj.event.Listener;
 import jj.event.Publisher;
@@ -64,32 +63,29 @@ class HttpServer implements JJServerStartupListener {
 	
 	private ServerBootstrap serverBootstrap;
 	
-	private final Arguments arguments;
+	private final HttpServerSwitch httpServerSwitch;
 	
 	private final Publisher publisher;
-	
-	private final boolean run;
 	
 	@Inject
 	HttpServer(
 		final JJNioEventLoopGroup ioEventLoopGroup,
 		final HttpServerChannelInitializer initializer,
 		final Configuration configuration,
-		final Arguments arguments,
+		final HttpServerSwitch httpServerSwitch,
 		final Publisher publisher
 	) {
 		this.ioEventLoopGroup = ioEventLoopGroup;
 		this.initializer = initializer;
 		this.configuration = configuration;
-		this.arguments = arguments;
+		this.httpServerSwitch = httpServerSwitch;
 		this.publisher = publisher;
-		run = arguments.get("httpServer", boolean.class, true);
 	}
 	
 	@Override
 	public void start() throws Exception {
 		
-		if (run) {
+		if (httpServerSwitch.on()) {
 		
 			assert (serverBootstrap == null) : "cannot start an already started server";
 			
@@ -128,7 +124,7 @@ class HttpServer implements JJServerStartupListener {
 		
 		Binding[] result;
 		
-		final int overridePort = arguments.get("httpPort", int.class, -1);
+		final int overridePort = httpServerSwitch.port();
 		if (overridePort > 1023 && overridePort < 65536) {
 			result = new Binding[] { new Binding(overridePort) };
 		} else {
@@ -163,7 +159,7 @@ class HttpServer implements JJServerStartupListener {
 
 	@Listener
 	public void stop(ServerStopping event) {
-		if (run) {
+		if (httpServerSwitch.on()) {
 			assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
 			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
 			serverBootstrap.childGroup().shutdownGracefully();
