@@ -18,8 +18,6 @@ package jj.configuration;
 import static jj.configuration.resolution.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
-import jj.configuration.ConfigurationScriptEnvironment.ConfigurationLoaded;
-import jj.configuration.ConfigurationScriptEnvironment.ConfigurationLoading;
 import jj.event.Publisher;
 import jj.resource.ResourceFinder;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
