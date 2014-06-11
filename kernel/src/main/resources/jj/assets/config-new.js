@@ -23,4 +23,5 @@ require('http-server-socket')
 	// overrides this configuration
 	// the default is to bind to all addresses
 	// on port 8080, which is also what this does
-	.bind(8080);
+	.bind(8080)
+	.bind('localhost', 8090);

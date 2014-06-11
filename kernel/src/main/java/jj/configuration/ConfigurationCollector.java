@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -60,6 +61,9 @@ public class ConfigurationCollector {
 		if (!inProgress.containsKey(key)) {
 			inProgress.put(key, new ArrayList<Object>());
 		}
+		@SuppressWarnings("unchecked")
+		ArrayList<Object> list = ((ArrayList<Object>)inProgress.get(key));
+		list.add(value);
 	}
 	
 	public <T> T get(String key, Class<T> type, Object defaultValue) {
@@ -71,11 +75,10 @@ public class ConfigurationCollector {
 	void configurationComplete() {
 		
 		for (String key : inProgress.keySet()) {
-			if (inProgress.get(key) instanceof Collection) {
+			if (inProgress.get(key) instanceof List) {
 				@SuppressWarnings({ "unchecked", "rawtypes" })
-				Collection collection =
-					Collections.unmodifiableCollection((Collection)inProgress.get(key));
-				inProgress.put(key, collection);
+				List list = Collections.unmodifiableList((List)inProgress.get(key));
+				inProgress.put(key, list);
 			}
 		}
 		

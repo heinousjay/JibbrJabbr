@@ -1,6 +1,7 @@
 var collector = inject('jj.configuration.ConfigurationCollector');
 
 module.exports = {
+
 	makeBooleanProperty: function(base, name) {
 		return function(arg) {
 			if (typeof arg != 'boolean') { throw new TypeError(name + ' must be a boolean'); }

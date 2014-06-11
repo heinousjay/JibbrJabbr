@@ -78,5 +78,7 @@ public class ConfigurationSystemTest {
 		// and let's peek into the collector to assert some stuff
 		assertThat(collector.get(httpServerSocket("keepAlive"), boolean.class, "false"), is(true));
 		assertThat(collector.get(httpServerSocket("backlog"), int.class, "0"), is(1024));
+		
+		System.out.println(collector.get(httpServerSocket("bindings"), Object.class, null));
 	}
 }
