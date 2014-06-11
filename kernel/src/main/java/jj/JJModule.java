@@ -15,6 +15,7 @@
  */
 package jj;
 
+import jj.configuration.ConfigurationObjectBinder;
 import jj.configuration.resolution.APIPaths;
 import jj.configuration.resolution.AssetPaths;
 import jj.conversion.Converter;
@@ -43,6 +44,8 @@ public abstract class JJModule extends AbstractModule {
 	private ExecutorBinder executors;
 	
 	private LoggingBinder loggers;
+	
+	private ConfigurationObjectBinder configurationObjects;
 	
 	private WebSocketConnectionHostBinder webSocketConnectionHosts;
 	
@@ -115,6 +118,13 @@ public abstract class JJModule extends AbstractModule {
 			loggers = new LoggingBinder(binder());
 		}
 		return loggers;
+	}
+	
+	protected ConfigurationObjectBinder bindConfiguration() {
+		if (configurationObjects == null) {
+			configurationObjects = new ConfigurationObjectBinder(binder());
+		}
+		return configurationObjects;
 	}
 	
 	protected WebSocketConnectionHostBinder bindWebSocketConnection() {
