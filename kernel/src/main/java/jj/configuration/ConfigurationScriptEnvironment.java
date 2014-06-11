@@ -85,6 +85,12 @@ public class ConfigurationScriptEnvironment extends AbstractScriptEnvironment im
 		config = resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), CONFIG_SCRIPT_NAME);
 		
 		config.addDependent(this);
+		
+		if (config.base() == Base) {
+			publisher.publish(new ConfigurationFound(config.path()));
+		} else {
+			publisher.publish(new UsingDefaultConfiguration());
+		}
 	}
 	
 	@Listener
