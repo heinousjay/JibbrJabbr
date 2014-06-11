@@ -105,4 +105,21 @@ public class ConvertersTest {
 	public void testFromStringToInteger() {
 		assertThat(converters.convert("1", int.class), is(1));
 	}
+	
+	enum ConverterEnums {
+		One,
+		Two,
+		Ready,
+		Steady,
+		What;
+	}
+	
+	@Test
+	public void testEnums() {
+		assertThat(converters.convert("One", ConverterEnums.class), is(ConverterEnums.One));
+		assertThat(converters.convert("Two", ConverterEnums.class), is(ConverterEnums.Two));
+		assertThat(converters.convert("Ready", ConverterEnums.class), is(ConverterEnums.Ready));
+		assertThat(converters.convert("Steady", ConverterEnums.class), is(ConverterEnums.Steady));
+		assertThat(converters.convert("What", ConverterEnums.class), is(ConverterEnums.What));
+	}
 }

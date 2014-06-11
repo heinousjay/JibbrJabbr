@@ -100,6 +100,8 @@ public class Converters {
 	 * 
 	 * <p>Identity conversions always work, so converting without needing to is just fine</p>
 	 * 
+	 * <p>String-to-enum conversions work, provided the value exactly matches the enum name</p>
+	 * 
 	 * <p>
 	 * Throws {@link AssertionError}s if the type cannot be handled since
 	 * it's currently configured programmatically
@@ -122,6 +124,15 @@ public class Converters {
 		if (to.isAssignableFrom(fromClass) ||
 			to.isPrimitive() && primitivesToWrappers.get(to).isAssignableFrom(fromClass)) {
 			return cast(from);
+		}
+		
+		if (to.isEnum() && from instanceof String) {
+			for (To eTo : to.getEnumConstants()) {
+				Enum<?> e = (Enum<?>)eTo;
+				if (from.equals(e.name())) {
+					return eTo;
+				}
+			}
 		}
 		
 		Map<Class<?>, Converter<?, ?>> fromConverters = converters.get(fromClass);
