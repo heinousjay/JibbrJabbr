@@ -66,9 +66,10 @@ public class ConfigurationScriptEnvironmentTest {
 
 	@Test
 	public void testInitialization() {
-
-		verify(configScript).addDependent(cse);
+		
 		verify(publisher).publish(isA(ConfigurationLoading.class));
+		verify(configScript).addDependent(cse);
+		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
 		
 		// make sure it only triggers on its own initialization
 		cse.scriptInitialized(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
@@ -80,6 +81,18 @@ public class ConfigurationScriptEnvironmentTest {
 		
 		verify(collector).configurationComplete();
 		verify(publisher).publish(isA(ConfigurationLoaded.class));
+	}
+	
+	@Test
+	public void testOtherEvent() {
+		given(configScript.base()).willReturn(Base);
+		
+		cse = new ConfigurationScriptEnvironment(
+			dependencies,
+			resourceFinder, publisher, global, collector
+		);
+		
+		verify(publisher).publish(isA(ConfigurationFound.class));
 	}
 
 }
