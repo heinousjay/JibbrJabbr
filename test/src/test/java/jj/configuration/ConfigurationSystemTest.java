@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 
 import jj.App;
 import jj.http.server.HttpServerSocketConfiguration;
-import jj.configuration.ConfigurationScriptEnvironment.ConfigurationLoaded;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceLoader;
