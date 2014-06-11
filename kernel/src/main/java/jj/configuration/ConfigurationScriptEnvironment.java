@@ -51,14 +51,6 @@ import jj.script.module.ScriptResource;
 @Subscriber
 public class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
 	
-	public static class ConfigurationLoading {
-		
-	}
-	
-	public static class ConfigurationLoaded {
-		
-	}
-	
 	private final Publisher publisher;
 	
 	private final ScriptableObject global;
