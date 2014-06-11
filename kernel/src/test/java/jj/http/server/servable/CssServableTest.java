@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 
-public class CssServableTest extends ServableTestBase{
+public class CssServableTest extends ServableTestBase {
 	
 	@Mock CssResource cssResource;
 	
