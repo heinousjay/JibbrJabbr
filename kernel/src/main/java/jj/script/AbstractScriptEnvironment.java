@@ -258,7 +258,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 					"} " +
 					"return result;" +
 				"}})(module);",
-				"making require"
+				"require"
 			);
 			
 			localScope.defineProperty(

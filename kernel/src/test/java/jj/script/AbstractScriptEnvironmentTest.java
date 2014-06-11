@@ -157,7 +157,7 @@ public class AbstractScriptEnvironmentTest {
 		
 		final String moduleId = "moduleIdentifier";
 		given(dependencies.rhinoContextProvider().context.newObject(scope)).willReturn(module, exports);
-		given(dependencies.rhinoContextProvider().context.evaluateString(eq(scope), anyString(), eq("making require"))).willReturn(require);
+		given(dependencies.rhinoContextProvider().context.evaluateString(eq(scope), anyString(), eq("require"))).willReturn(require);
 		assertThat(ase.configureModuleObjects(moduleId, scope), is(scope));
 		
 		verify(scope).defineProperty("module", module, ScriptableObject.CONST);
