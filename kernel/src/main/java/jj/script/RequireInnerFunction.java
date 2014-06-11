@@ -44,7 +44,7 @@ class RequireInnerFunction extends BaseFunction {
 	private final ResourceFinder resourceFinder;
 	
 	// just used for calculating paths
-	private final Path base = Paths.get("/requireBase");
+	private final Path base = Paths.get("");
 	
 	@Inject
 	RequireInnerFunction(

@@ -2,7 +2,7 @@
 var support = require('configuration-support');
 var base = 'jj.http.server.HttpServerSocketConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
-var print = require('print');
+
 module.exports = {
 	
 	keepAlive: support.makeBooleanProperty(base, 'keepAlive'),

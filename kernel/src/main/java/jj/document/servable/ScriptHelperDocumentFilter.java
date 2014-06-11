@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
+import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;

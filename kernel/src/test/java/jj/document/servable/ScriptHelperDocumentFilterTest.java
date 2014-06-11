@@ -11,8 +11,8 @@ import java.util.Collections;
 
 import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
+import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
-import jj.document.servable.DocumentConfiguration;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.ScriptHelperDocumentFilter;
 import jj.http.server.HttpServerRequest;

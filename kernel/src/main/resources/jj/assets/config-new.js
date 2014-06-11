@@ -25,3 +25,9 @@ require('http-server-socket')
 	// on port 8080, which is also what this does
 	.bind(8080)
 	.bind('localhost', 8090);
+
+require('document-system-configuration')
+	.clientDebug(true)
+	.showParsingErrors(true)
+	.removeComments(false);
+

@@ -38,6 +38,8 @@ public class ConfigurationObjectBinder {
 
 	public <T> void to(final Class<T> configurationInterface) {
 		
+		assert configurationInterface.isInterface() : "configuration objects must be interfaces";
+		
 		Provider<T> provider = new Provider<T>() {
 			
 			@Inject ConfigurationObjectImplementation configurationObjectImplementation;

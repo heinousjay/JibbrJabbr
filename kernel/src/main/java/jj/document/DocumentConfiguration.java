@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document.servable;
+package jj.document;
 
 import jj.configuration.Default;
 
@@ -26,7 +26,7 @@ public interface DocumentConfiguration {
 	@Default("false")
 	boolean clientDebug();
 
-	@Default("true")
+	@Default("false")
 	boolean showParsingErrors();
 	
 	@Default("true")

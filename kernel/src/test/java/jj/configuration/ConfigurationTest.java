@@ -26,7 +26,7 @@ import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
-import jj.document.servable.DocumentConfiguration;
+import jj.document.DocumentConfiguration;
 import jj.event.Publisher;
 import jj.http.server.HttpServerSocketConfiguration;
 import jj.resource.ResourceFinder;

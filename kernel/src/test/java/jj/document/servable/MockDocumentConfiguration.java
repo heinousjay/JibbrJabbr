@@ -15,7 +15,7 @@
  */
 package jj.document.servable;
 
-import jj.document.servable.DocumentConfiguration;
+import jj.document.DocumentConfiguration;
 
 /**
  * @author jason

@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import jj.configuration.resolution.AppLocation;
 import jj.document.HtmlResource;
 import jj.document.HtmlResourceCreator;
-import jj.document.servable.DocumentConfiguration;
 import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.ResourceBase;

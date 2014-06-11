@@ -63,6 +63,10 @@ public class DocumentProcessingModule extends JJModule {
 		bind(WebSocketMessageProcessor.class).to(DocumentWebSocketMessageProcessors.class);
 		
 		bindWebSocketConnection().toHost(DocumentScriptEnvironment.class);
+		
+		bindConfiguration().to(DocumentConfiguration.class);
+		
+		addAPIModulePath("/jj/document/api");
 
 		install(new DocumentServableModule());
 	}

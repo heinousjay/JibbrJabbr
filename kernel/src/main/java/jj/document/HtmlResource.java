@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Configuration;
-import jj.document.servable.DocumentConfiguration;
 import jj.event.Publisher;
 import jj.resource.AbstractFileResource;
 

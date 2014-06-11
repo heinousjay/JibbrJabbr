@@ -21,13 +21,16 @@ import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRI
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.App;
+import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
+import jj.document.DocumentConfiguration;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceLoader;
@@ -59,6 +62,9 @@ public class ConfigurationSystemTest {
 	@Inject
 	private ConfigurationCollector collector;
 	
+	@Inject
+	private DocumentConfiguration documentConfiguration;
+	
 	private CountDownLatch latch;
 	
 	@Listener
@@ -77,7 +83,18 @@ public class ConfigurationSystemTest {
 		// and let's peek into the collector to assert some stuff
 		assertThat(collector.get(httpServerSocket("keepAlive"), boolean.class, "false"), is(true));
 		assertThat(collector.get(httpServerSocket("backlog"), int.class, "0"), is(1024));
+		assertThat(collector.get(httpServerSocket("bindings"), List.class, null), isA(List.class));
+		@SuppressWarnings("unchecked")
+		List<Binding> bindings = (List<Binding>)collector.get(httpServerSocket("bindings"), List.class, null);
+		assertThat(bindings.size(), is(2));
+		assertThat(bindings.get(0), isA(Binding.class));
+		assertThat(bindings.get(1), isA(Binding.class));
 		
-		System.out.println(collector.get(httpServerSocket("bindings"), Object.class, null));
+		// okay good enough.  NOW! make sure that injected configuration is also correct
+		assertThat(documentConfiguration.clientDebug(), is(true));
+		assertThat(documentConfiguration.showParsingErrors(), is(true));
+		assertThat(documentConfiguration.removeComments(), is(false));
+		
+		// DO MOAR!
 	}
 }
