@@ -19,9 +19,33 @@ package jj.http.server;
  * @author jason
  *
  */
-public interface Binding {
-
-	public int port();
+public class Binding {
 	
-	public String host();
+	private final String host;
+	private final int port;
+
+	public Binding(int port) {
+		this(null, port);
+	}
+	
+	public Binding(String host, int port) {
+		this.host = host;
+		this.port = port;
+	}
+	
+	public int port() {
+		return port;
+	}
+	
+	public String host() {
+		return host;
+	}
+	
+	@Override
+	public String toString() {
+		return "Binding(" +
+			(host == null ? "" : host + ":") +
+			port +
+			")";
+	}
 }

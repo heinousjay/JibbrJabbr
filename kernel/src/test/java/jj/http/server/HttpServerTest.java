@@ -92,32 +92,7 @@ public class HttpServerTest {
 		
 		@Override
 		public Binding[] bindings() {
-			return new Binding[] {
-				new Binding() {
-
-					@Override
-					public int port() {
-						return 8080;
-					}
-
-					@Override
-					public String host() {
-						return null;
-					}
-				},
-				new Binding() {
-
-					@Override
-					public int port() {
-						return 8090;
-					}
-
-					@Override
-					public String host() {
-						return "localhost";
-					}
-				}
-			};
+			return new Binding[] { new Binding(8080), new Binding("localhost", 8090) };
 		}
 	};
 	

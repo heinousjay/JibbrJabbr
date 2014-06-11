@@ -130,39 +130,12 @@ class HttpServer implements JJServerStartupListener {
 		
 		final int overridePort = arguments.get("httpPort", int.class, -1);
 		if (overridePort > 1023 && overridePort < 65536) {
-			result = new Binding[1];
-			result[0] = new Binding() {
-				
-				@Override
-				public int port() {
-					// TODO Auto-generated method stub
-					return overridePort;
-				}
-				
-				@Override
-				public String host() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-			};
+			result = new Binding[] { new Binding(overridePort) };
 		} else {
 			result = configuration.get(HttpServerSocketConfiguration.class).bindings();
 		}
 		
-		if (result.length == 0) result = new Binding[] {
-			new Binding() {
-				
-				@Override
-				public int port() {
-					return 8080;
-				}
-				
-				@Override
-				public String host() {
-					return null;
-				}
-			}
-		};
+		if (result.length == 0) result = new Binding[] { new Binding(8080) };
 		
 		return result;
 	}

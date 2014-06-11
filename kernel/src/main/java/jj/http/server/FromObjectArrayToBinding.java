@@ -26,31 +26,9 @@ public class FromObjectArrayToBinding implements Converter<Object[], Binding> {
 	@Override
 	public Binding convert(final Object[] in) {
 		if (in.length == 2 && (in[0] instanceof String) && (in[1] instanceof Number)) {
-			return new Binding() {
-				
-				@Override
-				public int port() {
-					return ((Number)in[1]).intValue();
-				}
-				
-				@Override
-				public String host() {
-					return (String)in[0];
-				}
-			};
+			return new Binding((String)in[0], ((Number)in[1]).intValue());
 		} else if (in.length == 1 && (in[0] instanceof Number)) {
-			return new Binding() {
-				
-				@Override
-				public int port() {
-					return ((Number)in[0]).intValue();
-				}
-				
-				@Override
-				public String host() {
-					return null;
-				}
-			};
+			return new Binding(((Number)in[0]).intValue());
 		}
 		return null;
 	}
