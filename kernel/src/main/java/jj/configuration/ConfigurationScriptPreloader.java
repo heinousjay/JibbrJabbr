@@ -15,15 +15,19 @@
  */
 package jj.configuration;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static jj.configuration.resolution.AppLocation.*;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
+
+import java.util.concurrent.CountDownLatch;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
-import jj.configuration.resolution.AppLocation;
-import jj.event.Publisher;
-import jj.execution.TaskRunner;
-import jj.resource.ResourceTask;
-import jj.resource.ResourceFinder;
+import jj.event.Listener;
+import jj.event.Subscriber;
+import jj.resource.ResourceLoader;
 import jj.resource.config.ConfigResource;
 
 /**
@@ -34,37 +38,30 @@ import jj.resource.config.ConfigResource;
  *
  */
 @Singleton
+@Subscriber
 class ConfigurationScriptPreloader implements JJServerStartupListener {
 	
-	private final TaskRunner taskRunner;
-	private final ResourceFinder resourceFinder;
-	private final Publisher publisher;
+	private final ResourceLoader resourceLoader;
+	private final CountDownLatch latch = new CountDownLatch(1);
 	
 	@Inject
-	ConfigurationScriptPreloader(
-		final TaskRunner taskRunner,
-		final ResourceFinder resourceFinder,
-		final Publisher publisher
-	) {
-		this.taskRunner = taskRunner;
-		this.resourceFinder = resourceFinder;
-		this.publisher = publisher;
+	ConfigurationScriptPreloader(final ResourceLoader resourceFinder) {
+		this.resourceLoader = resourceFinder;
+	}
+	
+	@Listener
+	void configurationLoaded(ConfigurationLoaded configurationLoaded) {
+		latch.countDown();
 	}
 
 	@Override
 	public void start() throws Exception {
-		taskRunner.execute(new ResourceTask("preloading configuration script") {
-			
-			@Override
-			public void run() {
-				ConfigResource config = resourceFinder.loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
-				if (config != null) {
-					publisher.publish(new ConfigurationFound(config.path()));
-				} else {
-					publisher.publish(new UsingDefaultConfiguration());
-				}
-			}
-		});
+		
+		resourceLoader.loadResource(ConfigResource.class, Base, ConfigResource.CONFIG_JS);
+		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
+		
+		boolean success = latch.await(500, MILLISECONDS);
+		assert success : "configuration didn't load in 500 milliseconds";
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class RunAPage {
 	
 	@Test
 	public void test() throws Throwable {
-		EmbeddedHttpResponse response = server.request(new EmbeddedHttpRequest("/jj.js")).await(1, HOURS);
+		EmbeddedHttpResponse response = server.request(new EmbeddedHttpRequest("/")).await(1, HOURS);
 
 		System.out.println(response.bodyContentAsString());
 	}

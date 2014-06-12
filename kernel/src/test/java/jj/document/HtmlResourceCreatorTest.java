@@ -22,6 +22,8 @@ import jj.resource.ResourceBase;
 public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlResourceCreator> {
 	
 	@Mock Publisher publisher;
+	
+	@Mock DocumentConfiguration config;
 
 	@Override
 	protected String name() {
@@ -34,25 +36,8 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 	
 	@Override
 	protected HtmlResource resource() throws Exception {
-		given(configuration.get(DocumentConfiguration.class)).willReturn(new DocumentConfiguration() {
-			
-			@Override
-			public boolean showParsingErrors() {
-				return false;
-			}
-			
-			@Override
-			public boolean removeComments() {
-				return true;
-			}
-			
-			@Override
-			public boolean clientDebug() {
-				return false;
-			}
-		});
-		
-		return new HtmlResource(configuration, publisher, new Dependencies(cacheKey(), AppLocation.Base), name(), path());
+		given(config.removeComments()).willReturn(true);
+		return new HtmlResource(config, publisher, new Dependencies(cacheKey(), AppLocation.Base), name(), path());
 	}
 	
 	@Override

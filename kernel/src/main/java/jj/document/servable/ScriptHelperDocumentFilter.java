@@ -5,7 +5,6 @@ import static jj.configuration.resolution.Assets.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
@@ -26,12 +25,12 @@ import org.jsoup.nodes.Element;
 @Singleton
 class ScriptHelperDocumentFilter implements DocumentFilter {
 
-	private final Configuration configuration;
+	private final DocumentConfiguration configuration;
 	private final ResourceFinder resourceFinder;
 
 	@Inject
 	public ScriptHelperDocumentFilter(
-		final Configuration configuration,
+		final DocumentConfiguration configuration,
 		final ResourceFinder resourceFinder
 	) {
 		this.configuration = configuration;
@@ -78,7 +77,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 					documentRequestProcessor.startupJJMessages().toString()
 				);
 			
-			if (configuration.get(DocumentConfiguration.class).clientDebug()) {
+			if (configuration.clientDebug()) {
 				jjScript.attr("data-jj-debug", "true");
 			}
 			

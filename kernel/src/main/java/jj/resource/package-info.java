@@ -33,7 +33,7 @@
  * 
  * <p>
  * There are two main components that act as the API to the resource system, the {@link ResourceFinder}
- * and the {@link ResourceLoader}.  The system also produces several events (which can be observed by
+ * and the {@link ResourceLoaderImpl}.  The system also produces several events (which can be observed by
  * registering as described in {@link Listener}) describing resource lifecycles, all descended from
  * {@link ResourceEvent}
  * 

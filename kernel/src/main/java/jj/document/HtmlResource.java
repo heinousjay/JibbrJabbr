@@ -10,7 +10,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Configuration;
 import jj.event.Publisher;
 import jj.resource.AbstractFileResource;
 
@@ -64,7 +63,7 @@ public class HtmlResource extends AbstractFileResource {
 	 */
 	@Inject
 	HtmlResource(
-		final Configuration configuration,
+		final DocumentConfiguration configuration,
 		final Publisher publisher,
 		final Dependencies dependencies,
 		final String name,
@@ -72,12 +71,10 @@ public class HtmlResource extends AbstractFileResource {
 	) throws IOException {
 		super(dependencies, name, path);
 		
-		DocumentConfiguration config = configuration.get(DocumentConfiguration.class);
-		
 		this.uri = name;
 		String html = byteBuffer.toString(UTF_8);
 		
-		Parser parser = Parser.htmlParser().setTrackErrors(config.showParsingErrors() ? Integer.MAX_VALUE : 0);
+		Parser parser = Parser.htmlParser().setTrackErrors(configuration.showParsingErrors() ? Integer.MAX_VALUE : 0);
 		
 		this.document = parser.parseInput(html, name);
 		
@@ -86,7 +83,7 @@ public class HtmlResource extends AbstractFileResource {
 			publisher.publish(new HtmlParseError(path, errors));
 		}
 		
-		if (config.removeComments()) {
+		if (configuration.removeComments()) {
 			CommentKiller commentKiller = new CommentKiller();
 			new NodeTraversor(commentKiller).traverse(document);
 			commentKiller.kill();

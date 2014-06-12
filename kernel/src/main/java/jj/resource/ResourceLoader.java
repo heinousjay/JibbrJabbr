@@ -15,57 +15,15 @@
  */
 package jj.resource;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import jj.configuration.Location;
 import jj.execution.Promise;
-import jj.execution.TaskRunner;
 
 /**
- * if you need to load a resource, here's a simple way to do it
- * 
  * @author jason
  *
  */
-@Singleton
-public class ResourceLoader {
-	
-	private final TaskRunner taskRunner;
-	private final ResourceFinder resourceFinder;
-	
-	@Inject
-	ResourceLoader(final TaskRunner taskRunner, final ResourceFinder resourceFinder) {
-		this.taskRunner = taskRunner;
-		this.resourceFinder = resourceFinder;
-	}
-	
-	public Promise loadResource(final Class<? extends Resource> resourceClass, final Location base, final String name,  final Object...arguments) {
-		return taskRunner.execute(new ResourceLoaderTask(resourceClass, base, name, arguments));
-	}
-	
-	private final class ResourceLoaderTask extends ResourceTask {
-		
-		private final Class<? extends Resource> resourceClass;
-		private final Location base;
-		private final String name;
-		private final Object[] arguments;
+public interface ResourceLoader {
 
-		/**
-		 * @param name
-		 */
-		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
-			super("Resource loader [" + resourceClass.getSimpleName() + " at " + name);
-			this.resourceClass = resourceClass;
-			this.base = base;
-			this.name = name;
-			this.arguments = arguments;
-			
-		}
+	Promise loadResource(Class<? extends Resource> resourceClass, Location base, String name, Object... arguments);
 
-		@Override
-		protected void run() throws Exception {
-			resourceFinder.loadResource(resourceClass, base, name, arguments);
-		}
-	}
 }

@@ -23,6 +23,8 @@ public class ResourceModule extends JJModule {
 		
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
 		
+		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
+		
 		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
 		addStartupListenerBinding().to(ResourceWatchServiceImpl.class);
 		

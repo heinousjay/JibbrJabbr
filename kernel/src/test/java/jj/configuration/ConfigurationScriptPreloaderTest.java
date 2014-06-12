@@ -16,15 +16,15 @@
 package jj.configuration;
 
 import static org.mockito.BDDMockito.*;
-import jj.configuration.resolution.AppLocation;
-import jj.event.Publisher;
-import jj.execution.MockTaskRunner;
-import jj.resource.ResourceFinder;
+import static jj.configuration.resolution.AppLocation.*;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
+
+import jj.resource.ResourceLoader;
 import jj.resource.config.ConfigResource;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -35,40 +35,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationScriptPreloaderTest {
 
-	MockTaskRunner taskRunner;
-	@Mock ResourceFinder resourceFinder;
-	@Mock Publisher publisher;
+	@Mock ResourceLoader resourceLoader;
 	
-	@Mock ConfigResource resource;
-	
-	ConfigurationScriptPreloader csp;
-	
-	@Before
-	public void before() {
-		taskRunner = new MockTaskRunner();
-		csp = new ConfigurationScriptPreloader(taskRunner, resourceFinder, publisher);
-	}
+	@InjectMocks ConfigurationScriptPreloader csp;
 	
 	@Test
-	public void testDefault() throws Exception {
-		
+	public void test() throws Exception {
+		csp.configurationLoaded(null);
 		csp.start();
-		taskRunner.runFirstTask();
 		
-		verify(resourceFinder).loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS);
-		
-		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
-	}
-	
-	@Test
-	public void testFound() throws Exception {
-		
-		given(resourceFinder.loadResource(ConfigResource.class, AppLocation.Base, ConfigResource.CONFIG_JS)).willReturn(resource);
-
-		csp.start();
-		taskRunner.runFirstTask();
-		
-		verify(publisher).publish(isA(ConfigurationFound.class));
+		verify(resourceLoader).loadResource(ConfigResource.class, Base, ConfigResource.CONFIG_JS);
+		verify(resourceLoader).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
 	}
 
 }

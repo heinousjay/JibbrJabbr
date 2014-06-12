@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
@@ -50,7 +49,7 @@ public class ScriptHelperDocumentFilterTest {
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 
 
-	@Mock Configuration configuration;
+	@Mock DocumentConfiguration configuration;
 	@Mock ResourceFinder resourceFinder;
 	
 	@InjectMocks ScriptHelperDocumentFilter filter;
@@ -85,7 +84,7 @@ public class ScriptHelperDocumentFilterTest {
 		given(jjJs.sha1()).willReturn(JJ_SHA);
 		given(jjJs.uri()).willReturn(JJ_URI);
 		
-		given(configuration.get(DocumentConfiguration.class)).willReturn(new MockDocumentConfiguration());
+		given(configuration.clientDebug()).willReturn(true);
 	}
 	
 	@Test

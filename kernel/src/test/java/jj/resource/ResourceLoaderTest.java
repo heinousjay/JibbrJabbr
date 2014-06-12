@@ -42,7 +42,7 @@ public class ResourceLoaderTest {
 	@Before
 	public void before() {
 		taskRunner = new MockTaskRunner();
-		rl = new ResourceLoader(taskRunner, resourceFinder);
+		rl = new ResourceLoaderImpl(taskRunner, resourceFinder);
 	}
 	
 	@Test

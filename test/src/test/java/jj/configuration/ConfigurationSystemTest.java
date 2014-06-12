@@ -15,15 +15,10 @@
  */
 package jj.configuration;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.Virtual;
-import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -31,9 +26,6 @@ import jj.App;
 import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
 import jj.document.DocumentConfiguration;
-import jj.event.Listener;
-import jj.event.Subscriber;
-import jj.resource.ResourceLoader;
 import jj.testing.JibbrJabbrTestServer;
 
 import org.junit.Rule;
@@ -46,7 +38,6 @@ import org.junit.Test;
  *
  */
 @Singleton
-@Subscriber
 public class ConfigurationSystemTest {
 	
 	static String httpServerSocket(String key) {
@@ -54,33 +45,18 @@ public class ConfigurationSystemTest {
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one).injectInstance(this);
-	
-	@Inject
-	private ResourceLoader resourceFinder;
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.two).injectInstance(this);
 	
 	@Inject
 	private ConfigurationCollector collector;
 	
 	@Inject
 	private DocumentConfiguration documentConfiguration;
-	
-	private CountDownLatch latch;
-	
-	@Listener
-	void configLoaded(ConfigurationLoaded event) {
-		if (latch != null) latch.countDown();
-	}
 
 	@Test
 	public void test() throws Exception {
-		latch = new CountDownLatch(1);
 		
-		resourceFinder.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
-		
-		assertTrue(latch.await(2, SECONDS));
-		
-		// and let's peek into the collector to assert some stuff
+		// let's peek into the collector to assert some stuff
 		assertThat(collector.get(httpServerSocket("keepAlive"), boolean.class, "false"), is(true));
 		assertThat(collector.get(httpServerSocket("backlog"), int.class, "0"), is(1024));
 		assertThat(collector.get(httpServerSocket("bindings"), List.class, null), isA(List.class));

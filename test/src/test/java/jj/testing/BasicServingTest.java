@@ -256,24 +256,19 @@ public class BasicServingTest {
 		} finally {
 			service.shutdownNow();
 		}
-		List<String> errors = new ArrayList<>();
+		boolean fail = false;
+		AssertionError error = new AssertionError("pounded it into submission");
 		for (Throwable t : throwables) {
 			if (t != null) {
-				errors.add(t.getMessage());
+				error.addSuppressed(t);
+				fail = true;
 			}
 		}
 		
-		if (!errors.isEmpty()) fail("pounded it into submission", errors);
+		if (fail) throw error;
 	}
 	
-	private void fail(String lead, List<String> errors) {
-		StringBuilder sb = new StringBuilder(lead);
-		for (String error : errors) {
-			sb.append("\n").append(error);
-		}
-		
-		throw new AssertionError(sb.toString());
-	}
+	
 	
 	private void timePoundIt(final int threadCount, final int perClientTimeout, final int perClientRequestCount) throws Exception {
 		final long startingTotalMemory = Runtime.getRuntime().totalMemory();
