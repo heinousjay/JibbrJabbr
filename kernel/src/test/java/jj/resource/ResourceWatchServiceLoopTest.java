@@ -15,7 +15,10 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -24,8 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.configuration.resolution.AppLocation;
+import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +45,7 @@ public class ResourceWatchServiceLoopTest {
 	ResourceCache resourceCache;
 	@Mock ResourceFinder resourceFinder;
 	@Mock ResourceWatcher watcher;
+	@Mock Publisher publisher;
 	MockTaskRunner taskRunner;
 
 	Map<URI, Boolean> changes = new HashMap<>();
@@ -60,12 +66,12 @@ public class ResourceWatchServiceLoopTest {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private ResourceCreators makeResourceCreators() {
 		Map map = new HashMap<>();
-		map.put(MyResource.class, new MyResourceCreator());
+		map.put(MyResource.class, new MyResourceCreator(publisher));
 		return new ResourceCreators(map);
 	}
 	
 	private MyResource makeResource(URI uri) {
-		MyResource result = spy(new MyResource(uri));
+		MyResource result = spy(new MyResource(uri, publisher));
 		resourceCache.putIfAbsent(result.cacheKey(), result);
 		return result;
 	}
@@ -81,7 +87,7 @@ public class ResourceWatchServiceLoopTest {
 		uri1 = URI.create("resource1");
 		resource1 = makeResource(uri1);
 		
-		uri2 = URI.create("resource1");
+		uri2 = URI.create("resource2");
 		resource2 = makeResource(uri2);
 		
 		uri3 = URI.create("resource3");
@@ -127,7 +133,13 @@ public class ResourceWatchServiceLoopTest {
 		
 		assertThat(taskRunner.tasks, is(empty()));
 		verifyZeroInteractions(resourceFinder);
-		
+
+		verify(resource1).kill();
+		verify(resource2).kill();
+		verify(resource3).kill();
+		verify(resource4).kill();
+		verify(resource5, never()).kill();
+		verify(publisher, times(4)).publish(isA(ResourceKilled.class));
 	}
 	
 	@Test
@@ -164,6 +176,13 @@ public class ResourceWatchServiceLoopTest {
 		assertThat(taskRunner.tasks, is(not(empty())));
 		
 		taskRunner.runFirstTask();
+
+		verify(resource1).kill();
+		verify(resource2).kill();
+		verify(resource3).kill();
+		verify(resource4).kill();
+		verify(resource5).kill();
+		verify(publisher, times(5)).publish(isA(ResourceKilled.class));
 		
 		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.Base, resource5.name());
 	}

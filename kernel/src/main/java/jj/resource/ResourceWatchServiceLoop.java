@@ -54,7 +54,6 @@ class ResourceWatchServiceLoop extends ServerTask {
 
 	
 	private void remove(final AbstractResource resource) {
-		// publish this event!
 		if (resourceCache.remove(resource.cacheKey(), resource)) {
 			resource.kill();
 		}

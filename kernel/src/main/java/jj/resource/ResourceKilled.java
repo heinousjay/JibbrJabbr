@@ -15,27 +15,27 @@
  */
 package jj.resource;
 
-import java.io.IOException;
-import java.net.URI;
-
 import jj.configuration.Location;
-import jj.event.Publisher;
 
-class MyResourceCreator extends AbstractResourceCreator<MyResource> {
-	
-	private final Publisher publisher;
-	
-	MyResourceCreator(Publisher publisher) {
-		this.publisher = publisher;
+/**
+ * @author jason
+ *
+ */
+public class ResourceKilled extends ResourceEvent {
+
+	/**
+	 * @param resourceClass
+	 * @param base
+	 * @param name
+	 * @param arguments
+	 */
+	public ResourceKilled(Class<? extends Resource> resourceClass, Location base, String name, Object... arguments) {
+		super(resourceClass, base, name, arguments);
 	}
 
 	@Override
-	public MyResource create(Location base, String name, Object... args) throws IOException {
-		return new MyResource(URI.create(name), publisher);
+	protected String description() {
+		return "resource killed";
 	}
 
-	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		return URI.create(name);
-	}
 }

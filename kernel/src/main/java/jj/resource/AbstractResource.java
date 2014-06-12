@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -54,12 +55,15 @@ public abstract class AbstractResource implements Resource {
 	
 	protected final Location base;
 	
+	protected final Publisher publisher;
+	
 	final Set<AbstractResource> dependents = new HashSet<>();
-	volatile boolean alive = true;
+	final AtomicBoolean alive = new AtomicBoolean(true);
 	
 	protected AbstractResource(final Dependencies dependencies) {
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
+		this.publisher = dependencies.publisher;
 	}
 	
 	@ResourceThread
@@ -67,7 +71,7 @@ public abstract class AbstractResource implements Resource {
 
 	@ResourceThread
 	boolean isObselete() throws IOException {
-		return !alive || needsReplacing();
+		return !alive.get() || needsReplacing();
 	}
 	
 	/**
@@ -79,7 +83,7 @@ public abstract class AbstractResource implements Resource {
 	
 	@Override
 	public void addDependent(Resource dependent) {
-		assert alive : "cannot accept dependents, i am dead " + toString();
+		assert alive.get() : "cannot accept dependents, i am dead " + toString();
 		assert dependent != null : "can not depend on null";
 		assert dependent != this : "can not depend on myself";
 		dependents.add((AbstractResource)dependent);
@@ -100,11 +104,13 @@ public abstract class AbstractResource implements Resource {
 	}
 	
 	public boolean alive() {
-		return alive;
+		return alive.get();
 	}
 	
 	void kill() {
-		alive = false;
+		if (alive.getAndSet(false)) {
+			publisher.publish(new ResourceKilled(getClass(), base(), name(), creationArgs()));
+		}
 	}
 	
 	ResourceKey cacheKey() {

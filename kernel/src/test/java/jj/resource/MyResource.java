@@ -19,13 +19,14 @@ import java.io.IOException;
 import java.net.URI;
 
 import jj.configuration.resolution.AppLocation;
+import jj.event.Publisher;
 
 class MyResource extends AbstractResource {
 
 	private final URI uri;
 	
-	protected MyResource(URI uri) {
-		super(new Dependencies(new ResourceKey(MyResource.class, uri), AppLocation.Base, null));
+	protected MyResource(URI uri, Publisher publisher) {
+		super(new Dependencies(new ResourceKey(MyResource.class, uri), AppLocation.Base, publisher));
 		this.uri = uri;
 	}
 
