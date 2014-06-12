@@ -31,20 +31,20 @@ import jj.resource.ResourceLoader;
 
 /**
  * ensures that the configuration file for the application
- * is available to the system.
+ * is available to the system on startup
  * 
  * @author jason
  *
  */
 @Singleton
 @Subscriber
-class ConfigurationScriptPreloader implements JJServerStartupListener {
+class ConfigurationScriptLoader implements JJServerStartupListener {
 	
 	private final ResourceLoader resourceLoader;
 	private final CountDownLatch latch = new CountDownLatch(1);
 	
 	@Inject
-	ConfigurationScriptPreloader(final ResourceLoader resourceFinder) {
+	ConfigurationScriptLoader(final ResourceLoader resourceFinder) {
 		this.resourceLoader = resourceFinder;
 	}
 	

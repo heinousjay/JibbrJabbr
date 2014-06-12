@@ -32,11 +32,11 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigurationScriptPreloaderTest {
+public class ConfigurationScriptLoaderTest {
 
 	@Mock ResourceLoader resourceLoader;
 	
-	@InjectMocks ConfigurationScriptPreloader csp;
+	@InjectMocks ConfigurationScriptLoader csp;
 	
 	@Test
 	public void test() throws Exception {

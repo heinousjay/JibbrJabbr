@@ -32,7 +32,7 @@ public class ConfigurationModule extends JJModule {
 		
 		addAPIModulePath("/jj/configuration/api/");
 		
-		addStartupListenerBinding().to(ConfigurationScriptPreloader.class);
+		addStartupListenerBinding().to(ConfigurationScriptLoader.class);
 		
 		bind(PathResolver.class).to(Application.class);
 		

@@ -142,4 +142,8 @@ public class ConfigurationScriptEnvironment extends AbstractScriptEnvironment im
 		return global;
 	}
 
+	@Override
+	protected boolean removeOnReload() { // just get us a new copy
+		return false;
+	}
 }
