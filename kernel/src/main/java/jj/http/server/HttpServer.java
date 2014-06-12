@@ -17,6 +17,8 @@ package jj.http.server;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,7 +32,6 @@ import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
 import jj.ServerStopping;
-import jj.configuration.Configuration;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
@@ -44,6 +45,11 @@ import jj.util.StringUtils;
 @Subscriber
 class HttpServer implements JJServerStartupListener {
 	
+	/**
+	 * 
+	 */
+	private static final int DEFAULT_BINDING_PORT = 8080;
+
 	private static final ThreadFactory threadFactory = new ThreadFactory() {
 		
 		private final AtomicInteger id = new AtomicInteger();
@@ -59,7 +65,7 @@ class HttpServer implements JJServerStartupListener {
 	
 	private final HttpServerChannelInitializer initializer;
 	
-	private final Configuration configuration;
+	private final HttpServerSocketConfiguration configuration;
 	
 	private ServerBootstrap serverBootstrap;
 	
@@ -71,7 +77,7 @@ class HttpServer implements JJServerStartupListener {
 	HttpServer(
 		final JJNioEventLoopGroup ioEventLoopGroup,
 		final HttpServerChannelInitializer initializer,
-		final Configuration configuration,
+		final HttpServerSocketConfiguration configuration,
 		final HttpServerSwitch httpServerSwitch,
 		final Publisher publisher
 	) {
@@ -89,9 +95,9 @@ class HttpServer implements JJServerStartupListener {
 		
 			assert (serverBootstrap == null) : "cannot start an already started server";
 			
-			Binding[] bindings = getBindings();
+			List<Binding> bindings = getBindings();
 			
-			makeServerBootstrap(bindings.length);
+			makeServerBootstrap(bindings.size());
 			
 			bindPorts(bindings);
 			
@@ -99,7 +105,7 @@ class HttpServer implements JJServerStartupListener {
 		}
 	}
 
-	private void bindPorts(Binding[] bindings) throws Exception {
+	private void bindPorts(List<Binding> bindings) throws Exception {
 		try {
 			for (Binding binding : bindings) {
 				
@@ -120,35 +126,34 @@ class HttpServer implements JJServerStartupListener {
 		}
 	}
 	
-	private Binding[] getBindings() {
+	private List<Binding> getBindings() {
 		
-		Binding[] result;
+		List<Binding> result;
 		
 		final int overridePort = httpServerSwitch.port();
 		if (overridePort > 1023 && overridePort < 65536) {
-			result = new Binding[] { new Binding(overridePort) };
+			result = Arrays.asList(new Binding(overridePort));
 		} else {
-			result = configuration.get(HttpServerSocketConfiguration.class).bindings();
+			result = configuration.bindings();
 		}
 		
-		if (result.length == 0) result = new Binding[] { new Binding(8080) };
+		if (result.isEmpty()) result = Arrays.asList(new Binding(DEFAULT_BINDING_PORT));
 		
 		return result;
 	}
 
 	private void makeServerBootstrap(int bindingCount) {
-		HttpServerSocketConfiguration config = configuration.get(HttpServerSocketConfiguration.class);
 		serverBootstrap = new ServerBootstrap()
 			.group(new NioEventLoopGroup(bindingCount, threadFactory), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(initializer)
-			.option(ChannelOption.SO_KEEPALIVE, config.keepAlive())
-			.option(ChannelOption.SO_REUSEADDR, config.reuseAddress())
-			.option(ChannelOption.TCP_NODELAY, config.tcpNoDelay())
-			.option(ChannelOption.SO_TIMEOUT, config.timeout())
-			.option(ChannelOption.SO_BACKLOG, config.backlog())
-			.option(ChannelOption.SO_RCVBUF, config.receiveBufferSize())
-			.option(ChannelOption.SO_SNDBUF, config.sendBufferSize());
+			.option(ChannelOption.SO_KEEPALIVE, configuration.keepAlive())
+			.option(ChannelOption.SO_REUSEADDR, configuration.reuseAddress())
+			.option(ChannelOption.TCP_NODELAY, configuration.tcpNoDelay())
+			.option(ChannelOption.SO_TIMEOUT, configuration.timeout())
+			.option(ChannelOption.SO_BACKLOG, configuration.backlog())
+			.option(ChannelOption.SO_RCVBUF, configuration.receiveBufferSize())
+			.option(ChannelOption.SO_SNDBUF, configuration.sendBufferSize());
 	}
 	
 	@Override

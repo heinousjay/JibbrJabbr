@@ -7,6 +7,10 @@ public class HttpServerModule extends JJModule {
 	
 	@Override
 	protected void configure() {
+		
+		addAPIModulePath("/jj/http/server/api");
+		
+		bindConfiguration().to(HttpServerSocketConfiguration.class);
 
 		addStartupListenerBinding().to(HttpServer.class);
 		
@@ -19,7 +23,5 @@ public class HttpServerModule extends JJModule {
 		install(new ServableModule());
 		
 		bindExecutor(JJNioEventLoopGroup.class);
-		
-		addAPIModulePath("/jj/http/server/api");
 	}
 }

@@ -19,11 +19,12 @@ import static org.mockito.BDDMockito.*;
 import static org.junit.Assert.*;
 
 import java.net.ConnectException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Provider;
 import javax.net.SocketFactory;
 
-import jj.configuration.Configuration;
 import jj.event.Publisher;
 
 import org.junit.Test;
@@ -45,14 +46,12 @@ public class HttpServerTest {
 			return mock(EngineHttpHandler.class);
 		}
 	};
-
-	@Mock Configuration configuration;
 	
 	@Mock HttpServerSwitch httpServerSwitch;
 	
 	@Mock Publisher publisher;
 	
-	HttpServerSocketConfiguration config = new HttpServerSocketConfiguration() {
+	HttpServerSocketConfiguration configuration = new HttpServerSocketConfiguration() {
 		
 		@Override
 		public int timeout() {
@@ -90,8 +89,8 @@ public class HttpServerTest {
 		}
 		
 		@Override
-		public Binding[] bindings() {
-			return new Binding[] { new Binding(8080), new Binding("localhost", 8090) };
+		public List<Binding> bindings() {
+			return Arrays.asList(new Binding(8080), new Binding("localhost", 8090));
 		}
 	};
 	
@@ -109,7 +108,6 @@ public class HttpServerTest {
 		
 		// TODO - may need to recast this test in any case, since it's not guaranteed that 8080/8090/5678 are available
 		
-		given(configuration.get(HttpServerSocketConfiguration.class)).willReturn(config);
 		given(httpServerSwitch.on()).willReturn(true);
 		given(httpServerSwitch.port()).willReturn(5678);
 		HttpServer httpServer = new HttpServer(
