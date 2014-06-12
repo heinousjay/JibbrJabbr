@@ -30,7 +30,6 @@ import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
