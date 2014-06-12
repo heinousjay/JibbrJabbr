@@ -33,8 +33,8 @@ import jj.resource.Resource;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceMaker;
 import jj.resource.stat.ic.StaticResource;
+import jj.resource.stat.ic.StaticResourceMaker;
 import jj.script.RealRhinoContextProvider;
 import jj.util.SHA1Helper;
 
@@ -74,7 +74,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	}
 	
 	protected CssResource resource(String name) throws Exception {
-		return new CssResource(new Dependencies(cacheKey(name), AppLocation.Base), name, path(name), false);
+		return new CssResource(new Dependencies(cacheKey(name), AppLocation.Base, null), name, path(name), false);
 	}
 	
 	@Override
@@ -82,13 +82,11 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		return new CssResourceCreator(app, lessProcessor, resourceFinder, creator);
 	}
 	
-	ResourceMaker resourceMaker;
 	LessProcessor lessProcessor;
 	@Mock ResourceFinder resourceFinder;
 	
 	protected void before() throws Exception {
 		lessProcessor = spy(new LessProcessor(app, new RealRhinoContextProvider(), mock(Publisher.class)));
-		resourceMaker = new ResourceMaker(app);
 	}
 
 	@Test
@@ -114,9 +112,9 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 		
 		given(resourceFinder.loadResource(CssResource.class, AppLocation.Base, name())).willReturn(testResource);
 		
-		StaticResource box = resourceMaker.makeStatic(AppLocation.Base, BOX_ICON);
-		StaticResource rox = resourceMaker.makeStatic(AppLocation.Base, ROX_ICON);
-		StaticResource sox = resourceMaker.makeStatic(AppLocation.Base, SOX_ICON);
+		StaticResource box = StaticResourceMaker.make(app, AppLocation.Base, BOX_ICON);
+		StaticResource rox = StaticResourceMaker.make(app, AppLocation.Base, ROX_ICON);
+		StaticResource sox = StaticResourceMaker.make(app, AppLocation.Base, SOX_ICON);
 		given(resourceFinder.loadResource(StaticResource.class, AppLocation.Base, BOX_ICON)).willReturn(box);
 		given(resourceFinder.loadResource(StaticResource.class, AppLocation.Base, ROX_ICON)).willReturn(rox);
 		given(resourceFinder.loadResource(StaticResource.class, AppLocation.Base, SOX_ICON)).willReturn(sox);

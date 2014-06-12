@@ -28,6 +28,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import jj.configuration.resolution.AppLocation;
+import jj.event.Publisher;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceKey;
 import jj.util.Closer;
@@ -57,9 +58,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
 			final InjectFunction injectFunction,
-			final Timers timers
+			final Timers timers,
+			final Publisher publisher
 		) {
-			super(cacheKey, AppLocation.Virtual);
+			super(cacheKey, AppLocation.Virtual, publisher);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;

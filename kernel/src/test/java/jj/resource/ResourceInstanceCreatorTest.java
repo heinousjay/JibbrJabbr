@@ -27,6 +27,7 @@ import java.util.Date;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.PathResolver;
+import jj.event.Publisher;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
@@ -81,7 +82,13 @@ public class ResourceInstanceCreatorTest  {
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		verify(injector).getInstance(StaticResource.class);
 		
-		Injector testInjector = Guice.createInjector(moduleCaptor.getValue());
+		Injector testInjector = Guice.createInjector(new AbstractModule() {
+
+			@Override
+			protected void configure() {
+				bind(Publisher.class).toInstance(mock(Publisher.class));
+			}
+		}, moduleCaptor.getValue());
 		
 		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
 		assertThat(testInjector.getInstance(String.class), is(name));

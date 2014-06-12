@@ -15,20 +15,23 @@
  */
 package jj.resource.stat.ic;
 
+import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.PathResolver;
-import jj.resource.ResourceInstanceCreator;
+import jj.event.Publisher;
+import jj.resource.AbstractResource.Dependencies;
+import jj.resource.ResourceKey;
 
 /**
  * @author jason
  *
  */
 public class StaticResourceMaker {
-	public static StaticResource make(PathResolver app, ResourceInstanceCreator creator, AppLocation base, String name) throws Exception {
-		return new StaticResourceCreator(app, creator).create(base, name);
-	}
-	
-	public static StaticResourceCreator fake(PathResolver app) {
-		return new StaticResourceCreator(app, null);
+	public static StaticResource make(PathResolver app, AppLocation base, String name) throws Exception {
+		
+		ResourceKey resourceKey = mock(ResourceKey.class);
+		Publisher publisher = mock(Publisher.class);
+		
+		return new StaticResource(new Dependencies(resourceKey, base, publisher), app.resolvePath(base, name), name);
 	}
 }

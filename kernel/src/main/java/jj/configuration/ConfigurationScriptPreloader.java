@@ -52,11 +52,15 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 	void configurationLoaded(ConfigurationLoaded configurationLoaded) {
 		latch.countDown();
 	}
+	
+	private void load() {
+		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
+	}
 
 	@Override
 	public void start() throws Exception {
 		
-		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
+		load();
 		
 		boolean success = latch.await(500, MILLISECONDS);
 		assert success : "configuration didn't load in 500 milliseconds";
@@ -64,10 +68,6 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 
 	@Override
 	public Priority startPriority() {
-		// needs to run before anything else, since
-		// any other component may need configuring
-		// and we don't want to flip-flop into IO
-		// threads
-		return Priority.Highest;
+		return Priority.Middle;
 	}
 }

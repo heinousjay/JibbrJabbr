@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import jj.configuration.Location;
+import jj.event.Publisher;
 
 /**
  * internal helper for manipulating a resource.  ALL RESOURCES
@@ -37,11 +38,13 @@ public abstract class AbstractResource implements Resource {
 		
 		protected final ResourceKey resourceKey;
 		protected final Location base;
+		protected final Publisher publisher;
 		
 		@Inject
-		public Dependencies(final ResourceKey resourceKey, final Location base) {
+		public Dependencies(final ResourceKey resourceKey, final Location base, final Publisher publisher) {
 			this.resourceKey = resourceKey;
 			this.base = base;
+			this.publisher = publisher;
 		}
 	}
 

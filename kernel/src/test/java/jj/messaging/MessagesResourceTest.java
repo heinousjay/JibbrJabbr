@@ -43,7 +43,7 @@ public class MessagesResourceTest {
 	
 	@Mock ResourceFinder resourceFinder;
 	
-	Dependencies dependencies = new Dependencies(resourceKey, AppLocation.Virtual);
+	Dependencies dependencies = new Dependencies(resourceKey, AppLocation.Virtual, null);
 	
 	String name = "index";
 	

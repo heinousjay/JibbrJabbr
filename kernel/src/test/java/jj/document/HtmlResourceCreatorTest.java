@@ -37,7 +37,7 @@ public class HtmlResourceCreatorTest extends ResourceBase<HtmlResource, HtmlReso
 	@Override
 	protected HtmlResource resource() throws Exception {
 		given(config.removeComments()).willReturn(true);
-		return new HtmlResource(config, publisher, new Dependencies(cacheKey(), AppLocation.Base), name(), path());
+		return new HtmlResource(config, publisher, new Dependencies(cacheKey(), AppLocation.Base, null), name(), path());
 	}
 	
 	@Override

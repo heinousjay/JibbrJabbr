@@ -38,7 +38,7 @@ public class PropertiesResourceTest {
 
 	@Test
 	public void test() throws Exception {
-		Dependencies dependencies = new Dependencies(resourceKey, AppLocation.Base);
+		Dependencies dependencies = new Dependencies(resourceKey, AppLocation.Base, null);
 		
 		PropertiesResource resource = new PropertiesResource(dependencies, Base.appPath().resolve("index.properties"), "test");
 		

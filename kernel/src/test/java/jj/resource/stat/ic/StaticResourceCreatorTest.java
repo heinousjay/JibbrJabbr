@@ -40,7 +40,7 @@ public class StaticResourceCreatorTest extends ResourceBase<StaticResource, Stat
 
 	@Override
 	protected StaticResource resource() throws Exception {
-		return new StaticResource(new Dependencies(cacheKey(), AppLocation.Base), path(), name());
+		return new StaticResource(new Dependencies(cacheKey(), AppLocation.Base, null), path(), name());
 	}
 
 	@Override

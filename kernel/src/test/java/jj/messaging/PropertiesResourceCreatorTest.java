@@ -40,7 +40,7 @@ public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResour
 
 	@Override
 	protected PropertiesResource resource() throws Exception {
-		return new PropertiesResource(new Dependencies(cacheKey(), AppLocation.Base), path(), name());
+		return new PropertiesResource(new Dependencies(cacheKey(), AppLocation.Base, null), path(), name());
 	}
 
 	@Override

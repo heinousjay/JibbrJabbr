@@ -51,6 +51,6 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	
 	@Override
 	public Priority startPriority() {
-		return Priority.NearHighest;
+		return Priority.Highest;
 	}
 }

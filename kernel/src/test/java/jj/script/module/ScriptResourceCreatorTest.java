@@ -46,7 +46,7 @@ public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, Scri
 
 	@Override
 	protected ScriptResource resource() throws Exception {
-		return new ScriptResource(new Dependencies(cacheKey(), AppLocation.Base), path(), name(), contextProvider = new MockRhinoContextProvider());
+		return new ScriptResource(new Dependencies(cacheKey(), AppLocation.Base, null), path(), name(), contextProvider = new MockRhinoContextProvider());
 	}
 	
 	@Override

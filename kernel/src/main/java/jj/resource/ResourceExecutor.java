@@ -1,8 +1,9 @@
 package jj.resource;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,10 +31,15 @@ class ResourceExecutor extends ThreadPoolExecutor {
 	
 	@Inject
 	public ResourceExecutor(
+		final ResourceConfiguration configuration,
 		final JJThreadFactory threadFactory,
 		final JJRejectedExecutionHandler handler
 	) {
-		super(20, 20, 20, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), 
+		super(
+			configuration.ioThreads(),
+			configuration.ioThreads(),
+			20, SECONDS,
+			new LinkedBlockingQueue<Runnable>(), 
 			threadFactory.namePattern("JibbrJabbr Resource Thread %d"), 
 			handler
 		);

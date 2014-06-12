@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 
 import javax.inject.Provider;
 
+import jj.event.Publisher;
 import jj.resource.ResourceKey;
 import jj.script.AbstractScriptEnvironment.Dependencies;
 
@@ -37,7 +38,8 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class),
 			mock(InjectFunction.class),
-			mock(Timers.class)
+			mock(Timers.class),
+			mock(Publisher.class)
 		);
 	}
 
@@ -48,7 +50,8 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class),
 			mock(InjectFunction.class),
-			mock(Timers.class)
+			mock(Timers.class),
+			mock(Publisher.class)
 		);
 	}
 	
@@ -70,5 +73,9 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 	
 	public Timers timers() {
 		return timers;
+	}
+	
+	public Publisher publisher() {
+		return publisher;
 	}
 }

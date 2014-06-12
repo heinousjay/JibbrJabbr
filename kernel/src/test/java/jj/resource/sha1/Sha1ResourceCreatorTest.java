@@ -33,7 +33,7 @@ public class Sha1ResourceCreatorTest extends ResourceBase<Sha1Resource, Sha1Reso
 
 	@Override
 	protected Sha1Resource resource() throws Exception {
-		return new Sha1Resource(new Dependencies(cacheKey(), AppLocation.Base), name(), path());
+		return new Sha1Resource(new Dependencies(cacheKey(), AppLocation.Base, null), name(), path());
 	}
 
 	@Override
