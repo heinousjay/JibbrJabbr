@@ -1,4 +1,4 @@
-import org.ajoberstar.gradle.git.tasks.*
+import org.ajoberstar.grgit.*
 import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
@@ -7,7 +7,7 @@ buildscript {
 	}
 	
 	dependencies {
-		classpath 'org.ajoberstar:gradle-git:0.6.3'
+		classpath 'org.ajoberstar:gradle-git:0.9.0'
 	}
 }
 
@@ -15,28 +15,20 @@ dependencies {
 	testCompile configurations.testPack
 }
 
+ext.repo = Grgit.open(rootProject.file('.'))
+
+def commit = repo.log(maxCommits: 1)[0]
 
 def versionInfo = [
 	friendlyname: 'JibbrJabbr',
-	version: project.version
+	version: project.version,
+	branch: repo.branch.current.name,
+	commitUserName: commit.committer.name,
+	commitUserEmail: commit.committer.email,
+	commitId: commit.id,
+	commitMessage: commit.shortMessage,
+	commitTime: commit.time + "000"
 ]
-
-task readBranch(type: GitBranchList) << {
-	versionInfo.branch = workingBranch.name ?: 'master'
-}
-
-task readLog(type: GitLog) {
-	maxCommits 1
-	doLast {
-		log.each {
-			versionInfo['commit-id'] = it.id
-			versionInfo['commit-message'] = it.shortMessage
-			versionInfo['commit-user'] = it.committer.name
-			versionInfo['commit-email'] = it.committer.email
-			versionInfo['commit-time'] = it.time + '000'
-		}
-	}
-}
 
 processResources {
 	outputs.upToDateWhen {
@@ -52,5 +44,3 @@ processResources {
 	}
 	filter ReplaceTokens, tokens: versionInfo
 }
-
-processResources.dependsOn readLog, readBranch

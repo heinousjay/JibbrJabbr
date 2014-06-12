@@ -1,8 +1,8 @@
 @friendlyname@
 @version@
 @branch@
-@commit-user@
-@commit-email@
-@commit-id@
-@commit-message@
-@commit-time@
+@commitUserName@
+@commitUserEmail@
+@commitId@
+@commitMessage@
+@commitTime@
