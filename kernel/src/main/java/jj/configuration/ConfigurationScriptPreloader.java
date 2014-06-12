@@ -28,7 +28,6 @@ import jj.JJServerStartupListener;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceLoader;
-import jj.resource.config.ConfigResource;
 
 /**
  * ensures that the configuration file for the application
@@ -57,7 +56,6 @@ class ConfigurationScriptPreloader implements JJServerStartupListener {
 	@Override
 	public void start() throws Exception {
 		
-		resourceLoader.loadResource(ConfigResource.class, Base, ConfigResource.CONFIG_JS);
 		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
 		
 		boolean success = latch.await(500, MILLISECONDS);

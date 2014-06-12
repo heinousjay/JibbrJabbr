@@ -31,7 +31,7 @@ public class Base {
 	static {
 		
 		try {
-			path = Paths.get(Base.class.getResource("/app/config.js").toURI()).getParent();
+			path = Paths.get(Base.class.getResource("/app/").toURI()).toAbsolutePath();
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

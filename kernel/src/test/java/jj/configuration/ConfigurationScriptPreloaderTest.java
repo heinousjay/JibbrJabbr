@@ -20,7 +20,6 @@ import static jj.configuration.resolution.AppLocation.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
 
 import jj.resource.ResourceLoader;
-import jj.resource.config.ConfigResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +43,6 @@ public class ConfigurationScriptPreloaderTest {
 		csp.configurationLoaded(null);
 		csp.start();
 		
-		verify(resourceLoader).loadResource(ConfigResource.class, Base, ConfigResource.CONFIG_JS);
 		verify(resourceLoader).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
 	}
 

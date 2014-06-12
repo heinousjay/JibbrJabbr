@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 /**
- * Defines the configuration system, which allows for type-safe
- * access to configuration items that are passed on the command
- * line, perhaps from a config file?  and in the planning, exposure
- * to a REPL for runtime changes
+ * Defines the configuration function
  * 
  * @author jason
  *

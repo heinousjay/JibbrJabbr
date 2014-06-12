@@ -45,13 +45,6 @@ public class ConfigurationClassLoaderTest {
 	public void before() throws Exception {
 		ccl = new ConfigurationClassLoader();
 	}
-
-	@Test
-	public void test() throws Exception {
-		
-		assertThat(ccl.makeClassFor(ConfigurationInterface.class), is(notNullValue()));
-	}
-	
 	
 	@Test
 	public void testClassCreation() throws Exception {
