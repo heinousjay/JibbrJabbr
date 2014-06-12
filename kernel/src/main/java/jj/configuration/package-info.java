@@ -14,7 +14,20 @@
  * limitations under the License.
  */
 /**
- * Defines the configuration function
+ * <p>
+ * Defines the configuration API, by forming a bridge between an expressive
+ * javascript DSL and type-safe java interfaces
+ * 
+ * <p>
+ * On the java side, all that is necessary is an interface with methods that
+ * return some value.
+ * 
+ * <p>
+ * the javascript DSL is defined by using require('configuration-support')
+ * and/or inject('{@link jj.configuration.ConfigurationCollector}') to
+ * construct a set of module exports that gather the information from
+ * the script.  See, for instance, 
+ * /jj/http/server/api/http-server-socket-configuration.js
  * 
  * @author jason
  *
