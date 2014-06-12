@@ -30,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.Configuration;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.MockApplication;
 import jj.css.CssResource;
@@ -51,7 +50,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 public abstract class RealResourceBase {
 	
 	protected Path appPath;
-	@Mock protected Configuration configuration;
 	protected Application app;
 	@Mock protected Publisher publisher;
 

@@ -24,9 +24,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
-import jj.configuration.Configuration;
 import jj.document.HtmlResource;
-import jj.execution.ExecutionConfiguration;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
@@ -60,14 +58,12 @@ public class ResourceCacheTest extends RealResourceBase {
 	
 	ResourceCacheImpl rc;
 	
-	@Mock Configuration configuration;
-	@Mock ExecutionConfiguration executionCongfiguration;
+	@Mock ResourceConfiguration configuration;
 	
 	@Before
 	public void before() {
 		
-		given(configuration.get(ExecutionConfiguration.class)).willReturn(executionCongfiguration);
-		given(executionCongfiguration.ioThreads()).willReturn(4);
+		given(configuration.ioThreads()).willReturn(4);
 		
 		HashMap<Class<? extends AbstractResource>, AbstractResourceCreator<? extends AbstractResource>> map = new HashMap<>();
 		map.put(StaticResource.class, src);

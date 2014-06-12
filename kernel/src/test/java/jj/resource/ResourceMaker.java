@@ -15,7 +15,6 @@
  */
 package jj.resource;
 
-import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.PathResolver;
 import jj.document.HtmlResource;
@@ -34,9 +33,9 @@ public class ResourceMaker {
 	private final PathResolver app;
 	private final ResourceInstanceCreator creator;
 	
-	public ResourceMaker(Configuration configuration, final PathResolver app) throws Exception {
+	public ResourceMaker(final PathResolver app) throws Exception {
 		this.app = app;
-		creator = ResourceInstanceCreatorTest.creator(app, configuration);
+		creator = ResourceInstanceCreatorTest.creator(app);
 	}
 
 	public StaticResource makeStatic(AppLocation base, String name) throws Exception {

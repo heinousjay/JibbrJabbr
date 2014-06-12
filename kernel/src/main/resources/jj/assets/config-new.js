@@ -31,3 +31,5 @@ require('document-system-configuration')
 	.showParsingErrors(true)
 	.removeComments(false);
 
+require('resource-system-configuration')
+	.ioThreads(10);

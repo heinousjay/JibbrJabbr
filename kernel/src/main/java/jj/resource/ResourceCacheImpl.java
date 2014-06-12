@@ -14,10 +14,8 @@ import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
 import jj.ServerStopping;
-import jj.configuration.Configuration;
 import jj.event.Listener;
 import jj.event.Subscriber;
-import jj.execution.ExecutionConfiguration;
 
 /**
  * central lookup for all resources, mapped from the URI
@@ -31,12 +29,12 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	private final Configuration configuration;
+	private final ResourceConfiguration configuration;
 	
 	private AtomicReference<ConcurrentMap<ResourceKey, Resource>> delegate;
 
 	@Inject
-	ResourceCacheImpl(final ResourceCreators resourceCreators, final Configuration configuration) {
+	ResourceCacheImpl(final ResourceCreators resourceCreators, final ResourceConfiguration configuration) {
 		this.resourceCreators = resourceCreators;
 		this.configuration = configuration;
 		
@@ -71,7 +69,7 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 				PlatformDependent.<ResourceKey, Resource>newConcurrentHashMap(
 					128,
 					0.75F,
-					configuration.get(ExecutionConfiguration.class).ioThreads()
+					configuration.ioThreads()
 				)
 			); 
 		delegate.get().putAll(old);

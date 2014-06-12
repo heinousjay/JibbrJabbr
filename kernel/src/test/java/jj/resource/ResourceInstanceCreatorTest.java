@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import jj.configuration.Configuration;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.PathResolver;
@@ -49,16 +48,9 @@ public class ResourceInstanceCreatorTest  {
 	
 	// TODO kill this off.  too much concrete stuff
 	public static ResourceInstanceCreator creator(
-		final PathResolver app,
-		final Configuration configuration
+		final PathResolver app
 	) {
-		return new ResourceInstanceCreator(app, Guice.createInjector(new AbstractModule() {
-			
-			@Override
-			protected void configure() {
-				bind(Configuration.class).toInstance(configuration);
-			}
-		}));
+		return new ResourceInstanceCreator(app, Guice.createInjector());
 	}
 	
 	@Mock Application app;

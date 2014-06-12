@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.execution;
+package jj.resource;
 
 import jj.configuration.Default;
 
@@ -21,7 +21,7 @@ import jj.configuration.Default;
  * @author jason
  *
  */
-public interface ExecutionConfiguration {
+public interface ResourceConfiguration {
 
 	/**
 	 * The maximum number of IO workers that will be available.
@@ -29,18 +29,4 @@ public interface ExecutionConfiguration {
 	 */
 	@Default("20")
 	int ioThreads();
-	
-	/**
-	 * The number of threads to devote to script processing. Note that
-	 * a given ScriptEnvironment instance will only ever run on one
-	 * thread, this just configures how large a pool the instances will
-	 * use.  Even distribution over these threads is best effort.  It
-	 * may be possible to expose a configuration that allows for affinity,
-	 * or assigning specific script uris to specific executors for
-	 * manual balancing.
-	 *  
-	 * @return
-	 */
-	@Default("1")
-	int scriptThreads();
 }

@@ -16,6 +16,10 @@ public class ResourceModule extends JJModule {
 
 	@Override
 	protected void configure() {
+		
+		addAPIModulePath("/jj/resource/api");
+		
+		bindConfiguration().to(ResourceConfiguration.class);
 
 		bindExecutor(ResourceExecutor.class);
 		

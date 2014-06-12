@@ -88,7 +88,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	
 	protected void before() throws Exception {
 		lessProcessor = spy(new LessProcessor(app, new RealRhinoContextProvider(), mock(Publisher.class)));
-		resourceMaker = new ResourceMaker(configuration, app);
+		resourceMaker = new ResourceMaker(app);
 	}
 
 	@Test
