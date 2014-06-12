@@ -1,7 +1,7 @@
 
 // the http-server-socket module returns an object that can configure
 // its namesake
-require('http-server-socket')
+require('http-server-socket-configuration')
 	//SO_KEEPALIVE
 	.keepAlive(true)
 	// TCP_NODELAY
