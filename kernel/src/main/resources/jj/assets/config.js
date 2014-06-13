@@ -33,3 +33,11 @@ require('document-system-configuration')
 
 require('resource-system-configuration')
 	.ioThreads(10);
+
+var route = require('uri-routing-configuration');
+//for example!
+route.get('/').to('/index');
+route.get('/chat/').to('/chat/list');
+route.get('/chat/:room').to('/chat/room');
+// uppercase methods work too
+route.GET('/chat/:room/*secret').to('/chat/room');
