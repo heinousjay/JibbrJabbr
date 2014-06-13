@@ -23,9 +23,9 @@ import jj.util.StringUtils;
 
 /**
  * Simple immutable carrier of a match against a URI, potentially preceded by
- * a SHA key.  determines if the URI is versioned - either a SHA key is the first
- * path particle, or an explicit version is either on the filename or a path
- * preceding it.  Examples of uris that are considered versioned are
+ * a hex SHA1 hash.  determines if the URI is versioned - either a hash is
+ * the first path particle, or an explicit version is either on the filename
+ * or a path preceding it.  Examples of URIs that are considered versioned are
  * <ul>
  * <li>/jquery-2.0.2.min.js</li>
  * <li>/jquery-2.0.2.js</li>
@@ -45,11 +45,28 @@ public class URIMatch {
 	private static final Pattern URI_PATTERN = Pattern.compile("^/(?:([\\da-f]{40})/)?(.*?)(?:\\.([^.]+))?$");
 	private static final Pattern VERSION_PATTERN = Pattern.compile("-\\d+(?:[.]\\d+)*(?:[.-]?(?:alpha|beta|pre))?(?:(?:[.-](?:min|pack))?$|/)");
 
+	/** the complete URI including the leading / */
 	public final String uri;
+	
+	/** the resource SHA1 hash, if present */
 	public final String sha1;
+	
+	/** 
+	 * the name portion of the uri. this is the portion after any
+	 * sha1 hash, without a leading slash, ending before the last
+	 * dot in the path which separates the extension
+	 */
 	public final String name;
+	
+	/** the extension */
 	public final String extension;
+	
+	/** name + '.' + extension */
 	public final String baseName;
+	
+	/**
+	 * true if considered to be versioned as detailed in the class comment
+	 */
 	public final boolean versioned;
 	
 	public URIMatch(final String uri) {
