@@ -43,9 +43,9 @@ public class Binding {
 	
 	@Override
 	public String toString() {
-		return "Binding(" +
-			(host == null ? "" : host + ":") +
+		return "bind(" +
+			(host == null ? "" : "'" + host + "', ") +
 			port +
-			")";
+			");";
 	}
 }
