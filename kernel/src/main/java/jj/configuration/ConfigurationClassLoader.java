@@ -43,6 +43,7 @@ import jj.util.CodeGenHelper;
 class ConfigurationClassLoader extends ClassLoader {
 	
 	private static final String INJECT_ANNOTATION = "javax.inject.Inject";
+	private static final String SINGLETON_ANNOTATION = "javax.inject.Singleton";
 	private static final String NAME_FORMAT = "%s$$GeneratedImplementation$$%s";
 	
 	
@@ -109,10 +110,16 @@ class ConfigurationClassLoader extends ClassLoader {
 		ConstPool constpool = ccFile.getConstPool();
 		
 		// @Inject
-		AnnotationsAttribute attribute = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-		Annotation annotation = new Annotation(INJECT_ANNOTATION, constpool);
-		attribute.addAnnotation(annotation);
-		ctor.getMethodInfo().addAttribute(attribute);
+		AnnotationsAttribute inject = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+		Annotation injectAnnotation = new Annotation(INJECT_ANNOTATION, constpool);
+		inject.addAnnotation(injectAnnotation);
+		ctor.getMethodInfo().addAttribute(inject);
+		
+		// @Singleton
+		AnnotationsAttribute singleton = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+		Annotation singletonAnnotation = new Annotation(SINGLETON_ANNOTATION, constpool);
+		singleton.addAnnotation(singletonAnnotation);
+		ccFile.addAttribute(singleton);
 	}
 	
 	private void implementConfigurationClass(final CtClass result, final CtClass resultInterface) throws Exception {
@@ -126,15 +133,27 @@ class ConfigurationClassLoader extends ClassLoader {
 			
 			String name = resultInterface.getName() + "." + newMethod.getName();
 			
-			Class<?> returnType = method.getReturnType().isPrimitive() ?
-				primitiveNamesToWrappers.get(method.getReturnType().getName()) :
-				Class.forName(method.getReturnType().getName());
-			
-			newMethod.setBody(
-				"{" +
-					"return ($r)collector.get(\"" + name + "\", " + returnType.getName() + ".class, " + defaultValue + ");" +
-				"}"
-			);
+			if (method.getReturnType().isPrimitive()) {
+				
+				String returnType = method.getReturnType().getName();
+				String type = primitiveNamesToWrappers.get(returnType).getName();
+				
+				newMethod.setBody(
+					"{" +
+						"Object value = collector.get(\"" + name + "\", " + type + ".class, " + defaultValue + ");" +
+						"if (value == null) { return " + primitiveDefaults.get(type) + "; }" +
+						"else { return ($r)value; }" +
+					"}"
+				);
+				
+			} else {
+				
+				newMethod.setBody(
+					"{" +
+						"return ($r)collector.get(\"" + name + "\", " + method.getReturnType().getName() + ".class, " + defaultValue + ");" +
+					"}"
+				);
+			}
 			
 			result.addMethod(newMethod);
 		}

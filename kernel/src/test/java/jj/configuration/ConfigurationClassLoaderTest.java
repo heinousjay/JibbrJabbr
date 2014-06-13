@@ -19,9 +19,14 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import org.junit.Before;
+import java.lang.reflect.Constructor;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -36,26 +41,27 @@ public class ConfigurationClassLoaderTest {
 		
 		@Default("default")
 		Object defaultedThing();
+		
+		int undefinedThing();
+		
+		String otherUndefinedThing();
 	}
 	
-	ConfigurationClassLoader ccl;
+	@InjectMocks ConfigurationClassLoader ccl;
 	@Mock ConfigurationCollector collector;
-	
-	@Before
-	public void before() throws Exception {
-		ccl = new ConfigurationClassLoader();
-	}
 	
 	@Test
 	public void testClassCreation() throws Exception {
 		
-		System.out.println(int.class.getName());
-		
 		Class<? extends ConfigurationInterface> clazz = ccl.makeConfigurationClassFor(ConfigurationInterface.class);
 		
-		ConfigurationInterface iface1 = 
-			clazz.getConstructor(ConfigurationCollector.class)
-				.newInstance(collector);
+		assertTrue(clazz.isAnnotationPresent(Singleton.class));
+		
+		Constructor<? extends ConfigurationInterface> ctor = clazz.getConstructor(ConfigurationCollector.class);
+		
+		assertTrue(ctor.isAnnotationPresent(Inject.class));
+		
+		ConfigurationInterface iface1 = ctor.newInstance(collector);
 		
 		assertThat(iface1, is(notNullValue()));
 		
@@ -66,6 +72,8 @@ public class ConfigurationClassLoaderTest {
 		assertThat(iface1.something(), is("something"));
 		assertThat(iface1.otherThing(), is(45));
 		assertThat(iface1.defaultedThing(), is((Object)"default"));
+		assertThat(iface1.undefinedThing(), is(0));
+		assertThat(iface1.otherUndefinedThing(), is(nullValue()));
 	}
 
 }

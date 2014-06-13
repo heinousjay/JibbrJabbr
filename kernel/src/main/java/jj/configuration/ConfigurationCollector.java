@@ -52,11 +52,11 @@ public class ConfigurationCollector {
 	 * @param key
 	 * @param value
 	 */
-	public void addConfigurationElement(String key, Object value) {
+	void addConfigurationElement(String key, Object value) {
 		inProgress.put(key, value);
 	}
 	
-	public void addConfigurationMultiElement(String key, Object value) {
+	void addConfigurationMultiElement(String key, Object value) {
 		if (!inProgress.containsKey(key)) {
 			inProgress.put(key, new ArrayList<Object>());
 		}
@@ -67,7 +67,9 @@ public class ConfigurationCollector {
 	
 	public <T> T get(String key, Class<T> type, Object defaultValue) {
 		Map<String, Object> map = current.get();
-		//assert map != null : "configuration is not yet complete, cannot read!";
+		if (List.class.isAssignableFrom(type) && defaultValue == null) {
+			defaultValue = Collections.EMPTY_LIST;
+		}
 		return converters.convert(map != null && map.containsKey(key) ? map.get(key) : defaultValue, type);
 	}
 	
@@ -75,8 +77,7 @@ public class ConfigurationCollector {
 		
 		for (String key : inProgress.keySet()) {
 			if (inProgress.get(key) instanceof List) {
-				@SuppressWarnings({ "unchecked", "rawtypes" })
-				List list = Collections.unmodifiableList((List)inProgress.get(key));
+				List<?> list = Collections.unmodifiableList((List<?>)inProgress.get(key));
 				inProgress.put(key, list);
 			}
 		}

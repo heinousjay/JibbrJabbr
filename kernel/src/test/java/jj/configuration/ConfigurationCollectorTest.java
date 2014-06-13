@@ -17,6 +17,10 @@ package jj.configuration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+
+import java.util.Collections;
+import java.util.List;
+
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
 
@@ -39,6 +43,7 @@ public class ConfigurationCollectorTest {
 	}
 	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void test() {
 		
 		collector.addConfigurationElement("key1", "value1");
@@ -49,6 +54,24 @@ public class ConfigurationCollectorTest {
 		collector.configurationComplete();
 		
 		assertThat(collector.get("key1", String.class, null), is("value1"));
+		assertThat(collector.get("key2", int.class, 1), is(2));
+		
+		List<Boolean> list = collector.get("key3", List.class, null);
+		
+		assertThat(list, is(notNullValue()));
+		assertThat(list.size(), is(2));
+		assertThat(list.get(0), is(true));
+		assertThat(list.get(1), is(false));
+		
+		list = collector.get("notAKey", List.class, null);
+		
+		assertThat(list, is(notNullValue()));
+		assertTrue(list.isEmpty());
+		
+		list = collector.get("alsoNotAKey", List.class, Collections.EMPTY_LIST);
+		
+		assertThat(list, is(notNullValue()));
+		assertTrue(list.isEmpty());
 	}
 
 }
