@@ -21,7 +21,7 @@ import io.netty.handler.codec.http.HttpMethod;
  * @author jason
  *
  */
-public class ParamNode extends TrieNode {
+public class ParamNode<T> extends TrieNode<T> {
 	
 	private enum Type {
 		Param,
@@ -29,7 +29,7 @@ public class ParamNode extends TrieNode {
 	}
 	
 	
-	private SeparatorNode child;
+	private SeparatorNode<T> child;
 	private final String name;
 	private final Type type;
 	
@@ -60,7 +60,7 @@ public class ParamNode extends TrieNode {
 	}
 
 	@Override
-	void doAddChild(HttpMethod method, String uri, String destination, int index) {
+	void doAddChild(HttpMethod method, String uri, T destination, int index) {
 		if (type == Type.Splat) { 
 			throw new IllegalArgumentException(
 				"trailing uri after a splat parameter " + method + " for " + uri + " to destination " + destination
@@ -68,12 +68,12 @@ public class ParamNode extends TrieNode {
 		}
 		assert uri.charAt(index) == SEPARATOR_CHAR; // must be!
 		
-		child = child == null ? new SeparatorNode() : child;
+		child = child == null ? new SeparatorNode<T>() : child;
 		child.addRoute(method, uri, destination, index + 1);
 	}
 
 	@Override
-	boolean findGoal(RouteFinderContext context, String uri, int index) {
+	boolean findGoal(RouteFinderContext<T> context, String uri, int index) {
 		// first, see if we match
 		String matchValue = "";
 		switch (type) {
@@ -103,9 +103,26 @@ public class ParamNode extends TrieNode {
 		
 		return false;
 	}
-
+	
 	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "(goal: " + goal + ", type: " + type + ", name: " + name + ", child: " + child + ")";
+	void compress() {
+		if (child != null) {
+			child.compress();
+		}
+	}
+	
+	@Override
+	void describeChildren(int indent, StringBuilder sb) {
+		if (child != null) {
+			addIndentation(indent, sb.append("\n")).append(SEPARATOR_CHAR).append(" = ");
+			child.describe(indent, sb);
+		}
+	}
+	
+	@Override
+	StringBuilder describe(int indent, StringBuilder sb) {
+		sb.append(getClass().getSimpleName()).append(" - ").append("type: ").append(type).append(", name: ").append(name).append(", goal: ").append(goal);
+		describeChildren(indent + 2, sb);
+		return sb;
 	}
 }

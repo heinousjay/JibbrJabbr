@@ -39,13 +39,13 @@ public class RouterTest {
 		@Override
 		public List<Route> routes() {
 			List<Route> result = new ArrayList<>();
-			result.add(new Route(GET, URI.create("/"), URI.create("result1")));
-			result.add(new Route(POST, URI.create("/"), URI.create("result2")));
-			result.add(new Route(GET, URI.create("/chat/"), URI.create("result3")));
-			result.add(new Route(POST, URI.create("/chat/:room"), URI.create("result4")));
-			result.add(new Route(DELETE, URI.create("/chat/:room"), URI.create("result5")));
-			result.add(new Route(GET, URI.create("/chat/:room"), URI.create("result6")));
-			result.add(new Route(GET, URI.create("/chat/:room/*secret"), URI.create("result7")));
+			result.add(new Route(GET, URI.create("/"), URI.create("/result1")));
+			result.add(new Route(POST, URI.create("/"), URI.create("/result2")));
+			result.add(new Route(GET, URI.create("/chat/"), URI.create("/result3")));
+			result.add(new Route(POST, URI.create("/chat/:room"), URI.create("/result4")));
+			result.add(new Route(DELETE, URI.create("/chat/:room"), URI.create("/result5")));
+			result.add(new Route(GET, URI.create("/chat/:room"), URI.create("/result6")));
+			result.add(new Route(GET, URI.create("/chat/:room/*secret"), URI.create("/result7")));
 			
 			return result;
 		}

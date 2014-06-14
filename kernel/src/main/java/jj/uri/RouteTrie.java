@@ -28,7 +28,7 @@ import io.netty.handler.codec.http.HttpMethod;
  */
 class RouteTrie {
 	
-	private final TrieNode root = new SeparatorNode();
+	private final TrieNode<String> root = new SeparatorNode<String>();
 	
 	void addRoute(HttpMethod method, String uri, String destination) {
 		
@@ -39,14 +39,18 @@ class RouteTrie {
 		root.addRoute(method, uri, destination, 1);
 	}
 	
+	void compress() {
+		root.compress();
+	}
+	
 	MatchResult find(HttpMethod method, String uri) {
 		assert method != null : "method is required";
 		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
 		
-		RouteFinderContext context = new RouteFinderContext();
+		RouteFinderContext<String> context = new RouteFinderContext<String>();
 		MatchResult result = null;
 		if (root.findGoal(context, uri, 1)) {
-			// well just the first one here
+			// well just use the first one here
 			String goal = context.matches.get(0).goal.get(method);
 			@SuppressWarnings("unchecked")
 			Map<String, String> params =

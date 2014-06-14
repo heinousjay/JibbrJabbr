@@ -29,11 +29,11 @@ import java.util.Map;
  * @author jason
  *
  */
-class RouteFinderContext {
+class RouteFinderContext<T> {
 	
 	class Match {
 		Map<String, String> params;
-		Map<HttpMethod, String> goal;
+		Map<HttpMethod, T> goal;
 		
 		void addParam(String key, String value) {
 			if (params == null) { params = new HashMap<>(); }
@@ -43,7 +43,7 @@ class RouteFinderContext {
 
 	/** a stack of separator nodes */
 	// no, this needs to maintain more context...
-	ArrayDeque<SeparatorNode> lastSeparators = new ArrayDeque<>(4);
+	ArrayDeque<SeparatorNode<T>> lastSeparators = new ArrayDeque<>(4);
 	
 	/** the goals we have matched thus far */
 	List<Match> matches = new ArrayList<>();
@@ -55,7 +55,7 @@ class RouteFinderContext {
 		currentMatch.addParam(key, value);
 	}
 	
-	void setGoal(Map<HttpMethod, String> goal) {
+	void setGoal(Map<HttpMethod, T> goal) {
 		Match match = currentMatch == null ? new Match() : currentMatch;
 		match.goal = goal;
 		matches.add(match);

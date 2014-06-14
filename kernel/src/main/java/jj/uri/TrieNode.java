@@ -17,6 +17,7 @@ package jj.uri;
 
 import io.netty.handler.codec.http.HttpMethod;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,16 +25,16 @@ import java.util.Map;
  * @author jason
  *
  */
-abstract class TrieNode {
+abstract class TrieNode<T> {
 
 	static final char SEPARATOR_CHAR = '/';
 	static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHAR);
 	static final String PARAM_CHARS = ":*";
 	
 	
-	Map<HttpMethod, String> goal;
+	Map<HttpMethod, T> goal;
 	
-	void addRoute(HttpMethod method, String uri, String destination, int index) {
+	void addRoute(HttpMethod method, String uri, T destination, int index) {
 		if (uri.length() == index) {
 		
 			doAddGoal(method, uri, destination);
@@ -45,8 +46,8 @@ abstract class TrieNode {
 	}
 	
 
-	void doAddGoal(HttpMethod method, String uri, String destination) {
-		goal = goal == null ? new HashMap<HttpMethod, String>(3) : goal;
+	void doAddGoal(HttpMethod method, String uri, T destination) {
+		goal = goal == null ? new HashMap<HttpMethod, T>(3) : goal;
 		if (goal.containsKey(method)) {
 			throw new IllegalArgumentException(
 				"duplicate route " + method + " for " + uri + ", new destination = " + destination + ", current config = " + goal
@@ -55,8 +56,28 @@ abstract class TrieNode {
 		goal.put(method, destination);
 	}
 	
-	abstract void doAddChild(HttpMethod method, String uri, String destination, int index);
+	abstract void doAddChild(HttpMethod method, String uri, T destination, int index);
 	
-	abstract boolean findGoal(RouteFinderContext context, String uri, int index);
+	abstract boolean findGoal(RouteFinderContext<T> context, String uri, int index);
+	
+	abstract void compress();
+	
+	abstract StringBuilder describe(int indent, StringBuilder sb);
+	
+	StringBuilder addIndentation(int indent, StringBuilder sb) {
+		char[] c = new char[indent];
+		Arrays.fill(c, ' ');
+		sb.append(c);
+		return sb;
+	}
+	
+	abstract void describeChildren(int indent, StringBuilder sb);
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		describe(0, sb);
+		return sb.toString();
+	}
 
 }

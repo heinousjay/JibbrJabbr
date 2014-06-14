@@ -17,48 +17,50 @@ package jj.uri;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * @author jason
  *
  */
-class SeparatorNode extends TrieNode {
+class SeparatorNode<T> extends TrieNode<T> {
 	
-	Map<String, StringNode> stringNodeChildren;
-	Map<String, ParamNode> paramNodeChildren;
+	Map<String, StringNode<T>> stringNodeChildren;
+	int keyLength = 1;
+	Map<String, ParamNode<T>> paramNodeChildren;
 	
 
 	@Override
-	void doAddChild(HttpMethod method, String uri, String destination, int index) {
+	void doAddChild(HttpMethod method, String uri, T destination, int index) {
 		
 		char current = uri.charAt(index);
 		
 		assert current != SEPARATOR_CHAR : uri + " has two path separators in a row";
 		
 		if (PARAM_CHARS.indexOf(current) != -1) {
-			paramNodeChildren = paramNodeChildren == null ? new HashMap<String, ParamNode>(4) : paramNodeChildren;
+			paramNodeChildren = paramNodeChildren == null ? new HashMap<String, ParamNode<T>>(4) : paramNodeChildren;
 			String paramValue = ParamNode.makeValue(uri, index);
-			ParamNode nextNode = paramNodeChildren.get(paramValue);
+			ParamNode<T> nextNode = paramNodeChildren.get(paramValue);
 			if (nextNode == null) { 
-				nextNode = new ParamNode(paramValue);
+				nextNode = new ParamNode<T>(paramValue);
 				paramNodeChildren.put(paramValue, nextNode);
 			}
 			nextNode.addRoute(method, uri, destination, index + paramValue.length());
 		} else {
-			stringNodeChildren = stringNodeChildren == null ? new HashMap<String, StringNode>(4) : stringNodeChildren;
+			stringNodeChildren = stringNodeChildren == null ? new HashMap<String, StringNode<T>>(4) : stringNodeChildren;
 			String value = String.valueOf(current);
-			StringNode nextNode = stringNodeChildren.get(value);
+			StringNode<T> nextNode = stringNodeChildren.get(value);
 			if (nextNode == null) {
-				nextNode = new StringNode();
-				stringNodeChildren.put(value, (StringNode)nextNode);
+				nextNode = new StringNode<T>();
+				stringNodeChildren.put(value, (StringNode<T>)nextNode);
 			}
 			nextNode.addRoute(method, uri, destination, index + 1);
 		}
 	}
 
 	@Override
-	boolean findGoal(RouteFinderContext context, String uri, int index) {
+	boolean findGoal(RouteFinderContext<T> context, String uri, int index) {
 		if (uri.length() == index) {
 			if (goal != null) {
 				context.setGoal(goal);
@@ -69,15 +71,15 @@ class SeparatorNode extends TrieNode {
 		
 		boolean result = false;
 		
-		if (stringNodeChildren != null) {
-			String current = uri.substring(index, index + 1);
+		if (stringNodeChildren != null && uri.length() >= index + keyLength) {
+			String current = uri.substring(index, index + keyLength);
 			if (stringNodeChildren.containsKey(current)) {
-				result = stringNodeChildren.get(current).findGoal(context, uri, index + 1);
+				result = stringNodeChildren.get(current).findGoal(context, uri, index + keyLength);
 			}
 		}
 		
 		if (paramNodeChildren != null) {
-			for (ParamNode paramNode : paramNodeChildren.values()) {
+			for (ParamNode<T> paramNode : paramNodeChildren.values()) {
 				boolean matched = paramNode.findGoal(context, uri, index);
 				result = result || matched;
 				
@@ -86,10 +88,52 @@ class SeparatorNode extends TrieNode {
 		
 		return result;
 	}
-
 	
 	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "(goal: " + goal + "\nstringNodeChildren: " + stringNodeChildren + "\ndynamicChildren: " + paramNodeChildren + ")";
+	void compress() {
+		if (stringNodeChildren != null) {
+			if (stringNodeChildren.size() == 1) {
+				String key = stringNodeChildren.keySet().iterator().next();
+				StringBuilder accumulator = new StringBuilder(key);
+				StringNode<T> node = stringNodeChildren.remove(key);
+				StringNode<T> newNode = node.mergeUp(accumulator);
+				keyLength = accumulator.length();
+				newNode.compress();
+				stringNodeChildren.put(accumulator.toString(), newNode);
+			} else {
+				for (StringNode<T> node : stringNodeChildren.values()) {
+					node.compress();
+				}
+			}
+		}
+		
+		if (paramNodeChildren != null) {
+			for (ParamNode<T> node : paramNodeChildren.values()) {
+				node.compress();
+			}
+		}
+	}
+	
+	@Override
+	void describeChildren(int indent, StringBuilder sb) {
+		if (stringNodeChildren != null) {
+			for (String key : stringNodeChildren.keySet()) {
+				addIndentation(indent, sb.append("\n")).append(key).append(" = ");
+				stringNodeChildren.get(key).describe(indent, sb);
+			}
+		}
+		if (paramNodeChildren != null) {
+			for (String key : paramNodeChildren.keySet()) {
+				addIndentation(indent, sb.append("\n")).append(key).append(" = ");
+				paramNodeChildren.get(key).describe(indent, sb);
+			}
+		}
+	}
+	
+	@Override
+	StringBuilder describe(int indent, StringBuilder sb) {
+		sb.append(getClass().getSimpleName()).append(" - keylength: ").append(keyLength).append(", goal: ").append(goal);
+		describeChildren(indent + 2, sb);
+		return sb;
 	}
 }
