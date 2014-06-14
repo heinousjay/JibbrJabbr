@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.RhinoException;
 
 import jj.event.Publisher;
 import jj.util.Closer;
@@ -59,6 +60,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			execution.run(context);
 		} catch (ContinuationPending continuation) {
 			return extractContinuationState(continuation);
+		} catch (RhinoException re) {
+			// this is handled inside the RhinoContext
 		} catch (RuntimeException e) {
 			log(e, scriptEnvironment);
 		}
