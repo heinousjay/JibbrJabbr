@@ -80,7 +80,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	}
 	
 	void initializeScript(AbstractScriptEnvironment se) {
-		taskRunner.execute(new InitializerTask("initializing ScriptEnvironment at " + se.name(), se, continuationCoordinator));
+		taskRunner.execute(new InitializerTask("initializing " + se, se, continuationCoordinator));
 	}
 	
 	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
