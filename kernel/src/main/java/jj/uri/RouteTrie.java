@@ -15,10 +15,10 @@
  */
 package jj.uri;
 
-import io.netty.handler.codec.http.HttpMethod;
-
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * stores the router information in a trie for fast access
@@ -27,64 +27,36 @@ import java.util.Map;
  *
  */
 class RouteTrie {
-
-	class Node {
-		
-		Map<HttpMethod, String> goal;
-		Map<String, Node> children;
-		
-		
-		void addRoute(HttpMethod method, String uri, String destination, int index) {
-			if (uri.length() == index) {
-				goal = goal == null ? new HashMap<HttpMethod, String>(2, 0.5f) : goal;
-				if (goal.containsKey(method)) {
-					throw new IllegalArgumentException("duplicate route " + method + " for " + uri);
-				}
-				goal.put(method, destination);
-			} else {
-				children = children == null ? new HashMap<String, Node>(4, 0.75f) : children;
-				
-				String current = uri.substring(index, index + 1);
-				
-				Node nextNode = children.get(current);
-				if (nextNode == null) {
-					nextNode = new Node();
-					children.put(current, nextNode);
-				}
-				
-				nextNode.addRoute(method, uri, destination, index + 1);
-			}
-		}
-		
-		String find(HttpMethod method, String uri, int index) {
-			if (uri.length() == index) {
-				return goal != null ? goal.get(method) : null;
-			}
-			
-			if (children != null) {
-				String current = uri.substring(index, index + 1);
-				if (children.containsKey(current)) {
-					return children.get(current).find(method, uri, index + 1);
-				}
-			}
-			
-			return null;
-		}
-		
-		@Override
-		public String toString() {
-			return "goal: " + goal + "\nchildren: " + children;
-		}
-	}
 	
-	private final Node root = new Node();
+	private final TrieNode root = new SeparatorNode();
 	
 	void addRoute(HttpMethod method, String uri, String destination) {
-		root.addRoute(method, uri, destination, 0);
+		
+		assert method != null : "method is required";
+		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
+		assert destination != null && !destination.isEmpty() && destination.charAt(0) == '/' : "destination is required and must start with /";
+		
+		root.addRoute(method, uri, destination, 1);
 	}
 	
-	String find(HttpMethod method, String uri) {
-		return root.find(method, uri, 0);
+	MatchResult find(HttpMethod method, String uri) {
+		assert method != null : "method is required";
+		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
+		
+		RouteFinderContext context = new RouteFinderContext();
+		MatchResult result = null;
+		if (root.findGoal(context, uri, 1)) {
+			// well just the first one here
+			String goal = context.matches.get(0).goal.get(method);
+			@SuppressWarnings("unchecked")
+			Map<String, String> params =
+				(Map<String, String>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
+			if (goal != null) {
+				result = new MatchResult(goal, params);
+			}
+		}
+		
+		return result;
 	}
 	
 	@Override
