@@ -39,6 +39,8 @@ public class App {
 	
 	public static final String api;
 	
+	public static final String configuration;
+	
 	static {
 		try {
 			
@@ -50,6 +52,7 @@ public class App {
 			two = Paths.get(App.class.getResource("/app2/app/").toURI()).toAbsolutePath().toString();
 			minimal = Paths.get(App.class.getResource("/minimal/app/").toURI()).toAbsolutePath().toString();
 			api = Paths.get(App.class.getResource("/api/public/").toURI()).toAbsolutePath().toString();
+			configuration = Paths.get(App.class.getResource("/configuration/").toURI()).toAbsolutePath().toString();
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

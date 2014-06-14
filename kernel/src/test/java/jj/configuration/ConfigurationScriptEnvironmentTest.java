@@ -15,10 +15,14 @@
  */
 package jj.configuration;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.*;
 import static jj.configuration.resolution.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
 import jj.event.Publisher;
+import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.ScriptEnvironment;
@@ -55,21 +59,20 @@ public class ConfigurationScriptEnvironmentTest {
 		dependencies = new MockAbstractScriptEnvironmentDependencies();
 
 		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
-		
-		given(resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), CONFIG_SCRIPT_NAME)).willReturn(configScript);
+	}
+
+	@Test
+	public void testInitialization() {
+		given(resourceFinder.loadResource(ScriptResource.class, Base, CONFIG_SCRIPT_NAME)).willReturn(configScript);
 		
 		cse = new ConfigurationScriptEnvironment(
 			dependencies,
 			resourceFinder, publisher, global, collector
 		);
-	}
-
-	@Test
-	public void testInitialization() {
 		
 		verify(publisher).publish(isA(ConfigurationLoading.class));
 		verify(configScript).addDependent(cse);
-		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
+		verify(publisher).publish(isA(ConfigurationFound.class));
 		
 		// make sure it only triggers on its own initialization
 		cse.scriptInitialized(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
@@ -84,15 +87,19 @@ public class ConfigurationScriptEnvironmentTest {
 	}
 	
 	@Test
-	public void testOtherEvent() {
-		given(configScript.base()).willReturn(Base);
+	public void testDefaultConfiguration() {
 		
-		cse = new ConfigurationScriptEnvironment(
-			dependencies,
-			resourceFinder, publisher, global, collector
-		);
+		try {
+			cse = new ConfigurationScriptEnvironment(
+				dependencies,
+				resourceFinder, publisher, global, collector
+			);
+			fail("should have thrown");
+		} catch (NoSuchResourceException nsre) {
+			assertThat(nsre, is(notNullValue()));
+		}
 		
-		verify(publisher).publish(isA(ConfigurationFound.class));
+		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
 	}
 
 }

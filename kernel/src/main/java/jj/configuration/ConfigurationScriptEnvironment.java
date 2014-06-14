@@ -15,7 +15,6 @@
  */
 package jj.configuration;
 
-import static jj.configuration.resolution.AppLocation.Assets;
 import static jj.configuration.resolution.AppLocation.Base;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
 
@@ -30,6 +29,7 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
+import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.Global;
@@ -82,22 +82,27 @@ public class ConfigurationScriptEnvironment extends AbstractScriptEnvironment im
 		
 		publisher.publish(new ConfigurationLoading());
 		
-		config = resourceFinder.loadResource(ScriptResource.class, Base.and(Assets), CONFIG_SCRIPT_NAME);
+		config = resourceFinder.loadResource(ScriptResource.class, Base, CONFIG_SCRIPT_NAME);
 		
-		config.addDependent(this);
-		
-		if (config.base() == Base) {
+		if (config != null) {
 			publisher.publish(new ConfigurationFound(config.path()));
+			config.addDependent(this);
 		} else {
 			publisher.publish(new UsingDefaultConfiguration());
+			configurationComplete();
+			throw new NoSuchResourceException(CONFIG_SCRIPT_NAME);
 		}
+	}
+	
+	private void configurationComplete() {
+		collector.configurationComplete();
+		publisher.publish(new ConfigurationLoaded());
 	}
 	
 	@Listener
 	void scriptInitialized(final ScriptEnvironmentInitialized event) {
 		if (event.scriptEnvironment() == this) {
-			collector.configurationComplete();
-			publisher.publish(new ConfigurationLoaded());
+			configurationComplete();
 		}
 	}
 
