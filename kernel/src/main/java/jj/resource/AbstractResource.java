@@ -123,6 +123,6 @@ public abstract class AbstractResource implements Resource {
 	}
 	
 	public String toString() {
-		return getClass().getSimpleName() + "@" + uri();
+		return getClass().getName() + "@" + base() + "/" + name();
 	}
 }

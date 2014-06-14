@@ -175,14 +175,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	}
 
 	public String toString() {
-		return new StringBuilder(getClass().getSimpleName())
-			.append("[")
-			.append(name())
-			.append("@").append(sha1())
-			.append("] {")
-			.append("state=").append(state)
-			.append("}")
-			.toString();
+		return super.toString() + " {state=" + state + "}";
 	}
 
 	/**
