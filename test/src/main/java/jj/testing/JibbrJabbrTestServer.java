@@ -151,13 +151,6 @@ public class JibbrJabbrTestServer implements TestRule {
 	@Override
 	public Statement apply(final Statement base, final Description description) {
 		
-		// we use production to eagerly instantiate the graph, since the next line will do
-		// that anyway.
-		Statement statement = base;
-		if (instance != null) {
-			statement = createInjectionStatement(base);
-		}
-		
 		ArrayList<String> builder = new ArrayList<>();
 		builder.add("app=" + appPath);
 		builder.add("fileWatcher=" + fileWatcher);
@@ -168,10 +161,10 @@ public class JibbrJabbrTestServer implements TestRule {
 		
 		injector = Guice.createInjector(
 			Stage.PRODUCTION,
-			new TestModule(this, builder.toArray(new String[builder.size()]), statement, description, httpServer)
+			new TestModule(this, builder.toArray(new String[builder.size()]), base, description, httpServer)
 		);
 		
-		return new Statement() {
+		Statement statement = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
 				try {
@@ -181,5 +174,10 @@ public class JibbrJabbrTestServer implements TestRule {
 				}
 			}
 		};
+		if (instance != null) {
+			statement = createInjectionStatement(statement);
+		}
+		
+		return statement;
 	}
 }

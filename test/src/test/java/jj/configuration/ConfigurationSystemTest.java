@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -26,6 +27,9 @@ import jj.App;
 import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
 import jj.document.DocumentConfiguration;
+import jj.event.Listener;
+import jj.event.Subscriber;
+import jj.script.ScriptError;
 import jj.testing.JibbrJabbrTestServer;
 
 import org.junit.Rule;
@@ -38,6 +42,7 @@ import org.junit.Test;
  *
  */
 @Singleton
+@Subscriber
 public class ConfigurationSystemTest {
 	
 	static String httpServerSocket(String key) {
@@ -52,9 +57,17 @@ public class ConfigurationSystemTest {
 	
 	@Inject
 	private DocumentConfiguration documentConfiguration;
+	
+	boolean failed;
+	
+	@Listener
+	void scriptError(ScriptError scriptError) {
+		failed = true;
+	}
 
 	@Test
 	public void test() throws Exception {
+		assert !failed;
 		
 		// let's peek into the collector to assert some stuff
 		assertThat(collector.get(httpServerSocket("keepAlive"), boolean.class, "false"), is(true));

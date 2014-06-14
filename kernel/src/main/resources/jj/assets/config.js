@@ -34,7 +34,7 @@ require('document-system-configuration')
 require('resource-system-configuration')
 	.ioThreads(10);
 
-var route = require('uri-routing-configuration');
+var {route:route, redirect:redirect} = require('uri-routing-configuration');
 //for example!
 route.get('/').to('/index');
 route.get('/chat/').to('/chat/list');

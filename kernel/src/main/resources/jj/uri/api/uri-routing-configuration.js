@@ -9,14 +9,22 @@ var PUT    = Packages.io.netty.handler.codec.http.HttpMethod.PUT;
 var DELETE = Packages.io.netty.handler.codec.http.HttpMethod.DELETE;
 
 module.exports = {
-	get: function(uri) {
-		return {
-			to: function(destination) {
-				var route = new Packages.jj.uri.Route(GET, java.net.URI.create(uri), java.net.URI.create(uri));
-				collector.addConfigurationMultiElement(base + 'routes', route);
+		
+	route: {
+		get: function(uri) {
+			return {
+				to: function(destination) {
+					var route = new Packages.jj.uri.Route(GET, java.net.URI.create(uri), java.net.URI.create(destination));
+					collector.addConfigurationMultiElement(base + 'routes', route);
+				}
 			}
+		}
+	},
+	redirect: {
+		get: function() {
+			// whatever
 		}
 	}
 }
 
-module.exports.GET = get;
+module.exports.route.GET = module.exports.route.get;

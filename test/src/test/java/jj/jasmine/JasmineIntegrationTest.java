@@ -17,7 +17,6 @@ package jj.jasmine;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.configuration.resolution.AppLocation.Virtual;
-import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
@@ -51,12 +50,13 @@ public class JasmineIntegrationTest {
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
 	
-	CountDownLatch latch = new CountDownLatch(2);
+	CountDownLatch latch = new CountDownLatch(1);
 	
 	@Listener
 	void initialized(ScriptEnvironmentInitialized sei) {
-		
-		latch.countDown();
+		if (sei.scriptEnvironment() instanceof JasmineScriptEnvironment) {
+			latch.countDown();
+		}
 	}
 
 	@Test
