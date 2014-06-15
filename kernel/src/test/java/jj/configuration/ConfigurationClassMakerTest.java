@@ -31,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigurationClassLoaderTest {
+public class ConfigurationClassMakerTest {
 	
 	public interface ConfigurationInterface {
 		
@@ -47,14 +47,14 @@ public class ConfigurationClassLoaderTest {
 		String otherUndefinedThing();
 	}
 	
-	@InjectMocks ConfigurationClassLoader ccl;
+	@InjectMocks ConfigurationClassMaker ccl;
 	@Mock ConfigurationCollector collector;
 	
 	@Test
 	public void testClassCreation() throws Exception {
 		
-		Class<? extends ConfigurationInterface> clazz = ccl.makeConfigurationClassFor(ConfigurationInterface.class);
-		
+		Class<? extends ConfigurationInterface> clazz = ccl.make(ConfigurationInterface.class);
+		System.out.println(clazz);
 		assertTrue(clazz.isAnnotationPresent(Singleton.class));
 		
 		Constructor<? extends ConfigurationInterface> ctor = clazz.getConstructor(ConfigurationCollector.class);

@@ -36,7 +36,7 @@ import jj.conversion.Converters;
  *
  */
 @Singleton
-public class ConfigurationCollector {
+class ConfigurationCollector {
 	
 	private final AtomicReference<Map<String, Object>> current = new AtomicReference<>();
 	private HashMap<String, Object> inProgress = new HashMap<>();
@@ -65,7 +65,7 @@ public class ConfigurationCollector {
 		list.add(value);
 	}
 	
-	public <T> T get(String key, Class<T> type, Object defaultValue) {
+	<T> T get(String key, Class<T> type, Object defaultValue) {
 		Map<String, Object> map = current.get();
 		if (List.class.isAssignableFrom(type) && defaultValue == null) {
 			defaultValue = Collections.EMPTY_LIST;

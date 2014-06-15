@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
- * Fronts the {@link ConfigurationClassLoader} to cache the results
+ * Fronts the {@link ConfigurationClassMaker} to cache the results
  * 
  * @author jason
  *
@@ -33,10 +33,10 @@ class ConfigurationObjectImplementation {
 	/** mapped interface to implementation */
 	private final ConcurrentHashMapV8<Class<?>, Class<?>> implementations = new ConcurrentHashMapV8<>();
 	
-	private final ConfigurationClassLoader classLoader;
+	private final ConfigurationClassMaker classLoader;
 	
 	@Inject
-	ConfigurationObjectImplementation(final ConfigurationClassLoader classLoader) {
+	ConfigurationObjectImplementation(final ConfigurationClassMaker classLoader) {
 		this.classLoader = classLoader;
 	}
 
@@ -48,7 +48,7 @@ class ConfigurationObjectImplementation {
 			@Override
 			public Class<?> apply(Class<?> configurationInterface) {
 				try {
-					return classLoader.makeConfigurationClassFor(configurationInterface);
+					return classLoader.make(configurationInterface);
 				} catch (Exception e) {
 					throw new AssertionError("couldn't implement " + configurationInterface, e);
 				}

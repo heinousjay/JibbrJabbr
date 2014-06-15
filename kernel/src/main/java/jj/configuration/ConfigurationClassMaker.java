@@ -16,7 +16,6 @@
 package jj.configuration;
 
 import static jj.util.CodeGenHelper.*;
-
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -40,16 +39,11 @@ import jj.util.CodeGenHelper;
  * 
  */
 @Singleton
-class ConfigurationClassLoader extends ClassLoader {
+class ConfigurationClassMaker {
 	
 	private static final String INJECT_ANNOTATION = "javax.inject.Inject";
 	private static final String SINGLETON_ANNOTATION = "javax.inject.Singleton";
-	private static final String NAME_FORMAT = "%s$$GeneratedImplementation$$%s";
-	
-	
-	static {
-		registerAsParallelCapable();
-	}
+	private static final String NAME_FORMAT = "jj.configuration.GeneratedImplementationFor$$%s$$%s";
 	
 	private final ClassPool classPool;
 	
@@ -58,42 +52,49 @@ class ConfigurationClassLoader extends ClassLoader {
 	private final CtClass[] constructionExceptions = new CtClass[0];
 	
 	@Inject
-	ConfigurationClassLoader() throws Exception {
-		super(ConfigurationClassLoader.class.getClassLoader());
+	ConfigurationClassMaker() throws Exception {
 		classPool = CodeGenHelper.classPool();
 		constructionParameters = new CtClass[] { 
 			classPool.get(ConfigurationCollector.class.getName())
 		};
 	}
 	
-	<T> Class<? extends T> makeConfigurationClassFor(Class<T> configurationInterface) throws Exception {
-		
-		CtClass resultInterface = classPool.get(configurationInterface.getName());
+	<T> Class<? extends T> make(Class<T> configurationInterface) throws Exception {
 		
 		final String name = String.format(NAME_FORMAT,
-			configurationInterface.getName(),
+			configurationInterface.getName().replace(".", "_"),
 			configurationInterface.hashCode()
 		);
+		
+		// we may have already defined this class since we support being restarted
+		
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends T> resultClass = (Class<? extends T>) Class.forName(name);
+			return resultClass;
+		} catch (ClassNotFoundException e) { /* just carry on */ }
+		
+		CtClass resultInterface = classPool.get(configurationInterface.getName());
 		
 		CtClass result = classPool.makeClass(name);
 		result.addInterface(resultInterface);
 		
 		// make it!
-		prepareConfigurationClassForInjection(result);
-		implementConfigurationClass(result, resultInterface);
+		prepareForInjection(result);
+		implement(result, resultInterface);
 		
-		byte[] b = result.toBytecode();
-		
-		// no need to keep these around
-		result.detach();
-		resultInterface.detach();
-		
-		@SuppressWarnings("unchecked")
-		Class<? extends T> resultClass = (Class<? extends T>)defineClass(name, b, 0, b.length);
-		return resultClass;
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends T> resultClass = (Class<? extends T>)result.toClass(getClass().getClassLoader(), null);
+			return resultClass;
+		} finally {
+			// no need to keep these around
+			result.detach();
+			resultInterface.detach();
+		}
 	}
 	
-	private void prepareConfigurationClassForInjection(final CtClass result) throws CannotCompileException {
+	private void prepareForInjection(final CtClass result) throws CannotCompileException {
 		
 		CtField collectorField = CtField.make("private final " + ConfigurationCollector.class.getName() + " collector;", result);
 		result.addField(collectorField);
@@ -122,7 +123,7 @@ class ConfigurationClassLoader extends ClassLoader {
 		ccFile.addAttribute(singleton);
 	}
 	
-	private void implementConfigurationClass(final CtClass result, final CtClass resultInterface) throws Exception {
+	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {
 		
 
 		for (CtMethod method : resultInterface.getDeclaredMethods()) {
@@ -153,6 +154,9 @@ class ConfigurationClassLoader extends ClassLoader {
 						"return ($r)collector.get(\"" + name + "\", " + method.getReturnType().getName() + ".class, " + defaultValue + ");" +
 					"}"
 				);
+				
+				// if the return type is in the same package as the resultInterface,
+				// we can detach it
 			}
 			
 			result.addMethod(newMethod);
