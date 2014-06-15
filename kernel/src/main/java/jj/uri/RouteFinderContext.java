@@ -17,7 +17,6 @@ package jj.uri;
 
 import io.netty.handler.codec.http.HttpMethod;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +39,6 @@ class RouteFinderContext<T> {
 			params.put(key, value);
 		}
 	}
-
-	/** a stack of separator nodes */
-	// no, this needs to maintain more context...
-	ArrayDeque<SeparatorNode<T>> lastSeparators = new ArrayDeque<>(4);
 	
 	/** the goals we have matched thus far */
 	List<Match> matches = new ArrayList<>();

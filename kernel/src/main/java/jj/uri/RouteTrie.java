@@ -39,8 +39,9 @@ class RouteTrie<T> {
 		root.addRoute(method, uri, destination, 1);
 	}
 	
-	void compress() {
+	RouteTrie<T> compress() {
 		root.compress();
+		return this;
 	}
 	
 	MatchResult<T> find(HttpMethod method, String uri) {

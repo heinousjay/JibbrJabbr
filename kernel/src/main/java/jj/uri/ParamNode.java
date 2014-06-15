@@ -16,6 +16,8 @@
 package jj.uri;
 
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -30,10 +32,13 @@ class ParamNode<T> extends TrieNode<T> {
 		Splat
 	}
 	
+	private static final Pattern PARSER = Pattern.compile("^([:*])([\\w\\d$_-]+)(?:\\((.+)\\))?$");
+	
 	
 	private SeparatorNode<T> child;
 	private final String name;
 	private final Type type;
+	private final Pattern pattern;
 	
 	static String makeValue(final String uri, final int start) {
 		int end = uri.indexOf(SEPARATOR_STRING, start);
@@ -42,8 +47,11 @@ class ParamNode<T> extends TrieNode<T> {
 	}
 		
 	ParamNode(final String value) {
-		this.name = parseName(value);
-		this.type = parseType(value);
+		Matcher m = PARSER.matcher(value);
+		if (!m.matches()) { throw new IllegalArgumentException("[" + value + "] is not a value parameter definition"); }
+		this.type = parseType(m.group(1));
+		this.name = m.group(2);
+		this.pattern = m.group(3) == null ? null : Pattern.compile(m.group(3));
 	}
 	
 	private Type parseType(String value) {
@@ -55,10 +63,6 @@ class ParamNode<T> extends TrieNode<T> {
 		default:
 			throw new AssertionError();
 		}
-	}
-	
-	private String parseName(String value) {
-		return value.substring(1);
 	}
 
 	@Override
@@ -73,6 +77,12 @@ class ParamNode<T> extends TrieNode<T> {
 		child = child == null ? new SeparatorNode<T>() : child;
 		child.addRoute(method, uri, destination, index + 1);
 	}
+	
+	private String matchParam(String uri, int index) {
+		String value = makeValue(uri, index);
+		value = (pattern != null && !pattern.matcher(value).find()) ? "" : value;
+		return value;
+	}
 
 	@Override
 	boolean findGoal(RouteFinderContext<T> context, String uri, int index) {
@@ -80,14 +90,17 @@ class ParamNode<T> extends TrieNode<T> {
 		String matchValue = "";
 		switch (type) {
 		case Param:
-			matchValue = makeValue(uri, index);
+			matchValue = matchParam(uri, index);
 			break;
 		case Splat:
 			matchValue = uri.substring(index);
 			break;
 		}
 		
+		
 		if (!matchValue.isEmpty()) {
+			
+			
 			context.addParam(name, matchValue);
 		}
 		
@@ -124,7 +137,7 @@ class ParamNode<T> extends TrieNode<T> {
 	
 	@Override
 	StringBuilder describe(int indent, StringBuilder sb) {
-		sb.append(getClass().getSimpleName()).append(" - ").append("type: ").append(type).append(", name: ").append(name).append(", goal: ").append(goal);
+		sb.append(getClass().getSimpleName()).append(" - ").append("type: ").append(type).append(", name: ").append(name).append(", pattern: ").append(pattern).append(", goal: ").append(goal);
 		describeChildren(indent + 2, sb);
 		return sb;
 	}

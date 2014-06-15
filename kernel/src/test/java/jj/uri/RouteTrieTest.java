@@ -17,7 +17,7 @@ package jj.uri;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import io.netty.handler.codec.http.HttpMethod;
+import static io.netty.handler.codec.http.HttpMethod.*;
 
 import org.junit.Test;
 
@@ -31,68 +31,95 @@ public class RouteTrieTest {
 		return "/result" + index;
 	}
 	
+	private RouteTrie<String> makeParameterMatchTrie() {
+		
+		RouteTrie<String> trie = new RouteTrie<>();
+		// admittedly not the best example
+		trie.addRoute(GET, "/user/:id([a-z]-[\\d]{6})/picture", result(0));
+		trie.addRoute(GET, "/user/:name([\\w]+)/picture", result(1));
+		
+		return trie;
+	}
+	
+	@Test
+	public void testParameterMatching() {
+		RouteTrie<String> trie = makeParameterMatchTrie().compress();
+		
+		MatchResult<String> result = trie.find(GET, "/user/a-123456/picture");
+		assertThat(result, is(notNullValue()));
+		assertThat(result.uri, is(result(0)));
+		assertThat(result.params.get("id"), is("a-123456"));
+		assertThat(result.params.size(), is(1));
+		
+		result = trie.find(GET, "/user/jason/picture");
+		assertThat(result, is(notNullValue()));
+		assertThat(result.uri, is(result(1)));
+		assertThat(result.params.get("name"), is("jason"));
+		assertThat(result.params.size(), is(1));
+	}
+	
 	private RouteTrie<String> makeRouteTrie() {
 		RouteTrie<String> trie = new RouteTrie<>();
 		
-		trie.addRoute(HttpMethod.POST,   "/this/is",                 result(0));
-		trie.addRoute(HttpMethod.DELETE, "/this/isno",               result(-100));
-		trie.addRoute(HttpMethod.PUT,    "/this/isno",               result(-200));
-		trie.addRoute(HttpMethod.GET,    "/this/isno",               result(-300));
-		trie.addRoute(HttpMethod.GET,    "/this/isnot",              result(-1));
-		trie.addRoute(HttpMethod.GET,    "/this/is/the/bomb",        result(1));
-		trie.addRoute(HttpMethod.GET,    "/this/is/the/bomberman",   result(1000));
-		trie.addRoute(HttpMethod.GET,    "/this/is/the/best",        result(2));
-		trie.addRoute(HttpMethod.GET,    "/this/is/the/best-around", result(2000));
-		trie.addRoute(HttpMethod.GET,    "/this/:is/:the/best",      result(3));
-		trie.addRoute(HttpMethod.PUT,    "/this/:is/:the/*end",      result(4));
+		trie.addRoute(POST,   "/this/is",                 result(0));
+		trie.addRoute(DELETE, "/this/isno",               result(-100));
+		trie.addRoute(PUT,    "/this/isno",               result(-200));
+		trie.addRoute(GET,    "/this/isno",               result(-300));
+		trie.addRoute(GET,    "/this/isnot",              result(-1));
+		trie.addRoute(GET,    "/this/is/the/bomb",        result(1));
+		trie.addRoute(GET,    "/this/is/the/bomberman",   result(1000));
+		trie.addRoute(GET,    "/this/is/the/best",        result(2));
+		trie.addRoute(GET,    "/this/is/the/best-around", result(2000));
+		trie.addRoute(GET,    "/this/:is/:the/best",      result(3));
+		trie.addRoute(PUT,    "/this/:is/:the/*end",      result(4));
 		
 		// just to validate the structure works in order,
 		// these rules would basically eat up everything but since they're at
 		// the end, they match but don't get involved
-		trie.addRoute(HttpMethod.PUT,    "/this/*islast-and-should-not-interfere", result(4000));
-		trie.addRoute(HttpMethod.PUT,    "/this/*islast-and-also-is-not-used",     result(5000));
+		trie.addRoute(PUT,    "/this/*islast-and-should-not-interfere", result(4000));
+		trie.addRoute(PUT,    "/this/*islast-and-also-is-not-used",     result(5000));
 		
 		return trie;
 	}
 	
 	private void testRouteTrie(RouteTrie<String> trie) {
 
-		MatchResult<String> result = trie.find(HttpMethod.POST, "/this/is");
+		MatchResult<String> result = trie.find(POST, "/this/is");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(0)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(HttpMethod.DELETE, "/this/isno");
+		result = trie.find(DELETE, "/this/isno");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(-100)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(HttpMethod.GET, "/this/isnot");
+		result = trie.find(GET, "/this/isnot");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(-1)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(HttpMethod.GET, "/this/is");
+		result = trie.find(GET, "/this/is");
 		assertThat(result, is(nullValue()));
 		
-		result = trie.find(HttpMethod.GET, "/this/is/the/bomb");
+		result = trie.find(GET, "/this/is/the/bomb");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(1)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(HttpMethod.GET, "/this/is/the/best");
+		result = trie.find(GET, "/this/is/the/best");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(2)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(HttpMethod.GET, "/this/works/the/best");
+		result = trie.find(GET, "/this/works/the/best");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(3)));
 		assertThat(result.params.get("is"), is("works"));
 		assertThat(result.params.get("the"), is("the"));
 		assertThat(result.params.size(), is(2));
 		
-		result = trie.find(HttpMethod.PUT, "/this/makes/me/bees-knees/if-you-know/what-i-am-saying");
+		result = trie.find(PUT, "/this/makes/me/bees-knees/if-you-know/what-i-am-saying");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(4)));
 		assertThat(result.params.get("is"), is("makes"));
@@ -110,10 +137,7 @@ public class RouteTrieTest {
 	public void testCompressed() {
 		RouteTrie<String> trie = makeRouteTrie();
 
-		System.out.println(trie);
 		trie.compress();
-		System.out.println();
-		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}
@@ -123,10 +147,10 @@ public class RouteTrieTest {
 		
 		RouteTrie<String> trie = new RouteTrie<>();
 		
-		trie.addRoute(HttpMethod.POST, "/this/is", "/success");
+		trie.addRoute(POST, "/this/is", "/success");
 		
 		try {
-			trie.addRoute(HttpMethod.POST, "/this/is", "/failure");
+			trie.addRoute(POST, "/this/is", "/failure");
 			fail();
 		} catch (IllegalArgumentException iae) {
 			assertThat(iae.getMessage(), is("duplicate route POST for /this/is, new destination = /failure, current config = {POST=/success}"));
