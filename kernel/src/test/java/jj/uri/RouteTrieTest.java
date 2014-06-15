@@ -100,11 +100,7 @@ public class RouteTrieTest {
 	public void testCompressed() {
 		RouteTrie<String> trie = makeRouteTrie();
 
-		
-		System.out.println(trie);
 		trie.compress();
-		
-		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}

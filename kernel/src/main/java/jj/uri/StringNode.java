@@ -17,6 +17,7 @@ package jj.uri;
 
 import io.netty.handler.codec.http.HttpMethod;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -71,11 +72,12 @@ class StringNode<T> extends TrieNode<T> {
 				StringBuilder accumulator = new StringBuilder(key);
 				if (!SEPARATOR_STRING.equals(key)) {
 					StringNode<T> node = (StringNode<T>)children.remove(key);
-					StringNode<T> newNode = node.mergeUp(accumulator);
+					TrieNode<T> newNode = node.mergeUp(accumulator);
 					keyLength = accumulator.length();
 					newNode.compress();
-					children.put(accumulator.toString(), newNode);
+					children = Collections.singletonMap(accumulator.toString(), newNode);
 				} else {
+					children = Collections.singletonMap(key, children.get(key));
 					children.get(key).compress();
 				}
 			} else {

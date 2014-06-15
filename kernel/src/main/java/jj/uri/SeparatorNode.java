@@ -15,6 +15,7 @@
  */
 package jj.uri;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -99,7 +100,7 @@ class SeparatorNode<T> extends TrieNode<T> {
 				StringNode<T> newNode = node.mergeUp(accumulator);
 				keyLength = accumulator.length();
 				newNode.compress();
-				stringNodeChildren.put(accumulator.toString(), newNode);
+				stringNodeChildren = Collections.singletonMap(accumulator.toString(), newNode);
 			} else {
 				for (StringNode<T> node : stringNodeChildren.values()) {
 					node.compress();
