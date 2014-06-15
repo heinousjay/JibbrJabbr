@@ -15,6 +15,8 @@
  */
 package jj.uri;
 
+import io.netty.handler.codec.http.HttpMethod;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -34,11 +36,11 @@ import jj.execution.TaskRunner;
  */
 @Singleton
 @Subscriber
-class Router {
+public class Router {
 
 	private final RouterConfiguration configuration;
 	private final TaskRunner taskRunner;
-	private final AtomicReference<RouteTrie> trie = new AtomicReference<>();
+	private final AtomicReference<RouteTrie<String>> trie = new AtomicReference<>();
 	
 	@Inject
 	Router(
@@ -55,13 +57,20 @@ class Router {
 			
 			@Override
 			protected void run() throws Exception {
-				RouteTrie newTrie = new RouteTrie();
+				RouteTrie<String> newTrie = new RouteTrie<String>();
 				for (Route route: configuration.routes()) {
 					newTrie.addRoute(route.method(), route.uri().toString(), route.destination().toString());
 				}
-				// compress
+				newTrie.compress();
 				trie.set(newTrie);
 			}
 		});
+	}
+	
+	public MatchResult<String> matchURI(HttpMethod method, String uri) {
+		RouteTrie<String> routes = trie.get();
+		assert routes != null : "can't route without configuration!";
+		
+		return routes.find(method, uri);
 	}
 }

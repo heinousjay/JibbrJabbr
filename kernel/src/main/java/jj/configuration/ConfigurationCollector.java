@@ -85,4 +85,9 @@ public class ConfigurationCollector {
 		current.set(Collections.unmodifiableMap(inProgress));
 		inProgress = new HashMap<>();
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "(current = " + current + ")";
+	}
 }

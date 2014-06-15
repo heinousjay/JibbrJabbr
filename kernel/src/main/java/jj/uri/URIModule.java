@@ -28,6 +28,8 @@ public class URIModule extends JJModule {
 	protected void configure() {
 		
 		addAPIModulePath("/jj/uri/api");
+		
+		bindConfiguration().to(RouterConfiguration.class);
 	}
 
 }

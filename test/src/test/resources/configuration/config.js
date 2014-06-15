@@ -37,7 +37,11 @@ require('resource-system-configuration')
 var {route:route, redirect:redirect} = require('uri-routing-configuration');
 //for example!
 route.get('/').to('/index');
-route.get('/chat/').to('/chat/list');
-route.get('/chat/:room').to('/chat/room');
+route.post('/').to('/index');
+route.put('/').to('/index');
+route.del('/').to('/index');
+redirect.get('/chat/').to('/chat/list');
+redirect.post('/chat/:room').to('/chat/room');
 // uppercase methods work too
-route.GET('/chat/:room/*secret').to('/chat/room');
+redirect.PUT('/chat/:room/*secret').to('/chat/room');
+redirect.DELETE('/chat/:room/*secret').to('/chat/room');

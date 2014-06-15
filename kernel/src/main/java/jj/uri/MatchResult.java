@@ -17,12 +17,12 @@ package jj.uri;
 
 import java.util.Map;
 
-public class MatchResult {
+public class MatchResult<T> {
 	
-	public final String uri;
-	public final Map<String, String> params;
+	public final T uri;
+	public final Map<String, T> params;
 	
-	MatchResult(final String uri, final Map<String, String> params) {
+	MatchResult(final T uri, final Map<String, T> params) {
 		this.uri = uri;
 		this.params = params;
 	}

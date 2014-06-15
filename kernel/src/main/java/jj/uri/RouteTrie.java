@@ -26,15 +26,15 @@ import io.netty.handler.codec.http.HttpMethod;
  * @author jason
  *
  */
-class RouteTrie {
+class RouteTrie<T> {
 	
-	private final TrieNode<String> root = new SeparatorNode<String>();
+	private final TrieNode<T> root = new SeparatorNode<T>();
 	
-	void addRoute(HttpMethod method, String uri, String destination) {
+	void addRoute(HttpMethod method, String uri, T destination) {
 		
 		assert method != null : "method is required";
 		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
-		assert destination != null && !destination.isEmpty() && destination.charAt(0) == '/' : "destination is required and must start with /";
+		assert destination != null : "destination is required";
 		
 		root.addRoute(method, uri, destination, 1);
 	}
@@ -43,20 +43,20 @@ class RouteTrie {
 		root.compress();
 	}
 	
-	MatchResult find(HttpMethod method, String uri) {
+	MatchResult<T> find(HttpMethod method, String uri) {
 		assert method != null : "method is required";
 		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
 		
-		RouteFinderContext<String> context = new RouteFinderContext<String>();
-		MatchResult result = null;
+		RouteFinderContext<T> context = new RouteFinderContext<T>();
+		MatchResult<T> result = null;
 		if (root.findGoal(context, uri, 1)) {
 			// well just use the first one here
-			String goal = context.matches.get(0).goal.get(method);
+			T goal = context.matches.get(0).goal.get(method);
 			@SuppressWarnings("unchecked")
-			Map<String, String> params =
-				(Map<String, String>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
+			Map<String, T> params =
+				(Map<String, T>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
 			if (goal != null) {
-				result = new MatchResult(goal, params);
+				result = new MatchResult<T>(goal, params);
 			}
 		}
 		

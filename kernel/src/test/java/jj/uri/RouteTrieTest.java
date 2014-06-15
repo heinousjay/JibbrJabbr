@@ -33,7 +33,7 @@ public class RouteTrieTest {
 	
 	@Test
 	public void test() {
-		RouteTrie trie = new RouteTrie();
+		RouteTrie<String> trie = new RouteTrie<>();
 		
 		trie.addRoute(HttpMethod.POST, "/this/is", result(0));
 		trie.addRoute(HttpMethod.GET, "/this/isnot", result(-1));
@@ -42,7 +42,7 @@ public class RouteTrieTest {
 		trie.addRoute(HttpMethod.GET, "/this/:is/:the/best", result(3));
 		trie.addRoute(HttpMethod.GET, "/this/:is/:the/*end", result(4));
 		
-		MatchResult result = trie.find(HttpMethod.POST, "/this/is");
+		MatchResult<String> result = trie.find(HttpMethod.POST, "/this/is");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(0)));
 		assertTrue(result.params.isEmpty());
@@ -84,7 +84,7 @@ public class RouteTrieTest {
 	// basically this is the same exact test as above but with a compressed trie
 	@Test
 	public void testCompressed() {
-		RouteTrie trie = new RouteTrie();
+		RouteTrie<String> trie = new RouteTrie<>();
 		
 		trie.addRoute(HttpMethod.POST, "/this/is", result(0));
 		trie.addRoute(HttpMethod.GET, "/this/isnot", result(-1));
@@ -95,7 +95,7 @@ public class RouteTrieTest {
 		
 		trie.compress();
 		
-		MatchResult result = trie.find(HttpMethod.POST, "/this/is");
+		MatchResult<String> result = trie.find(HttpMethod.POST, "/this/is");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.uri, is(result(0)));
 		assertTrue(result.params.isEmpty());
@@ -137,7 +137,7 @@ public class RouteTrieTest {
 	@Test
 	public void testDuplicateRoute() {
 		
-		RouteTrie trie = new RouteTrie();
+		RouteTrie<String> trie = new RouteTrie<>();
 		
 		trie.addRoute(HttpMethod.POST, "/this/is", "/success");
 		
