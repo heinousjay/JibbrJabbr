@@ -50,14 +50,12 @@ class StringNode<T> extends TrieNode<T> {
 	}
 	
 	StringNode<T> mergeUp(StringBuilder accumulator) {
-		if (children != null && children.size() == 1) {
+		if (children != null && children.size() == 1 && goal == null) {
 			String key = children.keySet().iterator().next();
 			if (!SEPARATOR_STRING.equals(key)) {
 				StringNode<T> node = (StringNode<T>)children.get(key);
-				if (node.goal == null) {
-					accumulator.append(key);
-					return node.mergeUp(accumulator);
-				}
+				accumulator.append(key);
+				return node.mergeUp(accumulator);
 			}
 		}
 		
@@ -69,8 +67,8 @@ class StringNode<T> extends TrieNode<T> {
 		if (children != null) {
 			if (children.size() == 1) {
 				String key = children.keySet().iterator().next();
-				StringBuilder accumulator = new StringBuilder(key);
 				if (!SEPARATOR_STRING.equals(key)) {
+					StringBuilder accumulator = new StringBuilder(key);
 					StringNode<T> node = (StringNode<T>)children.remove(key);
 					TrieNode<T> newNode = node.mergeUp(accumulator);
 					keyLength = accumulator.length();

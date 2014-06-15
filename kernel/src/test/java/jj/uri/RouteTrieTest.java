@@ -34,13 +34,23 @@ public class RouteTrieTest {
 	private RouteTrie<String> makeRouteTrie() {
 		RouteTrie<String> trie = new RouteTrie<>();
 		
-		trie.addRoute(HttpMethod.POST,   "/this/is",            result(0));
-		trie.addRoute(HttpMethod.DELETE, "/this/isno",          result(-100));
-		trie.addRoute(HttpMethod.GET,    "/this/isnot",         result(-1));
-		trie.addRoute(HttpMethod.GET,    "/this/is/the/bomb",   result(1));
-		trie.addRoute(HttpMethod.GET,    "/this/is/the/best",   result(2));
-		trie.addRoute(HttpMethod.GET,    "/this/:is/:the/best", result(3));
-		trie.addRoute(HttpMethod.PUT,    "/this/:is/:the/*end", result(4));
+		trie.addRoute(HttpMethod.POST,   "/this/is",                 result(0));
+		trie.addRoute(HttpMethod.DELETE, "/this/isno",               result(-100));
+		trie.addRoute(HttpMethod.PUT,    "/this/isno",               result(-200));
+		trie.addRoute(HttpMethod.GET,    "/this/isno",               result(-300));
+		trie.addRoute(HttpMethod.GET,    "/this/isnot",              result(-1));
+		trie.addRoute(HttpMethod.GET,    "/this/is/the/bomb",        result(1));
+		trie.addRoute(HttpMethod.GET,    "/this/is/the/bomberman",   result(1000));
+		trie.addRoute(HttpMethod.GET,    "/this/is/the/best",        result(2));
+		trie.addRoute(HttpMethod.GET,    "/this/is/the/best-around", result(2000));
+		trie.addRoute(HttpMethod.GET,    "/this/:is/:the/best",      result(3));
+		trie.addRoute(HttpMethod.PUT,    "/this/:is/:the/*end",      result(4));
+		
+		// just to validate the structure works in order,
+		// these rules would basically eat up everything but since they're at
+		// the end, they match but don't get involved
+		trie.addRoute(HttpMethod.PUT,    "/this/*islast-and-should-not-interfere", result(4000));
+		trie.addRoute(HttpMethod.PUT,    "/this/*islast-and-also-is-not-used",     result(5000));
 		
 		return trie;
 	}
@@ -100,7 +110,10 @@ public class RouteTrieTest {
 	public void testCompressed() {
 		RouteTrie<String> trie = makeRouteTrie();
 
+		System.out.println(trie);
 		trie.compress();
+		System.out.println();
+		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}
