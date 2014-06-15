@@ -15,7 +15,7 @@
  */
 package jj.uri;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -39,7 +39,7 @@ class SeparatorNode<T> extends TrieNode<T> {
 		assert current != SEPARATOR_CHAR : uri + " has two path separators in a row";
 		
 		if (PARAM_CHARS.indexOf(current) != -1) {
-			paramNodeChildren = paramNodeChildren == null ? new HashMap<String, ParamNode<T>>(4) : paramNodeChildren;
+			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<String, ParamNode<T>>(4) : paramNodeChildren;
 			String paramValue = ParamNode.makeValue(uri, index);
 			ParamNode<T> nextNode = paramNodeChildren.get(paramValue);
 			if (nextNode == null) { 
@@ -48,7 +48,7 @@ class SeparatorNode<T> extends TrieNode<T> {
 			}
 			nextNode.addRoute(method, uri, destination, index + paramValue.length());
 		} else {
-			stringNodeChildren = stringNodeChildren == null ? new HashMap<String, StringNode<T>>(4) : stringNodeChildren;
+			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StringNode<T>>(4) : stringNodeChildren;
 			String value = String.valueOf(current);
 			StringNode<T> nextNode = stringNodeChildren.get(value);
 			if (nextNode == null) {

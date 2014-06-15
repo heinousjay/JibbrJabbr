@@ -17,7 +17,7 @@ package jj.uri;
 
 import io.netty.handler.codec.http.HttpMethod;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 class StringNode<T> extends TrieNode<T> {
@@ -26,7 +26,7 @@ class StringNode<T> extends TrieNode<T> {
 	int keyLength = 1;
 	
 	void doAddChild(HttpMethod method, String uri, T destination, int index) {
-		children = children == null ? new HashMap<String, TrieNode<T>>(4, 0.75f) : children;
+		children = children == null ? new LinkedHashMap<String, TrieNode<T>>(4, 0.75f) : children;
 		TrieNode<T> nextNode;
 		if (uri.charAt(index) == SEPARATOR_CHAR) {
 			nextNode = children.get(SEPARATOR_STRING);
@@ -53,8 +53,10 @@ class StringNode<T> extends TrieNode<T> {
 			String key = children.keySet().iterator().next();
 			if (!SEPARATOR_STRING.equals(key)) {
 				StringNode<T> node = (StringNode<T>)children.get(key);
-				accumulator.append(key);
-				return node.mergeUp(accumulator);
+				if (node.goal == null) {
+					accumulator.append(key);
+					return node.mergeUp(accumulator);
+				}
 			}
 		}
 		
