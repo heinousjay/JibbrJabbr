@@ -15,9 +15,9 @@
  */
 package jj.uri;
 
-import io.netty.handler.codec.http.HttpMethod;
+import java.util.regex.Pattern;
 
-import java.net.URI;
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * Used to carry the route definition in from the API
@@ -26,12 +26,20 @@ import java.net.URI;
  *
  */
 public class Route {
+	
+	private static final Pattern URI_PATTERN = 
+		Pattern.compile("^(?:/|(?:/(?:[a-zA-Z0-9.-]+|:[a-zA-Z0-9.$-]+(?:\\([^/]+?\\))?))+(?:/(?:\\*[a-zA-Z0-9.$-]+(?:\\(.+?\\))?)?)?)$");
 
 	private final HttpMethod method;
-	private final URI uri;
-	private final URI destination;
+	private final String uri;
+	private final String destination;
 	
-	public Route(final HttpMethod method, final URI uri, final URI destination) {
+	public Route(final HttpMethod method, final String uri, final String destination) {
+		
+		if (!URI_PATTERN.matcher(uri).matches()) {
+			throw new IllegalArgumentException("uri " + uri + " does not fit the correct pattern");
+		}
+		
 		this.method = method;
 		this.uri = uri;
 		this.destination = destination;
@@ -41,17 +49,17 @@ public class Route {
 		return method;
 	}
 	
-	public URI uri() {
+	public String uri() {
 		return uri;
 	}
 	
-	public URI destination() {
+	public String destination() {
 		return destination;
 	}
 	
 	@Override
 	public String toString() {
-		return "route." + method + "('" + uri + "').to('" + destination + "');";
+		return "route " + method + " " + uri + " to " + destination + ";";
 	}
 
 }

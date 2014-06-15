@@ -18,7 +18,6 @@ package jj.uri;
 import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,15 +36,20 @@ public class RouterTest {
 	RouterConfiguration config = new RouterConfiguration() {
 		
 		@Override
+		public String welcomeFile() {
+			return "welcome";
+		}
+		
+		@Override
 		public List<Route> routes() {
 			List<Route> result = new ArrayList<>();
-			result.add(new Route(GET, URI.create("/"), URI.create("/result1")));
-			result.add(new Route(POST, URI.create("/"), URI.create("/result2")));
-			result.add(new Route(GET, URI.create("/chat/"), URI.create("/result3")));
-			result.add(new Route(POST, URI.create("/chat/:room"), URI.create("/result4")));
-			result.add(new Route(DELETE, URI.create("/chat/:room"), URI.create("/result5")));
-			result.add(new Route(GET, URI.create("/chat/:room"), URI.create("/result6")));
-			result.add(new Route(GET, URI.create("/chat/:room/*secret"), URI.create("/result7")));
+			result.add(new Route(GET, "/", "/result1"));
+			result.add(new Route(POST, "/", "/result1"));
+			result.add(new Route(GET, "/chat/", "/result3"));
+			result.add(new Route(POST, "/chat/:room", "/result4"));
+			result.add(new Route(DELETE, "/chat/:room", "/result5"));
+			result.add(new Route(GET, "/chat/:room", "/result6"));
+			result.add(new Route(GET, "/chat/:room/*secret", "/result7"));
 			
 			return result;
 		}

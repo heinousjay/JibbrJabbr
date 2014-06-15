@@ -18,6 +18,7 @@ package jj.configuration;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
+import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
 
@@ -100,10 +101,12 @@ public class ConfigurationSystemTest {
 		assertThat(documentConfiguration.showParsingErrors(), is(true));
 		assertThat(documentConfiguration.removeComments(), is(false));
 		
-		// DO MOAR! but just basic stuff
+		
+		assertThat(routerConfiguration.welcomeFile(), is("index"));
 		List<Route> routes = routerConfiguration.routes();
 		assertThat(routes.size(), is(8));
 		assertThat(routes.get(0).method(), is(GET));
+		
 		assertThat(routes.get(1).method(), is(POST));
 		assertThat(routes.get(2).method(), is(PUT));
 		assertThat(routes.get(3).method(), is(DELETE));
@@ -111,5 +114,11 @@ public class ConfigurationSystemTest {
 		assertThat(routes.get(5).method(), is(POST));
 		assertThat(routes.get(6).method(), is(PUT));
 		assertThat(routes.get(7).method(), is(DELETE));
+	}
+	
+	private void assertRoute(Route route, HttpMethod method, String uri, String destination) {
+		assertThat(route.method(), is(method));
+		assertThat(route.uri(), is(uri));
+		assertThat(route.destination(), is(destination));
 	}
 }

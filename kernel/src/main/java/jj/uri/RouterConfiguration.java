@@ -17,11 +17,16 @@ package jj.uri;
 
 import java.util.List;
 
+import jj.configuration.Default;
+
 /**
  * @author jason
  *
  */
 public interface RouterConfiguration {
+	
+	@Default("index")
+	String welcomeFile();
 
 	List<Route> routes();
 }

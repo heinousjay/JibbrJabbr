@@ -9,18 +9,18 @@ var PUT    = Packages.io.netty.handler.codec.http.HttpMethod.PUT;
 var DELETE = Packages.io.netty.handler.codec.http.HttpMethod.DELETE;
 
 function route(destination) {
-	return java.net.URI.create(destination);
+	return destination;
 }
 
 function redirect(destination) {
-	return route(destination);
+	return destination;
 }
 
 function makeSetter(method, type) {
 	return function(uri) {
 		return {
 			to: function(destination) {
-				var route = new Packages.jj.uri.Route(method, java.net.URI.create(uri), type(destination));
+				var route = new Packages.jj.uri.Route(method, uri, type(destination));
 				collector.addConfigurationMultiElement(base + 'routes', route);
 			},
 			to404: function() {
