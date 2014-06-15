@@ -21,11 +21,18 @@ import jj.ServerLogger;
 import jj.logging.LoggedEvent;
 
 /**
+ * <p>
+ * event published during a configuration lifecycle that
+ * indicates no configuration file was found and all defaults
+ * are being used.
+ * 
+ * <p>
+ * 
  * @author jason
  *
  */
 @ServerLogger
-class UsingDefaultConfiguration extends LoggedEvent {
+public class UsingDefaultConfiguration extends LoggedEvent {
 
 	@Override
 	public void describeTo(Logger logger) {
