@@ -105,6 +105,7 @@ class SeparatorNode<T> extends TrieNode<T> {
 				for (StringNode<T> node : stringNodeChildren.values()) {
 					node.compress();
 				}
+				stringNodeChildren = Collections.unmodifiableMap(stringNodeChildren);
 			}
 		}
 		
@@ -112,7 +113,9 @@ class SeparatorNode<T> extends TrieNode<T> {
 			for (ParamNode<T> node : paramNodeChildren.values()) {
 				node.compress();
 			}
+			paramNodeChildren = Collections.unmodifiableMap(paramNodeChildren);
 		}
+		goal = goal == null ? null : Collections.unmodifiableMap(goal);
 	}
 	
 	@Override

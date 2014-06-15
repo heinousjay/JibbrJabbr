@@ -15,13 +15,15 @@
  */
 package jj.uri;
 
+import java.util.Collections;
+
 import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * @author jason
  *
  */
-public class ParamNode<T> extends TrieNode<T> {
+class ParamNode<T> extends TrieNode<T> {
 	
 	private enum Type {
 		Param,
@@ -109,6 +111,7 @@ public class ParamNode<T> extends TrieNode<T> {
 		if (child != null) {
 			child.compress();
 		}
+		goal = goal == null ? null : Collections.unmodifiableMap(goal);
 	}
 	
 	@Override

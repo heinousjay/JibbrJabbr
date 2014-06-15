@@ -82,8 +82,10 @@ class StringNode<T> extends TrieNode<T> {
 				for (TrieNode<T> child : children.values()) {
 					child.compress();
 				}
+				children = Collections.unmodifiableMap(children);
 			}
 		}
+		goal = goal == null ? null : Collections.unmodifiableMap(goal);
 	}
 	
 	@Override
