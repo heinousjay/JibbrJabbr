@@ -49,7 +49,7 @@ import jj.script.module.ScriptResource;
  *
  */
 @Subscriber
-public class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
+class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
 	
 	private final Publisher publisher;
 	

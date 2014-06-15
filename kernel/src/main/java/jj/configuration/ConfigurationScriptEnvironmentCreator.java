@@ -32,7 +32,7 @@ import jj.script.ScriptEnvironmentInitializer;
  *
  */
 @Singleton
-public class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ConfigurationScriptEnvironment> {
+class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ConfigurationScriptEnvironment> {
 	
 	static final String CONFIG_SCRIPT_NAME = "config.js";
 
