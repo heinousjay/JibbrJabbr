@@ -20,7 +20,12 @@ import java.util.regex.Pattern;
 import io.netty.handler.codec.http.HttpMethod;
 
 /**
+ * <p>
  * Used to carry the route definition in from the API
+ * 
+ * <p>
+ * for the purposes of implementing hashCode and equals, only
+ * the method and URI are considered equivalent
  * 
  * @author jason
  *
@@ -36,9 +41,15 @@ public class Route {
 	
 	public Route(final HttpMethod method, final String uri, final String destination) {
 		
+		if (method == null) {
+			throw new NullPointerException("method");
+		}
+		
 		if (!URI_PATTERN.matcher(uri).matches()) {
 			throw new IllegalArgumentException("uri " + uri + " does not fit the correct pattern");
 		}
+		
+		// test destination!
 		
 		this.method = method;
 		this.uri = uri;
@@ -55,6 +66,23 @@ public class Route {
 	
 	public String destination() {
 		return destination;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Route && equals((Route)obj); 
+	}
+	
+	public boolean equals(Route route) {
+		return route != null &&
+			method.equals(route.method) &&
+			uri.equals(route.uri);
+	}
+	
+	@Override
+	public int hashCode() {
+		// such a cheat
+		return (method + " " + uri).hashCode();
 	}
 	
 	@Override
