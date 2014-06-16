@@ -26,38 +26,41 @@ import io.netty.handler.codec.http.HttpMethod;
  * @author jason
  *
  */
-class RouteTrie<T> {
+class RouteTrie {
 	
-	private final TrieNode<T> root = new SeparatorNode<T>();
+	private final TrieNode root = new SeparatorNode();
 	
-	void addRoute(HttpMethod method, String uri, T destination) {
+	void addRoute(Route route) {
 		
-		assert method != null : "method is required";
-		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
-		assert destination != null : "destination is required";
-		
-		root.addRoute(method, uri, destination, 1);
+		root.addRoute(route);
 	}
 	
-	RouteTrie<T> compress() {
+	RouteTrie compress() {
 		root.compress();
 		return this;
 	}
 	
-	MatchResult<T> find(HttpMethod method, String uri) {
+	MatchResult find(HttpMethod method, String uri) {
 		assert method != null : "method is required";
 		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
 		
-		RouteFinderContext<T> context = new RouteFinderContext<T>();
-		MatchResult<T> result = null;
+		RouteFinderContext context = new RouteFinderContext();
+		MatchResult result = null;
 		if (root.findGoal(context, uri, 1)) {
 			// well just use the first one here
-			T goal = context.matches.get(0).goal.get(method);
+			Route route = null;
+			for (Route r : context.matches.get(0).goal) {
+				if (r.method().equals(method)) {
+					route = r;
+					break;
+				}
+			}
+			
 			@SuppressWarnings("unchecked")
-			Map<String, T> params =
-				(Map<String, T>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
-			if (goal != null) {
-				result = new MatchResult<T>(goal, params);
+			Map<String, String> params =
+				(Map<String, String>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
+			if (route != null) {
+				result = new MatchResult(route, params);
 			}
 		}
 		

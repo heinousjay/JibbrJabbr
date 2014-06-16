@@ -40,7 +40,7 @@ public class Router {
 
 	private final RouterConfiguration configuration;
 	private final TaskRunner taskRunner;
-	private final AtomicReference<RouteTrie<Route>> trie = new AtomicReference<>();
+	private final AtomicReference<RouteTrie> trie = new AtomicReference<>();
 	
 	@Inject
 	Router(
@@ -57,9 +57,9 @@ public class Router {
 			
 			@Override
 			protected void run() throws Exception {
-				RouteTrie<Route> newTrie = new RouteTrie<Route>();
+				RouteTrie newTrie = new RouteTrie();
 				for (Route route: configuration.routes()) {
-					newTrie.addRoute(route.method(), route.uri(), route);
+					newTrie.addRoute(route);
 				}
 				newTrie.compress();
 				trie.set(newTrie);
@@ -67,8 +67,8 @@ public class Router {
 		});
 	}
 	
-	public MatchResult<Route> matchURI(HttpMethod method, String uri) {
-		RouteTrie<Route> routes = trie.get();
+	public MatchResult matchURI(HttpMethod method, String uri) {
+		RouteTrie routes = trie.get();
 		assert routes != null : "can't route without configuration!";
 		
 		return routes.find(method, uri);

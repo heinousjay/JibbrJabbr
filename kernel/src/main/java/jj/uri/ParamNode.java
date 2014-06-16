@@ -19,13 +19,11 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 /**
  * @author jason
  *
  */
-class ParamNode<T> extends TrieNode<T> {
+class ParamNode extends TrieNode {
 	
 	private enum Type {
 		Param,
@@ -35,7 +33,7 @@ class ParamNode<T> extends TrieNode<T> {
 	private static final Pattern PARSER = Pattern.compile("^([:*])([\\w\\d$_-]+)(?:\\((.+)\\))?$");
 	
 	
-	private SeparatorNode<T> child;
+	private SeparatorNode child;
 	private final String name;
 	private final Type type;
 	private final Pattern pattern;
@@ -66,16 +64,17 @@ class ParamNode<T> extends TrieNode<T> {
 	}
 
 	@Override
-	void doAddChild(HttpMethod method, String uri, T destination, int index) {
+	void doAddChild(Route route) {
 		if (type == Type.Splat) { 
 			throw new IllegalArgumentException(
-				"trailing uri after a splat parameter " + method + " for " + uri + " to destination " + destination
+				"trailing uri after a splat parameter in " + route
 			);
 		}
-		assert uri.charAt(index) == SEPARATOR_CHAR; // must be!
+		assert route.uri().charAt(route.index) == SEPARATOR_CHAR; // must be!
 		
-		child = child == null ? new SeparatorNode<T>() : child;
-		child.addRoute(method, uri, destination, index + 1);
+		child = child == null ? new SeparatorNode() : child;
+		route.index += 1;
+		child.addRoute(route);
 	}
 	
 	private String matchParam(String uri, int index) {
@@ -85,7 +84,7 @@ class ParamNode<T> extends TrieNode<T> {
 	}
 
 	@Override
-	boolean findGoal(RouteFinderContext<T> context, String uri, int index) {
+	boolean findGoal(RouteFinderContext context, String uri, int index) {
 		// first, see if we match
 		String matchValue = "";
 		switch (type) {
@@ -99,7 +98,6 @@ class ParamNode<T> extends TrieNode<T> {
 		
 		
 		if (!matchValue.isEmpty()) {
-			
 			
 			context.addParam(name, matchValue);
 		}
@@ -124,7 +122,7 @@ class ParamNode<T> extends TrieNode<T> {
 		if (child != null) {
 			child.compress();
 		}
-		goal = goal == null ? null : Collections.unmodifiableMap(goal);
+		goal = goal == null ? null : Collections.unmodifiableSet(goal);
 	}
 	
 	@Override

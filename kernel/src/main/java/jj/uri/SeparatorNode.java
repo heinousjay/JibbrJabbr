@@ -19,49 +19,49 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 /**
  * @author jason
  *
  */
-class SeparatorNode<T> extends TrieNode<T> {
+class SeparatorNode extends TrieNode {
 	
-	Map<String, StringNode<T>> stringNodeChildren;
+	Map<String, StringNode> stringNodeChildren;
 	int keyLength = 1;
-	Map<String, ParamNode<T>> paramNodeChildren;
+	Map<String, ParamNode> paramNodeChildren;
 	
 
 	@Override
-	void doAddChild(HttpMethod method, String uri, T destination, int index) {
+	void doAddChild(Route route) {
 		
-		char current = uri.charAt(index);
+		char current = route.uri().charAt(route.index);
 		
-		assert current != SEPARATOR_CHAR : uri + " has two path separators in a row";
+		assert current != SEPARATOR_CHAR : route + " has two path separators in a row";
 		
 		if (PARAM_CHARS.indexOf(current) != -1) {
-			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<String, ParamNode<T>>(4) : paramNodeChildren;
-			String paramValue = ParamNode.makeValue(uri, index);
-			ParamNode<T> nextNode = paramNodeChildren.get(paramValue);
+			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<String, ParamNode>(4) : paramNodeChildren;
+			String paramValue = ParamNode.makeValue(route.uri(), route.index);
+			ParamNode nextNode = paramNodeChildren.get(paramValue);
 			if (nextNode == null) { 
-				nextNode = new ParamNode<T>(paramValue);
+				nextNode = new ParamNode(paramValue);
 				paramNodeChildren.put(paramValue, nextNode);
 			}
-			nextNode.addRoute(method, uri, destination, index + paramValue.length());
+			route.index += paramValue.length();
+			nextNode.addRoute(route);
 		} else {
-			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StringNode<T>>(4) : stringNodeChildren;
+			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StringNode>(4) : stringNodeChildren;
 			String value = String.valueOf(current);
-			StringNode<T> nextNode = stringNodeChildren.get(value);
+			StringNode nextNode = stringNodeChildren.get(value);
 			if (nextNode == null) {
-				nextNode = new StringNode<T>();
-				stringNodeChildren.put(value, (StringNode<T>)nextNode);
+				nextNode = new StringNode();
+				stringNodeChildren.put(value, (StringNode)nextNode);
 			}
-			nextNode.addRoute(method, uri, destination, index + 1);
+			route.index += 1;
+			nextNode.addRoute(route);
 		}
 	}
 
 	@Override
-	boolean findGoal(RouteFinderContext<T> context, String uri, int index) {
+	boolean findGoal(RouteFinderContext context, String uri, int index) {
 		if (uri.length() == index) {
 			if (goal != null) {
 				context.setGoal(goal);
@@ -80,7 +80,7 @@ class SeparatorNode<T> extends TrieNode<T> {
 		}
 		
 		if (paramNodeChildren != null) {
-			for (ParamNode<T> paramNode : paramNodeChildren.values()) {
+			for (ParamNode paramNode : paramNodeChildren.values()) {
 				boolean matched = paramNode.findGoal(context, uri, index);
 				result = result || matched;
 				
@@ -96,13 +96,13 @@ class SeparatorNode<T> extends TrieNode<T> {
 			if (stringNodeChildren.size() == 1) {
 				String key = stringNodeChildren.keySet().iterator().next();
 				StringBuilder accumulator = new StringBuilder(key);
-				StringNode<T> node = stringNodeChildren.remove(key);
-				StringNode<T> newNode = node.mergeUp(accumulator);
+				StringNode node = stringNodeChildren.remove(key);
+				StringNode newNode = node.mergeUp(accumulator);
 				keyLength = accumulator.length();
 				newNode.compress();
 				stringNodeChildren = Collections.singletonMap(accumulator.toString(), newNode);
 			} else {
-				for (StringNode<T> node : stringNodeChildren.values()) {
+				for (StringNode node : stringNodeChildren.values()) {
 					node.compress();
 				}
 				stringNodeChildren = Collections.unmodifiableMap(stringNodeChildren);
@@ -110,12 +110,12 @@ class SeparatorNode<T> extends TrieNode<T> {
 		}
 		
 		if (paramNodeChildren != null) {
-			for (ParamNode<T> node : paramNodeChildren.values()) {
+			for (ParamNode node : paramNodeChildren.values()) {
 				node.compress();
 			}
 			paramNodeChildren = Collections.unmodifiableMap(paramNodeChildren);
 		}
-		goal = goal == null ? null : Collections.unmodifiableMap(goal);
+		goal = goal == null ? null : Collections.unmodifiableSet(goal);
 	}
 	
 	@Override

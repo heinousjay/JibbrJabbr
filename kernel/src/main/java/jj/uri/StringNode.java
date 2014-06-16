@@ -15,45 +15,44 @@
  */
 package jj.uri;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class StringNode<T> extends TrieNode<T> {
+class StringNode extends TrieNode {
 	
-	Map<String, TrieNode<T>> children;
+	Map<String, TrieNode> children;
 	int keyLength = 1;
 	
-	void doAddChild(HttpMethod method, String uri, T destination, int index) {
-		children = children == null ? new LinkedHashMap<String, TrieNode<T>>(4, 0.75f) : children;
-		TrieNode<T> nextNode;
-		if (uri.charAt(index) == SEPARATOR_CHAR) {
+	void doAddChild(Route route) {
+		children = children == null ? new LinkedHashMap<String, TrieNode>(4, 0.75f) : children;
+		TrieNode nextNode;
+		if (route.uri().charAt(route.index) == SEPARATOR_CHAR) {
 			nextNode = children.get(SEPARATOR_STRING);
 			if (nextNode == null) {
-				nextNode = new SeparatorNode<T>();
+				nextNode = new SeparatorNode();
 				children.put(SEPARATOR_STRING, nextNode);
 			}
 			
 			
 		} else {
 
-			String current = uri.substring(index, index + 1);
+			String current = String.valueOf(route.uri().charAt(route.index));
 			nextNode = children.get(current);
 			if (nextNode == null) {
-				nextNode = new StringNode<T>();
+				nextNode = new StringNode();
 				children.put(current, nextNode);
 			}
 		}
-		nextNode.addRoute(method, uri, destination, index + 1);
+		route.index += 1;
+		nextNode.addRoute(route);
 	}
 	
-	StringNode<T> mergeUp(StringBuilder accumulator) {
+	StringNode mergeUp(StringBuilder accumulator) {
 		if (children != null && children.size() == 1 && goal == null) {
 			String key = children.keySet().iterator().next();
 			if (!SEPARATOR_STRING.equals(key)) {
-				StringNode<T> node = (StringNode<T>)children.get(key);
+				StringNode node = (StringNode)children.get(key);
 				accumulator.append(key);
 				return node.mergeUp(accumulator);
 			}
@@ -69,8 +68,8 @@ class StringNode<T> extends TrieNode<T> {
 				String key = children.keySet().iterator().next();
 				if (!SEPARATOR_STRING.equals(key)) {
 					StringBuilder accumulator = new StringBuilder(key);
-					StringNode<T> node = (StringNode<T>)children.remove(key);
-					TrieNode<T> newNode = node.mergeUp(accumulator);
+					StringNode node = (StringNode)children.remove(key);
+					TrieNode newNode = node.mergeUp(accumulator);
 					keyLength = accumulator.length();
 					newNode.compress();
 					children = Collections.singletonMap(accumulator.toString(), newNode);
@@ -79,17 +78,17 @@ class StringNode<T> extends TrieNode<T> {
 					children.get(key).compress();
 				}
 			} else {
-				for (TrieNode<T> child : children.values()) {
+				for (TrieNode child : children.values()) {
 					child.compress();
 				}
 				children = Collections.unmodifiableMap(children);
 			}
 		}
-		goal = goal == null ? null : Collections.unmodifiableMap(goal);
+		goal = goal == null ? null : Collections.unmodifiableSet(goal);
 	}
 	
 	@Override
-	boolean findGoal(RouteFinderContext<T> context, String uri, int index) {
+	boolean findGoal(RouteFinderContext context, String uri, int index) {
 		if (uri.length() == index) {
 			if (goal != null) {
 				context.setGoal(goal);

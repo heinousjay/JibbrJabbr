@@ -15,50 +15,48 @@
  */
 package jj.uri;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author jason
  *
  */
-abstract class TrieNode<T> {
+abstract class TrieNode {
 
 	static final char SEPARATOR_CHAR = '/';
 	static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHAR);
 	static final String PARAM_CHARS = ":*";
 	
 	
-	Map<HttpMethod, T> goal;
+	Set<Route> goal;
 	
-	void addRoute(HttpMethod method, String uri, T destination, int index) {
-		if (uri.length() == index) {
+	void addRoute(Route route) {
+		if (route.uri().length() == route.index) {
 		
-			doAddGoal(method, uri, destination);
+			doAddGoal(route);
 		
 		} else {
 
-			doAddChild(method, uri, destination, index);
+			doAddChild(route);
 		}
 	}
 	
 
-	void doAddGoal(HttpMethod method, String uri, T destination) {
-		goal = goal == null ? new HashMap<HttpMethod, T>(3) : goal;
-		if (goal.containsKey(method)) {
+	void doAddGoal(Route route) {
+		goal = goal == null ? new LinkedHashSet<Route>(3) : goal;
+		if (goal.contains(route)) {
 			throw new IllegalArgumentException(
-				"duplicate route " + method + " for " + uri + ", new destination = " + destination + ", current config = " + goal
+				"duplicate " + route + ", current config = " + goal
 			);
 		}
-		goal.put(method, destination);
+		goal.add(route);
 	}
 	
-	abstract void doAddChild(HttpMethod method, String uri, T destination, int index);
+	abstract void doAddChild(Route route);
 	
-	abstract boolean findGoal(RouteFinderContext<T> context, String uri, int index);
+	abstract boolean findGoal(RouteFinderContext context, String uri, int index);
 	
 	abstract void compress();
 	

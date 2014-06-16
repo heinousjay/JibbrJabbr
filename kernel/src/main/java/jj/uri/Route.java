@@ -39,6 +39,8 @@ public class Route {
 	private final String uri;
 	private final String destination;
 	
+	int index = 1;
+	
 	public Route(final HttpMethod method, final String uri, final String destination) {
 		
 		if (method == null) {
@@ -48,7 +50,7 @@ public class Route {
 		if (!URI_PATTERN.matcher(uri).matches()) {
 			throw new IllegalArgumentException("uri " + uri + " does not fit the correct pattern");
 		}
-		
+//		
 		// test destination!
 		
 		this.method = method;
@@ -87,7 +89,7 @@ public class Route {
 	
 	@Override
 	public String toString() {
-		return "route " + method + " " + uri + " to " + destination + ";";
+		return "route " + method + " " + uri + " to " + destination;
 	}
 
 }
