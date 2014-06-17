@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
-import java.util.regex.Pattern;
+import java.util.List;
 
-class Parameter {
+import jj.configuration.Default;
+
+/**
+ * @author jason
+ *
+ */
+public interface RouterConfiguration {
 	
-	enum Type {
-		Param,
-		Splat
-	}
-	
-	final String name;
-	final int start;
-	final int end;
-	final Type type;
-	final Pattern pattern;
-	
-	Parameter(String name, int start, int end, final Type type, final Pattern pattern) {
-		this.name = name;
-		this.start = start;
-		this.end = end;
-		this.type = type;
-		this.pattern = pattern;
-	}
-	
-	@Override
-	public String toString() {
-		return type + " " + name + "@[" + start + "," + end + "]" + (pattern != null ? " with pattern " + pattern : "");
-	}
+	@Default("index")
+	String welcomeFile();
+
+	List<Route> routes();
 }

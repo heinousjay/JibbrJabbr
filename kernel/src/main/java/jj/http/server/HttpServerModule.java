@@ -2,6 +2,7 @@ package jj.http.server;
 
 import jj.JJModule;
 import jj.http.server.servable.ServableModule;
+import jj.http.server.uri.URIModule;
 
 public class HttpServerModule extends JJModule {
 	
@@ -20,8 +21,10 @@ public class HttpServerModule extends JJModule {
 		
 		bindLoggedEvents().annotatedWith(AccessLogger.class).toLogger(AccessLogger.NAME);
 		
-		install(new ServableModule());
-		
 		bindExecutor(JJNioEventLoopGroup.class);
+		
+		
+		install(new ServableModule());
+		install(new URIModule());
 	}
 }

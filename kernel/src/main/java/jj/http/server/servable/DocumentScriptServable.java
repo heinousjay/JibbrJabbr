@@ -14,9 +14,9 @@ import jj.configuration.resolution.Application;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.script.module.ScriptResource;
-import jj.uri.URIMatch;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 
 /**
  * handles serving the scripts associated with a document

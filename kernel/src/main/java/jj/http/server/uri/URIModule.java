@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
-import java.util.List;
-
-import jj.configuration.Default;
+import jj.JJModule;
 
 /**
  * @author jason
  *
  */
-public interface RouterConfiguration {
-	
-	@Default("index")
-	String welcomeFile();
+public class URIModule extends JJModule {
 
-	List<Route> routes();
+
+	@Override
+	protected void configure() {
+		
+		addAPIModulePath("/jj/http/server/uri/api");
+		
+		bindConfiguration().to(RouterConfiguration.class);
+	}
+
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -61,7 +61,7 @@ class StringNode extends TrieNode {
 	}
 	
 	@Override
-	void compress() {
+	void doCompress() {
 		if (children != null) {
 			if (children.size() == 1) {
 				String key = children.keySet().iterator().next();
@@ -83,7 +83,6 @@ class StringNode extends TrieNode {
 				children = Collections.unmodifiableMap(children);
 			}
 		}
-		goal = goal == null ? null : Collections.unmodifiableSet(goal);
 	}
 	
 	@Override

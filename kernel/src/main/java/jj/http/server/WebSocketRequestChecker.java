@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
-import jj.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 
 /**
  * @author jason

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -81,6 +82,10 @@ public class Route {
 		return destination;
 	}
 	
+	public Set<Route> allMethods() {
+		return parent.goal;
+	}
+	
 	// move this to another class
 	public String resolve(Map<String, String> params) {
 		// need a local copy for tracking
@@ -132,6 +137,10 @@ public class Route {
 		this.parent = parent;
 		this.parameters = this.parameters == null ? null : Collections.unmodifiableList(this.parameters);
 		return this;
+	}
+	
+	TrieNode parent() {
+		return parent;
 	}
 	
 	//---> basics

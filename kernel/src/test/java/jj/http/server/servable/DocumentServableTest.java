@@ -22,7 +22,7 @@ import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentRequestProcessor;
-import jj.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -21,8 +21,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.*;
+import jj.http.server.uri.URIMatch;
 import jj.resource.stat.ic.StaticResource;
-import jj.uri.URIMatch;
 
 import org.junit.Before;
 import org.junit.Test;

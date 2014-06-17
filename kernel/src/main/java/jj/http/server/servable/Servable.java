@@ -11,10 +11,10 @@ import java.nio.file.Path;
 import jj.configuration.resolution.Application;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
-import jj.uri.URIMatch;
 import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable<T extends Resource> {

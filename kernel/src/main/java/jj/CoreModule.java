@@ -32,7 +32,6 @@ import jj.logging.LoggingModule;
 import jj.messaging.MessagingModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
-import jj.uri.URIModule;
 import jj.http.server.HttpServerModule;
 
 /**
@@ -108,7 +107,6 @@ public class CoreModule extends JJModule {
 		// this is second wave, in the new plan - restartable services with bridged
 		// access to the core
 		install(new HttpServerModule());
-		install(new URIModule());
 		
 		// this needs to be split into pieces and contributed
 		// from places that make the most sense

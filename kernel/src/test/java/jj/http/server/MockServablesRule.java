@@ -23,9 +23,9 @@ import java.util.List;
 import jj.css.CssResource;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
+import jj.http.server.uri.URIMatch;
 import jj.resource.Resource;
 import jj.resource.stat.ic.StaticResource;
-import jj.uri.URIMatch;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;

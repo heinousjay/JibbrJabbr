@@ -10,7 +10,7 @@ import jj.configuration.resolution.AppLocation;
 import jj.css.CssResource;
 import jj.http.server.servable.CssServable;
 import jj.http.server.servable.RequestProcessor;
-import jj.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -13,23 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
-import jj.JJModule;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author jason
  *
  */
-public class URIModule extends JJModule {
+public class RouteFinder {
 
-
-	@Override
-	protected void configure() {
+	/**
+	 * @param string
+	 * @return
+	 */
+	public String find(String uri) {
 		
-		addAPIModulePath("/jj/uri/api");
+		Path path = uri.startsWith("/") ? Paths.get(uri) : Paths.get("/" + uri);
 		
-		bindConfiguration().to(RouterConfiguration.class);
+		StringBuilder sb = new StringBuilder(path.normalize().toAbsolutePath().toString());
+		
+		if (sb.charAt(sb.length() - 1) == '/') {
+			sb.append("index");
+		} else if (uri.charAt(uri.length() - 1) == '/') {
+			sb.append("/index");
+		}
+		
+		return sb.toString();
 	}
 
 }

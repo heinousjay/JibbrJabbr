@@ -38,8 +38,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import jj.AnswerWithSelf;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
-import jj.uri.URIMatch;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -30,12 +30,12 @@ import javax.inject.Singleton;
 import jj.configuration.Location;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
+import jj.http.server.uri.URIMatch;
 import jj.resource.AbstractResourceCreator;
 import jj.resource.Resource;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.stat.ic.StaticResource;
-import jj.uri.URIMatch;
 import jj.util.SHA1Helper;
 
 /**

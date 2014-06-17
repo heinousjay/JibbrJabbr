@@ -16,10 +16,10 @@ import jj.document.servable.DocumentRequestProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
-import jj.uri.URIMatch;
 import jj.util.StringUtils;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 
 @Singleton
 class DocumentServable extends Servable<DocumentScriptEnvironment> {

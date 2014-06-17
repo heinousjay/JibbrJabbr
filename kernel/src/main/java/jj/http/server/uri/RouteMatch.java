@@ -13,34 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Map;
 
-/**
- * @author jason
- *
- */
-public class RouteFinder {
-
-	/**
-	 * @param string
-	 * @return
-	 */
-	public String find(String uri) {
-		
-		Path path = uri.startsWith("/") ? Paths.get(uri) : Paths.get("/" + uri);
-		
-		StringBuilder sb = new StringBuilder(path.normalize().toAbsolutePath().toString());
-		
-		if (sb.charAt(sb.length() - 1) == '/') {
-			sb.append("index");
-		} else if (uri.charAt(uri.length() - 1) == '/') {
-			sb.append("/index");
-		}
-		
-		return sb.toString();
+public class RouteMatch {
+	
+	public final Route route;
+	public final Map<String, String> params;
+	
+	RouteMatch(final Route route, final Map<String, String> params) {
+		this.route = route;
+		this.params = params;
 	}
-
 }

@@ -26,10 +26,10 @@ import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
-import jj.uri.URIMatch;
 
 import org.junit.Before;
 import org.junit.Test;

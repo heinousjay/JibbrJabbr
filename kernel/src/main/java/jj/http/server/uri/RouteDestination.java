@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.http.server.uri;
+
 /**
  * @author jason
  *
  */
-package jj.uri;
+public interface RouteDestination {
+
+	void dispatch(RouteMatch routeMatch);
+}

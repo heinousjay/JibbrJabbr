@@ -28,13 +28,13 @@ import javax.inject.Singleton;
 import jj.App;
 import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
+import jj.http.server.uri.Route;
+import jj.http.server.uri.RouterConfiguration;
 import jj.document.DocumentConfiguration;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.script.ScriptError;
 import jj.testing.JibbrJabbrTestServer;
-import jj.uri.Route;
-import jj.uri.RouterConfiguration;
 
 import org.junit.Rule;
 import org.junit.Test;

@@ -10,8 +10,8 @@ import jj.configuration.resolution.Application;
 import jj.css.CssResource;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
-import jj.uri.URIMatch;
 
 // TODO! move this to the css package
 @Singleton

@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
-import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jj.uri.Parameter.Type;
+import jj.http.server.uri.Parameter.Type;
 
 /**
  * @author jason
@@ -122,11 +121,10 @@ class ParamNode extends TrieNode {
 	}
 	
 	@Override
-	void compress() {
+	void doCompress() {
 		if (child != null) {
 			child.compress();
 		}
-		goal = goal == null ? null : Collections.unmodifiableSet(goal);
 	}
 	
 	@Override

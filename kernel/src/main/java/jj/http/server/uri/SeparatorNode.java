@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -75,7 +75,8 @@ class SeparatorNode extends TrieNode {
 		if (stringNodeChildren != null && uri.length() >= index + keyLength) {
 			String current = uri.substring(index, index + keyLength);
 			if (stringNodeChildren.containsKey(current)) {
-				result = stringNodeChildren.get(current).findGoal(context, uri, index + keyLength);
+				boolean matched = stringNodeChildren.get(current).findGoal(context, uri, index + keyLength);
+				result = result || matched;
 			}
 		}
 		
@@ -91,7 +92,7 @@ class SeparatorNode extends TrieNode {
 	}
 	
 	@Override
-	void compress() {
+	void doCompress() {
 		if (stringNodeChildren != null) {
 			if (stringNodeChildren.size() == 1) {
 				String key = stringNodeChildren.keySet().iterator().next();
@@ -115,7 +116,6 @@ class SeparatorNode extends TrieNode {
 			}
 			paramNodeChildren = Collections.unmodifiableMap(paramNodeChildren);
 		}
-		goal = goal == null ? null : Collections.unmodifiableSet(goal);
 	}
 	
 	@Override

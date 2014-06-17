@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.uri;
+package jj.http.server.uri;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -54,7 +55,12 @@ abstract class TrieNode {
 	
 	abstract boolean findGoal(RouteFinderContext context, String uri, int index);
 	
-	abstract void compress();
+	void compress() {
+		doCompress();
+		goal = goal == null ? null : Collections.unmodifiableSet(goal);
+	}
+	
+	abstract void doCompress();
 	
 	abstract StringBuilder describe(int indent, StringBuilder sb);
 	

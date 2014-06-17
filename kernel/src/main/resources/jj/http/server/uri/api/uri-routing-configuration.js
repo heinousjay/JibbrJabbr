@@ -1,6 +1,6 @@
 
 //var support = require('configuration-support');
-var base = 'jj.uri.RouterConfiguration.';
+var base = 'jj.http.server.uri.RouterConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
 var support = require('configuration-support');
 
@@ -21,11 +21,11 @@ function makeSetter(method, type) {
 	return function(uri) {
 		return {
 			to: function(destination) {
-				var route = new Packages.jj.uri.Route(method, uri, type(destination));
+				var route = new Packages.jj.http.server.uri.Route(method, uri, type(destination));
 				collector.addConfigurationMultiElement(base + 'routes', route);
 			},
 			to404: function() {
-				var route = new Packages.jj.uri.Route(method, java.net.URI.create(uri));
+				var route = new Packages.jj.http.server.uri.Route(method, uri);
 			}
 		}
 	}
