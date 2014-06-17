@@ -19,37 +19,42 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jj.uri.Parameter.Type;
+
 /**
  * @author jason
  *
  */
 class ParamNode extends TrieNode {
 	
-	private enum Type {
-		Param,
-		Splat
-	}
-	
 	private static final Pattern PARSER = Pattern.compile("^([:*])([\\w\\d$_-]+)(?:\\((.+)\\))?$");
 	
 	
 	private SeparatorNode child;
-	private final String name;
-	private final Type type;
-	private final Pattern pattern;
+	final Parameter parameter;
 	
-	static String makeValue(final String uri, final int start) {
-		int end = uri.indexOf(SEPARATOR_STRING, start);
+	static String makeValue(final Route route) {
+		return makeValue(route.uri(), route.index());
+	}
+	
+	static String makeValue(final String uri, final int index) {
+		int end = uri.indexOf(SEPARATOR_STRING, index);
 		if (end == -1) { end = uri.length(); }
-		return uri.substring(start, end);
+		return uri.substring(index, end);
 	}
 		
-	ParamNode(final String value) {
+	ParamNode(Route route) {
+		String value = makeValue(route);
 		Matcher m = PARSER.matcher(value);
-		if (!m.matches()) { throw new IllegalArgumentException("[" + value + "] is not a value parameter definition"); }
-		this.type = parseType(m.group(1));
-		this.name = m.group(2);
-		this.pattern = m.group(3) == null ? null : Pattern.compile(m.group(3));
+		if (!m.matches()) { throw new IllegalArgumentException("[" + value + "] is not a valid parameter definition"); }
+		parameter = new Parameter(
+			m.group(2),
+			route.index(),
+			route.index() + value.length(),
+			parseType(m.group(1)),
+			m.group(3) == null ? null : Pattern.compile("^" + m.group(3) + "$")
+		);
+		route.addParam(parameter);
 	}
 	
 	private Type parseType(String value) {
@@ -65,21 +70,20 @@ class ParamNode extends TrieNode {
 
 	@Override
 	void doAddChild(Route route) {
-		if (type == Type.Splat) { 
+		if (parameter.type == Type.Splat) { 
 			throw new IllegalArgumentException(
 				"trailing uri after a splat parameter in " + route
 			);
 		}
-		assert route.uri().charAt(route.index) == SEPARATOR_CHAR; // must be!
+		assert route.currentChar() == SEPARATOR_CHAR; // must be!
 		
 		child = child == null ? new SeparatorNode() : child;
-		route.index += 1;
-		child.addRoute(route);
+		child.addRoute(route.advanceIndex());
 	}
 	
 	private String matchParam(String uri, int index) {
 		String value = makeValue(uri, index);
-		value = (pattern != null && !pattern.matcher(value).find()) ? "" : value;
+		value = (parameter.pattern != null && !parameter.pattern.matcher(value).find()) ? "" : value;
 		return value;
 	}
 
@@ -87,7 +91,7 @@ class ParamNode extends TrieNode {
 	boolean findGoal(RouteFinderContext context, String uri, int index) {
 		// first, see if we match
 		String matchValue = "";
-		switch (type) {
+		switch (parameter.type) {
 		case Param:
 			matchValue = matchParam(uri, index);
 			break;
@@ -99,7 +103,7 @@ class ParamNode extends TrieNode {
 		
 		if (!matchValue.isEmpty()) {
 			
-			context.addParam(name, matchValue);
+			context.addParam(parameter.name, matchValue);
 		}
 		
 		if (index + matchValue.length() == uri.length()) {
@@ -135,7 +139,7 @@ class ParamNode extends TrieNode {
 	
 	@Override
 	StringBuilder describe(int indent, StringBuilder sb) {
-		sb.append(getClass().getSimpleName()).append(" - ").append("type: ").append(type).append(", name: ").append(name).append(", pattern: ").append(pattern).append(", goal: ").append(goal);
+		sb.append(getClass().getSimpleName()).append(" - ").append("parameter: ").append(parameter).append(", goal: ").append(goal);
 		describeChildren(indent + 2, sb);
 		return sb;
 	}

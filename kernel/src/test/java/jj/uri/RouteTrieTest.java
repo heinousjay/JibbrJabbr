@@ -19,6 +19,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
 
+import java.util.Collections;
+
 import org.junit.Test;
 
 /**
@@ -36,7 +38,9 @@ public class RouteTrieTest {
 		RouteTrie trie = new RouteTrie();
 		// admittedly not the best example
 		trie.addRoute(new Route(GET, "/user/:id([a-z]-[\\d]{6})/picture", result(0)));
-		trie.addRoute(new Route(GET, "/user/:name([\\w]+)/picture", result(1)));
+		trie.addRoute(new Route(GET, "/user/:name([\\w]+)/picture",       result(1)));
+		trie.addRoute(new Route(GET, "/this/:is/:the/best",               result(2)));
+		trie.addRoute(new Route(PUT, "/this/:is/:the/*end",               result(3)));
 		
 		return trie;
 	}
@@ -56,6 +60,9 @@ public class RouteTrieTest {
 		assertThat(result.route.destination(), is(result(1)));
 		assertThat(result.params.get("name"), is("jason"));
 		assertThat(result.params.size(), is(1));
+		
+		assertThat(result.route.resolve(Collections.singletonMap("name", "jason")), is("/user/jason/picture"));
+		assertThat(result.route.resolve(Collections.singletonMap("name", "test")), is("/user/test/picture"));
 	}
 	
 	private RouteTrie makeRouteTrie() {
@@ -155,7 +162,7 @@ public class RouteTrieTest {
 			trie.addRoute(new Route(POST, "/this/is", "/failure"));
 			fail();
 		} catch (IllegalArgumentException iae) {
-			assertThat(iae.getMessage(), is("duplicate route POST /this/is to /failure, current config = [route POST /this/is to /success]"));
+			assertThat(iae.getMessage(), is("duplicate route POST /this/is to /failure with params null, current config = [route POST /this/is to /success with params null]"));
 		}
 	}
 }

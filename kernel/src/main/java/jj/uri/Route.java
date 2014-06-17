@@ -15,6 +15,11 @@
  */
 package jj.uri;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -39,7 +44,11 @@ public class Route {
 	private final String uri;
 	private final String destination;
 	
-	int index = 1;
+	private int index = 1;
+	
+	private List<Parameter> parameters;
+	
+	private TrieNode parent;
 	
 	public Route(final HttpMethod method, final String uri, final String destination) {
 		
@@ -58,6 +67,8 @@ public class Route {
 		this.destination = destination;
 	}
 	
+	//---> accessors
+	
 	public HttpMethod method() {
 		return method;
 	}
@@ -69,6 +80,61 @@ public class Route {
 	public String destination() {
 		return destination;
 	}
+	
+	// move this to another class
+	public String resolve(Map<String, String> params) {
+		// need a local copy for tracking
+		// maybe encode them here?
+		HashMap<String, String> p = new HashMap<>(params);
+		StringBuilder sb = new StringBuilder();
+		int current = 0;
+		for (Parameter param : parameters) {
+			for (; current < param.start; ++current) {
+				sb.append(uri.charAt(current));
+			}
+			// defaults? error?
+			sb.append(p.remove(param.name));
+			current = param.end;
+		}
+		for (; current < uri.length(); ++current) {
+			sb.append(uri.charAt(current));
+		}
+		return sb.toString();
+	}
+	
+	//---> internal api
+	
+	char currentChar() {
+		return uri.charAt(index);
+	}
+	
+	int index() {
+		return index;
+	}
+	
+	Route advanceIndex() {
+		index++;
+		return this;
+	}
+	
+	Route advanceIndex(int by) {
+		index += by;
+		return this;
+	}
+	
+	Route addParam(Parameter parameter) {
+		parameters = parameters == null ? new ArrayList<Parameter>() : parameters;
+		parameters.add(parameter);
+		return this;
+	}
+	
+	Route setParent(TrieNode parent) {
+		this.parent = parent;
+		this.parameters = this.parameters == null ? null : Collections.unmodifiableList(this.parameters);
+		return this;
+	}
+	
+	//---> basics
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -89,7 +155,7 @@ public class Route {
 	
 	@Override
 	public String toString() {
-		return "route " + method + " " + uri + " to " + destination;
+		return "route " + method + " " + uri + " to " + destination + " with params " + parameters;
 	}
 
 }

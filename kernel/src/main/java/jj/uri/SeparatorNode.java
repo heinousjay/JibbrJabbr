@@ -33,20 +33,21 @@ class SeparatorNode extends TrieNode {
 	@Override
 	void doAddChild(Route route) {
 		
-		char current = route.uri().charAt(route.index);
+		char current = route.currentChar();
 		
 		assert current != SEPARATOR_CHAR : route + " has two path separators in a row";
 		
 		if (PARAM_CHARS.indexOf(current) != -1) {
 			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<String, ParamNode>(4) : paramNodeChildren;
-			String paramValue = ParamNode.makeValue(route.uri(), route.index);
+			String paramValue = ParamNode.makeValue(route);
 			ParamNode nextNode = paramNodeChildren.get(paramValue);
 			if (nextNode == null) { 
-				nextNode = new ParamNode(paramValue);
+				nextNode = new ParamNode(route);
 				paramNodeChildren.put(paramValue, nextNode);
+			} else {
+				route.addParam(nextNode.parameter);
 			}
-			route.index += paramValue.length();
-			nextNode.addRoute(route);
+			nextNode.addRoute(route.advanceIndex(paramValue.length()));
 		} else {
 			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StringNode>(4) : stringNodeChildren;
 			String value = String.valueOf(current);
@@ -55,8 +56,7 @@ class SeparatorNode extends TrieNode {
 				nextNode = new StringNode();
 				stringNodeChildren.put(value, (StringNode)nextNode);
 			}
-			route.index += 1;
-			nextNode.addRoute(route);
+			nextNode.addRoute(route.advanceIndex());
 		}
 	}
 

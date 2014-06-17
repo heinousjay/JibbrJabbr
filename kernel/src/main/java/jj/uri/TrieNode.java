@@ -33,25 +33,21 @@ abstract class TrieNode {
 	Set<Route> goal;
 	
 	void addRoute(Route route) {
-		if (route.uri().length() == route.index) {
+		if (route.uri().length() == route.index()) {
 		
-			doAddGoal(route);
+			goal = goal == null ? new LinkedHashSet<Route>(3) : goal;
+			if (goal.contains(route)) {
+				throw new IllegalArgumentException(
+					"duplicate " + route + ", current config = " + goal
+				);
+			}
+			goal.add(route);
+			route.setParent(this);
 		
 		} else {
 
 			doAddChild(route);
 		}
-	}
-	
-
-	void doAddGoal(Route route) {
-		goal = goal == null ? new LinkedHashSet<Route>(3) : goal;
-		if (goal.contains(route)) {
-			throw new IllegalArgumentException(
-				"duplicate " + route + ", current config = " + goal
-			);
-		}
-		goal.add(route);
 	}
 	
 	abstract void doAddChild(Route route);

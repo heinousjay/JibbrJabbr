@@ -27,7 +27,7 @@ class StringNode extends TrieNode {
 	void doAddChild(Route route) {
 		children = children == null ? new LinkedHashMap<String, TrieNode>(4, 0.75f) : children;
 		TrieNode nextNode;
-		if (route.uri().charAt(route.index) == SEPARATOR_CHAR) {
+		if (route.currentChar() == SEPARATOR_CHAR) {
 			nextNode = children.get(SEPARATOR_STRING);
 			if (nextNode == null) {
 				nextNode = new SeparatorNode();
@@ -37,15 +37,14 @@ class StringNode extends TrieNode {
 			
 		} else {
 
-			String current = String.valueOf(route.uri().charAt(route.index));
+			String current = String.valueOf(route.currentChar());
 			nextNode = children.get(current);
 			if (nextNode == null) {
 				nextNode = new StringNode();
 				children.put(current, nextNode);
 			}
 		}
-		route.index += 1;
-		nextNode.addRoute(route);
+		nextNode.addRoute(route.advanceIndex());
 	}
 	
 	StringNode mergeUp(StringBuilder accumulator) {
