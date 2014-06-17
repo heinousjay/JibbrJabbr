@@ -2,6 +2,7 @@
 //var support = require('configuration-support');
 var base = 'jj.uri.RouterConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
+var support = require('configuration-support');
 
 var GET    = Packages.io.netty.handler.codec.http.HttpMethod.GET;
 var POST   = Packages.io.netty.handler.codec.http.HttpMethod.POST;
@@ -42,14 +43,6 @@ module.exports = {
 		del: makeSetter(DELETE, route),
 		DELETE: makeSetter(DELETE, route)
 	},
-	redirect: {
-		get: makeSetter(GET, redirect),
-		GET: makeSetter(GET, redirect),
-		post: makeSetter(POST, redirect),
-		POST: makeSetter(POST, redirect),
-		put: makeSetter(PUT, redirect),
-		PUT: makeSetter(PUT, redirect),
-		del: makeSetter(DELETE, redirect),
-		DELETE: makeSetter(DELETE, redirect)
-	}
+	
+	welcomeFile: support.makeStringProperty(base, 'welcomeFile')
 }

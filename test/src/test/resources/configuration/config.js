@@ -34,14 +34,19 @@ require('document-system-configuration')
 require('resource-system-configuration')
 	.ioThreads(10);
 
-var {route:route, redirect:redirect} = require('uri-routing-configuration');
+// this is a silly helper, it just copies the exports
+// of the given script into the given object
+var globalize = require('globalize');
+
+// so bam.  life is easy.  although in this case, there
+// are only two pieces exposed
+globalize('uri-routing-configuration', this);
+
+welcomeFile('root');
+
 //for example!
-route.get('/').to('/index');
-route.post('/').to('/index');
-route.put('/').to('/index');
-route.del('/').to('/index');
-redirect.get('/chat/').to('/chat/list');
-redirect.post('/chat/:room').to('/chat/room');
-// uppercase methods work too
-redirect.PUT('/chat/:room/*secret').to('/chat/room');
-redirect.DELETE('/chat/:room/*secret').to('/chat/room');
+route.GET('/chat/').to('/chat/list');
+route.POST('/chat/:room').to('/chat/room');
+route.PUT('/chat/:room/*secret').to('/chat/room');
+route.DELETE('/chat/:room/*secret').to('/chat/room');
+

@@ -17,5 +17,12 @@ module.exports = {
 			collector.addConfigurationElement(base + name, new java.lang.Integer(arg));
 			return this;
 		}
+	},
+
+	makeStringProperty: function(base, name) {
+		return function(arg) {
+			collector.addConfigurationElement(base + name, new java.lang.String.valueOf(arg));
+			return this;
+		}
 	}
 }

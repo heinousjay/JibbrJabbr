@@ -102,18 +102,14 @@ public class ConfigurationSystemTest {
 		assertThat(documentConfiguration.removeComments(), is(false));
 		
 		
-		assertThat(routerConfiguration.welcomeFile(), is("index"));
+		assertThat(routerConfiguration.welcomeFile(), is("root"));
 		List<Route> routes = routerConfiguration.routes();
-		assertThat(routes.size(), is(8));
-		assertThat(routes.get(0).method(), is(GET));
-		
-		assertThat(routes.get(1).method(), is(POST));
-		assertThat(routes.get(2).method(), is(PUT));
-		assertThat(routes.get(3).method(), is(DELETE));
-		assertThat(routes.get(4).method(), is(GET));
-		assertThat(routes.get(5).method(), is(POST));
-		assertThat(routes.get(6).method(), is(PUT));
-		assertThat(routes.get(7).method(), is(DELETE));
+		assertThat(routes.size(), is(4));
+		assertRoute(routes.get(0), GET, "/chat/", "/chat/list");
+//		route.GET('/chat/').to('/chat/list');
+//		route.POST('/chat/:room').to('/chat/room');
+//		route.PUT('/chat/:room/*secret').to('/chat/room');
+//		route.DELETE('/chat/:room/*secret').to('/chat/room');
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String destination) {
