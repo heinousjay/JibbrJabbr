@@ -19,7 +19,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -33,6 +34,15 @@ public class RouteTrieTest {
 		return "/result" + index;
 	}
 	
+	private Map<String, String> makeMap(String...s) {
+		assert s.length % 2 == 0;
+		Map<String, String> map = new HashMap<>();
+		for (int i = 0; i < s.length; i += 2) {
+			map.put(s[i], s[i + 1]);
+		}
+		return map;
+	}
+	
 	private RouteTrie makeParameterMatchTrie() {
 		
 		RouteTrie trie = new RouteTrie();
@@ -40,7 +50,7 @@ public class RouteTrieTest {
 		trie.addRoute(new Route(GET, "/user/:id([a-z]-[\\d]{6})/picture", result(0)));
 		trie.addRoute(new Route(GET, "/user/:name([\\w]+)/picture",       result(1)));
 		trie.addRoute(new Route(GET, "/this/:is/:the/best",               result(2)));
-		trie.addRoute(new Route(PUT, "/this/:is/:the/*end",               result(3)));
+		trie.addRoute(new Route(GET, "/this/:is/:the/*end",               result(3)));
 		
 		return trie;
 	}
@@ -49,11 +59,16 @@ public class RouteTrieTest {
 	public void testParameterMatching() {
 		RouteTrie trie = makeParameterMatchTrie().compress();
 		
+		System.out.println(trie);
+		
 		MatchResult result = trie.find(GET, "/user/a-123456/picture");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(0)));
 		assertThat(result.params.get("id"), is("a-123456"));
 		assertThat(result.params.size(), is(1));
+		
+		assertThat(result.route.resolve(makeMap("id", "b-987654")), is("/user/b-987654/picture"));
+		assertThat(result.route.resolve(makeMap("id", "c-098765")), is("/user/c-098765/picture"));
 		
 		result = trie.find(GET, "/user/jason/picture");
 		assertThat(result, is(notNullValue()));
@@ -61,8 +76,23 @@ public class RouteTrieTest {
 		assertThat(result.params.get("name"), is("jason"));
 		assertThat(result.params.size(), is(1));
 		
-		assertThat(result.route.resolve(Collections.singletonMap("name", "jason")), is("/user/jason/picture"));
-		assertThat(result.route.resolve(Collections.singletonMap("name", "test")), is("/user/test/picture"));
+		assertThat(result.route.resolve(makeMap("name", "jason")), is("/user/jason/picture"));
+		assertThat(result.route.resolve(makeMap("name", "test")), is("/user/test/picture"));
+		
+		result = trie.find(GET, "/this/time/it/is/personal");
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(3)));
+		assertThat(result.params.get("is"), is("time"));
+		assertThat(result.params.get("the"), is("it"));
+		assertThat(result.params.get("end"), is("is/personal"));
+		assertThat(result.params.size(), is(3));
+		
+		result = trie.find(GET, "/this/is/not-the/best");
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(2)));
+		assertThat(result.params.get("is"), is("is"));
+		assertThat(result.params.get("the"), is("not-the"));
+		assertThat(result.params.size(), is(2));
 	}
 	
 	private RouteTrie makeRouteTrie() {
@@ -78,13 +108,13 @@ public class RouteTrieTest {
 		trie.addRoute(new Route(GET,    "/this/is/the/best",        result(2)));
 		trie.addRoute(new Route(GET,    "/this/is/the/best-around", result(2000)));
 		trie.addRoute(new Route(GET,    "/this/:is/:the/best",      result(3)));
-		trie.addRoute(new Route(PUT,    "/this/:is/:the/*end",      result(4)));
+		trie.addRoute(new Route(GET,    "/this/:is/:the/*end",      result(4)));
 		
 		// just to validate the structure works in order,
 		// these rules would basically eat up everything but since they're at
 		// the end, they match but don't get involved
-		trie.addRoute(new Route(PUT,    "/this/*islast-and-should-not-interfere", result(4000)));
-		trie.addRoute(new Route(PUT,    "/this/*islast-and-also-is-not-used",     result(5000)));
+		trie.addRoute(new Route(GET,    "/this/*islast-and-should-not-interfere", result(4000)));
+		trie.addRoute(new Route(GET,    "/this/*islast-and-also-is-not-used",     result(5000)));
 		
 		return trie;
 	}
@@ -126,7 +156,7 @@ public class RouteTrieTest {
 		assertThat(result.params.get("the"), is("the"));
 		assertThat(result.params.size(), is(2));
 		
-		result = trie.find(PUT, "/this/makes/me/bees-knees/if-you-know/what-i-am-saying");
+		result = trie.find(GET, "/this/makes/me/bees-knees/if-you-know/what-i-am-saying");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(4)));
 		assertThat(result.params.get("is"), is("makes"));
@@ -144,9 +174,11 @@ public class RouteTrieTest {
 	public void testCompressed() {
 		RouteTrie trie = makeRouteTrie();
 
+//		System.out.println(trie);
+		
 		trie.compress();
 		
-		System.out.println(trie);
+//		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}
