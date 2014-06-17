@@ -15,6 +15,7 @@ import org.mozilla.javascript.Script;
 
 import jj.resource.AbstractFileResource;
 import jj.resource.LoadedResource;
+import jj.resource.MimeTypes;
 import jj.script.RhinoContext;
 
 @Singleton
@@ -48,7 +49,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 
 	@Override
 	public String mime() {
-		return "application/javascript; charset=UTF-8";
+		return MimeTypes.get("js");
 	}
 	
 	@Override
