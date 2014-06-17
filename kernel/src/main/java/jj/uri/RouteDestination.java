@@ -21,4 +21,5 @@ package jj.uri;
  */
 public interface RouteDestination {
 
+	void dispatch(RouteMatch routeMatch);
 }

@@ -40,12 +40,12 @@ class RouteTrie {
 		return this;
 	}
 	
-	MatchResult find(HttpMethod method, String uri) {
+	RouteMatch find(HttpMethod method, String uri) {
 		assert method != null : "method is required";
 		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
 		
 		RouteFinderContext context = new RouteFinderContext();
-		MatchResult result = null;
+		RouteMatch result = null;
 		if (root.findGoal(context, uri, 1)) {
 			// well just use the first one here
 			Route route = null;
@@ -60,7 +60,7 @@ class RouteTrie {
 			Map<String, String> params =
 				(Map<String, String>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
 			if (route != null) {
-				result = new MatchResult(route, params);
+				result = new RouteMatch(route, params);
 			}
 		}
 		

@@ -67,7 +67,7 @@ public class Router {
 		});
 	}
 	
-	public MatchResult matchURI(HttpMethod method, String uri) {
+	public RouteMatch matchURI(HttpMethod method, String uri) {
 		RouteTrie routes = trie.get();
 		assert routes != null : "can't route without configuration!";
 		

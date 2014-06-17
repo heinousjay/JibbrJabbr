@@ -61,7 +61,7 @@ public class RouteTrieTest {
 		
 		System.out.println(trie);
 		
-		MatchResult result = trie.find(GET, "/user/a-123456/picture");
+		RouteMatch result = trie.find(GET, "/user/a-123456/picture");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(0)));
 		assertThat(result.params.get("id"), is("a-123456"));
@@ -121,7 +121,7 @@ public class RouteTrieTest {
 	
 	private void testRouteTrie(RouteTrie trie) {
 
-		MatchResult result = trie.find(POST, "/this/is");
+		RouteMatch result = trie.find(POST, "/this/is");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(0)));
 		assertTrue(result.params.isEmpty());
