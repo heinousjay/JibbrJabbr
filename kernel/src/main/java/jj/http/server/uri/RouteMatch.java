@@ -15,15 +15,19 @@
  */
 package jj.http.server.uri;
 
+import io.netty.handler.codec.http.HttpMethod;
+
 import java.util.Map;
 
 public class RouteMatch {
 	
 	public final Route route;
+	public final Map<HttpMethod, Route> routes;
 	public final Map<String, String> params;
 	
-	RouteMatch(final Route route, final Map<String, String> params) {
-		this.route = route;
+	RouteMatch(final HttpMethod method, final Map<HttpMethod, Route> routes, final Map<String, String> params) {
+		this.route = routes.get(method);
+		this.routes = routes;
 		this.params = params;
 	}
 }

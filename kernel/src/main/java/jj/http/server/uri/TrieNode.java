@@ -15,10 +15,12 @@
  */
 package jj.http.server.uri;
 
+import io.netty.handler.codec.http.HttpMethod;
+
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author jason
@@ -31,18 +33,18 @@ abstract class TrieNode {
 	static final String PARAM_CHARS = ":*";
 	
 	
-	Set<Route> goal;
+	Map<HttpMethod, Route> goal;
 	
 	void addRoute(Route route) {
 		if (route.uri().length() == route.index()) {
 		
-			goal = goal == null ? new LinkedHashSet<Route>(3) : goal;
-			if (goal.contains(route)) {
+			goal = goal == null ? new LinkedHashMap<HttpMethod, Route>(3) : goal;
+			if (goal.containsKey(route.method())) {
 				throw new IllegalArgumentException(
 					"duplicate " + route + ", current config = " + goal
 				);
 			}
-			goal.add(route);
+			goal.put(route.method(), route);
 			route.setParent(this);
 		
 		} else {
@@ -57,7 +59,7 @@ abstract class TrieNode {
 	
 	void compress() {
 		doCompress();
-		goal = goal == null ? null : Collections.unmodifiableSet(goal);
+		goal = goal == null ? null : Collections.unmodifiableMap(goal);
 	}
 	
 	abstract void doCompress();

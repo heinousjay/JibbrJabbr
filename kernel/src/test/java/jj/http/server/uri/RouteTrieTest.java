@@ -63,8 +63,6 @@ public class RouteTrieTest {
 	public void testParameterMatching() {
 		RouteTrie trie = makeParameterMatchTrie().compress();
 		
-		System.out.println(trie);
-		
 		RouteMatch result = trie.find(GET, "/user/a-123456/picture");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(0)));
@@ -106,6 +104,7 @@ public class RouteTrieTest {
 		trie.addRoute(new Route(DELETE, "/this/isno",               result(-100)));
 		trie.addRoute(new Route(PUT,    "/this/isno",               result(-200)));
 		trie.addRoute(new Route(GET,    "/this/isno",               result(-300)));
+		trie.addRoute(new Route(POST,    "/this/isno",              result(-400)));
 		trie.addRoute(new Route(GET,    "/this/isnot",              result(-1)));
 		trie.addRoute(new Route(GET,    "/this/is/the/bomb",        result(1)));
 		trie.addRoute(new Route(GET,    "/this/is/the/bomberman",   result(1000)));
@@ -188,6 +187,25 @@ public class RouteTrieTest {
 	}
 	
 	@Test
+	public void testSpecialMethodHandling() {
+		RouteTrie trie = makeRouteTrie().compress();
+		
+		//System.out.println(trie);
+		
+		RouteMatch routeMatch = trie.find(OPTIONS, "/this/isno");
+		
+		assertThat(routeMatch.routes, is(notNullValue()));
+		assertThat(routeMatch.routes.keySet(), containsInAnyOrder(GET, POST, PUT, DELETE));
+		assertThat(routeMatch.route, is(nullValue()));
+		
+		routeMatch = trie.find(HEAD, "/this/isno");
+		
+		assertThat(routeMatch.routes, is(notNullValue()));
+		assertThat(routeMatch.route.method(), is(GET));
+		assertThat(routeMatch.route.destination(), is(result(-300)));
+	}
+	
+	@Test
 	public void testDuplicateRoute() {
 		
 		RouteTrie trie = new RouteTrie();
@@ -198,7 +216,10 @@ public class RouteTrieTest {
 			trie.addRoute(new Route(POST, "/this/is", "/failure"));
 			fail();
 		} catch (IllegalArgumentException iae) {
-			assertThat(iae.getMessage(), is("duplicate route POST /this/is to /failure with params null, current config = [route POST /this/is to /success with params null]"));
+			assertThat(
+				iae.getMessage(), 
+				is("duplicate route POST /this/is to /failure with params null, current config = {POST=route POST /this/is to /success with params null}")
+			);
 		}
 	}
 }

@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -86,7 +85,7 @@ public class Route {
 		return destination;
 	}
 	
-	public Set<Route> allMethods() {
+	public Map<HttpMethod, Route> allMethods() {
 		return parent.goal;
 	}
 	

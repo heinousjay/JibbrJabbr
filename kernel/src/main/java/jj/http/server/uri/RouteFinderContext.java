@@ -15,11 +15,12 @@
  */
 package jj.http.server.uri;
 
+import io.netty.handler.codec.http.HttpMethod;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * state carrier for route matching attempts
@@ -31,7 +32,7 @@ class RouteFinderContext {
 	
 	class Match {
 		Map<String, String> params;
-		Set<Route> goal;
+		Map<HttpMethod, Route> goal;
 		
 		void addParam(String key, String value) {
 			if (params == null) { params = new HashMap<>(); }
@@ -49,7 +50,7 @@ class RouteFinderContext {
 		currentMatch.addParam(key, value);
 	}
 	
-	void setGoal(Set<Route> goal) {
+	void setGoal(Map<HttpMethod, Route> goal) {
 		Match match = currentMatch == null ? new Match() : currentMatch;
 		match.goal = goal;
 		matches.add(match);

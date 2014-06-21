@@ -15,9 +15,10 @@
  */
 package jj.http.server.uri;
 
+import static io.netty.handler.codec.http.HttpMethod.*;
+
 import java.util.Collections;
 import java.util.Map;
-
 import io.netty.handler.codec.http.HttpMethod;
 
 /**
@@ -44,14 +45,18 @@ class RouteTrie {
 		assert method != null : "method is required";
 		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
 		
+		// just play HEAD out as a GET
+		if (HEAD.equals(method)) { method = GET; }
+		
 		RouteFinderContext context = new RouteFinderContext();
 		RouteMatch result = null;
+		
 		if (root.findGoal(context, uri, 1)) {
-			// well just use the first one here
-			Route route = null;
-			for (Route r : context.matches.get(0).goal) {
-				if (r.method().equals(method)) {
-					route = r;
+			// 
+			Map<HttpMethod, Route> routes = null;
+			for (Route r : context.matches.get(0).goal.values()) {
+				if (r.method().equals(method) || OPTIONS.equals(method)) {
+					routes = context.matches.get(0).goal;
 					break;
 				}
 			}
@@ -59,8 +64,8 @@ class RouteTrie {
 			@SuppressWarnings("unchecked")
 			Map<String, String> params =
 				(Map<String, String>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
-			if (route != null) {
-				result = new RouteMatch(route, params);
+			if (routes != null) {
+				result = new RouteMatch(method, routes, params);
 			}
 		}
 		
