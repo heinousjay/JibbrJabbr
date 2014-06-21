@@ -18,6 +18,7 @@ package jj.http.server.uri;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author jason
@@ -114,7 +115,13 @@ class SeparatorNode extends TrieNode {
 			for (ParamNode node : paramNodeChildren.values()) {
 				node.compress();
 			}
-			paramNodeChildren = Collections.unmodifiableMap(paramNodeChildren);
+			// silly optimization
+			if (paramNodeChildren.size() == 1) {
+				Entry<String, ParamNode> entry = paramNodeChildren.entrySet().iterator().next();
+				paramNodeChildren = Collections.singletonMap(entry.getKey(), entry.getValue());
+			} else {
+				paramNodeChildren = Collections.unmodifiableMap(paramNodeChildren);
+			}
 		}
 	}
 	
