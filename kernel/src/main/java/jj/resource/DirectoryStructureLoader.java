@@ -15,12 +15,15 @@
  */
 package jj.resource;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -42,6 +45,7 @@ class DirectoryStructureLoader implements JJServerStartupListener {
 	private final PathResolver pathResolver;
 	private final ResourceFinder resourceFinder;
 	private final TaskRunner taskRunner;
+	private final CountDownLatch initLatch = new CountDownLatch(1);
 	
 	@Inject
 	DirectoryStructureLoader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
@@ -53,6 +57,8 @@ class DirectoryStructureLoader implements JJServerStartupListener {
 	@Override
 	public void start() throws Exception {
 		load(pathResolver.path());
+		boolean success = initLatch.await(500, MILLISECONDS);
+		assert success : "timed out reading the app directory structure";
 	}
 
 	void load(final Path path) {
@@ -86,6 +92,7 @@ class DirectoryStructureLoader implements JJServerStartupListener {
 						return FileVisitResult.CONTINUE;
 					}
 				});
+				initLatch.countDown();
 			}
 		});
 	}
