@@ -10,6 +10,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -28,6 +29,7 @@ import jj.script.module.ScriptResource;
 import jj.testing.JibbrJabbrTestServer;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -62,14 +64,17 @@ public class ResourceSystemIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
+//		System.out.println(resourceCache);
+//		System.out.println(reloadedCount);
+//		System.out.println(killedCount);
+//		System.out.println(loadedCount);
 		try {
 			Files.walkFileTree(Paths.get(App.one).resolve("created"), new TreeDeleter());
 		} catch (NoSuchFileException nsfe) {}
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(App.one)
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one)
 		.withFileWatcher()
 		.injectInstance(this);
 
@@ -116,7 +121,13 @@ public class ResourceSystemIntegrationTest {
 		// on the Mac, you will wait a while..., so if it's time to
 		// make this test more things, try to only have this
 		// single wait point!
-		assertTrue(waitForResource(dse));
+		
+		// wait count is 9 for the directories created above
+		// + 4 kills from scriptResource2, mse2, mse1, and dse
+		// + 1 reload of dse.  note that scriptResource1 and
+		// html resource are left alone in the tree
+		
+		assertTrue(waitForCount(9 + 4 + 1));
 		
 		assertFalse(scriptResource2.alive());
 		assertFalse(mse2.alive());
@@ -153,22 +164,48 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	// small strictly ordered waiting mechanism
+	// also tests out the events indirectly
 	
-	AbstractResource waiting;
+	boolean countEvents = false;
 	CountDownLatch latch;
+	AtomicInteger reloadedCount;
+	AtomicInteger killedCount;
+	AtomicInteger loadedCount;
+	
+	@Before
+	public void before() {
+		reloadedCount = new AtomicInteger();
+		killedCount = new AtomicInteger();
+		loadedCount = new AtomicInteger();
+	}
 	
 	@Listener
-	void resourceLoaded(ResourceReloaded event) {
-		if (waiting != null && event.matches(waiting)) {
+	void resourceReloaded(ResourceReloaded event) {
+		reloadedCount.incrementAndGet();
+		if (countEvents) {
 			latch.countDown();
-			waiting = null;
-			latch = null;
+		} 
+	}
+	
+	@Listener
+	void resourceKilled(ResourceKilled event) {
+		killedCount.incrementAndGet();
+		if (countEvents) {
+			latch.countDown();
 		}
 	}
 	
-	private boolean waitForResource(AbstractResource resource) throws Exception {
-		latch = new CountDownLatch(1);
-		waiting = resource;
+	@Listener
+	void resourceLoaded(ResourceLoaded event) {
+		if (loadedCount != null) loadedCount.incrementAndGet();
+		if (countEvents) {
+			latch.countDown();
+		}
+	}
+	
+	private boolean waitForCount(int count) throws Exception {
+		latch = new CountDownLatch(count);
+		countEvents = true;
 		return latch.await(11, SECONDS);
 	}
 }
