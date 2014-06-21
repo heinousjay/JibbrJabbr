@@ -104,7 +104,7 @@ public class RouteTrieTest {
 		trie.addRoute(new Route(DELETE, "/this/isno",               result(-100)));
 		trie.addRoute(new Route(PUT,    "/this/isno",               result(-200)));
 		trie.addRoute(new Route(GET,    "/this/isno",               result(-300)));
-		trie.addRoute(new Route(POST,    "/this/isno",              result(-400)));
+		trie.addRoute(new Route(POST,   "/this/isno",               result(-400)));
 		trie.addRoute(new Route(GET,    "/this/isnot",              result(-1)));
 		trie.addRoute(new Route(GET,    "/this/is/the/bomb",        result(1)));
 		trie.addRoute(new Route(GET,    "/this/is/the/bomberman",   result(1000)));
@@ -169,7 +169,7 @@ public class RouteTrieTest {
 	}
 	
 	@Test
-	public void test() {
+	public void testUncompressed() {
 		testRouteTrie(makeRouteTrie());
 	}
 	
@@ -177,11 +177,11 @@ public class RouteTrieTest {
 	public void testCompressed() {
 		RouteTrie trie = makeRouteTrie();
 
-//		System.out.println(trie);
+		//System.out.println(trie);
 		
 		trie.compress();
 		
-//		System.out.println(trie);
+		//System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}
@@ -196,6 +196,12 @@ public class RouteTrieTest {
 		
 		assertThat(routeMatch.routes, is(notNullValue()));
 		assertThat(routeMatch.routes.keySet(), containsInAnyOrder(GET, POST, PUT, DELETE));
+		assertThat(routeMatch.route, is(nullValue()));
+		
+		routeMatch = trie.find(OPTIONS, "/this/is/the/best");
+		
+		assertThat(routeMatch.routes, is(notNullValue()));
+		assertThat(routeMatch.routes.keySet(), contains(GET));
 		assertThat(routeMatch.route, is(nullValue()));
 		
 		routeMatch = trie.find(HEAD, "/this/isno");
