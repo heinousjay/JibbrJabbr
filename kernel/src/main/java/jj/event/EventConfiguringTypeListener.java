@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -180,9 +181,21 @@ class EventConfiguringTypeListener implements TypeListener {
 	}
 	
 	private void possiblySubscribeToEvents(final Object subscriber) {
-		final String name = subscriber.getClass().getName();
+		
+		ArrayList<MethodInfo> methods = new ArrayList<>();
+		
+		Class<?> startingClass = subscriber.getClass();
+		
+		while (startingClass != Object.class) {
+			String name = startingClass.getName();
+			if (subscribers.containsKey(name)) {
+				methods.addAll(subscribers.get(name));
+			}
+			
+			startingClass = startingClass.getSuperclass();
+		}
 
-		for (final MethodInfo invoked : subscribers.get(name)) {
+		for (final MethodInfo invoked : methods) {
 			
 			cleanupMap.computeIfAbsent(
 				new WeakReference<Object>(subscriber, invokerInstanceQueue),
@@ -237,7 +250,7 @@ class EventConfiguringTypeListener implements TypeListener {
 		CtMethod newMethod = CtNewMethod.copy(invokeMethod, newClass, null);
 		newMethod.setBody(
 			"{" +
-			injectee.getClass().getName() + " invokee = (" + injectee.getClass().getName() + ")instance.get();" +
+				invoked.getDeclaringClass().getName() + " invokee = (" + invoked.getDeclaringClass().getName() + ")instance.get();" +
 			// if the invokee goes out of scope, we can stop sending events to it
 			"if (invokee != null) invokee." + invoked.getName() + "((" + invoked.getParameterTypes()[0].getName() + ")$1);" +
 			"}"
@@ -260,17 +273,20 @@ class EventConfiguringTypeListener implements TypeListener {
 		// anything we heard here, we also want to wire
 		encounter.register(new EventWiringInjectionListener<I>());
 		
-		String name = type.toString();
+		Class<?> c = type.getRawType();
+		if (!TaskRunner.class.isAssignableFrom(c) && !Publisher.class.isAssignableFrom(c)) {
 		
-		subscribers.computeIfAbsent(name, new Fun<String, List<MethodInfo>>() {
-
-			@Override
-			public List<MethodInfo> apply(String name) {
-				ArrayList<MethodInfo> result = new ArrayList<>();
-				
-				try {
-					CtClass clazz = classPool.get(name);
-					if (clazz.hasAnnotation(Subscriber.class)) {
+			String name = type.toString();
+			
+			subscribers.computeIfAbsent(name, new Fun<String, List<MethodInfo>>() {
+	
+				@Override
+				public List<MethodInfo> apply(String name) {
+					
+					ArrayList<MethodInfo> result = new ArrayList<>();
+					
+					try {
+						CtClass clazz = classPool.get(name);
 						for (CtMethod method : clazz.getMethods()) {
 							if (
 								// should be not static, have one parameter
@@ -294,15 +310,16 @@ class EventConfiguringTypeListener implements TypeListener {
 							}
 						}
 						assert !result.isEmpty() : name + " is subscribing but has no listeners";
+						
+					} catch (NotFoundException e1) {
+						// don't care
+					} catch (Exception e) {
+						throw new AssertionError(name, e);
 					}
-				} catch (NotFoundException e1) {
-					// don't care
-				} catch (Exception e) {
-					throw new AssertionError(name, e);
+					
+					return result.isEmpty() ? null : Collections.unmodifiableList(result);
 				}
-				
-				return result.isEmpty() ? null : Collections.unmodifiableList(result);
-			}
-		});
+			});
+		}
 	}
 }

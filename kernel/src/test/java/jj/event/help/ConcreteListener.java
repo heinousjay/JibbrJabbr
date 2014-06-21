@@ -13,31 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.event;
+package jj.event.help;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import jj.event.Listener;
 
 /**
- * <p>
- * Marks a class as subscribing to events.  This is mainly
- * to avoid introspecting every class the system loads and
- * may go away.
- * 
- * <p>
- * This is inherited, so abstract bases can get events
- * 
  * @author jason
  *
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Inherited
-public @interface Subscriber {
+public class ConcreteListener extends AbstractListener {
 
+	public int unrelatedIEventCount;
+	
+	@Listener
+	void unrelatedIEvent(UnrelatedIEvent event) {
+		++unrelatedIEventCount;
+	}
 }

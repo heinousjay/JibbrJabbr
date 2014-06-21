@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Singleton;
 
 import jj.event.help.ChildSub;
+import jj.event.help.ConcreteListener;
 import jj.event.help.ConcurrentSub;
 import jj.event.help.Event;
 import jj.event.help.EventSub;
@@ -119,10 +120,11 @@ public class EventSystemTest {
 		// verify the listeners are all unregistered so
 		// we aren't leaking memory, but we should still have
 		// sets for the event types
-		assertThat(pub.listenerMap.size(), is(3));
+		assertThat(pub.listenerMap.size(), is(4));
 		assertTrue("should have no IEvent listeners", pub.listenerMap.get(IEvent.class).isEmpty());
 		assertTrue("should have no Event listeners", pub.listenerMap.get(Event.class).isEmpty());
 		assertTrue("should have no EventSub listeners", pub.listenerMap.get(EventSub.class).isEmpty());
+		assertTrue("should have no UnrelatedIEvent listeners", pub.listenerMap.get(UnrelatedIEvent.class).isEmpty());
 		
 		// and publishing should not cause any exceptions at this point
 		pub.publish(new EventSub());
@@ -134,6 +136,7 @@ public class EventSystemTest {
 		
 		
 		Sub sub = injector.getInstance(Sub.class);
+		ConcreteListener cl = injector.getInstance(ConcreteListener.class);
 		
 		// when
 		pub.publish(new Event());
@@ -164,19 +167,23 @@ public class EventSystemTest {
 		
 		// when
 		pub.publish(new EventSub());
+		pub.publish(new UnrelatedIEvent());
 		
 		// then
 		assertThat(childSub.heard, is(2));
 		assertThat(childSub.heard2, is(1));
-		assertThat(sub.heard, is(4));
-		assertThat(sub2.heard, is(1));
+		assertThat(sub.heard, is(5));
+		assertThat(sub2.heard, is(2));
+		assertThat(cl.unrelatedIEventCount, is(1));
+		assertThat(cl.iEventCount, is(5));
 		
 		// we should have four listeners registered at this point,
 		// and after they go out of scope we should have none
-		assertThat(pub.listenerMap.size(), is(3));
-		assertThat(pub.listenerMap.get(IEvent.class).size(), is(2));
+		assertThat(pub.listenerMap.size(), is(4));
+		assertThat(pub.listenerMap.get(IEvent.class).size(), is(3));
 		assertThat(pub.listenerMap.get(Event.class).size(), is(1));
 		assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
+		assertThat(pub.listenerMap.get(UnrelatedIEvent.class).size(), is(1));
 		
 		return pub;
 	}
