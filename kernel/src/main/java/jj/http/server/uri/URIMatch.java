@@ -91,4 +91,15 @@ public class URIMatch {
 	public boolean equals(Object other) {
 		return other != null && other instanceof URIMatch && StringUtils.equals(((URIMatch)other).uri, uri);
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "{ " +
+			"uri: " + uri +
+			", sha1: " + sha1 +
+			", name: " + name +
+			", extension: " + extension + 
+			", baseName: " + baseName +
+			", versioned: " + versioned + " }";
+	}
 }
