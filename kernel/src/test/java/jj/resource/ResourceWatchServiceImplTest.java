@@ -35,7 +35,7 @@ public class ResourceWatchServiceImplTest {
 	@Mock ResourceWatchServiceLoop loop;
 	@Mock TaskRunner taskRunner;
 	@Mock Arguments arguments;
-	@Mock FileResource resource;
+	@Mock DirectoryResource resource;
 	
 	@Test
 	public void testNoRun() {

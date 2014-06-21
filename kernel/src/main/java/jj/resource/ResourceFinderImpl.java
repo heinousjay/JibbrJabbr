@@ -150,11 +150,11 @@ class ResourceFinderImpl implements ResourceFinder {
 			publisher.publish(new ResourceLoaded(resourceCreator.type(), base, name, arguments));
 			if (
 				resourceCache.putIfAbsent(cacheKey, resource) == null &&
-				resource instanceof FileResource
+				resource instanceof DirectoryResource
 			) {
 				// if this was the first time we put this in the cache,
 				// we set up a file watch on it for background reloads
-				resourceWatchService.watch((FileResource)resource);
+				resourceWatchService.watch((DirectoryResource)resource);
 			}
 		}
 	}

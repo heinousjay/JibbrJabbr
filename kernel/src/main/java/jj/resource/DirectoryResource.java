@@ -44,7 +44,12 @@ public class DirectoryResource extends AbstractResource {
 	private final String sha1;
 	
 	@Inject
-	DirectoryResource(final Dependencies dependencies, final Path path, final String name) throws IOException {
+	DirectoryResource(
+		final Dependencies dependencies,
+		//final ResourceFinder resourceFinder,
+		final Path path,
+		final String name
+	) throws IOException {
 		super(dependencies);
 		
 		BasicFileAttributes attributes;

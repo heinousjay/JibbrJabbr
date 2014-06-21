@@ -36,7 +36,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupL
 	}
 
 	@Override
-	public void watch(FileResource resource) throws IOException {
+	public void watch(DirectoryResource resource) throws IOException {
 		if (run) {
 			loop.watch(resource);
 		}
