@@ -24,11 +24,20 @@ import jj.configuration.Location;
  *
  */
 public interface PathResolver {
+	
+	/**
+	 * The base location of the application
+	 */
+	Location base();
+	
+	/**
+	 * The base path of the application
+	 */
+	Path path();
 
 	/**
-	 * @param base
-	 * @param name
-	 * @return
+	 * resolve the given location and name against
+	 * the application base
 	 */
 	Path resolvePath(Location base, String name);
 

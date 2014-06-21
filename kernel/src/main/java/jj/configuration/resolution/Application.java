@@ -50,18 +50,19 @@ public class Application implements PathResolver {
 		this.assets = assets;
 		this.apiModules = apiModules;
 	}
-	
+
+	@Override
+	public Location base() {
+		return AppLocation.Base;
+	}
+
+	@Override
 	public Path path() {
 		Path result = arguments.get(APP_PATH_ARG_NAME, Path.class);
 		if (result == null) result = Paths.get(DEFAULT_APP_PATH);
 		return result;
 	}
 
-	/**
-	 * @param base
-	 * @param name
-	 * @return
-	 */
 	@Override
 	public Path resolvePath(Location base, String name) {
 		

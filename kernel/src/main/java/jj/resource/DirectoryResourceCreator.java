@@ -45,11 +45,13 @@ public class DirectoryResourceCreator extends AbstractResourceCreator<DirectoryR
 
 	@Override
 	protected URI uri(Location base, String name, Object... args) {
+		assert base.equals(pathResolver.base()) : "all DirectoryResources are should be in " + pathResolver.base();
 		return pathResolver.resolvePath(base, name).toUri();
 	}
 
 	@Override
 	public DirectoryResource create(Location base, String name, Object... args) throws IOException {
+		assert base.equals(pathResolver.base()) : "all DirectoryResources are should be in " + pathResolver.base(); 
 		return instanceModuleCreator.createResource(DirectoryResource.class, resourceKey(base, name), base, name);
 	}
 

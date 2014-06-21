@@ -1,6 +1,7 @@
 package jj.resource;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.configuration.resolution.AppLocation.Base;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -34,7 +35,7 @@ import org.junit.Test;
  *
  */
 @Subscriber
-public class ResourceWatchServiceIntegrationTest {
+public class ResourceSystemIntegrationTest {
 	
 	@Inject ResourceFinder finder;
 	
@@ -54,10 +55,18 @@ public class ResourceWatchServiceIntegrationTest {
 		new JibbrJabbrTestServer(App.one)
 		.withFileWatcher()
 		.injectInstance(this);
-	
 
 	@Test
-	public void test() throws Throwable {
+	public void testDirectoryPreloading() throws Exception {
+		assertThat(finder.findResource(DirectoryResource.class, Base, ""), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, "chat"), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, "deep"), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, "deep/nesting"), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, "modules"), is(notNullValue()));
+	}
+
+	@Test
+	public void testResourceWatching() throws Throwable {
 		
 		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
 
@@ -80,7 +89,8 @@ public class ResourceWatchServiceIntegrationTest {
 		// touch a script and wait for a reload event.
 		touch(scriptResource2);
 
-		// on the Mac, you will wait a while..., so if it's time to make this test more things, try to only have this
+		// on the Mac, you will wait a while..., so if it's time to
+		// make this test more things, try to only have this
 		// single wait point!
 		assertTrue(waitForResource(dse));
 		
@@ -92,9 +102,15 @@ public class ResourceWatchServiceIntegrationTest {
 		assertTrue(scriptResource1.alive());
 		assertTrue(htmlResource.alive());
 		
-		assertThat(dse, is(not(sameInstance(finder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, "deep/nested")))));
-		assertThat(mse1, is(not(sameInstance(finder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "deep/module", new RequiredModule(dse, "deep/module"))))));
-		assertThat(mse2, is(not(sameInstance(finder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"))))));
+		assertThat(dse, is(not(sameInstance(
+			finder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, "deep/nested")
+		))));
+		assertThat(mse1, is(not(sameInstance(
+			finder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "deep/module", new RequiredModule(dse, "deep/module"))
+		))));
+		assertThat(mse2, is(not(sameInstance(
+			finder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"))
+		))));
 	}
 	
 	// also need a delete test!
