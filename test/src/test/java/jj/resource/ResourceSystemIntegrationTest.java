@@ -6,12 +6,15 @@ import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 
 import jj.App;
+import jj.TreeDeleter;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.HtmlResource;
@@ -24,6 +27,7 @@ import jj.script.module.RequiredModule;
 import jj.script.module.ScriptResource;
 import jj.testing.JibbrJabbrTestServer;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,6 +45,8 @@ public class ResourceSystemIntegrationTest {
 	
 	@Inject EmbeddedHttpServer server;
 	
+	@Inject ResourceCache resourceCache;
+	
 	DocumentScriptEnvironment dse;
 	HtmlResource htmlResource;
 	
@@ -49,6 +55,17 @@ public class ResourceSystemIntegrationTest {
 	
 	ModuleScriptEnvironment mse2;
 	ScriptResource scriptResource2;
+	
+	String createDirectoriesOne = "created/1/directory/structure";
+	String createDirectoriesTwo = "created/1/other/structure";
+	String createDirectoriesThree = "created/2/hi/there";
+	
+	@After
+	public void after() throws Exception {
+		try {
+			Files.walkFileTree(Paths.get(App.one).resolve("created"), new TreeDeleter());
+		} catch (NoSuchFileException nsfe) {}
+	}
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
@@ -86,8 +103,15 @@ public class ResourceSystemIntegrationTest {
 		assertTrue(mse2.alive());
 		assertTrue(scriptResource2.alive());
 		
+		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesOne), is(nullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesTwo), is(nullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesThree), is(nullValue()));
+		
 		// touch a script and wait for a reload event.
 		touch(scriptResource2);
+		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesOne));
+		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesTwo));
+		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesThree));
 
 		// on the Mac, you will wait a while..., so if it's time to
 		// make this test more things, try to only have this
@@ -111,6 +135,10 @@ public class ResourceSystemIntegrationTest {
 		assertThat(mse2, is(not(sameInstance(
 			finder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"))
 		))));
+		
+		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesOne), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesTwo), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesThree), is(notNullValue()));
 	}
 	
 	// also need a delete test!

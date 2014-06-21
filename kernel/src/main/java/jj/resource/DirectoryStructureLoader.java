@@ -37,14 +37,14 @@ import jj.execution.TaskRunner;
  *
  */
 @Singleton
-class DirectoryPreloader implements JJServerStartupListener {
+class DirectoryStructureLoader implements JJServerStartupListener {
 	
 	private final PathResolver pathResolver;
 	private final ResourceFinder resourceFinder;
 	private final TaskRunner taskRunner;
 	
 	@Inject
-	DirectoryPreloader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
+	DirectoryStructureLoader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
 		this.pathResolver = pathResolver;
 		this.resourceFinder = resourceFinder;
 		this.taskRunner = taskRunner;
@@ -52,13 +52,22 @@ class DirectoryPreloader implements JJServerStartupListener {
 
 	@Override
 	public void start() throws Exception {
+		load(pathResolver.path());
+	}
+
+	void load(final Path path) {
 		taskRunner.execute(new ResourceTask("directory preloader") {
 			@Override
 			protected void run() throws Exception {
-				Files.walkFileTree(pathResolver.path(), new FileVisitor<Path>() {
+				Files.walkFileTree(path, new FileVisitor<Path>() {
 
 					@Override
 					public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+						resourceFinder.loadResource(
+							DirectoryResource.class,
+							pathResolver.base(),
+							pathResolver.path().relativize(path.resolve(dir)).toString()
+						);
 						return FileVisitResult.CONTINUE;
 					}
 
@@ -74,11 +83,6 @@ class DirectoryPreloader implements JJServerStartupListener {
 
 					@Override
 					public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-						resourceFinder.loadResource(
-							DirectoryResource.class,
-							pathResolver.base(),
-							pathResolver.path().relativize(dir).toString()
-						);
 						return FileVisitResult.CONTINUE;
 					}
 				});

@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -109,5 +110,14 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 	
 	int size() {
 		return delegate.get().size();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
+		for (Entry<ResourceKey, Resource> entry : delegate.get().entrySet()) {
+			sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
+		}
+ 		return sb.append("}").toString();
 	}
 }

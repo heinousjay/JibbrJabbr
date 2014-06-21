@@ -30,7 +30,7 @@ public class ResourceModule extends JJModule {
 		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
 		addStartupListenerBinding().to(ResourceWatchServiceImpl.class);
 		
-		addStartupListenerBinding().to(DirectoryPreloader.class);
+		addStartupListenerBinding().to(DirectoryStructureLoader.class);
 		
 		bindCreation().of(DirectoryResource.class).to(DirectoryResourceCreator.class);
 		
