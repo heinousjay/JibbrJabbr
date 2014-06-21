@@ -26,7 +26,7 @@ class MyResource extends AbstractResource {
 	private final URI uri;
 	
 	protected MyResource(URI uri, Publisher publisher) {
-		super(new Dependencies(new ResourceKey(MyResource.class, uri), AppLocation.Base, publisher));
+		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, uri), AppLocation.Base, publisher));
 		this.uri = uri;
 	}
 

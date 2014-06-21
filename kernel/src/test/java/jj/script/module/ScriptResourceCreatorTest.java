@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 import java.nio.file.Path;
 
 import jj.configuration.resolution.AppLocation;
-import jj.resource.AbstractResource.Dependencies;
+import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceBase;
 import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
@@ -46,7 +46,7 @@ public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, Scri
 
 	@Override
 	protected ScriptResource resource() throws Exception {
-		return new ScriptResource(new Dependencies(cacheKey(), AppLocation.Base, null), path(), name(), contextProvider = new MockRhinoContextProvider());
+		return new ScriptResource(new MockAbstractResourceDependencies(cacheKey(), AppLocation.Base), path(), name(), contextProvider = new MockRhinoContextProvider());
 	}
 	
 	@Override

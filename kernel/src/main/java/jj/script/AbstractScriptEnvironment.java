@@ -30,6 +30,7 @@ import org.mozilla.javascript.Undefined;
 import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
 import jj.resource.AbstractResource;
+import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
 import jj.util.Closer;
 
@@ -59,9 +60,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final RequireInnerFunction requireInnerFunction,
 			final InjectFunction injectFunction,
 			final Timers timers,
-			final Publisher publisher
+			final Publisher publisher,
+			final ResourceFinder resourceFinder
 		) {
-			super(cacheKey, AppLocation.Virtual, publisher);
+			super(cacheKey, AppLocation.Virtual, publisher, resourceFinder);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;

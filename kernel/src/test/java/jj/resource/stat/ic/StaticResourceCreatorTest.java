@@ -18,7 +18,7 @@ package jj.resource.stat.ic;
 import java.nio.file.Path;
 
 import jj.configuration.resolution.AppLocation;
-import jj.resource.AbstractResource.Dependencies;
+import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceBase;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceCreator;
@@ -40,7 +40,7 @@ public class StaticResourceCreatorTest extends ResourceBase<StaticResource, Stat
 
 	@Override
 	protected StaticResource resource() throws Exception {
-		return new StaticResource(new Dependencies(cacheKey(), AppLocation.Base, null), path(), name());
+		return new StaticResource(new MockAbstractResourceDependencies(cacheKey(), AppLocation.Base), path(), name());
 	}
 
 	@Override

@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import jj.Base;
 import jj.configuration.Location;
 import jj.configuration.resolution.AppLocation;
-import jj.resource.AbstractResource.Dependencies;
 
 import org.junit.Test;
 
@@ -40,14 +39,14 @@ public class DirectoryResourceTest {
 		String name = "helpers";
 		Path path = Base.appPath().resolve(name);
 		
-		DirectoryResource r = new DirectoryResource(new Dependencies(null, base, null), path, name);
+		DirectoryResource r = new DirectoryResource(new MockAbstractResourceDependencies(base), path, name);
 		
 		assertThat(r, is(notNullValue()));
 
 		name = "internal";
 		path = Base.appPath().resolve(name);
 		
-		r = new DirectoryResource(new Dependencies(null, base, null), path, name);
+		r = new DirectoryResource(new MockAbstractResourceDependencies(base), path, name);
 		
 		assertThat(r, is(notNullValue()));
 
@@ -55,7 +54,7 @@ public class DirectoryResourceTest {
 		path = Base.appPath().resolve(name);
 		
 		try {
-			new DirectoryResource(new Dependencies(null, base, null), path, name);
+			new DirectoryResource(new MockAbstractResourceDependencies(base), path, name);
 			fail();
 		} catch (NoSuchResourceException nsre) {}
 
@@ -63,7 +62,7 @@ public class DirectoryResourceTest {
 		path = Base.appPath().resolve(name);
 		
 		try {
-			new DirectoryResource(new Dependencies(null, base, null), path, name);
+			new DirectoryResource(new MockAbstractResourceDependencies(base), path, name);
 			fail();
 		} catch (NoSuchResourceException nsre) {}
 		

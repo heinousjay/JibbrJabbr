@@ -19,7 +19,7 @@ import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.PathResolver;
 import jj.event.Publisher;
-import jj.resource.AbstractResource.Dependencies;
+import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceKey;
 
 /**
@@ -32,6 +32,6 @@ public class StaticResourceMaker {
 		ResourceKey resourceKey = mock(ResourceKey.class);
 		Publisher publisher = mock(Publisher.class);
 		
-		return new StaticResource(new Dependencies(resourceKey, base, publisher), app.resolvePath(base, name), name);
+		return new StaticResource(new MockAbstractResourceDependencies(resourceKey, base, publisher), app.resolvePath(base, name), name);
 	}
 }

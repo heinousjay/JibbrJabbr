@@ -40,12 +40,19 @@ public abstract class AbstractResource implements Resource {
 		protected final ResourceKey resourceKey;
 		protected final Location base;
 		protected final Publisher publisher;
+		protected final ResourceFinder resourceFinder;
 		
 		@Inject
-		public Dependencies(final ResourceKey resourceKey, final Location base, final Publisher publisher) {
+		public Dependencies(
+			final ResourceKey resourceKey,
+			final Location base,
+			final Publisher publisher,
+			final ResourceFinder resourceFinder
+		) {
 			this.resourceKey = resourceKey;
 			this.base = base;
 			this.publisher = publisher;
+			this.resourceFinder = resourceFinder;
 		}
 	}
 

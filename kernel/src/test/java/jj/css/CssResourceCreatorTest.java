@@ -28,7 +28,7 @@ import jj.css.CssResource;
 import jj.css.CssResourceCreator;
 import jj.css.LessProcessor;
 import jj.event.Publisher;
-import jj.resource.AbstractResource.Dependencies;
+import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.Resource;
 import jj.resource.ResourceBase;
 import jj.resource.ResourceKey;
@@ -74,7 +74,7 @@ public class CssResourceCreatorTest extends ResourceBase<CssResource, CssResourc
 	}
 	
 	protected CssResource resource(String name) throws Exception {
-		return new CssResource(new Dependencies(cacheKey(name), AppLocation.Base, null), name, path(name), false);
+		return new CssResource(new MockAbstractResourceDependencies(cacheKey(name), AppLocation.Base), name, path(name), false);
 	}
 	
 	@Override

@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import jj.configuration.resolution.AppLocation;
 import jj.messaging.PropertiesResource;
 import jj.messaging.PropertiesResourceCreator;
-import jj.resource.AbstractResource.Dependencies;
+import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceBase;
 
 /**
@@ -40,7 +40,7 @@ public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResour
 
 	@Override
 	protected PropertiesResource resource() throws Exception {
-		return new PropertiesResource(new Dependencies(cacheKey(), AppLocation.Base, null), path(), name());
+		return new PropertiesResource(new MockAbstractResourceDependencies(cacheKey(), AppLocation.Base), path(), name());
 	}
 
 	@Override

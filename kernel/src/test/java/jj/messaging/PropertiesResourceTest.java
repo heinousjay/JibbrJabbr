@@ -20,25 +20,18 @@ import static org.hamcrest.Matchers.*;
 import jj.Base;
 import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource.Dependencies;
-import jj.resource.ResourceKey;
-
+import jj.resource.MockAbstractResourceDependencies;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-@RunWith(MockitoJUnitRunner.class)
 public class PropertiesResourceTest {
-	
-	@Mock ResourceKey resourceKey;
 
 	@Test
 	public void test() throws Exception {
-		Dependencies dependencies = new Dependencies(resourceKey, AppLocation.Base, null);
+		Dependencies dependencies = new MockAbstractResourceDependencies(AppLocation.Base);
 		
 		PropertiesResource resource = new PropertiesResource(dependencies, Base.appPath().resolve("index.properties"), "test");
 		

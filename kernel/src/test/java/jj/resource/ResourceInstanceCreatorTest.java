@@ -87,6 +87,7 @@ public class ResourceInstanceCreatorTest  {
 			@Override
 			protected void configure() {
 				bind(Publisher.class).toInstance(mock(Publisher.class));
+				bind(ResourceFinder.class).toInstance(mock(ResourceFinder.class));
 			}
 		}, moduleCaptor.getValue());
 		

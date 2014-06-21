@@ -23,7 +23,7 @@ import java.util.Locale;
 
 import jj.Base;
 import jj.configuration.resolution.AppLocation;
-import jj.resource.AbstractResource.Dependencies;
+import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
 
@@ -43,7 +43,8 @@ public class MessagesResourceTest {
 	
 	@Mock ResourceFinder resourceFinder;
 	
-	Dependencies dependencies = new Dependencies(resourceKey, AppLocation.Virtual, null);
+	MockAbstractResourceDependencies dependencies = 
+		new MockAbstractResourceDependencies(resourceKey, AppLocation.Virtual);
 	
 	String name = "index";
 	
