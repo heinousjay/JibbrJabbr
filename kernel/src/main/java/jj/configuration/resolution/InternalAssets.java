@@ -52,7 +52,7 @@ public class InternalAssets {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			// don't much care...
 		}
 		
 		// this is sort of an ugly solution but we have to return a path that doesn't
@@ -61,7 +61,7 @@ public class InternalAssets {
 			result = NOT_FOUND;
 		}
 		
-		return result;
+		return result.toAbsolutePath();
 	}
 
 }

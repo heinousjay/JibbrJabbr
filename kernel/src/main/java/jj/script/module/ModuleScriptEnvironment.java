@@ -89,7 +89,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		scriptResource = resourceFinder.loadResource(ScriptResource.class, Base.and(APIModules), scriptName());
 		
 		if (scriptResource == null) {
-			throw new NoSuchResourceException(moduleIdentifier);
+			throw new NoSuchResourceException(getClass(), moduleIdentifier);
 		}
 		
 		// we need to reload each other on changes

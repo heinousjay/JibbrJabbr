@@ -61,25 +61,28 @@ public class ApplicationTest {
 		// otherwise we're doing something worth looking at
 		
 		// first, default config, no argument for app path
-		assertThat(app.resolvePath(Base, "config.js"), is(Paths.get("app/config.js")));
-		assertThat(app.resolvePath(Public, "index.html"), is(Paths.get("app/public/index.html")));
-		assertThat(app.resolvePath(Public, "deep/index.html"), is(Paths.get("app/public/deep/index.html")));
-		assertThat(app.resolvePath(Public, "deep/and/deeper/index.html"), is(Paths.get("app/public/deep/and/deeper/index.html")));
-		assertThat(app.resolvePath(Private, "index.js"), is(Paths.get("app/private/index.js")));
-		assertThat(app.resolvePath(PublicSpecs, "index.js"), is(Paths.get("app/public-specs/index.js")));
-		assertThat(app.resolvePath(PrivateSpecs, "index.js"), is(Paths.get("app/private-specs/index.js")));
+		Path base = Paths.get("app").toAbsolutePath();
+		
+		assertThat(app.resolvePath(Base, "config.js"), is(base.resolve("config.js")));
+		assertThat(app.resolvePath(Public, "index.html"), is(base.resolve("public/index.html")));
+		assertThat(app.resolvePath(Public, "deep/index.html"), is(base.resolve("public/deep/index.html")));
+		assertThat(app.resolvePath(Public, "deep/and/deeper/index.html"), is(base.resolve("public/deep/and/deeper/index.html")));
+		assertThat(app.resolvePath(Private, "index.js"), is(base.resolve("private/index.js")));
+		assertThat(app.resolvePath(PublicSpecs, "index.js"), is(base.resolve("public-specs/index.js")));
+		assertThat(app.resolvePath(PrivateSpecs, "index.js"), is(base.resolve("private-specs/index.js")));
 		
 		
 		// and then with an argument
-		given(arguments.get("app", Path.class)).willReturn(Paths.get("other"));
+		base = Paths.get("other").toAbsolutePath();
+		given(arguments.get("app", Path.class)).willReturn(base);
 		
-		assertThat(app.resolvePath(Base, "config.js"), is(Paths.get("other/config.js")));
-		assertThat(app.resolvePath(Public, "index.html"), is(Paths.get("other/public/index.html")));
-		assertThat(app.resolvePath(Private, "index.js"), is(Paths.get("other/private/index.js")));
-		assertThat(app.resolvePath(PublicSpecs, "index.js"), is(Paths.get("other/public-specs/index.js")));
-		assertThat(app.resolvePath(PublicSpecs, "deep/index.js"), is(Paths.get("other/public-specs/deep/index.js")));
-		assertThat(app.resolvePath(PublicSpecs, "deep/and/deeper/index.js"), is(Paths.get("other/public-specs/deep/and/deeper/index.js")));
-		assertThat(app.resolvePath(PrivateSpecs, "index.js"), is(Paths.get("other/private-specs/index.js")));
+		assertThat(app.resolvePath(Base, "config.js"), is(base.resolve("config.js")));
+		assertThat(app.resolvePath(Public, "index.html"), is(base.resolve("public/index.html")));
+		assertThat(app.resolvePath(Private, "index.js"), is(base.resolve("private/index.js")));
+		assertThat(app.resolvePath(PublicSpecs, "index.js"), is(base.resolve("public-specs/index.js")));
+		assertThat(app.resolvePath(PublicSpecs, "deep/index.js"), is(base.resolve("public-specs/deep/index.js")));
+		assertThat(app.resolvePath(PublicSpecs, "deep/and/deeper/index.js"), is(base.resolve("public-specs/deep/and/deeper/index.js")));
+		assertThat(app.resolvePath(PrivateSpecs, "index.js"), is(base.resolve("private-specs/index.js")));
 	}
 
 }

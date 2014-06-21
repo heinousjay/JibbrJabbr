@@ -51,10 +51,6 @@ public class Application implements PathResolver {
 		this.apiModules = apiModules;
 	}
 	
-	public Path configPath() {
-		return path().resolve("config.js");
-	}
-	
 	public Path path() {
 		Path result = arguments.get(APP_PATH_ARG_NAME, Path.class);
 		if (result == null) result = Paths.get(DEFAULT_APP_PATH);
@@ -79,7 +75,7 @@ public class Application implements PathResolver {
 		case APIModules:
 			return apiModules.path(name);
 		default:
-			return path().resolve(location.path()).resolve(name);
+			return path().resolve(location.path()).resolve(name).toAbsolutePath();
 		}
 	}
 }

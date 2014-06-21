@@ -75,7 +75,8 @@ public abstract class AbstractResource implements Resource {
 	}
 	
 	/**
-	 * return true from this method to be removed instead of reloaded on watch notifications 
+	 * return true from this method to be removed instead of reloaded on watch notifications,
+	 * or return false to be reloaded in the background and replaced.  default is true
 	 */
 	protected boolean removeOnReload() {
 		return true;

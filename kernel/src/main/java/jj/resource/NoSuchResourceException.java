@@ -32,11 +32,11 @@ public class NoSuchResourceException extends ResourceNotViableException {
 	 * @param resourcePath
 	 * @param cause
 	 */
-	public NoSuchResourceException(Path resourcePath) {
-		super(resourcePath);
+	public NoSuchResourceException(Class<? extends Resource> type, Path resourcePath) {
+		super(type.getName() + "@" + resourcePath);
 	}
 	
-	public NoSuchResourceException(String uri) {
-		super(uri);
+	public NoSuchResourceException(Class<? extends Resource> type, String uri) {
+		super(type.getName() + "@" + uri);
 	}
 }

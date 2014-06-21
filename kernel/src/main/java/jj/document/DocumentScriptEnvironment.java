@@ -111,7 +111,7 @@ public class DocumentScriptEnvironment
 		
 		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, HtmlResourceCreator.resourceName(baseName));
 		
-		if (html == null) throw new NoSuchResourceException(baseName + "-" + baseName + ".html");
+		if (html == null) throw new NoSuchResourceException(getClass(), baseName + "-" + baseName + ".html");
 		
 		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(baseName));
 		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(baseName));

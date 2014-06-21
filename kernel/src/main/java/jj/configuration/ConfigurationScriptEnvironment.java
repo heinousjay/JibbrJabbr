@@ -90,7 +90,7 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 		} else {
 			publisher.publish(new UsingDefaultConfiguration());
 			configurationComplete();
-			throw new NoSuchResourceException(CONFIG_SCRIPT_NAME);
+			throw new NoSuchResourceException(getClass(), CONFIG_SCRIPT_NAME);
 		}
 	}
 	

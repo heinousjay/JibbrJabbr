@@ -64,11 +64,11 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 			try {
 				attributes = Files.readAttributes(path, BasicFileAttributes.class);
 			} catch (NoSuchFileException nsfe) {
-				throw new NoSuchResourceException(path);
+				throw new NoSuchResourceException(getClass(), path);
 			}
 			
 			if (!attributes.isRegularFile()) {
-				throw new NoSuchResourceException(path);
+				throw new NoSuchResourceException(getClass(), path);
 			}
 			
 			size = attributes.size();

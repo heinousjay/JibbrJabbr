@@ -178,7 +178,7 @@ public class DocumentScriptEnvironmentTest {
 			givenADocumentScriptEnvironment(baseName);
 			fail();
 		} catch (NoSuchResourceException nsre) {
-			assertThat(nsre.getMessage(), is(baseName + "-" + baseName + ".html"));
+			assertThat(nsre.getMessage(), is(DocumentScriptEnvironment.class.getName() + "@" + baseName + "-" + baseName + ".html"));
 		}
 	}
 
