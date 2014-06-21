@@ -18,6 +18,8 @@ package jj.resource;
 import jj.configuration.Location;
 
 /**
+ * The event published when a resource is retired from the cache.
+ * 
  * @author jason
  *
  */
@@ -29,7 +31,7 @@ public class ResourceKilled extends ResourceEvent {
 	 * @param name
 	 * @param arguments
 	 */
-	public ResourceKilled(Class<? extends Resource> resourceClass, Location base, String name, Object... arguments) {
+	ResourceKilled(Class<? extends Resource> resourceClass, Location base, String name, Object... arguments) {
 		super(resourceClass, base, name, arguments);
 	}
 
