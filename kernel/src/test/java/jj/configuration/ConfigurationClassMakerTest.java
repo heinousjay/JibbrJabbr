@@ -54,7 +54,7 @@ public class ConfigurationClassMakerTest {
 	public void testClassCreation() throws Exception {
 		
 		Class<? extends ConfigurationInterface> clazz = ccl.make(ConfigurationInterface.class);
-		System.out.println(clazz);
+		
 		assertTrue(clazz.isAnnotationPresent(Singleton.class));
 		
 		Constructor<? extends ConfigurationInterface> ctor = clazz.getConstructor(ConfigurationCollector.class);
