@@ -15,8 +15,12 @@
  */
 package jj.http.server.uri;
 
+import static io.netty.handler.codec.http.HttpMethod.*;
+
 import io.netty.handler.codec.http.HttpMethod;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -61,16 +65,23 @@ public class Router {
 				for (Route route: configuration.routes()) {
 					newTrie.addRoute(route);
 				}
+				
+				// default routes. this should get smarter!
+				newTrie.addRoute(new Route(GET, "/*path", ""));
+				newTrie.addRoute(new Route(GET, "/", "/" + configuration.welcomeFile()));
+				
 				newTrie.compress();
 				trie.set(newTrie);
 			}
 		});
 	}
 	
-	public RouteMatch matchURI(HttpMethod method, String uri) {
+	public RouteMatch matchURI(final HttpMethod method, final String uri) {
 		RouteTrie routes = trie.get();
 		assert routes != null : "can't route without configuration!";
 		
-		return routes.find(method, uri);
+		Path path = uri.startsWith("/") ? Paths.get(uri) : Paths.get("/" + uri);
+		
+		return routes.find(method, path.normalize().toAbsolutePath().toString());
 	}
 }

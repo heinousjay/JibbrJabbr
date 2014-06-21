@@ -15,6 +15,7 @@
  */
 package jj.http.server.uri;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
 
@@ -26,6 +27,7 @@ import jj.http.server.uri.Route;
 import jj.http.server.uri.Router;
 import jj.http.server.uri.RouterConfiguration;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -34,20 +36,22 @@ import org.junit.Test;
  */
 public class RouterTest {
 	
+	String welcome = "something.jpg";
+	
 	MockTaskRunner mockTaskRunner = new MockTaskRunner();
 	
 	RouterConfiguration config = new RouterConfiguration() {
 		
 		@Override
 		public String welcomeFile() {
-			return "welcome";
+			return welcome;
 		}
 		
 		@Override
 		public List<Route> routes() {
 			List<Route> result = new ArrayList<>();
-			result.add(new Route(GET, "/", "/result1"));
-			result.add(new Route(POST, "/", "/result1"));
+			result.add(new Route(GET, "/start", "/result1"));
+			result.add(new Route(POST, "/finish", "/result1"));
 			result.add(new Route(GET, "/chat/", "/result3"));
 			result.add(new Route(POST, "/chat/:room", "/result4"));
 			result.add(new Route(DELETE, "/chat/:room", "/result5"));
@@ -57,13 +61,48 @@ public class RouterTest {
 			return result;
 		}
 	};
+	
+	Router router;
 
-	@Test
-	public void test() throws Exception {
+	@Before
+	public void before() throws Exception {
 		
-		Router router = new Router(config, mockTaskRunner);
+		router = new Router(config, mockTaskRunner);
 		router.configurationLoaded(null);
 		mockTaskRunner.runFirstTask();
+	}
+	
+	
+	@Test
+	public void test() {
+
+		RouteMatch routeMatch = router.matchURI(GET, "/");
+		
+		assertThat(routeMatch.route.destination(), is("/" + welcome));
+		assertTrue(routeMatch.params.isEmpty());
+		
+		routeMatch = router.matchURI(GET, "/something/../../");
+		
+		assertThat(routeMatch.route.destination(), is("/" + welcome));
+		assertTrue(routeMatch.params.isEmpty());
+		
+		routeMatch = router.matchURI(GET, "../");
+		
+		assertThat(routeMatch.route.destination(), is("/" + welcome));
+		assertTrue(routeMatch.params.isEmpty());
+		
+		
+//		assertThat(router.find("/index"), is("/index"));
+//		assertThat(router.find("/other"), is("/other"));
+//		assertThat(router.find("/other/"), is("/other/index"));
+//		assertThat(router.find("/other/index"), is("/other/index"));
+//		assertThat(router.find("/other/other"), is("/other/other"));
+//		assertThat(router.find("../other/"), is("/other/index"));
+//		assertThat(router.find("../other/index"), is("/other/index"));
+//		assertThat(router.find("../other/other"), is("/other/other"));
+//		assertThat(router.find("/../../../other/"), is("/other/index"));
+//		assertThat(router.find("/../../../other/index"), is("/other/index"));
+//		assertThat(router.find("/../../../other/other"), is("/other/other"));
 	}
 
 }
