@@ -114,6 +114,7 @@ public class ResourceSystemIntegrationTest {
 		
 		// touch a script and wait for a reload event.
 		touch(scriptResource2);
+		// and let's add some directories
 		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesOne));
 		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesTwo));
 		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesThree));
