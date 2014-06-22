@@ -18,9 +18,9 @@ package jj.resource;
 import static jj.configuration.resolution.AppLocation.Base;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -71,8 +71,7 @@ public abstract class AbstractResource implements Resource {
 	
 	protected final ResourceFinder resourceFinder;
 	
-	final Set<AbstractResource> dependents = 
-		Collections.newSetFromMap(new WeakHashMap<AbstractResource, Boolean>());
+	final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
 	
 	final AtomicBoolean alive = new AtomicBoolean(true);
 	
@@ -96,6 +95,11 @@ public abstract class AbstractResource implements Resource {
 		}
 	}
 	
+	@Listener
+	void resourceKilled(ResourceKilled event) {
+		dependents.remove(event.resourceKey);
+	}
+	
 	@ResourceThread
 	public abstract boolean needsReplacing() throws IOException;
 
@@ -117,7 +121,8 @@ public abstract class AbstractResource implements Resource {
 		assert alive.get() : "cannot accept dependents, i am dead " + toString();
 		assert dependent != null : "can not depend on null";
 		assert dependent != this : "can not depend on myself";
-		dependents.add((AbstractResource)dependent);
+		AbstractResource r = (AbstractResource)dependent;
+		dependents.put(r.cacheKey(), r);
 	}
 
 	
@@ -130,8 +135,8 @@ public abstract class AbstractResource implements Resource {
 		return EMPTY_ARGS;
 	}
 	
-	Set<AbstractResource> dependents() {
-		return Collections.unmodifiableSet(dependents);
+	Collection<AbstractResource> dependents() {
+		return Collections.unmodifiableCollection(dependents.values());
 	}
 	
 	public boolean alive() {

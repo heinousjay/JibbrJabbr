@@ -25,7 +25,6 @@ import jj.Base;
 import jj.configuration.resolution.AppLocation;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceKey;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,13 +37,11 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class MessagesResourceTest {
-
-	@Mock ResourceKey resourceKey;
 	
 	@Mock ResourceFinder resourceFinder;
 	
 	MockAbstractResourceDependencies dependencies = 
-		new MockAbstractResourceDependencies(resourceKey, AppLocation.Virtual);
+		new MockAbstractResourceDependencies(AppLocation.Virtual);
 	
 	String name = "index";
 	
