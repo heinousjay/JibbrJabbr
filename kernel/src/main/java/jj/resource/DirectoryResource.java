@@ -99,4 +99,8 @@ public class DirectoryResource extends AbstractResource {
 	protected boolean removeOnReload() {
 		return false;
 	}
+	
+	void addChild(AbstractResource childResource) {
+		// do something interesting
+	}
 }

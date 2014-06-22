@@ -15,16 +15,20 @@
  */
 package jj.resource;
 
+import static jj.configuration.resolution.AppLocation.Base;
+
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
 import jj.configuration.Location;
+import jj.event.Listener;
 import jj.event.Publisher;
+import jj.event.Subscriber;
 
 /**
  * internal helper for manipulating a resource.  ALL RESOURCES
@@ -33,6 +37,7 @@ import jj.event.Publisher;
  * @author jason
  *
  */
+@Subscriber
 public abstract class AbstractResource implements Resource {
 	
 	public static class Dependencies {
@@ -64,13 +69,31 @@ public abstract class AbstractResource implements Resource {
 	
 	protected final Publisher publisher;
 	
-	final Set<AbstractResource> dependents = new HashSet<>();
+	protected final ResourceFinder resourceFinder;
+	
+	final Set<AbstractResource> dependents = 
+		Collections.newSetFromMap(new WeakHashMap<AbstractResource, Boolean>());
+	
 	final AtomicBoolean alive = new AtomicBoolean(true);
 	
 	protected AbstractResource(final Dependencies dependencies) {
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
 		this.publisher = dependencies.publisher;
+		this.resourceFinder = dependencies.resourceFinder;
+	}
+	
+	@Listener
+	void setInDirectory(ResourceLoaded event) {
+		if (event.matches(this) && (this instanceof FileResource || this instanceof DirectoryResource)) {
+			String parentName = name().substring(0, name().lastIndexOf('/') + 1);
+			if (!parentName.equals(name())) {
+				DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, Base, parentName);
+				
+				assert parent != null : "no parent directory for a resource";
+				parent.addChild(this);
+			}
+		}
 	}
 	
 	@ResourceThread
@@ -117,7 +140,7 @@ public abstract class AbstractResource implements Resource {
 	
 	void kill() {
 		if (alive.getAndSet(false)) {
-			publisher.publish(new ResourceKilled(getClass(), base(), name(), creationArgs()));
+			publisher.publish(new ResourceKilled(this));
 		}
 	}
 	

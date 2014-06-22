@@ -81,6 +81,8 @@ public class RequiredModuleContinuationProcessorTest {
 		requiredModule = new RequiredModule(documentScriptEnvironment, module);
 		requiredModule.pendingKey(pendingKey);
 		
+		given(moduleScriptEnvironment.creationArgs()).willReturn(new Object[] {requiredModule});
+		
 		given(continuationState.continuationAs(RequiredModule.class)).willReturn(requiredModule);
 	}
 	
@@ -101,7 +103,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceLoaded(new ResourceLoaded(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
+		processor.resourceLoaded(new ResourceLoaded(moduleScriptEnvironment));
 		
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
 		

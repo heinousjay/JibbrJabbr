@@ -30,12 +30,23 @@ import jj.logging.LoggedEvent;
 @ResourceLogger
 public abstract class ResourceEvent extends LoggedEvent {
 	
+	/** this is not always available, in particular when the resource did not get created */
+	final ResourceKey resourceKey;
 	public final Class<? extends Resource> resourceClass;
 	public final Location base;
 	public final String name;
 	public final Object[] arguments;
 	
+	protected ResourceEvent(final AbstractResource resource) {
+		this.resourceKey = resource.cacheKey();
+		this.resourceClass = resource.getClass();
+		this.base = resource.base();
+		this.name = resource.name();
+		this.arguments = resource.creationArgs();
+	}
+	
 	protected ResourceEvent(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
+		this.resourceKey = null;
 		this.resourceClass = resourceClass;
 		this.base = base;
 		this.name = name;
@@ -58,6 +69,11 @@ public abstract class ResourceEvent extends LoggedEvent {
 	@Override
 	public void describeTo(Logger log) {
 		log.info("{} - {} at {}/{}", description(), resourceClass, base, name);
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "(type: " + resourceClass + ", base: " + base + ", name: " + name + ", args: " + arguments + ")";
 	}
 
 }

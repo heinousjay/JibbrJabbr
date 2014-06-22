@@ -117,7 +117,7 @@ public class CssResource extends AbstractResource implements FileResource, Loade
 
 	@Override
 	protected Object[] creationArgs() {
-		return less ? LESS_ARG : null;
+		return less ? LESS_ARG : super.creationArgs();
 	}
 	
 	@Override

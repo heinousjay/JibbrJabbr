@@ -15,20 +15,20 @@
  */
 package jj.resource;
 
-import jj.configuration.Location;
-
 /**
  * @author jason
  *
  */
 public class ResourceLoaded extends ResourceEvent {
 
-	public ResourceLoaded(Class<? extends Resource> resourceClass, final Location base, String name, Object...arguments) {
-		super(resourceClass, base, name, arguments);
+	public ResourceLoaded(AbstractResource resource) {
+		super(resource);
 	}
 
 	@Override
 	public String description() {
 		return "resource loaded";
 	}
+	
+	
 }
