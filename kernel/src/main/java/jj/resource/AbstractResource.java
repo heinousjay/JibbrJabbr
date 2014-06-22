@@ -95,11 +95,6 @@ public abstract class AbstractResource implements Resource {
 		}
 	}
 	
-	@Listener
-	void resourceKilled(ResourceKilled event) {
-		dependents.remove(event.resourceKey);
-	}
-	
 	@ResourceThread
 	public abstract boolean needsReplacing() throws IOException;
 
@@ -124,8 +119,12 @@ public abstract class AbstractResource implements Resource {
 		AbstractResource r = (AbstractResource)dependent;
 		dependents.put(r.cacheKey(), r);
 	}
-
 	
+	@Listener
+	void resourceKilled(ResourceKilled event) {
+		dependents.remove(event.resourceKey);
+	}
+
 	/**
 	 * the arguments used to create this resource. mocking needs prevent this
 	 * from being kept package private but don't call it
