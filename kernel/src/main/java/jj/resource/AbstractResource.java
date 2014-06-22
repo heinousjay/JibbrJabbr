@@ -84,7 +84,9 @@ public abstract class AbstractResource implements Resource {
 	
 	@Listener
 	void resourceLoaded(ResourceLoaded event) {
-		// if we 
+		// little bit of internal magic here - post initialization of either a
+		// FileResource or a DirectoryResource rooted in Base should be added to
+		// the directory structure.
 		if (
 			event.matches(this) && 
 			(this instanceof FileResource || this instanceof DirectoryResource) &&
