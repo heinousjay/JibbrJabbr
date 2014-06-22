@@ -97,8 +97,8 @@ public abstract class AbstractResource implements Resource {
 				DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, Base, parentName);
 				// possibly the best bet in this case is to make the missing directory,
 				// which really oughta go into another thread? cause this could get all deadlocky
-				assert parent != null : "no parent directory for a resource";
-				parent.addChild(this);
+				assert parent != null : "no parent directory for " + this;
+				parent.addDependent(this);
 			}
 		}
 	}

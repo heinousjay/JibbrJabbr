@@ -37,6 +37,8 @@ import jj.util.SHA1Helper;
  *
  */
 public class DirectoryResource extends AbstractResource {
+	
+	public static final String ROOT_NAME = "";
 
 	private final Path path;
 	private final String name;
@@ -46,7 +48,6 @@ public class DirectoryResource extends AbstractResource {
 	@Inject
 	DirectoryResource(
 		final Dependencies dependencies,
-		//final ResourceFinder resourceFinder,
 		final Path path,
 		final String name
 	) throws IOException {
@@ -98,9 +99,5 @@ public class DirectoryResource extends AbstractResource {
 	@Override
 	protected boolean removeOnReload() {
 		return false;
-	}
-	
-	void addChild(AbstractResource childResource) {
-		// do something interesting
 	}
 }
