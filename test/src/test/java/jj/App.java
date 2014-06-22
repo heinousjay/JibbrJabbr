@@ -43,11 +43,6 @@ public class App {
 	
 	static {
 		try {
-			
-			for (URL resource : Collections.list(App.class.getClassLoader().getResources("/"))) {
-				System.out.println(resource);
-			}
-			
 			one = Paths.get(App.class.getResource("/app1/app/").toURI()).toAbsolutePath().toString();
 			two = Paths.get(App.class.getResource("/app2/app/").toURI()).toAbsolutePath().toString();
 			minimal = Paths.get(App.class.getResource("/minimal/app/").toURI()).toAbsolutePath().toString();
