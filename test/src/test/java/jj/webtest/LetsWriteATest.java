@@ -56,7 +56,7 @@ public class LetsWriteATest {
 		index.setInput("/bg #5645EF 2500\n")
 			.setInput("/topic I AM A CLASSY CHIEF!").clickSay();
 		
-		webDriverRule.takeScreenshot();
+		//webDriverRule.takeScreenshot();
 	}
 
 	@Test
@@ -70,6 +70,6 @@ public class LetsWriteATest {
 			.setInput("I AM BEEF! I AM KING OF ALL MEATS!").clickSay()
 			.setInput("/topic I AM BEEFY BEEF").clickSay();
 		
-		webDriverRule.takeScreenshot();
+		//webDriverRule.takeScreenshot();
 	}
 }
