@@ -105,7 +105,6 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 			injector.getInstance(WebSocketConnectionMaker.class).handshakeWebsocket();
 			
 		} else {
-			publisher.publish(new HttpServerRequestReceived(injector.getInstance(HttpServerRequest.class), injector.getInstance(HttpServerResponse.class)));
 			handleHttpRequest(injector.getInstance(HttpServerRequest.class), injector.getInstance(HttpServerResponse.class));
 		}
 	}
