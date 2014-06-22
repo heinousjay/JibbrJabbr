@@ -6,6 +6,8 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
 import javax.inject.Singleton;
 
+import jj.resource.ResourceLogger;
+
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
@@ -38,8 +40,9 @@ class LogConfigurator {
 		
 		if (isTest) {
 			rootLogger.setLevel(OFF);
-			testLogger(INFO);
+			testLogger(TRACE);
 			traceLogger(TRACE);
+			resourceLogger(OFF);
 		}
 	}
 	
@@ -107,6 +110,10 @@ class LogConfigurator {
 	
 	protected void serverLogger(Level level) {
 		logger("server", level);
+	}
+	
+	protected void resourceLogger(Level level) {
+		logger(ResourceLogger.NAME, level);
 	}
 	
 	protected void jjLogger(Level level) {
