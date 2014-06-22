@@ -15,10 +15,7 @@
  */
 package jj;
 
-import java.net.URL;
 import java.nio.file.Paths;
-import java.util.Collections;
-
 import jj.webdriver.WebDriverProvider;
 import jj.webdriver.provider.PhantomJSWebDriverProvider;
 
