@@ -49,9 +49,27 @@ public interface Location {
 			return obj instanceof Bundle &&
 				((Bundle)obj).locations.equals(locations);
 		}
+		
+		@Override
+		public Location parent() {
+			// bundles never have a parent, and
+			// this should never be called on a bundle
+			throw new AssertionError("called parent on a Location.Bundle. should never happen");
+		}
+		
+		@Override
+		public Location root() {
+			// bundles never have a parent, and
+			// this should never be called on a bundle
+			throw new AssertionError("called root on a Location.Bundle. should never happen");
+		}
 	}
 	
 	Location and(Location location);
 	
 	List<Location> locations();
+	
+	Location parent();
+	
+	Location root();
 }

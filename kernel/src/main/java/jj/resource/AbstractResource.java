@@ -83,12 +83,18 @@ public abstract class AbstractResource implements Resource {
 	}
 	
 	@Listener
-	void setInDirectory(ResourceLoaded event) {
-		if (event.matches(this) && (this instanceof FileResource || this instanceof DirectoryResource)) {
+	void resourceLoaded(ResourceLoaded event) {
+		// if we 
+		if (
+			event.matches(this) && 
+			(this instanceof FileResource || this instanceof DirectoryResource) &&
+			this.base().root() == Base
+		) {
 			String parentName = name().substring(0, name().lastIndexOf('/') + 1);
 			if (!parentName.equals(name())) {
 				DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, Base, parentName);
-				
+				// possibly the best bet in this case is to make the missing directory,
+				// which really oughta go into another thread? cause this could get all deadlocky
 				assert parent != null : "no parent directory for a resource";
 				parent.addChild(this);
 			}

@@ -38,31 +38,43 @@ import jj.script.ScriptEnvironment;
  * 
  * <p>or internally with virtual
  * 
+ * <p>
+ * This needs a little more work.  The core system should define
+ * Virtual and AppBase (and later some system for jars) and those
+ * are considered the roots.  All filesystem resources are located
+ * under AppBase and can be resolved by appending to that root
+ * directly
+ * 
  * @author jason
  *
  */
 public enum AppLocation implements Location {
 	
-	/** denotes this resource is not from the file system, such as a {@link ScriptEnvironment} */
-	Virtual(""),
+	/** 
+	 * denotes this resource is not from the application file system,
+	 * such as a {@link ScriptEnvironment} 
+	 */
+	Virtual("", null),
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets(""),
+	Assets("", Virtual),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules(""),
+	APIModules("", Virtual),
 	
 	/** the paths of the application pieces */
-	Base(""),
-	Private("private"),
-	PrivateSpecs("private-specs"),
-	Public("public"),
-	PublicSpecs("public-specs");
+	Base("", null),
+	Private("private/", Base),
+	PrivateSpecs("private-specs/", Base),
+	Public("public/", Base),
+	PublicSpecs("public-specs/", Base);
 	
 	private final String path;
+	private final Location parent;
 	
-	private AppLocation(final String path) {
+	private AppLocation(final String path, final Location parent) {
 		this.path = path;
+		this.parent = parent;
 	}
 	
 	public Location and(Location next) {
@@ -71,6 +83,16 @@ public enum AppLocation implements Location {
 	
 	public List<Location> locations() {
 		return Collections.unmodifiableList(Arrays.asList((Location)this));
+	}
+	
+	@Override
+	public Location parent() {
+		return parent;
+	}
+	
+	@Override
+	public Location root() {
+		return parent == null ? this : parent.root();
 	}
 	
 	public String path() {
