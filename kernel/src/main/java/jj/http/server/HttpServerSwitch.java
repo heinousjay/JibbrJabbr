@@ -33,7 +33,7 @@ public class HttpServerSwitch {
 	@Inject
 	HttpServerSwitch(final Arguments arguments) {
 		on = arguments.get("httpServer", boolean.class, true);
-		port = arguments.get("", int.class, -1);
+		port = arguments.get("httpPort", int.class, -1);
 	}
 	
 	public boolean on() {
