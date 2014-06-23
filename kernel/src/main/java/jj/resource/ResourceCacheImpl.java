@@ -8,12 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicReference;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
 import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -26,21 +23,16 @@ import jj.event.Subscriber;
  */
 @Singleton
 @Subscriber
-class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
+class ResourceCacheImpl implements ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	private final ResourceConfiguration configuration;
-	
-	private AtomicReference<ConcurrentMap<ResourceKey, Resource>> delegate;
+	ConcurrentMap<ResourceKey, Resource> resourceCache =
+		PlatformDependent.newConcurrentHashMap(128, 0.75F, 4);
 
 	@Inject
-	ResourceCacheImpl(final ResourceCreators resourceCreators, final ResourceConfiguration configuration) {
+	ResourceCacheImpl(final ResourceCreators resourceCreators) {
 		this.resourceCreators = resourceCreators;
-		this.configuration = configuration;
-		
-		// we're going to have our config resource, at least, before we get started
-		delegate = new AtomicReference<>(PlatformDependent.<ResourceKey, Resource>newConcurrentHashMap(4, 0.75F, 3));
 	}
 
 	/**
@@ -58,64 +50,44 @@ class ResourceCacheImpl implements JJServerStartupListener, ResourceCache {
 		return Collections.unmodifiableList(result);
 	}
 	
+	@Listener
+	public void serverStopping(ServerStopping event) {
+		resourceCache.clear();
+	}
+	
 	@Override
 	public <T extends Resource> ResourceCreator<T> getCreator(Class<T> type) {
 		return resourceCreators.get(type);
 	}
 	
 	@Override
-	public void start() throws Exception {
-		ConcurrentMap<ResourceKey, Resource> old = 
-			delegate.getAndSet(
-				PlatformDependent.<ResourceKey, Resource>newConcurrentHashMap(
-					128,
-					0.75F,
-					configuration.ioThreads()
-				)
-			); 
-		delegate.get().putAll(old);
-	}
-	
-	@Override
-	public Priority startPriority() {
-		// it's pretty important we're ready to go early on.
-		return Priority.NearHighest;
-	}
-
-	@Listener
-	public void stop(ServerStopping event) {
-		// make sure we start fresh if we get restarted
-		delegate.get().clear();
-	}
-	
-	@Override
 	public Resource get(ResourceKey key) {
-		return delegate.get().get(key);
+		return resourceCache.get(key);
 	}
 
 	@Override
 	public Resource putIfAbsent(ResourceKey key, Resource value) {
-		return delegate.get().putIfAbsent(key, value);
+		return resourceCache.putIfAbsent(key, value);
 	}
 
 	@Override
 	public boolean replace(ResourceKey key, Resource oldValue, Resource newValue) {
-		return delegate.get().replace(key, oldValue, newValue);
+		return resourceCache.replace(key, oldValue, newValue);
 	}
 
 	@Override
 	public boolean remove(ResourceKey cacheKey, Resource resource) {
-		return delegate.get().remove(cacheKey, resource);
+		return resourceCache.remove(cacheKey, resource);
 	}
 	
 	int size() {
-		return delegate.get().size();
+		return resourceCache.size();
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
-		for (Entry<ResourceKey, Resource> entry : delegate.get().entrySet()) {
+		for (Entry<ResourceKey, Resource> entry : resourceCache.entrySet()) {
 			sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
 		}
  		return sb.append("}").toString();

@@ -58,17 +58,13 @@ public class ResourceCacheTest extends RealResourceBase {
 	
 	ResourceCacheImpl rc;
 	
-	@Mock ResourceConfiguration configuration;
-	
 	@Before
 	public void before() {
-		
-		given(configuration.ioThreads()).willReturn(4);
 		
 		HashMap<Class<? extends AbstractResource>, AbstractResourceCreator<? extends AbstractResource>> map = new HashMap<>();
 		map.put(StaticResource.class, src);
 		map.put(HtmlResource.class, hrc);
-		rc = new ResourceCacheImpl(new ResourceCreators(map), configuration);
+		rc = new ResourceCacheImpl(new ResourceCreators(map));
 		
 		given(src.type()).willReturn(StaticResource.class);
 		given(hrc.type()).willReturn(HtmlResource.class);
@@ -78,14 +74,11 @@ public class ResourceCacheTest extends RealResourceBase {
 	}
 	
 	@Test
-	public void testStartupBehavior() throws Exception {
+	public void testShutdownBehavior() throws Exception {
 		
 		rc.putIfAbsent(sKey, hr);
-		rc.start();
-		
 		assertThat(rc.get(sKey), is((Resource)hr));
-		rc.stop(null);
-		rc.start();
+		rc.serverStopping(null);
 		assertThat(rc.get(sKey), is(nullValue()));
 		
 	}

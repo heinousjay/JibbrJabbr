@@ -77,7 +77,7 @@ public class ResourceWatchServiceLoopTest {
 	
 	@Before
 	public void before() throws Exception {
-		resourceCache = new ResourceCacheImpl(makeResourceCreators(), null);
+		resourceCache = new ResourceCacheImpl(makeResourceCreators());
 		
 		taskRunner = new MockTaskRunner();
 		loop = new ResourceWatchServiceLoop(resourceCache, resourceFinder, watcher, taskRunner);
