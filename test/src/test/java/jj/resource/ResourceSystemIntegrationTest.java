@@ -81,7 +81,6 @@ public class ResourceSystemIntegrationTest {
 	@Test
 	public void testDirectoryPreloading() throws Exception {
 		assertThat(finder.findResource(DirectoryResource.class, Base, ""), is(notNullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, "chat"), is(notNullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, "deep"), is(notNullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, "deep/nesting"), is(notNullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, "modules"), is(notNullValue()));
