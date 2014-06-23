@@ -127,7 +127,7 @@ public class ResourceSystemIntegrationTest {
 		// + 1 reload of dse.  note that scriptResource1 and
 		// html resource are left alone in the tree
 		
-		assertTrue(waitForCount(9 + 4 + 1));
+		assertTrue("total count = " + latch.getCount(), waitForCount(9 + 4 + 1));
 		
 		assertFalse(scriptResource2.alive());
 		assertFalse(mse2.alive());
