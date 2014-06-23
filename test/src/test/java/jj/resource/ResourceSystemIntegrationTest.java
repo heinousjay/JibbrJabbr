@@ -10,6 +10,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -111,12 +112,24 @@ public class ResourceSystemIntegrationTest {
 		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesTwo), is(nullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesThree), is(nullValue()));
 		
-		// touch a script and wait for a reload event.
-		touch(scriptResource2);
-		// and let's add some directories
-		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesOne));
-		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesTwo));
-		Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesThree));
+		final AtomicBoolean failed = new AtomicBoolean();
+		
+		new Thread() {
+			
+			public void run() {
+				try {
+					// touch a script and wait for a reload event.
+					touch(scriptResource2);
+					// and let's add some directories
+					Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesOne));
+					Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesTwo));
+					Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesThree));
+				} catch (Exception e) {
+					e.printStackTrace();
+					failed.set(true);
+				}
+			}
+		}.start();
 
 		// on the Mac, you will wait a while..., so if it's time to
 		// make this test more things, try to only have this
@@ -127,7 +140,8 @@ public class ResourceSystemIntegrationTest {
 		// + 1 reload of dse.  note that scriptResource1 and
 		// html resource are left alone in the tree
 		
-		assertTrue(waitForCount(9 + 4 + 1));
+		assertTrue("timed out", waitForCount(9 + 4 + 1));
+		assertFalse("couldn't update things correctly", failed.get());
 		
 		assertFalse(scriptResource2.alive());
 		assertFalse(mse2.alive());
@@ -206,8 +220,6 @@ public class ResourceSystemIntegrationTest {
 	private boolean waitForCount(int count) throws Exception {
 		latch = new CountDownLatch(count);
 		countEvents = true;
-		boolean result = latch.await(11, SECONDS);
-		if (!result) System.out.println(latch.getCount());
-		return result;
+		return latch.await(11, SECONDS);
 	}
 }
