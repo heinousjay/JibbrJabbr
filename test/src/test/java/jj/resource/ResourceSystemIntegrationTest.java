@@ -127,7 +127,7 @@ public class ResourceSystemIntegrationTest {
 		// + 1 reload of dse.  note that scriptResource1 and
 		// html resource are left alone in the tree
 		
-		assertTrue("total count = " + latch.getCount(), waitForCount(9 + 4 + 1));
+		assertTrue(waitForCount(9 + 4 + 1));
 		
 		assertFalse(scriptResource2.alive());
 		assertFalse(mse2.alive());
@@ -206,6 +206,8 @@ public class ResourceSystemIntegrationTest {
 	private boolean waitForCount(int count) throws Exception {
 		latch = new CountDownLatch(count);
 		countEvents = true;
-		return latch.await(11, SECONDS);
+		boolean result = latch.await(11, SECONDS);
+		if (!result) System.out.println(latch.getCount());
+		return result;
 	}
 }
