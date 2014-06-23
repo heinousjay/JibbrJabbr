@@ -147,14 +147,15 @@ class ResourceFinderImpl implements ResourceFinder {
 		if (resource == null) {
 			publisher.publish(new ResourceNotFound(resourceCreator.type(), base, name, arguments));
 		} else {
-			publisher.publish(new ResourceLoaded((AbstractResource)resource));
-			if (
-				resourceCache.putIfAbsent(cacheKey, resource) == null &&
-				resource instanceof DirectoryResource
-			) {
-				// if this was the first time we put this in the cache,
-				// we set up a file watch on it for background reloads
-				resourceWatchService.watch((DirectoryResource)resource);
+			if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
+				// let the world know
+				publisher.publish(new ResourceLoaded((AbstractResource)resource));
+				
+				if (resource instanceof DirectoryResource) {
+					// if this was the first time we put this in the cache,
+					// we set up a file watch on it for background reloads
+					resourceWatchService.watch((DirectoryResource)resource);
+				}
 			}
 		}
 	}
