@@ -56,7 +56,7 @@ class ResourceLoaderImpl implements ResourceLoader {
 		 * @param name
 		 */
 		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
-			super("Resource loader [" + resourceClass.getSimpleName() + " at " + name);
+			super("Resource loader [" + resourceClass.getSimpleName() + "@" + base + "/" + name + "]");
 			this.resourceClass = resourceClass;
 			this.base = base;
 			this.name = name;
