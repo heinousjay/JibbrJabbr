@@ -19,7 +19,7 @@
  * of computation for the JibbrJabbr system.
  * 
  * <p>
- * At the most basic level, the {@link StaticResource} represents a generic file in
+ * At the most basic level, the {@link jj.resource.stat.ic.StaticResource} represents a generic file in
  * the file system.  only metadata is kept.
  * 
  * <p>
@@ -33,22 +33,20 @@
  * 
  * <p>
  * There are two main components that act as the API to the resource system, the {@link ResourceFinder}
- * and the {@link ResourceLoaderImpl}.  The system also produces several events (which can be observed by
- * registering as described in {@link Listener}) describing resource lifecycles, all descended from
- * {@link ResourceEvent}
+ * and the {@link jj.resource.ResourceLoader}.  The system also produces several events (which can be observed by
+ * registering as described in {@link jj.event.Listener}) describing resource lifecycles, all descended from
+ * {@link jj.resource.ResourceEvent}
  * 
  * <ul>
- * <li>{@link ResourceLoaded} when a resource is loaded
- * <li>{@link ResourceNotFound} when a resource was requested but not found
- * <li>{@link ResourceReloaded} when a resource is being reloaded
- * <li> a remove event?
- * <li> an error event?
+ * <li>{@link jj.resource.ResourceLoaded} when a resource is loaded
+ * <li>{@link jj.resource.ResourceNotFound} when a resource was requested but not found
+ * <li>{@link jj.resource.ResourceReloaded} when a resource is being reloaded
+ * <li>{@link jj.resource.ResourceError} when an error occurs loading a resource
+ * <li>{@link jj.resource.ResourceKilled} when a resource is removed from service
  * </ul>
  * 
  * @author jason
  *
  */
 package jj.resource;
-import jj.resource.stat.ic.StaticResource;
-import jj.event.Listener;
 
