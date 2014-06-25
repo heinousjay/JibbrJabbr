@@ -18,8 +18,6 @@ package jj.conversion;
 import java.util.HashSet;
 import java.util.Set;
 
-import jj.http.server.FromObjectArrayToBinding;
-
 /**
  * @author jason
  *
@@ -32,7 +30,6 @@ public class ConverterSetMaker {
 		output.add(new FromStringToPath());
 		output.add(new FromStringToInteger());
 		output.add(new FromDoubleToInteger());
-		output.add(new FromObjectArrayToBinding());
 		return output;
 	}
 }
