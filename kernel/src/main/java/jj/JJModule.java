@@ -15,6 +15,7 @@
  */
 package jj;
 
+import io.netty.handler.codec.http.HttpMethod;
 import jj.configuration.ConfigurationObjectBinder;
 import jj.configuration.resolution.APIPaths;
 import jj.configuration.resolution.AssetPaths;
@@ -22,6 +23,7 @@ import jj.conversion.Converter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
 import jj.http.server.WebSocketConnectionHostBinder;
+import jj.http.server.methods.HttpMethodHandlerBinder;
 import jj.logging.LoggingBinder;
 import jj.resource.ResourceCreatorBinder;
 import jj.script.ContinuationProcessorBinder;
@@ -48,6 +50,8 @@ public abstract class JJModule extends AbstractModule {
 	private ConfigurationObjectBinder configurationObjects;
 	
 	private WebSocketConnectionHostBinder webSocketConnectionHosts;
+	
+	private HttpMethodHandlerBinder httpMethodHandlerBinder;
 	
 	private Multibinder<JJServerStartupListener> startupListeners;
 	private Multibinder<Converter<?, ?>> converters;
@@ -132,5 +136,12 @@ public abstract class JJModule extends AbstractModule {
 			webSocketConnectionHosts = new WebSocketConnectionHostBinder(binder());
 		}
 		return webSocketConnectionHosts;
+	}
+	
+	protected HttpMethodHandlerBinder.With handle(HttpMethod method) {
+		if (httpMethodHandlerBinder == null) {
+			httpMethodHandlerBinder = new HttpMethodHandlerBinder(binder());
+		}
+		return httpMethodHandlerBinder.handle(method);
 	}
 }

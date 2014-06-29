@@ -88,7 +88,7 @@ public class EmbeddedHttpResponse {
 			
 			ContentTypeHeaderReader cth = new ContentTypeHeaderReader(response.headers());
 			assert !cth.isBadRequest() && !cth.isUnsupportedMediaType() : "response was not understood";
-			return cth.isText() ? buffer.toString(cth.charset()) : null;
+			return cth.isText() ? buffer.readerIndex(0).toString(cth.charset()) : null;
 		}
 		
 		return null;

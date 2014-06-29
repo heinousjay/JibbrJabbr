@@ -53,7 +53,10 @@ public class EmbeddedHttpServerTest {
 		
 		assertThat(response.headers().get(HttpHeaders.Names.CONTENT_TYPE), is("text/html; charset=UTF-8"));
 		int contentLength = Integer.parseInt(response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
+		// this comparison works because it's actually ASCII.  if at some point characters outside
+		// that range are returned then only the octets can be inspected
 		assertThat(response.bodyContentAsString().length(), is(contentLength));
+		assertThat(response.bodyContentAsBytes().length, is(contentLength));
 	}
 	
 	@Test
