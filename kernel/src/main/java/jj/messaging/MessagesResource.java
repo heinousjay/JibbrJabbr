@@ -50,6 +50,8 @@ import jj.util.SHA1Helper;
  */
 public class MessagesResource extends AbstractResource {
 	
+	// doubled because java8 is a pain
+	private static final String __ = "_";
 	private static final String EXT = ".properties";
 	
 	private final String name;
@@ -89,7 +91,7 @@ public class MessagesResource extends AbstractResource {
 			if (resource != null) {
 				result.add(resource);
 				resource.addDependent(this);
-			}
+			} // else somehow flag that we want to know if it gets created
 		}
 		
 		return result.toArray(new PropertiesResource[result.size()]);
@@ -97,9 +99,9 @@ public class MessagesResource extends AbstractResource {
 	
 	private String[] candidateNames() {
 		return new String[] {
-			name + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_" + locale.getVariant() + EXT,
-			name + "_" + locale.getLanguage() + "_" + locale.getCountry() + EXT,
-			name + "_" + locale.getLanguage() + EXT,
+			name + __ + locale.getLanguage() + __ + locale.getCountry() + __ + locale.getVariant() + EXT,
+			name + __ + locale.getLanguage() + __ + locale.getCountry() + EXT,
+			name + __ + locale.getLanguage() + EXT,
 			name + EXT
 		};
 	}
@@ -110,7 +112,7 @@ public class MessagesResource extends AbstractResource {
 
 	@Override
 	public String name() {
-		return name + "_" + locale.toString();
+		return name + __ + locale.toString();
 	}
 
 	@Override
@@ -133,6 +135,12 @@ public class MessagesResource extends AbstractResource {
 		}
 		
 		return result;
+	}
+	
+	@Override
+	protected boolean removeOnReload() {
+		// this is a root resource
+		return false;
 	}
 
 	@Override
