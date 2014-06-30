@@ -45,6 +45,11 @@ public class MockApplication extends Application {
 		super(mock(Arguments.class), new MockAssets(), new MockAPIModules());
 		this.basePath = basePath;
 	}
+	
+	@Override
+	public Path path() {
+		return basePath;
+	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {
