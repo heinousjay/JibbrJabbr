@@ -60,7 +60,7 @@ public class RhinoContext implements Closer {
 	 */
 	public RhinoContext withoutContinuations() {
 		assertNotClosed();
-		context.setOptimizationLevel(0);
+		context.setOptimizationLevel(1);
 		return this;
 	}
 	
@@ -156,6 +156,17 @@ public class RhinoContext implements Closer {
 			publishRhinoException("script error evaluating a string\n{}\n{}", re);
 			throw re;
 		}
+	}
+	
+	public Object executeScript(Script script, Scriptable scope) {
+		assertNotClosed();
+		try {
+			return script.exec(context, scope);
+		} catch (RhinoException re) {
+			publishRhinoException("script error during execution\n{}\n{}", re);
+			throw re;
+		}
+		
 	}
 
 	/**
