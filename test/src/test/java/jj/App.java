@@ -38,6 +38,8 @@ public class App {
 	
 	public static final String configuration;
 	
+	public static final String css;
+	
 	static {
 		try {
 			one = Paths.get(App.class.getResource("/app1/app/").toURI()).toAbsolutePath().toString();
@@ -45,6 +47,7 @@ public class App {
 			minimal = Paths.get(App.class.getResource("/minimal/app/").toURI()).toAbsolutePath().toString();
 			api = Paths.get(App.class.getResource("/api/public/").toURI()).toAbsolutePath().toString();
 			configuration = Paths.get(App.class.getResource("/configuration/").toURI()).toAbsolutePath().toString();
+			css = Paths.get(App.class.getResource("/css/").toURI()).toAbsolutePath().toString();
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}
