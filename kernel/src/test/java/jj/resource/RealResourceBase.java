@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -57,7 +56,6 @@ public abstract class RealResourceBase {
 	public final void init() throws Exception {
 		app = new MockApplication();
 		appPath = Base.appPath();
-		given(app.path()).willReturn(appPath);
 	}
 	
 	protected <T extends Resource> T testResource(final T resource) throws Exception {
