@@ -16,10 +16,7 @@
 package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static jj.resource.DependentsExtractor.dependents;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.*;
@@ -28,17 +25,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.MockApplication;
 import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.Resource;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceMaker;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
