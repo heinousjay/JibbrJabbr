@@ -27,6 +27,8 @@ public class CssModule extends JJModule {
 	protected void configure() {
 		
 		bindCreation().of(CssResource.class).to(CssResourceCreator.class);
+		
+		bindCreation().of(LessResource.class).to(LessResourceCreator.class);
 	}
 
 }
