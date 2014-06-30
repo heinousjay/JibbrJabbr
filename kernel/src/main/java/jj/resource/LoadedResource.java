@@ -22,7 +22,11 @@ import io.netty.buffer.ByteBuf;
  * @author jason
  *
  */
-public interface LoadedResource extends FileResource {
+public interface LoadedResource extends Resource {
 	
 	ByteBuf bytes();
+	
+	String mime();
+	
+	long size();
 }
