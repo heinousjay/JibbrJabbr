@@ -1,0 +1,24 @@
+@import "/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css";
+@import "http://example.com/something.css";
+.box-icon {
+  background-image: url(/95f2f5ffdef7c9dbbdd440e6632af7342eac9e08/images/box-icon.png);
+}
+.rox-icon {
+  background-image: url("/1bb4287ffefb82d44a6084f6d59227ecd4d366e8/images/other/rox-icon.png") no-repeat 1% 25%;
+}
+.sox-icon {
+  background-image: url('/17d4d26908948cd0451593375fee8355a0862f10/images/sox-icon.png');
+}
+.sox-icon2 {
+  background-image: url('/17d4d26908948cd0451593375fee8355a0862f10/images/sox-icon.png');
+}
+.warning-icon {
+  background-image: url(not-found-thing.jpg);
+}
+.fqdn-icon {
+  background-image: url(http://example.com/absolute/path);
+}
+
+body { background: url('https://www.example.com/pinkish.png') }
+
+li { list-style: url("//www.example.com/redball.png") disc }

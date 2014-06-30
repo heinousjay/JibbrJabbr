@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.mozilla.javascript.BaseFunction;
@@ -60,7 +61,8 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	private final String sha1;
 	private final Path path;
 
-	protected StylesheetResource(
+	@Inject
+	StylesheetResource(
 		final Dependencies dependencies,
 		final String name,
 		final Provider<RhinoContext> contextProvider,
