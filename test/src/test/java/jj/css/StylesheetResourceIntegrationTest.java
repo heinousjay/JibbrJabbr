@@ -75,5 +75,18 @@ public class StylesheetResourceIntegrationTest {
 		
 		assertThat(lessOutput, is(expectedOutput));
 	}
+	
+	
+	@Test
+	public void testCss() throws Exception {
+		resourceLoader.loadResource(StylesheetResource.class, Base, "test.css");
+		
+		assertTrue("timed out", latch.await(2, SECONDS));
+		
+		String lessOutput = stylesheet.bytes().toString(UTF_8);
+		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css")), UTF_8);
+		
+		assertThat(lessOutput, is(expectedOutput));
+	}
 
 }
