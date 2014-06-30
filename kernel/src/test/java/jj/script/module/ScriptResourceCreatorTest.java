@@ -15,48 +15,42 @@
  */
 package jj.script.module;
 
-import static org.mockito.Mockito.*;
+import static jj.configuration.resolution.AppLocation.Base;
+import static org.mockito.BDDMockito.*;
+import jj.configuration.resolution.MockApplication;
+import jj.resource.ResourceInstanceCreator;
+import jj.resource.ResourceKey;
 
-import java.nio.file.Path;
-
-import jj.configuration.resolution.AppLocation;
-import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.ResourceBase;
-import jj.script.MockRhinoContextProvider;
-import jj.script.module.ScriptResource;
-import jj.script.module.ScriptResourceCreator;
-import jj.script.module.ScriptResourceType;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-public class ScriptResourceCreatorTest extends ResourceBase<ScriptResource, ScriptResourceCreator> {
-
-	MockRhinoContextProvider contextProvider;
+@RunWith(MockitoJUnitRunner.class)
+public class ScriptResourceCreatorTest {
 	
-	@Override
-	protected String name() {
-		return ScriptResourceType.Client.suffix("index");
-	}
+	MockApplication app;
+	ScriptResourceCreator src;
+	@Mock ResourceInstanceCreator instanceCreator;
 
-	protected Path path() {
-		return appPath.resolve(name());
-	}
-
-	@Override
-	protected ScriptResource resource() throws Exception {
-		return new ScriptResource(new MockAbstractResourceDependencies(cacheKey(), AppLocation.Base), path(), name(), contextProvider = new MockRhinoContextProvider());
-	}
-	
-	@Override
-	protected void resourceAssertions(ScriptResource resource) throws Exception {
-		verify(contextProvider.context).compileString(anyString(), eq(name()));
-	}
-
-	@Override
-	protected ScriptResourceCreator toTest() {
-		return new ScriptResourceCreator(app, creator);
+	@Test
+	public void test() throws Exception {
+		String name = "name";
+		app = new MockApplication();
+		src = new ScriptResourceCreator(app, instanceCreator);
+		
+		src.create(Base, name);
+		
+		verify(instanceCreator).createResource(
+			eq(ScriptResource.class),
+			isA(ResourceKey.class),
+			eq(Base),
+			eq(name)
+		);
 	}
 
 }
