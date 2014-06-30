@@ -15,15 +15,15 @@ import jj.resource.ResourceInstanceCreator;
 public class ScriptResourceCreator extends AbstractResourceCreator<ScriptResource> {
 
 	private final PathResolver app;
-	private final ResourceInstanceCreator instanceModuleCreator;
+	private final ResourceInstanceCreator instanceCreator;
 	
 	@Inject
 	ScriptResourceCreator(
 		final PathResolver app,
-		final ResourceInstanceCreator instanceModuleCreator
+		final ResourceInstanceCreator instanceCreator
 	) {
 		this.app = app;
-		this.instanceModuleCreator = instanceModuleCreator;
+		this.instanceCreator = instanceCreator;
 	}
 	
 	@Override
@@ -33,7 +33,7 @@ public class ScriptResourceCreator extends AbstractResourceCreator<ScriptResourc
 
 	@Override
 	public ScriptResource create(Location base, String name, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(ScriptResource.class, resourceKey(base, name), base, name);
+		return instanceCreator.createResource(ScriptResource.class, resourceKey(base, name), base, name);
 	}
 
 }
