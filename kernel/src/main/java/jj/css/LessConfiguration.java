@@ -15,22 +15,45 @@
  */
 package jj.css;
 
-import jj.JJModule;
+import jj.configuration.Default;
 
 /**
+ * <p>
+ * Allows to configure less processing options
  * @author jason
  *
  */
-public class CssModule extends JJModule {
-
-	@Override
-	protected void configure() {
-		
-		addAssetPath("/jj/css/");
-		addAPIModulePath("/jj/css/api/");
-		bindCreation().of(LessResource.class).to(LessResourceCreator.class);
-		bindCreation().of(StylesheetResource.class).to(StylesheetResourceCreator.class);
-		bindConfiguration().to(LessConfiguration.class);
-	}
-
+public interface LessConfiguration {
+	
+	boolean depends();
+	
+	boolean compress();
+	
+	boolean cleancss();
+	
+	@Default("-1")
+	int maxLineLen();
+	
+	@Default("1")
+	int optimization();
+	
+	boolean silent();
+	
+	boolean verbose();
+	
+	boolean lint();
+	
+	@Default("true")
+	boolean color();
+	
+	boolean strictImports();
+	
+	boolean relativeUrls();
+	
+	@Default("true")
+	boolean ieCompat();
+	
+	boolean strictMath();
+	
+	boolean strictUnits();
 }
