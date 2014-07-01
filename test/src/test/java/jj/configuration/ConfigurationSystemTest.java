@@ -30,6 +30,7 @@ import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
 import jj.http.server.uri.Route;
 import jj.http.server.uri.RouterConfiguration;
+import jj.css.LessConfiguration;
 import jj.document.DocumentConfiguration;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -64,6 +65,9 @@ public class ConfigurationSystemTest {
 	
 	@Inject 
 	private RouterConfiguration routerConfiguration;
+	
+	@Inject
+	private LessConfiguration lessConfiguration;
 	
 	boolean loaded;
 	boolean failed;
@@ -110,6 +114,10 @@ public class ConfigurationSystemTest {
 //		route.POST('/chat/:room').to('/chat/room');
 //		route.PUT('/chat/:room/*secret').to('/chat/room');
 //		route.DELETE('/chat/:room/*secret').to('/chat/room');
+		
+		assertTrue(lessConfiguration.cleancss());
+		assertThat(lessConfiguration.optimization(), is(2));
+		assertThat(lessConfiguration.maxLineLen(), is(1024));
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String destination) {
