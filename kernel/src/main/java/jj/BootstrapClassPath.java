@@ -16,6 +16,7 @@
 package jj;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -51,7 +52,12 @@ public class BootstrapClassPath implements ResourceResolver {
 	public Path pathForFile(String file) throws Exception {
 		return jarFs != null ?
 			jarFs.getPath(file) :
-			Paths.get(BootstrapClassPath.class.getResource(file).toURI());
+			findPath(file);
+	}
+
+	private Path findPath(String file) throws Exception {
+		URL url = BootstrapClassPath.class.getResource(file);
+		return url != null ? Paths.get(url.toURI()) : null;
 	}
 
 }
