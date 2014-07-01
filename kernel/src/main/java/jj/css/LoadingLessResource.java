@@ -17,17 +17,19 @@ package jj.css;
 
 import org.slf4j.Logger;
 
-import jj.script.ExecutionEvent;
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class LoadLessResource extends ExecutionEvent {
+@ServerLogger
+public class LoadingLessResource extends LoggedEvent {
 
 	private final String name;
 	
-	LoadLessResource(final String name) {
+	LoadingLessResource(final String name) {
 		this.name = name;
 	}
 

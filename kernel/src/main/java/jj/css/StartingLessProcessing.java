@@ -17,13 +17,15 @@ package jj.css;
 
 import org.slf4j.Logger;
 
-import jj.script.ExecutionEvent;
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class StartingLessProcessing extends ExecutionEvent {
+@ServerLogger
+public class StartingLessProcessing extends LoggedEvent {
 	
 	private final String lessName;
 	
@@ -35,5 +37,4 @@ public class StartingLessProcessing extends ExecutionEvent {
 	public void describeTo(Logger log) {
 		log.info("started processing less resource {}", lessName);
 	}
-
 }

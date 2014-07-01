@@ -17,25 +17,24 @@ package jj.css;
 
 import org.slf4j.Logger;
 
-import jj.script.ExecutionEvent;
+import jj.logging.EmergencyLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class ErrorLoadingLessResource extends ExecutionEvent {
+@EmergencyLogger
+public class LessResourceNotFound extends LoggedEvent {
 	
 	private final String name;
-	private final Throwable cause;
 	
-	ErrorLoadingLessResource(final String name, final Throwable cause) {
+	LessResourceNotFound(final String name) {
 		this.name = name;
-		this.cause = cause;
 	}
 	
 	@Override
 	public void describeTo(Logger log) {
-		log.error("error loading less resource {}", name);
-		log.error("", cause);
+		log.error("ignored unfound less resource {}", name);
 	}
 }
