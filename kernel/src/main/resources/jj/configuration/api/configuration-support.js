@@ -1,27 +1,36 @@
 var collector = inject('jj.configuration.ConfigurationCollector');
 
-module.exports = {
+function addElement(location, value) {
+	collector.addConfigurationElement(location, value);
+}
 
-	makeBooleanProperty: function(base, name) {
+module.exports = {
+		
+	addElement: addElement,
+
+	makeBooleanProperty: function(base, name, validator) {
 		return function(arg) {
 			if (typeof arg != 'boolean') { throw new TypeError(name + ' must be a boolean'); }
-			collector.addConfigurationElement(base + name, arg);
+			if (typeof validator == 'function') { validator(name, arg); }
+			addElement(base + name, arg);
 			return this;
 		}
 	},
 
-	makeIntProperty: function(base, name) {
+	makeIntProperty: function(base, name, validator) {
 		return function(arg) {
 			arg = parseInt(arg);
 			if (isNaN(arg)) { throw new TypeError(name + ' must be an int'); }
-			collector.addConfigurationElement(base + name, new java.lang.Integer(arg));
+			if (typeof validator == 'function') { validator(name, arg); }
+			addElement(base + name, new java.lang.Integer(arg));
 			return this;
 		}
 	},
 
-	makeStringProperty: function(base, name) {
+	makeStringProperty: function(base, name, validator) {
 		return function(arg) {
-			collector.addConfigurationElement(base + name, new java.lang.String.valueOf(arg));
+			if (typeof validator == 'function') { validator(name, arg); }
+			addElement(base + name, new java.lang.String.valueOf(arg));
 			return this;
 		}
 	}

@@ -26,6 +26,23 @@ require('http-server-socket-configuration')
 	.bind(8080)
 	.bind('localhost', 8090);
 
+require('less-configuration')
+	.depends(true)
+	.compress(true)
+	.cleancss(true)
+	.maxLineLen(1024)
+	.O2()
+	.depends(true)
+	.silent(true)
+	.verbose(true)
+	.lint(true)
+	.color(true)
+	.strictImports(true)
+	.relativeUrls(true)
+	.ieCompat(false)
+	.strictMath(true)
+	.strictUnits(true);
+
 require('document-system-configuration')
 	.clientDebug(true)
 	.showParsingErrors(true)
