@@ -46,13 +46,15 @@ public class InternalAssets {
 		try {
 			Iterator<String> iterator = paths.iterator();
 			while (result == null && iterator.hasNext()) {
-				Path path = resolver.pathForFile(iterator.next()).resolve(name);
-				if (Files.exists(path)) {
+				String candidate = iterator.next();
+				candidate = candidate + (candidate.endsWith("/") ? "" : "/") + name;
+				Path path = resolver.pathForFile(candidate);
+				if (path != null && Files.exists(path)) {
 					result = path;
 				}
 			}
 		} catch (Exception e) {
-			// don't much care...
+			e.printStackTrace();
 		}
 		
 		// this is sort of an ugly solution but we have to return a path that doesn't
