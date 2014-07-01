@@ -60,6 +60,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	private final ByteBuf bytes;
 	private final String sha1;
 	private final Path path;
+	private final long size;
 
 	@Inject
 	StylesheetResource(
@@ -112,6 +113,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 
 		sha1 = SHA1Helper.keyFor(result);
 		bytes = Unpooled.copiedBuffer(result, UTF_8);
+		size = bytes.readableBytes();
 	}
 	
 	private String processLessScript(final Provider<RhinoContext> contextProvider, final ScriptableObject global, String lessName) {
@@ -159,7 +161,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 
 	@Override
 	public long size() {
-		return bytes.readableBytes();
+		return size;
 	}
 	
 	Path path() {
@@ -173,7 +175,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 
 	@Override
 	public ByteBuf bytes() {
-		return bytes;
+		return Unpooled.wrappedBuffer(bytes);
 	}
 
 	@Override

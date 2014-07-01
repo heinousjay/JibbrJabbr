@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.Arrays;
 import java.util.List;
 
-import jj.css.CssResource;
+import jj.css.StylesheetResource;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
 import jj.http.server.uri.URIMatch;
@@ -47,7 +47,7 @@ public class MockServablesRule implements TestRule {
 	public final URIMatch uri5 = new URIMatch("/5");
 	
 	@Mock public Servable<StaticResource> staticServable;
-	@Mock public Servable<CssResource> cssServable;
+	@Mock public Servable<StylesheetResource> cssServable;
 	
 	@Mock public Servables servables;
 	

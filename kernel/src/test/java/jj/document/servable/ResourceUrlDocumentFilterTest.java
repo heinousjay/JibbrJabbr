@@ -18,7 +18,7 @@ package jj.document.servable;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
-import jj.css.CssResource;
+import jj.css.StylesheetResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.ResourceUrlDocumentFilter;
 import jj.http.server.MockServablesRule;
@@ -47,7 +47,7 @@ public class ResourceUrlDocumentFilterTest {
 	@Mock DocumentRequestProcessor documentRequestProcessor;
 	Document document;
 	
-	@Mock CssResource cssResource;
+	@Mock StylesheetResource cssResource;
 	@Mock StaticResource staticResource;
 	@Mock Sha1Resource sha1Resource;
 	

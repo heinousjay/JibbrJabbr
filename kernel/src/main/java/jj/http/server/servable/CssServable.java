@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
-import jj.css.CssResource;
+import jj.css.StylesheetResource;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
@@ -15,7 +15,7 @@ import jj.resource.ResourceFinder;
 
 // TODO! move this to the css package
 @Singleton
-class CssServable extends Servable<CssResource> {
+class CssServable extends Servable<StylesheetResource> {
 	
 	private static final String CSS = "css";
 	
@@ -36,13 +36,8 @@ class CssServable extends Servable<CssResource> {
 	}
 	
 	@Override
-	public CssResource loadResource(final URIMatch match) {
-		CssResource resource = resourceFinder.loadResource(CssResource.class, AppLocation.Base, match.baseName, true);
-		if (resource == null) {
-			resource = resourceFinder.loadResource(CssResource.class, AppLocation.Base, match.baseName);
-		}
-		
-		return resource;
+	public StylesheetResource loadResource(final URIMatch match) {
+		return resourceFinder.loadResource(StylesheetResource.class, AppLocation.Base, match.baseName);
 	}
 
 	@Override
@@ -53,11 +48,9 @@ class CssServable extends Servable<CssResource> {
 		
 		final URIMatch match = request.uriMatch();
 		
-		// try less first
-		CssResource resource = loadResource(match);
-		
+		StylesheetResource resource = loadResource(match);
 		RequestProcessor result = null;
-		if (resource != null && isServableResource(resource)) {
+		if (resource != null) {
 			result = makeStandardRequestProcessor(request, response, match, resource);
 		}
 		return result;
