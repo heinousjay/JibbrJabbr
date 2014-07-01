@@ -17,6 +17,7 @@ package jj.testing;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.configuration.resolution.Assets.*;
@@ -146,6 +147,12 @@ public class BasicServingTest {
 						assertThat(response.bodyContentAsBytes(), is(request.bytes));
 					} catch (Throwable t) {
 						error.addSuppressed(t);
+//						try {
+//							System.out.println("got :");
+//							System.out.println(response.bodyContentAsString());
+//							System.out.println("expected: ");
+//							System.out.println(new String(request.bytes, UTF_8));
+//						} catch (Throwable eaten) {}
 					} finally {
 						latch.countDown();
 					}

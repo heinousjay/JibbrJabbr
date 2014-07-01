@@ -7,7 +7,7 @@ import static org.mockito.BDDMockito.*;
 import java.io.IOException;
 
 import jj.configuration.resolution.AppLocation;
-import jj.css.CssResource;
+import jj.css.StylesheetResource;
 import jj.http.server.servable.CssServable;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.uri.URIMatch;
@@ -19,7 +19,7 @@ import org.mockito.Mock;
 
 public class CssServableTest extends ServableTestBase {
 	
-	@Mock CssResource cssResource;
+	@Mock StylesheetResource cssResource;
 	
 	CssServable cs;
 	
@@ -34,8 +34,7 @@ public class CssServableTest extends ServableTestBase {
 		
 		// given
 		given(request.uriMatch()).willReturn(new URIMatch("/style.css"));
-		given(resourceFinder.loadResource(CssResource.class, AppLocation.Base, "style.css", true)).willReturn(cssResource);
-		given(cssResource.path()).willReturn(appPath.resolve("style.css"));
+		given(resourceFinder.loadResource(StylesheetResource.class, AppLocation.Base, "style.css")).willReturn(cssResource);
 		
 		// then
 		assertThat(cs.isMatchingRequest(request.uriMatch()), is(true));

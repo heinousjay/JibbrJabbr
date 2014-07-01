@@ -15,26 +15,19 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.Base;
 import jj.configuration.resolution.Application;
 import jj.configuration.resolution.MockApplication;
-import jj.css.CssResource;
 import jj.event.Publisher;
-import jj.util.SHA1Helper;
-
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -76,11 +69,7 @@ public abstract class RealResourceBase {
 		assertTrue(resource.name() + " does not exist", Files.exists(path));
 		
 		testNonFileResource(resource);
-		
-		if (!(resource instanceof CssResource)) { 
-			final byte[] bytes = Files.readAllBytes(path);
-			assertThat(resource.sha1(), is(SHA1Helper.keyFor(bytes))); 
-		}
+
 		return resource;
 	}
 
@@ -92,15 +81,6 @@ public abstract class RealResourceBase {
 		assertThat(resource.name(), is(notNullValue()));
 		assertThat(resource.name(), not(Matchers.startsWith("/")));
 		assertThat(((AbstractResource)resource).needsReplacing(), is(false));
-		
-		if (!(resource instanceof CssResource) && (resource instanceof LoadedResource)) { 
-
-			ByteBuf buf = ((LoadedResource)resource).bytes();
-			buf.readBytes(Unpooled.buffer(buf.readableBytes()));
-			// this test is to ensure that all buffers are wrapped before returning
-			// since this has caught me out twice now
-			assertThat(((LoadedResource)resource).bytes().readableBytes(), greaterThan(0));
-		}
 		
 		return resource;
 	}
