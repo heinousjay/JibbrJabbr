@@ -117,6 +117,9 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	}
 	
 	private String processLessScript(final Provider<RhinoContext> contextProvider, final ScriptableObject global, String lessName) {
+		
+		publisher.publish(new StartingLessProcessing(lessName));
+		
 		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			// turn on optimizations before loading this!
 			ScriptResource lessScript = resourceFinder.loadResource(ScriptResource.class, Assets, LESS_SCRIPT);
@@ -141,6 +144,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 			return String.valueOf(result);
 		} finally {
 			NameFunction.name.set(null);
+			publisher.publish(new FinishedLessProcessing(lessName));
 		}
 	}
 
