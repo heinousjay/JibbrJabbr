@@ -102,6 +102,7 @@ public class StylesheetResourceTest {
 	@Test
 	public void testLessFound() throws Exception {
 		
+		// given
 		String name = "test.css";
 		
 		LessResource less1 = new LessResource(dependencies, "test.less", cssPath.resolveSibling("test.less"));
@@ -120,13 +121,22 @@ public class StylesheetResourceTest {
 		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			global = context.initStandardObjects();
 			given(lessScriptResource.script()).willReturn(context.compileString(getLessScript(), "less script"));
+			
+			
+		// when
 			StylesheetResource sr = newStylesheet(name);
+			
+			
+		// then
 			verify(lessScriptResource).addDependent(sr);
 			assertTrue(dependents(less1).contains(sr));
 			assertTrue(dependents(less2).contains(sr));
 			
 			assertThat(sr.bytes().toString(UTF_8), is(new String(Files.readAllBytes(cssPath), UTF_8)));
 		}
+		
+		verify(dependencies.publisher()).publish(isA(StartingLessProcessing.class));
+		verify(dependencies.publisher()).publish(isA(FinishedLessProcessing.class));
 	}
 
 	private String getLessScript() throws Exception {
