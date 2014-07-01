@@ -17,13 +17,15 @@ package jj.css;
 
 import org.slf4j.Logger;
 
-import jj.script.ExecutionEvent;
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
-public class FinishedLessProcessing extends ExecutionEvent {
+@ServerLogger
+public class FinishedLessProcessing extends LoggedEvent {
 
 	private final String lessName;
 	

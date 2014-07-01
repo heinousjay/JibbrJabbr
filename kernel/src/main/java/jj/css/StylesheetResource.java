@@ -202,11 +202,15 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		@Override
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			String resourceName = String.valueOf(args[0]);
+			publisher.publish(new LoadingLessResource(resourceName));
 			LessResource lr = resourceFinder.loadResource(LessResource.class, Base, resourceName);
 			if (lr != null) {
 				lr.addDependent(StylesheetResource.this);
-			}
-			return lr == null ? Undefined.instance : lr.contents();
+				return lr.contents();
+			} 
+			
+			publisher.publish(new LessResourceNotFound(resourceName));
+			return "";
 		}
 	}
 	

@@ -137,6 +137,8 @@ public class StylesheetResourceTest {
 		
 		verify(dependencies.publisher()).publish(isA(StartingLessProcessing.class));
 		verify(dependencies.publisher()).publish(isA(FinishedLessProcessing.class));
+		verify(dependencies.publisher(), times(3)).publish(isA(LoadingLessResource.class));
+		verify(dependencies.publisher()).publish(isA(LessResourceNotFound.class));
 	}
 
 	private String getLessScript() throws Exception {
