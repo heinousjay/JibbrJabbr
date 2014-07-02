@@ -35,6 +35,6 @@ public class LessResourceNotFound extends LoggedEvent {
 	
 	@Override
 	public void describeTo(Logger log) {
-		log.error("ignored unfound less resource {}", name);
+		log.warn("ignored missing less resource: {}", name);
 	}
 }
