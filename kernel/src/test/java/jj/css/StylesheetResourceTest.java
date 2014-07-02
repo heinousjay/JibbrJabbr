@@ -57,6 +57,8 @@ public class StylesheetResourceTest {
 	@Mock StaticResource cssResource;
 	@Mock ScriptResource lessScriptResource;
 	
+	@Mock LessConfiguration lessConfiguration;
+	
 	Path cssPath;
 	
 	@Before
@@ -69,7 +71,7 @@ public class StylesheetResourceTest {
 	}
 	
 	private StylesheetResource newStylesheet(String name) {
-		return new StylesheetResource(dependencies, name, contextProvider, global, processor);
+		return new StylesheetResource(dependencies, name, contextProvider, global, processor, lessConfiguration);
 	}
 
 	@Test

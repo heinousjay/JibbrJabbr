@@ -72,7 +72,7 @@ public class StylesheetResourceIntegrationTest {
 		
 		String lessOutput = stylesheet.bytes().toString(UTF_8);
 		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css")), UTF_8);
-		
+		System.out.println(lessOutput);
 		assertThat(lessOutput, is(expectedOutput));
 	}
 	

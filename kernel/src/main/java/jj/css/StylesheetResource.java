@@ -29,6 +29,7 @@ import javax.inject.Provider;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
@@ -55,12 +56,13 @@ import jj.util.SHA1Helper;
  */
 public class StylesheetResource extends AbstractResource implements LoadedResource {
 
-	static final String LESS_SCRIPT = "less-1.4.0.rhino.js";
+	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";
 	private final String name;
 	private final ByteBuf bytes;
 	private final String sha1;
 	private final Path path;
 	private final long size;
+	private final LessConfiguration lessConfiguration;
 
 	@Inject
 	StylesheetResource(
@@ -68,11 +70,13 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		final String name,
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global,
-		final CssReferenceVersionProcessor processor
+		final CssReferenceVersionProcessor processor,
+		final LessConfiguration lessConfiguration
 	) {
 		super(dependencies);
 		
 		this.name = name;
+		this.lessConfiguration = lessConfiguration;
 		
 		// is there a static css file?
 		StaticResource css = resourceFinder.loadResource(StaticResource.class, Base, name);
@@ -128,14 +132,17 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 			lessScript.addDependent(this);
 			
 			ScriptableObject local = context.newObject(global);
-
+			local.setPrototype(global);
+			local.setParentScope(null);
+			
 			local.defineProperty("readFile", new ReadFileFunction(), ScriptableObject.EMPTY);
 			local.defineProperty("name", new NameFunction(), ScriptableObject.EMPTY);
-			local.defineProperty("lessOptions", new LessOptionsFunction(), ScriptableObject.EMPTY);
+			local.defineProperty("lessLog", new LessLogFunction(), ScriptableObject.EMPTY);
 			
 			context.executeScript(lessScript.script(), local);
 
-			Object result = context.evaluateString(local, "runLess('" + lessName + "');", lessName);
+			Function runLess = (Function)local.get("runLess", local);
+			Object result = context.callFunction(runLess, local, local, lessName, lessConfiguration);
 			
 			if (result == Scriptable.NOT_FOUND) {
 				return null;
@@ -228,17 +235,14 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		}
 	}
 	
-	private class LessOptionsFunction extends BaseFunction {
+	private class LessLogFunction extends BaseFunction {
 		
 		private static final long serialVersionUID = -1L;
 		
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			
-			Scriptable object = cx.newObject(scope);
-			// TODO get these from a configuration object
-			//object.put("dumpLineNumbers", object, "all");
-			//object.put("compress", object, true);
-			return object;
+			System.out.println(args[0]);
+			return Undefined.instance;
 		}
 	}
 }
