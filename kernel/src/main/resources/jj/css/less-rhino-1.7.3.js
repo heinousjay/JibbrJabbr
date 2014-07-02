@@ -9491,6 +9491,10 @@ function runLess(filename, configuration) {
         }
     };
     
+    if (configuration.sourceMaps()) {
+        lessLog("source maps don't seem to work yet.  also logging is going to the sysout!");
+    }
+    
     name(filename);
     var result;
     var parser = new less.Parser(options);
