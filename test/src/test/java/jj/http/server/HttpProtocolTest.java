@@ -127,6 +127,20 @@ public class HttpProtocolTest {
 	@Test
 	public void test() throws Throwable {
 		
+		testFirstLineErrors();
+		testGet();
+		testOptions();
+	}
+	
+	private void testGet() throws Throwable {
+		EmbeddedHttpResponse response = testServer.request("GET / HTTP/1.1\r\n\r\n");
+		
+		response.await(2, SECONDS);
+		
+		assertThat(response.status(), is(OK));
+	}
+
+	private void testFirstLineErrors() throws Throwable {
 		EmbeddedHttpResponse response = testServer.request("this will fail\r\n\r\n");
 		
 		response.await(2, SECONDS);
@@ -144,14 +158,10 @@ public class HttpProtocolTest {
 		response.await(2, SECONDS);
 		
 		assertThat(response.status(), is(NOT_IMPLEMENTED));
-		
-		response = testServer.request("GET / HTTP/1.1\r\n\r\n");
-		
-		response.await(2, SECONDS);
-		
-		assertThat(response.status(), is(OK));
-		
-		response = testServer.request("OPTIONS /something HTTP/1.1\r\n\r\n");
+	}
+	
+	private void testOptions() throws Throwable {
+		EmbeddedHttpResponse response = testServer.request("OPTIONS /something HTTP/1.1\r\n\r\n");
 		
 		response.await(2, SECONDS);
 		
