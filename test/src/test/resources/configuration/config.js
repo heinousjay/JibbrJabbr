@@ -27,7 +27,6 @@ require('http-server-socket-configuration')
 	.bind('localhost', 8090);
 
 require('less-configuration')
-	.depends(true)
 	.compress(true)
 	.cleancss(true)
 	.maxLineLen(1024)
@@ -36,12 +35,15 @@ require('less-configuration')
 	.silent(true)
 	.verbose(true)
 	.lint(true)
-	.color(true)
+	.color(false)
 	.strictImports(true)
 	.relativeUrls(true)
 	.ieCompat(false)
 	.strictMath(true)
-	.strictUnits(true);
+	.strictUnits(true)
+	.javascriptEnabled(false)
+	.sourceMaps(false)
+	.rootpath("images/");
 
 require('document-system-configuration')
 	.clientDebug(true)

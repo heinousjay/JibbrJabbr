@@ -3,8 +3,6 @@ var base = 'jj.css.LessConfiguration.';
 
 module.exports = {
 	
-	depends: support.makeBooleanProperty(base, 'depends'),
-	
 	compress: support.makeBooleanProperty(base, 'compress'),
 	
 	cleancss: support.makeBooleanProperty(base, 'cleancss'),
@@ -49,5 +47,11 @@ module.exports = {
 	
 	strictMath: support.makeBooleanProperty(base, 'strictMath'),
 	
-	strictUnits: support.makeBooleanProperty(base, 'strictUnits')
+	strictUnits: support.makeBooleanProperty(base, 'strictUnits'),
+	
+	javascriptEnabled: support.makeBooleanProperty(base, 'javascriptEnabled'),
+	
+	sourceMaps: support.makeBooleanProperty(base, 'sourceMaps'),
+	
+	rootpath: support.makeStringProperty(base, 'rootpath')
 };

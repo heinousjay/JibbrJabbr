@@ -20,12 +20,12 @@ import jj.configuration.Default;
 /**
  * <p>
  * Allows to configure less processing options
+ * 
+ * https://github.com/less/less-docs/blob/master/content/usage/command-line-usage.md
  * @author jason
  *
  */
 public interface LessConfiguration {
-	
-	boolean depends();
 	
 	boolean compress();
 	
@@ -56,4 +56,12 @@ public interface LessConfiguration {
 	boolean strictMath();
 	
 	boolean strictUnits();
+	
+	@Default("true")
+	boolean javascriptEnabled();
+	
+	@Default("true")
+	boolean sourceMaps();
+	
+	String rootpath(); // null by default
 }
