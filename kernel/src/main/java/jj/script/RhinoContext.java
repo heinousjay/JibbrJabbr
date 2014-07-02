@@ -131,15 +131,15 @@ public class RhinoContext implements Closer {
 	}
 
 	/**
-	 * @param configurationFunction
+	 * @param function
 	 * @param scope
 	 * @param thisObj
 	 * @param args
 	 */
-	public Object callFunction(Function configurationFunction, Scriptable scope, Scriptable thisObj, Object...args) {
+	public Object callFunction(Function function, Scriptable scope, Scriptable thisObj, Object...args) {
 		assertNotClosed();
 		try {
-			return configurationFunction.call(context, scope, thisObj, args);
+			return function.call(context, scope, thisObj, args);
 		} catch (RhinoException re) {
 			publishRhinoException("script error executing a function\n{}\n{}", re);
 			throw re;
