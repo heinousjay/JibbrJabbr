@@ -3,7 +3,7 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.http.server.WebSocketConnectionHost;
+import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
 

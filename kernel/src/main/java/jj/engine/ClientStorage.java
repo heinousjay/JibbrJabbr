@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.http.server.CurrentWebSocketConnection;
+import jj.http.server.websocket.CurrentWebSocketConnection;
 
 import org.mozilla.javascript.Scriptable;
 

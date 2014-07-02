@@ -30,7 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import jj.document.DocumentWebSocketMessageProcessor;
 import jj.document.DocumentWebSocketMessageProcessors;
-import jj.http.server.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.jjmessage.JJMessage.Type;

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
 
-import jj.http.server.ConnectionBroadcastStack;
-import jj.http.server.WebSocketConnection;
+import jj.http.server.websocket.ConnectionBroadcastStack;
+import jj.http.server.websocket.WebSocketConnection;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Undefined;
 
-import jj.http.server.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.ContinuationCoordinator;
 import jj.script.ScriptJSON;

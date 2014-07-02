@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
-
+package jj.http.server.websocket;
 
 /**
  * @author jason
  *
  */
-public interface WebSocketMessageProcessor {
+public interface WebSocketMessage {
 
-	boolean process(WebSocketConnection connection, String message);
-
+	/**
+	 * render this message as a JSON string value
+	 * @return
+	 */
+	String stringify();
 }

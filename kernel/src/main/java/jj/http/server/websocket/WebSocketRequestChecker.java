@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import javax.inject.Singleton;
 
@@ -27,7 +27,7 @@ import jj.http.server.uri.URIMatch;
  *
  */
 @Singleton
-class WebSocketRequestChecker {
+public class WebSocketRequestChecker {
 
 	private static final String SOCKET = "socket";
 
@@ -41,7 +41,7 @@ class WebSocketRequestChecker {
 			request.headers().get(HttpHeaders.Names.CONNECTION).toLowerCase().contains(HttpHeaders.Values.UPGRADE.toLowerCase());
 	}
 	
-	boolean isWebSocketRequest(final FullHttpRequest request) {
+	public boolean isWebSocketRequest(final FullHttpRequest request) {
 		
 		return HttpMethod.GET.equals(request.getMethod()) &&
 			isUpgradeRequest(request) &&

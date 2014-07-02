@@ -31,12 +31,16 @@ class GetMethodHandler extends HttpMethodHandler {
 
 	@Override
 	protected void handleHttpRequest(ChannelHandlerContext ctx, HttpRequest request) {
+		// shoopy doopy doo
+		
+		
+		
 		ctx.writeAndFlush(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK)).addListener(ChannelFutureListener.CLOSE);
 	}
 
 	@Override
 	protected void handleHttpContent(ChannelHandlerContext ctx, HttpContent content) {
-		// NEIN! but yes.  for websockets
+		
 	}
 
 }

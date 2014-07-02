@@ -1,7 +1,7 @@
 package jj.engine;
 
 
-import jj.http.server.WebSocketConnectionHost;
+import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.script.CurrentScriptEnvironment;
 
 import org.mozilla.javascript.BaseFunction;

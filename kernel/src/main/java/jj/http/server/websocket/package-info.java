@@ -13,25 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
-
-import com.google.inject.Binder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.TypeLiteral;
-
 /**
+ * Websockets!
+ * 
  * @author jason
  *
  */
-public class WebSocketConnectionHostBinder {
-
-	private final Multibinder<Class<? extends WebSocketConnectionHost>> hostBinder;
-	
-	public WebSocketConnectionHostBinder(Binder binder) {
-		hostBinder = Multibinder.newSetBinder(binder, new TypeLiteral<Class<? extends WebSocketConnectionHost>>() {});
-	}
-	
-	public void toHost(Class<? extends WebSocketConnectionHost> hostClass) {
-		hostBinder.addBinding().toInstance(hostClass);
-	}
-}
+package jj.http.server.websocket;

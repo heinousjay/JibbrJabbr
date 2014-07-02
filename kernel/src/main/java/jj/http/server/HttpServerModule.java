@@ -4,6 +4,7 @@ import jj.JJModule;
 import jj.http.server.methods.HttpMethodHandlerModule;
 import jj.http.server.servable.ServableModule;
 import jj.http.server.uri.URIModule;
+import jj.http.server.websocket.WebSocketConnectionTracker;
 
 public class HttpServerModule extends JJModule {
 	

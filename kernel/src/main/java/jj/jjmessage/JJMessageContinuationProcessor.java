@@ -3,7 +3,7 @@ package jj.jjmessage;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.http.server.CurrentWebSocketConnection;
+import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
 

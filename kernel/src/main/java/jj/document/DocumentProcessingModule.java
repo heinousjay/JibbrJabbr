@@ -21,7 +21,7 @@ import com.google.inject.multibindings.MapBinder;
 
 import jj.JJModule;
 import jj.document.servable.DocumentServableModule;
-import jj.http.server.WebSocketMessageProcessor;
+import jj.http.server.websocket.WebSocketMessageProcessor;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessage.Type;
 

@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static org.mockito.BDDMockito.*;
 import jj.document.DocumentScriptEnvironment;
 import jj.execution.ServerTask;
 import jj.execution.TaskHelper;
 import jj.execution.TaskRunner;
+import jj.http.server.websocket.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnectionTracker;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

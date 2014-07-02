@@ -17,6 +17,7 @@ package jj.document;
 
 import java.io.IOException;
 import java.util.HashMap;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -29,11 +30,11 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.configuration.resolution.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
-import jj.http.server.AbstractWebSocketConnectionHost;
-import jj.http.server.ConnectionBroadcastStack;
-import jj.http.server.CurrentWebSocketConnection;
-import jj.http.server.WebSocketConnection;
-import jj.http.server.WebSocketMessageProcessor;
+import jj.http.server.websocket.AbstractWebSocketConnectionHost;
+import jj.http.server.websocket.ConnectionBroadcastStack;
+import jj.http.server.websocket.CurrentWebSocketConnection;
+import jj.http.server.websocket.WebSocketConnection;
+import jj.http.server.websocket.WebSocketMessageProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;

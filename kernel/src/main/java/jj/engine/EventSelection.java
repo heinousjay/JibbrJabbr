@@ -1,6 +1,6 @@
 package jj.engine;
 
-import jj.http.server.CurrentWebSocketConnection;
+import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static jj.http.server.PipelineStages.*;
 
@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
+import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 
@@ -44,7 +45,7 @@ import jj.resource.ResourceFinder;
  *
  */
 @Singleton
-class WebSocketConnectionMaker {
+public class WebSocketConnectionMaker {
 	
 	private final WebSocketFrameHandlerCreator handlerCreator;
 	
@@ -79,7 +80,7 @@ class WebSocketConnectionMaker {
 		this.webSocketConnectionHostClasses = webSocketConnectionHostClasses;
 	}
 	
-	void handshakeWebsocket() {
+	public void handshakeWebsocket() {
 		final WebSocketServerHandshaker handshaker = handshakerFactory.newHandshaker(request);
 		if (handshaker == null) {
 			response

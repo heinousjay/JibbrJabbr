@@ -19,8 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.EventSelection;
-import jj.http.server.CurrentWebSocketConnection;
-import jj.http.server.WebSocketConnection;
+import jj.http.server.websocket.CurrentWebSocketConnection;
+import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.ContinuationCoordinator;
 import jj.script.CurrentScriptEnvironment;

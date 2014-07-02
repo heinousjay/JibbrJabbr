@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import jj.document.CurrentDocumentRequestProcessor;
-import jj.http.server.WebSocketConnectionHost;
+import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;

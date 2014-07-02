@@ -6,7 +6,7 @@ import static jj.util.StringUtils.*;
 
 import java.util.Map;
 
-import jj.http.server.WebSocketMessage;
+import jj.http.server.websocket.WebSocketMessage;
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 

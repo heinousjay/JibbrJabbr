@@ -21,9 +21,9 @@ import javax.inject.Singleton;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.engine.EventSelection;
-import jj.http.server.ConnectionEventExecutor;
-import jj.http.server.CurrentWebSocketConnection;
-import jj.http.server.WebSocketConnection;
+import jj.http.server.websocket.ConnectionEventExecutor;
+import jj.http.server.websocket.CurrentWebSocketConnection;
+import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.EventNameHelper;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;

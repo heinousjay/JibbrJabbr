@@ -1,4 +1,4 @@
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import io.netty.util.internal.PlatformDependent;

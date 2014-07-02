@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -38,7 +38,12 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import jj.AnswerWithSelf;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
+import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
+import jj.http.server.websocket.WebSocketConnectionHost;
+import jj.http.server.websocket.WebSocketConnectionMaker;
+import jj.http.server.websocket.WebSocketFrameHandler;
+import jj.http.server.websocket.WebSocketFrameHandlerCreator;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;

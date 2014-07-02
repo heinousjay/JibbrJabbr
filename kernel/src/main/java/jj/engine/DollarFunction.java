@@ -9,8 +9,8 @@ import javax.inject.Singleton;
 
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
-import jj.http.server.CurrentWebSocketConnection;
-import jj.http.server.WebSocketConnectionHost;
+import jj.http.server.websocket.CurrentWebSocketConnection;
+import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
 

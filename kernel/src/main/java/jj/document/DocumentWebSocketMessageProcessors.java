@@ -20,8 +20,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.http.server.WebSocketConnection;
-import jj.http.server.WebSocketMessageProcessor;
+import jj.http.server.websocket.WebSocketConnection;
+import jj.http.server.websocket.WebSocketMessageProcessor;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.JJMessageException;
 

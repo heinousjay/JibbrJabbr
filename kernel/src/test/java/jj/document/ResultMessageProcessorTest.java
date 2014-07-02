@@ -17,7 +17,7 @@ package jj.document;
 
 import static org.mockito.BDDMockito.*;
 import jj.document.ResultMessageProcessor;
-import jj.http.server.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.script.ContinuationCoordinator;

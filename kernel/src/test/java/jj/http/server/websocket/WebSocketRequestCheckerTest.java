@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import jj.http.server.websocket.WebSocketRequestChecker;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

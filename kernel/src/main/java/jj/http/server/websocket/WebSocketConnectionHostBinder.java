@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
+package jj.http.server.websocket;
 
-import jj.http.server.websocket.WebSocketConnection;
-import jj.jjmessage.JJMessage;
+import com.google.inject.Binder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.TypeLiteral;
 
 /**
- * component based refactoring of handling incoming websocket messages
- * 
  * @author jason
  *
  */
-interface DocumentWebSocketMessageProcessor {
+public class WebSocketConnectionHostBinder {
+
+	private final Multibinder<Class<? extends WebSocketConnectionHost>> hostBinder;
 	
-	void handle(WebSocketConnection connection, JJMessage message);
+	public WebSocketConnectionHostBinder(Binder binder) {
+		hostBinder = Multibinder.newSetBinder(binder, new TypeLiteral<Class<? extends WebSocketConnectionHost>>() {});
+	}
+	
+	public void toHost(Class<? extends WebSocketConnectionHost> hostClass) {
+		hostBinder.addBinding().toInstance(hostClass);
+	}
 }

@@ -36,8 +36,10 @@ import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.HttpServerRequestImpl;
-import jj.http.server.WebSocketConnectionMaker;
 import jj.http.server.servable.RequestProcessor;
+import jj.http.server.websocket.WebSocketConnectionMaker;
+import jj.http.server.websocket.WebSocketFrameHandlerCreator;
+import jj.http.server.websocket.WebSocketRequestChecker;
 import jj.logging.Emergency;
 
 import org.junit.Before;

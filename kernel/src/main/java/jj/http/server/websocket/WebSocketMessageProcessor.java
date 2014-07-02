@@ -13,24 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
-import static org.mockito.Mockito.mock;
-import jj.script.CurrentScriptEnvironment;
 
 /**
  * @author jason
  *
  */
-public class MockCurrentWebSocketConnection extends CurrentWebSocketConnection {
-	
-	/**
-	 * @param env
-	 */
-	public MockCurrentWebSocketConnection() {
-		super(mock(CurrentScriptEnvironment.class));
-		
-		
-	}
+public interface WebSocketMessageProcessor {
+
+	boolean process(WebSocketConnection connection, String message);
 
 }

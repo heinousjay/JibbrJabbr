@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.document.DocumentScriptEnvironment;
+import jj.http.server.websocket.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnectionHost;
+import jj.http.server.websocket.WebSocketFrameHandler;
+import jj.http.server.websocket.WebSocketFrameHandlerCreator;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 import org.junit.Test;

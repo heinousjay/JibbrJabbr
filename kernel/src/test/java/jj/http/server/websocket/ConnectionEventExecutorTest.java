@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import jj.execution.MockTaskRunner;
+import jj.http.server.websocket.ConnectionEventExecutor;
+import jj.http.server.websocket.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.jjmessage.EventNameHelper;
 import jj.script.ContinuationCoordinator;
 

@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-enum PipelineStages {
+public enum PipelineStages {
 	Decoder,
 	Aggregator,
 	Encoder,

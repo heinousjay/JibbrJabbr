@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -23,6 +23,7 @@ import static org.mockito.BDDMockito.*;
 import java.net.InetSocketAddress;
 
 import jj.document.DocumentScriptEnvironment;
+import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

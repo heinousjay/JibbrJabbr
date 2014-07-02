@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.server.websocket;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,7 +27,7 @@ import com.google.inject.Injector;
  *
  */
 @Singleton
-class WebSocketFrameHandlerCreator {
+public class WebSocketFrameHandlerCreator {
 	
 	private final class CreatorModule extends AbstractModule {
 		
