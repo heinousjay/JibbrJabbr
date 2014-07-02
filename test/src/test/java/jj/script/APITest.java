@@ -28,6 +28,7 @@ import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
 import jj.testing.JibbrJabbrTestServer;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -52,6 +53,7 @@ public class APITest {
 	
 	private boolean error;
 	
+	@Ignore // not sure what this test is supposed to be
 	@Test
 	public void test() throws Throwable {
 		
