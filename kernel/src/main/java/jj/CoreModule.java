@@ -30,6 +30,7 @@ import jj.jasmine.JasmineModule;
 import jj.jjmessage.JJMessageModule;
 import jj.logging.LoggingModule;
 import jj.messaging.MessagingModule;
+import jj.repl.ReplModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
 import jj.http.server.HttpServerModule;
@@ -95,18 +96,15 @@ public class CoreModule extends JJModule {
 		install(new ConversionModule());
 		install(new EventModule());
 		install(new ExecutionModule());
-		
-		// extract the Document system from here.
-		// it is a standalone feature
 		install(new ResourceModule());
 		install(new ScriptModule());
+		install(new ReplModule());
+		
+		install(new HttpServerModule());
 		
 		install(new MessagingModule());
 
 		install(new DocumentProcessingModule());
-		// this is second wave, in the new plan - restartable services with bridged
-		// access to the core
-		install(new HttpServerModule());
 		
 		// this needs to be split into pieces and contributed
 		// from places that make the most sense
