@@ -15,8 +15,6 @@
  */
 package jj;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 
 import jj.configuration.CommandLine;
 import jj.configuration.ConfigurationModule;
@@ -40,24 +38,6 @@ import jj.http.server.HttpServerModule;
  *
  */
 public class CoreModule extends JJModule {
-	
-	// can probably live in RhinoContext, assuming that is the only entry point to the context
-	
-	// this lives here because we need to set up the context factory
-	// before anything actually creates a context, otherwise we won't
-	// get the "enhanced java access" which means exceptions will just
-	// break on through the scripts
-	private static final class JJContextFactory extends ContextFactory {
-		
-		@Override
-		protected boolean hasFeature(Context cx, int featureIndex) {
-			return (featureIndex == Context.FEATURE_ENHANCED_JAVA_ACCESS) || super.hasFeature(cx, featureIndex);
-		}
-	}
-	
-	static {
-		ContextFactory.initGlobal(new JJContextFactory());
-	}
 	
 	private final String [] args;
 	private final boolean isTest;

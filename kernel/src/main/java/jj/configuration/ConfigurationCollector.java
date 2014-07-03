@@ -36,7 +36,7 @@ import jj.conversion.Converters;
  *
  */
 @Singleton
-class ConfigurationCollector {
+public class ConfigurationCollector {
 	
 	private final AtomicReference<Map<String, Object>> current = new AtomicReference<>();
 	private HashMap<String, Object> inProgress = new HashMap<>();
@@ -52,11 +52,11 @@ class ConfigurationCollector {
 	 * @param key
 	 * @param value
 	 */
-	void addConfigurationElement(String key, Object value) {
+	public void addConfigurationElement(String key, Object value) {
 		inProgress.put(key, value);
 	}
 	
-	void addConfigurationMultiElement(String key, Object value) {
+	public void addConfigurationMultiElement(String key, Object value) {
 		if (!inProgress.containsKey(key)) {
 			inProgress.put(key, new ArrayList<Object>());
 		}

@@ -20,7 +20,7 @@ import org.mozilla.javascript.Context;
  * @author jason
  *
  */
-class DocumentSelection implements Selection {
+public class DocumentSelection implements Selection {
 	
 	
 	private final Elements elements;
