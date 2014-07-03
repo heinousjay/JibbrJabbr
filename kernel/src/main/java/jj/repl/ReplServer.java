@@ -16,6 +16,7 @@
 package jj.repl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.configuration.resolution.AppLocation.Virtual;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -27,12 +28,14 @@ import io.netty.util.concurrent.GenericFutureListener;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.ServerStarting;
 import jj.ServerStopping;
 import jj.configuration.ConfigurationLoaded;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.logging.Emergency;
+import jj.resource.ResourceLoader;
 
 /**
  * starts up with the server (bound as an eager singleton)
@@ -57,6 +60,8 @@ class ReplServer {
 	private final ReplConfiguration configuration;
 	private final ReplServerChannelInitializer channelInitializer;
 	private final Publisher publisher;
+	private final ResourceLoader resourceLoader;
+	
 	private volatile ServerBootstrap server;
 	private volatile int port;
 	
@@ -64,11 +69,18 @@ class ReplServer {
 	ReplServer(
 		final ReplConfiguration configuration,
 		final ReplServerChannelInitializer channelInitializer,
-		final Publisher publisher
+		final Publisher publisher,
+		final ResourceLoader resourceLoader
 	) {
 		this.configuration = configuration;
 		this.channelInitializer = channelInitializer;
 		this.publisher = publisher;
+		this.resourceLoader = resourceLoader;
+	}
+	
+	@Listener
+	void serverStarting(ServerStarting serverStarting) {
+		resourceLoader.loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM);
 	}
 	
 	@Listener

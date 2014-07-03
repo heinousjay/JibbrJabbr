@@ -15,6 +15,11 @@
  */
 package jj.repl;
 
+import static jj.configuration.resolution.AppLocation.Virtual;
+
+import javax.inject.Inject;
+
+import jj.resource.ResourceFinder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -23,9 +28,24 @@ import io.netty.channel.SimpleChannelInboundHandler;
  *
  */
 class ReplHandler extends SimpleChannelInboundHandler<String> {
+	
+	private final ResourceFinder resourceFinder;
+	
+	@Inject
+	ReplHandler(final ResourceFinder resourceFinder) {
+		this.resourceFinder = resourceFinder;
+	}
+	
+	
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+		
+		ReplScriptEnvironment rse = 
+			resourceFinder.findResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM);
+		
+		assert rse != null : "no ReplScriptEnvironment found!";
+		
 		ctx.writeAndFlush("you said: " + msg);
 	}
 

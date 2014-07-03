@@ -17,6 +17,8 @@ package jj.repl;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import io.netty.channel.ChannelInitializer;
@@ -33,6 +35,13 @@ import io.netty.handler.codec.string.StringEncoder;
  */
 @Singleton
 public class ReplServerChannelInitializer extends ChannelInitializer<SocketChannel> {
+	
+	private final Provider<ReplHandler> replHandlerProvider;
+	
+	@Inject
+	ReplServerChannelInitializer(final Provider<ReplHandler> replHandlerProvider) {
+		this.replHandlerProvider = replHandlerProvider;
+	}
 
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
@@ -41,7 +50,7 @@ public class ReplServerChannelInitializer extends ChannelInitializer<SocketChann
 		p.addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()))
 			.addLast(new StringDecoder(US_ASCII))
 			.addLast(new StringEncoder(US_ASCII))
-			.addLast(new ReplHandler());
+			.addLast(replHandlerProvider.get());
 	}
 
 }

@@ -18,7 +18,9 @@ package jj.repl;
 import jj.configuration.Default;
 
 /**
- * Not a whole lot to configure, really
+ * Not a whole lot to configure, really,
+ * controls whether the listener is active
+ * and what port it is on
  * 
  * @author jason
  *

@@ -16,12 +16,16 @@
 package jj.repl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.configuration.resolution.AppLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.concurrent.CountDownLatch;
 
+import javax.inject.Provider;
+
 import jj.event.Publisher;
+import jj.resource.ResourceLoader;
 
 import org.junit.After;
 import org.junit.Before;
@@ -52,22 +56,38 @@ public class ReplServerTest {
 		}
 	};
 	
+	Provider<ReplHandler> replHandlerProvider = new Provider<ReplHandler>() {
+
+		@Override
+		public ReplHandler get() {
+			return mock(ReplHandler.class);
+		}
+	};
+	
 	@Mock Publisher publisher;
+	@Mock ResourceLoader resourceLoader;
 	
 	ReplServer server;
 	
 	@Before
 	public void before() {
-		server = new ReplServer(configuration, new ReplServerChannelInitializer(), publisher);
+		server = new ReplServer(configuration, new ReplServerChannelInitializer(replHandlerProvider), publisher, resourceLoader);
 	}
 	
 	@After
 	public void after() {
 		server.serverStopping(null);
 	}
+	
+	@Test
+	public void testInitialization() {
+		server.serverStarting(null);
+		
+		verify(resourceLoader).loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM);
+	}
 
 	@Test
-	public void test() throws Exception {
+	public void testConnecting() throws Exception {
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 		
