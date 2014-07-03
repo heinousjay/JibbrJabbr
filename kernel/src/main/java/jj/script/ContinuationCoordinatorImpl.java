@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 
 import jj.event.Publisher;
@@ -68,10 +69,28 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		return null;
 	}
 	
+	private static final Object[] EMPTY_ARGS = new Object[0];
+	
+	@Override
+	public ContinuationPendingKey evaluate(final ScriptEnvironment scriptEnvironment, final String script, final String sourceName) {
+		
+		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
+		
+		return processContinuationState(execute(new ContinuationExecution() {
+			
+			@Override
+			public void run(RhinoContext context) {
+				try (Closer closer = env.enterScope(scriptEnvironment)) {
+					Function function = context.compileFunction(scriptEnvironment.scope(), script, sourceName);
+					context.callFunctionWithContinuations(function, scriptEnvironment.scope(), EMPTY_ARGS);
+				}
+			}
+		}, scriptEnvironment));
+	}
+	
 	/**
 	 * initial execution of a script environment.  only available to the Initializer task
-	 * @param scriptEnvironment
-	 * @return true if completed, false if continued
+	 * @param scriptEnvironment The script environment
 	 */
 	ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment) {
 		
@@ -88,13 +107,6 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		}, scriptEnvironment));
 	}
 	
-	/**
-	 * function execution within the context of script environment
-	 * @param scriptEnvironment
-	 * @param functionName
-	 * @param args
-	 * @return true if completed, false if continued
-	 */
 	@Override
 	public ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		

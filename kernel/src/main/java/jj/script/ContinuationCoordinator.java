@@ -18,26 +18,37 @@ package jj.script;
 import org.mozilla.javascript.Callable;
 
 /**
+ * Continuable script execution services
+ * 
  * @author jason
  *
  */
 public interface ContinuationCoordinator {
 
 	/**
-	 * function execution within the context of script environment
-	 * @param scriptEnvironment
-	 * @param functionName
-	 * @param args
-	 * @return true if completed, false if continued
+	 * continuable String evaluation within the context of {@link ScriptEnvironment}
+	 * @param scriptEnvironment The containing <code>ScriptEnvironment</code>
+	 * @param script The script to evaluate.
+	 * @param sourceName The source name of the script, for error reporting
+	 * @return A key representing a pending continuation, or null if the execution completed
+	 */
+	ContinuationPendingKey evaluate(ScriptEnvironment scriptEnvironment, String script, String sourceName);
+
+	/**
+	 * continuable <code>Callable</code> execution within the context of {@link ScriptEnvironment}
+	 * @param scriptEnvironment The containing <code>ScriptEnvironment</code>
+	 * @param function The <code>Callable</code> to execute
+	 * @param args The arguments to the function, if any
+	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
 	ContinuationPendingKey execute(ScriptEnvironment scriptEnvironment, Callable function, Object... args);
 
 	/**
 	 * Resumes a continuation that was previously saved from an execution in this class
-	 * @param pendingKey
+	 * @param pendingKey The {@link ContinuationPendingKey} repe
 	 * @param scriptEnvironment
 	 * @param result
-	 * @return true if completed, false if continued
+	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
 	ContinuationPendingKey resumeContinuation(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey, Object result);
 	
