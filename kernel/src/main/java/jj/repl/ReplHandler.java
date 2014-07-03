@@ -71,28 +71,34 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 		
 		assert rse != null : "no ReplScriptEnvironment found!";
 		
-		try (RhinoContext context = contextProvider.get()) {
+		if (msg.trim().isEmpty()) {
 			
-			final Script script = context.compileString(
-				"$$print(function() { return " + msg + "; });",
-				"repl"
-			);
-
-			taskRunner.execute(new ScriptTask<ReplScriptEnvironment>("repl execution:\n" + msg, rse, continuationCoordinator) {
-
-				@Override
-				protected void begin() throws Exception {
-					
-					try (Closer closer = currentCtx.enterScope(ctx)) {
-						pendingKey = continuationCoordinator.execute(rse, script);
+			ctx.writeAndFlush("\n>");
+			
+		} else {
+		
+			try (RhinoContext context = contextProvider.get()) {
+				
+				final Script script = context.compileString(
+					"$$print(function() { return " + msg + "; });",
+					"repl"
+				);
+	
+				taskRunner.execute(new ScriptTask<ReplScriptEnvironment>("repl execution:\n" + msg, rse, continuationCoordinator) {
+	
+					@Override
+					protected void begin() throws Exception {
+						
+						try (Closer closer = currentCtx.enterScope(ctx)) {
+							pendingKey = continuationCoordinator.execute(rse, script);
+						}
 					}
-				}
-			});
-			
-		} catch (Exception e) {
-			
-			ctx.writeAndFlush(e.getMessage() + "\n>");
+				});
+				
+			} catch (Exception e) {
+				
+				ctx.writeAndFlush(e.getMessage() + "\n>");
+			}
 		}
 	}
-
 }

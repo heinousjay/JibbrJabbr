@@ -77,6 +77,16 @@ public class ReplHandlerTest {
 	}
 	
 	@Test
+	public void testEmptyMessage() throws Exception {
+		
+		rh.channelRead0(ctx, "   \n\r\n\r\n   ");
+
+		verify(ctx).writeAndFlush("\n>");
+		
+		assertThat(taskRunner.tasks, is(empty()));
+	}
+	
+	@Test
 	public void testMessageSuccess() throws Exception {
 		
 		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl")).willReturn(script);
