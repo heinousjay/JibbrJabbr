@@ -15,6 +15,7 @@
  */
 package jj.http.server;
 
+import io.netty.handler.codec.http.HttpRequest;
 import jj.logging.EmergencyLogger;
 import jj.logging.LoggedEvent;
 
@@ -23,9 +24,11 @@ import org.slf4j.Logger;
 @EmergencyLogger
 public class RequestErrored extends LoggedEvent {
 	
+	private final HttpRequest request;
 	private final Throwable t;
 	
-	RequestErrored(final Throwable t) {
+	RequestErrored(final HttpRequest request, final Throwable t) {
+		this.request = request;
 		this.t = t;
 	}
 
