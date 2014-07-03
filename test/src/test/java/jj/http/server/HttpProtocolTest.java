@@ -40,6 +40,7 @@ import com.google.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.App;
+import jj.event.Publisher;
 import jj.execution.TaskRunner;
 import jj.http.server.methods.HttpMethodHandler;
 import jj.testing.JibbrJabbrTestServer;
@@ -85,14 +86,17 @@ public class HttpProtocolTest {
 	public static class ProtocolTestHttpServer {
 		
 		private final TaskRunner taskRunner;
+		private final Publisher publisher;
 		private final Map<HttpMethod, Provider<HttpMethodHandler>> methodHandlers;
 		
 		@Inject
 		ProtocolTestHttpServer(
 			final TaskRunner taskRunner,
+			final Publisher publisher,
 			final Map<HttpMethod, Provider<HttpMethodHandler>> methodHandlers
 		) {
 			this.taskRunner = taskRunner;
+			this.publisher = publisher;
 			this.methodHandlers = methodHandlers;
 		}
 		
@@ -108,7 +112,7 @@ public class HttpProtocolTest {
 						new ProtocolTestResponseAdapter(response),
 						// timeout handler
 						new HttpRequestDecoder(),
-						new HttpRequestListeningHandler(methodHandlers)
+						new HttpRequestListeningHandler(publisher, methodHandlers)
 					);
 					channel.writeInbound(Unpooled.copiedBuffer(request, US_ASCII));
 				}

@@ -15,11 +15,14 @@
  */
 package jj.http.server;
 
+import static jj.http.server.DefaultResponse.*;
+
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
+import jj.event.Publisher;
 import jj.http.server.methods.HttpMethodHandler;
 
 import com.google.inject.Provider;
@@ -29,12 +32,8 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * first-chance disposition of an incoming request
@@ -54,33 +53,31 @@ import io.netty.handler.codec.http.HttpVersion;
  */
 class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpRequest> {
 	
+	private final Publisher publisher;
+	
 	private final Map<HttpMethod, Provider<HttpMethodHandler>> methodHandlers;
 	
 	private String name;
 	
-	private static final HttpResponse BAD_REQUEST =
-		new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST);
-
-	private static final HttpResponse NOT_IMPLEMENTED =
-		new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_IMPLEMENTED);
-
-	private static final HttpResponse INTERNAL_SERVER_ERROR =
-		new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+	private HttpRequest request;
 	
 	@Inject
 	HttpRequestListeningHandler(
+		final Publisher publisher,
 		final Map<HttpMethod, Provider<HttpMethodHandler>> methodHandlers
 	) {
+		this.publisher = publisher;
 		this.methodHandlers = methodHandlers;
 	}
 	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
+		this.request = request;
 		
 		if (request.getDecoderResult().isFailure()) {
 			// respond with BAD_REQUEST and close the connection
 			// (unless we are being proxied and the connection is keep-alive, that is)
-			ctx.writeAndFlush(BAD_REQUEST).addListener(ChannelFutureListener.CLOSE);
+			BAD_REQUEST.writeAndFlush(ctx).addListener(ChannelFutureListener.CLOSE);
 			
 		} else if (methodHandlers.containsKey(request.getMethod())) {
 
@@ -95,14 +92,14 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 		} else {
 			// respond with NOT_IMPLEMENTED
 			// unless we are being proxied and the connection is keep-alive
-			ctx.writeAndFlush(NOT_IMPLEMENTED).addListener(ChannelFutureListener.CLOSE);
+			NOT_IMPLEMENTED.writeAndFlush(ctx).addListener(ChannelFutureListener.CLOSE);
 		}
 	}
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		// publish the error!
-		ctx.writeAndFlush(INTERNAL_SERVER_ERROR).addListener(ChannelFutureListener.CLOSE);
+		publisher.publish(new RequestErrored(request, cause));
+		INTERNAL_SERVER_ERROR.writeAndFlush(ctx).addListener(ChannelFutureListener.CLOSE);
 	}
 	
 	@Override
