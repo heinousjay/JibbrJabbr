@@ -19,11 +19,24 @@ import jj.configuration.Location;
 import jj.execution.Promise;
 
 /**
+ * <p>
+ * Service component that asynchronously loads a resource 
+ * 
  * @author jason
  *
  */
 public interface ResourceLoader {
 
+	/**
+	 * <p>
+	 * Asynchronously load the identified {@link Resource} using a {@link ResourceTask}
+	 * 
+	 * @param resourceClass The type of <code>Resource</code>
+	 * @param base The {@link Location} of the <code>Resource</code>
+	 * @param name The name of the <code>Resource</code>
+	 * @param arguments The creation arguments of the <code>Resource</code>
+	 * @return the <code>ResourceTask</code>'s {@link Promise}
+	 */
 	Promise loadResource(Class<? extends Resource> resourceClass, Location base, String name, Object... arguments);
 
 }
