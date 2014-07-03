@@ -8,8 +8,8 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
-import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Script;
 
 import jj.event.Publisher;
 import jj.util.Closer;
@@ -69,10 +69,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		return null;
 	}
 	
-	private static final Object[] EMPTY_ARGS = new Object[0];
-	
 	@Override
-	public ContinuationPendingKey evaluate(final ScriptEnvironment scriptEnvironment, final String script, final String sourceName) {
+	public ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment, final Script script) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -81,8 +79,7 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			@Override
 			public void run(RhinoContext context) {
 				try (Closer closer = env.enterScope(scriptEnvironment)) {
-					Function function = context.compileFunction(scriptEnvironment.scope(), script, sourceName);
-					context.callFunctionWithContinuations(function, scriptEnvironment.scope(), EMPTY_ARGS);
+					context.executeScriptWithContinuations(script, scriptEnvironment.scope());
 				}
 			}
 		}, scriptEnvironment));

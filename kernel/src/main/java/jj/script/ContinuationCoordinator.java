@@ -16,6 +16,7 @@
 package jj.script;
 
 import org.mozilla.javascript.Callable;
+import org.mozilla.javascript.Script;
 
 /**
  * Continuable script execution services
@@ -32,7 +33,7 @@ public interface ContinuationCoordinator {
 	 * @param sourceName The source name of the script, for error reporting
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
-	ContinuationPendingKey evaluate(ScriptEnvironment scriptEnvironment, String script, String sourceName);
+	ContinuationPendingKey execute(ScriptEnvironment scriptEnvironment, Script script);
 
 	/**
 	 * continuable <code>Callable</code> execution within the context of {@link ScriptEnvironment}

@@ -19,6 +19,10 @@ import jj.execution.CurrentTask;
 
 /**
  * <p>
+ * Don't forget! Descendents of this class should be annotated with 
+ * {@link javax.inject.Singleton} or there really is just no point
+ * 
+ * <p>
  * Performs the basic management of a contextual resource with a generic closer. 
  * <pre class="brush:java">
  * try (Closer closer = resource.enterScope(..something..)) {

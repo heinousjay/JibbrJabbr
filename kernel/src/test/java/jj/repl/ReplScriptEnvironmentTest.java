@@ -56,7 +56,7 @@ public class ReplScriptEnvironmentTest {
 		given(dependencies.resourceFinder().loadResource(ScriptResource.class, Assets, ReplScriptEnvironment.BASE_REPL_SYSTEM)).willReturn(script);
 		
 		try (RhinoContext context = contextProvider.get()) {
-			rse = new ReplScriptEnvironment(dependencies, context.initStandardObjects());
+			rse = new ReplScriptEnvironment(dependencies, context.initStandardObjects(), new CurrentReplChannelHandlerContext());
 		}
 	}
 	

@@ -70,6 +70,8 @@ public class ContinuationCoordinatorTest {
 	@Mock Publisher publisher;
 	
 	@Mock Callable function;
+	
+	@Mock Script executedScript;
 
 	ContinuationCoordinatorImpl continuationCoordinator;
 	
@@ -167,6 +169,38 @@ public class ContinuationCoordinatorTest {
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(e);
 		
 		continuationCoordinator.execute(scriptEnvironment, function);
+		
+		verify(publisher).publish(isA(ScriptExecutionError.class));
+	}
+	
+	@Test
+	public void testScriptExecutionNoContinuation() {
+		
+		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, executedScript);
+		
+		assertThat(result, is(nullValue()));
+	}
+	
+	@Test
+	public void testScriptExecutionWithContinuation() {
+		
+		given(context.executeScriptWithContinuations(executedScript, scope)).willThrow(continuation);
+		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
+		
+		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, executedScript);
+		
+		assertThat(result, is(notNullValue()));
+		verify(continuationProcessor2).process(continuationState);
+	}
+	
+	@Test
+	public void testScriptExecutionWithUnexpectedException() {
+		
+		final RuntimeException e = new RuntimeException();
+		
+		given(context.executeScriptWithContinuations(executedScript, scope)).willThrow(e);
+		
+		continuationCoordinator.execute(scriptEnvironment, executedScript);
 		
 		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}

@@ -16,8 +16,10 @@
 package jj.repl;
 
 import static jj.configuration.resolution.AppLocation.Assets;
+import io.netty.channel.ChannelHandlerContext;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -26,9 +28,11 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.script.AbstractScriptEnvironment;
+import jj.script.ContinuationPendingKey;
 import jj.script.Global;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
+import jj.util.Closer;
 
 /**
  * provides an execution environment which runs a setup script, listens
@@ -42,16 +46,22 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 	static final String NAME = "repl";
 	static final String BASE_REPL_SYSTEM = "base-repl-system.js";
 	
+	private final CurrentReplChannelHandlerContext currentCtx;
 	private final ScriptableObject global;
 	private final ScriptableObject local;
 	private final ScriptResource system;
 	
+	private final HashMap<ContinuationPendingKey, ChannelHandlerContext> pendingContexts = new HashMap<>();
+	
 	@Inject
 	ReplScriptEnvironment(
 		final Dependencies dependencies,
-		final @Global ScriptableObject global
+		final @Global ScriptableObject global,
+		final CurrentReplChannelHandlerContext currentCtx
 	) {
 		super(dependencies);
+		
+		this.currentCtx = currentCtx;
 		
 		this.global = global;
 		this.local = 
@@ -64,8 +74,23 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 		system = resourceFinder.loadResource(ScriptResource.class, Assets, BASE_REPL_SYSTEM);
 		
 		assert system != null : "can't find " + BASE_REPL_SYSTEM + ", build is broken!";
+		
+		system.addDependent(this);
 	}
 
+	@Override
+	protected void captureContextForKey(ContinuationPendingKey key) {
+		pendingContexts.put(key, currentCtx.current());
+	}
+	
+	@Override
+	protected Closer restoreContextForKey(ContinuationPendingKey key) {
+		ChannelHandlerContext ctx = pendingContexts.remove(key);
+		assert ctx != null : "no ctx found to restore";
+		
+		return currentCtx.enterScope(ctx);
+	}
+	
 	@Override
 	public Scriptable scope() {
 		return local;

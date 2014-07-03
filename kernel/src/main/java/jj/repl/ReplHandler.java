@@ -18,8 +18,16 @@ package jj.repl;
 import static jj.configuration.resolution.AppLocation.Virtual;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
+import org.mozilla.javascript.Script;
+
+import jj.execution.TaskRunner;
 import jj.resource.ResourceFinder;
+import jj.script.ContinuationCoordinator;
+import jj.script.RhinoContext;
+import jj.script.ScriptTask;
+import jj.util.Closer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -30,23 +38,61 @@ import io.netty.channel.SimpleChannelInboundHandler;
 class ReplHandler extends SimpleChannelInboundHandler<String> {
 	
 	private final ResourceFinder resourceFinder;
+	private final TaskRunner taskRunner;
+	private final ContinuationCoordinator continuationCoordinator;
+	private final CurrentReplChannelHandlerContext currentCtx;
+	private final Provider<RhinoContext> contextProvider;
 	
 	@Inject
-	ReplHandler(final ResourceFinder resourceFinder) {
+	ReplHandler(
+		final ResourceFinder resourceFinder,
+		final TaskRunner taskRunner,
+		final ContinuationCoordinator continuationCoordinator,
+		final CurrentReplChannelHandlerContext currentCtx,
+		final Provider<RhinoContext> contextProvider
+	) {
 		this.resourceFinder = resourceFinder;
+		this.taskRunner = taskRunner;
+		this.continuationCoordinator = continuationCoordinator;
+		this.currentCtx = currentCtx;
+		this.contextProvider = contextProvider;
 	}
 	
-	
+	@Override
+	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+		ctx.writeAndFlush("Welcome to JibbrJabbr\n>");
+	}
 
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+	protected void channelRead0(final ChannelHandlerContext ctx, final String msg) throws Exception {
 		
-		ReplScriptEnvironment rse = 
+		final ReplScriptEnvironment rse = 
 			resourceFinder.findResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM);
 		
 		assert rse != null : "no ReplScriptEnvironment found!";
 		
-		ctx.writeAndFlush("you said: " + msg);
+		try (RhinoContext context = contextProvider.get()) {
+			
+			final Script script = context.compileString(
+				"$$print(function() { return " + msg + "; });",
+				"repl"
+			);
+
+			taskRunner.execute(new ScriptTask<ReplScriptEnvironment>("repl execution:\n" + msg, rse, continuationCoordinator) {
+
+				@Override
+				protected void begin() throws Exception {
+					
+					try (Closer closer = currentCtx.enterScope(ctx)) {
+						pendingKey = continuationCoordinator.execute(rse, script);
+					}
+				}
+			});
+			
+		} catch (Exception e) {
+			
+			ctx.writeAndFlush(e.getMessage() + "\n>");
+		}
 	}
 
 }

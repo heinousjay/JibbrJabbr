@@ -27,6 +27,7 @@ import jj.util.Closer;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -43,7 +44,7 @@ public class DollarFunctionTest extends AbstractEngineApiTest {
 		return Jsoup.parse(readPath(url));
 	}
 
-	//@Ignore
+	@Ignore
 	@Test
 	public void test() throws Exception {
 		
