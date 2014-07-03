@@ -22,6 +22,9 @@ import java.util.concurrent.CountDownLatch;
 import jj.execution.JJTask;
 
 /**
+ * A task for loading resources.  In most cases, try to use 
+ * {@link ResourceLoader} first.
+ * 
  * @author jason
  *
  */
@@ -49,8 +52,7 @@ public abstract class ResourceTask extends JJTask {
 	}
 
 	/**
-	 * this is only intended for synchronizing resource creation but maybe will be useful in
-	 * some less stuff?
+	 * used to synchronize resource creation across multiple requests
 	 */
 	void await() {
 		try {
