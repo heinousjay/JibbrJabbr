@@ -250,8 +250,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 					"return function(id) {" +
 					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
 					"var result = module['//requireInner'](id, module.id); " +
+					"if (result == null) {" +
+						"throw new ReferenceError(id + ' cannot be found');" +
+					"} " +
 					"if (result['getCause']) { " +
-						"throw result;" + 
+						"throw new ReferenceError(result.getMessage());" + 
 					"} " +
 					"return result;" +
 				"}})(module);",
