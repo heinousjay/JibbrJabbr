@@ -47,7 +47,7 @@ public class LetsWriteATest {
 	// normally you would be sourcing the driver provider from some project-specific configuration
 	// but for the purposes of testing the rule, we hardcode
 	@Test
-	public void test() throws Exception {
+	public void testChief() throws Exception {
 		
 		IndexPage index = webDriverRule.get(IndexPage.class);
 		
@@ -60,7 +60,7 @@ public class LetsWriteATest {
 	}
 
 	@Test
-	public void test2() throws Exception {
+	public void testBeef() throws Exception {
 		
 		IndexPage index = webDriverRule.get(IndexPage.class);
 		
