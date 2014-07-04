@@ -16,6 +16,7 @@
 package jj;
 
 import java.nio.file.Paths;
+
 import jj.webdriver.WebDriverProvider;
 import jj.webdriver.provider.PhantomJSWebDriverProvider;
 
@@ -39,6 +40,8 @@ public class App {
 	public static final String configuration;
 	
 	public static final String css;
+
+	public static final String repl;
 	
 	static {
 		try {
@@ -48,6 +51,7 @@ public class App {
 			api = Paths.get(App.class.getResource("/api/public/").toURI()).toAbsolutePath().toString();
 			configuration = Paths.get(App.class.getResource("/configuration/").toURI()).toAbsolutePath().toString();
 			css = Paths.get(App.class.getResource("/css/").toURI()).toAbsolutePath().toString();
+			repl = Paths.get(App.class.getResource("/repl/").toURI()).toAbsolutePath().toString();
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}
