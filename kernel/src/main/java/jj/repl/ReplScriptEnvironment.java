@@ -35,8 +35,9 @@ import jj.script.module.ScriptResource;
 import jj.util.Closer;
 
 /**
- * provides an execution environment which runs a setup script, listens
- * on port 9955 for
+ * <p>
+ * Execution environment for REPL connections. Main purpose is as a coordination
+ * point for continuations and a parent for modules
  * 
  * @author jason
  *
@@ -113,12 +114,12 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 
 	@Override
 	public String uri() {
-		return "";
+		return "/" + sha1() + "/" + name();
 	}
 
 	@Override
 	public String sha1() {
-		return "";
+		return system.sha1();
 	}
 
 	@Override
