@@ -69,11 +69,11 @@ allprojects {
 		}
 		
 		serverCore configurations.core
-		serverCore 'io.netty:netty-all:4.0.19.Final'
+		serverCore 'io.netty:netty-all:4.0.21.Final'
 		serverCore 'org.asynchttpclient:async-http-client-netty-provider:2.0.0-SNAPSHOT'
 		serverCore 'org.mozilla:rhino:1.7R4'
 		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
-		serverCore 'org.jsoup:jsoup:1.7.2'
+		serverCore 'org.jsoup:jsoup:1.7.3'
 	}
 	
 	eclipseClasspath.doFirst {
