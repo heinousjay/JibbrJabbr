@@ -26,6 +26,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 
+import jj.event.Subscriber;
 import jj.execution.DelayedExecutor.CancelKey;
 import jj.execution.TaskRunner;
 

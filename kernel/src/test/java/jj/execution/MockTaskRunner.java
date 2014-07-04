@@ -41,12 +41,18 @@ public class MockTaskRunner implements TaskRunner {
 		return tasks.get(0);
 	}
 	
-	public void runFirstTask() throws Exception {
+	public DelayedTask<?> firstDelayedTask() {
+		return (DelayedTask<?>)tasks.get(0);
+	}
+	
+	public JJTask runFirstTask() throws Exception {
 		assert(!tasks.isEmpty());
 		
 		JJTask task = tasks.remove(0);
 			
 		task.run();
+		
+		return task;
 	}
 	
 	public Thread runFirstTaskInDaemon() throws Exception {
@@ -76,5 +82,17 @@ public class MockTaskRunner implements TaskRunner {
 		tasks.add(task);
 		
 		return task.promise().taskRunner(this);
+	}
+	
+	public long firstTaskDelay() {
+		assert !tasks.isEmpty() && tasks.get(0) instanceof DelayedTask : "no DelayedTask at index 0";
+		
+		return ((DelayedTask<?>)tasks.get(0)).delay();
+	}
+	
+	public boolean taskWillRepeat(JJTask task) {
+		assert task instanceof DelayedTask : "no DelayedTask at index 0";
+		
+		return ((DelayedTask<?>)task).willRepeat;
 	}
 }

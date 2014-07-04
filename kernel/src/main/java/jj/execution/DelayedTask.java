@@ -47,11 +47,15 @@ public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask {
 		return cancelKey;
 	}
 	
+	// this is strictly for testing!!
+	boolean willRepeat = false;
+	
 	/**
 	 * invoke this during the run if the task should be
 	 * scheduled again
 	 */
 	protected final void repeat() {
+		willRepeat = true;
 		promise().then(this);
 	}
 }
