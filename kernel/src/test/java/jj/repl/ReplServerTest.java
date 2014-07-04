@@ -83,7 +83,7 @@ public class ReplServerTest {
 	public void testInitialization() {
 		server.serverStarting(null);
 		
-		verify(resourceLoader).loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM);
+		verify(resourceLoader).loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.NAME);
 	}
 
 	@Test

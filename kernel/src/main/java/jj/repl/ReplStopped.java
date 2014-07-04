@@ -25,16 +25,11 @@ import jj.logging.LoggedEvent;
  *
  */
 @ServerLogger
-public class ReplListening extends LoggedEvent {
-
-	private final int port;
-	
-	ReplListening(final int port) {
-		this.port = port;
-	}
+public class ReplStopped extends LoggedEvent {
 
 	@Override
 	public void describeTo(Logger logger) {
-		logger.info("REPL server listening on port {}", port);
+		logger.info("REPL server stopped");
 	}
+
 }

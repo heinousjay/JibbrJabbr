@@ -17,6 +17,10 @@ package jj.repl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.configuration.resolution.AppLocation.Virtual;
+
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -80,7 +84,7 @@ class ReplServer {
 	
 	@Listener
 	void serverStarting(ServerStarting serverStarting) {
-		resourceLoader.loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM);
+		resourceLoader.loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.NAME);
 	}
 	
 	@Listener
@@ -120,7 +124,7 @@ class ReplServer {
 		port = (configuration.port() < 1023 || configuration.port() > 65535) ? DEFAULT_PORT : configuration.port();
 		
 		final ServerBootstrap bootstrap = new ServerBootstrap()
-			.group(new NioEventLoopGroup(1), new NioEventLoopGroup(1))
+			.group(new NioEventLoopGroup(1, bossThreadFactory), new NioEventLoopGroup(1, workerThreadFactory))
 			.channel(NioServerSocketChannel.class)
 			.childHandler(channelInitializer);
 		
@@ -144,6 +148,29 @@ class ReplServer {
 		server.group().shutdownGracefully();
 		server.childGroup().shutdownGracefully();
 		server = null;
+		publisher.publish(new ReplStopped());
 	}
+	
+	private static final ThreadFactory bossThreadFactory = new ThreadFactory() {
+		
+		private final AtomicInteger id = new AtomicInteger();
+		
+		@Override
+		public Thread newThread(Runnable r) {
+			
+			return new Thread(r, "JibbrJabbr REPL Boss " + id.incrementAndGet());
+		}
+	};
+	
+	private static final ThreadFactory workerThreadFactory = new ThreadFactory() {
+		
+		private final AtomicInteger id = new AtomicInteger();
+		
+		@Override
+		public Thread newThread(Runnable r) {
+			
+			return new Thread(r, "JibbrJabbr REPL Worker " + id.incrementAndGet());
+		}
+	};
 
 }

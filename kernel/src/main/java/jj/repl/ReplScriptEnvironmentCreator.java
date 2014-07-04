@@ -44,6 +44,7 @@ class ReplScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Repl
 
 	@Override
 	protected ReplScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
+		assert ReplScriptEnvironment.NAME.equals(name) : "repl must be named " + ReplScriptEnvironment.NAME;
 		return creator.createResource(ReplScriptEnvironment.class, resourceKey(Virtual, name), Virtual, name);
 	}
 

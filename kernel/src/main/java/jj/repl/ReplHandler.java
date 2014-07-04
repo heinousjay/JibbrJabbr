@@ -22,8 +22,11 @@ import javax.inject.Provider;
 
 import org.mozilla.javascript.Script;
 
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 import jj.resource.ResourceFinder;
+import jj.resource.ResourceReloaded;
 import jj.script.ContinuationCoordinator;
 import jj.script.RhinoContext;
 import jj.script.ScriptTask;
@@ -35,6 +38,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
  * @author jason
  *
  */
+@Subscriber
 class ReplHandler extends SimpleChannelInboundHandler<String> {
 	
 	private final ResourceFinder resourceFinder;
@@ -42,6 +46,8 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 	private final ContinuationCoordinator continuationCoordinator;
 	private final CurrentReplChannelHandlerContext currentCtx;
 	private final Provider<RhinoContext> contextProvider;
+	
+	private ChannelHandlerContext ctx;
 	
 	@Inject
 	ReplHandler(
@@ -58,18 +64,26 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 		this.contextProvider = contextProvider;
 	}
 	
+	@Listener
+	void resourceReloaded(ResourceReloaded resourceReloaded) {
+		if (resourceReloaded.resourceClass == ReplScriptEnvironment.class) {
+			ctx.writeAndFlush("\nreloading! your definitions are gone\n>");
+		}
+	}
+	
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 		ctx.writeAndFlush("Welcome to JibbrJabbr\n>");
+		this.ctx = ctx;
 	}
 
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final String msg) throws Exception {
 		
-		final ReplScriptEnvironment rse = 
-			resourceFinder.findResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM);
+		ReplScriptEnvironment rse = 
+			resourceFinder.findResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.NAME);
 		
-		assert rse != null : "no ReplScriptEnvironment found!";
+		assert rse != null && rse.alive() : "no ReplScriptEnvironment found!";
 		
 		if (msg.trim().isEmpty()) {
 			
@@ -90,7 +104,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 					protected void begin() throws Exception {
 						
 						try (Closer closer = currentCtx.enterScope(ctx)) {
-							pendingKey = continuationCoordinator.execute(rse, script);
+							pendingKey = continuationCoordinator.execute(scriptEnvironment, script);
 						}
 					}
 				});

@@ -86,6 +86,7 @@ class ResourceFinderImpl implements ResourceFinder {
 				if (result == null) {
 					createResource(base, name, resourceCreator, cacheKey, arguments);
 				} else if (((AbstractResource)result).isObselete()) {
+					System.out.println("attempting to replace " + result);
 					replaceResource(base, name, resourceCreator, result, cacheKey, arguments);
 				}
 				result = resourceClass.cast(resourceCache.get(cacheKey));

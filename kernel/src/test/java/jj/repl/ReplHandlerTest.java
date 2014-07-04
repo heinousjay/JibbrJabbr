@@ -66,7 +66,8 @@ public class ReplHandlerTest {
 			contextProvider
 		);
 		
-		given(resourceFinder.findResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.BASE_REPL_SYSTEM)).willReturn(rse);
+		given(rse.alive()).willReturn(true);
+		given(resourceFinder.findResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.NAME)).willReturn(rse);
 	}
 	
 	@Test
