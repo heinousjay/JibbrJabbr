@@ -58,10 +58,10 @@ public enum AppLocation implements Location {
 	Virtual("", null, false),
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", Virtual, JJ.jarForClass(AppLocation.class) == null),
+	Assets("", Virtual, false), //JJ.jarForClass(AppLocation.class) == null),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", Virtual, JJ.jarForClass(AppLocation.class) == null),
+	APIModules("", Virtual, false), //JJ.jarForClass(AppLocation.class) == null),
 	
 	/** the paths of the application pieces */
 	Base("", null, true),
@@ -103,7 +103,7 @@ public enum AppLocation implements Location {
 	}
 	
 	@Override
-	public boolean ensureDirectoryParent() {
+	public boolean parentInDirectory() {
 		return ensureDirectory;
 	}
 }

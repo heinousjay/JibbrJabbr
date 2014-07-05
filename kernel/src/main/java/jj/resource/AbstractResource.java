@@ -15,8 +15,6 @@
  */
 package jj.resource;
 
-import static jj.configuration.resolution.AppLocation.Base;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,11 +88,11 @@ public abstract class AbstractResource implements Resource {
 		if (
 			event.matches(this) && 
 			(this instanceof FileResource || this instanceof DirectoryResource) &&
-			this.base().root() == Base
+			this.base().parentInDirectory()
 		) {
 			String parentName = name().substring(0, name().lastIndexOf('/') + 1);
 			if (!parentName.equals(name())) {
-				DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, Base, parentName);
+				DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, base(), parentName);
 				// possibly the best bet in this case is to make the missing directory,
 				// which really oughta go into another thread? cause this could get all deadlocky
 				assert parent != null : "no parent directory for " + this;
