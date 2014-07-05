@@ -117,6 +117,11 @@ public class ResourceInstanceCreatorTest  {
 		public String sha1() {
 			return null;
 		}
+		
+		@Override
+		public ResourceKey cacheKey() {
+			return null;
+		}
 
 		@Override
 		public void addDependent(Resource dependent) {

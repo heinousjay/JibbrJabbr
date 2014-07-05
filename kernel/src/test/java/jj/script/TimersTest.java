@@ -21,6 +21,9 @@ import static org.mockito.BDDMockito.*;
 import jj.execution.DelayedExecutor.CancelKey;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
+import jj.resource.ResourceEventMaker;
+import jj.resource.ResourceKey;
+import jj.resource.ResourceKilled;
 import jj.util.Closer;
 
 import org.junit.Before;
@@ -45,7 +48,8 @@ public class TimersTest {
 	
 	@Mock Function function;
 	@Mock ScriptableObject scope;
-	@Mock ScriptEnvironment se;
+	@Mock AbstractScriptEnvironment se;
+	@Mock ResourceKey rk;
 	CurrentScriptEnvironment env;
 	
 	@Mock CancelKey cancelKey;
@@ -53,12 +57,26 @@ public class TimersTest {
 	@Before
 	public void before() {
 		taskRunner = new MockTaskRunner();
+		taskRunner.cancelKey = cancelKey;
 		env = new CurrentScriptEnvironment(contextProvider);
+		given(se.cacheKey()).willReturn(rk);
 		timers = new Timers(taskRunner, continuationCoordinator, env);
+	}
+	
+	@Test
+	public void testEnvironmentDied() {
+		try (Closer closer = env.enterScope(se)) {
+			timers.setInterval.call(null, scope, null, new Object[]{ function, "2" });
+		}
+		
+		ResourceKilled rk = ResourceEventMaker.makeResourceKilled(se);
+		timers.scriptEnvironmentKilled(rk);
+		
+		verify(cancelKey).cancel();
 	}
 
 	@Test
-	public void cancel() {
+	public void testCancel() {
 		timers.clearInterval.call(null, scope, null, new Object[] { cancelKey });
 		
 		verify(cancelKey).cancel();
@@ -78,7 +96,7 @@ public class TimersTest {
 		
 		@Override
 		public void run() {
-			timers.setInterval.call(null, scope, null, new Object[]{ function, "2", 3L });
+			assertThat((CancelKey)timers.setInterval.call(null, scope, null, new Object[]{ function, "2", 3L }), is(cancelKey));
 		}
 	};
 	
@@ -86,7 +104,7 @@ public class TimersTest {
 		
 		@Override
 		public void run() {
-			timers.setTimeout.call(null, scope, null, new Object[]{ function, 600, "hi", "there" });
+			assertThat((CancelKey)timers.setTimeout.call(null, scope, null, new Object[]{ function, 600, "hi", "there" }), is(cancelKey));
 		}
 	};
 	

@@ -31,7 +31,7 @@ import jj.logging.LoggedEvent;
 public abstract class ResourceEvent extends LoggedEvent {
 	
 	/** this is not always available, in particular when the resource did not get created */
-	final ResourceKey resourceKey;
+	public final ResourceKey resourceKey;
 	public final Class<? extends Resource> resourceClass;
 	public final Location base;
 	public final String name;

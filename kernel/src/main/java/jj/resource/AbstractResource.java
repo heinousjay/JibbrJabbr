@@ -156,7 +156,8 @@ public abstract class AbstractResource implements Resource {
 		}
 	}
 	
-	ResourceKey cacheKey() {
+	@Override
+	public ResourceKey cacheKey() {
 		return cacheKey;
 	}
 	

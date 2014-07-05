@@ -20,6 +20,8 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
+import jj.execution.DelayedExecutor.CancelKey;
+
 /**
  * @author jason
  *
@@ -49,7 +51,7 @@ public class MockTaskRunner implements TaskRunner {
 		assert(!tasks.isEmpty());
 		
 		JJTask task = tasks.remove(0);
-			
+		
 		task.run();
 		
 		return task;
@@ -76,9 +78,15 @@ public class MockTaskRunner implements TaskRunner {
 		return t;
 	}
 	
+	public CancelKey cancelKey;
 	
 	@Override
 	public Promise execute(final JJTask task) {
+		if (cancelKey != null && task instanceof DelayedTask<?>) {
+			DelayedTask<?> dTask = (DelayedTask<?>)task;
+			dTask.cancelKey = cancelKey;
+			cancelKey = null;
+		}
 		tasks.add(task);
 		
 		return task.promise().taskRunner(this);

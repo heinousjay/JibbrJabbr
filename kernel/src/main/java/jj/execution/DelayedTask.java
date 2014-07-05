@@ -37,13 +37,15 @@ public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask {
 		return 0;
 	}
 	
-	private volatile CancelKey cancelKey;
+	// package friendly for testing.
+	/** DON'T TOUCH THIS */
+	volatile CancelKey cancelKey;
 
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
+	protected void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
 		cancelKey = findExecutor(executors).submit(runnable, delay(), TimeUnit.MILLISECONDS);
 	}
 
-	public final CancelKey cancelKey() {
+	public CancelKey cancelKey() {
 		return cancelKey;
 	}
 	

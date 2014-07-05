@@ -15,7 +15,13 @@
  */
 package jj.script;
 
+import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
+import io.netty.util.internal.chmv8.ConcurrentHashMapV8.Fun;
+
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -26,9 +32,12 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 
+import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.DelayedExecutor.CancelKey;
 import jj.execution.TaskRunner;
+import jj.resource.ResourceKey;
+import jj.resource.ResourceKilled;
 
 /**
  * 
@@ -37,11 +46,13 @@ import jj.execution.TaskRunner;
  *
  */
 @Singleton
+@Subscriber
 public class Timers {
 	
 	private final TaskRunner taskRunner;
 	private final ContinuationCoordinator continuationCoordinator;
 	private final CurrentScriptEnvironment env;
+	private final ConcurrentHashMapV8<ResourceKey, Set<WeakReference<CancelKey>>> runningTimers = new ConcurrentHashMapV8<>();
 
 	@Inject
 	Timers(
@@ -52,6 +63,21 @@ public class Timers {
 		this.taskRunner = taskRunner;
 		this.continuationCoordinator = continuationCoordinator;
 		this.env = env;
+	}
+	
+	@Listener
+	void scriptEnvironmentKilled(ResourceKilled event) {
+		if (ScriptEnvironment.class.isAssignableFrom(event.resourceClass)) {
+			Set<WeakReference<CancelKey>> cancelKeys = runningTimers.remove(event.resourceKey);
+			if (cancelKeys != null) {
+				for (WeakReference<CancelKey> keyRef : cancelKeys) {
+					CancelKey key = keyRef.get();
+					if (key != null) {
+						key.cancel();
+					}
+				}
+			}
+		}
 	}
 	
 	private CancelKey setTimer(final Function function, final int delay, final boolean repeat, final Object...args) {
@@ -78,6 +104,14 @@ public class Timers {
 		
 		taskRunner.execute(task);
 		
+		runningTimers.computeIfAbsent(env.current().cacheKey(), new Fun<ResourceKey, Set<WeakReference<CancelKey>>>() {
+
+			@Override
+			public Set<WeakReference<CancelKey>> apply(ResourceKey a) {
+				return new HashSet<>();
+			}
+		}).add(new WeakReference<>(task.cancelKey()));
+		System.out.println(task.getClass());
 		return task.cancelKey();
 	}
 	

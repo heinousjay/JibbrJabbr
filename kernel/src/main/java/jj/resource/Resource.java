@@ -44,4 +44,6 @@ public interface Resource {
 	 * @param dependent
 	 */
 	void addDependent(Resource dependent);
+	
+	ResourceKey cacheKey();
 }
