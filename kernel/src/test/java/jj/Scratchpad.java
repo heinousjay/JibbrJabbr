@@ -15,11 +15,5 @@ public class Scratchpad {
 		System.out.println("|" + StringUtil.normaliseWhitespace("			   something   	\n\r \n\r		") + "|");
 		
 	}
-	
-	@Test
-	public void guiceFun() {
-		
-		
-	}
 
 }

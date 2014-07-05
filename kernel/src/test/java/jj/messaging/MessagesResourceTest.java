@@ -62,8 +62,6 @@ public class MessagesResourceTest {
 		assertThat(resource.message("title"), is("JAYCHAT!"));
 		assertThat(resource.message("topic"), is("US TOPIC"));
 		assertThat(resource.message("welcome"), is("EN WELCOME"));
-		
-		System.out.println(resource.sha1());
 	}
 
 }

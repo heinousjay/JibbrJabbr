@@ -111,7 +111,6 @@ public class Timers {
 				return new HashSet<>();
 			}
 		}).add(new WeakReference<>(task.cancelKey()));
-		System.out.println(task.getClass());
 		return task.cancelKey();
 	}
 	

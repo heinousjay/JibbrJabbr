@@ -81,7 +81,7 @@ public class ContinuationPendingCacheTest {
 	
 	@Before
 	public void before() {
-		System.out.println(KEY_COUNT + " keys on " + STRESS_LEVEL + " threads");
+		//System.out.println(KEY_COUNT + " keys on " + STRESS_LEVEL + " threads");
 		assertThat(KEY_COUNT % STRESS_LEVEL, is(0));
 		
 		tasks = new HelperTask[KEY_COUNT];
