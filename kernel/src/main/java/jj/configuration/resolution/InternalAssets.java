@@ -33,10 +33,10 @@ public class InternalAssets {
 	private final ResourceResolver resolver;
 	private final Set<String> paths;
 
-	/**
-	 * 
-	 */
-	protected InternalAssets(final ResourceResolver resolver, final Set<String> paths) {
+	protected InternalAssets(
+		final ResourceResolver resolver,
+		final Set<String> paths
+	) {
 		this.resolver = resolver;
 		this.paths = paths;
 	}

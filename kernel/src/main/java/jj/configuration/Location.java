@@ -63,6 +63,13 @@ public interface Location {
 			// this should never be called on a bundle
 			throw new AssertionError("called root on a Location.Bundle. should never happen");
 		}
+		
+		@Override
+		public boolean ensureDirectoryParent() {
+			// bundles cannot be used in this way
+			// never should even get called
+			throw new AssertionError("called directoryParent on a Location.Bundle. should never happen");
+		}
 	}
 	
 	Location and(Location location);
@@ -72,4 +79,6 @@ public interface Location {
 	Location parent();
 	
 	Location root();
+	
+	boolean ensureDirectoryParent();
 }

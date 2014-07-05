@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import jj.JJ;
 import jj.configuration.Location;
 import jj.script.ScriptEnvironment;
 
@@ -54,27 +55,29 @@ public enum AppLocation implements Location {
 	 * denotes this resource is not from the application file system,
 	 * such as a {@link ScriptEnvironment} 
 	 */
-	Virtual("", null),
+	Virtual("", null, false),
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", Virtual),
+	Assets("", Virtual, JJ.jarForClass(AppLocation.class) == null),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", Virtual),
+	APIModules("", Virtual, JJ.jarForClass(AppLocation.class) == null),
 	
 	/** the paths of the application pieces */
-	Base("", null),
-	Private("private/", Base),
-	PrivateSpecs("private-specs/", Base),
-	Public("public/", Base),
-	PublicSpecs("public-specs/", Base);
+	Base("", null, true),
+	Private("private/", Base, true),
+	PrivateSpecs("private-specs/", Base, true),
+	Public("public/", Base, true),
+	PublicSpecs("public-specs/", Base, true);
 	
 	private final String path;
 	private final Location parent;
+	private final boolean ensureDirectory;
 	
-	private AppLocation(final String path, final Location parent) {
+	private AppLocation(final String path, final Location parent, boolean ensureDirectory) {
 		this.path = path;
 		this.parent = parent;
+		this.ensureDirectory = ensureDirectory;
 	}
 	
 	public Location and(Location next) {
@@ -97,5 +100,10 @@ public enum AppLocation implements Location {
 	
 	public String path() {
 		return path;
+	}
+	
+	@Override
+	public boolean ensureDirectoryParent() {
+		return ensureDirectory;
 	}
 }
