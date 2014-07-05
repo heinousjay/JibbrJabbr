@@ -17,8 +17,6 @@ package jj.resource;
 
 import org.slf4j.Logger;
 
-import jj.configuration.Location;
-
 /**
  * @author jason
  *

@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.configuration.resolution.Application;
 import jj.configuration.resolution.MockApplication;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceFinder;
@@ -54,7 +53,7 @@ public class CssReferenceVersionProcessorTest {
 	Path basePath;
 
 	ResourceFinder resourceFinder;
-	Application app;
+	MockApplication app;
 	
 	@Mock StylesheetResource testCss;
 	

@@ -2,8 +2,6 @@ package jj.resource;
 
 import java.io.IOException;
 
-import jj.configuration.Location;
-
 /**
  * represents the ability to create a resource given a baseName and
  * some unspecified arguments

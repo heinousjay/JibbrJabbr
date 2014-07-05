@@ -17,11 +17,11 @@ package jj.resource;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.Location;
 import jj.configuration.resolution.AppLocation;
 
 import org.junit.Test;

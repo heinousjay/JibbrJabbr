@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 
-import jj.configuration.Location;
 import jj.logging.LoggedEvent;
 
 /**

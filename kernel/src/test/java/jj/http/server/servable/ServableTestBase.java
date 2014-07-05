@@ -21,9 +21,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.JJ;
-import jj.configuration.resolution.Application;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;
@@ -40,7 +40,7 @@ public abstract class ServableTestBase {
 	
 	Path appPath;
 	
-	@Mock Application app;
+	@Mock PathResolver app;
 	@Mock ResourceFinder resourceFinder;
 	
 	@Mock HttpServerRequest request;

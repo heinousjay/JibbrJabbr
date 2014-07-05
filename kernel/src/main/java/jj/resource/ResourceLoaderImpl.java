@@ -18,7 +18,6 @@ package jj.resource;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Location;
 import jj.execution.Promise;
 import jj.execution.TaskRunner;
 

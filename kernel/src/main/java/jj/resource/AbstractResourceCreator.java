@@ -17,7 +17,6 @@ package jj.resource;
 
 import java.net.URI;
 
-import jj.configuration.Location;
 import jj.util.GenericUtils;
 
 /**

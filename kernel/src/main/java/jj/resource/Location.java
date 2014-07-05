@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.resource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,24 +51,17 @@ public interface Location {
 		}
 		
 		@Override
-		public Location parent() {
-			// bundles never have a parent, and
-			// this should never be called on a bundle
-			throw new AssertionError("called parent on a Location.Bundle. should never happen");
-		}
-		
-		@Override
-		public Location root() {
-			// bundles never have a parent, and
-			// this should never be called on a bundle
-			throw new AssertionError("called root on a Location.Bundle. should never happen");
-		}
-		
-		@Override
 		public boolean parentInDirectory() {
 			// bundles cannot be used in this way
 			// never should even get called
-			throw new AssertionError("called directoryParent on a Location.Bundle. should never happen");
+			throw new AssertionError("called parentInDirectory on a Location.Bundle. should never happen");
+		}
+		
+		@Override
+		public boolean watchForReloads() {
+			// bundles cannot be used in this way
+			// never should even get called
+			throw new AssertionError("called watchForReloads on a Location.Bundle. should never happen");
 		}
 	}
 	
@@ -76,9 +69,7 @@ public interface Location {
 	
 	List<Location> locations();
 	
-	Location parent();
-	
-	Location root();
-	
 	boolean parentInDirectory();
+	
+	boolean watchForReloads();
 }

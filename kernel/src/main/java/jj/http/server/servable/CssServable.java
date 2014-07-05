@@ -6,11 +6,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Application;
 import jj.css.StylesheetResource;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
+import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 
 // TODO! move this to the css package
@@ -23,7 +23,7 @@ class CssServable extends Servable<StylesheetResource> {
 	
 	@Inject
 	CssServable(
-		final Application app,
+		final PathResolver app,
 		final ResourceFinder resourceFinder
 	) {
 		super(app);

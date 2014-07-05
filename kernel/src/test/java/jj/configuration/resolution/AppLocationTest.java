@@ -21,7 +21,7 @@ import static jj.configuration.resolution.AppLocation.*;
 
 import java.util.List;
 
-import jj.configuration.Location;
+import jj.resource.Location;
 
 import org.junit.Test;
 

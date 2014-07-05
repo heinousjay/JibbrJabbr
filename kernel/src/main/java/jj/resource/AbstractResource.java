@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import jj.configuration.Location;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;

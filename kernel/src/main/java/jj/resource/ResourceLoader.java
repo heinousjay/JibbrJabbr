@@ -15,7 +15,6 @@
  */
 package jj.resource;
 
-import jj.configuration.Location;
 import jj.execution.Promise;
 
 /**

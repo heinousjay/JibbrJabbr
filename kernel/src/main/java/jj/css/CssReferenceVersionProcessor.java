@@ -22,8 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Application;
 import jj.http.server.uri.URIMatch;
+import jj.resource.PathResolver;
 import jj.resource.Resource;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
@@ -43,15 +43,15 @@ class CssReferenceVersionProcessor {
 	private static final Pattern URL = Pattern.compile("url\\((['\"])?(.+?)\\1?\\)");
 	private static final Pattern ABSOLUTE = Pattern.compile("^(?:https?:)?//");
 
-	private final Application app;
+	private final PathResolver pathResolver;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
 	CssReferenceVersionProcessor(
-		final Application app,
+		final PathResolver pathResolver,
 		final ResourceFinder resourceFinder
 	) {
-		this.app = app;
+		this.pathResolver = pathResolver;
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -89,7 +89,7 @@ class CssReferenceVersionProcessor {
 				if (replacement.startsWith("/")) {
 					name = replacement.substring(1);
 				} else {
-					name = app.path()
+					name = pathResolver.path()
 						.relativize(resource.path().resolveSibling(replacement))
 						.normalize()
 						.toString();

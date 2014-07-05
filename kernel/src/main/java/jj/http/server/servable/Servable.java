@@ -8,26 +8,26 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 
-import jj.configuration.resolution.Application;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
 import jj.resource.FileResource;
+import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
 import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable<T extends Resource> {
 	
-	protected final Application app;
+	protected final PathResolver pathResolver;
 	
-	protected Servable(final Application app) {
-		this.app = app;
+	protected Servable(final PathResolver pathResolver) {
+		this.pathResolver = pathResolver;
 	}
 	
 	// TODO probably removing this?
-	protected Path appPath() {
-		return app.path();
+	private Path appPath() {
+		return pathResolver.path();
 	}
 	
 	/**

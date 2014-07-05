@@ -18,7 +18,6 @@ package jj.resource;
 import java.io.IOException;
 import java.net.URI;
 
-import jj.configuration.Location;
 import jj.event.Publisher;
 
 class MyResourceCreator extends AbstractResourceCreator<MyResource> {

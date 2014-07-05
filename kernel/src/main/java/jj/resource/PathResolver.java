@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.resource;
 
 import java.nio.file.Path;
-
-import jj.configuration.Location;
 
 /**
  * @author jason

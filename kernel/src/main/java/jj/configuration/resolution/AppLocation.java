@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jj.JJ;
-import jj.configuration.Location;
+import jj.resource.Location;
 import jj.script.ScriptEnvironment;
 
 /**
@@ -55,29 +55,31 @@ public enum AppLocation implements Location {
 	 * denotes this resource is not from the application file system,
 	 * such as a {@link ScriptEnvironment} 
 	 */
-	Virtual("", null, false),
+	Virtual("", null, false, false),
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", Virtual, false), //JJ.jarForClass(AppLocation.class) == null),
+	Assets("", Virtual, false, JJ.jarForClass(AppLocation.class) == null),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", Virtual, false), //JJ.jarForClass(AppLocation.class) == null),
+	APIModules("", Virtual, false, JJ.jarForClass(AppLocation.class) == null),
 	
 	/** the paths of the application pieces */
-	Base("", null, true),
-	Private("private/", Base, true),
-	PrivateSpecs("private-specs/", Base, true),
-	Public("public/", Base, true),
-	PublicSpecs("public-specs/", Base, true);
+	Base("", null, true, true),
+	Private("private/", Base, true, true),
+	PrivateSpecs("private-specs/", Base, true, true),
+	Public("public/", Base, true, true),
+	PublicSpecs("public-specs/", Base, true, true);
 	
 	private final String path;
-	private final Location parent;
+	private final AppLocation parent;
 	private final boolean ensureDirectory;
+	private final boolean watchForReloads;
 	
-	private AppLocation(final String path, final Location parent, boolean ensureDirectory) {
+	private AppLocation(final String path, final AppLocation parent, boolean ensureDirectory, boolean watchForReloads) {
 		this.path = path;
 		this.parent = parent;
 		this.ensureDirectory = ensureDirectory;
+		this.watchForReloads = watchForReloads;
 	}
 	
 	public Location and(Location next) {
@@ -88,22 +90,25 @@ public enum AppLocation implements Location {
 		return Collections.unmodifiableList(Arrays.asList((Location)this));
 	}
 	
-	@Override
 	public Location parent() {
 		return parent;
 	}
 	
-	@Override
 	public Location root() {
 		return parent == null ? this : parent.root();
 	}
 	
 	public String path() {
-		return path;
+		return parent == null ? path : parent.path() + path;
 	}
 	
 	@Override
 	public boolean parentInDirectory() {
 		return ensureDirectory;
+	}
+	
+	@Override
+	public boolean watchForReloads() {
+		return watchForReloads;
 	}
 }

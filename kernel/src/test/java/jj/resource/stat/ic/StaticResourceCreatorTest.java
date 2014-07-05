@@ -45,7 +45,7 @@ public class StaticResourceCreatorTest extends ResourceBase<StaticResource, Stat
 
 	@Override
 	protected StaticResourceCreator toTest() {
-		return new StaticResourceCreator(app, creator);
+		return new StaticResourceCreator(pathResolver, creator);
 	}
 
 }

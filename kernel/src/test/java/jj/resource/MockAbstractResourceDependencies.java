@@ -17,7 +17,6 @@ package jj.resource;
 
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.Base;
-import jj.configuration.Location;
 import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;
 

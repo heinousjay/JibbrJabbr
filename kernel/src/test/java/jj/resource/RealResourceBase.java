@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.resolution.Application;
 import jj.configuration.resolution.MockApplication;
 import jj.event.Publisher;
 import org.hamcrest.Matchers;
@@ -42,12 +41,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 public abstract class RealResourceBase {
 	
 	protected Path appPath;
-	protected Application app;
+	protected PathResolver pathResolver;
 	@Mock protected Publisher publisher;
 
 	@Before
 	public final void init() throws Exception {
-		app = new MockApplication();
+		pathResolver = new MockApplication();
 		appPath = Base.appPath();
 	}
 	

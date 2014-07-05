@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Application;
 import jj.document.DocumentScriptEnvironment;
+import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 import jj.script.module.ScriptResource;
 import jj.http.server.HttpServerRequest;
@@ -31,8 +31,8 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 	private final ResourceFinder resourceFinder;
 
 	@Inject
-	DocumentScriptServable(final Application app, final ResourceFinder finder) {
-		super(app);
+	DocumentScriptServable(final PathResolver pathResolver, final ResourceFinder finder) {
+		super(pathResolver);
 		this.resourceFinder = finder;
 	}
 	

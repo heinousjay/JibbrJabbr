@@ -21,9 +21,6 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Location;
-import jj.configuration.resolution.PathResolver;
-
 /**
  * @author jason
  *

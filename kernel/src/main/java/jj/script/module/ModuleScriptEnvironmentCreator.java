@@ -21,7 +21,7 @@ import java.net.URI;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
-import jj.configuration.Location;
+import jj.resource.Location;
 import jj.resource.ResourceInstanceCreator;
 import jj.script.AbstractScriptEnvironmentCreator;
 import jj.script.ScriptEnvironmentInitializer;

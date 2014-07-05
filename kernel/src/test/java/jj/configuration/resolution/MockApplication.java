@@ -21,9 +21,9 @@ import java.nio.file.Path;
 
 import jj.Base;
 import jj.configuration.Arguments;
-import jj.configuration.Location;
 import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Application;
+import jj.resource.Location;
 
 /**
  * @author jason

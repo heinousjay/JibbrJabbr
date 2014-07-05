@@ -72,7 +72,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		before();
 		
-		creator = new ResourceInstanceCreator(app, injector);
+		creator = new ResourceInstanceCreator(pathResolver, injector);
 		
 		toTest = toTest();
 		

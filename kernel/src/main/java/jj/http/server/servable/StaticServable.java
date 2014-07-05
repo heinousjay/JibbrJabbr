@@ -22,7 +22,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.Application;
+import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.http.server.HttpServerRequest;
@@ -43,10 +43,10 @@ public class StaticServable extends Servable<StaticResource> {
 	 */
 	@Inject
 	protected StaticServable(
-		final Application app,
+		final PathResolver pathResolver,
 		final ResourceFinder resourceFinder
 	) {
-		super(app);
+		super(pathResolver);
 		this.resourceFinder = resourceFinder;
 	}
 

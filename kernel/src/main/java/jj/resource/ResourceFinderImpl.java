@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.Location;
 import jj.event.Publisher;
 import jj.execution.CurrentTask;
 

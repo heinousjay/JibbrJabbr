@@ -25,8 +25,6 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Application;
-import jj.configuration.resolution.PathResolver;
 import jj.event.Publisher;
 import jj.resource.stat.ic.StaticResource;
 
@@ -54,7 +52,7 @@ public class ResourceInstanceCreatorTest  {
 		return new ResourceInstanceCreator(app, Guice.createInjector());
 	}
 	
-	@Mock Application app;
+	@Mock PathResolver app;
 	@Mock Injector injector;
 	
 	@Captor ArgumentCaptor<AbstractModule> moduleCaptor;

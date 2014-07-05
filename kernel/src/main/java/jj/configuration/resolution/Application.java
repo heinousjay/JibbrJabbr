@@ -22,7 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.Arguments;
-import jj.configuration.Location;
+import jj.resource.Location;
+import jj.resource.PathResolver;
 
 /**
  * component for determining app paths, based on the current application root.

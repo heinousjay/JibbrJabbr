@@ -23,11 +23,11 @@ import io.netty.handler.codec.http.HttpHeaders;
 import java.io.IOException;
 
 import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Application;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
 import jj.resource.FileResource;
+import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
 
@@ -53,8 +53,8 @@ public class ServableTest extends ServableTestBase {
 		/**
 		 * @param configuration
 		 */
-		protected ServableImpl(Application app) {
-			super(app);
+		protected ServableImpl(PathResolver pathResolver) {
+			super(pathResolver);
 		}
 
 		@Override

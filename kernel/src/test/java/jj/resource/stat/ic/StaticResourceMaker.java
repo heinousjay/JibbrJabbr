@@ -17,9 +17,9 @@ package jj.resource.stat.ic;
 
 import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.PathResolver;
 import jj.event.Publisher;
 import jj.resource.MockAbstractResourceDependencies;
+import jj.resource.PathResolver;
 import jj.resource.ResourceKey;
 
 /**

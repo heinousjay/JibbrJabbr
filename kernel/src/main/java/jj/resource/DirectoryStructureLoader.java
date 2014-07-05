@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerStartupListener;
-import jj.configuration.resolution.PathResolver;
 import jj.execution.TaskRunner;
 
 /**

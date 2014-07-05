@@ -45,7 +45,7 @@ public class PropertiesResourceCreatorTest extends ResourceBase<PropertiesResour
 
 	@Override
 	protected PropertiesResourceCreator toTest() {
-		return new PropertiesResourceCreator(app, creator);
+		return new PropertiesResourceCreator(pathResolver, creator);
 	}
 
 

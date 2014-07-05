@@ -1,6 +1,5 @@
 package jj.resource;
 
-import jj.configuration.Location;
 
 /**
  * Inject this to get resources from the filesystem

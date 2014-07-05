@@ -17,7 +17,7 @@ package jj.configuration;
 
 import jj.JJModule;
 import jj.configuration.resolution.Application;
-import jj.configuration.resolution.PathResolver;
+import jj.resource.PathResolver;
 
 /**
  * @author jason
