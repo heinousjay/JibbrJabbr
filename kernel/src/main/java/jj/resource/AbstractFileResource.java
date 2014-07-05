@@ -127,6 +127,11 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	public Path path() {
 		return path;
 	}
+	
+	@Override
+	public boolean isDirectory() {
+		return false;
+	}
 
 	@Override
 	public long size() {

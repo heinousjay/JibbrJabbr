@@ -18,6 +18,7 @@ package jj.resource;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -77,9 +78,11 @@ class ResourceWatchServiceLoop extends ServerTask {
 		);
 	}
 	
-	void watch(DirectoryResource directory) throws IOException {
-		if (directory.path().getFileSystem() == FileSystems.getDefault()) {
-			watcher.watch(directory.path());
+	void watch(ParentedResource resource) throws IOException {
+		Path path = resource.path();
+		
+		if (path.getFileSystem() == FileSystems.getDefault()) {
+			watcher.watch(resource.isDirectory() ? path : path.getParent());
 		}
 	}
 	

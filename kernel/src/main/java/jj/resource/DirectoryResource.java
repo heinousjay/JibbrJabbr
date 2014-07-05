@@ -36,7 +36,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-public class DirectoryResource extends AbstractResource {
+public class DirectoryResource extends AbstractResource implements ParentedResource {
 	
 	public static final String ROOT_NAME = "";
 
@@ -92,8 +92,14 @@ public class DirectoryResource extends AbstractResource {
 		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
 	}
 	
+	@Override
 	public Path path() {
 		return path;
+	}
+	
+	@Override
+	public boolean isDirectory() {
+		return true;
 	}
 
 	@Override

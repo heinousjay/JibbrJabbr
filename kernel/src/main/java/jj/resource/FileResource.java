@@ -28,7 +28,7 @@ import java.nio.file.Path;
  * @author jason
  *
  */
-public interface FileResource extends Resource {
+public interface FileResource extends Resource, ParentedResource {
 
 	
 	/**

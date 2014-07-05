@@ -15,14 +15,15 @@
  */
 package jj.resource;
 
-import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-interface ResourceWatchService {
+interface ParentedResource {
 
-	void watch(ParentedResource resource) throws IOException;
-
+	Path path();
+	
+	boolean isDirectory();
 }
