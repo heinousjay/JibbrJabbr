@@ -56,13 +56,6 @@ public interface Location {
 			// never should even get called
 			throw new AssertionError("called parentInDirectory on a Location.Bundle. should never happen");
 		}
-		
-		@Override
-		public boolean watchForReloads() {
-			// bundles cannot be used in this way
-			// never should even get called
-			throw new AssertionError("called watchForReloads on a Location.Bundle. should never happen");
-		}
 	}
 	
 	Location and(Location location);
@@ -70,6 +63,4 @@ public interface Location {
 	List<Location> locations();
 	
 	boolean parentInDirectory();
-	
-	boolean watchForReloads();
 }

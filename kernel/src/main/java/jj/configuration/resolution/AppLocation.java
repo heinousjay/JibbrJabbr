@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import jj.JJ;
 import jj.resource.Location;
 import jj.script.ScriptEnvironment;
 
@@ -55,31 +54,29 @@ public enum AppLocation implements Location {
 	 * denotes this resource is not from the application file system,
 	 * such as a {@link ScriptEnvironment} 
 	 */
-	Virtual("", null, false, false),
+	Virtual("", null, false),
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", Virtual, false, JJ.jarForClass(AppLocation.class) == null),
+	Assets("", Virtual, false),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", Virtual, false, JJ.jarForClass(AppLocation.class) == null),
+	APIModules("", Virtual, false),
 	
 	/** the paths of the application pieces */
-	Base("", null, true, true),
-	Private("private/", Base, true, true),
-	PrivateSpecs("private-specs/", Base, true, true),
-	Public("public/", Base, true, true),
-	PublicSpecs("public-specs/", Base, true, true);
+	Base("", null, true),
+	Private("private/", Base, true),
+	PrivateSpecs("private-specs/", Base, true),
+	Public("public/", Base, true),
+	PublicSpecs("public-specs/", Base, true);
 	
 	private final String path;
 	private final AppLocation parent;
 	private final boolean ensureDirectory;
-	private final boolean watchForReloads;
 	
-	private AppLocation(final String path, final AppLocation parent, boolean ensureDirectory, boolean watchForReloads) {
+	private AppLocation(final String path, final AppLocation parent, boolean ensureDirectory) {
 		this.path = path;
 		this.parent = parent;
 		this.ensureDirectory = ensureDirectory;
-		this.watchForReloads = watchForReloads;
 	}
 	
 	public Location and(Location next) {
@@ -105,10 +102,5 @@ public enum AppLocation implements Location {
 	@Override
 	public boolean parentInDirectory() {
 		return ensureDirectory;
-	}
-	
-	@Override
-	public boolean watchForReloads() {
-		return watchForReloads;
 	}
 }
