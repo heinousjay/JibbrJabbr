@@ -144,6 +144,6 @@ public class StylesheetResourceTest {
 	}
 
 	private String getLessScript() throws Exception {
-		return new String(Files.readAllBytes(Paths.get(getClass().getResource("/jj/css/" + StylesheetResource.LESS_SCRIPT).toURI())), UTF_8);
+		return new String(Files.readAllBytes(Paths.get(getClass().getResource("/jj/css/assets/" + StylesheetResource.LESS_SCRIPT).toURI())), UTF_8);
 	}
 }

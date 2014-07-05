@@ -28,9 +28,9 @@ public class ConfigurationModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAssetPath("/jj/assets/");
+		addAssetPath("/jj/assets");
 		
-		addAPIModulePath("/jj/configuration/api/");
+		addAPIModulePath("/jj/configuration/api");
 		
 		addStartupListenerBinding().to(ConfigurationScriptLoader.class);
 		
