@@ -61,7 +61,7 @@ class HttpServer implements JJServerStartupListener {
 		}
 	};
 	
-	private final JJNioEventLoopGroup ioEventLoopGroup;
+	private final HttpServerNioEventLoopGroup ioEventLoopGroup;
 	
 	private final HttpServerChannelInitializer initializer;
 	
@@ -75,7 +75,7 @@ class HttpServer implements JJServerStartupListener {
 	
 	@Inject
 	HttpServer(
-		final JJNioEventLoopGroup ioEventLoopGroup,
+		final HttpServerNioEventLoopGroup ioEventLoopGroup,
 		final HttpServerChannelInitializer initializer,
 		final HttpServerSocketConfiguration configuration,
 		final HttpServerSwitch httpServerSwitch,

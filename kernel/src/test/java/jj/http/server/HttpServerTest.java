@@ -111,7 +111,7 @@ public class HttpServerTest {
 		given(httpServerSwitch.on()).willReturn(true);
 		given(httpServerSwitch.port()).willReturn(5678);
 		HttpServer httpServer = new HttpServer(
-			new MockJJNioEventLoopGroup(),
+			new MockHttpServerNioEventLoopGroup(),
 			new HttpServerChannelInitializer(engineProvider),
 			configuration,
 			httpServerSwitch,
@@ -140,7 +140,7 @@ public class HttpServerTest {
 		// given
 		given(httpServerSwitch.port()).willReturn(-1);
 		httpServer = new HttpServer(
-			new MockJJNioEventLoopGroup(),
+			new MockHttpServerNioEventLoopGroup(),
 			new HttpServerChannelInitializer(engineProvider),
 			configuration,
 			httpServerSwitch,

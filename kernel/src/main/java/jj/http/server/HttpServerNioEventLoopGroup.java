@@ -29,10 +29,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
  *
  */
 @Singleton
-class JJNioEventLoopGroup extends NioEventLoopGroup {
+class HttpServerNioEventLoopGroup extends NioEventLoopGroup {
 
 	@Inject
-	JJNioEventLoopGroup(
+	HttpServerNioEventLoopGroup(
 		final UncaughtExceptionHandler uncaughtExceptionHandler
 	) {
 		super(Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
@@ -42,7 +42,7 @@ class JJNioEventLoopGroup extends NioEventLoopGroup {
 			@Override
 			public Thread newThread(Runnable r) {
 				
-				Thread thread = new Thread(r, "JibbrJabbr HTTP I/O Handler " + id.incrementAndGet());
+				Thread thread = new Thread(r, "JibbrJabbr HTTP Server I/O Handler " + id.incrementAndGet());
 				thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
 				return thread;
 			}

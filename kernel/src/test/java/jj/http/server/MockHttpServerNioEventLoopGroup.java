@@ -17,18 +17,18 @@ package jj.http.server;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import jj.http.server.JJNioEventLoopGroup;
+import jj.http.server.HttpServerNioEventLoopGroup;
 
 /**
  * @author jason
  *
  */
-class MockJJNioEventLoopGroup extends JJNioEventLoopGroup {
+class MockHttpServerNioEventLoopGroup extends HttpServerNioEventLoopGroup {
 
 	/**
 	 * @param uncaughtExceptionHandler
 	 */
-	MockJJNioEventLoopGroup() {
+	MockHttpServerNioEventLoopGroup() {
 		super(new UncaughtExceptionHandler() {
 			
 			@Override

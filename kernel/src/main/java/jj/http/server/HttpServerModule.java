@@ -21,7 +21,7 @@ public class HttpServerModule extends JJModule {
 		
 		bindLoggedEvents().annotatedWith(AccessLogger.class).toLogger(AccessLogger.NAME);
 		
-		bindExecutor(JJNioEventLoopGroup.class);
+		bindExecutor(HttpServerNioEventLoopGroup.class);
 		
 		install(new ServableModule());
 		install(new URIModule());

@@ -31,7 +31,7 @@ public abstract class HttpTask extends JJTask {
 
 	@Override
 	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(JJNioEventLoopGroup.class).execute(runnable);
+		executors.ofType(HttpServerNioEventLoopGroup.class).execute(runnable);
 	}
 
 }
