@@ -234,7 +234,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			ScriptableObject exports = context.newObject(localScope);
 			module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
 			module.defineProperty("exports", exports, ScriptableObject.EMPTY);
-			module.defineProperty("//requireInner", dependencies.requireInnerFunction, ScriptableObject.CONST | ScriptableObject.DONTENUM);
+			module.defineProperty("requireInner", dependencies.requireInnerFunction, ScriptableObject.EMPTY);
 			
 			localScope.defineProperty("module", module, ScriptableObject.CONST);
 			localScope.defineProperty("exports", exports, ScriptableObject.CONST);
@@ -244,15 +244,17 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			// follow the node.js concept of module.exports === exports, and
 			// assigning to module.exports changes the exports object,
 			// potentially to a function
+			// the ability to load this as a ScriptResource is implicit, i believe
 			ScriptableObject require = (ScriptableObject)context.evaluateString(
 				localScope,  
 				"(function(module) {\n" +
 					"var idFormat = /^(?:\\.?\\/)?[a-zA-Z][\\/\\w-]*$/;\n" +
+					"var requireInner = module.requireInner;\n" +
 					"return function(id) {\n" +
 						"if (!id || typeof id != 'string' || !idFormat.test(id)) {\n" + 
 							"throw new Error(id + ' is not a valid module identifier');\n" +
 						"}\n" +
-						"var result = module['//requireInner'](id, module.id);\n" +
+						"var result = requireInner(id, module.id);\n" +
 						"if (result === null || result === false) {\n" +
 							"throw new Error('module \"' + id + '\" cannot be found');\n" +
 						"}\n" +
@@ -267,6 +269,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 				require,
 				ScriptableObject.CONST
 			);
+			
+			ScriptableObject.deleteProperty(module, "requireInner");
 		}
 		
 		return localScope;
