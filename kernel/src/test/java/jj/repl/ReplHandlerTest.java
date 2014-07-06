@@ -82,7 +82,7 @@ public class ReplHandlerTest {
 		
 		rh.channelRead0(ctx, "   \n\r\n\r\n   ");
 
-		verify(ctx).writeAndFlush("\n>");
+		verify(ctx).writeAndFlush(">");
 		
 		assertThat(taskRunner.tasks, is(empty()));
 	}

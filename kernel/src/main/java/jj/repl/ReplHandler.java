@@ -87,7 +87,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 		
 		if (msg.trim().isEmpty()) {
 			
-			ctx.writeAndFlush("\n>");
+			ctx.writeAndFlush(">");
 			
 		} else {
 		

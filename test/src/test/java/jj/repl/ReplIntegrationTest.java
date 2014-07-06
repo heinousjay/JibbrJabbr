@@ -97,7 +97,7 @@ public class ReplIntegrationTest {
 						});
 				}
 			});
-		latch = new CountDownLatch(3);
+		latch = new CountDownLatch(4);
 		bootstrap.connect("localhost", 9955).addListener(new ChannelFutureListener() {
 			
 			@Override
