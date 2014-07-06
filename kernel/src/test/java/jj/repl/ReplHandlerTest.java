@@ -90,7 +90,7 @@ public class ReplHandlerTest {
 	@Test
 	public void testMessageSuccess() throws Exception {
 		
-		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl")).willReturn(script);
+		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl-console")).willReturn(script);
 		rh.channelRead0(ctx, "something");
 		
 		taskRunner.runFirstTask();
@@ -103,7 +103,7 @@ public class ReplHandlerTest {
 		
 		RuntimeException e = new RuntimeException("this is an exception");
 
-		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl")).willThrow(e);
+		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl-console")).willThrow(e);
 		rh.channelRead0(ctx, "something");
 		
 		verify(ctx).writeAndFlush(e.getMessage() + "\n>");

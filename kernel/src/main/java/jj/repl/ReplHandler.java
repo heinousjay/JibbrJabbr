@@ -95,7 +95,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 				
 				final Script script = context.compileString(
 					"$$print(function() { return " + msg + "; });",
-					"repl"
+					"repl-console"
 				);
 	
 				taskRunner.execute(new ScriptTask<ReplScriptEnvironment>("repl execution:\n" + msg, rse, continuationCoordinator) {
