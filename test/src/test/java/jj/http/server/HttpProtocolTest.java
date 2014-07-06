@@ -104,7 +104,7 @@ public class HttpProtocolTest {
 
 			final EmbeddedHttpResponse response = new EmbeddedHttpResponse();
 
-			taskRunner.execute(new HttpTask("ProtocolTestHttpServer request") {
+			taskRunner.execute(new HttpServerTask("ProtocolTestHttpServer request") {
 
 				@Override
 				protected void run() throws Exception {

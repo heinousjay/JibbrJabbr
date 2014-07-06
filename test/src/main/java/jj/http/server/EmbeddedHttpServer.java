@@ -69,7 +69,7 @@ public class EmbeddedHttpServer {
 		final EmbeddedChannel channel = new EmbeddedChannel(new ReceiverAdapter(response), handlerProvider.get());
 		
 		final FullHttpRequest msg = request.fullHttpRequest();
-		taskRunner.execute(new HttpTask("submitting embedded request for " + request.request.getUri()) {
+		taskRunner.execute(new HttpServerTask("submitting embedded request for " + request.request.getUri()) {
 			
 			@Override
 			protected void run() throws Exception {

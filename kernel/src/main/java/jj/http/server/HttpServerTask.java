@@ -23,9 +23,9 @@ import jj.execution.JJTask;
  * @author jason
  *
  */
-public abstract class HttpTask extends JJTask {
+public abstract class HttpServerTask extends JJTask {
 
-	public HttpTask(String name) {
+	public HttpServerTask(String name) {
 		super(name);
 	}
 
