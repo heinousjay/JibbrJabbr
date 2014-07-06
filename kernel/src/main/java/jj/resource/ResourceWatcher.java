@@ -65,7 +65,13 @@ class ResourceWatcher {
 	}
 	
 	void watch(Path directory) throws IOException {
-		directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE);
+		// this is kind of cheating
+		if ("Mac OS X".equals(System.getProperty("os.name"))) {
+			// it still polls but this makes it much quicker
+			directory.register(watcher, new Kind[]{ ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE }, com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
+		} else {
+			directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE);
+		}
 	}
 	
 	@Listener
