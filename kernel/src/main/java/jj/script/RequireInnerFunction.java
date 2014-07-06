@@ -15,7 +15,6 @@
  */
 package jj.script;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
@@ -43,9 +42,6 @@ class RequireInnerFunction extends BaseFunction {
 	private final CurrentScriptEnvironment env;
 	private final ResourceFinder resourceFinder;
 	
-	// just used for calculating paths
-	private final Path base = Paths.get("");
-	
 	@Inject
 	RequireInnerFunction(
 		final CurrentScriptEnvironment env,
@@ -56,10 +52,12 @@ class RequireInnerFunction extends BaseFunction {
 	}
 	
 	private String toModuleIdentifier(final String input, final String parent) {
-		// crazytimes! can probably be simplified
-		return base.relativize(
-			base.resolve(parent).resolveSibling(input).normalize()
-		).toString();
+		// if absolute, from the root
+		if (input.startsWith("/")) {
+			return input.substring(1);
+		}
+		
+		return Paths.get(parent).resolveSibling(input).normalize().toString();
 	}
 	
 	@Override

@@ -69,25 +69,23 @@ public class ResourceSystemIntegrationTest {
 //		System.out.println(killedCount);
 //		System.out.println(loadedCount);
 		try {
-			Files.walkFileTree(Paths.get(App.one).resolve("created"), new TreeDeleter());
+			Files.walkFileTree(Paths.get(App.module).resolve("created"), new TreeDeleter());
 		} catch (NoSuchFileException nsfe) {}
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one)
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.module)
 		.withFileWatcher()
 		.injectInstance(this);
 
+	// done as a single test because at some point, the document system will be split off
+	// and for now, the repl is a simple way to cause things to happen via the loader
 	@Test
-	public void testDirectoryPreloading() throws Exception {
+	public void testResourceSystem() throws Throwable {
+		
 		assertThat(finder.findResource(DirectoryResource.class, Base, ""), is(notNullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, "deep"), is(notNullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, "deep/nesting"), is(notNullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, "modules"), is(notNullValue()));
-	}
-
-	@Test
-	public void testResourceWatching() throws Throwable {
 		
 		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
 
@@ -120,9 +118,9 @@ public class ResourceSystemIntegrationTest {
 					// touch a script and wait for a reload event.
 					touch(scriptResource2);
 					// and let's add some directories
-					Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesOne));
-					Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesTwo));
-					Files.createDirectories(Paths.get(App.one).resolve(createDirectoriesThree));
+					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesOne));
+					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesTwo));
+					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesThree));
 				} catch (Exception e) {
 					e.printStackTrace();
 					failed.set(true);

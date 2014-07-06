@@ -18,7 +18,6 @@ package jj.script.module;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
 import jj.configuration.resolution.AppLocation;
@@ -34,7 +33,6 @@ import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.module.ModuleScriptEnvironment;
 import jj.script.module.RequiredModule;
 import jj.script.module.RequiredModuleContinuationProcessor;
-import jj.script.module.RequiredModuleException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -123,7 +121,7 @@ public class RequiredModuleContinuationProcessorTest {
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
 		
 		assertThat(result, is(notNullValue()));
-		assertThat(result, is(instanceOf(RequiredModuleException.class)));
+		assertThat(result, is((Object)false));
 	}
 	
 	private void givenAScriptEnvironment() {

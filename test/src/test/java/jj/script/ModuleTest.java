@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.testing;
+package jj.script;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
@@ -25,6 +25,7 @@ import jj.App;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
+import jj.testing.JibbrJabbrTestServer;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
@@ -38,7 +39,7 @@ import org.junit.Test;
 public class ModuleTest {
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.module).injectInstance(this);
 	
 	@Inject EmbeddedHttpServer server;
 	

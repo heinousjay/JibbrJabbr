@@ -15,6 +15,7 @@
  */
 package jj;
 
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import jj.webdriver.WebDriverProvider;
@@ -42,18 +43,25 @@ public class App {
 	public static final String css;
 
 	public static final String repl;
+
+	public static final String module;
 	
 	static {
 		try {
-			one = Paths.get(App.class.getResource("/app1/app/").toURI()).toAbsolutePath().toString();
-			two = Paths.get(App.class.getResource("/app2/app/").toURI()).toAbsolutePath().toString();
-			minimal = Paths.get(App.class.getResource("/minimal/app/").toURI()).toAbsolutePath().toString();
-			api = Paths.get(App.class.getResource("/api/public/").toURI()).toAbsolutePath().toString();
-			configuration = Paths.get(App.class.getResource("/configuration/").toURI()).toAbsolutePath().toString();
-			css = Paths.get(App.class.getResource("/css/").toURI()).toAbsolutePath().toString();
-			repl = Paths.get(App.class.getResource("/repl/").toURI()).toAbsolutePath().toString();
+			one = getPath("/app1/app/");
+			two = getPath("/app2/app/");
+			minimal = getPath("/minimal/app/");
+			api = getPath("/api/public/");
+			configuration = getPath("/configuration/");
+			css = getPath("/css/");
+			repl = getPath("/repl/");
+			module = getPath("/module/");
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}
+	}
+
+	private static String getPath(String p) throws URISyntaxException {
+		return Paths.get(App.class.getResource(p).toURI()).toAbsolutePath().toString();
 	}
 }

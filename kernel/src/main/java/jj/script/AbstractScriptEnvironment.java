@@ -246,19 +246,20 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			// potentially to a function
 			ScriptableObject require = (ScriptableObject)context.evaluateString(
 				localScope,  
-				"(function(module) {" +
-					"return function(id) {" +
-					"if (!id || typeof id != 'string') throw new TypeError('argument to require must be a valid module identifier'); " +
-					"var result = module['//requireInner'](id, module.id); " +
-					"if (result == null) {" +
-						"throw new ReferenceError(id + ' cannot be found');" +
-					"} " +
-					"if (result['getCause']) { " +
-						"throw new ReferenceError(result.getMessage());" + 
-					"} " +
-					"return result;" +
-				"}})(module);",
-				"require"
+				"(function(module) {\n" +
+					"var idFormat = /^(?:\\.?\\/)?[a-zA-Z][\\/\\w-]*$/;\n" +
+					"return function(id) {\n" +
+						"if (!id || typeof id != 'string' || !idFormat.test(id)) {\n" + 
+							"throw new Error(id + ' is not a valid module identifier');\n" +
+						"}\n" +
+						"var result = module['//requireInner'](id, module.id);\n" +
+						"if (result === null || result === false) {\n" +
+							"throw new Error('module \"' + id + '\" cannot be found');\n" +
+						"}\n" +
+						"return result;\n" +
+					"}\n" +
+				"})(module);",
+				AbstractScriptEnvironment.class.getSimpleName() + " require function definition"
 			);
 			
 			localScope.defineProperty(

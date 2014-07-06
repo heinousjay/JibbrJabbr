@@ -51,22 +51,28 @@ import org.junit.Test;
  */
 @Subscriber
 public class ScriptEnvironmentIntegrationTest {
-	
+
+	private static final String DOCUMENT_ONE = "index";
+	private static final String DOCUMENT_TWO = "deep/nested";
+
+	private static final String MODULE_TWO = "deep/nesting/module";
+	private static final String MODULE_ONE = "deep/module";
+
 	@Inject ResourceFinder resourceFinder;
 	@Inject ResourceLoader resourceLoader;
 	@Inject EmbeddedHttpServer server;
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(App.one)
+		new JibbrJabbrTestServer(App.module)
 			.injectInstance(this);
 	
 	CountDownLatch latch;
 	
 	DocumentScriptEnvironment scriptEnvironment;
 	
-	AtomicInteger animalCount = new AtomicInteger(0);
-	AtomicInteger deep_nestedCount = new AtomicInteger(0);
+	AtomicInteger documentOneCount = new AtomicInteger(0);
+	AtomicInteger documentTwoCount = new AtomicInteger(0);
 	
 	@Listener
 	void scriptEnvironmentInitialized(ScriptEnvironmentInitialized sei) {
@@ -75,16 +81,16 @@ public class ScriptEnvironmentIntegrationTest {
 			scriptEnvironment = (DocumentScriptEnvironment)sei.scriptEnvironment();
 			latch.countDown();
 			
-			if ("animal".equals(sei.scriptEnvironment().name())) {
-				animalCount.incrementAndGet();
-			} else if ("deep/nested".equals(sei.scriptEnvironment().name())) {
-				deep_nestedCount.incrementAndGet();
+			if (DOCUMENT_ONE.equals(sei.scriptEnvironment().name())) {
+				documentOneCount.incrementAndGet();
+			} else if (DOCUMENT_TWO.equals(sei.scriptEnvironment().name())) {
+				documentTwoCount.incrementAndGet();
 			}
 		}
 	}
 	
 	private ServerTask countDown(final CountDownLatch latch) {
-		return new ServerTask("coutdown") {
+		return new ServerTask("countdown") {
 			
 			@Override
 			protected void run() throws Exception {
@@ -98,15 +104,15 @@ public class ScriptEnvironmentIntegrationTest {
 	public void testingDuplicateInitializationRequestsJoin() throws Exception {
 		
 		// external set up
-		animalCount.set(0);
-		deep_nestedCount.set(0);
+		documentOneCount.set(0);
+		documentTwoCount.set(0);
 		latch = new CountDownLatch(2);
 		
 		CountDownLatch latch1 = new CountDownLatch(12);
 		ServerTask countDown = countDown(latch1);
 		
-		String name1 = "animal";
-		String name2 = "deep/nested";
+		String name1 = DOCUMENT_ONE;
+		String name2 = DOCUMENT_TWO;
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
@@ -124,29 +130,30 @@ public class ScriptEnvironmentIntegrationTest {
 		assertTrue(latch1.await(1, SECONDS));
 		assertTrue(latch.await(1, SECONDS));
 		
-		assertThat(animalCount.get(), is(1));
-		assertThat(deep_nestedCount.get(), is(1));
+		assertThat(documentOneCount.get(), is(1));
+		assertThat(documentTwoCount.get(), is(1));
 	}
 	
 	@Test
-	public void test1() throws Exception {
+	public void test1() throws Throwable {
 		
-		loadScriptEnvironment("animal");
+		loadScriptEnvironment(DOCUMENT_TWO);
 		
-		assertThat(scriptEnvironment.name(), is("animal"));
+		assertThat(scriptEnvironment.name(), is(DOCUMENT_TWO));
 		assertThat(scriptEnvironment.initialized(), is(true));
 		
-		// these lines just validate that the animal ScriptEnvironment correctly loaded and initialized its dependencies
+		// need to run a document request first
+		assertThat(server.request(new EmbeddedHttpRequest(DOCUMENT_TWO)).await(1, SECONDS).status(), is(HttpResponseStatus.OK));
 		
 		ModuleScriptEnvironment mse =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "modules/module1", new RequiredModule(scriptEnvironment, "modules/module1"));
+			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, MODULE_ONE, new RequiredModule(scriptEnvironment, MODULE_ONE));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
 		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
 		
 		mse =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "modules/module2", new RequiredModule(scriptEnvironment, "modules/module2"));
+			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, MODULE_TWO, new RequiredModule(scriptEnvironment, MODULE_TWO));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
@@ -158,24 +165,24 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		loadScriptEnvironment("index");
 		
-		assertThat(scriptEnvironment.name(), is("index"));
+		assertThat(scriptEnvironment.name(), is(DOCUMENT_ONE));
 		assertThat(scriptEnvironment.initialized(), is(true));
 	}
 	
 	@Test
 	public void test3() throws Throwable {
 		
-		loadScriptEnvironment("deep/nested");
+		loadScriptEnvironment(DOCUMENT_TWO);
 		
-		assertThat(scriptEnvironment.name(), is("deep/nested"));
+		assertThat(scriptEnvironment.name(), is(DOCUMENT_TWO));
 		assertThat(scriptEnvironment.initialized(), is(true));
 		
 		// need to run a document request first
-		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status(), is(HttpResponseStatus.OK));
+		assertThat(server.request(new EmbeddedHttpRequest(DOCUMENT_TWO)).await(1, SECONDS).status(), is(HttpResponseStatus.OK));
 		
 		
 		ModuleScriptEnvironment mse =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, "deep/module", new RequiredModule(scriptEnvironment, "deep/module"));
+			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, MODULE_ONE, new RequiredModule(scriptEnvironment, MODULE_ONE));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));

@@ -75,7 +75,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	void resourceNotFound(final ResourceNotFound event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null && waiters.remove(requiredModule) != null) {
-			requiredModule.pendingKey().resume(new RequiredModuleException(requiredModule));
+			requiredModule.pendingKey().resume(false);
 		}
 	}
 	
