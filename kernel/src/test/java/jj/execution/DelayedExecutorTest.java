@@ -160,6 +160,8 @@ public class DelayedExecutorTest {
 		
 		cancelKey.cancel();
 		
+		assertTrue(cancelKey.canceled());
+		
 		clock.advance(1, MILLISECONDS);
 
 		assertFalse(latch.await(LATCH_WAIT_TIME, MILLISECONDS));
@@ -173,6 +175,8 @@ public class DelayedExecutorTest {
 		CancelKey cancelKey = de.submit(helper, 1, MILLISECONDS);
 		
 		cancelKey.cancel();
+		
+		assertTrue(cancelKey.canceled());
 		
 		clock.advance(1, MILLISECONDS);
 

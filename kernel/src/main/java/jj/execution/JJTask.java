@@ -15,9 +15,6 @@
  */
 package jj.execution;
 
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
-
 import jj.resource.ResourceTask;
 import jj.script.ScriptTask;
 
@@ -34,15 +31,10 @@ import jj.script.ScriptTask;
  * for scheduling
  * </p>
  * 
- * <p>
- * although this class implements {@link Delayed}, it is not schedulable.
- * Extend {@link DelayedTask} and see {@link DelayedExecutor} if that is
- * what you need.
- * 
  * @author jason
  *
  */
-public abstract class JJTask implements Delayed {
+public abstract class JJTask {
 	
 	protected interface ExecutorFinder {
 		
@@ -51,13 +43,7 @@ public abstract class JJTask implements Delayed {
 	
 	private final String name;
 	
-	private volatile long maxTime = 0;
-	
-	private volatile long enqueuedTime = 0;
-	
-	private volatile long startTime = 0;
-	
-	private volatile long executionTime = 0;
+	private final String spawnedBy = Thread.currentThread().getName();
 	
 	private final Promise promise = new Promise();
 	
@@ -81,42 +67,6 @@ public abstract class JJTask implements Delayed {
 		return name;
 	}
 	
-	final void enqueue(long timeoutMillis) {
-		executionTime = 0;
-		startTime = 0;
-		maxTime = timeoutMillis;
-		enqueuedTime = System.currentTimeMillis();
-	}
-	
-	final void start() {
-		enqueuedTime = 0;
-		startTime = System.currentTimeMillis();
-	}
-	
-	final void end() {
-		executionTime = System.currentTimeMillis() - startTime;
-	}
-	
-	final boolean enqueued() {
-		return enqueuedTime > 0;
-	}
-
-	final boolean started() {
-		return startTime > 0;
-	}
-	
-	final boolean finished() {
-		return executionTime > 0;
-	}
-	
-	final long timeInQueue() {
-		return System.currentTimeMillis() - enqueuedTime;
-	}
-	
-	final long executionTime() {
-		return executionTime;
-	}
-	
 	final void next(JJTask next) {
 		promise.then(next);
 	}
@@ -126,20 +76,10 @@ public abstract class JJTask implements Delayed {
 	}
 	
 	@Override
-	public final long getDelay(TimeUnit unit) {
-		return unit.convert(maxTime - (System.currentTimeMillis() - enqueuedTime), TimeUnit.MILLISECONDS);
-	}
-	
-	@Override
-	public final int compareTo(Delayed o) {
-		long x = getDelay(TimeUnit.MILLISECONDS);
-		long y = o.getDelay(TimeUnit.MILLISECONDS);
-		return (x < y) ? -1 : ((x == y) ? 0 : 1);
-	}
-	
-	@Override
 	public final String toString() {
-		return new StringBuilder(getClass().getSimpleName()).append(" - ").append(name).toString();
+		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append(" - ").append(name);
+		sb.append(" spawned by: ").append(spawnedBy);
+		return sb.toString();
 	}
 	
 }

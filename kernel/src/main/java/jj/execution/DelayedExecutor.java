@@ -45,6 +45,8 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 		
 		private final WeakReference<DelayedRunnable> runnable;
 		
+		private volatile boolean canceled = false;
+		
 		private CancelKey(DelayedRunnable runnable) {
 			this.runnable = new WeakReference<>(runnable);
 		}
@@ -52,9 +54,14 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 		public void cancel() {
 			DelayedRunnable r = runnable.get();
 			if (r != null) {
+				canceled = true;
 				r.canceled.set(true);
 				delayedTasks.remove(r);
 			}
+		}
+		
+		public boolean canceled() {
+			return canceled;
 		}
 	}
 	

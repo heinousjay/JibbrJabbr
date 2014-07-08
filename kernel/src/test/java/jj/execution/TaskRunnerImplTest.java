@@ -16,6 +16,7 @@
 package jj.execution;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
@@ -23,12 +24,16 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jj.event.Publisher;
+import jj.event.MockPublisher;
+import jj.execution.DelayedExecutor.CancelKey;
 import jj.logging.Emergency;
 import jj.script.ScriptEnvironment;
+import jj.util.MockClock;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,9 +45,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class TaskRunnerTest {
+public class TaskRunnerImplTest {
 	
 	private @Mock ServerExecutor serverExecutor;
+	
+	private Runnable monitorTask;
+	
+	@Mock CancelKey cancelKey;
 	
 	private @Mock ScriptEnvironment scriptEnvironment;
 
@@ -50,13 +59,15 @@ public class TaskRunnerTest {
 	
 	private CurrentTask currentTask;
 	
-	private @Mock Publisher publisher;
+	private MockPublisher publisher;
 	
 	private TaskRunnerImpl executor;
 	
 	private @Captor ArgumentCaptor<Runnable> runnableCaptor;
 	
 	private String baseName = "test";
+	
+	private MockClock clock = new MockClock();
 	
 	@Before
 	public void before() {
@@ -67,16 +78,21 @@ public class TaskRunnerTest {
 		executors.put(ServerExecutor.class, serverExecutor);
 		bundle = new ExecutorBundle(executors);
 		
-		executor = new TaskRunnerImpl(bundle, currentTask, publisher);
+		executor = new TaskRunnerImpl(bundle, currentTask, publisher = new MockPublisher(), clock);
+		
+		verify(serverExecutor).submit(runnableCaptor.capture(), eq(0L), eq(MILLISECONDS));
+		monitorTask = runnableCaptor.getValue();
+		reset(serverExecutor);
+		given(serverExecutor.submit(any(Runnable.class), any(Long.class), any(TimeUnit.class))).willReturn(cancelKey);
 		
 		given(scriptEnvironment.name()).willReturn(baseName);
 	}
 	
-	private void runTask(ServerExecutor service) {
-		verify(service, atLeastOnce()).submit(runnableCaptor.capture(), eq(0L), eq(MILLISECONDS));
+	private void runTask() {
+		verify(serverExecutor).submit(runnableCaptor.capture(), eq(0L), eq(MILLISECONDS));
 		// reset before each task run so that a test can control execution
 		// one task at a time
-		reset(service);
+		reset(serverExecutor);
 		runnableCaptor.getValue().run();
 	}
 	
@@ -107,15 +123,15 @@ public class TaskRunnerTest {
 		};
 		
 		executor.execute(task1).then(task2).then(task3);
-		runTask(serverExecutor);
-		runTask(serverExecutor);
-		runTask(serverExecutor);
+		runTask();
+		runTask();
+		runTask();
 		
 		assertThat(counter.get(), is(3));
 	}
 	
 	@Test
-	public void testExecuteIOTask() {
+	public void testExecuteTask() {
 		
 		final AtomicBoolean flag = new AtomicBoolean(false);
 		
@@ -129,7 +145,7 @@ public class TaskRunnerTest {
 		assertThat(currentTask.current(), is(nullValue()));
 		
 		executor.execute(task);
-		runTask(serverExecutor);
+		runTask();
 		
 		assertThat(flag.get(), is(true));
 		assertThat(currentTask.current(), is(nullValue()));
@@ -148,8 +164,34 @@ public class TaskRunnerTest {
 			}
 		});
 		
-		runTask(serverExecutor);
+		runTask();
 		
-		verify(publisher).publish(isA(Emergency.class));
+		assertThat(publisher.events.get(0), is(instanceOf(Emergency.class)));
+	}
+	
+	@Test
+	public void testMonitor() throws Throwable {
+		// okay, gotta start the runnable
+		final Thread t = new Thread(monitorTask, "test thread");
+		t.setDaemon(true);
+		t.start();
+		
+		ServerTask task = new ServerTask("test task") {
+			@Override
+			protected void run() throws Exception {
+				t.setName("NO NO NO NO NO NO NO ");
+			}
+		};
+		
+		executor.execute(task);
+		
+		clock.advance(TaskTracker.MAX_QUEUED_TIME, MILLISECONDS);
+
+		executor.execute(task);
+		reset(serverExecutor);
+		
+		Thread.sleep(40);
+		
+		assertThat(publisher.events.get(0), is(instanceOf(Emergency.class)));
 	}
 }
