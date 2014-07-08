@@ -35,6 +35,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
+ * The handler for the REPL if we're in linemode. this can happen if,
+ * for instance, the client refuses to leave linemode (no idea why)
+ * or if the user chooses netcat to connect, which doesn't understand telnet
+ * stuff.
+ * 
  * @author jason
  *
  */
@@ -71,10 +76,13 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 		}
 	}
 	
+	
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		ctx.writeAndFlush("Welcome to JibbrJabbr\n>");
+		
 		this.ctx = ctx;
+		
+		ctx.writeAndFlush("Welcome to JibbrJabbr\n>");
 	}
 
 	@Override

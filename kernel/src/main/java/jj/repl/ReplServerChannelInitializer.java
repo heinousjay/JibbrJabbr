@@ -39,7 +39,9 @@ public class ReplServerChannelInitializer extends ChannelInitializer<SocketChann
 	private final Provider<ReplHandler> replHandlerProvider;
 	
 	@Inject
-	ReplServerChannelInitializer(final Provider<ReplHandler> replHandlerProvider) {
+	ReplServerChannelInitializer(
+		final Provider<ReplHandler> replHandlerProvider
+	) {
 		this.replHandlerProvider = replHandlerProvider;
 	}
 

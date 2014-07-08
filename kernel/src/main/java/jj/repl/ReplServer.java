@@ -104,7 +104,12 @@ class ReplServer {
 					@Override
 					public void operationComplete(Future<Object> future) throws Exception {
 						// if this failed what do we do?
-						start();
+						// just publish an emergency
+						if (future.isSuccess()) {
+							start();
+						} else {
+							publisher.publish(new Emergency("couldn't restart the REPL server.  The server may need to be restarted", future.cause()));
+						}
 					}
 				});
 				

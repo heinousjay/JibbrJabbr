@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 
+import javax.inject.Inject;
+
 import jj.App;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -53,6 +55,8 @@ public class ReplIntegrationTest {
 	
 	@Rule
 	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(App.repl).injectInstance(this);
+	
+	@Inject ReplConfiguration config;
 
 	Bootstrap bootstrap;
 	CountDownLatch latch = new CountDownLatch(1);
@@ -72,6 +76,8 @@ public class ReplIntegrationTest {
 	@Test
 	public void test() throws Exception {
 		assertTrue("timed out", latch.await(1, SECONDS));
+		
+		assertTrue("somehow not activated?", config.activate());
 		
 		final HashSet<String> responses = new HashSet<>(Arrays.asList("Welcome to JibbrJabbr\n>", "ReferenceError: \"whatever\" is not defined.", "\n>"));
 		
@@ -98,7 +104,7 @@ public class ReplIntegrationTest {
 				}
 			});
 		latch = new CountDownLatch(4);
-		bootstrap.connect("localhost", 9955).addListener(new ChannelFutureListener() {
+		bootstrap.connect("localhost", config.port()).addListener(new ChannelFutureListener() {
 			
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {

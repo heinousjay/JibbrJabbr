@@ -71,7 +71,12 @@ public class ReplServerTest {
 	
 	@Before
 	public void before() {
-		server = new ReplServer(configuration, new ReplServerChannelInitializer(replHandlerProvider), publisher, resourceLoader);
+		server = new ReplServer(
+			configuration, 
+			new ReplServerChannelInitializer(replHandlerProvider),
+			publisher,
+			resourceLoader
+		);
 	}
 	
 	@After
