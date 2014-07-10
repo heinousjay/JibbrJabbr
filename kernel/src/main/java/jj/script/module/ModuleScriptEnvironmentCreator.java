@@ -41,29 +41,26 @@ class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Mo
 		super(initializer);
 		this.creator = creator;
 	}
+	
+	private RequiredModule requiredModule(Object[] args) {
+		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
+		return (RequiredModule)args[0];
+	}
 
 	@Override
 	protected ModuleScriptEnvironment createScriptEnvironment(String moduleIdentifier, Object... args) throws IOException {
-		
-		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
-		
 		return creator.createResource(
 			ModuleScriptEnvironment.class,
 			resourceKey(Virtual, moduleIdentifier, args),
 			Virtual,
 			moduleIdentifier,
-			args
+			requiredModule(args)
 		);
 	}
 	
 	@Override
 	protected URI uri(Location base, String moduleIdentifier, Object... args) {
-		
-		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
-		
-		RequiredModule requiredModule = (RequiredModule)args[0];
-		
-		return requiredModule.uri();
+		return requiredModule(args).uri();
 	}
 
 }
