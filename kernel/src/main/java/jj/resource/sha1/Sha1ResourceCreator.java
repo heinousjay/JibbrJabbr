@@ -15,43 +15,20 @@
  */
 package jj.resource.sha1;
 
-import java.io.IOException;
-import java.net.URI;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.AbstractResourceCreator;
-import jj.resource.Location;
-import jj.resource.PathResolver;
-import jj.resource.ResourceInstanceCreator;
+import jj.resource.SimpleResourceCreator;
 
 /**
  * @author jason
  *
  */
 @Singleton
-public class Sha1ResourceCreator extends AbstractResourceCreator<Sha1Resource> {
+public class Sha1ResourceCreator extends SimpleResourceCreator<Sha1Resource> {
 
-	private final PathResolver pathResolver;
-	private final ResourceInstanceCreator instanceModuleCreator;
-	
 	@Inject
-	Sha1ResourceCreator(
-		final PathResolver pathResolver,
-		final ResourceInstanceCreator instanceModuleCreator
-	) {
-		this.pathResolver = pathResolver;
-		this.instanceModuleCreator = instanceModuleCreator;
-	}
-
-	@Override
-	public Sha1Resource create(Location base, String name, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(Sha1Resource.class, resourceKey(base, name), base, name);
-	}
-	
-	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		return pathResolver.resolvePath(base, name).toUri();
+	Sha1ResourceCreator(final Dependencies dependencies) {
+		super(dependencies);
 	}
 }

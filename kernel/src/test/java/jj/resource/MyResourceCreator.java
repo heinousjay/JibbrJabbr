@@ -20,11 +20,12 @@ import java.net.URI;
 
 import jj.event.Publisher;
 
-class MyResourceCreator extends AbstractResourceCreator<MyResource> {
+class MyResourceCreator extends SimpleResourceCreator<MyResource> {
 	
 	private final Publisher publisher;
 	
 	MyResourceCreator(Publisher publisher) {
+		super(new Dependencies(null, null));
 		this.publisher = publisher;
 	}
 

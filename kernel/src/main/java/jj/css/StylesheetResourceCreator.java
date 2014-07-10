@@ -15,43 +15,20 @@
  */
 package jj.css;
 
-import java.io.IOException;
-import java.net.URI;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.AbstractResourceCreator;
-import jj.resource.Location;
-import jj.resource.PathResolver;
-import jj.resource.ResourceInstanceCreator;
+import jj.resource.SimpleResourceCreator;
 
 /**
  * @author jason
  *
  */
 @Singleton
-class StylesheetResourceCreator extends AbstractResourceCreator<StylesheetResource> {
-
-	private final PathResolver pathResolver;
-	private final ResourceInstanceCreator instanceModuleCreator;
-
-	@Inject
-	StylesheetResourceCreator(
-		final PathResolver pathResolver,
-		final ResourceInstanceCreator instanceModuleCreator
-	) {
-		this.pathResolver = pathResolver;
-		this.instanceModuleCreator = instanceModuleCreator;
-	}
+class StylesheetResourceCreator extends SimpleResourceCreator<StylesheetResource> {
 	
-	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		return pathResolver.resolvePath(base, name).toUri();
-	}
-
-	@Override
-	public StylesheetResource create(Location base, String name, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(StylesheetResource.class, resourceKey(base, name), base, name);
+	@Inject
+	StylesheetResourceCreator(final Dependencies dependencies) {
+		super(dependencies);
 	}
 }

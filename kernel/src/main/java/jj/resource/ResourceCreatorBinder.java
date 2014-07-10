@@ -26,19 +26,19 @@ import com.google.inject.multibindings.MapBinder;
  */
 public class ResourceCreatorBinder {
 
-	private final MapBinder<Class<? extends AbstractResource>, AbstractResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
+	private final MapBinder<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
 	
 	public ResourceCreatorBinder(final Binder binder) {
 		resourceCreatorBinder = 
 			MapBinder.newMapBinder(
 				binder,
 				new TypeLiteral<Class<? extends AbstractResource>>() {},
-				new TypeLiteral<AbstractResourceCreator<? extends AbstractResource>>() {}
+				new TypeLiteral<SimpleResourceCreator<? extends AbstractResource>>() {}
 			);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends AbstractResource, U extends AbstractResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
+	public <T extends AbstractResource, U extends SimpleResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
 		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);
 	}
 }

@@ -23,37 +23,36 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
-import jj.resource.AbstractResourceCreator;
+import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
-import jj.resource.ResourceInstanceCreator;
 
 /**
  * @author jason
  *
  */
 @Singleton
-class MessagesResourceCreator extends AbstractResourceCreator<MessagesResource> {
+class MessagesResourceCreator extends SimpleResourceCreator<MessagesResource> {
 
-	private final ResourceInstanceCreator creator;
-	
 	@Inject
-	MessagesResourceCreator(
-		final ResourceInstanceCreator creator
-	) {
-		this.creator = creator;
+	MessagesResourceCreator(final Dependencies dependencies) {
+		super(dependencies);
 	}
 
 	@Override
 	public MessagesResource create(Location base, String name, Object... args) throws IOException {
-		assert args.length == 1 && args[0] instanceof Locale : "MessagesResource requires a Locale argument";
-		assert base == AppLocation.Virtual : "MessagesResource is only Virtual";
+		assertArgs(base, args);
 		return creator.createResource(MessagesResource.class, resourceKey(base, name, args), base, name, args);
 	}
 
 	@Override
 	protected URI uri(Location base, String name, Object... args) {
-		assert args.length == 1 && args[0] instanceof Locale : "messages require a Locale argument";
+		assertArgs(base, args);
 		return URI.create(name + "#" + String.valueOf(args[0]));
+	}
+
+	private void assertArgs(Location base, Object... args) {
+		assert args.length == 1 && args[0] instanceof Locale : "messages require a Locale argument";
+		assert base == AppLocation.Virtual : "MessagesResource is only Virtual";
 	}
 
 }

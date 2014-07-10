@@ -20,9 +20,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.ResourceInstanceCreator;
 import jj.script.AbstractScriptEnvironmentCreator;
-import jj.script.ScriptEnvironmentInitializer;
 
 /**
  * @author jason
@@ -31,15 +29,9 @@ import jj.script.ScriptEnvironmentInitializer;
 @Singleton
 class ReplScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ReplScriptEnvironment> {
 
-	private final ResourceInstanceCreator creator;
-
 	@Inject
-	ReplScriptEnvironmentCreator(
-		final ScriptEnvironmentInitializer initializer,
-		final ResourceInstanceCreator creator
-	) {
-		super(initializer);
-		this.creator = creator;
+	ReplScriptEnvironmentCreator(Dependencies dependencies) {
+		super(dependencies);
 	}
 
 	@Override

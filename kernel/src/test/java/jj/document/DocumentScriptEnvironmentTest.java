@@ -30,7 +30,6 @@ import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.DocumentWebSocketMessageProcessors;
 import jj.document.HtmlResource;
-import jj.document.HtmlResourceCreator;
 import jj.document.ScriptCompiler;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
@@ -102,7 +101,7 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
-		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, HtmlResourceCreator.resourceName(baseName))).willReturn(html);
+		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, baseName + ".html")).willReturn(html);
 	}
 
 	private void givenAClientScript(String baseName) throws Exception {

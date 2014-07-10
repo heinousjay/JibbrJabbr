@@ -22,9 +22,7 @@ import javax.inject.Singleton;
 import javax.inject.Inject;
 
 import jj.resource.Location;
-import jj.resource.ResourceInstanceCreator;
 import jj.script.AbstractScriptEnvironmentCreator;
-import jj.script.ScriptEnvironmentInitializer;
 
 /**
  * @author jason
@@ -34,12 +32,10 @@ import jj.script.ScriptEnvironmentInitializer;
 class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ModuleScriptEnvironment> {
 	
 	private static final String ARG_ERROR = "ModuleScriptEnvironmentCreator requires a RequiredModule argument";
-	private final ResourceInstanceCreator creator;
 	
 	@Inject
-	ModuleScriptEnvironmentCreator(final ScriptEnvironmentInitializer initializer, final ResourceInstanceCreator creator) {
-		super(initializer);
-		this.creator = creator;
+	ModuleScriptEnvironmentCreator(final Dependencies dependencies) {
+		super(dependencies);
 	}
 	
 	private RequiredModule requiredModule(Object[] args) {

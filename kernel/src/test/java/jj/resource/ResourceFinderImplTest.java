@@ -32,8 +32,8 @@ public class ResourceFinderImplTest {
 	
 	private @InjectMocks ResourceFinderImpl rfi;
 	
-	private @Mock AbstractResourceCreator<StaticResource> staticResourceCreator;
-	private @Mock AbstractResourceCreator<Sha1Resource> sha1ResourceCreator;
+	private @Mock SimpleResourceCreator<StaticResource> staticResourceCreator;
+	private @Mock SimpleResourceCreator<Sha1Resource> sha1ResourceCreator;
 	
 	private @Captor ArgumentCaptor<ResourceEvent> eventCaptor;
 	

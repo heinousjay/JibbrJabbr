@@ -46,11 +46,11 @@ public class ResourceCacheTest extends RealResourceBase {
 	
 	@Mock StaticResource sr;
 	
-	@Mock AbstractResourceCreator<StaticResource> src;
+	@Mock SimpleResourceCreator<StaticResource> src;
 	
 	@Mock HtmlResource hr;
 	
-	@Mock AbstractResourceCreator<HtmlResource> hrc;
+	@Mock SimpleResourceCreator<HtmlResource> hrc;
 	
 	ResourceKey sKey;
 	
@@ -61,7 +61,7 @@ public class ResourceCacheTest extends RealResourceBase {
 	@Before
 	public void before() {
 		
-		HashMap<Class<? extends AbstractResource>, AbstractResourceCreator<? extends AbstractResource>> map = new HashMap<>();
+		HashMap<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> map = new HashMap<>();
 		map.put(StaticResource.class, src);
 		map.put(HtmlResource.class, hrc);
 		rc = new ResourceCacheImpl(new ResourceCreators(map));

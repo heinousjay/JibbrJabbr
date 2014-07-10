@@ -15,44 +15,21 @@
  */
 package jj.resource.stat.ic;
 
-import java.io.IOException;
-import java.net.URI;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.AbstractResourceCreator;
-import jj.resource.Location;
-import jj.resource.PathResolver;
-import jj.resource.ResourceInstanceCreator;
+import jj.resource.SimpleResourceCreator;
 
 /**
  * @author jason
  *
  */
 @Singleton
-public class StaticResourceCreator extends AbstractResourceCreator<StaticResource> {
-
-	private final PathResolver pathResolver;
-	private final ResourceInstanceCreator instanceModuleCreator;
+public class StaticResourceCreator extends SimpleResourceCreator<StaticResource> {
 
 	@Inject
-	StaticResourceCreator(
-		final PathResolver pathResolver,
-		final ResourceInstanceCreator instanceModuleCreator
-	) {
-		this.pathResolver = pathResolver;
-		this.instanceModuleCreator = instanceModuleCreator;
-	}
-	
-	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		return pathResolver.resolvePath(base, name).toUri();
-	}
-
-	@Override
-	public StaticResource create(Location base, String name, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(StaticResource.class, resourceKey(base, name), base, name);
+	StaticResourceCreator(final Dependencies dependencies) {
+		super(dependencies);
 	}
 
 }

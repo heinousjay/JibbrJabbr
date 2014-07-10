@@ -22,9 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.Location;
-import jj.resource.ResourceInstanceCreator;
 import jj.script.AbstractScriptEnvironmentCreator;
-import jj.script.ScriptEnvironmentInitializer;
 
 /**
  * 
@@ -36,16 +34,12 @@ import jj.script.ScriptEnvironmentInitializer;
 class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ConfigurationScriptEnvironment> {
 	
 	static final String CONFIG_SCRIPT_NAME = "config.js";
-
-	private final ResourceInstanceCreator creator;
 	
 	@Inject
 	ConfigurationScriptEnvironmentCreator(
-		final ScriptEnvironmentInitializer initializer,
-		final ResourceInstanceCreator creator
+		final Dependencies dependencies
 	) {
-		super(initializer);
-		this.creator = creator;
+		super(dependencies);
 	}
 
 	@Override

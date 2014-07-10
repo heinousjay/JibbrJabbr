@@ -43,7 +43,7 @@ class ResourceCacheImpl implements ResourceCache {
 		
 		List<Resource> result = new ArrayList<>();
 		
-		for (AbstractResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
+		for (SimpleResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
 			Resource it = get(new ResourceKey(resourceCreator.type(), uri));
 			if (it != null) result.add(it);
 		}

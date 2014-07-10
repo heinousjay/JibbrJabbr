@@ -18,28 +18,51 @@ package jj.script;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import jj.configuration.resolution.AppLocation;
-import jj.resource.AbstractResourceCreator;
+import jj.resource.PathResolver;
+import jj.resource.ResourceInstanceCreator;
+import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
 
 /**
  * @author jason
  *
  */
-public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptEnvironment> extends AbstractResourceCreator<T> {
+public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptEnvironment> extends SimpleResourceCreator<T> {
 	
 	protected static final AppLocation Virtual = AppLocation.Virtual;
 	
+	@Singleton
+	public static class Dependencies extends SimpleResourceCreator.Dependencies {
+		
+		protected final ScriptEnvironmentInitializer initializer;
+
+		@Inject
+		protected Dependencies(
+			final PathResolver pathResolver,
+			final ResourceInstanceCreator creator,
+			final ScriptEnvironmentInitializer initializer
+		) {
+			super(pathResolver, creator);
+			this.initializer = initializer;
+		}
+		
+	}
+	
 	protected final ScriptEnvironmentInitializer initializer;
 	
-	protected AbstractScriptEnvironmentCreator(final ScriptEnvironmentInitializer initializer) {
-		this.initializer = initializer; 
+	protected AbstractScriptEnvironmentCreator(final Dependencies dependencies) {
+		super(dependencies);
+		this.initializer = dependencies.initializer; 
 	}
 
 	@Override
 	public T create(Location base, String name, Object... args) throws IOException {
 		
-		assert base == AppLocation.Virtual : "all ScriptEnvironments are Virtual";
+		assert base == Virtual : "all ScriptEnvironments are Virtual";
 		
 		T result = createScriptEnvironment(name, args);
 		
@@ -54,7 +77,7 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 	
 	@Override
 	protected URI uri(Location base, String name, Object... args) {
-		assert base == AppLocation.Virtual : "all ScriptEnvironments are Virtual";
+		assert base == Virtual : "all ScriptEnvironments are Virtual";
 		return URI.create(name);
 	}
 

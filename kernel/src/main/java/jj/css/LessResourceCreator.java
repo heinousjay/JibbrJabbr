@@ -15,43 +15,20 @@
  */
 package jj.css;
 
-import java.io.IOException;
-import java.net.URI;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.AbstractResourceCreator;
-import jj.resource.Location;
-import jj.resource.PathResolver;
-import jj.resource.ResourceInstanceCreator;
+import jj.resource.SimpleResourceCreator;
 
 /**
+ * Configuration using the type system!
+ * 
  * @author jason
  */
 @Singleton
-class LessResourceCreator extends AbstractResourceCreator<LessResource> {
-
-	private final PathResolver pathResolver;
-	private final ResourceInstanceCreator instanceModuleCreator;
-
+class LessResourceCreator extends SimpleResourceCreator<LessResource> {
 	@Inject
-	LessResourceCreator(
-		final PathResolver pathResolver,
-		final ResourceInstanceCreator instanceModuleCreator
-	) {
-		this.pathResolver = pathResolver;
-		this.instanceModuleCreator = instanceModuleCreator;
+	LessResourceCreator(Dependencies dependencies) {
+		super(dependencies);
 	}
-	
-	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		return pathResolver.resolvePath(base, name).toUri();
-	}
-
-	@Override
-	public LessResource create(Location base, String name, Object... args) throws IOException {
-		return instanceModuleCreator.createResource(LessResource.class, resourceKey(base, name), base, name);
-	}
-
 }

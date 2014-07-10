@@ -26,15 +26,15 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class ResourceCreators implements Iterable<AbstractResourceCreator<? extends AbstractResource>> {
+class ResourceCreators implements Iterable<SimpleResourceCreator<? extends AbstractResource>> {
 	
-	private final Map<Class<? extends AbstractResource>, AbstractResourceCreator<? extends AbstractResource>> resourceCreators;
+	private final Map<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreators;
 
 	/**
 	 * 
 	 */
 	@Inject
-	ResourceCreators(final Map<Class<? extends AbstractResource>, AbstractResourceCreator<? extends AbstractResource>> resourceCreators) {
+	ResourceCreators(final Map<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreators) {
 		this.resourceCreators = Collections.unmodifiableMap(resourceCreators);
 	}
 	
@@ -51,7 +51,7 @@ class ResourceCreators implements Iterable<AbstractResourceCreator<? extends Abs
 	}
 
 	@Override
-	public Iterator<AbstractResourceCreator<? extends AbstractResource>> iterator() {
+	public Iterator<SimpleResourceCreator<? extends AbstractResource>> iterator() {
 		return resourceCreators.values().iterator();
 	}
 

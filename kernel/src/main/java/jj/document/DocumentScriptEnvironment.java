@@ -110,9 +110,11 @@ public class DocumentScriptEnvironment
 		super(dependencies);
 		this.baseName = baseName;
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, HtmlResourceCreator.resourceName(baseName));
+		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, resourceName(baseName));
 		
-		if (html == null) throw new NoSuchResourceException(getClass(), baseName + "-" + baseName + ".html");
+		if (html == null) {
+			throw new NoSuchResourceException(getClass(), baseName + "-" + resourceName(baseName));
+		}
 		
 		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(baseName));
 		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(baseName));
@@ -153,6 +155,10 @@ public class DocumentScriptEnvironment
 		
 		this.currentDocument = currentDocument;
 		this.currentConnection = currentConnection;
+	}
+
+	private String resourceName(final String baseName) {
+		return baseName + ".html";
 	}
 
 	@Override

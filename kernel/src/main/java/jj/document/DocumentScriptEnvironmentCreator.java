@@ -19,9 +19,7 @@ import java.io.IOException;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
-import jj.resource.ResourceInstanceCreator;
 import jj.script.AbstractScriptEnvironmentCreator;
-import jj.script.ScriptEnvironmentInitializer;
 
 /**
  * @author jason
@@ -30,12 +28,9 @@ import jj.script.ScriptEnvironmentInitializer;
 @Singleton
 public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<DocumentScriptEnvironment> {
 	
-	private final ResourceInstanceCreator creator;
-	
 	@Inject
-	DocumentScriptEnvironmentCreator(final ScriptEnvironmentInitializer initializer, final ResourceInstanceCreator creator) {
-		super(initializer);
-		this.creator = creator;
+	DocumentScriptEnvironmentCreator(final Dependencies dependencies) {
+		super(dependencies);
 	}
 
 	@Override
