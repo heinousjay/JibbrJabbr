@@ -15,29 +15,17 @@
  */
 package jj.http.client;
 
-import jj.script.Continuation;
-import jj.script.ContinuationPendingKey;
+import jj.configuration.Default;
 
 /**
- * 
- * 
  * @author jason
  *
  */
-class RestRequest implements Continuation {
-
-	private ContinuationPendingKey pendingKey;
+public interface HttpClientConfiguration {
 	
-	@Override
-	public ContinuationPendingKey pendingKey() {
-		return pendingKey;
-	}
+	@Default("8")
+	int maximumConnectionsPerHost();
 	
-	@Override
-	public void pendingKey(ContinuationPendingKey pendingKey) {
-		assert this.pendingKey == null;
-		assert pendingKey != null;
-		this.pendingKey = pendingKey;
-	}
-
+	@Default("JibbrJabbr") // hmmm want interpolations here.  maybe
+	String userAgent();
 }

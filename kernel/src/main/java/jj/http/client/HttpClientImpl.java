@@ -15,21 +15,22 @@
  */
 package jj.http.client;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.script.ContinuationProcessor;
-import jj.script.ContinuationState;
+import org.asynchttpclient.AsyncHttpClient;
 
 /**
  * @author jason
  *
  */
 @Singleton
-public class RestRequestContinuationProcessor implements ContinuationProcessor {
+class HttpClientImpl {
 
-	@Override
-	public void process(ContinuationState continuationState) {
-		RestRequest requestRequest = continuationState.continuationAs(RestRequest.class);
+	private final AsyncHttpClient httpClient;
+	
+	@Inject
+	HttpClientImpl(final AsyncHttpClient httpClient) {
+		this.httpClient = httpClient;
 	}
-
 }

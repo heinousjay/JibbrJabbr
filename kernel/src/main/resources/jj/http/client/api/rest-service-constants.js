@@ -3,11 +3,12 @@
 // require('globalize')('rest-service-constants', this);
 
 module.exports = {
-	GET: 'get',
-	POST: 'post',
-	PUT: 'put',
-	DELETE: 'del',
+	GET: 'GET',
+	POST: 'POST',
+	PUT: 'PUT',
+	DELETE: 'DELETE',
 	JSON: 'application/json',
+	FORM: 'application/x-www-form-urlencoded',
 	XML: 'text/xml',
 	HTML: 'text/html',
 	TEXT: 'text/plain'

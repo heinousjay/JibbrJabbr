@@ -31,6 +31,7 @@ import jj.messaging.MessagingModule;
 import jj.repl.ReplModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
+import jj.http.client.HttpClientModule;
 import jj.http.server.HttpServerModule;
 
 /**
@@ -81,6 +82,8 @@ public class CoreModule extends JJModule {
 		install(new ReplModule());
 		
 		install(new HttpServerModule());
+		
+		install(new HttpClientModule());
 		
 		install(new MessagingModule());
 
