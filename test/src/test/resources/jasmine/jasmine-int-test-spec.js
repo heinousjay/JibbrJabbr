@@ -4,6 +4,11 @@
  * basically, this is one verification that the jasmine integration works,
  * we should get a pass on all specs in this file
  * 
+ * there is one small modification to this test - the last spec is altered
+ * to shorten the timeout and make sure we come in under it, since the actual
+ * timing isn't really the point here, and i'm not a fan of making a test
+ * take 10 seconds by design
+ * 
  */
 
 
@@ -302,6 +307,7 @@ describe("A spec", function() {
       expect(foo).toEqual(bar);
     });
   });
+
 });
 
 /**
@@ -902,13 +908,13 @@ describe("Asynchronous specs", function() {
     var originalTimeout;
     beforeEach(function() {
       originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 100;
     });
 
     it("takes a long time", function(done) {
       setTimeout(function() {
         done();
-      }, 9000);
+      }, 50);
     });
 
     afterEach(function() {

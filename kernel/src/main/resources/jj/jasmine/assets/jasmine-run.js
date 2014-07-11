@@ -2,13 +2,11 @@
 
 (function() {
 	
-	// ARG NO!
-	function print(thing) {
-		java.lang.System.out.print(thing);
-	}
+	var resultCollector = $$realInject('jj.jasmine.JasmineResultCollector');
 	
 	jasmine.testJsApiReporter = (function() {
 
+		// todo - make the timer real! (use clock?)
 		var noopTimer = {
 			start : function() {
 			},
@@ -35,57 +33,38 @@
 				this.finished = true;
 				executionTime = timer.elapsed();
 				status = 'done';
+				// publish from here!
+				resultCollector.jasmineDone();
 			};
 
 			this.status = function() {
 				return status;
 			};
 
-			var suites = {};
-			var currentSuite;
-			this.suiteStarted = function(result) {
-				print('** ' + result.description + ' beginning\n');
-				storeSuite(result);
-				if (currentSuite) result.parentId = currentSuite.id;
-				currentSuite = result;
+
+			this.suiteStarted = function(suite) {
+				// id,status,description,fullName
+				resultCollector.suiteStarted(suite.id, suite.description);
 			};
 
-			this.suiteDone = function(result) {
-				print('** ' + result.description + ' completed\n');
-				storeSuite(result);
-				currentSuite = result.parentId ? suites[result.parentId] : null;
+			this.suiteDone = function(suite) {
+				// id,status,description,fullName
+				resultCollector.suiteDone(suite.id, suite.description);
+			};
+			
+			this.specStarted = function(spec) {
+				// id,description,fullName,failedExpectations
+				resultCollector.specStarted(spec.id, spec.description);
 			};
 
-			function storeSuite(result) {
-				suites[result.id] = result;
-			}
-
-			this.suites = function() {
-				return suites;
-			};
-
-			var specs = [];
-			this.specStarted = function(result) {
-				print("- " + result.description + '(' + currentSuite.id + ')');
-				result.suiteId = currentSuite.id;
-			};
-
-			this.specDone = function(result) {
-				print(" --> " + result.status + "\n");
-				specs.push(result);
-				if (result.status == 'failed') {
-					result.failedExpectations.forEach(function(failedExpectation) {
-						print('  ' + failedExpectation.message + '\n');
-					});
-				}
-			};
-
-			this.specResults = function(index, length) {
-				return specs.slice(index, index + length);
-			};
-
-			this.specs = function() {
-				return specs;
+			// this does not get called for specs that call pending();
+			this.specDone = function(spec) {
+				// id,description,fullName,failedExpectations,status
+				spec.failedExpectations.forEach(function(fe) {
+					resultCollections.specExpectationFailed(spec.id, fe);
+				});
+				resultCollector.specDone(spec.id, spec.status);
+				
 			};
 
 			this.executionTime = function() {

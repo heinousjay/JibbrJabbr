@@ -1,3 +1,3 @@
 
-// turn jasmine one baby yeah
+// turn jasmine on baby yeah
 require('jasmine-configuration').autorunSpecs(true);

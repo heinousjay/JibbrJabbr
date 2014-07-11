@@ -50,7 +50,7 @@ public class JasmineIntegrationTest {
 	CountDownLatch latch = new CountDownLatch(1);
 	
 	@Listener
-	void jasmineSpecExecutionCompleted(JasmineSpecExecutionCompleted jsec) {
+	void jasmineSpecExecutionCompleted(JasmineResultCollector jsec) {
 		latch.countDown();
 	}
 
@@ -59,12 +59,7 @@ public class JasmineIntegrationTest {
 		
 		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test.js");
 		
-		// need to publish that event not on completion! but at the point when the test is actually finished
-		// i really hope jasmine exposes that
-		assertTrue("timed out", latch.await(1, SECONDS));
-		
-		// ugly ugly ugly!
-		Thread.sleep(10000);
+		assertTrue("timed out", latch.await(11, SECONDS));
 	}
 
 }

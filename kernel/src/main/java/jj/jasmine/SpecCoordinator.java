@@ -68,7 +68,7 @@ class SpecCoordinator {
 			final JasmineScriptEnvironment scriptEnvironment,
 			final ContinuationCoordinator continuationCoordinator
 		) {
-			super("spec evaluation for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+			super("spec execution for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override
@@ -88,7 +88,7 @@ class SpecCoordinator {
 			final JasmineScriptEnvironment scriptEnvironment,
 			final ContinuationCoordinator continuationCoordinator
 		) {
-			super("target evaluation for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+			super("target execution for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override
@@ -108,7 +108,7 @@ class SpecCoordinator {
 			final JasmineScriptEnvironment scriptEnvironment,
 			final ContinuationCoordinator continuationCoordinator
 		) {
-			super("runner evaluation for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+			super("runner execution for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override
@@ -118,6 +118,7 @@ class SpecCoordinator {
 		
 		@Override
 		protected void complete() throws Exception {
+			// this isn't the right time to do this.  there could be some timeout running
 			publisher.publish(new JasmineSpecExecutionCompleted());
 		}
 	}

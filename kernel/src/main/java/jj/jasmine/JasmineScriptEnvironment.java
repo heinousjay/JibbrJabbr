@@ -109,6 +109,8 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		// to allow things to be mocked correctly
 		scope = configureTimers(configureModuleObjects(JASMINE, createChainedScope(global)));
 		
+		configureInjectFunction(scope, "$$realInject");
+		
 		// and we need to pre-execute the jasmine script into our scope, because requiring it
 		// makes it use the wrong global, and therefore timers can't be simulated
 		try (RhinoContext context = contextProvider.get()) {
