@@ -15,7 +15,6 @@
  */
 package jj.jasmine;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import javax.inject.Inject;
@@ -32,64 +31,6 @@ import jj.event.Publisher;
 public class JasmineResultCollector {
 
 	private final Publisher publisher;
-	
-	private static class Suite extends Spec {
-		
-		Suite(String id, String description, Suite parent) {
-			super(id, description, parent);
-		}
-		
-		void finish() {
-			if (!children.isEmpty()) {
-				status = "passed";
-				// and look for failures and change to failure instead
-				for (Spec child : children.values()) {
-					if (child.status == "failed") {
-						status = "failed";
-						break;
-					}
-				}
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return makeToString(new StringBuilder(), 0).toString();
-		}
-	}
-	
-	private static class Spec {
-		
-		final String description;
-		final Suite parent;
-		final LinkedHashMap<String, Spec> children = new LinkedHashMap<>();
-		final ArrayList<String> failedExpectations = new ArrayList<>();
-		
-		String status = "pending";
-		
-		Spec(String id, String description, Suite parent) {
-			this.description = description;
-			this.parent = parent;
-			if (parent != null) {
-				parent.children.put(id, this);
-			}
-		}
-		
-		protected StringBuilder makeToString(StringBuilder sb, int indentation) {
-			
-			for (int i = 0; i < indentation; ++i) {
-				sb.append(' ');
-			}
-			
-			sb.append(description).append(" - ").append(status).append('\n');
-			
-			for (Spec child : children.values()) {
-				child.makeToString(sb, indentation + 2);
-			}
-			
-			return sb;
-		}
-	}
 	
 	private final LinkedHashMap<String, Suite> suites = new LinkedHashMap<>();
 	
@@ -136,14 +77,19 @@ public class JasmineResultCollector {
 	public void specDone(String id, String status) {
 		assert currentSuite != null;
 		assert currentSuite.children.get(id) != null;
-		// status is "null" in specs that called pending();
 		currentSuite.children.get(id).status = status;
 	}
 	
 	public void jasmineDone() {
+		// if there are any failures, publish
+		// JasmineSpecFailure
+		// else
+		// JasmineSpecSuccess
+		// with the stringified suite information
+		boolean failed = false;
 		for (Suite suite : suites.values()) {
-			System.out.println(suite);
+			failed = failed || suite.failed();
 		}
-		publisher.publish(this);
+		publisher.publish(failed ? new JasmineTestFailure(suites.values()) : new JasmineTestSuccess(suites.values()));
 	}
 }

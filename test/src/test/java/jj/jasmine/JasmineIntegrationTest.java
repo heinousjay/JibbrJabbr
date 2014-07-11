@@ -47,10 +47,15 @@ public class JasmineIntegrationTest {
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
 	
-	CountDownLatch latch = new CountDownLatch(1);
+	CountDownLatch latch = new CountDownLatch(2);
 	
 	@Listener
-	void jasmineSpecExecutionCompleted(JasmineResultCollector jsec) {
+	void jasmineSpecExecutionSuccess(JasmineTestSuccess success) {
+		latch.countDown();
+	}
+
+	@Listener
+	void jasmineSpecExecutionFailure(JasmineTestFailure success) {
 		latch.countDown();
 	}
 
@@ -58,8 +63,9 @@ public class JasmineIntegrationTest {
 	public void test() throws Exception {
 		
 		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test.js");
+		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test-failures.js");
 		
-		assertTrue("timed out", latch.await(11, SECONDS));
+		assertTrue("timed out", latch.await(1, SECONDS));
 	}
 
 }

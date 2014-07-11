@@ -4,81 +4,55 @@
 	
 	var resultCollector = $$realInject('jj.jasmine.JasmineResultCollector');
 	
-	jasmine.testJsApiReporter = (function() {
-
-		// todo - make the timer real! (use clock?)
-		var noopTimer = {
-			start : function() {
-			},
-			elapsed : function() {
-				return 0;
-			}
-		};
-
-		function JsApiReporter(options) {
-			var timer = options.timer || noopTimer, status = "loaded";
-			
-			this.started = false;
-			this.finished = false;
-
-			this.jasmineStarted = function() {
-				this.started = true;
-				status = 'started';
-				timer.start();
-			};
-
-			var executionTime;
-
-			this.jasmineDone = function() {
-				this.finished = true;
-				executionTime = timer.elapsed();
-				status = 'done';
-				// publish from here!
-				resultCollector.jasmineDone();
-			};
-
-			this.status = function() {
-				return status;
-			};
-
-
-			this.suiteStarted = function(suite) {
-				// id,status,description,fullName
-				resultCollector.suiteStarted(suite.id, suite.description);
-			};
-
-			this.suiteDone = function(suite) {
-				// id,status,description,fullName
-				resultCollector.suiteDone(suite.id, suite.description);
-			};
-			
-			this.specStarted = function(spec) {
-				// id,description,fullName,failedExpectations
-				resultCollector.specStarted(spec.id, spec.description);
-			};
-
-			// this does not get called for specs that call pending();
-			this.specDone = function(spec) {
-				// id,description,fullName,failedExpectations,status
-				spec.failedExpectations.forEach(function(fe) {
-					resultCollections.specExpectationFailed(spec.id, fe);
-				});
-				resultCollector.specDone(spec.id, spec.status);
-				
-			};
-
-			this.executionTime = function() {
-				return executionTime;
-			};
-
+	function JsApiReporter() {
+		var timer = {
+			start: function() {},
+			elapsed: function() {}
 		}
 
-		return JsApiReporter;
-	}());
+		var executionTime;
+
+		this.jasmineStarted = function() {
+			timer.start();
+		};
+
+		this.jasmineDone = function() {
+			executionTime = timer.elapsed();
+			resultCollector.jasmineDone();
+		};
+
+		this.suiteStarted = function(suite) {
+			// id,status,description,fullName
+			resultCollector.suiteStarted(suite.id, suite.description);
+		};
+
+		this.suiteDone = function(suite) {
+			// id,status,description,fullName
+			resultCollector.suiteDone(suite.id, suite.description);
+		};
+		
+		this.specStarted = function(spec) {
+			// id,description,fullName,failedExpectations
+			resultCollector.specStarted(spec.id, spec.description);
+		};
+
+		// this does not get called for specs that don't pass.  wtf?
+		this.specDone = function(spec) {
+			// id,description,fullName,failedExpectations,status
+			spec.failedExpectations.forEach(function(fe) {
+				resultCollector.specExpectationFailed(spec.id, fe);
+			});
+			resultCollector.specDone(spec.id, spec.status);
+			
+		};
+
+		this.executionTime = function() {
+			return executionTime;
+		};
+
+	}
 	
-	env.addReporter(new jasmine.testJsApiReporter({
-		timer: new jasmine.Timer()
-	}));
+	env.addReporter(new JsApiReporter());
 	env.execute();
 	
 	/*
