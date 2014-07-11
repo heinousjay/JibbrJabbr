@@ -14,7 +14,20 @@
  * limitations under the License.
  */
 /**
- * wraps up the jasmine spec runner so it can be used for testing
+ * <p>
+ * wraps up the jasmine spec runner so it can be used for testing. currently,
+ * the integration stays out of the way - it merely listens for some events,
+ * and when those events happen, it does some stuff.
+ * 
+ * <p>
+ * The lifecycle is like so:
+ * <ul>
+ *   <li>listen for a ScriptResource to get loaded
+ *   <li>attempt to create a corresponding JasmineScriptEnvironment
+ *   <li>look for a spec script named the same as the original script, with -spec in the name
+ *   <li>if found, run it
+ *   <li>publish the results
+ * </ul>
  * 
  * @author jason
  *
