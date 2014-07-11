@@ -20,7 +20,7 @@ import static jj.configuration.resolution.AppLocation.*;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.resource.DependentsExtractor.dependents;
+import static jj.resource.DependentsHelper.dependents;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -116,7 +116,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	 */
 	private final class ListenerCleaner extends ServerTask {
 		/**
-		 * @param name
+		 * @param targetName
 		 */
 		public ListenerCleaner() {
 			super("Event System cleanup");

@@ -1,5 +1,5 @@
 // define the jasmine API
-var jasmineRequire = require('jasmine'),
+var jasmineRequire = module.exports,
 jasmine = jasmineRequire.core(jasmineRequire),
 env = jasmine.getEnv(),
 describe = function(description, specDefinitions) {
@@ -50,34 +50,3 @@ jasmine.addMatchers = function(matchers) {
 jasmine.clock = function() {
   return env.clock;
 };
-
-
-describe('selecting from the DOM', function() {
-	
-	it('can select elements', function() {
-		var body = null;
-		expect(body).not.toBeNull();
-		
-		throw new TypeError("eff yeah");
-	});
-	
-	it('can confuse me', function() {
-		expect(2 + 2).toBe(5);
-	});
-	
-	describe('passing tests are nice, though', function() {
-		
-		it('can make you feel so good', function() {
-			expect(true).toBe(true);
-		});
-	});
-});
-
-describe('this shit is a pain in the ass', function() {
-	
-	it('is not really doing what i expected', function() {
-		expect(1).toBe(1);
-	});
-});
-
-

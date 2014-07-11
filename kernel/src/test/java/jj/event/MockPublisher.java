@@ -25,10 +25,19 @@ import java.util.List;
 public class MockPublisher implements Publisher {
 	
 	public List<Object> events = new ArrayList<>();
+	
+	public interface OnPublish {
+		void published(Object event);
+	}
 
 	@Override
 	public void publish(Object event) {
 		events.add(event);
+		if (onPublish != null) {
+			onPublish.published(event);
+		}
 	}
+	
+	public OnPublish onPublish;
 
 }

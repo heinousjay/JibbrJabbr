@@ -27,7 +27,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-public class JasmineScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<JasmineScriptEnvironment> {
+class JasmineScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<JasmineScriptEnvironment> {
 
 	@Inject
 	JasmineScriptEnvironmentCreator(final Dependencies dependencies) {

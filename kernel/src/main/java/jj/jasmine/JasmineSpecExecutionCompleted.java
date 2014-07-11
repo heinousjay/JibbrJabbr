@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
-
-import java.util.HashSet;
-import java.util.Set;
+package jj.jasmine;
 
 /**
  * @author jason
  *
  */
-public class DependentsExtractor {
+public class JasmineSpecExecutionCompleted {
 
-	public static Set<Resource> dependents(Resource resource) {
-		return new HashSet<Resource>(((AbstractResource)resource).dependents());
-	}
 }

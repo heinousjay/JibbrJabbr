@@ -16,7 +16,7 @@
 package jj.jasmine;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.configuration.resolution.AppLocation.*;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
@@ -28,14 +28,11 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
-import jj.script.ScriptEnvironmentInitialized;
-import jj.script.module.ModuleScriptEnvironment;
-import jj.script.module.RequiredModule;
+import jj.script.module.ScriptResource;
 import jj.testing.JibbrJabbrTestServer;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * @author jason
@@ -45,7 +42,7 @@ import org.mozilla.javascript.Scriptable;
 public class JasmineIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer jj = new JibbrJabbrTestServer(App.minimal).injectInstance(this);
+	public JibbrJabbrTestServer jj = new JibbrJabbrTestServer(App.jasmine).injectInstance(this);
 	
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
@@ -53,23 +50,21 @@ public class JasmineIntegrationTest {
 	CountDownLatch latch = new CountDownLatch(1);
 	
 	@Listener
-	void initialized(ScriptEnvironmentInitialized sei) {
-		if (sei.scriptEnvironment() instanceof JasmineScriptEnvironment) {
-			latch.countDown();
-		}
+	void jasmineSpecExecutionCompleted(JasmineSpecExecutionCompleted jsec) {
+		latch.countDown();
 	}
 
 	@Test
 	public void test() throws Exception {
 		
-		resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, "test-boot");
+		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test.js");
+		
+		// need to publish that event not on completion! but at the point when the test is actually finished
+		// i really hope jasmine exposes that
 		assertTrue("timed out", latch.await(1, SECONDS));
 		
-		JasmineScriptEnvironment jse = 
-			resourceFinder.findResource(JasmineScriptEnvironment.class, Virtual, "test-boot");
-		ModuleScriptEnvironment jasmine =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, Virtual, "jasmine", new RequiredModule(jse, "jasmine"));
-		Scriptable exports = (Scriptable)jasmine.exports();
+		// ugly ugly ugly!
+		Thread.sleep(10000);
 	}
 
 }

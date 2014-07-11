@@ -25,4 +25,8 @@ public enum ResourceEventMaker {
 	public static ResourceKilled makeResourceKilled(AbstractResource resource) {
 		return new ResourceKilled(resource);
 	}
+	
+	public static ResourceLoaded makeResourceLoaded(AbstractResource resource) {
+		return new ResourceLoaded(resource);
+	}
 }

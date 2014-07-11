@@ -45,6 +45,8 @@ public class App {
 	public static final String repl;
 
 	public static final String module;
+
+	public static final String jasmine;
 	
 	static {
 		try {
@@ -56,6 +58,7 @@ public class App {
 			css = getPath("/css/");
 			repl = getPath("/repl/");
 			module = getPath("/module/");
+			jasmine = getPath("/jasmine/");
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

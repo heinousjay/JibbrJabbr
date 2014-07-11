@@ -2,6 +2,7 @@
 
 (function() {
 	
+	// ARG NO!
 	function print(thing) {
 		java.lang.System.out.print(thing);
 	}
@@ -43,14 +44,14 @@
 			var suites = {};
 			var currentSuite;
 			this.suiteStarted = function(result) {
-				print(result.description + '\n');
+				print('** ' + result.description + ' beginning\n');
 				storeSuite(result);
 				if (currentSuite) result.parentId = currentSuite.id;
 				currentSuite = result;
 			};
 
 			this.suiteDone = function(result) {
-				print('done with ' + result.description + '\n');
+				print('** ' + result.description + ' completed\n');
 				storeSuite(result);
 				currentSuite = result.parentId ? suites[result.parentId] : null;
 			};
@@ -65,13 +66,18 @@
 
 			var specs = [];
 			this.specStarted = function(result) {
-				print("-" + result.description + '(' + currentSuite.id + ')');
+				print("- " + result.description + '(' + currentSuite.id + ')');
 				result.suiteId = currentSuite.id;
 			};
 
 			this.specDone = function(result) {
 				print(" --> " + result.status + "\n");
 				specs.push(result);
+				if (result.status == 'failed') {
+					result.failedExpectations.forEach(function(failedExpectation) {
+						print('  ' + failedExpectation.message + '\n');
+					});
+				}
 			};
 
 			this.specResults = function(index, length) {
@@ -91,23 +97,9 @@
 		return JsApiReporter;
 	}());
 	
-	
-	var reporter = new jasmine.JsApiReporter({
-      timer: new jasmine.Timer()
-    });
-	//env.addReporter(reporter);
-	
-	/*
-	jasmineRequire.ConsoleReporter = require('console').ConsoleReporter;
-	require('console').console(jasmineRequire, jasmine);
-	env.addReporter(new jasmine.ConsoleReporter({
-		print: print
-	}));
-	*/
-	
 	env.addReporter(new jasmine.testJsApiReporter({
-      timer: new jasmine.Timer()
-    }));
+		timer: new jasmine.Timer()
+	}));
 	env.execute();
 	
 	/*
@@ -167,8 +159,6 @@
 	 */
 
 	//["started","finished","jasmineStarted","jasmineDone","status","suiteStarted","suiteDone","suites","specStarted","specDone","specResults","specs","executionTime"]
-	var suites = reporter.suites();
-	var specs = reporter.specs();
 	
 /*
 	function print(indent, suite) {

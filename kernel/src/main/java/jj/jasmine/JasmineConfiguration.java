@@ -15,26 +15,16 @@
  */
 package jj.jasmine;
 
-import jj.JJModule;
-
 /**
  * @author jason
  *
  */
-public class JasmineModule extends JJModule {
-
-	@Override
-	protected void configure() {
-
-		addAssetPath("/jj/jasmine/assets");
-		addAPIModulePath("/jj/jasmine/api");
-
-		bindCreation().of(JasmineScriptEnvironment.class).to(JasmineScriptEnvironmentCreator.class);
-		
-		bindConfiguration().to(JasmineConfiguration.class);
-
-		// we basically just initialize some event listeners and wait for things to happen
-		bind(SpecRunner.class).asEagerSingleton();
-		bind(SpecCoordinator.class).asEagerSingleton();
-	}
+public interface JasmineConfiguration {
+	
+	/**
+	 * when a script environment is loaded, if a spec resource matching the specPattern
+	 * above is found, it is automatically run if this property is true
+	 * @return
+	 */
+	boolean autorunSpecs();
 }

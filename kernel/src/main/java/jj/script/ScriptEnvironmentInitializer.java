@@ -63,7 +63,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	};
 	
 	/**
-	 * @param name
+	 * @param targetName
 	 * @param moduleScriptEnvironment
 	 */
 	@Inject
