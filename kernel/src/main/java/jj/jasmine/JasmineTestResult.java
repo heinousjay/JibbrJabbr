@@ -45,8 +45,7 @@ public abstract class JasmineTestResult extends LoggedEvent {
 				result.append("\n").append(suite);
 			}
 			
-			logger.info(description());
-			logger.info("results:{}", result);
+			logger.info(description() + "\n{}", result);
 		}
 	}
 

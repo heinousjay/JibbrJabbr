@@ -40,7 +40,7 @@
 		this.specDone = function(spec) {
 			// id,description,fullName,failedExpectations,status
 			spec.failedExpectations.forEach(function(fe) {
-				resultCollector.specExpectationFailed(spec.id, fe);
+				resultCollector.specExpectationFailed(spec.id, fe.message);
 			});
 			resultCollector.specDone(spec.id, spec.status);
 			

@@ -6,5 +6,3 @@ module.exports = function() {
 	});
 	java.lang.System.out.println();
 }
-
-this.asshole = 'hi'

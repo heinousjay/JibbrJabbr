@@ -37,17 +37,27 @@ import jj.script.module.ScriptResource;
 class SpecRunner {
 	
 	private final JasmineConfiguration configuration;
+	private final JasmineSwitch jasmineSwitch;
 	private final ResourceLoader resourceLoader;
 	
 	@Inject
-	SpecRunner(final JasmineConfiguration configuration, final ResourceLoader resourceLoader) {
+	SpecRunner(
+		final JasmineConfiguration configuration,
+		final JasmineSwitch jasmineSwitch,
+		final ResourceLoader resourceLoader
+	) {
 		this.configuration = configuration;
+		this.jasmineSwitch = jasmineSwitch;
 		this.resourceLoader = resourceLoader;
+	}
+	
+	private boolean shouldRun() {
+		return jasmineSwitch.runAllSpecs() || configuration.autorunSpecs();
 	}
 
 	@Listener
 	void resourceLoaded(ResourceLoaded rl) {
-		if (configuration.autorunSpecs() && ScriptResource.class.isAssignableFrom(rl.resourceClass)) {
+		if (shouldRun() && ScriptResource.class.isAssignableFrom(rl.resourceClass)) {
 			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name.replace(".js", "-spec.js"), rl);
 		}
 	}

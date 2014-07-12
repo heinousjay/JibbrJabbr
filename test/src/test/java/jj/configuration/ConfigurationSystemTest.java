@@ -18,9 +18,11 @@ package jj.configuration;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -69,12 +71,14 @@ public class ConfigurationSystemTest {
 	@Inject
 	private LessConfiguration lessConfiguration;
 	
-	boolean loaded;
-	boolean failed;
+	volatile boolean loaded;
+	final CountDownLatch loadedLatch = new CountDownLatch(1);
+	volatile boolean failed;
 	
 	@Listener 
 	void ConfigurationLoaded(ConfigurationLoaded configurationLoaded) {
 		loaded = true;
+		loadedLatch.countDown();
 	}
 	
 	@Listener
@@ -84,7 +88,9 @@ public class ConfigurationSystemTest {
 
 	@Test
 	public void test() throws Exception {
-		assert loaded: "didn't load";
+		if (!loaded) {
+			assertTrue("timed out waiting for load", loadedLatch.await(500, MILLISECONDS));
+		}
 		assert !failed : "failed";
 		
 		// let's peek into the collector to assert some stuff

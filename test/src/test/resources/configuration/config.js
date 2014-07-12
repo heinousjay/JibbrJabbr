@@ -1,4 +1,8 @@
 
+// including these scripts for the SystemScriptsTest but we configure off
+require('jasmine-configuration').autorunSpecs(false);
+require('repl-configuration').activate(true).port(33445); // on an abnormal port to avoid startup conflicts
+
 // the http-server-socket module returns an object that can configure
 // its namesake
 require('http-server-socket-configuration')

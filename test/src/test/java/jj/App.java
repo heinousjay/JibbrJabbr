@@ -36,8 +36,6 @@ public class App {
 	
 	public static final String minimal;
 	
-	public static final String api;
-	
 	public static final String configuration;
 	
 	public static final String css;
@@ -53,7 +51,6 @@ public class App {
 			one = getPath("/app1/app/");
 			two = getPath("/app2/app/");
 			minimal = getPath("/minimal/app/");
-			api = getPath("/api/public/");
 			configuration = getPath("/configuration/");
 			css = getPath("/css/");
 			repl = getPath("/repl/");

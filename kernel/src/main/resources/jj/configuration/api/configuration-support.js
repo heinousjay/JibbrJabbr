@@ -20,7 +20,7 @@ module.exports = {
 	makeIntProperty: function(base, name, validator) {
 		return function(arg) {
 			arg = parseInt(arg);
-			if (isNaN(arg)) { throw new TypeError(name + ' must be an int'); }
+			if (isNaN(arg)) { throw new TypeError(name + ' must be an integer'); }
 			if (typeof validator == 'function') { validator(name, arg); }
 			addElement(base + name, new java.lang.Integer(arg));
 			return this;

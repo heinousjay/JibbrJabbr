@@ -53,6 +53,8 @@ public class JibbrJabbrTestServer implements TestRule {
 	
 	private int httpPort = 0;
 	
+	private boolean runAllSpecs = false;
+	
 	private Object instance;
 	
 	private Injector injector;
@@ -99,6 +101,13 @@ public class JibbrJabbrTestServer implements TestRule {
 		
 		httpServer = true;
 		httpPort = port;
+		return this;
+	}
+	
+	public JibbrJabbrTestServer runAllSpecs() {
+		assertNotStarted();
+		
+		runAllSpecs = true;
 		return this;
 	}
 	
@@ -155,6 +164,7 @@ public class JibbrJabbrTestServer implements TestRule {
 		builder.add("app=" + appPath);
 		builder.add("fileWatcher=" + fileWatcher);
 		builder.add("httpServer=" + httpServer);
+		builder.add("runAllSpecs=" + runAllSpecs);
 		if (httpPort > 1023 && httpPort < 65536) {
 			builder.add("httpPort=" + httpPort);
 		}

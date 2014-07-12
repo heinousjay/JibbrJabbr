@@ -52,6 +52,15 @@ class Spec {
 		
 		sb.append(description).append(" - ").append(status).append('\n');
 		
+		if (!failedExpectations.isEmpty()) {
+			for (String fe : failedExpectations) {
+				for (int i = 0; i < indentation; ++i) {
+					sb.append(' ');
+				}
+				sb.append(" - ").append(fe).append('\n');
+			}
+		}
+		
 		for (Spec child : children.values()) {
 			child.makeToString(sb, indentation + 2);
 		}

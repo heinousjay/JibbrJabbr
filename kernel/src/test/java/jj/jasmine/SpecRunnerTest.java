@@ -36,6 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class SpecRunnerTest {
 	
 	@Mock JasmineConfiguration configuration;
+	@Mock JasmineSwitch jasmineSwitch;
 	@Mock ResourceLoader resourceLoader;
 	
 	@InjectMocks SpecRunner specRunner;

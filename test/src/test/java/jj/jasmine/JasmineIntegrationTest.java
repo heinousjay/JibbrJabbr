@@ -49,23 +49,39 @@ public class JasmineIntegrationTest {
 	
 	CountDownLatch latch = new CountDownLatch(2);
 	
+	JasmineTestSuccess success;
+	JasmineTestFailure failure;
+	
 	@Listener
 	void jasmineSpecExecutionSuccess(JasmineTestSuccess success) {
+		this.success = success;
 		latch.countDown();
 	}
 
 	@Listener
-	void jasmineSpecExecutionFailure(JasmineTestFailure success) {
+	void jasmineSpecExecutionFailure(JasmineTestFailure failure) {
+		this.failure = failure;
 		latch.countDown();
 	}
 
 	@Test
 	public void test() throws Exception {
 		
+		// loading a script resource triggers the jasmine run
 		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test.js");
 		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test-failures.js");
 		
-		assertTrue("timed out", latch.await(1, SECONDS));
+		// takes about 1 second locally
+		// maybe externalize timeouts?  or produce a factor on travis?
+		assertTrue("timed out", latch.await(3, SECONDS));
+		
+		// make sure!
+		assertNotNull(success);
+		assertNotNull(failure);
+		
+		// TODO assert the results of the test runs, which means
+		// TODO expose the results of the test runs
+		// TODO touch a script/spec and ensure it runs again?
 	}
 
 }
