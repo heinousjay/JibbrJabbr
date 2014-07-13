@@ -83,7 +83,7 @@ public class SystemScriptsTest {
 		// load everything we care about here!
 		
 		// could take a while!
-		assertTrue(testCountLatch.await(10, SECONDS));
+		assertTrue("timed out", testCountLatch.await(10, SECONDS));
 		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
 		assertThat(successCount.get(), is(total)); // just for certainty?
 		

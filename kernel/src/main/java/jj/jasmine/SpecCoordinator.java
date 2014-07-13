@@ -57,10 +57,11 @@ class SpecCoordinator {
 	void scriptInitialized(final ScriptEnvironmentInitialized event) {
 		// right now, checking this way for testing purposes, to let mocks in
 		if (JasmineScriptEnvironment.class.isAssignableFrom(event.scriptEnvironment().getClass())) {
-			// do we want to check to make sure it is initialized?
 			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment(), continuationCoordinator));
 		}
 	}
+	
+	
 	
 	private final class SpecEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
@@ -68,7 +69,7 @@ class SpecCoordinator {
 			final JasmineScriptEnvironment scriptEnvironment,
 			final ContinuationCoordinator continuationCoordinator
 		) {
-			super("spec execution for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+			super("spec execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override
@@ -88,7 +89,7 @@ class SpecCoordinator {
 			final JasmineScriptEnvironment scriptEnvironment,
 			final ContinuationCoordinator continuationCoordinator
 		) {
-			super("target execution for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+			super("target execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override
@@ -108,7 +109,7 @@ class SpecCoordinator {
 			final JasmineScriptEnvironment scriptEnvironment,
 			final ContinuationCoordinator continuationCoordinator
 		) {
-			super("runner execution for" + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+			super("runner execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
 		}
 
 		@Override

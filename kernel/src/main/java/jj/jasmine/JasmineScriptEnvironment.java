@@ -97,7 +97,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		runner  = resourceFinder.loadResource(ScriptResource.class, Assets,              JASMINE_RUN_JS);
 		
 		// target is unlikely to be null, but maybe it got deleted while we were getting created
-		if (target == null || spec == null) { 
+		if (target == null || spec == null) {
 			throw new NoSuchResourceException(JasmineScriptEnvironment.class, name);
 		}
 		assert jasmine != null : "can't find the jasmine script";
