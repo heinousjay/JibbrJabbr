@@ -37,6 +37,10 @@ import io.netty.handler.codec.http.HttpMethod;
  */
 public class Route {
 	
+	public static boolean isInvalid(String uri) {
+		return !URI_PATTERN.matcher(uri).matches();
+	}
+	
 	private static final Pattern URI_PATTERN = 
 		Pattern.compile("^(?:/|(?:/(?:[a-zA-Z0-9.-]+|:[a-zA-Z0-9.$-]+(?:\\([^/]+?\\))?))*(?:/(?:\\*[a-zA-Z0-9.$-]+(?:\\(.+?\\))?)?)?)$");
 
@@ -60,7 +64,7 @@ public class Route {
 			throw new NullPointerException("uri");
 		}
 		
-		if (uri.isEmpty() || !URI_PATTERN.matcher(uri).matches()) {
+		if (uri.isEmpty() || isInvalid(uri)) {
 			throw new IllegalArgumentException("uri " + uri + " does not fit the correct pattern");
 		}
 //		

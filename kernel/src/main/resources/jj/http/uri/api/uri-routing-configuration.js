@@ -19,6 +19,11 @@ function redirect(destination) {
 
 function makeSetter(method, type) {
 	return function(uri) {
+		
+		if (Route.isInvalid(uri)) {
+			throw new Error(uri + " is not a route uri");
+		}
+		
 		return {
 			to: function(destination) {
 				var route = new Route(method, uri, type(destination));

@@ -47,20 +47,20 @@ public class SystemScriptsTest {
 
 	@Rule
 	public JibbrJabbrTestServer server =
-		new JibbrJabbrTestServer(App.configuration)
-			.runAllSpecs()
-			.injectInstance(this)
+		new JibbrJabbrTestServer(App.configuration)        // we use the configuration because that loads all the core configuration scripts
+			.runAllSpecs()                                 // this defaults to off.  that might not survive now!
+			.injectInstance(this)                          // well, sure
 			.withModule(new JJModule() {
 				@Override
 				protected void configure() {
-					addAPIModulePath("/jj/testing/specs");
+					addAPIModulePath("/jj/testing/specs"); // and put the specs on the path
 				}
 			});
 	
 	@Inject
 	ResourceLoader resourceLoader;
 	
-	final int total = 1;
+	final int total = 2; // well, it's manual but maybe the phaser does what i need?
 	final CountDownLatch testCountLatch = new CountDownLatch(total);
 	final AtomicInteger successCount = new AtomicInteger();
 	final AtomicInteger failureCount = new AtomicInteger();
@@ -84,8 +84,8 @@ public class SystemScriptsTest {
 		
 		// could take a while!
 		assertTrue(testCountLatch.await(10, SECONDS));
-		assertThat(successCount.get(), is(total));
-		assertThat(failureCount.get(), is(0));
+		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
+		assertThat(successCount.get(), is(total)); // just for certainty?
 		
 	}
 	

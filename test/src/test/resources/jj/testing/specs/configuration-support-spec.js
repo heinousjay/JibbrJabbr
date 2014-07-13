@@ -1,5 +1,7 @@
 var location, value;
 
+var valueOf = java.lang.String.valueOf;
+
 // replacing inject('jj.configuration.ConfigurationCollector')
 function inject(obj) {
 	return {
@@ -113,15 +115,15 @@ describe("function makeStringProperty", function() {
 
 		testFunc("hi");
 		expect(location).toEqual("basename");
-		expect(value).toEqual(java.lang.String.valueOf("hi"));
+		expect(value).toEqual(valueOf("hi"));
 
 		testFunc(1);
 		expect(location).toEqual("basename");
-		expect(value).toEqual(java.lang.String.valueOf(1));
+		expect(value).toEqual(valueOf(1));
 
 		testFunc(true);
 		expect(location).toEqual("basename");
-		expect(value).toEqual(java.lang.String.valueOf("true"));
+		expect(value).toEqual(valueOf("true"));
 		
 	});
 	
