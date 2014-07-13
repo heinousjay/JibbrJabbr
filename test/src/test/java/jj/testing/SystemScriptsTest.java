@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.JJModule;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.jasmine.JasmineTestFailure;
@@ -46,7 +47,15 @@ public class SystemScriptsTest {
 
 	@Rule
 	public JibbrJabbrTestServer server =
-		new JibbrJabbrTestServer(App.configuration).runAllSpecs().injectInstance(this);
+		new JibbrJabbrTestServer(App.configuration)
+			.runAllSpecs()
+			.injectInstance(this)
+			.withModule(new JJModule() {
+				@Override
+				protected void configure() {
+					addAPIModulePath("/jj/testing/specs");
+				}
+			});
 	
 	@Inject
 	ResourceLoader resourceLoader;

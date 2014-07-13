@@ -18,8 +18,10 @@ package jj.testing;
 import java.net.URI;
 import java.util.ArrayList;
 
+import jj.JJModule;
 import jj.webdriver.WebDriverProvider;
 import jj.webdriver.WebDriverRule;
+
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -56,6 +58,8 @@ public class JibbrJabbrTestServer implements TestRule {
 	private boolean runAllSpecs = false;
 	
 	private Object instance;
+	
+	ArrayList<JJModule> modules;
 	
 	private Injector injector;
 	
@@ -115,6 +119,16 @@ public class JibbrJabbrTestServer implements TestRule {
 		assertNotStarted();
 		
 		this.instance = instance;
+		return this;
+	}
+	
+	public JibbrJabbrTestServer withModule(JJModule module) {
+		assertNotStarted();
+		
+		if (modules == null) {
+			modules = new ArrayList<>(1); // probably
+		}
+		modules.add(module);
 		return this;
 	}
 	

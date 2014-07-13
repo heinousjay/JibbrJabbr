@@ -71,5 +71,11 @@ class TestModule extends JJModule {
 		}
 		
 		install(new CoreModule(args));
+		
+		if (testServer.modules != null) {
+			for (JJModule module : testServer.modules) {
+				install(module);
+			}
+		}
 	}
 }
