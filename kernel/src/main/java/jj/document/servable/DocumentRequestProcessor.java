@@ -123,9 +123,10 @@ public class DocumentRequestProcessor implements RequestProcessor {
 
 		@Override
 		protected void begin() throws Exception {
-			
 			if (!scriptEnvironment.hasServerScript()) {
 				respond();
+			} else if (scriptEnvironment.initializationDidError()) {
+				httpResponse.error(scriptEnvironment.initializationError());
 			} else if (!scriptEnvironment.initialized()) {
 				initializer.executeOnInitialization(scriptEnvironment, this);
 			} else {
@@ -149,7 +150,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		
 		@Override
 		protected boolean errored(Throwable cause) {
-			// log it and return a 500
 			httpResponse.error(cause);
 			return true;
 		}

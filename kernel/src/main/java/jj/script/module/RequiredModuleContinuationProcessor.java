@@ -88,7 +88,6 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	}
 	
 	private void loadEnvironment(final RequiredModule requiredModule) {
-		
 		resourceLoader.loadResource(ModuleScriptEnvironment.class, AppLocation.Virtual, requiredModule.identifier(), requiredModule);
 		Boolean result = waiters.putIfAbsent(requiredModule, Boolean.TRUE);
 		assert (result == null) : "something is crossed up in the " + getClass();

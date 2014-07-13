@@ -1,3 +1,3 @@
 
 // turn jasmine on baby yeah
-require('jasmine-configuration').autorunSpecs(true);
+require('api/jasmine-configuration').autorunSpecs(true);

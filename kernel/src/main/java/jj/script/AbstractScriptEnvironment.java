@@ -81,7 +81,9 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	private final Dependencies dependencies;
 	
-	ScriptExecutionState state = Unitialized;
+	private ScriptExecutionState state = Unitialized;
+	
+	private Throwable initializationError;
 	
 	/**
 	 * @param cacheKey
@@ -127,6 +129,22 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		if (initializing && state == Unitialized) {
 			state = Initializing;
 		}
+	}
+	
+	@Override
+	public void initializationError(Throwable cause) {
+		state = Errored;
+		this.initializationError = cause;
+	}
+	
+	@Override
+	public Throwable initializationError() {
+		return initializationError;
+	}
+	
+	@Override
+	public boolean initializationDidError() {
+		return state == Errored;
 	}
 	
 	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {

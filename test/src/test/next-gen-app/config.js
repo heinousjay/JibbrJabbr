@@ -1,7 +1,7 @@
 
 // the http-server-socket module returns an object that can configure
 // its namesake
-require('http-server-socket-configuration')
+require('api/http-server-socket-configuration')
 	//SO_KEEPALIVE
 	.keepAlive(true)
 	// TCP_NODELAY
@@ -26,10 +26,10 @@ require('http-server-socket-configuration')
 	.bind(8080)
 	.bind('localhost', 8090);
 
-require('document-system-configuration')
+require('api/document-system-configuration')
 	.clientDebug(false)
 	.showParsingErrors(false)
 	.removeComments(true);
 
-require('resource-system-configuration')
+require('api/resource-system-configuration')
 	.ioThreads(10);

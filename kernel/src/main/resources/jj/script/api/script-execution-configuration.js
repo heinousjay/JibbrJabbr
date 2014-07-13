@@ -1,4 +1,4 @@
-var support = require('configuration-support');
+var support = require('api/configuration-support');
 var base = 'jj.script.ScriptExecutionConfiguration.';
 
 module.exports = {
@@ -6,5 +6,5 @@ module.exports = {
 		if (arg < 1) {
 			throw new TypeError(name + " must be positive");
 		}
-	});
+	})
 }

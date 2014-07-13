@@ -1,5 +1,4 @@
-
-var support = require('configuration-support');
+var support = require('api/configuration-support');
 var base = 'jj.resource.ResourceConfiguration.';
 
 module.exports = {

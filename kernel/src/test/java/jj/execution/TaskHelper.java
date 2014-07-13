@@ -15,6 +15,7 @@
  */
 package jj.execution;
 
+
 /**
  * just working around access restrictions
  * for test purposes
@@ -33,5 +34,9 @@ public class TaskHelper {
 	
 	public static void markDone(final JJTask toMark) {
 		toMark.promise().done();
+	}
+	
+	public static void errored(final JJTask task, final Throwable cause) {
+		task.errored(cause);
 	}
 }

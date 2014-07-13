@@ -3,7 +3,6 @@ var env = inject('jj.script.CurrentScriptEnvironment');
 
 module.exports = function broadcast(func) {
 	
-	// TODO - error module!
 	if (typeof func !== 'function') { throw new Error('broadcast requires a function argument'); }
 	
 	var host = env.current();

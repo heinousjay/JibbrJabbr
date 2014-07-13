@@ -56,6 +56,14 @@ public interface ScriptEnvironment extends Resource {
 	void initializing(boolean initializing);
 
 	/**
+	 * @param initializationError
+	 */
+	void initializationError(Throwable cause);
+	Throwable initializationError();
+		
+	boolean initializationDidError();
+
+	/**
 	 * Get a new, empty script object in the scope of this environment
 	 */
 	ScriptableObject newObject();

@@ -5,7 +5,7 @@
 // var $ = require('$');
 
 // we need some id generation for testing
-var seed = 0;
+var seed = 0, broadcast = require('api/broadcast');
 
 // this registers a function to run whenever the document is 
 // requested, similar to listening to document.ready on the client

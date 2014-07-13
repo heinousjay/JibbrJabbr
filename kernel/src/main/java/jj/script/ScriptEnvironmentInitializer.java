@@ -162,11 +162,11 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		
 		@Override
 		protected boolean errored(Throwable cause) {
-			cause.printStackTrace();
-			// mark the script environment somehow!
-			checkParentResumption(cause);
-			// we want this error reported
-			return false;
+			scriptEnvironment.initializationError(cause);
+			publisher.publish(new ScriptEnvironmentInitializationError(scriptEnvironment, cause));
+			scriptEnvironmentInitialized(scriptEnvironment);
+			checkParentResumption(false);
+			return true;
 		}
 		
 		private void checkParentResumption(Object result) {

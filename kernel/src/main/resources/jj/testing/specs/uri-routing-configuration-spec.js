@@ -12,7 +12,7 @@ var bases = [];
 var names = [];
 var stringProperty = function() {}
 var mocks = {
-	'configuration-support' : {
+	'api/configuration-support' : {
 		makeStringProperty:function(base, name) {
 			bases.push(base);
 			names.push(name);

@@ -14,6 +14,8 @@ var linkify = require('helpers/linkify');
 
 var smileyify = require('helpers/smileys');
 
+var broadcast = require('api/broadcast');
+
 var messages = (function() {
 	// need some unique ids per line
 	var idBase = "chat-line";

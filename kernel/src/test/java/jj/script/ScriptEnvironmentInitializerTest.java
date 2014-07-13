@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.*;
 import jj.event.Publisher;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
+import jj.execution.TaskHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +56,8 @@ public class ScriptEnvironmentInitializerTest {
 	@Mock IsThread isScriptThread;
 	
 	@Mock Publisher publisher;
-	@Captor ArgumentCaptor<ScriptEnvironmentInitialized> eventCaptor;
+	@Captor ArgumentCaptor<ScriptEnvironmentInitialized> initEventCaptor;
+	@Captor ArgumentCaptor<ScriptEnvironmentInitializationError> errorEventCaptor;
 	
 	@Before
 	public void before() {
@@ -68,10 +70,7 @@ public class ScriptEnvironmentInitializerTest {
 	
 	@Test
 	public void testRootScriptEnvironmentInitialization() throws Exception {
-		// this just puts the task into our greedy little hands
-		sei.initializeScript(scriptEnvironment);
-		JJTask task = taskRunner.tasks.get(0);
-		ScriptTask<?> resumable = (ScriptTask<?>)task;
+		ScriptTask<?> resumable = startInitialization();
 		
 		given(continuationCoordinator.execute(scriptEnvironment)).willReturn(pendingKey1);
 		
@@ -86,7 +85,7 @@ public class ScriptEnvironmentInitializerTest {
 		given(continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey1, result)).willReturn(pendingKey2);
 		
 		// put it back!
-		taskRunner.tasks.add(task);
+		taskRunner.tasks.add(resumable);
 		taskRunner.runFirstTask();
 		
 		verify(scriptEnvironment, never()).initialized(true);
@@ -95,15 +94,35 @@ public class ScriptEnvironmentInitializerTest {
 		result = new Object();
 		ScriptTaskHelper.resumeWith(resumable, result);
 		
-		taskRunner.tasks.add(task);
+		taskRunner.tasks.add(resumable);
 		taskRunner.runFirstTask();
 		
 		verify(continuationCoordinator).resumeContinuation(scriptEnvironment, pendingKey2, result);
 		verify(scriptEnvironment).initialized(true);
-		verify(publisher).publish(eventCaptor.capture());
-		assertThat(eventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));
+		verify(publisher).publish(initEventCaptor.capture());
+		assertThat(initEventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));
 		assertThat(ScriptTaskHelper.pendingKey(resumable), is(nullValue()));
+	}
+	
+	@Test
+	public void testRootScriptEnvironmentInitializationErrored() throws Exception {
+		ScriptTask<?> resumable = startInitialization();
+		RuntimeException re = new RuntimeException();
 		
+		TaskHelper.errored(resumable, re);
+		
+		verify(scriptEnvironment).initializationError(re);
+		verify(publisher).publish(errorEventCaptor.capture());
+		assertThat(errorEventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));
+		assertThat(errorEventCaptor.getValue().cause(), is((Throwable)re));
+	}
+
+	private ScriptTask<?> startInitialization() {
+		// this just puts the task into our greedy little hands
+		sei.initializeScript(scriptEnvironment);
+		JJTask task = taskRunner.tasks.get(0);
+		ScriptTask<?> resumable = (ScriptTask<?>)task;
+		return resumable;
 	}
 
 }

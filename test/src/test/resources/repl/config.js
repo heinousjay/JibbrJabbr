@@ -1,2 +1,2 @@
 
-require('repl-configuration').activate(true);
+require('api/repl-configuration').activate(true);

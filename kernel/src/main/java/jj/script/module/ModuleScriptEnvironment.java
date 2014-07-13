@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.AbstractResource;
+import jj.resource.Location;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
@@ -53,6 +54,8 @@ import org.mozilla.javascript.ScriptableObject;
 @Singleton
 public class ModuleScriptEnvironment extends AbstractScriptEnvironment implements ChildScriptEnvironment {
 	
+	public static final String API_PREFIX = "api/";
+	
 	private final String moduleIdentifier;
 	
 	private final RequiredModule requiredModule;
@@ -75,8 +78,14 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		final ResourceFinder resourceFinder
 	) {
 		super(dependencies);
-		
-		this.moduleIdentifier = moduleIdentifier;
+
+		Location base = Base;
+		if (moduleIdentifier.startsWith(API_PREFIX)) {
+			base = APIModules;
+			this.moduleIdentifier = moduleIdentifier.substring(API_PREFIX.length());
+		} else {
+			this.moduleIdentifier = moduleIdentifier;
+		}
 		
 		this.requiredModule = requiredModule;
 		
@@ -86,7 +95,8 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		// the script is loaded from the app, and if not found there, then an API module is searched
 		// internally.  this may change! but i like its simplicity
-		scriptResource = resourceFinder.loadResource(ScriptResource.class, Base.and(APIModules), scriptName());
+		
+		scriptResource = resourceFinder.loadResource(ScriptResource.class, base, scriptName());
 		
 		if (scriptResource == null) {
 			throw new NoSuchResourceException(getClass(), moduleIdentifier);

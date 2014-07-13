@@ -22,5 +22,6 @@ package jj.script;
 enum ScriptExecutionState {
 	Unitialized,
 	Initializing,
-	Initialized
+	Initialized,
+	Errored
 }

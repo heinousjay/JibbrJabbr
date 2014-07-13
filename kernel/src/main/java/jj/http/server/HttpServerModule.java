@@ -11,6 +11,7 @@ public class HttpServerModule extends JJModule {
 	protected void configure() {
 		
 		addAPIModulePath("/jj/http/server/api");
+		addAPIModulePath("/jj/http/server/websocket/api");
 		
 		bindConfiguration().to(HttpServerSocketConfiguration.class);
 

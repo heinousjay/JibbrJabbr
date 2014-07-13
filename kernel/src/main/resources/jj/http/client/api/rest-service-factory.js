@@ -2,7 +2,7 @@
  * Provides a function that produces REST services objects
  * 
  * 
- * var service = require('rest-service-factory')({
+ * var service = require('api/rest-service-factory')({
  *   baseUri: 'http://localhost:8080', // this would come from some configuration - TODO provide that
  *   operations: {
  *     find: {
@@ -14,8 +14,8 @@
  * 
  * service.find({thing: 'value'}); // makes a GET to http://localhost:8080/find/value
  */
-require('globalize')('rest-service-constants', this);
-var print = require('print');
+require('globalize')('api/rest-service-constants', this);
+var print = require('api/print');
 var parameterRegex = /:([\w]+)/g;
 var http = Packages.io.netty.handler.codec.http;
 

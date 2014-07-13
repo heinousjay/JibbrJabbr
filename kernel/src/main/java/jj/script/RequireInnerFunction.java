@@ -55,6 +55,8 @@ class RequireInnerFunction extends BaseFunction {
 		// if absolute, from the root
 		if (input.startsWith("/")) {
 			return input.substring(1);
+		} else if (input.startsWith(ModuleScriptEnvironment.API_PREFIX)) {
+			return input;
 		}
 		
 		return Paths.get(parent).resolveSibling(input).normalize().toString();

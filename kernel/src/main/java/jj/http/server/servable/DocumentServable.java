@@ -70,20 +70,26 @@ class DocumentServable extends Servable<DocumentScriptEnvironment> {
 		if (StringUtils.isEmpty(request.uriMatch().extension)) {
 			
 			final DocumentScriptEnvironment dse = loadResource(request.uriMatch());
-			
 			if (dse != null) {
 				
-				preloadResources(request.uriMatch().baseName);
-			
-				result = parentInjector.createChildInjector(new AbstractModule() {
+				if (dse.initializationDidError()) {
 					
-					@Override
-					protected void configure() {
-						bind(DocumentScriptEnvironment.class).toInstance(dse);
-						bind(HttpServerRequest.class).toInstance(request);
-						bind(HttpServerResponse.class).toInstance(response);
-					}
-				}).getInstance(DocumentRequestProcessor.class);
+					response.error(dse.initializationError());
+					
+				} else {
+					
+					preloadResources(request.uriMatch().baseName);
+				
+					result = parentInjector.createChildInjector(new AbstractModule() {
+						
+						@Override
+						protected void configure() {
+							bind(DocumentScriptEnvironment.class).toInstance(dse);
+							bind(HttpServerRequest.class).toInstance(request);
+							bind(HttpServerResponse.class).toInstance(response);
+						}
+					}).getInstance(DocumentRequestProcessor.class);
+				}
 			}
 		}
 		

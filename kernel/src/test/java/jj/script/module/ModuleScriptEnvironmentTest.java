@@ -73,7 +73,7 @@ public class ModuleScriptEnvironmentTest {
 		
 		given(parent.alive()).willReturn(true);
 		
-		given(resourceFinder.loadResource(ScriptResource.class, Base.and(APIModules), moduleIdentifier + ".js")).willReturn(scriptResource);
+		given(resourceFinder.loadResource(ScriptResource.class, Base, moduleIdentifier + ".js")).willReturn(scriptResource);
 		
 		given(scriptResource.source()).willReturn("");
 	}
