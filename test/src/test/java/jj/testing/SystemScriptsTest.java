@@ -15,8 +15,8 @@
  */
 package jj.testing;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.is;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
@@ -83,7 +83,7 @@ public class SystemScriptsTest {
 		// load everything we care about here!
 		
 		// could take a while!
-		assertTrue("timed out", testCountLatch.await(10, SECONDS));
+		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
 		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
 		assertThat(successCount.get(), is(total)); // just for certainty?
 		

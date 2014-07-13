@@ -107,9 +107,9 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		// okay, we have all the things we need, now we can bother finishing up
 		// need to configure different require.  also need different inject.
 		// to allow things to be mocked correctly
-		scope = configureTimers(configureModuleObjects(JASMINE, createChainedScope(global)));
+		scope = configureModuleObjects(JASMINE, createChainedScope(global), "$$realRequire");
 		
-		configureInjectFunction(scope, "$$realInject");
+		configureInjectFunction(configureTimers(scope), "$$realInject");
 		
 		// and we need to pre-execute the jasmine script into our scope, because requiring it
 		// makes it use the wrong global, and therefore timers can't be simulated

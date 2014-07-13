@@ -63,8 +63,10 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 			return extractContinuationState(continuation);
 		} catch (RhinoException re) {
 			// this is handled inside the RhinoContext
+			throw re;
 		} catch (RuntimeException e) {
 			log(e, scriptEnvironment);
+			throw e;
 		}
 		return null;
 	}

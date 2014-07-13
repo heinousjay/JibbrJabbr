@@ -9,6 +9,16 @@ var inject = function() {
 }
 var valueOf = java.lang.String.valueOf;
 
+var mocks = {
+	'configuration-support' : {
+		makeStringProperty:function() {}
+	}
+};
+
+var require = function(id) {
+	return mocks[id];
+}
+
 describe("makeSetter", function() {
 	
 	beforeEach(function() {

@@ -16,10 +16,6 @@
 package jj.jasmine;
 
 import static org.mockito.BDDMockito.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import jj.event.MockPublisher;
 import jj.execution.MockTaskRunner;
 import jj.script.ContinuationCoordinator;
 import jj.script.ScriptEnvironmentInitialized;
@@ -40,7 +36,6 @@ public class SpecCoordinatorTest {
 
 	@Mock ContinuationCoordinator continuationCoordinator;
 	MockTaskRunner taskRunner;
-	MockPublisher publisher;
 	
 	SpecCoordinator sc;
 	
@@ -53,13 +48,12 @@ public class SpecCoordinatorTest {
 	@Before
 	public void before() {
 		taskRunner = new MockTaskRunner();
-		publisher = new MockPublisher();
 		
 		given(jse.specScript()).willReturn(specScript);
 		given(jse.targetScript()).willReturn(targetScript);
 		given(jse.runnerScript()).willReturn(runnerScript);
 		
-		sc = new SpecCoordinator(continuationCoordinator, taskRunner, publisher);
+		sc = new SpecCoordinator(continuationCoordinator, taskRunner);
 	}
 	
 	@Test
@@ -82,8 +76,6 @@ public class SpecCoordinatorTest {
 		// essentially if we got here with no errors, things worked
 		
 		// need to understand error scenarios!
-		
-		assertThat(publisher.events.get(0), is(instanceOf(JasmineSpecExecutionCompleted.class)));
 	}
 
 }

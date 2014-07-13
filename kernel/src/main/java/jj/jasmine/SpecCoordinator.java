@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.event.Listener;
-import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 import jj.script.ContinuationCoordinator;
@@ -40,17 +39,14 @@ class SpecCoordinator {
 
 	private final ContinuationCoordinator continuationCoordinator;
 	private final TaskRunner taskRunner;
-	private final Publisher publisher;
 	
 	@Inject
 	SpecCoordinator(
 		final ContinuationCoordinator continuationCoordinator,
-		final TaskRunner taskRunner,
-		final Publisher publisher
+		final TaskRunner taskRunner
 	) {
 		this.continuationCoordinator = continuationCoordinator;
 		this.taskRunner = taskRunner;
-		this.publisher = publisher;
 	}
 	
 	@Listener
@@ -115,12 +111,6 @@ class SpecCoordinator {
 		@Override
 		protected void begin() throws Exception {
 			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.runnerScript());
-		}
-		
-		@Override
-		protected void complete() throws Exception {
-			// this isn't the right time to do this.  there could be some timeout running
-			publisher.publish(new JasmineSpecExecutionCompleted());
 		}
 	}
 }

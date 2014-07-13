@@ -18,6 +18,7 @@ package jj.script;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -27,6 +28,7 @@ import java.util.Map;
 import jj.event.Publisher;
 import jj.jjmessage.JJMessage;
 import jj.script.module.RequiredModule;
+import jj.util.Closer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -87,6 +89,8 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock ContinuationPendingCache cache;
 	
+	@Mock Closer closer;
+	
 	@Before
 	public void before() {
 		
@@ -136,7 +140,12 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.executeScriptWithContinuations(script, scope)).willThrow(e);
 		
-		continuationCoordinator.execute(scriptEnvironment);
+		try {
+			continuationCoordinator.execute(scriptEnvironment);
+			fail();
+		} catch (RuntimeException re) {
+			assertThat(re, is(sameInstance(e)));
+		}
 		
 		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
@@ -168,7 +177,12 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(e);
 		
-		continuationCoordinator.execute(scriptEnvironment, function);
+		try {
+			continuationCoordinator.execute(scriptEnvironment, function);
+			fail();
+		} catch (RuntimeException re) {
+			assertThat(re, is(sameInstance(e)));
+		}
 		
 		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
@@ -200,7 +214,12 @@ public class ContinuationCoordinatorTest {
 		
 		given(context.executeScriptWithContinuations(executedScript, scope)).willThrow(e);
 		
-		continuationCoordinator.execute(scriptEnvironment, executedScript);
+		try {
+			continuationCoordinator.execute(scriptEnvironment, executedScript);
+			fail();
+		} catch (RuntimeException re) {
+			assertThat(re, is(sameInstance(e)));
+		}
 		
 		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
@@ -209,6 +228,7 @@ public class ContinuationCoordinatorTest {
 	public void testContinuationResumptionNoContinuation() {
 		
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
+		given(scriptEnvironment.restoreContextForKey(pendingKey)).willReturn(closer);
 		
 		ContinuationPendingKey result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
@@ -233,12 +253,18 @@ public class ContinuationCoordinatorTest {
 	public void testContinuationResumptionWithUnexpectedException() {
 		
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
+		given(scriptEnvironment.restoreContextForKey(pendingKey)).willReturn(closer);
 		
 		final RuntimeException e = new RuntimeException();
 		
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(e);
 		
-		continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
+		try {
+			continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
+			fail();
+		} catch (RuntimeException re) {
+			assertThat(re, is(sameInstance(e)));
+		}
 		
 		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
