@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script.module;
+package jj.document;
 
 /**
  * @author jason
@@ -21,13 +21,6 @@ package jj.script.module;
  */
 public enum ScriptResourceType {
 	Client {
-		@Override
-		public String suffix(String baseName)  {
-			return baseName + ".js";
-		}
-	},
-	
-	Module {
 		@Override
 		public String suffix(String baseName)  {
 			return baseName + ".js";

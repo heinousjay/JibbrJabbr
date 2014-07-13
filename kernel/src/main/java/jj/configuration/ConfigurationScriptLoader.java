@@ -15,7 +15,7 @@
  */
 package jj.configuration;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.configuration.resolution.AppLocation.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
 
@@ -62,8 +62,8 @@ class ConfigurationScriptLoader implements JJServerStartupListener {
 		
 		load();
 		
-		boolean success = latch.await(500, MILLISECONDS);
-		assert success : "configuration didn't load in 500 milliseconds";
+		boolean success = latch.await(3, SECONDS);
+		assert success : "configuration didn't load in 3 seconds";
 	}
 
 	@Override

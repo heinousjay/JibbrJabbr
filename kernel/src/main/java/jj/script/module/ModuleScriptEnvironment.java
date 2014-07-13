@@ -123,7 +123,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 
 	@Override
 	public String scriptName() {
-		return ScriptResourceType.Module.suffix(moduleIdentifier);
+		return moduleIdentifier + ".js";
 	}
 
 	@Override

@@ -8,9 +8,9 @@ import javax.inject.Singleton;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
+import jj.document.ScriptResourceType;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
-import jj.script.module.ScriptResourceType;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

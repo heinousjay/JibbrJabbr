@@ -43,7 +43,6 @@ import jj.script.ContinuationPendingKey;
 import jj.script.ScriptThread;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
-import jj.script.module.ScriptResourceType;
 import jj.util.Closer;
 import jj.util.CurrentResource;
 import jj.util.CurrentResourceAware;

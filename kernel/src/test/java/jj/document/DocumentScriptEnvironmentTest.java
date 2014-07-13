@@ -45,7 +45,6 @@ import jj.script.ExecutionEvent;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
-import jj.script.module.ScriptResourceType;
 import jj.util.Closer;
 
 import org.jsoup.Jsoup;
