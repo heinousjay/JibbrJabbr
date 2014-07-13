@@ -213,6 +213,13 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		localScope.defineProperty(name, dependencies.injectFunction, ScriptableObject.CONST);
 		return localScope;
 	}
+	
+	protected ScriptableObject configureModuleObjects(
+		final String moduleIdentifier,
+		final ScriptableObject localScope
+	) {
+		return configureModuleObjects(moduleIdentifier, localScope, "require");
+	}
 
 	/**
 	 * Configures top-level module objects in a given scope, including a require function and assignable exports
@@ -221,7 +228,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * @param localScope must not be sealed
 	 * @return localScope, post configuration, for chaining
 	 */
-	protected ScriptableObject configureModuleObjects(final String moduleIdentifier, ScriptableObject localScope) {
+	protected ScriptableObject configureModuleObjects(
+		final String moduleIdentifier,
+		final ScriptableObject localScope,
+		final String requireFunctionName
+	) {
 		assert !localScope.isSealed() : "cannot configure module objects on a sealed scope";
 		
 		try (RhinoContext context = contextProvider.get()) {
@@ -264,11 +275,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 				AbstractScriptEnvironment.class.getSimpleName() + " require function definition"
 			);
 			
-			localScope.defineProperty(
-				"require",
-				require,
-				ScriptableObject.CONST
-			);
+			localScope.defineProperty(requireFunctionName, require, ScriptableObject.CONST);
 			
 			ScriptableObject.deleteProperty(module, "requireInner");
 		}
