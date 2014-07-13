@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.server.uri.URIMatch;
+import jj.http.uri.URIMatch;
 import jj.resource.FileResource;
 import jj.resource.PathResolver;
 import jj.resource.ResourceThread;

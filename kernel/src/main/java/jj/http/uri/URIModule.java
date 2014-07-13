@@ -13,33 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server.uri;
+package jj.http.uri;
 
-import java.util.regex.Pattern;
+import jj.JJModule;
 
-class Parameter {
-	
-	enum Type {
-		Param,
-		Splat
-	}
-	
-	final String name;
-	final int start;
-	final int end;
-	final Type type;
-	final Pattern pattern;
-	
-	Parameter(String name, int start, int end, final Type type, final Pattern pattern) {
-		this.name = name;
-		this.start = start;
-		this.end = end;
-		this.type = type;
-		this.pattern = pattern;
-	}
-	
+/**
+ * @author jason
+ *
+ */
+public class URIModule extends JJModule {
+
+
 	@Override
-	public String toString() {
-		return type + " " + name + "@[" + start + "," + end + "]" + (pattern != null ? " with pattern " + pattern : "");
+	protected void configure() {
+		
+		addAPIModulePath("/jj/http/uri/api");
+		
+		bindConfiguration().to(RouterConfiguration.class);
 	}
+
 }

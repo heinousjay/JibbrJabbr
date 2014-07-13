@@ -12,8 +12,8 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.http.server.uri.RouteFinder;
-import jj.http.server.uri.URIMatch;
+import jj.http.uri.RouteFinder;
+import jj.http.uri.URIMatch;
 import jj.util.Sequence;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;

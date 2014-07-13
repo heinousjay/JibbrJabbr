@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.http.server.servable.Servables;
-import jj.http.server.uri.URIMatch;
+import jj.http.uri.URIMatch;
 import jj.resource.Resource;
 
 import org.jsoup.nodes.Element;

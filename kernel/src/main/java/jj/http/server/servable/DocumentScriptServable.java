@@ -16,7 +16,7 @@ import jj.resource.ResourceFinder;
 import jj.script.module.ScriptResource;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.server.uri.URIMatch;
+import jj.http.uri.URIMatch;
 
 /**
  * handles serving the scripts associated with a document

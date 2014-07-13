@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import jj.css.StylesheetResource;
-import jj.http.server.uri.URIMatch;
+import jj.http.uri.URIMatch;
 import jj.resource.Resource;
 import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;

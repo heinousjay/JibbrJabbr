@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
-import jj.http.server.uri.URIMatch;
+import jj.http.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.script.module.ScriptResource;
 

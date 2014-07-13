@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server.uri;
+package jj.http.uri;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jj.http.server.uri.Parameter.Type;
+import jj.http.uri.Parameter.Type;
 
 /**
  * @author jason

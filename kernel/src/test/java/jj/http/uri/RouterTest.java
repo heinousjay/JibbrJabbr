@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server.uri;
+package jj.http.uri;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jj.execution.MockTaskRunner;
-import jj.http.server.uri.Route;
-import jj.http.server.uri.Router;
-import jj.http.server.uri.RouterConfiguration;
+import jj.http.uri.Route;
+import jj.http.uri.RouteMatch;
+import jj.http.uri.Router;
+import jj.http.uri.RouterConfiguration;
 
 import org.junit.Before;
 import org.junit.Test;

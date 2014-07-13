@@ -25,7 +25,7 @@ import java.io.IOException;
 import jj.configuration.resolution.AppLocation;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.server.uri.URIMatch;
+import jj.http.uri.URIMatch;
 import jj.resource.FileResource;
 import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
