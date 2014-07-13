@@ -52,8 +52,8 @@
 
 	}
 	
-	env.addReporter(new JsApiReporter());
-	env.execute();
+	$$env.addReporter(new JsApiReporter());
+	$$env.execute();
 	
 	/*
 	

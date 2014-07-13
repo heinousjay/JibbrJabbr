@@ -16,6 +16,7 @@
 package jj.testing;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static jj.configuration.resolution.AppLocation.APIModules;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -31,6 +32,7 @@ import jj.event.Subscriber;
 import jj.jasmine.JasmineTestFailure;
 import jj.jasmine.JasmineTestSuccess;
 import jj.resource.ResourceLoader;
+import jj.script.module.ScriptResource;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,7 +62,7 @@ public class SystemScriptsTest {
 	@Inject
 	ResourceLoader resourceLoader;
 	
-	final int total = 2; // well, it's manual but maybe the phaser does what i need?
+	final int total = 3; // well, it's manual but maybe the phaser does what i need?
 	final CountDownLatch testCountLatch = new CountDownLatch(total);
 	final AtomicInteger successCount = new AtomicInteger();
 	final AtomicInteger failureCount = new AtomicInteger();
@@ -77,10 +79,15 @@ public class SystemScriptsTest {
 		testCountLatch.countDown();
 	}
 	
+	private void load(String name) {
+		resourceLoader.loadResource(ScriptResource.class, APIModules, name);
+	}
+	
 	@Test
 	public void test() throws Exception {
 		
 		// load everything we care about here!
+		load("broadcast.js");
 		
 		// could take a while!
 		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
