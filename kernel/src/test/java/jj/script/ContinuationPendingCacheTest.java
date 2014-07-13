@@ -145,7 +145,6 @@ public class ContinuationPendingCacheTest {
 						}
 						latch2.countDown();
 					} catch (Throwable t) {
-						System.err.println(i);
 						throwables.add(t);
 					}
 				}
