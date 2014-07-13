@@ -23,6 +23,9 @@ public class ScriptJSON {
 	@Inject
 	public ScriptJSON(final Provider<RhinoContext> contextProvider) {
 		this.contextProvider = contextProvider;
+		// for the sake of safety, incoming strings are parsed
+		// against an independent scope
+		// i don't know if it helps but it can't hurt
 		try (RhinoContext context = contextProvider.get()) {
 			scope = context.initStandardObjects(true);
 		}
