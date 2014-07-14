@@ -1,5 +1,10 @@
 var mockEnv = {};
-var mockHost = {};
+var startBroadcastingCalled, endBroadcastingCalled, connectionCount;
+var mockHost = {
+	startBroadcasting: function() { startBroadcastingCalled = true; },
+	nextConnection: function() { return !!(--connectionCount); },
+	endBroadcasting: function() { endBroadcastingCalled = true; }
+};
 
 var inject = function() {
 	return mockEnv;
@@ -45,7 +50,7 @@ describe("broadcast", function() {
 		});
 		
 		it('throws an error if current does not have startBroadcasting', function() {
-			mockEnv.current = function() { return mockHost; }
+			mockEnv.current = function() { return mockEnv; }
 			expect(function() {
 				bc(function() {});
 			}).toThrow(error);
@@ -56,5 +61,33 @@ describe("broadcast", function() {
 				delete mockEnv.current;
 			}
 		});
-	})
+	});
+	
+	describe("a valid call", function() {
+		
+		beforeEach(function() {
+			mockEnv.current = function() { return mockHost; }
+			startBroadcastingCalled = false;
+			endBroadcastingCalled = false;
+			connectionCount = 3;
+		});
+		
+		it("just works", function() {
+			var calls = 0;
+			bc(function() {
+				++calls;
+			});
+			
+			expect(calls).toBe(2);
+			expect(startBroadcastingCalled).toBe(true);
+			expect(endBroadcastingCalled).toBe(true);
+			expect(connectionCount).toBe(0);
+		});
+		
+		afterEach(function() {
+			if (mockEnv.current) {
+				delete mockEnv.current;
+			}
+		});
+	});
 });
