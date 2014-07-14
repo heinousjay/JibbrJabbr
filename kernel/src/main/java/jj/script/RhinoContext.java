@@ -55,9 +55,6 @@ public class RhinoContext implements Closer {
 		context.setOptimizationLevel(-1);
 	}
 
-	/**
-	 * @param i
-	 */
 	public RhinoContext withoutContinuations() {
 		assertNotClosed();
 		context.setOptimizationLevel(1);
@@ -113,13 +110,6 @@ public class RhinoContext implements Closer {
 		}
 	}
 
-	/**
-	 * @param script
-	 * @param string
-	 * @param i
-	 * @param object
-	 * @return
-	 */
 	public Script compileString(final String source, final String sourceName) {
 		assertNotClosed();
 		try {
@@ -130,12 +120,6 @@ public class RhinoContext implements Closer {
 		}
 	}
 
-	/**
-	 * @param function
-	 * @param scope
-	 * @param thisObj
-	 * @param args
-	 */
 	public Object callFunction(Function function, Scriptable scope, Scriptable thisObj, Object...args) {
 		assertNotClosed();
 		try {
@@ -146,8 +130,6 @@ public class RhinoContext implements Closer {
 		}
 	}
 
-	/**
-	 */
 	public Object evaluateString(Scriptable scope, String source, String sourceName) {
 		assertNotClosed();
 		try {
@@ -169,10 +151,6 @@ public class RhinoContext implements Closer {
 		
 	}
 
-	/**
-	 * @param script
-	 * @param scope
-	 */
 	public Object executeScriptWithContinuations(Script script, Scriptable scope) {
 		assertNotClosed();
 		try {
@@ -183,11 +161,6 @@ public class RhinoContext implements Closer {
 		}
 	}
 
-	/**
-	 * @param function
-	 * @param scope
-	 * @param args
-	 */
 	public Object callFunctionWithContinuations(Callable function, Scriptable scope, Object[] args) {
 		assertNotClosed();
 		try {
@@ -198,12 +171,6 @@ public class RhinoContext implements Closer {
 		}
 	}
 
-	/**
-	 * @param continuation
-	 * @param scope
-	 * @param result
-	 * @return 
-	 */
 	public Object resumeContinuation(Object continuation, Scriptable scope, Object result) {
 		assertNotClosed();
 		try {

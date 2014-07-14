@@ -1,6 +1,6 @@
 // useful constants for defining services
 // best way to use it:
-// require('api/globalize')('rest-service-constants', this);
+// require('jj/globalize')('rest-service-constants', this);
 
 module.exports = {
 	GET: 'GET',

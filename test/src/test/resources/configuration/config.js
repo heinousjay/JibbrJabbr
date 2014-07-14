@@ -1,11 +1,11 @@
 
 // including these scripts for the SystemScriptsTest but we configure off
-require('api/jasmine-configuration').autorunSpecs(false);
-require('api/repl-configuration').activate(true).port(33445); // on an abnormal port to avoid startup conflicts
+require('jj/jasmine-configuration').autorunSpecs(false);
+require('jj/repl-configuration').activate(true).port(33445); // on an abnormal port to avoid startup conflicts
 
 // the http-server-socket module returns an object that can configure
 // its namesake
-require('api/http-server-socket-configuration')
+require('jj/http-server-socket-configuration')
 	//SO_KEEPALIVE
 	.keepAlive(true)
 	// TCP_NODELAY
@@ -30,7 +30,7 @@ require('api/http-server-socket-configuration')
 	.bind(8080)
 	.bind('localhost', 8090);
 
-require('api/less-configuration')
+require('jj/less-configuration')
 	.compress(true)
 	.cleancss(true)
 	.maxLineLen(1024)
@@ -49,21 +49,21 @@ require('api/less-configuration')
 	.sourceMaps(false)
 	.rootpath("images/");
 
-require('api/document-system-configuration')
+require('jj/document-system-configuration')
 	.clientDebug(true)
 	.showParsingErrors(true)
 	.removeComments(false);
 
-require('api/resource-system-configuration')
+require('jj/resource-system-configuration')
 	.ioThreads(10);
 
 // this is a silly helper, it just copies the exports
 // of the given script into the given object
-var globalize = require('api/globalize');
+var globalize = require('jj/globalize');
 
 // so bam.  life is easy.  although in this case, there
 // are only two pieces exposed
-globalize('api/uri-routing-configuration', this);
+globalize('jj/uri-routing-configuration', this);
 
 welcomeFile('root');
 

@@ -54,7 +54,7 @@ import org.mozilla.javascript.ScriptableObject;
 @Singleton
 public class ModuleScriptEnvironment extends AbstractScriptEnvironment implements ChildScriptEnvironment {
 	
-	public static final String API_PREFIX = "api/";
+	public static final String API_PREFIX = "jj/";
 	
 	private final String moduleIdentifier;
 	

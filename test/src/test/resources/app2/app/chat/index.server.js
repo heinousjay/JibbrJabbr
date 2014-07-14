@@ -14,7 +14,7 @@ var linkify = require('helpers/linkify');
 
 var smileyify = require('helpers/smileys');
 
-var broadcast = require('api/broadcast');
+var broadcast = require('jj/broadcast');
 
 var messages = (function() {
 	// need some unique ids per line

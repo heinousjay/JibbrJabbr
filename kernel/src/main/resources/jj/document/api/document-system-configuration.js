@@ -1,5 +1,5 @@
 
-var support = require('api/configuration-support');
+var support = require('jj/configuration-support');
 var base = 'jj.document.DocumentConfiguration.';
 
 module.exports = {

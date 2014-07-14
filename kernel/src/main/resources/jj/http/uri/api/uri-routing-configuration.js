@@ -1,7 +1,7 @@
 
 var base = 'jj.http.uri.RouterConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
-var support = require('api/configuration-support');
+var support = require('jj/configuration-support');
 
 var GET    = Packages.io.netty.handler.codec.http.HttpMethod.GET;
 var POST   = Packages.io.netty.handler.codec.http.HttpMethod.POST;
