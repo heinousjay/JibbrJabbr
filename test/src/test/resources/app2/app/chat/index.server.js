@@ -18,6 +18,8 @@ var broadcast = require('jj/broadcast');
 
 var localStorage = require('jj/localStorage');
 
+var print = require('jj/print');
+
 var messages = (function() {
 	// need some unique ids per line
 	var idBase = "chat-line";

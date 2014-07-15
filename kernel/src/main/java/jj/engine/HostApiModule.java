@@ -17,8 +17,6 @@ public class HostApiModule extends JJModule {
 		addHostObjectBinding().to(DollarFunction.class);
 		addHostObjectBinding().to(DoCallFunction.class);
 		addHostObjectBinding().to(DoInvokeFunction.class);
-		addHostObjectBinding().to(PrintFunction.class);
-		addHostObjectBinding().to(PrintfFunction.class);
 		addHostObjectBinding().to(ClientConnectedFunction.class);
 		addHostObjectBinding().to(ClientDisconnectedFunction.class);
 		addHostObjectBinding().to(TerminatingFunction.class);
