@@ -15,13 +15,11 @@
  */
 package jj.script;
 
-import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
-import io.netty.util.internal.chmv8.ConcurrentHashMapV8.Fun;
-
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -52,7 +50,7 @@ public class Timers {
 	private final TaskRunner taskRunner;
 	private final ContinuationCoordinator continuationCoordinator;
 	private final CurrentScriptEnvironment env;
-	private final ConcurrentHashMapV8<ResourceKey, Set<WeakReference<CancelKey>>> runningTimers = new ConcurrentHashMapV8<>();
+	private final ConcurrentHashMap<ResourceKey, Set<WeakReference<CancelKey>>> runningTimers = new ConcurrentHashMap<>();
 
 	@Inject
 	Timers(
@@ -104,13 +102,10 @@ public class Timers {
 		
 		taskRunner.execute(task);
 		
-		runningTimers.computeIfAbsent(env.current().cacheKey(), new Fun<ResourceKey, Set<WeakReference<CancelKey>>>() {
-
-			@Override
-			public Set<WeakReference<CancelKey>> apply(ResourceKey a) {
-				return new HashSet<>();
-			}
-		}).add(new WeakReference<>(task.cancelKey()));
+		runningTimers.computeIfAbsent(
+			env.current().cacheKey(), a -> new HashSet<>()
+		).add(new WeakReference<>(task.cancelKey()));
+		
 		return task.cancelKey();
 	}
 	

@@ -1,8 +1,8 @@
 package jj.http.server.websocket;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import io.netty.util.internal.PlatformDependent;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -49,8 +49,7 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		}
 	}
 
-	private final ConcurrentMap<WebSocketConnection, Boolean> allConnections =
-		PlatformDependent.newConcurrentHashMap(16, 0.75F, 2);
+	private final ConcurrentMap<WebSocketConnection, Boolean> allConnections = new ConcurrentHashMap<>(16, 0.75F, 2);
 		
 	private final TaskRunner taskRunner;
 	

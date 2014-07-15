@@ -1,13 +1,13 @@
 package jj.resource;
 
-import io.netty.util.internal.PlatformDependent;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -27,8 +27,7 @@ class ResourceCacheImpl implements ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	ConcurrentMap<ResourceKey, Resource> resourceCache =
-		PlatformDependent.newConcurrentHashMap(128, 0.75F, 4);
+	ConcurrentMap<ResourceKey, Resource> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
 
 	@Inject
 	ResourceCacheImpl(final ResourceCreators resourceCreators) {

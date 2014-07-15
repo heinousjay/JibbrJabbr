@@ -15,8 +15,7 @@
  */
 package jj.script;
 
-import io.netty.util.internal.PlatformDependent;
-
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
@@ -59,7 +58,7 @@ class ContinuationPendingCache {
 	/**
 	 * tasks awaiting resumption. can this be stored per executor somehow?
 	 */
-	private final ConcurrentMap<String, ScriptTask<?>> resumableTasks = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentMap<String, ScriptTask<?>> resumableTasks = new ConcurrentHashMap<>();
 	
 	String uniqueID() {
 		// wow.  a do...while!

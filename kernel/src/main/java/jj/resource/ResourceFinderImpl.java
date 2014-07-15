@@ -1,8 +1,7 @@
 package jj.resource;
 
-import io.netty.util.internal.PlatformDependent;
-
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
@@ -20,7 +19,7 @@ import jj.execution.CurrentTask;
 @Singleton
 class ResourceFinderImpl implements ResourceFinder {
 	
-	private final ConcurrentMap<ResourceKey, ResourceTask> resourcesInProgress = PlatformDependent.newConcurrentHashMap();
+	private final ConcurrentMap<ResourceKey, ResourceTask> resourcesInProgress = new ConcurrentHashMap<>();
 
 	private final ResourceCache resourceCache;
 	

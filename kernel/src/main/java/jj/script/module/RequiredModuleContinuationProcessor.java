@@ -15,8 +15,7 @@
  */
 package jj.script.module;
 
-import io.netty.util.internal.PlatformDependent;
-
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
@@ -50,7 +49,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final DependsOnScriptEnvironmentInitialization initializer;
 	
-	private final ConcurrentMap<RequiredModule, Boolean> waiters = PlatformDependent.newConcurrentHashMap(4);
+	private final ConcurrentMap<RequiredModule, Boolean> waiters = new ConcurrentHashMap<>(4);
 	
 	@Inject
 	RequiredModuleContinuationProcessor(
