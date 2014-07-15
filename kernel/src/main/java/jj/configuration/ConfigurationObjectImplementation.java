@@ -15,8 +15,7 @@
  */
 package jj.configuration;
 
-import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
-import io.netty.util.internal.chmv8.ConcurrentHashMapV8.Fun;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,7 +30,7 @@ import javax.inject.Singleton;
 class ConfigurationObjectImplementation {
 	
 	/** mapped interface to implementation */
-	private final ConcurrentHashMapV8<Class<?>, Class<?>> implementations = new ConcurrentHashMapV8<>();
+	private final ConcurrentHashMap<Class<?>, Class<?>> implementations = new ConcurrentHashMap<>();
 	
 	private final ConfigurationClassMaker classLoader;
 	
@@ -43,17 +42,15 @@ class ConfigurationObjectImplementation {
 	@SuppressWarnings("unchecked")
 	<T> Class<? extends T> implementationClassFor(final Class<T> configurationInterface) {
 		
-		return (Class<? extends T>)implementations.computeIfAbsent(configurationInterface, new Fun<Class<?>, Class<?>>() {
-
-			@Override
-			public Class<?> apply(Class<?> configurationInterface) {
+		return (Class<? extends T>)implementations.computeIfAbsent(configurationInterface, 
+			ci -> {
 				try {
-					return classLoader.make(configurationInterface);
+					return classLoader.make(ci);
 				} catch (Exception e) {
-					throw new AssertionError("couldn't implement " + configurationInterface, e);
+					throw new AssertionError("couldn't implement " + ci, e);
 				}
 			}
-		});
+		);
 	}
 	
 }
