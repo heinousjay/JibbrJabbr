@@ -6,7 +6,7 @@ An experiment in Java HTTP server concepts.
 
 [![Build Status](https://travis-ci.org/heinousjay/JibbrJabbr.png?branch=master)](https://travis-ci.org/heinousjay/JibbrJabbr)
 
-Requires [JDK 7](http://openjdk.java.net/install/index.html)
+Requires [JDK 8](http://openjdk.java.net/install/index.html)
 
 Build using Gradle, for example
 

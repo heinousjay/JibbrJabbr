@@ -57,16 +57,17 @@ public class WebSocketFrameHandlerCreatorTest {
 	@Captor ArgumentCaptor<AbstractModule> moduleCaptor;
 	
 	@Mock Binder binder;
-	@Mock AnnotatedBindingBuilder<Object> abb;
+	@Mock AnnotatedBindingBuilder<WebSocketServerHandshaker> wsshAbb;
+	@Mock AnnotatedBindingBuilder<WebSocketConnectionHost> wschAbb;
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void test() {
 		
 		// given
 		given(injector.createChildInjector(isA(AbstractModule.class))).willReturn(injector);
 		given(injector.getInstance(WebSocketFrameHandler.class)).willReturn(handler);
-		given(binder.bind(any(Class.class))).willReturn(abb);
+		given(binder.bind(WebSocketServerHandshaker.class)).willReturn(wsshAbb);
+		given(binder.bind(WebSocketConnectionHost.class)).willReturn(wschAbb);
 		
 		// when
 		WebSocketFrameHandler result = wsfhc.createHandler(handshaker, scriptEnvironment);
@@ -80,18 +81,17 @@ public class WebSocketFrameHandlerCreatorTest {
 		AbstractModule module = moduleCaptor.getValue();
 		module.configure(binder);
 		
-		InOrder bindings = inOrder(binder,abb);
+		InOrder bindings = inOrder(binder, wsshAbb, wschAbb);
 		
 		// then
 		bindings.verify(binder).bind(WebSocketConnection.class);
 		bindings.verify(binder).bind(WebSocketFrameHandler.class);
 		bindings.verify(binder).bind(WebSocketServerHandshaker.class);
-		bindings.verify(abb).toInstance(handshaker);
+		bindings.verify(wsshAbb).toInstance(handshaker);
 		bindings.verify(binder).bind(WebSocketConnectionHost.class);
-		bindings.verify(abb).toInstance(scriptEnvironment);
+		bindings.verify(wschAbb).toInstance(scriptEnvironment);
 		
-		verifyNoMoreInteractions(binder, abb);
-		
+		verifyNoMoreInteractions(binder, wsshAbb);
 	}
 
 }

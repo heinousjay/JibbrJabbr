@@ -62,9 +62,9 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 	
 	protected void before() throws Exception {}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void configureInjector(U resource) {
-		given(injector.getInstance(any(Class.class))).willReturn(resource);
+		given(injector.getInstance((Class)any())).willReturn(resource);
 	}
 	
 	@Before

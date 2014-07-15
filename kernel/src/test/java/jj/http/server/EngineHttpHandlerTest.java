@@ -114,14 +114,14 @@ public class EngineHttpHandlerTest {
 		handler = new EngineHttpHandler(taskRunner, servables.servables, injector, webSocketRequestChecker, publisher);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void prepareInjectorStubbing() {
 		// little ugly, but sets up an injector that will return our mocks
 		given(injector.getInstance(HttpServerRequest.class)).willReturn(httpRequest1);
 		given(injector.getInstance(HttpServerResponse.class)).willReturn(httpResponse);
 		given(injector.getInstance(WebSocketConnectionMaker.class)).willReturn(webSocketConnectionMaker);
 		given(injector.createChildInjector(any(Module.class))).willReturn(injector);
-		given(binder.bind(any(Class.class))).willReturn(abb);
+		given(binder.bind((Class)any())).willReturn(abb);
 	}
 	
 	@Test
