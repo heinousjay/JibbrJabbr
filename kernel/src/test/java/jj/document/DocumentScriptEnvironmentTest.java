@@ -91,6 +91,7 @@ public class DocumentScriptEnvironmentTest {
 		
 		contextMaker = dependencies.rhinoContextProvider();
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
+		given(contextMaker.context.newChainedScope(any(Scriptable.class))).willReturn(local);
 		
 		given(script.path()).willReturn(Paths.get("/"));
 		
@@ -200,30 +201,6 @@ public class DocumentScriptEnvironmentTest {
 			assertThat(rnve.getMessage(), is(name));
 			assertThat(rnve.getCause(), is(sameInstance((Throwable)re)));
 		}
-	}
-	
-	// i know this looks like a private method is being tested... and sure, it is... but the
-	// job this class does needs to be rigorously specified to ensure the system runs properly
-	@Test
-	public void testLocalScopeSetup() throws Exception {
-		
-		String name = "index";
-		
-		givenAnHtmlResource(name);
-		givenAServerScript(name);
-		ScriptableObject scope = mock(ScriptableObject.class);
-		given(api.global()).willReturn(scope);
-		
-		givenADocumentScriptEnvironment(name);
-		
-		verify(local).setPrototype(scope);
-		verify(local).setParentScope(null);
-		
-		// local is return as all new object results.  luckily nothing overlaps
-		verify(local).defineProperty("module", local, ScriptableObject.CONST);
-		verify(local).defineProperty("id", name, ScriptableObject.CONST);
-		verify(local).defineProperty(eq("require"), isNull(), eq(ScriptableObject.CONST));
-		
 	}
 	
 	@Test

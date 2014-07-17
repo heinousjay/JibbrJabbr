@@ -197,19 +197,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	public String toString() {
 		return super.toString() + " {state=" + state + "}";
 	}
-
-	/**
-	 * Helper to create and attach a new scope object in a scope chain
-	 * @param parent
-	 * @return
-	 */
+	
 	protected ScriptableObject createChainedScope(final ScriptableObject parent) {
 		try (RhinoContext context = contextProvider.get()) {
-			ScriptableObject local = context.newObject(parent);
-			local.setPrototype(parent);
-			local.setParentScope(null);
-			
-			return local;
+			return context.newChainedScope(parent);
 		}
 	}
 	

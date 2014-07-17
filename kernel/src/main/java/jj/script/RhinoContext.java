@@ -45,11 +45,10 @@ public class RhinoContext implements Closer {
 	private final Publisher publisher;
 	
 	@Inject
-	RhinoContext(
-		final Publisher publisher
-	) {
-		this.context = Context.enter();
+	RhinoContext(final Publisher publisher) {
 		this.publisher = publisher;
+		
+		this.context = Context.enter();
 		
 		context.setLanguageVersion(Context.VERSION_1_8);
 		context.setOptimizationLevel(-1);
@@ -89,6 +88,15 @@ public class RhinoContext implements Closer {
 	public ScriptableObject newObject(Scriptable scope) {
 		assertNotClosed();
 		return (ScriptableObject)context.newObject(scope);
+	}
+	
+	public ScriptableObject newChainedScope(Scriptable prototype) {
+		assertNotClosed();
+		ScriptableObject local = newObject(prototype);
+		local.setPrototype(prototype);
+		local.setParentScope(null);
+		
+		return local;
 	}
 	
 	public JsonParser newJsonParser(Scriptable scope) {

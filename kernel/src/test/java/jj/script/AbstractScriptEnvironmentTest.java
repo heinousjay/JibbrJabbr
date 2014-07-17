@@ -129,12 +129,9 @@ public class AbstractScriptEnvironmentTest {
 	public void testCreateChainedScope() {
 		
 		ScriptableObject chained = mock(ScriptableObject.class);
-		given(dependencies.rhinoContextProvider().context.newObject(scope)).willReturn(chained);
+		given(dependencies.rhinoContextProvider().context.newChainedScope(scope)).willReturn(chained);
 		
 		assertThat(ase.createChainedScope(scope), is(chained));
-		
-		verify(chained).setPrototype(scope);
-		verify(chained).setParentScope(null);
 	}
 	
 	@Test

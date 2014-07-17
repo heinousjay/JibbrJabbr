@@ -59,6 +59,7 @@ public class ConfigurationScriptEnvironmentTest {
 		dependencies = new MockAbstractScriptEnvironmentDependencies();
 
 		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
+		given(dependencies.rhinoContextProvider().context.newChainedScope(global)).willReturn(global);
 	}
 
 	@Test

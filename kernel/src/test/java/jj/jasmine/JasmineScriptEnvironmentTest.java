@@ -72,6 +72,7 @@ public class JasmineScriptEnvironmentTest {
 		count = 0;
 		dependencies = new MockAbstractScriptEnvironmentDependencies();
 		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
+		given(dependencies.rhinoContextProvider().context.newChainedScope(global)).willReturn(global);
 		
 		given(jasmine.script()).willReturn(jasmineScript);
 		given(jasmineBoot.script()).willReturn(jasmineBootScript);
