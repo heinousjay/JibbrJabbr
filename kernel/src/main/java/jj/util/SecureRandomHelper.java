@@ -34,4 +34,14 @@ public enum SecureRandomHelper {
 	public static int nextInt() {
 		return randoms.get().nextInt();
 	}
+	
+	public static byte[] nextBytes(int size) {
+		byte[] result = new byte[size];
+		randoms.get().nextBytes(result);
+		return result;
+	}
+	
+	public static long nextLong() {
+		return randoms.get().nextLong();
+	}
 }
