@@ -6,7 +6,7 @@ var JJMessage   = Packages.jj.jjmessage.JJMessage;
 
 function assertValidContext() {
 	if (connection.current() == null) {
-		throw new Error('localStorage operations are not valid from this context, there is no connected client');
+		throw new Error('local storage operations are not valid from this context, there is no connected client');
 	}
 }
 

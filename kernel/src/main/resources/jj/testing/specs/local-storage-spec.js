@@ -19,9 +19,9 @@ var inject = function(id) {
 
 var print = $$realRequire('jj/print');
 print('here is the result:', typeof JSON.stringify(null));
-describe('localStorage', function() {
+describe('local-storage', function() {
 	
-	var contextError = new Error('localStorage operations are not valid from this context, there is no connected client');
+	var contextError = new Error('local storage operations are not valid from this context, there is no connected client');
 	
 	describe('store', function() {
 		

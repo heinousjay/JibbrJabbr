@@ -16,7 +16,7 @@ var smileyify = require('helpers/smileys');
 
 var broadcast = require('jj/broadcast');
 
-var localStorage = require('jj/localStorage');
+var localStorage = require('jj/local-storage');
 
 var print = require('jj/print');
 

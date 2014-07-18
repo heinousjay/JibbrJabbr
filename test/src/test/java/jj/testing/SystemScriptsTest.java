@@ -89,7 +89,7 @@ public class SystemScriptsTest {
 		// load everything we care about here!
 		load("globalize.js");
 		load("broadcast.js");
-		load("localStorage.js");
+		load("local-storage.js");
 		
 		// could take a while!
 		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
