@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import javax.inject.Inject;
 
 import jj.event.Publisher;
+import jj.script.CurrentScriptEnvironment;
+import jj.util.Clock;
 
 /**
  * collects results from a jasmine run, collates them into
@@ -29,16 +31,28 @@ import jj.event.Publisher;
  *
  */
 public class JasmineResultCollector {
+	
+	private final Clock clock;
 
 	private final Publisher publisher;
 	
+	private final JasmineScriptEnvironment jse;
+	
 	private final LinkedHashMap<String, Suite> suites = new LinkedHashMap<>();
+	
+	private long startTime;
 	
 	private Suite currentSuite = null;
 	
 	@Inject
-	JasmineResultCollector(final Publisher publisher) {
+	JasmineResultCollector(
+		final Clock clock,
+		final Publisher publisher,
+		final CurrentScriptEnvironment env
+	) {
+		this.clock = clock;
 		this.publisher = publisher;
+		jse = env.currentAs(JasmineScriptEnvironment.class);
 	}
 	
 	public void suiteStarted(String id, String description) {
@@ -80,6 +94,10 @@ public class JasmineResultCollector {
 		currentSuite.children.get(id).status = status;
 	}
 	
+	public void jasmineStarted() {
+		startTime = clock.time();
+	}
+	
 	public void jasmineDone() {
 		// if there are any failures, publish
 		// JasmineSpecFailure
@@ -90,6 +108,11 @@ public class JasmineResultCollector {
 		for (Suite suite : suites.values()) {
 			failed = failed || suite.failed();
 		}
-		publisher.publish(failed ? new JasmineTestFailure(suites.values()) : new JasmineTestSuccess(suites.values()));
+		long executionTime = clock.time() - startTime;
+		publisher.publish(
+			failed ? 
+			new JasmineTestFailure(jse, executionTime, suites.values()) :
+			new JasmineTestSuccess(jse, executionTime, suites.values())
+		);
 	}
 }

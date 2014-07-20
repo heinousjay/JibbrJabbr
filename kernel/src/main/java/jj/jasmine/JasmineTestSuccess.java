@@ -17,19 +17,33 @@ package jj.jasmine;
 
 import java.util.Collection;
 
+import org.slf4j.Logger;
+
 /**
  * @author jason
  *
  */
 public class JasmineTestSuccess extends JasmineTestResult {
 
-	JasmineTestSuccess(Collection<Suite> suites) {
-		super(suites);
+	private final JasmineScriptEnvironment jse;
+	private final long executionTime;
+	private final Collection<Suite> suites;
+	
+	JasmineTestSuccess(final JasmineScriptEnvironment jse, final long executionTime, final Collection<Suite> suites) {
+		this.jse = jse;
+		this.executionTime = executionTime;
+		this.suites = suites;
 	}
-
+	
 	@Override
-	protected String description() {
-		return "Jasmine test run succeeded";
+	public void describeTo(Logger logger) {
+		logger.info("Jasmine spec success!\nrunning {} succeeded\ntargeting {}\nexecution time: {}ms", jse.spec(), jse.target(), executionTime);
+		if (logger.isTraceEnabled()) {
+			StringBuilder result = new StringBuilder();
+			for (Suite suite : suites) {
+				result.append("\n").append(suite);
+			}
+			logger.trace("results:\n{}", result.toString());
+		}
 	}
-
 }

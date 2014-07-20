@@ -149,8 +149,16 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		return boot.script();
 	}
 	
+	ScriptResource spec() {
+		return spec;
+	}
+	
 	Script specScript() {
 		return spec.script();
+	}
+	
+	ScriptResource target() {
+		return target;
 	}
 	
 	Script targetScript() {

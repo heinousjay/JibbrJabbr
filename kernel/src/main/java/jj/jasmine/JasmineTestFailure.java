@@ -17,19 +17,31 @@ package jj.jasmine;
 
 import java.util.Collection;
 
+import org.slf4j.Logger;
+
 /**
  * @author jason
  *
  */
 public class JasmineTestFailure extends JasmineTestResult {
 
-	JasmineTestFailure(Collection<Suite> suites) {
-		super(suites);
+	private final JasmineScriptEnvironment jse;
+	private final long executionTime;
+	private final Collection<Suite> suites;
+	
+	JasmineTestFailure(final JasmineScriptEnvironment jse, final long executionTime, final Collection<Suite> suites) {
+		this.jse = jse;
+		this.executionTime = executionTime;
+		this.suites = suites;
 	}
-
+	
 	@Override
-	protected String description() {
-		return "Jasmine test run failed:";
+	public void describeTo(Logger logger) {
+		StringBuilder result = new StringBuilder();
+		for (Suite suite : suites) {
+			result.append("\n").append(suite);
+		}
+		logger.error("Jasmine spec failure!\nrunning {} failed\ntargeting {}\nexecution time: {}ms\nresults:{}", jse.spec(), jse.target(), executionTime, result.toString());
 	}
 
 }

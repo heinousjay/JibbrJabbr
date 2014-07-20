@@ -64,6 +64,10 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 		return (AbstractScriptEnvironment)current();
 	}
 	
+	public <T extends ScriptEnvironment> T currentAs(Class<T> environmentClass) {
+		return environmentClass.cast(current());
+	}
+	
 	/**
 	 * Prepares a continuation and throws it.  Returns the ContinuationPending
 	 * so that callers can write

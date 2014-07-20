@@ -15,10 +15,6 @@
  */
 package jj.jasmine;
 
-import java.util.Collection;
-
-import org.slf4j.Logger;
-
 import jj.ServerLogger;
 import jj.logging.LoggedEvent;
 
@@ -29,24 +25,6 @@ import jj.logging.LoggedEvent;
 @ServerLogger
 public abstract class JasmineTestResult extends LoggedEvent {
 	
-	protected final Collection<Suite> suites;
 	
-	JasmineTestResult(final Collection<Suite> suites) {
-		this.suites = suites;
-	}
-	
-	protected abstract String description();
-	
-	@Override
-	public void describeTo(Logger logger) {
-		if (logger.isInfoEnabled()) {
-			StringBuilder result = new StringBuilder();
-			for (Suite suite : suites) {
-				result.append("\n").append(suite);
-			}
-			
-			logger.info(description() + "\n{}", result);
-		}
-	}
 
 }

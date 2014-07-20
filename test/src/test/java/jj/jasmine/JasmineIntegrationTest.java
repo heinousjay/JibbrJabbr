@@ -47,7 +47,7 @@ public class JasmineIntegrationTest {
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
 	
-	CountDownLatch latch = new CountDownLatch(2);
+	CountDownLatch latch;
 	
 	JasmineTestSuccess success;
 	JasmineTestFailure failure;
@@ -67,6 +67,8 @@ public class JasmineIntegrationTest {
 	@Test
 	public void test() throws Exception {
 		
+		latch = new CountDownLatch(2);
+		
 		// loading a script resource triggers the jasmine run
 		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test.js");
 		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test-failures.js");
@@ -75,12 +77,11 @@ public class JasmineIntegrationTest {
 		// maybe externalize timeouts?  or produce a factor on travis?
 		assertTrue("timed out", latch.await(3, SECONDS));
 		
-		// make sure!
+		// make sure we got notified as expected
 		assertNotNull(success);
 		assertNotNull(failure);
 		
-		// TODO assert the results of the test runs, which means
-		// TODO expose the results of the test runs
+		// contents of test results are verified in the unit tests
 		// TODO touch a script/spec and ensure it runs again?
 	}
 
