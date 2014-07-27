@@ -27,7 +27,7 @@ class ResourceCacheImpl implements ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	ConcurrentMap<ResourceKey, Resource> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
+	private final ConcurrentMap<ResourceKey, Resource> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
 
 	@Inject
 	ResourceCacheImpl(final ResourceCreators resourceCreators) {
