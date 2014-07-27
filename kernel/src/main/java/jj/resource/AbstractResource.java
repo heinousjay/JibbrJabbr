@@ -68,9 +68,9 @@ public abstract class AbstractResource implements Resource {
 	
 	protected final ResourceFinder resourceFinder;
 	
-	final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
+	private final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
 	
-	final AtomicBoolean alive = new AtomicBoolean(true);
+	private final AtomicBoolean alive = new AtomicBoolean(true);
 	
 	protected AbstractResource(final Dependencies dependencies) {
 		this.cacheKey = dependencies.resourceKey;
