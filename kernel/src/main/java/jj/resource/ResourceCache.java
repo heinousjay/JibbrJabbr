@@ -28,15 +28,15 @@ interface ResourceCache {
 	 * @param uri
 	 * @return
 	 */
-	List<Resource> findAllByUri(URI uri);
+	List<AbstractResource> findAllByUri(URI uri);
 
 	/**
 	 * @param cacheKey
 	 * @return
 	 */
-	Resource get(ResourceKey cacheKey);
+	AbstractResource get(ResourceKey cacheKey);
 	
-	Resource putIfAbsent(ResourceKey cacheKey, Resource resource);
+	AbstractResource putIfAbsent(ResourceKey cacheKey, AbstractResource resource);
 	
 	<T extends Resource> ResourceCreator<T> getCreator(final Class<T> type);
 
@@ -45,8 +45,8 @@ interface ResourceCache {
 	 * @param resource
 	 * @return
 	 */
-	boolean remove(ResourceKey cacheKey, Resource resource);
+	boolean remove(ResourceKey cacheKey, AbstractResource resource);
 	
-	boolean replace(ResourceKey key, Resource oldValue, Resource newValue);
+	boolean replace(ResourceKey key, AbstractResource oldValue, AbstractResource newValue);
 
 }

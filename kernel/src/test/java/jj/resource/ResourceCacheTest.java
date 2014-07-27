@@ -90,7 +90,7 @@ public class ResourceCacheTest extends RealResourceBase {
 		rc.putIfAbsent(sKey, sr);
 		rc.putIfAbsent(hKey, hr);
 		// when
-		List<Resource> resources = rc.findAllByUri(uri);
+		List<AbstractResource> resources = rc.findAllByUri(uri);
 		
 		// then
 		assertThat(resources.size(), is(2));

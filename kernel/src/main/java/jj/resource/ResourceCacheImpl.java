@@ -27,7 +27,7 @@ class ResourceCacheImpl implements ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	private final ConcurrentMap<ResourceKey, Resource> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
+	private final ConcurrentMap<ResourceKey, AbstractResource> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
 
 	@Inject
 	ResourceCacheImpl(final ResourceCreators resourceCreators) {
@@ -38,15 +38,24 @@ class ResourceCacheImpl implements ResourceCache {
 	 * @param uri
 	 * @return
 	 */
-	public List<Resource> findAllByUri(URI uri) {
+	public List<AbstractResource> findAllByUri(URI uri) {
 		
-		List<Resource> result = new ArrayList<>();
+		List<AbstractResource> result = new ArrayList<>();
 		
 		for (SimpleResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
-			Resource it = get(new ResourceKey(resourceCreator.type(), uri));
+			AbstractResource it = get(new ResourceKey(resourceCreator.type(), uri));
 			if (it != null) result.add(it);
 		}
 		return Collections.unmodifiableList(result);
+	}
+	
+	/**
+	 * Returns an unmodifiable snapshot of the current Resource instances.  This information is
+	 * immediately out of date, cannot be manipulated, and is in no particular order.
+	 * @return
+	 */
+	List<AbstractResource> allResources() {
+		return Collections.unmodifiableList(new ArrayList<>(resourceCache.values()));
 	}
 	
 	@Listener
@@ -60,22 +69,22 @@ class ResourceCacheImpl implements ResourceCache {
 	}
 	
 	@Override
-	public Resource get(ResourceKey key) {
+	public AbstractResource get(ResourceKey key) {
 		return resourceCache.get(key);
 	}
 
 	@Override
-	public Resource putIfAbsent(ResourceKey key, Resource value) {
+	public AbstractResource putIfAbsent(ResourceKey key, AbstractResource value) {
 		return resourceCache.putIfAbsent(key, value);
 	}
 
 	@Override
-	public boolean replace(ResourceKey key, Resource oldValue, Resource newValue) {
+	public boolean replace(ResourceKey key, AbstractResource oldValue, AbstractResource newValue) {
 		return resourceCache.replace(key, oldValue, newValue);
 	}
 
 	@Override
-	public boolean remove(ResourceKey cacheKey, Resource resource) {
+	public boolean remove(ResourceKey cacheKey, AbstractResource resource) {
 		return resourceCache.remove(cacheKey, resource);
 	}
 	
@@ -86,7 +95,7 @@ class ResourceCacheImpl implements ResourceCache {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
-		for (Entry<ResourceKey, Resource> entry : resourceCache.entrySet()) {
+		for (Entry<ResourceKey, AbstractResource> entry : resourceCache.entrySet()) {
 			sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
 		}
  		return sb.append("}").toString();

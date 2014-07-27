@@ -127,7 +127,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		if (resource == null) {
 			publisher.publish(new ResourceNotFound(resourceCreator.type(), base, name, arguments));
 		} else {
-			if (resourceCache.replace(cacheKey, result, resource)) {
+			if (resourceCache.replace(cacheKey, (AbstractResource)result, (AbstractResource)resource)) {
 				publisher.publish(new ResourceReloaded((AbstractResource)result));
 			} // else we wasted our time, something else replaced it already
 		} 
@@ -145,7 +145,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		if (resource == null) {
 			publisher.publish(new ResourceNotFound(resourceCreator.type(), base, name, arguments));
 		} else {
-			if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
+			if (resourceCache.putIfAbsent(cacheKey, (AbstractResource)resource) == null) {
 				// let the world know
 				publisher.publish(new ResourceLoaded((AbstractResource)resource));
 				
