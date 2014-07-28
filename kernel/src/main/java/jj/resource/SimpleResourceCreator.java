@@ -25,7 +25,18 @@ import jj.util.GenericUtils;
 
 /**
  * <p>
- * Extend this to declare a {@link ResourceCreator}
+ * Extend this to declare a {@link ResourceCreator}. It must be extended
+ * to allow the construction system to use the generic type parameter.
+ * 
+ * <p>
+ * If the resource being created has special creation needs, override
+ * {@link #create(Location, String, Object...)}, otherwise just extend
+ * this class and bind it.
+ * 
+ * <p>
+ * If all you need to do is validate the arguments are correct, override
+ * {@link #arguments(Location, String)} and return true if everything is
+ * fine, false if not.
  * 
  * @author jason
  *
