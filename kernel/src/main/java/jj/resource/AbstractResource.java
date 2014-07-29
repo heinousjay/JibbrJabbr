@@ -85,9 +85,9 @@ public abstract class AbstractResource implements Resource {
 		// FileResource or a DirectoryResource rooted in Base should be added to
 		// the directory structure.
 		if (
-			event.matches(this) && 
-			(this instanceof FileResource || this instanceof DirectoryResource) &&
-			this.base().parentInDirectory()
+			(this instanceof ParentedResource) && 
+			this.base().parentInDirectory() &&
+			event.matches(this)
 		) {
 			String parentName = name().substring(0, name().lastIndexOf('/') + 1);
 			if (!parentName.equals(name())) {

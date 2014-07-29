@@ -16,6 +16,7 @@
 package jj.script;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import jj.event.Publisher;
 import jj.util.Closer;
@@ -31,9 +32,19 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.json.JsonParser;
 
 /**
+ * <p>
  * Thin wrapper around the rhino context mechanism to take advantage of
  * try-with-resources, and to facilitate mocking and ensure all script
  * errors are logged
+ * 
+ * <p>
+ * Inject this as a {@link Provider}, then use it like:
+ * <pre class="brush:java">
+ * try (RhinoContext context = contextProvider.get()) {
+ *   context.whatever();
+ *   // and so on
+ * }
+ * </pre>
  * @author jason
  *
  */
@@ -88,6 +99,11 @@ public class RhinoContext implements Closer {
 	public ScriptableObject newObject(Scriptable scope) {
 		assertNotClosed();
 		return (ScriptableObject)context.newObject(scope);
+	}
+	
+	public Scriptable newArray(Scriptable scope, int length) {
+		assertNotClosed();
+		return context.newArray(scope, length);
 	}
 	
 	public ScriptableObject newChainedScope(Scriptable prototype) {
