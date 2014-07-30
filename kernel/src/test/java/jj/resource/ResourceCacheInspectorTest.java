@@ -33,23 +33,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Scriptable;
 
 /**
- * this test is going to be a bit of a pain i think.  gotta
- * mock up a few AbstractResource instances with dependencies
- * amongst themselves, including! circular. to ensure the information
- * is correctly output.
- * 
- * 
- * 
+ * the point here is to ensure we're outputting things in a basically correct
+ * manner.  the actual output
  * @author jason
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ResourceCacheAPITest {
+public class ResourceCacheInspectorTest {
 	
 	@Mock ResourceCacheImpl resourceCacheImpl;
 	RealRhinoContextProvider rhinoContextProvider;
 
-	ResourceCacheAPI rca;
+	ResourceCacheInspector rca;
 	
 	// few different types (we don't get many in the core)
 	// to validate that class information is passed through
@@ -82,7 +77,7 @@ public class ResourceCacheAPITest {
 		rhinoContextProvider = new RealRhinoContextProvider();
 		
 		try (RhinoContext context = rhinoContextProvider.get()) {
-			rca = new ResourceCacheAPI(resourceCacheImpl, rhinoContextProvider, context.initStandardObjects());
+			rca = new ResourceCacheInspector(resourceCacheImpl, rhinoContextProvider, context.initStandardObjects());
 		}
 	}
 	

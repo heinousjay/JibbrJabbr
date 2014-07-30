@@ -31,7 +31,7 @@ import jj.script.RhinoContext;
 /**
  * <p>
  * Exposes information about the Resource contents of ResourceCache to
- * the script API layer. In particular, mediates accessibility to the
+ * the script API layer. Specifically, it mediates accessibility to the
  * data structures, and performs transformation steps to collate interesting
  * facts about the various resources.
  * 
@@ -61,7 +61,7 @@ import jj.script.RhinoContext;
  * @author jason
  *
  */
-public class ResourceCacheAPI {
+public class ResourceCacheInspector {
 
 	private final List<AbstractResource> resources;
 	private final Provider<RhinoContext> contextProvider;
@@ -73,7 +73,7 @@ public class ResourceCacheAPI {
 	private final Scriptable links;
 	
 	@Inject
-	ResourceCacheAPI(
+	ResourceCacheInspector(
 		final ResourceCacheImpl resourceCache,
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global
@@ -95,6 +95,11 @@ public class ResourceCacheAPI {
 				reverseIndex.put(resource, index);
 				Scriptable rObj = context.newObject(global);
 				rObj.put("type", rObj, resource.getClass().getName());
+				rObj.put("name", rObj, resource.base() + "/" + resource.name());
+				rObj.put("index", rObj, index);
+				// if ParentedResource, put the path.  should be PathedResource? ugly but more accurate
+				// OR make a method in AbstractResource to describe itself to a Scriptable and let
+				// descendants override it or some set of templates or something
 				// TODO: other interesting info!
 				resultArray.put(index++, resultArray, rObj);
 			}
