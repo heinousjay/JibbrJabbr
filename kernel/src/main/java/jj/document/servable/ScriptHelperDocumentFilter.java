@@ -45,7 +45,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 	}
 
 	private void addScript(Document document, Element scriptTag) {
-		document.select("head").append(scriptTag.toString());
+		document.select("body").append(scriptTag.toString());
 	}
 
 	private void addScript(Document document, String uri) {
@@ -59,7 +59,9 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			
 			// internal version of jquery
 			// it's versioned already, so no need for sha-ing
-			addScript(documentRequestProcessor.document(), "/" + resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JQUERY_JS).name());
+			StaticResource jquery = resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JQUERY_JS);
+			jquery.addDependent(documentRequestProcessor.documentScriptEnvironment());
+			addScript(documentRequestProcessor.document(), "/" + jquery.name());
 			
 			// jj script
 			String wsURI = "ws" + 
@@ -68,8 +70,10 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				documentRequestProcessor.httpRequest().host() + 
 				scriptEnvironment.socketUri();
 			
+			StaticResource jj = resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS);
+			jj.addDependent(documentRequestProcessor.documentScriptEnvironment());
 			Element jjScript = 
-				makeScriptTag(documentRequestProcessor.document(), resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS).uri())
+				makeScriptTag(documentRequestProcessor.document(), jj.uri())
 				.attr("id", "jj-connector-script")
 				.attr("data-jj-socket-url", wsURI)
 				.attr(

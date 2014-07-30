@@ -190,5 +190,18 @@ public class ScriptHelperDocumentFilterTest {
 		// then
 		assertThat(document.select("#jj-connector-script").attr("data-jj-startup-messages"), is(messages.toString()));
 	}
+	
+	@Test
+	public void testDependencySetup() {
+		
+		// given our default state
+		
+		// when
+		filter.filter(documentRequestProcessor);
+		
+		//then
+		verify(jjJs).addDependent(documentScriptEnvironment);
+		verify(jqueryJs).addDependent(documentScriptEnvironment);
+	}
 
 }
