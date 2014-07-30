@@ -16,7 +16,7 @@
 package jj.configuration;
 
 import static jj.configuration.resolution.AppLocation.Base;
-import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
 
 import java.io.IOException;
 
@@ -123,7 +123,7 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 
 	@Override
 	public String name() {
-		return CONFIG_SCRIPT_NAME;
+		return CONFIG_NAME;
 	}
 
 	@Override

@@ -17,7 +17,7 @@ package jj.configuration;
 
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.*;
-import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
 
 import jj.resource.ResourceLoader;
 
@@ -43,7 +43,7 @@ public class ConfigurationScriptLoaderTest {
 		csp.configurationLoaded(null);
 		csp.start();
 		
-		verify(resourceLoader).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
+		verify(resourceLoader).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
 	}
 
 }

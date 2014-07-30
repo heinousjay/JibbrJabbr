@@ -101,6 +101,8 @@ public class ConfigurationScriptEnvironmentTest {
 		}
 		
 		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
+		verify(collector).configurationComplete();
+		verify(publisher).publish(isA(ConfigurationLoaded.class));
 	}
 
 }

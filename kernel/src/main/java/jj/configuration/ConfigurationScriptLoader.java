@@ -16,8 +16,8 @@
 package jj.configuration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.*;
-import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
+import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -54,7 +54,7 @@ class ConfigurationScriptLoader implements JJServerStartupListener {
 	}
 	
 	private void load() {
-		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_SCRIPT_NAME);
+		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
 	}
 
 	@Override
