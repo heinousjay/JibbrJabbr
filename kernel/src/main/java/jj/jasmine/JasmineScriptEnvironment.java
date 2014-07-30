@@ -89,17 +89,21 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		
 		this.global = global;
 		
-		// we need so much to be happy
+		// we need some scripts to be happy
 		target  = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, resourceLoaded.name);
 		spec    = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, name);
-		jasmine = resourceFinder.loadResource(ScriptResource.class, Assets,              JASMINE_JS);
-		boot    = resourceFinder.loadResource(ScriptResource.class, Assets,              JASMINE_BOOT_JS);
-		runner  = resourceFinder.loadResource(ScriptResource.class, Assets,              JASMINE_RUN_JS);
 		
 		// target is unlikely to be null, but maybe it got deleted while we were getting created
 		if (target == null || spec == null) {
 			throw new NoSuchResourceException(JasmineScriptEnvironment.class, name);
 		}
+		
+		// if we have a reason to load stuff, load stuff!
+		
+		jasmine = resourceFinder.loadResource(ScriptResource.class, Assets, JASMINE_JS);
+		boot    = resourceFinder.loadResource(ScriptResource.class, Assets, JASMINE_BOOT_JS);
+		runner  = resourceFinder.loadResource(ScriptResource.class, Assets, JASMINE_RUN_JS);
+		
 		assert jasmine != null : "can't find the jasmine script";
 		assert boot != null    : "can't find the jasmine-boot script";
 		assert runner != null  : "can't find the jasmine-run script";
