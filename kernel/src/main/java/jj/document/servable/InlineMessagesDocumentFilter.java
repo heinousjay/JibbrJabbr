@@ -1,13 +1,13 @@
 package jj.document.servable;
 
-import java.util.Map;
+import static jj.configuration.resolution.AppLocation.Virtual;
 
+import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
 import jj.execution.CurrentTask;
-import jj.messaging.PropertiesResource;
+import jj.messaging.MessagesResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceTask;
 
@@ -59,8 +59,8 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		this.currentTask = currentTask;
 	}
 	
-	private String findValue(String key, Map<String, String> bundle) {
-		return bundle.containsKey(key) ? bundle.get(key) : String.format(MISSING_KEY, key);
+	private String findValue(String key, MessagesResource resource) {
+		return resource.containsKey(key) ? resource.message(key) : String.format(MISSING_KEY, key);
 	}
 	
 	@Override
@@ -68,17 +68,14 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		
 		String baseName = documentRequestProcessor.baseName();
 		
-		PropertiesResource resource = 
-			currentTask.currentIs(ResourceTask.class) ?	
-			resourceFinder.loadResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties") :
-			resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, baseName + ".properties");
-			
+		MessagesResource resource = resource(baseName, Locale.US);
+		
 		if (resource != null) {
-			final Map<String, String> bundle = resource.properties();
+			resource.addDependent(documentRequestProcessor.documentScriptEnvironment());
 			
 			for (final Element el : documentRequestProcessor.document().select("[" + TEXT_KEY + "]")) {
 				String key = el.attr(TEXT_KEY);
-				String value = findValue(key, bundle);
+				String value = findValue(key, resource);
 				el.html(value).removeAttr(TEXT_KEY);
 			}
 			
@@ -87,7 +84,7 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 					if (attr.getKey().startsWith(ATTRIBUTE_KEY)) {
 						
 						String key = attr.getValue();
-						String value = findValue(key, bundle);
+						String value = findValue(key, resource);
 						
 						String newAttr = attr.getKey().substring(ATTRIBUTE_KEY.length());
 						el.attr(newAttr, value).removeAttr(attr.getKey());
@@ -97,12 +94,20 @@ class InlineMessagesDocumentFilter implements DocumentFilter {
 		}
 	}
 	
+	@Override
 	public boolean needsIO(final DocumentRequestProcessor documentRequestProcessor) {
 		return resourceFinder.findResource(
-			PropertiesResource.class, 
-			AppLocation.Base,
-			documentRequestProcessor.baseName() + ".properties"
+			MessagesResource.class, 
+			Virtual,
+			documentRequestProcessor.baseName(),
+			Locale.US
 		) == null;
+	}
+	
+	private MessagesResource resource(String baseName, Locale locale) {
+		return currentTask.currentIs(ResourceTask.class) ?	
+			resourceFinder.loadResource(MessagesResource.class, Virtual, baseName, locale) :
+			resourceFinder.findResource(MessagesResource.class, Virtual, baseName, locale);
 	}
 
 }

@@ -1,18 +1,18 @@
 package jj.document.servable;
 
+import static jj.configuration.resolution.AppLocation.Virtual;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Locale;
 
-import jj.configuration.resolution.AppLocation;
-import jj.document.HtmlResource;
+import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.InlineMessagesDocumentFilter;
 import jj.execution.CurrentTask;
-import jj.messaging.PropertiesResource;
+import jj.messaging.MessagesResource;
 import jj.resource.ResourceFinder;
 
 import org.jsoup.Jsoup;
@@ -27,12 +27,15 @@ public class InlineMessagesDocumentFilterTest {
 
 	String name;
 	@Mock ResourceFinder resourceFinder;
-	@Mock PropertiesResource propertiesResource;
-	HashMap<String, String> bundle;
+	@Mock MessagesResource resource;
+	
 	@Mock DocumentRequestProcessor documentRequestProcessor;
-	@Mock HtmlResource htmlResource;
+	@Mock DocumentScriptEnvironment dse;
+	
 	Document document;
+	
 	InlineMessagesDocumentFilter toTest;
+	
 	@Mock CurrentTask currentTask;
 	
 	@Test
@@ -41,20 +44,22 @@ public class InlineMessagesDocumentFilterTest {
 		// given
 		name = "index";
 		
-		bundle = new HashMap<>();
-		bundle.put("hi", "Why, hello there");
-		bundle.put("goodbye", "http://www.google.com/");
-		bundle.put("title", "this is the secret");
-		
-		given(propertiesResource.properties()).willReturn(bundle);
+		given(resource.containsKey("hi")).willReturn(true);
+		given(resource.message("hi")).willReturn("Why, hello there");
+		given(resource.containsKey("goodbye")).willReturn(true);
+		given(resource.message("goodbye")).willReturn("http://www.google.com/");
+		given(resource.containsKey("title")).willReturn(true);
+		given(resource.message("title")).willReturn("this is the secret");
 		
 		document = Jsoup.parse(
-			"<div data-i18n-class='missing-1' data-i18n='missing-2'></div><a id=\"test\" data-i18n-href=\"goodbye\" data-i18n-title=\"title\" data-i18n=\"hi\">HI MESSAGE HERE</a><p data-i18n=\"hi\">HI MESSAGE HERE ALSO</p>");
-		given(documentRequestProcessor.document()).willReturn(document);
+			"<div data-i18n-class='missing-1' data-i18n='missing-2'></div><a id=\"test\" data-i18n-href=\"goodbye\" data-i18n-title=\"title\" data-i18n=\"hi\">HI MESSAGE HERE</a><p data-i18n=\"hi\">HI MESSAGE HERE ALSO</p>"
+		);
 		
+		given(documentRequestProcessor.document()).willReturn(document);
+		given(documentRequestProcessor.documentScriptEnvironment()).willReturn(dse);
 		given(documentRequestProcessor.baseName()).willReturn(name);
 		
-		given(resourceFinder.findResource(PropertiesResource.class, AppLocation.Base, name + ".properties")).willReturn(propertiesResource);
+		given(resourceFinder.findResource(MessagesResource.class, Virtual, name, Locale.US)).willReturn(resource);
 		
 		toTest = new InlineMessagesDocumentFilter(resourceFinder, currentTask);
 		
@@ -69,6 +74,8 @@ public class InlineMessagesDocumentFilterTest {
 		assertThat(document.select("p").text(), is("Why, hello there"));
 		assertThat(document.select("a").attr("href"), is("http://www.google.com/"));
 		assertThat(document.select("a").attr("title"), is("this is the secret"));
+		
+		verify(resource).addDependent(dse);
 	}
 
 }

@@ -19,8 +19,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import jj.configuration.resolution.AppLocation;
 import jj.resource.AbstractResource;
+import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
 import jj.util.SHA1Helper;
 
@@ -61,6 +64,7 @@ public class MessagesResource extends AbstractResource {
 	
 	private final String sha;
 
+	@Inject
 	MessagesResource(
 		final Dependencies dependencies,
 		final String name,
@@ -74,6 +78,9 @@ public class MessagesResource extends AbstractResource {
 		
 		this.propertiesResources = findResources(resourceFinder);
 		
+		if (propertiesResources.length == 0) {
+			throw new NoSuchResourceException(MessagesResource.class, name);
+		}
 		
 		String[] shas = new String[propertiesResources.length];
 		int count = 0;
@@ -123,6 +130,18 @@ public class MessagesResource extends AbstractResource {
 	@Override
 	public String sha1() {
 		return sha;
+	}
+	
+	public boolean containsKey(String key) {
+		boolean result = false;
+		for (PropertiesResource resource : propertiesResources) {
+			if (resource.properties().containsKey(key)) {
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
 	}
 	
 	public String message(String key) {
