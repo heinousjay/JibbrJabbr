@@ -4,9 +4,13 @@
 
 module.exports = function() {
 
+	// ResourceCacheInspector directly outputs the javascript objects
+	// because it is a sweetheart
 	var rci = inject('jj.resource.ResourceCacheInspector');
+	
 	return {
 		nodes: rci.nodes(),
-		links: rci.links()
+		links: rci.links(),
+		types: rci.types()
 	}
 }

@@ -42,6 +42,7 @@ import org.mozilla.javascript.Scriptable;
 public class ResourceCacheInspectorTest {
 	
 	@Mock ResourceCacheImpl resourceCacheImpl;
+	@Mock ResourceCreators resourceCreators;
 	RealRhinoContextProvider rhinoContextProvider;
 
 	ResourceCacheInspector rca;
@@ -74,27 +75,34 @@ public class ResourceCacheInspectorTest {
 		total = resources.size();
 		given(resourceCacheImpl.allResources()).willReturn(resources);
 		
+		given(resourceCreators.knownResourceTypeNames()).willReturn(Arrays.asList("type1", "type2"));
+		
 		rhinoContextProvider = new RealRhinoContextProvider();
 		
 		try (RhinoContext context = rhinoContextProvider.get()) {
-			rca = new ResourceCacheInspector(resourceCacheImpl, rhinoContextProvider, context.initStandardObjects());
+			rca = new ResourceCacheInspector(resourceCacheImpl, resourceCreators, rhinoContextProvider, context.initStandardObjects());
 		}
 	}
 	
 	@Test
-	public void test() {
+	public void testNodes() {
 		Scriptable nodesArray = rca.nodes();
 		assertThat(nodesArray, is(notNullValue()));
 		assertThat(nodesArray.get("length", nodesArray), is((double)total)); // js numbers are doubles!
 		for (int i = 0; i < total; ++i) {
 			Scriptable node = (Scriptable)nodesArray.get(i, nodesArray);
 			assertThat(node, is(notNullValue()));
-			assertThat(node.get("type", node), is(resources.get(i).getClass().getName()));
+			verify(resources.get(i)).describe(node);
 		}
+		
+	}
+	
+	@Test
+	public void testLinks() {
 		
 		Scriptable linksArray = rca.links();
 		assertThat(linksArray, is(notNullValue()));
-		assertThat(linksArray.get("length", nodesArray), is(6D));
+		assertThat(linksArray.get("length", linksArray), is(6D));
 		
 		Scriptable link = (Scriptable)linksArray.get(0, linksArray);
 		assertThat(link.get("source", link), is(0));
@@ -119,6 +127,15 @@ public class ResourceCacheInspectorTest {
 		link = (Scriptable)linksArray.get(5, linksArray);
 		assertThat(link.get("source", link), is(2));
 		assertThat(link.get("target", link), is(6));
+	}
+	
+	@Test
+	public void testTypes() {
+		Scriptable typeArray = rca.types();
+		assertThat(typeArray, is(notNullValue()));
+		assertThat(typeArray.get("length", typeArray), is(2D));
+		assertThat(typeArray.get(0, typeArray), is("type1"));
+		assertThat(typeArray.get(1, typeArray), is("type2"));
 	}
 
 }

@@ -15,13 +15,19 @@
  */
 package jj.resource;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
+ * Encapsulates the map of resource types to the creator instance
+ * 
  * @author jason
  *
  */
@@ -30,9 +36,6 @@ class ResourceCreators implements Iterable<SimpleResourceCreator<? extends Abstr
 	
 	private final Map<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreators;
 
-	/**
-	 * 
-	 */
 	@Inject
 	ResourceCreators(final Map<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreators) {
 		this.resourceCreators = Collections.unmodifiableMap(resourceCreators);
@@ -55,4 +58,12 @@ class ResourceCreators implements Iterable<SimpleResourceCreator<? extends Abstr
 		return resourceCreators.values().iterator();
 	}
 
+	public List<String> knownResourceTypeNames() {
+		List<String> result =
+			new ArrayList<>(resourceCreators.keySet().stream().map(Class::getName).collect(Collectors.toList()));
+		
+		result.sort(null);
+		
+		return result;
+	}
 }

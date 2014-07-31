@@ -32,6 +32,7 @@ import jj.event.Publisher;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
+import jj.util.Clock;
 import jj.util.Closer;
 
 /**
@@ -54,6 +55,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		
 		@Inject
 		Dependencies(
+			final Clock clock,
 			final ResourceKey cacheKey,
 			final Provider<RhinoContext> contextProvider,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
@@ -63,7 +65,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Publisher publisher,
 			final ResourceFinder resourceFinder
 		) {
-			super(cacheKey, AppLocation.Virtual, publisher, resourceFinder);
+			super(clock, cacheKey, AppLocation.Virtual, publisher, resourceFinder);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;

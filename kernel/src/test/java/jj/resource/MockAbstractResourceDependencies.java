@@ -19,6 +19,7 @@ import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.Base;
 import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;
+import jj.util.MockClock;
 
 /**
  * to simplify resource testing
@@ -31,19 +32,23 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	public final DirectoryResource rootDirectory = mock(DirectoryResource.class);
 
 	public MockAbstractResourceDependencies(Location base) {
-		super(mock(ResourceKey.class), base, mock(Publisher.class), mock(ResourceFinder.class));
+		super(new MockClock(), mock(ResourceKey.class), base, mock(Publisher.class), mock(ResourceFinder.class));
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base) {
-		super(resourceKey, base, mock(Publisher.class), mock(ResourceFinder.class));
+		super(new MockClock(), resourceKey, base, mock(Publisher.class), mock(ResourceFinder.class));
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, Publisher publisher) {
-		super(resourceKey, base, publisher, mock(ResourceFinder.class));
+		super(new MockClock(), resourceKey, base, publisher, mock(ResourceFinder.class));
 	}
 	
 	{
 		given(resourceFinder.findResource(DirectoryResource.class, Base, "")).willReturn(rootDirectory);
+	}
+	
+	public MockClock clock() {
+		return (MockClock)clock;
 	}
 
 	public ResourceFinder resourceFinder() {

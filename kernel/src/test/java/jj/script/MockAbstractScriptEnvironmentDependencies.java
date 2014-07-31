@@ -23,6 +23,7 @@ import jj.event.Publisher;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
 import jj.script.AbstractScriptEnvironment.Dependencies;
+import jj.util.MockClock;
 
 /**
  * @author jason
@@ -34,6 +35,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 
 	public MockAbstractScriptEnvironmentDependencies() {
 		super(
+			new MockClock(),
 			mock(ResourceKey.class),
 			new MockRhinoContextProvider(),
 			mock(MockPendingKeyProvider.class),
@@ -47,6 +49,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 
 	public MockAbstractScriptEnvironmentDependencies(RealRhinoContextProvider rhinoContextProvider) {
 		super(
+			new MockClock(),
 			mock(ResourceKey.class),
 			rhinoContextProvider,
 			mock(MockPendingKeyProvider.class),
@@ -56,6 +59,10 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(Publisher.class),
 			mock(ResourceFinder.class)
 		);
+	}
+	
+	public MockClock clock() {
+		return (MockClock)clock;
 	}
 	
 	public ResourceKey resourceCacheKey() {

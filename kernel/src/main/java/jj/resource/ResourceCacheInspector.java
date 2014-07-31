@@ -71,10 +71,12 @@ public class ResourceCacheInspector {
 	
 	private final Scriptable nodes;
 	private final Scriptable links;
+	private final Scriptable types;
 	
 	@Inject
 	ResourceCacheInspector(
 		final ResourceCacheImpl resourceCache,
+		final ResourceCreators resourceCreators,
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global
 	) {
@@ -84,6 +86,7 @@ public class ResourceCacheInspector {
 		
 		nodes = makeNodes();
 		links = makeLinks();
+		types = makeTypes(resourceCreators.knownResourceTypeNames());
 	}
 	
 	private Scriptable makeNodes() {
@@ -94,13 +97,7 @@ public class ResourceCacheInspector {
 			for (AbstractResource resource : resources) {
 				reverseIndex.put(resource, index);
 				Scriptable rObj = context.newObject(global);
-				rObj.put("type", rObj, resource.getClass().getName());
-				rObj.put("name", rObj, resource.base() + "/" + resource.name());
-				rObj.put("index", rObj, index);
-				// if ParentedResource, put the path.  should be PathedResource? ugly but more accurate
-				// OR make a method in AbstractResource to describe itself to a Scriptable and let
-				// descendants override it or some set of templates or something
-				// TODO: other interesting info!
+				resource.describe(rObj);
 				resultArray.put(index++, resultArray, rObj);
 			}
 			return resultArray;
@@ -124,11 +121,26 @@ public class ResourceCacheInspector {
 		}
 	}
 	
+	private Scriptable makeTypes(List<String> typeNames) {
+		try (RhinoContext context = contextProvider.get()) {
+			Scriptable resultArray = context.newArray(global, typeNames.size());
+			int index = 0;
+			for (String typeName : typeNames) {
+				resultArray.put(index++, resultArray, typeName);
+			}
+			return resultArray;
+		}
+	}
+	
 	public Scriptable nodes() {
 		return nodes;
 	}
 	
 	public Scriptable links() {
 		return links;
+	}
+	
+	public Scriptable types() {
+		return types;
 	}
 }

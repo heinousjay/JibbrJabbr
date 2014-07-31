@@ -23,9 +23,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import org.mozilla.javascript.Scriptable;
+
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
+import jj.util.Clock;
 
 /**
  * internal helper for manipulating a resource.  ALL RESOURCES
@@ -39,6 +42,7 @@ public abstract class AbstractResource implements Resource {
 	
 	public static class Dependencies {
 		
+		protected final Clock clock;
 		protected final ResourceKey resourceKey;
 		protected final Location base;
 		protected final Publisher publisher;
@@ -46,11 +50,13 @@ public abstract class AbstractResource implements Resource {
 		
 		@Inject
 		public Dependencies(
+			final Clock clock,
 			final ResourceKey resourceKey,
 			final Location base,
 			final Publisher publisher,
 			final ResourceFinder resourceFinder
 		) {
+			this.clock = clock;
 			this.resourceKey = resourceKey;
 			this.base = base;
 			this.publisher = publisher;
@@ -61,6 +67,8 @@ public abstract class AbstractResource implements Resource {
 	protected static final Object[] EMPTY_ARGS = {};
 	
 	protected final ResourceKey cacheKey;
+	
+	protected final long creationTime;
 	
 	protected final Location base;
 	
@@ -73,6 +81,7 @@ public abstract class AbstractResource implements Resource {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	
 	protected AbstractResource(final Dependencies dependencies) {
+		this.creationTime = dependencies.clock.time();
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
 		this.publisher = dependencies.publisher;
@@ -141,6 +150,21 @@ public abstract class AbstractResource implements Resource {
 	
 	Collection<AbstractResource> dependents() {
 		return Collections.unmodifiableCollection(dependents.values());
+	}
+	
+	void describe(Scriptable to) {
+		// put the basics in place, then start calling
+		// downstream to add more?  sure
+		// certain stuff can be done here anyway?
+		// ugh. lee.
+		
+		// don't forget to convert to strings if needed
+		to.put("type",         to, getClass().getName());
+		to.put("name",         to, name());
+		to.put("base",         to, base().toString());
+		to.put("uri",          to, uri());
+		to.put("sha1",         to, sha1());
+		to.put("creationTime", to, creationTime);
 	}
 	
 	public boolean alive() {
