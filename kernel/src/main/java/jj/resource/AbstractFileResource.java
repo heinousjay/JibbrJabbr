@@ -22,14 +22,6 @@ import jj.util.SHA1Helper;
  */
 public abstract class AbstractFileResource extends AbstractResource implements FileResource {
 	
-	// beyond this, we don't keep bytes
-	private static final long MAX_IN_MEMORY_SIZE  = 1000000;
-	// beyond this, we don't read the SHA inside here
-	private static final long MAX_READ_AND_DIGEST = 10000000;
-	
-	private static final String TOO_LARGE_ASSERTION_ERROR =
-		AbstractFileResource.class.getSimpleName() + " asked to load a file over " + MAX_IN_MEMORY_SIZE + " bytes";
-	
 	protected final String baseName;
 	protected final Path path;
 	protected final FileTime lastModified;
@@ -72,36 +64,39 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 			}
 			
 			size = attributes.size();
-			boolean large = size > MAX_IN_MEMORY_SIZE;
+			boolean large = size > dependencies.resourceConfiguration.maxFileSizeToLoad();
 			
-			assert !(large && keepBytes) : TOO_LARGE_ASSERTION_ERROR;
+			if (large && keepBytes) {
+				throw new ResourceNotViableException(path, 
+					"resource is " + size + " bytes but configured maximum is " + 
+					dependencies.resourceConfiguration.maxFileSizeToLoad() + " bytes"
+				);
+			}
 			
 			this.baseName = name;
 			this.path = path;
 			this.lastModified = attributes.lastModifiedTime();
 			
-			if (keepBytes) {
+			if (keepBytes) { // read it all in
 				byteBuffer = readAllBytes(path);
 				sha1 = SHA1Helper.keyFor(byteBuffer);
-			} else if (size <= MAX_READ_AND_DIGEST) {
+			// read the SHA-1 directly if the size is under the configured limit
+			// or we're getting it from a jar
+			} else if (!large || path.getFileSystem() != FileSystems.getDefault()) {
 				byteBuffer = null;
 				sha1 = SHA1Helper.keyFor(path);
-			} else {
+			} else { // avoid reading the sha1 directly, try to save it
 				byteBuffer = null;
-				sha1 = null;
+				Sha1Resource sha1Resource = resourceFinder.loadResource(Sha1Resource.class, base, name, this);
+				assert sha1Resource.representedFileSize() == size;
+				sha1 = sha1Resource.representedSha();
 			}
 			
 		} catch (IOException ioe) {
 			throw new ResourceNotViableException(path, ioe);
 		}
 		
-		String sha = sha1();
-		StringBuilder sb = new StringBuilder("/");
-		if (sha != null) {
-			sb.append(sha).append("/");
-		}
-		
-		uri = sb.append(name).toString();
+		uri = "/" + sha1 + "/" + name;
 	}
 	
 	private ByteBuf readAllBytes(final Path path) throws IOException {
@@ -142,5 +137,9 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	@ResourceThread
 	public boolean needsReplacing() throws IOException {
 		return (path.getFileSystem() == FileSystems.getDefault()) && lastModified.compareTo(Files.getLastModifiedTime(path)) < 0;
+	}
+
+	public FileTime lastModified() {
+		return lastModified;
 	}
 }

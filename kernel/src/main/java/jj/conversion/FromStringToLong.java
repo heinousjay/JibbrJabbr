@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.sha1;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import jj.resource.SimpleResourceCreator;
+package jj.conversion;
 
 /**
  * @author jason
  *
  */
-@Singleton
-public class Sha1ResourceCreator extends SimpleResourceCreator<Sha1Resource> {
+class FromStringToLong implements Converter<String, Long> {
 
-	@Inject
-	Sha1ResourceCreator(final Dependencies dependencies) {
-		super(dependencies);
+	@Override
+	public Long convert(String in) {
+		try {
+			return Long.decode(in);
+		} catch (NumberFormatException nfe) {
+			return null;
+		}
 	}
+
 }

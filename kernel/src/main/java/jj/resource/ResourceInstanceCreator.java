@@ -56,6 +56,18 @@ public class ResourceInstanceCreator {
 	) {
 		final Path path = pathResolver.resolvePath(base, name);
 		
+		return createResource(resourceClass, resourceKey, base, name, path, args);
+	}
+		
+	public <T extends Resource> T createResource(
+		final Class<T> resourceClass,
+		final ResourceKey resourceKey,
+		final Location base,
+		final String name,
+		final Path path,
+		final Object...args
+	) {	
+		
 		try {
 			
 			try {

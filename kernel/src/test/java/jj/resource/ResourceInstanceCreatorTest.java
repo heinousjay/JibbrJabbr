@@ -86,6 +86,7 @@ public class ResourceInstanceCreatorTest  {
 			protected void configure() {
 				bind(Publisher.class).toInstance(mock(Publisher.class));
 				bind(ResourceFinder.class).toInstance(mock(ResourceFinder.class));
+				bind(ResourceConfiguration.class).toInstance(mock(ResourceConfiguration.class));
 			}
 		}, moduleCaptor.getValue());
 		

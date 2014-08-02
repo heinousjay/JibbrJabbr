@@ -1,8 +1,6 @@
 package jj.resource;
 
 import jj.JJModule;
-import jj.resource.sha1.Sha1Resource;
-import jj.resource.sha1.Sha1ResourceCreator;
 import jj.resource.stat.ic.StaticResource;
 import jj.resource.stat.ic.StaticResourceCreator;
 

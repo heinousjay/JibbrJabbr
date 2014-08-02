@@ -32,23 +32,28 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	public final DirectoryResource rootDirectory = mock(DirectoryResource.class);
 
 	public MockAbstractResourceDependencies(Location base) {
-		super(new MockClock(), mock(ResourceKey.class), base, mock(Publisher.class), mock(ResourceFinder.class));
+		super(new MockClock(), mock(ResourceConfiguration.class), mock(ResourceKey.class), base, mock(Publisher.class), mock(ResourceFinder.class));
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base) {
-		super(new MockClock(), resourceKey, base, mock(Publisher.class), mock(ResourceFinder.class));
+		super(new MockClock(), mock(ResourceConfiguration.class), resourceKey, base, mock(Publisher.class), mock(ResourceFinder.class));
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, Publisher publisher) {
-		super(new MockClock(), resourceKey, base, publisher, mock(ResourceFinder.class));
+		super(new MockClock(), mock(ResourceConfiguration.class), resourceKey, base, publisher, mock(ResourceFinder.class));
 	}
 	
 	{
 		given(resourceFinder.findResource(DirectoryResource.class, Base, "")).willReturn(rootDirectory);
+		given(resourceConfiguration.maxFileSizeToLoad()).willReturn(1024 * 1024 * 10L);
 	}
 	
 	public MockClock clock() {
 		return (MockClock)clock;
+	}
+	
+	public ResourceConfiguration resourceConfiguration() {
+		return resourceConfiguration;
 	}
 
 	public ResourceFinder resourceFinder() {

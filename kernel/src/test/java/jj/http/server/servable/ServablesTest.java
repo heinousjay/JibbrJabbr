@@ -26,7 +26,6 @@ import java.util.Set;
 import jj.css.StylesheetResource;
 import jj.http.uri.URIMatch;
 import jj.resource.Resource;
-import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
@@ -45,7 +44,6 @@ public class ServablesTest {
 	URIMatch cssMatch = new URIMatch("/something.css");
 	URIMatch otherMatch = new URIMatch("/other.thing");
 	
-	@Mock Servable<Sha1Resource> assetServable;
 	@Mock Servable<StylesheetResource> cssServable;
 	@Mock Servable<StaticResource> staticServable;
 	
@@ -54,13 +52,11 @@ public class ServablesTest {
 	@Before
 	public void before() {
 		
-		given(assetServable.isMatchingRequest(otherMatch)).willReturn(true);
 		given(cssServable.isMatchingRequest(cssMatch)).willReturn(true);
 		given(staticServable.isMatchingRequest(otherMatch)).willReturn(true);
 		given(staticServable.isMatchingRequest(cssMatch)).willReturn(true);
 		
 		Set<Servable<? extends Resource>>  servablesSet = new HashSet<>();
-		servablesSet.add(assetServable);
 		servablesSet.add(cssServable);
 		servablesSet.add(staticServable);
 		
@@ -78,8 +74,8 @@ public class ServablesTest {
 		assertThat(result, containsInAnyOrder((Servable<? extends Resource>)cssServable, staticServable));
 		
 		result = servables.findMatchingServables(otherMatch);
-		assertThat(result.size(), is(2));
-		assertThat(result, containsInAnyOrder((Servable<? extends Resource>)assetServable, staticServable));
+		assertThat(result.size(), is(1));
+		assertThat(result, containsInAnyOrder(staticServable));
 	}
 
 }

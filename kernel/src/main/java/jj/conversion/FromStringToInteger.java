@@ -19,7 +19,7 @@ package jj.conversion;
  * @author jason
  *
  */
-public class FromStringToInteger implements Converter<String, Integer> {
+class FromStringToInteger implements Converter<String, Integer> {
 
 	@Override
 	public Integer convert(String in) {

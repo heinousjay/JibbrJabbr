@@ -29,6 +29,7 @@ public class ConverterSetMaker {
 		output.add(new FromStringToBoolean());
 		output.add(new FromStringToPath());
 		output.add(new FromStringToInteger());
+		output.add(new FromStringToLong());
 		output.add(new FromDoubleToInteger());
 		return output;
 	}

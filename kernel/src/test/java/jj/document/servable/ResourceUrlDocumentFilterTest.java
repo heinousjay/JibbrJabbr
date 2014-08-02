@@ -22,7 +22,6 @@ import jj.css.StylesheetResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.ResourceUrlDocumentFilter;
 import jj.http.server.MockServablesRule;
-import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.jsoup.Jsoup;
@@ -48,8 +47,8 @@ public class ResourceUrlDocumentFilterTest {
 	Document document;
 	
 	@Mock StylesheetResource cssResource;
-	@Mock StaticResource staticResource;
-	@Mock Sha1Resource sha1Resource;
+	@Mock StaticResource staticResource1;
+	@Mock StaticResource staticResource2;
 	
 	ResourceUrlDocumentFilter filter;
 	
@@ -70,11 +69,11 @@ public class ResourceUrlDocumentFilterTest {
 		given(m.servables.loadResource(m.cssUri)).willReturn(cssResource);
 		given(cssResource.uri()).willReturn("/substitutesha" + m.cssUri.uri);
 		
-		given(m.servables.loadResource(m.assetUri)).willReturn(sha1Resource);
-		given(sha1Resource.uri()).willReturn("/substitutesha" + m.assetUri.uri);
+		given(m.servables.loadResource(m.assetUri)).willReturn(staticResource2);
+		given(staticResource2.uri()).willReturn("/substitutesha" + m.assetUri.uri);
 		
-		given(m.servables.loadResource(m.staticUri)).willReturn(staticResource);
-		given(staticResource.uri()).willReturn("/substitutesha" + m.staticUri.uri);
+		given(m.servables.loadResource(m.staticUri)).willReturn(staticResource1);
+		given(staticResource1.uri()).willReturn("/substitutesha" + m.staticUri.uri);
 		
 		given(documentRequestProcessor.uri()).willReturn("/");
 		filter.filter(documentRequestProcessor);

@@ -19,7 +19,7 @@ package jj.conversion;
  * @author jason
  *
  */
-public class FromDoubleToInteger implements Converter<Double, Integer> {
+class FromDoubleToInteger implements Converter<Double, Integer> {
 
 	@Override
 	public Integer convert(Double in) {

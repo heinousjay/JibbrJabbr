@@ -36,6 +36,7 @@ import jj.css.LessConfiguration;
 import jj.document.DocumentConfiguration;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.resource.ResourceConfiguration;
 import jj.script.ScriptError;
 import jj.testing.JibbrJabbrTestServer;
 
@@ -71,6 +72,9 @@ public class ConfigurationSystemTest {
 	@Inject
 	private LessConfiguration lessConfiguration;
 	
+	@Inject
+	private ResourceConfiguration resourceConfiguration;
+	
 	volatile boolean loaded;
 	final CountDownLatch loadedLatch = new CountDownLatch(1);
 	volatile boolean failed;
@@ -105,7 +109,6 @@ public class ConfigurationSystemTest {
 		assertThat(bindings.get(1).host(), is("localhost"));
 		assertThat(bindings.get(1).port(), is(8090));
 		
-		
 		// okay good enough.  NOW! make sure that injected configuration is also correct
 		assertThat(documentConfiguration.clientDebug(), is(true));
 		assertThat(documentConfiguration.showParsingErrors(), is(true));
@@ -124,6 +127,8 @@ public class ConfigurationSystemTest {
 		assertTrue(lessConfiguration.cleancss());
 		assertThat(lessConfiguration.optimization(), is(2));
 		assertThat(lessConfiguration.maxLineLen(), is(1024));
+		
+		assertThat(resourceConfiguration.maxFileSizeToLoad(), is(102400000000L));
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String destination) {

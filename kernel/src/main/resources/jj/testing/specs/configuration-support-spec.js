@@ -75,6 +75,14 @@ describe("function makeIntProperty", function() {
 		expect(function() {
 			testFunc(true)
 		}).toThrow(new TypeError("name must be an integer"));
+		
+		expect(function() {
+			testFunc(java.lang.Integer.MAX_VALUE + 1)
+		}).toThrow(new TypeError("name is out of integer range"));
+		
+		expect(function() {
+			testFunc(java.lang.Integer.MIN_VALUE - 1)
+		}).toThrow(new TypeError("name is out of integer range"));
 	});
 	
 	it("sets integer values to the collector", function() {
@@ -101,6 +109,51 @@ describe("function makeIntProperty", function() {
 		}
 		
 		var testFunc = module.exports.makeIntProperty('base', 'name', validator);
+		
+		testFunc(1);
+		expect(name).toBe("name");
+		expect(arg).toBe(1);
+	});
+});
+
+describe("function makeLongProperty", function() {
+	
+	it("rejects values that are not longs", function() {
+		var testFunc = module.exports.makeLongProperty('base', 'name');
+		
+		expect(function() {
+			testFunc("not an int")
+		}).toThrow(new TypeError("name must be an long"));
+		
+		expect(function() {
+			testFunc(true)
+		}).toThrow(new TypeError("name must be an long"));
+	});
+	
+	it("sets long values to the collector", function() {
+		var testFunc = module.exports.makeLongProperty('base', 'name');
+		
+		var val = 1;
+		testFunc(val);
+		expect(location).toBe("basename");
+		expect(value).toBeCloseTo(val, 0);
+
+		val = 5000;
+		testFunc(val);
+		expect(location).toBe("basename");
+		expect(value).toBeCloseTo(val, 0);
+		
+	});
+	
+	it("calls a given validator function", function() {
+		var name, arg;
+		
+		function validator(n, a) {
+			name = n;
+			arg = a;
+		}
+		
+		var testFunc = module.exports.makeLongProperty('base', 'name', validator);
 		
 		testFunc(1);
 		expect(name).toBe("name");

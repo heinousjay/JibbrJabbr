@@ -106,6 +106,12 @@ public class ConvertersTest {
 		assertThat(converters.convert("1", int.class), is(1));
 	}
 	
+	@Test
+	public void testFromStringToLong() {
+		long now = System.currentTimeMillis();
+		assertThat(converters.convert(String.valueOf(now), long.class), is(now));
+	}
+	
 	enum ConverterEnums {
 		One,
 		Two,

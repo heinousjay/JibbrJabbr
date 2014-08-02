@@ -8,7 +8,6 @@ import static jj.configuration.resolution.AppLocation.*;
 import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
 import jj.execution.CurrentTask;
-import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Test;
@@ -126,7 +125,7 @@ public class ResourceFinderImplTest {
 		
 		verify(resourceCache).putIfAbsent(staticResource2Key, staticResource2);
 		verify(resourceCache).putIfAbsent(sha1Resource1Key, sha1Resource1);
-		verify(resourceWatchService, times(2)).watch(any(ParentedResource.class));
+		verify(resourceWatchService, times(1)).watch(any(ParentedResource.class));
 		
 		verify(publisher, times(2)).publish(eventCaptor.capture());
 		// validate the events? probably

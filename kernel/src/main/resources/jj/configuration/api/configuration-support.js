@@ -21,8 +21,20 @@ module.exports = {
 		return function(arg) {
 			arg = parseInt(arg);
 			if (isNaN(arg)) { throw new TypeError(name + ' must be an integer'); }
+			if (arg > java.lang.Integer.MAX_VALUE || arg < java.lang.Integer.MIN_VALUE) { throw new TypeError(name + ' is out of integer range'); }
 			if (typeof validator == 'function') { validator(name, arg); }
 			addElement(base + name, new java.lang.Integer(arg));
+			return this;
+		}
+	},
+
+	makeLongProperty: function(base, name, validator) {
+		return function(arg) {
+			arg = parseInt(arg);
+			if (isNaN(arg)) { throw new TypeError(name + ' must be an long'); }
+			// no need for range checks, javascript stops at 53 bits.  or something
+			if (typeof validator == 'function') { validator(name, arg); }
+			addElement(base + name, new java.lang.Long(arg));
 			return this;
 		}
 	},

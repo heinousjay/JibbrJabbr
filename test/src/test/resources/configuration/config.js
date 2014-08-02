@@ -55,7 +55,8 @@ require('jj/document-system-configuration')
 	.removeComments(false);
 
 require('jj/resource-system-configuration')
-	.ioThreads(10);
+	.ioThreads(10)
+	.maxFileSizeToLoad(102400000000); // test a bigun
 
 // this is a silly helper, it just copies the exports
 // of the given script into the given object

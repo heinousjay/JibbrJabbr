@@ -88,7 +88,7 @@ public class ResourceSystemIntegrationTest {
 		assertThat(finder.findResource(DirectoryResource.class, Base, "deep/nesting"), is(notNullValue()));
 		
 		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
-
+		
 		dse = finder.findResource(DocumentScriptEnvironment.class, Virtual, "deep/nested");
 		htmlResource = finder.findResource(HtmlResource.class, Base, "deep/nested.html");
 		

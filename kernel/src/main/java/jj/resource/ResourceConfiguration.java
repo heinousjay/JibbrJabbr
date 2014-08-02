@@ -23,10 +23,16 @@ import jj.configuration.Default;
  */
 public interface ResourceConfiguration {
 
+	// 10 megabytes is the default limit
+	static final long MAX_IN_MEMORY_SIZE  = 1024 * 1024 * 10;
+	
 	/**
 	 * The maximum number of IO workers that will be available.
 	 * @return
 	 */
 	@Default("20")
 	int ioThreads();
+	
+	@Default(MAX_IN_MEMORY_SIZE + "") // hi java! you suck sometimes!
+	long maxFileSizeToLoad();
 }

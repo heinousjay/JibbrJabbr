@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.resource.sha1.Sha1Resource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Test;
@@ -51,7 +50,7 @@ public class ResourceCreatorsTest {
 		
 		assertThat(rc.knownResourceTypeNames(), contains(
 			"jj.resource.AbstractResource",
-			"jj.resource.sha1.Sha1Resource",
+			"jj.resource.Sha1Resource",
 			"jj.resource.stat.ic.StaticResource"
 		));
 	}

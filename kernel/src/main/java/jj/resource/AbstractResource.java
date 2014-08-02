@@ -43,6 +43,7 @@ public abstract class AbstractResource implements Resource {
 	public static class Dependencies {
 		
 		protected final Clock clock;
+		protected final ResourceConfiguration resourceConfiguration;
 		protected final ResourceKey resourceKey;
 		protected final Location base;
 		protected final Publisher publisher;
@@ -51,12 +52,14 @@ public abstract class AbstractResource implements Resource {
 		@Inject
 		public Dependencies(
 			final Clock clock,
+			final ResourceConfiguration resourceConfiguration,
 			final ResourceKey resourceKey,
 			final Location base,
 			final Publisher publisher,
 			final ResourceFinder resourceFinder
 		) {
 			this.clock = clock;
+			this.resourceConfiguration = resourceConfiguration;
 			this.resourceKey = resourceKey;
 			this.base = base;
 			this.publisher = publisher;

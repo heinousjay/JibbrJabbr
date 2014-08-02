@@ -67,12 +67,12 @@ public abstract class ResourceEvent extends LoggedEvent {
 	
 	@Override
 	public void describeTo(Logger log) {
-		log.info("{} - {} at {}/{}", description(), resourceClass, base, name);
+		log.info("{} - {} at {}/{}", description(), resourceClass.getName(), base, name);
 	}
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(type: " + resourceClass + ", base: " + base + ", name: " + name + ", args: " + arguments + ")";
+		return getClass().getSimpleName() + "(type: " + resourceClass.getName() + ", base: " + base + ", name: " + name + ", args: " + arguments + ")";
 	}
 
 }

@@ -19,7 +19,7 @@ package jj.conversion;
  * @author jason
  *
  */
-public class FromStringToBoolean implements Converter<String, Boolean> {
+class FromStringToBoolean implements Converter<String, Boolean> {
 
 	@Override
 	public Boolean convert(String in) {

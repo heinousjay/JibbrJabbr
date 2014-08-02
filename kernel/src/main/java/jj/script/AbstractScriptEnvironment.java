@@ -30,6 +30,7 @@ import org.mozilla.javascript.Undefined;
 import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
 import jj.resource.AbstractResource;
+import jj.resource.ResourceConfiguration;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
 import jj.util.Clock;
@@ -56,6 +57,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		@Inject
 		Dependencies(
 			final Clock clock,
+			final ResourceConfiguration resourceConfiguration,
 			final ResourceKey cacheKey,
 			final Provider<RhinoContext> contextProvider,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
@@ -65,7 +67,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Publisher publisher,
 			final ResourceFinder resourceFinder
 		) {
-			super(clock, cacheKey, AppLocation.Virtual, publisher, resourceFinder);
+			super(clock, resourceConfiguration, cacheKey, AppLocation.Virtual, publisher, resourceFinder);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
