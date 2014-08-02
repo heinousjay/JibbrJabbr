@@ -24,10 +24,6 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.annotation.Annotation;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,8 +37,6 @@ import jj.util.CodeGenHelper;
 @Singleton
 class ConfigurationClassMaker {
 	
-	private static final String INJECT_ANNOTATION = "javax.inject.Inject";
-	private static final String SINGLETON_ANNOTATION = "javax.inject.Singleton";
 	private static final String NAME_FORMAT = "jj.configuration.GeneratedImplementationFor$$%s$$%s";
 	
 	private final ClassPool classPool;
@@ -107,20 +101,11 @@ class ConfigurationClassMaker {
 		);
 		result.addConstructor(ctor);
 		
-		ClassFile ccFile = result.getClassFile();
-		ConstPool constpool = ccFile.getConstPool();
-		
 		// @Inject
-		AnnotationsAttribute inject = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-		Annotation injectAnnotation = new Annotation(INJECT_ANNOTATION, constpool);
-		inject.addAnnotation(injectAnnotation);
-		ctor.getMethodInfo().addAttribute(inject);
+		CodeGenHelper.addAnnotationToMethod(ctor, Inject.class);
 		
 		// @Singleton
-		AnnotationsAttribute singleton = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-		Annotation singletonAnnotation = new Annotation(SINGLETON_ANNOTATION, constpool);
-		singleton.addAnnotation(singletonAnnotation);
-		ccFile.addAttribute(singleton);
+		CodeGenHelper.addAnnotationToClass(result, Singleton.class);
 	}
 	
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {

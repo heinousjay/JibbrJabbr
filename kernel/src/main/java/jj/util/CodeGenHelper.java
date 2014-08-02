@@ -15,12 +15,26 @@
  */
 package jj.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+import javassist.ClassPath;
 import javassist.ClassPool;
+import javassist.CtBehavior;
+import javassist.CtClass;
 import javassist.LoaderClassPath;
+import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.ConstPool;
+import javassist.bytecode.annotation.Annotation;
 
 /**
  * Some useful stuff for code gen and dealing with types generically
@@ -32,11 +46,65 @@ public enum CodeGenHelper {
 
 	;
 	
+	public static void addAnnotationToMethod(final CtBehavior method, final Class<? extends java.lang.annotation.Annotation> annotation) {
+		CtClass ctClass = method.getDeclaringClass();
+		ClassFile ccFile = ctClass.getClassFile();
+		ConstPool constpool = ccFile.getConstPool();
+		
+		AnnotationsAttribute inject = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+		Annotation injectAnnotation = new Annotation(annotation.getName(), constpool);
+		inject.addAnnotation(injectAnnotation);
+		method.getMethodInfo().addAttribute(inject);
+	}
+	
+	public static void addAnnotationToClass(final CtClass ctClass, final Class<? extends java.lang.annotation.Annotation> annotation) {
+		ClassFile ccFile = ctClass.getClassFile();
+		ConstPool constpool = ccFile.getConstPool();
+		
+		AnnotationsAttribute singleton = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+		Annotation singletonAnnotation = new Annotation(annotation.getName(), constpool);
+		singleton.addAnnotation(singletonAnnotation);
+		ccFile.addAttribute(singleton);
+	}
+	
+	private static final class MemoryClassPath implements ClassPath {
+		
+		final ConcurrentMap<String, byte[]> classBytes = new ConcurrentHashMap<>();
+
+		@Override
+		public InputStream openClassfile(String classname) throws NotFoundException {
+			return classBytes.containsKey(classname) ? new ByteArrayInputStream(classBytes.get(classname)) : null;
+		}
+
+		@Override
+		public URL find(String classname) {
+			try {
+				return classBytes.containsKey(classname) ? new URL("file:/" + classname) : null;
+			} catch (MalformedURLException e) {
+				throw new AssertionError(e);
+			}
+		}
+
+		@Override
+		public void close() {
+			classBytes.clear();
+		}
+	}
+	
+	private static final MemoryClassPath memoryClassPath = new MemoryClassPath();
+	
+	public static void storeGeneratedClass(CtClass clazz) throws Exception {
+		clazz.stopPruning(true);
+		memoryClassPath.classBytes.putIfAbsent(clazz.getName(), clazz.toBytecode());
+		clazz.stopPruning(false);
+	}
+	
 	private static final ThreadLocal<ClassPool> classPool = new ThreadLocal<ClassPool>() {
 		@Override
 		protected ClassPool initialValue() {
 			ClassPool classPool = new ClassPool();
 			classPool.appendClassPath(new LoaderClassPath(CodeGenHelper.class.getClassLoader()));
+			classPool.appendClassPath(memoryClassPath);
 			return classPool;
 		}
 	};

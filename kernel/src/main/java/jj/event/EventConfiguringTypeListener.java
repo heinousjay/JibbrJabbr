@@ -18,6 +18,8 @@ package jj.event;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +32,6 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
-import javassist.Modifier;
 import javassist.NotFoundException;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
@@ -58,7 +59,18 @@ import com.google.inject.spi.TypeListener;
  * </p>
  * 
  * <p>
- * Breaking this up might pay some dividends?
+ * Breaking this up might pay some dividends?  it's pretty tricky to do so,
+ * however.  Guice doesn't really have a reliable way of letting TypeListener
+ * instances participate with the injector and still get all the notifications,
+ * so it becomes a dance of figuring out how to manually instantiate stuff
+ * which seems painful.  A quick google suggests this exact thing has been a
+ * problem for others.
+ * 
+ * Possibly moving all of the management of invoker creation to a separate object
+ * could work, if the creation of the structures can be rearranged so that the AOT
+ * creation of the instance queues is just done at the point of injection rather
+ * than the binding time.  That's the kind of sentence that will stop making
+ * sense to me in the next hour.
  * @author jason
  *
  */
@@ -136,14 +148,14 @@ class EventConfiguringTypeListener implements TypeListener {
 	
 	private static final class MethodInfo {
 		
-		private final CtMethod method;
+		private final Method method;
 		private final String className;
 		private final String parameterType;
 		
-		MethodInfo(final CtMethod method) throws Exception {
+		MethodInfo(final Method method) throws Exception {
 			
 			this.method = method;
-			className = method.getDeclaringClass().getPackageName() +
+			className = method.getDeclaringClass().getPackage().getName() +
 				".InvokerFor" +
 				method.getDeclaringClass().getSimpleName() +
 				"$" + method.getName() +
@@ -220,7 +232,7 @@ class EventConfiguringTypeListener implements TypeListener {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Class<? extends Invoker> makeInvokerClass(String className, Object injectee, CtMethod invoked) throws Exception {
+	private Class<? extends Invoker> makeInvokerClass(String className, Object injectee, Method invoked) throws Exception {
 		// might be defined already
 		try {
 			return (Class<? extends Invoker>)Class.forName(className);
@@ -257,49 +269,61 @@ class EventConfiguringTypeListener implements TypeListener {
 		
 		return invokerClass;
 	}
+	
+	private List<Method> resolveAllListenerMethods(Class<?> c) {
+		List<Method> result = new ArrayList<>();
+		do {
+			for (Method m : c.getDeclaredMethods()) {
+				if ((m.getAnnotation(Listener.class) != null) &&
+					!Modifier.isStatic(m.getModifiers()) &&
+					!Modifier.isPrivate(m.getModifiers()) &&
+					m.getParameterTypes().length == 1)
+				{
+					result.add(m);
+				}
+			}
+			
+		} while ((c = c.getSuperclass()) != Object.class);
+		
+		return result;
+	}
 
 	@Override
 	public <I> void hear(TypeLiteral<I> type, final TypeEncounter<I> encounter) {
 		// anything we heard here, we also want to wire
 		encounter.register(new EventWiringInjectionListener<I>());
 		
-		Class<?> c = type.getRawType();
-		if (!TaskRunner.class.isAssignableFrom(c) && !Publisher.class.isAssignableFrom(c)) {
+		final Class<?> clazz = type.getRawType();
+		
+		if (!TaskRunner.class.isAssignableFrom(clazz) && !Publisher.class.isAssignableFrom(clazz)) {
 		
 			String name = type.toString();
 			
 			subscribers.computeIfAbsent(name, className -> {
-				ArrayList<MethodInfo> result = new ArrayList<>();
 				
+				ArrayList<MethodInfo> result = new ArrayList<>();
 				try {
-					CtClass clazz = classPool.get(className);
-					for (CtMethod method : clazz.getMethods()) {
-						if (
-							// should be not static, have one parameter
-							// can return anything, but it's ignored
-							method.hasAnnotation(Listener.class) &&
-							!Modifier.isStatic(method.getModifiers()) &&
-							method.getParameterTypes().length == 1
-						) {
-							result.add(new MethodInfo(method));
 
-							invokers.computeIfAbsent(
-								Class.forName(method.getParameterTypes()[0].getName()),
-								a -> new ConcurrentLinkedQueue<>()
-							);
-						}
+					for (Method method : resolveAllListenerMethods(clazz)) {
+						
+						result.add(new MethodInfo(method));
+
+						invokers.computeIfAbsent(
+							Class.forName(method.getParameterTypes()[0].getName()),
+							a -> new ConcurrentLinkedQueue<>()
+						);
 					}
-					if (result.isEmpty()) {
-						encounter.addError("%s is annotated as a @Subscriber but has no @Listener methods", className);
-					}
-					
-				} catch (NotFoundException e1) {
-					// don't care about this
+				} catch (NotFoundException nfe) {
+					encounter.addError("unable to load " + className + " for subscription");
 				} catch (Exception e) {
 					encounter.addError(e);
 				}
+
+				if (result.isEmpty()) {
+					encounter.addError("%s is annotated as a @Subscriber but has no @Listener methods", className);
+				}
 				
-				return result.isEmpty() ? null : Collections.unmodifiableList(result);
+				return Collections.unmodifiableList(result);
 			});
 		}
 	}
