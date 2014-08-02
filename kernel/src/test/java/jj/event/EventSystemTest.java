@@ -19,6 +19,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -35,6 +36,7 @@ import jj.event.help.ConcurrentSub;
 import jj.event.help.Event;
 import jj.event.help.EventSub;
 import jj.event.help.IEvent;
+import jj.event.help.NoListeners;
 import jj.event.help.Sub;
 import jj.event.help.UnrelatedIEvent;
 import jj.execution.MockTaskRunner;
@@ -48,8 +50,10 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.spi.Message;
 
 /**
  * doesn't really make sense to test the event stuff in isolation,
@@ -106,6 +110,20 @@ public class EventSystemTest {
 	@After
 	public void after() {
 		publisherLoop.interrupt();
+	}
+	
+	@Test
+	public void testListenersAreRequired() throws Exception {
+		
+		try {
+			injector.getInstance(NoListeners.class);
+			fail("should not have succeeded!");
+		} catch (ConfigurationException ce) {
+			Collection<Message> c = ce.getErrorMessages();
+			assertThat(c.size(), is(1));
+			Message m = c.iterator().next();
+			assertThat(m.getMessage(), is(NoListeners.class.getName() + " is annotated as a @Subscriber but has no @Listener methods"));
+		}
 	}
 	
 	@Test

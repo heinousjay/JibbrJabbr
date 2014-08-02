@@ -289,12 +289,14 @@ class EventConfiguringTypeListener implements TypeListener {
 							);
 						}
 					}
-					assert !result.isEmpty() : className + " is subscribing but has no listeners";
+					if (result.isEmpty()) {
+						encounter.addError("%s is annotated as a @Subscriber but has no @Listener methods", className);
+					}
 					
 				} catch (NotFoundException e1) {
-					// don't care
+					// don't care about this
 				} catch (Exception e) {
-					throw new AssertionError(name, e);
+					encounter.addError(e);
 				}
 				
 				return result.isEmpty() ? null : Collections.unmodifiableList(result);
