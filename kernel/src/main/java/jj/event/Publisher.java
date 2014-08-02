@@ -23,7 +23,8 @@ package jj.event;
  * 
  * <p>
  * Event objects should probably be immutable in most circumstances but it's not
- * at all required.
+ * at all required.  The event system does no manipulation of event objects, but
+ * in general there are no restrictions on the behavior of listeners.
  * 
  * @author jason
  *
