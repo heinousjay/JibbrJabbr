@@ -2,7 +2,7 @@
 // best way to use it:
 // require('jj/globalize')('rest-service-constants', this);
 
-module.exports = {
+var result = {
 	GET: 'GET',
 	POST: 'POST',
 	PUT: 'PUT',
@@ -14,9 +14,13 @@ module.exports = {
 	TEXT: 'text/plain'
 }
 
-Object.keys(module.exports).forEach(function(key) {
-	module.exports[key.toLowerCase()] = module.exports[key];
+Object.keys(result).forEach(function(key) {
+	result[key.toLowerCase()] = result[key];
 });
 
 // special casing the delete keyword
-module.exports.del = module.exports.DELETE;
+result.del = result.DELETE;
+
+Object.freeze(result);
+
+module.exports = result;

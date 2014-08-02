@@ -1,4 +1,9 @@
-describe("test function mergeObject", function() {
+var require = function(id) {
+	return $$realRequire(id);
+	
+}
+
+describe("mergeObject", function() {
 	it('should merge two objects together', function() {
 		var object1 = {a: 'b'};
 		var object2 = {b: 'c'};
@@ -10,106 +15,31 @@ describe("test function mergeObject", function() {
 	});
 });
 
-describe("test function unpackArguments", function() {
+describe("makeUri", function() {
 	
-	it('should handle no args correctly', function() {
-		let [parameters, headers, body, callback] = unpackArguments([]);
-		expect(parameters).toBeUndefined();
-		expect(headers).toBeUndefined();
-		expect(body).toBeUndefined();
-		expect(callback).toBeUndefined();
+	it('concatenates the base and operation URIs', function() {
+		let [uri, remainingParams] = makeUri('http://localhost', '/api');
+		expect(uri).toBe('http://localhost/api');
+		expect(remainingParams).toEqual({});
 	});
 	
-	it('should handle one parameter argument correctly', function() {
-		var params = {hi:'there'};
-		let [parameters, headers, body, callback] = unpackArguments([params]);
-		expect(parameters).toBe(params);
-		expect(headers).toBeUndefined();
-		expect(body).toBeUndefined();
-		expect(callback).toBeUndefined();
+	it('substitutes parameters into the resulting URI', function() {
+		let [uri, remainingParams] = makeUri('http://localhost', '/api/:param/trailer', {param:'value'});
+		expect(uri).toBe('http://localhost/api/value/trailer');
+		expect(remainingParams).toEqual({});
 	});
 	
-	it('should handle one callback argument correctly', function() {
-		var cb = function() {}
-		let [parameters, headers, body, callback] = unpackArguments([cb]);
-		expect(parameters).toBeUndefined();
-		expect(headers).toBeUndefined();
-		expect(body).toBeUndefined();
-		expect(callback).toBe(cb);
+	it('returns unsubstituted parameters as remainingParams', function() {
+		let [uri, remainingParams] = makeUri('http://localhost', '/api/trailer', {param:'value'});
+		expect(uri).toBe('http://localhost/api/trailer');
+		expect(remainingParams).toEqual({param:'value'});
 	});
-	
-	it('should handle parameter,callback arguments correctly', function() {
-		var params = {hi:'there'};
-		var cb = function() {}
-		let [parameters, headers, body, callback] = unpackArguments([params, cb]);
-		expect(parameters).toBe(params);
-		expect(headers).toBeUndefined();
-		expect(body).toBeUndefined();
-		expect(callback).toBe(cb);
-	});
-	
-	it('should handle all arguments correctly', function() {
-		var params = {hi:'there'};
-		var h = {hello:'back'};
-		var b = 'body';
-		var cb = function() {}
-		let [parameters, headers, body, callback] = unpackArguments([params, h, b, cb]);
-		expect(parameters).toBe(params);
-		expect(headers).toBe(h);
-		expect(body).toBe(b);
-		expect(callback).toBe(cb);
-	})
-//	
-//	(function testParametersAndCallbackArgs() {
-//		print('testParametersAndCallbackArgs');
-//		let [parameters, headers, body, callback] = unpackArguments([{}, function() {}]);
-//		print("parameters", parameters, "headers", headers, "body", body, "callback", callback);
-//	})();
 });
 
-
-
-// none of this belongs here - it should be in a jasmine integration test.
-// in fact the entire introduction.js suite should be in there to prove
-// passing works!
-describe("Manually ticking the Jasmine Clock", function() {
-	var timerCallback;
-
-	beforeEach(function() {
-		timerCallback = jasmine.createSpy("timerCallback");
-		jasmine.clock().install();
-	});
-
-	afterEach(function() {
-		jasmine.clock().uninstall();
-	});
+describe('makeUriNoBody', function() {
 	
-	it("causes a timeout to be called synchronously", function() {
-		setTimeout(function() {
-			timerCallback();
-		}, 100);
-
-		expect(timerCallback).not.toHaveBeenCalled();
-
-		jasmine.clock().tick(101);
-
-		expect(timerCallback).toHaveBeenCalled();
-	});
-
-	it("causes an interval to be called synchronously", function() {
-		setInterval(function() {
-			timerCallback();
-		}, 100);
-
-		expect(timerCallback).not.toHaveBeenCalled();
-
-		jasmine.clock().tick(101);
-		expect(timerCallback.calls.count()).toEqual(1);
-
-		jasmine.clock().tick(50);
-		expect(timerCallback.calls.count()).toEqual(1);
-
-		jasmine.clock().tick(50);
-		expect(timerCallback.calls.count()).toEqual(2);
+	it('appends a query string to the result from makeUri', function() {
+		let uri = makeUriNoBody('http://localhost', '/api/trailer', {param:'val ue'});
+		expect(uri).toEqual('http://localhost/api/trailer?param=val%20ue');
 	});
 });
