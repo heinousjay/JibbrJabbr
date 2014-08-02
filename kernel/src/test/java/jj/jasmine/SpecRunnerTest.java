@@ -16,8 +16,10 @@
 package jj.jasmine;
 
 import static org.mockito.BDDMockito.*;
+import static jj.jasmine.JasmineScriptEnvironment.*;
 import static jj.configuration.resolution.AppLocation.Virtual;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
+
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.script.module.ScriptResource;
@@ -61,6 +63,26 @@ public class SpecRunnerTest {
 		specRunner.resourceLoaded(rl);
 		
 		verify(resourceLoader).loadResource(JasmineScriptEnvironment.class, Virtual, "name-spec.js", rl);
+	}
+	
+	@Test
+	public void testIgnored() {
+
+		given(configuration.autorunSpecs()).willReturn(true);
+		
+		given(sr.name()).willReturn(JASMINE_JS);
+		ResourceLoaded rl = makeResourceLoaded(sr);
+		specRunner.resourceLoaded(rl);
+
+		given(sr.name()).willReturn(JASMINE_BOOT_JS);
+		rl = makeResourceLoaded(sr);
+		specRunner.resourceLoaded(rl);
+
+		given(sr.name()).willReturn(JASMINE_RUN_JS);
+		rl = makeResourceLoaded(sr);
+		specRunner.resourceLoaded(rl);
+		
+		verifyZeroInteractions(resourceLoader);
 	}
 
 }

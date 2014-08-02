@@ -47,9 +47,9 @@ import jj.util.SHA1Helper;
 public class JasmineScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
 
 	private static final String JASMINE         = "jasmine";
-	private static final String JASMINE_JS      = JASMINE + ".js";
-	private static final String JASMINE_BOOT_JS = JASMINE + "-boot.js";
-	private static final String JASMINE_RUN_JS  = JASMINE + "-run.js";
+	static final String JASMINE_JS      = JASMINE + ".js";
+	static final String JASMINE_BOOT_JS = JASMINE + "-boot.js";
+	static final String JASMINE_RUN_JS  = JASMINE + "-run.js";
 	
 	private final String name;
 

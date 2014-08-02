@@ -16,6 +16,11 @@
 package jj.jasmine;
 
 import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.jasmine.JasmineScriptEnvironment.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,6 +45,8 @@ class SpecRunner {
 	private final JasmineSwitch jasmineSwitch;
 	private final ResourceLoader resourceLoader;
 	
+	private final Set<String> ignoredNames = new HashSet<>(Arrays.asList(JASMINE_JS, JASMINE_BOOT_JS, JASMINE_RUN_JS));
+	
 	@Inject
 	SpecRunner(
 		final JasmineConfiguration configuration,
@@ -57,7 +64,11 @@ class SpecRunner {
 
 	@Listener
 	void resourceLoaded(ResourceLoaded rl) {
-		if (shouldRun() && ScriptResource.class.isAssignableFrom(rl.resourceClass)) {
+		if (
+			shouldRun() && 
+			ScriptResource.class.isAssignableFrom(rl.resourceClass) &&
+			!ignoredNames.contains(rl.name)
+		) {
 			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name.replace(".js", "-spec.js"), rl);
 		}
 	}
