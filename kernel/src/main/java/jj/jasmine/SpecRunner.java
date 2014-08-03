@@ -41,6 +41,9 @@ import jj.script.module.ScriptResource;
 @Subscriber
 class SpecRunner {
 	
+	private static final String JS_ENDING = ".js";
+	private static final String SPEC_JS_ENDING = "-spec.js";
+	
 	private final JasmineConfiguration configuration;
 	private final JasmineSwitch jasmineSwitch;
 	private final ResourceLoader resourceLoader;
@@ -64,12 +67,12 @@ class SpecRunner {
 
 	@Listener
 	void resourceLoaded(ResourceLoaded rl) {
-		if (
-			shouldRun() && 
-			ScriptResource.class.isAssignableFrom(rl.resourceClass) &&
-			!ignoredNames.contains(rl.name)
+		if (shouldRun() &&                                               // are we even on?
+			ScriptResource.class.isAssignableFrom(rl.resourceClass) &&   // was it a script that got loaded?
+			!ignoredNames.contains(rl.name) &&                           // are we not recursively trying to test our runner scripts?
+			!rl.name.endsWith(SPEC_JS_ENDING)                            // and of course, specs don't get specs.  stay out of rabbit holes
 		) {
-			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name.replace(".js", "-spec.js"), rl);
+			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name.replace(JS_ENDING, SPEC_JS_ENDING), rl);
 		}
 	}
 }

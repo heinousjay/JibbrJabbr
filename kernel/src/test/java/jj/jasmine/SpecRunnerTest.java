@@ -81,6 +81,10 @@ public class SpecRunnerTest {
 		given(sr.name()).willReturn(JASMINE_RUN_JS);
 		rl = makeResourceLoaded(sr);
 		specRunner.resourceLoaded(rl);
+
+		given(sr.name()).willReturn("name-spec.js");
+		rl = makeResourceLoaded(sr);
+		specRunner.resourceLoaded(rl);
 		
 		verifyZeroInteractions(resourceLoader);
 	}
