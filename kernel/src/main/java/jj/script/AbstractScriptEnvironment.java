@@ -153,6 +153,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return state == Errored;
 	}
 	
+	protected void died() {
+		state = Dead;
+		publisher.publish(new ScriptEnvironmentDied(this));
+	}
+	
 	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
 		ContinuationPendingKey key = dependencies.pendingKeyProvider.get();
 		continuationPendings.put(key, continuationPending);

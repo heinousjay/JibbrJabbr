@@ -15,14 +15,26 @@
  */
 package jj.script;
 
+import org.slf4j.Logger;
+
 /**
  * @author jason
  *
  */
-enum ScriptExecutionState {
-	Unitialized,
-	Initializing,
-	Initialized,
-	Errored,
-	Dead
+public class ScriptEnvironmentDied extends ExecutionEvent {
+	
+	private final ScriptEnvironment scriptEnvironment;
+
+	public ScriptEnvironmentDied(final ScriptEnvironment scriptEnvironment) {
+		this.scriptEnvironment = scriptEnvironment;
+	}
+	
+	public ScriptEnvironment scriptEnvironment() {
+		return scriptEnvironment;
+	}
+
+	@Override
+	public void describeTo(Logger log) {
+		log.info("script environment died: {}", scriptEnvironment);
+	}
 }

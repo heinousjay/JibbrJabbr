@@ -179,7 +179,12 @@ public abstract class AbstractResource implements Resource {
 	void kill() {
 		if (alive.getAndSet(false)) {
 			publisher.publish(new ResourceKilled(this));
+			died();
 		}
+	}
+	
+	protected void died() {
+		// mainly to allow AbstractScriptEnvironment to publish its own death event
 	}
 	
 	@Override
