@@ -44,6 +44,7 @@ public abstract class AbstractResource implements Resource {
 		
 		protected final Clock clock;
 		protected final ResourceConfiguration resourceConfiguration;
+		protected final AbstractResourceInitializationListener aril;
 		protected final ResourceKey resourceKey;
 		protected final Location base;
 		protected final Publisher publisher;
@@ -53,6 +54,7 @@ public abstract class AbstractResource implements Resource {
 		public Dependencies(
 			final Clock clock,
 			final ResourceConfiguration resourceConfiguration,
+			final AbstractResourceInitializationListener aril,
 			final ResourceKey resourceKey,
 			final Location base,
 			final Publisher publisher,
@@ -60,6 +62,7 @@ public abstract class AbstractResource implements Resource {
 		) {
 			this.clock = clock;
 			this.resourceConfiguration = resourceConfiguration;
+			this.aril = aril;
 			this.resourceKey = resourceKey;
 			this.base = base;
 			this.publisher = publisher;
@@ -89,27 +92,29 @@ public abstract class AbstractResource implements Resource {
 		this.base = dependencies.base;
 		this.publisher = dependencies.publisher;
 		this.resourceFinder = dependencies.resourceFinder;
+		
+		if ((this instanceof ParentedResource) && this.base().parentInDirectory()) {
+			dependencies.aril.awaitInitialization(this);
+		}
 	}
 	
-	@Listener
-	void resourceLoaded(ResourceLoaded event) {
+	void resourceLoaded() {
 		// little bit of internal magic here - post initialization of either a
 		// FileResource or a DirectoryResource rooted in Base should be added to
 		// the directory structure.
-		if (
-			(this instanceof ParentedResource) && 
-			this.base().parentInDirectory() &&
-			event.matches(this)
-		) {
-			String parentName = name().substring(0, name().lastIndexOf('/') + 1);
-			if (!parentName.equals(name())) {
-				DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, base(), parentName);
-				// possibly the best bet in this case is to make the missing directory,
-				// which really oughta go into another thread? cause this could get all deadlocky
-				assert parent != null : "no parent directory for " + this;
-				parent.addDependent(this);
-			}
+		String parentName = name().substring(0, name().lastIndexOf('/') + 1);
+		if (!parentName.equals(name())) {
+			DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, base(), parentName);
+			// possibly the best bet in this case is to make the missing directory,
+			// which really oughta go into another thread? cause this could get all deadlocky
+			assert parent != null : "no parent directory for " + this;
+			parent.addDependent(this);
 		}
+	}
+	
+	@Listener
+	void resourceKilled(ResourceKilled event) {
+		dependents.remove(event.resourceKey);
 	}
 	
 	@ResourceThread
@@ -136,11 +141,6 @@ public abstract class AbstractResource implements Resource {
 		AbstractResource r = (AbstractResource)dependent;
 		dependents.put(r.cacheKey(), r);
 	}
-	
-	@Listener
-	void resourceKilled(ResourceKilled event) {
-		dependents.remove(event.resourceKey);
-	}
 
 	/**
 	 * the arguments used to create this resource. mocking needs prevent this
@@ -162,6 +162,8 @@ public abstract class AbstractResource implements Resource {
 		// ugh. lee.
 		
 		// don't forget to convert to strings if needed
+		// need an id!
+		to.put("id",           to, getClass().getName() + base() + name());
 		to.put("type",         to, getClass().getName());
 		to.put("name",         to, name());
 		to.put("base",         to, base().toString());

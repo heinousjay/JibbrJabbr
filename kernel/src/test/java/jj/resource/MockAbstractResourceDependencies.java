@@ -32,15 +32,39 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	public final DirectoryResource rootDirectory = mock(DirectoryResource.class);
 
 	public MockAbstractResourceDependencies(Location base) {
-		super(new MockClock(), mock(ResourceConfiguration.class), mock(ResourceKey.class), base, mock(Publisher.class), mock(ResourceFinder.class));
+		super(
+			new MockClock(),
+			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
+			mock(ResourceKey.class),
+			base,
+			mock(Publisher.class),
+			mock(ResourceFinder.class)
+		);
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base) {
-		super(new MockClock(), mock(ResourceConfiguration.class), resourceKey, base, mock(Publisher.class), mock(ResourceFinder.class));
+		super(
+			new MockClock(),
+			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
+			resourceKey,
+			base,
+			mock(Publisher.class),
+			mock(ResourceFinder.class)
+		);
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, Publisher publisher) {
-		super(new MockClock(), mock(ResourceConfiguration.class), resourceKey, base, publisher, mock(ResourceFinder.class));
+		super(
+			new MockClock(),
+			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
+			resourceKey,
+			base,
+			publisher,
+			mock(ResourceFinder.class)
+		);
 	}
 	
 	{
@@ -54,6 +78,10 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	
 	public ResourceConfiguration resourceConfiguration() {
 		return resourceConfiguration;
+	}
+	
+	public AbstractResourceInitializationListener abstractResourceInitializationListener() {
+		return aril;
 	}
 
 	public ResourceFinder resourceFinder() {

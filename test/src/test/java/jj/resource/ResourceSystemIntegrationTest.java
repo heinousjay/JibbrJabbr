@@ -83,20 +83,29 @@ public class ResourceSystemIntegrationTest {
 	@Test
 	public void testResourceSystem() throws Throwable {
 		
-		assertThat(finder.findResource(DirectoryResource.class, Base, ""), is(notNullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, "deep"), is(notNullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, "deep/nesting"), is(notNullValue()));
+		// validates that directory structures are created as expected
+		DirectoryResource root = finder.findResource(DirectoryResource.class, Base, "");
+		DirectoryResource deep = finder.findResource(DirectoryResource.class, Base, "deep");
+		DirectoryResource nesting = finder.findResource(DirectoryResource.class, Base, "deep/nesting");
+		assertThat(root, is(notNullValue()));
+		assertThat(deep, is(notNullValue()));
+		assertThat(nesting, is(notNullValue()));
+		assertTrue(root.dependents().contains(deep));
+		assertTrue(deep.dependents().contains(nesting));
 		
 		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
 		
 		dse = finder.findResource(DocumentScriptEnvironment.class, Virtual, "deep/nested");
 		htmlResource = finder.findResource(HtmlResource.class, Base, "deep/nested.html");
+		assertTrue(deep.dependents().contains(htmlResource));
 		
 		mse1 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module"));
 		scriptResource1 = finder.findResource(ScriptResource.class, Base, "deep/module.js");
+		assertTrue(deep.dependents().contains(scriptResource1));
 		
 		mse2 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"));
 		scriptResource2 = finder.findResource(ScriptResource.class, Base, "deep/nesting/module.js");
+		assertTrue(nesting.dependents().contains(scriptResource2));
 		
 		assertTrue(dse.alive());
 		assertTrue(htmlResource.alive());
@@ -142,6 +151,8 @@ public class ResourceSystemIntegrationTest {
 		assertFalse("couldn't update things correctly", failed.get());
 		
 		assertFalse(scriptResource2.alive());
+		// should be removed upon death
+		assertFalse(nesting.dependents().contains(scriptResource2));
 		assertFalse(mse2.alive());
 		assertFalse(mse1.alive());
 		assertFalse(dse.alive());

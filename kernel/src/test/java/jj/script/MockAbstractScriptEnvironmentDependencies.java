@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import javax.inject.Provider;
 
 import jj.event.Publisher;
+import jj.resource.AbstractResourceInitializationListener;
 import jj.resource.ResourceConfiguration;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
@@ -38,6 +39,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
 			mock(ResourceKey.class),
 			new MockRhinoContextProvider(),
 			mock(MockPendingKeyProvider.class),
@@ -53,6 +55,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
 			mock(ResourceKey.class),
 			rhinoContextProvider,
 			mock(MockPendingKeyProvider.class),
@@ -70,6 +73,10 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 	
 	public ResourceConfiguration resourceConfiguration() {
 		return resourceConfiguration;
+	}
+	
+	public AbstractResourceInitializationListener abstractResourceInitializationListener() {
+		return aril;
 	}
 	
 	public ResourceKey resourceCacheKey() {

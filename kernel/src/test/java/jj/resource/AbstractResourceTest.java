@@ -92,5 +92,4 @@ public class AbstractResourceTest {
 		assertFalse(two.alive());
 		assertFalse(one_two.alive());
 	}
-
 }
