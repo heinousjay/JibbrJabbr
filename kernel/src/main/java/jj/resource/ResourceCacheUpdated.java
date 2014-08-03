@@ -16,19 +16,13 @@
 package jj.resource;
 
 /**
+ * implemented by events that alter the state of the {@link ResourceCache}
  * @author jason
  *
  */
-public class ResourceLoaded extends ResourceEvent implements ResourceCacheUpdated {
-
-	public ResourceLoaded(AbstractResource resource) {
-		super(resource);
-	}
-
-	@Override
-	public String description() {
-		return "resource loaded";
-	}
+public interface ResourceCacheUpdated {
 	
-	
+	boolean matches(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments);
+
+	boolean matches(final AbstractResource resource);
 }

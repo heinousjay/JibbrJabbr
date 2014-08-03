@@ -19,7 +19,7 @@ package jj.resource;
  * @author jason
  *
  */
-public class ResourceReloaded extends ResourceEvent {
+public class ResourceReloaded extends ResourceEvent implements ResourceCacheUpdated {
 
 	public ResourceReloaded(AbstractResource resource) {
 		super(resource);

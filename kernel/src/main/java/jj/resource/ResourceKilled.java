@@ -21,7 +21,7 @@ package jj.resource;
  * @author jason
  *
  */
-public class ResourceKilled extends ResourceEvent {
+public class ResourceKilled extends ResourceEvent implements ResourceCacheUpdated {
 
 	/**
 	 * @param resourceClass
