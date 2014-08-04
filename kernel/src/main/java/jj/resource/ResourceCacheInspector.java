@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.configuration.resolution.AppLocation;
 import jj.script.Global;
 import jj.script.RhinoContext;
 
@@ -72,6 +73,7 @@ public class ResourceCacheInspector {
 	private final Scriptable nodes;
 	private final Scriptable links;
 	private final Scriptable types;
+	private final Scriptable bases;
 	
 	@Inject
 	ResourceCacheInspector(
@@ -87,6 +89,7 @@ public class ResourceCacheInspector {
 		nodes = makeNodes();
 		links = makeLinks();
 		types = makeTypes(resourceCreators.knownResourceTypeNames());
+		bases = makeBases();
 	}
 	
 	private Scriptable makeNodes() {
@@ -132,6 +135,17 @@ public class ResourceCacheInspector {
 		}
 	}
 	
+	private Scriptable makeBases() {
+		try (RhinoContext context = contextProvider.get()) {
+			Scriptable resultArray = context.newArray(global, AppLocation.values().length);
+			int index = 0;
+			for (AppLocation baseName : AppLocation.values()) {
+				resultArray.put(index++, resultArray, baseName.name());
+			}
+			return resultArray;
+		}
+	}
+	
 	public Scriptable nodes() {
 		return nodes;
 	}
@@ -142,5 +156,9 @@ public class ResourceCacheInspector {
 	
 	public Scriptable types() {
 		return types;
+	}
+	
+	public Scriptable bases() {
+		return bases;
 	}
 }

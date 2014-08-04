@@ -11,6 +11,7 @@ module.exports = function() {
 	return {
 		nodes: rci.nodes(),
 		links: rci.links(),
-		types: rci.types()
+		types: rci.types(),
+		bases: rci.bases()
 	}
 }

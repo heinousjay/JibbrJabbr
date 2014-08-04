@@ -162,8 +162,8 @@ public abstract class AbstractResource implements Resource {
 		// ugh. lee.
 		
 		// don't forget to convert to strings if needed
-		// need an id!
-		to.put("id",           to, getClass().getName() + base() + name());
+		// need an id! use the resource key?
+		to.put("id",           to, cacheKey.toString());
 		to.put("type",         to, getClass().getName());
 		to.put("name",         to, name());
 		to.put("base",         to, base().toString());
