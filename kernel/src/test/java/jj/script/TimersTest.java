@@ -19,11 +19,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.execution.DelayedExecutor.CancelKey;
-import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
-import jj.resource.ResourceEventMaker;
 import jj.resource.ResourceKey;
-import jj.resource.ResourceKilled;
+import jj.script.module.RootScriptEnvironment;
 import jj.util.Closer;
 
 import org.junit.Before;
@@ -31,7 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
@@ -46,79 +44,129 @@ public class TimersTest {
 	MockRhinoContextProvider contextProvider;
 	Timers timers;
 	
-	@Mock Function function;
+	@Mock Callable callable;
 	@Mock ScriptableObject scope;
-	@Mock AbstractScriptEnvironment se;
+	@Mock(extraInterfaces = {ChildScriptEnvironment.class}) AbstractScriptEnvironment module;
+	@Mock(extraInterfaces = {RootScriptEnvironment.class}) AbstractScriptEnvironment root;
 	@Mock ResourceKey rk;
 	CurrentScriptEnvironment env;
 	
 	@Mock CancelKey cancelKey;
+	@Mock ContinuationPendingKey pendingKey;
 
 	@Before
 	public void before() {
 		taskRunner = new MockTaskRunner();
 		taskRunner.cancelKey = cancelKey;
+		given(((ChildScriptEnvironment)module).parent()).willReturn(root);
 		env = new CurrentScriptEnvironment(contextProvider);
-		given(se.cacheKey()).willReturn(rk);
+		given(root.cacheKey()).willReturn(rk);
+		
+		given(continuationCoordinator.execute(any(ScriptEnvironment.class), any(Callable.class), anyVararg())).willReturn(pendingKey);
+		
 		timers = new Timers(taskRunner, continuationCoordinator, env);
 	}
 	
 	@Test
 	public void testEnvironmentDied() {
-		try (Closer closer = env.enterScope(se)) {
-			timers.setInterval.call(null, scope, null, new Object[]{ function, "2" });
+		try (Closer closer = env.enterScope(root)) {
+			timers.setInterval.call(null, scope, null, new Object[]{ callable, "2" });
 		}
 		
-		ResourceKilled rk = ResourceEventMaker.makeResourceKilled(se);
-		timers.scriptEnvironmentKilled(rk);
+		ScriptEnvironmentDied event = new ScriptEnvironmentDied(root);
+		timers.scriptEnvironmentDied(event);
 		
 		verify(cancelKey).cancel();
 	}
+	
+	String cancelId;
+	
+	@Test
+	public void testSetIntervalFromRoot() throws Throwable {
+		testRun(interval1, 2L, true, 3L);
+		testRun(interval2, 0L, true);
+	}
+	
+	@Test
+	public void testSetTimeoutFromRoot() throws Throwable {
+		testRun(timeout1, 600L, false, "hi", "there");
+		testRun(timeout2, 0L, false);
+	}
+	
+	@Test
+	public void testCancelSetInterval() throws Throwable {
+		try (Closer closer = env.enterScope(module)) {
+			interval1.run();
+		}
 
-	@Test
-	public void testCancel() {
-		timers.clearInterval.call(null, scope, null, new Object[] { cancelKey });
+		try (Closer closer = env.enterScope(root)) {
+			timers.clearInterval.call(null, scope, null, new Object[] { cancelId });
+		}
 		
 		verify(cancelKey).cancel();
 	}
 	
 	@Test
-	public void testSetInterval() throws Throwable {
-		testRun(interval, 2L, true, 3L);
+	public void testCancelSetTimeout() throws Throwable {
+		try (Closer closer = env.enterScope(module)) {
+			timeout1.run();
+		}
+		
+		try (Closer closer = env.enterScope(root)) {
+			timers.clearTimeout.call(null, scope, null, new Object[] { cancelId });
+		}
+		
+		verify(cancelKey).cancel();
 	}
 	
-	@Test
-	public void testSetTimeout() throws Throwable {
-		testRun(timeout, 600L, false, "hi", "there");
-	}
-	
-	private Runnable interval = new Runnable() {
+	private Runnable interval1 = new Runnable() {
 		
 		@Override
 		public void run() {
-			assertThat((CancelKey)timers.setInterval.call(null, scope, null, new Object[]{ function, "2", 3L }), is(cancelKey));
+			cancelId = (String)timers.setInterval.call(null, scope, null, new Object[]{ callable, "2", 3L });
 		}
 	};
 	
-	private Runnable timeout = new Runnable() {
+	private Runnable interval2 = new Runnable() {
 		
 		@Override
 		public void run() {
-			assertThat((CancelKey)timers.setTimeout.call(null, scope, null, new Object[]{ function, 600, "hi", "there" }), is(cancelKey));
+			cancelId = (String)timers.setInterval.call(null, scope, null, new Object[]{ callable });
+		}
+	};
+	
+	private Runnable timeout1 = new Runnable() {
+		
+		@Override
+		public void run() {
+			cancelId = (String)timers.setTimeout.call(null, scope, null, new Object[]{ callable, 600, "hi", "there" });
+		}
+	};
+	
+	private Runnable timeout2 = new Runnable() {
+		
+		@Override
+		public void run() {
+			cancelId = (String)timers.setTimeout.call(null, scope, null, new Object[]{ callable });
 		}
 	};
 	
 	private void testRun(Runnable r, long delay, boolean repeat, Object...args) throws Throwable {
-		try (Closer closer = env.enterScope(se)) {
+		try (Closer closer = env.enterScope(module)) {
 			r.run();
 		}
 		assertThat(taskRunner.firstTaskDelay(), is(delay));
 		
-		JJTask task = taskRunner.runFirstTask();
+		ScriptTask<?> task = (ScriptTask<?>)taskRunner.runFirstTask();
+		
+		// verify we're doing this! cause i forgot lol
+		assertThat(task.pendingKey, is(pendingKey));
+		
+		task.complete();
 		
 		assertThat(taskRunner.taskWillRepeat(task), is(repeat));
 		
-		verify(continuationCoordinator).execute(se, function, args);
+		verify(continuationCoordinator).execute(module, callable, args);
 	}
 
 }

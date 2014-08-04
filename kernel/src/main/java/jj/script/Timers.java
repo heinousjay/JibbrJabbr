@@ -15,18 +15,17 @@
  */
 package jj.script;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.BaseFunction;
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 
@@ -34,23 +33,37 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.DelayedExecutor.CancelKey;
 import jj.execution.TaskRunner;
-import jj.resource.ResourceKey;
-import jj.resource.ResourceKilled;
+import jj.script.module.RootScriptEnvironment;
+import jj.util.Sequence;
 
 /**
- * 
+ * <p>
+ * Provides standard timer functions to script environments, i.e.
+ * <ul>
+ *  <li>setTimeout
+ *  <li>setInterval
+ *  <li>clearTimeout
+ *  <li>clearInterval
+ * </ul>
  * 
  * @author jason
  *
  */
 @Singleton
 @Subscriber
-public class Timers {
+class Timers {
+	
+	private static final Object[] EMPTY_SLICE = new Object[0];
 	
 	private final TaskRunner taskRunner;
 	private final ContinuationCoordinator continuationCoordinator;
 	private final CurrentScriptEnvironment env;
-	private final ConcurrentHashMap<ResourceKey, Set<WeakReference<CancelKey>>> runningTimers = new ConcurrentHashMap<>();
+	
+	// there is a bit of a dance around the cancel keys.  they must be stored according to the root environment, because
+	// it's conceivable that a module will pass a cancel key via exports or a callback or a function call to some other
+	// environment - but the timer itself should execute in the context of the original environment
+	private final ConcurrentHashMap<RootScriptEnvironment, Map<String, CancelKey>> runningTimers = new ConcurrentHashMap<>();
+	private final Sequence cancelIds = new Sequence();
 
 	@Inject
 	Timers(
@@ -64,72 +77,109 @@ public class Timers {
 	}
 	
 	@Listener
-	void scriptEnvironmentKilled(ResourceKilled event) {
-		if (ScriptEnvironment.class.isAssignableFrom(event.resourceClass)) {
-			Set<WeakReference<CancelKey>> cancelKeys = runningTimers.remove(event.resourceKey);
-			if (cancelKeys != null) {
-				for (WeakReference<CancelKey> keyRef : cancelKeys) {
-					CancelKey key = keyRef.get();
-					if (key != null) {
-						key.cancel();
-					}
-				}
+	void scriptEnvironmentDied(ScriptEnvironmentDied event) {
+		
+		Map<String, CancelKey> cancelKeys = runningTimers.remove(event.scriptEnvironment());
+		if (cancelKeys != null) {
+			cancelKeys.values().forEach(CancelKey::cancel);
+		}
+	}
+	
+	private void killTimerCancelKey(final ScriptEnvironment se, final String timerKey) {
+		Map<String, CancelKey> keys = runningTimers.get(se);
+		if (keys != null) {
+			CancelKey key = keys.remove(timerKey);
+			if (key != null) {
+				key.cancel();
 			}
 		}
 	}
 	
-	private CancelKey setTimer(final Function function, final int delay, final boolean repeat, final Object...args) {
+	private String setTimer(final Callable function, final int delay, final boolean repeat, final Object...args) {
 		
-		ScriptTask<ScriptEnvironment> task = 
-			new ScriptTask<ScriptEnvironment>(
-				repeat ? "setInterval" : "setTimeout",
-				env.current(),
-				continuationCoordinator
-			) {
-				@Override
-				protected void begin() throws Exception {
-					continuationCoordinator.execute(scriptEnvironment, function, args);
-					if (repeat) {
-						repeat();
-					}
+		final String key = "jj-timer-" + cancelIds.next();
+		final ScriptEnvironment rootEnvironment = env.currentRootScriptEnvironment();
+		
+		ScriptTask<ScriptEnvironment> task = new ScriptTask<ScriptEnvironment>(
+			repeat ? "setInterval" : "setTimeout",
+			env.current(),
+			continuationCoordinator
+		) {
+			@Override
+			protected void begin() throws Exception {
+				// if this is setTimeout, kill the cancelation structure
+				if (!repeat) {
+					killTimerCancelKey(rootEnvironment, key);
 				}
 				
-				@Override
-				protected long delay() {
-					return delay;
+				pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+			}
+			
+			@Override
+			protected void complete() throws Exception {
+				// we need to repeat once the task is complete, as an artifact of the resumable structure
+				// to do otherwise would require a way to clone tasks, which should actually be doable?
+				// but for now, repeat on complete
+				if (repeat) {
+					repeat();
 				}
-			};
+			}
+			
+			@Override
+			protected long delay() {
+				return delay;
+			}
+		};
 		
 		taskRunner.execute(task);
 		
-		runningTimers.computeIfAbsent(
-			env.current().cacheKey(), a -> new HashSet<>()
-		).add(new WeakReference<>(task.cancelKey()));
+		runningTimers.computeIfAbsent(env.currentRootScriptEnvironment(), a -> new HashMap<>()).put(key, task.cancelKey());
 		
-		return task.cancelKey();
+		return key;
 	}
 	
-	public final BaseFunction setInterval = new BaseFunction() {
+	private final class TimerFunction extends BaseFunction {
 
 		private static final long serialVersionUID = 1L;
 		
+		private final boolean repeat;
+		
+		TimerFunction(final boolean repeat) {
+			this.repeat = repeat;
+		}
+		
 		@Override
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-			assert args.length >= 2;
-			return setTimer((Function)args[0], Util.toJavaInt(args[1]), true, Arrays.copyOfRange(args, 2, args.length));
+			Callable c = null;
+			int time = 0;
+			Object[] slice = EMPTY_SLICE;
+			
+			if (args.length > 0 && args[0] instanceof Callable) {
+				c = (Callable)args[0];
+			}
+			
+			if (args.length > 1) {
+				Integer timeAtt = Util.toJavaInt(args[1]);
+				if (timeAtt != null) {
+					time = timeAtt.intValue();
+				}
+			}
+			
+			if (args.length > 2) {
+				slice = Arrays.copyOfRange(args, 2, args.length);
+			}
+			
+			if (c != null) {
+				return setTimer(c, time, repeat, slice);
+			}
+			
+			return Undefined.instance;
 		}
-	};
+	}
 	
-	public final BaseFunction setTimeout = new BaseFunction() {
-
-		private static final long serialVersionUID = 1L;
-		
-		@Override
-		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-			assert args.length >= 2;
-			return setTimer((Function)args[0], Util.toJavaInt(args[1]), false, Arrays.copyOfRange(args, 2, args.length));
-		}
-	};
+	public final BaseFunction setInterval = new TimerFunction(true);
+	
+	public final BaseFunction setTimeout = new TimerFunction(false);
 	
 	public final BaseFunction clearInterval = new BaseFunction() {
 
@@ -137,8 +187,8 @@ public class Timers {
 		
 		@Override
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-			if (args.length == 1 && args[0] instanceof CancelKey) {
-				((CancelKey)args[0]).cancel();
+			if (args.length > 0 && args[0] instanceof CharSequence) {
+				killTimerCancelKey(env.currentRootScriptEnvironment(), String.valueOf(args[0]));
 			}
 			return Undefined.instance;
 		}
