@@ -45,7 +45,7 @@ class TaskRunnerImpl implements TaskRunner {
 				final JJTask task = taskTracker.task();
 				if (taskTracker.startTime() == 0 
 					&& task != null
-					&& ((task instanceof DelayedTask<?>) ? !((DelayedTask<?>)task).cancelKey.canceled() : true)
+					&& ((task instanceof DelayedTask<?>) ? !((DelayedTask<?>)task).cancelKey().canceled() : true)
 				) {
 					log(taskTracker, task);
 				}
