@@ -47,7 +47,8 @@ class MessagesResourceCreator extends SimpleResourceCreator<MessagesResource> {
 	@Override
 	protected URI uri(Location base, String name, Object... args) {
 		assertArgs(base, args);
-		return URI.create(name + "#" + String.valueOf(args[0]));
+		Locale locale = (Locale)args[0];
+		return URI.create(name + "_" + locale.toLanguageTag());
 	}
 
 	private void assertArgs(Location base, Object... args) {

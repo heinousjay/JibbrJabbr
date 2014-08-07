@@ -32,7 +32,6 @@ public class I18NModule extends JJModule {
 		
 		addConverterBinding().to(StringToLocaleConverter.class);
 		
-		
 		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		bindCreation().of(MessagesResource.class).to(MessagesResourceCreator.class);
 	}

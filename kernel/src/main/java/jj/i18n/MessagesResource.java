@@ -119,12 +119,12 @@ public class MessagesResource extends AbstractResource {
 
 	@Override
 	public String name() {
-		return name + __ + locale.toString();
+		return name;
 	}
 
 	@Override
 	public String uri() {
-		return "/" + name();
+		return "/" + name() + __ + locale.toLanguageTag();
 	}
 
 	@Override

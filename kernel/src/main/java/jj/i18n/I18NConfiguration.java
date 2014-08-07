@@ -38,7 +38,8 @@ public interface I18NConfiguration {
 	/**
 	 * <p>
 	 * The default Locale to be served.  Defaults to the locale returned by
-	 * {@link Locale#getDefault()}
+	 * {@link Locale#getDefault()}.  This is the Locale used when no better
+	 * alternative can be negotiated.
 	 */
 	Locale defaultLocale();
 }
