@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.i18n;
+
+import jj.JJModule;
+
 /**
- * <p>
- * Defines the {@link PropertiesResource}, a primitive resource that wraps a properties file
- * to expose the key-value pairs defined within in a manner analogous to {@link Properties},
- * but assuming UTF-8 (and soon this will be configurable)
- * 
- * <p>
- * Also defines a higher-level {@link MessagesResource}, which organizes a set of 
- * {@link PropertiesResource}s according to a name and a locale, for internationalization
- * purposes.
- * 
  * @author jason
  *
  */
-package jj.messaging;
+public class MessagingModule extends JJModule {
 
-import java.util.Properties;
+	@Override
+	protected void configure() {
+		
+		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
+		bindCreation().of(MessagesResource.class).to(MessagesResourceCreator.class);
+	}
+
+}

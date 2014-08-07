@@ -12,7 +12,7 @@ import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.InlineMessagesDocumentFilter;
 import jj.execution.CurrentTask;
-import jj.messaging.MessagesResource;
+import jj.i18n.MessagesResource;
 import jj.resource.ResourceFinder;
 
 import org.jsoup.Jsoup;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.messaging;
+package jj.i18n;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
@@ -23,6 +23,8 @@ import java.util.Locale;
 
 import jj.Base;
 import jj.configuration.resolution.AppLocation;
+import jj.i18n.MessagesResource;
+import jj.i18n.PropertiesResource;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceFinder;
 

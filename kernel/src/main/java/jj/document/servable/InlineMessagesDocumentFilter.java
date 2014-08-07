@@ -3,11 +3,12 @@ package jj.document.servable;
 import static jj.configuration.resolution.AppLocation.Virtual;
 
 import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.CurrentTask;
-import jj.messaging.MessagesResource;
+import jj.i18n.MessagesResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceTask;
 

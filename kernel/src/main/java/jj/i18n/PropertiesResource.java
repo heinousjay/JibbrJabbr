@@ -1,4 +1,4 @@
-package jj.messaging;
+package jj.i18n;
 
 
 import static java.nio.charset.StandardCharsets.UTF_8;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.messaging;
+package jj.i18n;
 
 import java.util.Arrays;
 import java.util.Collections;

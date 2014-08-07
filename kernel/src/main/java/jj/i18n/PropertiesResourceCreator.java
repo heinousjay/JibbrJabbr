@@ -1,4 +1,4 @@
-package jj.messaging;
+package jj.i18n;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
