@@ -86,6 +86,7 @@ public class ResourceInstanceCreatorTest  {
 
 			@Override
 			protected void configure() {
+				bind(PathResolver.class).toInstance(app);
 				bind(Publisher.class).toInstance(mock(Publisher.class));
 				bind(ResourceFinder.class).toInstance(mock(ResourceFinder.class));
 				bind(ResourceConfiguration.class).toInstance(mock(ResourceConfiguration.class));
@@ -144,7 +145,6 @@ public class ResourceInstanceCreatorTest  {
 		
 		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one, date);
 		
-		verify(app).resolvePath(AppLocation.Virtual, name);
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		verify(injector).getInstance(TestResource.class);
 		

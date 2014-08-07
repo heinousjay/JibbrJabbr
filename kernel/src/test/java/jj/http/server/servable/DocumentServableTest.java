@@ -48,7 +48,7 @@ public class DocumentServableTest extends ServableTestBase {
 		given(parentInjector.createChildInjector(any(AbstractModule.class))).willReturn(parentInjector);
 		given(parentInjector.getInstance(DocumentRequestProcessor.class)).willReturn(requestProcessor);
 		
-		ds = new DocumentServable(app, resourceFinder, parentInjector);
+		ds = new DocumentServable(resourceFinder, parentInjector);
 	}
 	
 	@Test

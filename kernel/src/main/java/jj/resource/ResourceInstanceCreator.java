@@ -54,7 +54,7 @@ public class ResourceInstanceCreator {
 		final String name,
 		final Object...args
 	) {
-		final Path path = pathResolver.resolvePath(base, name);
+		final Path path = base.representsFilesystem() ? pathResolver.resolvePath(base, name).normalize().toAbsolutePath() : null;
 		
 		return createResource(resourceClass, resourceKey, base, name, path, args);
 	}

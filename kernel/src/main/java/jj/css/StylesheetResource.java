@@ -38,6 +38,7 @@ import jj.resource.AbstractResource;
 import jj.resource.LoadedResource;
 import jj.resource.MimeTypes;
 import jj.resource.NoSuchResourceException;
+import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
 import jj.resource.stat.ic.StaticResource;
 import jj.script.Global;
@@ -62,6 +63,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	private final Path path;
 	private final String serverPath;
 	private final long size;
+	private final boolean safeToServe;
 	private final LessConfiguration lessConfiguration;
 
 	@Inject
@@ -70,7 +72,8 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global,
 		final CssReferenceVersionProcessor processor,
-		final LessConfiguration lessConfiguration
+		final LessConfiguration lessConfiguration,
+		final PathResolver pathResolver
 	) {
 		super(dependencies);
 		
@@ -110,6 +113,8 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 				throw new ResourceNotViableException(path, ioe);
 			}
 		}
+		
+		safeToServe = path.startsWith(pathResolver.path());
 
 		result = processor.fixUris(result, this);
 
@@ -162,6 +167,11 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	@Override
 	public String serverPath() {
 		return serverPath;
+	}
+	
+	@Override
+	public boolean safeToServe() {
+		return safeToServe;
 	}
 
 	@Override

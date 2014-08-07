@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.configuration.resolution.MockApplication;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
@@ -63,16 +64,19 @@ public class StylesheetResourceTest {
 	
 	Path cssPath;
 	
+	MockApplication app;
+	
 	@Before
 	public void before() throws Exception {
 		contextProvider = new RealRhinoContextProvider();
 		
 		cssPath = Paths.get(StylesheetResourceTest.class.getResource("/jj/css/test/test.css").toURI());
+		app = new MockApplication(cssPath.getParent());
 		given(cssResource.path()).willReturn(cssPath);
 	}
 	
 	private StylesheetResource newStylesheet(MockAbstractResourceDependencies dependencies) {
-		return new StylesheetResource(dependencies, contextProvider, global, processor, lessConfiguration);
+		return new StylesheetResource(dependencies, contextProvider, global, processor, lessConfiguration, app);
 	}
 
 	@Test

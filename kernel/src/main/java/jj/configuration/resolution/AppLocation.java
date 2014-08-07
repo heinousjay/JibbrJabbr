@@ -54,29 +54,33 @@ public enum AppLocation implements Location {
 	 * denotes this resource is not from the application file system,
 	 * such as a {@link ScriptEnvironment} 
 	 */
-	Virtual("", null, false),
+	Virtual("", null, false, false, false),
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", Virtual, false),
+	Assets("", Virtual, false, true, true),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", Virtual, false),
+	APIModules("", Virtual, false, true, true),
 	
 	/** the paths of the application pieces */
-	Base("", null, true),
-	Private("private/", Base, true),
-	PrivateSpecs("private-specs/", Base, true),
-	Public("public/", Base, true),
-	PublicSpecs("public-specs/", Base, true);
+	Base("", null, true, true, false),
+	Private("private/", Base, true, true, false),
+	PrivateSpecs("private-specs/", Base, true, true, false),
+	Public("public/", Base, true, true, false),
+	PublicSpecs("public-specs/", Base, true, true, false);
 	
 	private final String path;
 	private final AppLocation parent;
 	private final boolean ensureDirectory;
+	private final boolean representsFilesystem;
+	private final boolean internal;
 	
-	private AppLocation(final String path, final AppLocation parent, boolean ensureDirectory) {
+	private AppLocation(final String path, final AppLocation parent, final boolean ensureDirectory, final boolean representsFilesystem, final boolean internal) {
 		this.path = path;
 		this.parent = parent;
 		this.ensureDirectory = ensureDirectory;
+		this.representsFilesystem = representsFilesystem;
+		this.internal = internal;
 	}
 	
 	public Location and(Location next) {
@@ -102,5 +106,15 @@ public enum AppLocation implements Location {
 	@Override
 	public boolean parentInDirectory() {
 		return ensureDirectory;
+	}
+	
+	@Override
+	public boolean representsFilesystem() {
+		return representsFilesystem;
+	}
+	
+	@Override
+	public boolean internal() {
+		return internal;
 	}
 }

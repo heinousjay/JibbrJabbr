@@ -78,7 +78,7 @@ public class CssReferenceVersionProcessorTest {
 		StaticResource replacement = spy(StaticResourceMaker.make(app, Base, REPLACEMENT_CSS));
 		given(resourceFinder.loadResource(StaticResource.class, Base, REPLACEMENT_CSS)).willReturn(replacement);
 		
-		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null);
+		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null, app);
 		
 		
 		given(testCss.serverPath()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");

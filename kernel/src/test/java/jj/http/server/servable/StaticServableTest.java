@@ -44,7 +44,7 @@ public class StaticServableTest extends ServableTestBase {
 	@Before
 	public void before() {
 		
-		ss = new StaticServable(app, resourceFinder);
+		ss = new StaticServable(resourceFinder);
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public class StaticServableTest extends ServableTestBase {
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/" + ZERO_TXT));
 		given(resourceFinder.loadResource(StaticResource.class, Base.and(Assets), ZERO_TXT)).willReturn(resource);
-		given(resource.path()).willReturn(appPath.resolve(ZERO_TXT));
+		given(resource.safeToServe()).willReturn(true);
 		
 		RequestProcessor rp = ss.makeRequestProcessor(request, response);
 		

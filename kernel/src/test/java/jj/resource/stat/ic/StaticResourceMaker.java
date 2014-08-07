@@ -32,6 +32,6 @@ public class StaticResourceMaker {
 		ResourceKey resourceKey = mock(ResourceKey.class);
 		Publisher publisher = mock(Publisher.class);
 		
-		return new StaticResource(new MockAbstractResourceDependencies(resourceKey, base, name, publisher), app.resolvePath(base, name));
+		return new StaticResource(new MockAbstractResourceDependencies(resourceKey, base, name, publisher), app.resolvePath(base, name), app);
 	}
 }

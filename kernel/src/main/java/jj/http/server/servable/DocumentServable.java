@@ -12,7 +12,6 @@ import jj.configuration.resolution.AppLocation;
 import jj.configuration.resolution.Assets;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentRequestProcessor;
-import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
@@ -35,11 +34,9 @@ class DocumentServable extends Servable<DocumentScriptEnvironment> {
 	
 	@Inject
 	DocumentServable(
-		final PathResolver pathResolver,
 		final ResourceFinder resourceFinder,
 		final Injector parentInjector
 	) {
-		super(pathResolver);
 		this.resourceFinder = resourceFinder;
 		this.parentInjector = parentInjector;
 	}

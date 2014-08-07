@@ -26,4 +26,6 @@ public interface ServableResource extends Resource {
 	String serverPath();
 	
 	String mime();
+	
+	boolean safeToServe();
 }

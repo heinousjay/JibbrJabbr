@@ -22,7 +22,6 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 import jj.http.server.HttpServerRequest;
@@ -43,10 +42,8 @@ public class StaticServable extends Servable<StaticResource> {
 	 */
 	@Inject
 	protected StaticServable(
-		final PathResolver pathResolver,
 		final ResourceFinder resourceFinder
 	) {
-		super(pathResolver);
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -64,7 +61,7 @@ public class StaticServable extends Servable<StaticResource> {
 		final HttpServerResponse response
 	) throws IOException {
 		final StaticResource resource = loadResource(request.uriMatch());
-		if (resource != null && isServableResource(resource)) {
+		if (resource != null && resource.safeToServe()) {
 			return makeStandardRequestProcessor(request, response, request.uriMatch(), resource);
 		}
 		

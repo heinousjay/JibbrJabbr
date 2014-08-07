@@ -1,6 +1,7 @@
 package jj.script.module;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static jj.configuration.resolution.AppLocation.Base;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -17,6 +18,7 @@ import org.mozilla.javascript.Script;
 import jj.resource.AbstractFileResource;
 import jj.resource.LoadedResource;
 import jj.resource.MimeTypes;
+import jj.resource.PathResolver;
 import jj.script.RhinoContext;
 
 @Singleton
@@ -26,17 +28,23 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	
 	private final Script script;
 	
+	private final boolean safeToServe;
+	
 	@Inject
 	ScriptResource(
 		final Dependencies dependencies,
 		final Path path,
-		final Provider<RhinoContext> contextProvider
+		final Provider<RhinoContext> contextProvider,
+		final PathResolver pathResolver
 	) throws IOException {
 		super(dependencies, path);
 		source = byteBuffer.toString(UTF_8);
 		try (RhinoContext context = contextProvider.get()) {
 			script = context.compileString(source, name);
 		}
+		
+		// Public! soon
+		safeToServe = base == Base && pathResolver.pathInBase(path);
 	}
 	
 	public Script script() {
@@ -65,5 +73,10 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	@Override
 	public String serverPath() {
 		return "/" + sha1() + "/" + name();
+	}
+	
+	@Override
+	public boolean safeToServe() {
+		return safeToServe;
 	}
 }

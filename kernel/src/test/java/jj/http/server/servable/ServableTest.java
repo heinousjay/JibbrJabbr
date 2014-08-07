@@ -15,21 +15,17 @@
  */
 package jj.http.server.servable;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
 
 import java.io.IOException;
 
-import jj.configuration.resolution.AppLocation;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.uri.URIMatch;
 import jj.resource.FileResource;
-import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
-import jj.resource.Resource;
+import jj.resource.ServableResource;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,14 +44,7 @@ public class ServableTest extends ServableTestBase {
 	static final String MIME = "mime";
 	static final long LENGTH = 100L;
 	
-	static final class ServableImpl extends Servable<Resource> {
-
-		/**
-		 * @param configuration
-		 */
-		protected ServableImpl(PathResolver pathResolver) {
-			super(pathResolver);
-		}
+	static final class ServableImpl extends Servable<ServableResource> {
 
 		@Override
 		public boolean isMatchingRequest(URIMatch uriMatch) {
@@ -69,7 +58,7 @@ public class ServableTest extends ServableTestBase {
 		}
 
 		@Override
-		public Resource loadResource(URIMatch match) {
+		public ServableResource loadResource(URIMatch match) {
 			return null;
 		}
 		
@@ -81,21 +70,7 @@ public class ServableTest extends ServableTestBase {
 	
 	@Before
 	public void before() {
-		si = new ServableImpl(app);
-	}
-
-	@Test
-	public void testIsServablePath() {
-		
-		given(resource.path()).willReturn(appPath.resolve("index.html"));
-		given(resource.base()).willReturn(AppLocation.Public);
-		
-		assertThat(si.isServableResource(resource), is(true));
-		
-		given(resource.path()).willReturn(appPath.resolve("../not-servable/index.html"));
-		
-		assertThat(si.isServableResource(resource), is(false));
-		
+		si = new ServableImpl();
 	}
 	
 	@Test

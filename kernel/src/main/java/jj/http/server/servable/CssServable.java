@@ -10,7 +10,6 @@ import jj.css.StylesheetResource;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.uri.URIMatch;
-import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 
 // TODO! move this to the css package
@@ -22,11 +21,7 @@ class CssServable extends Servable<StylesheetResource> {
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
-	CssServable(
-		final PathResolver app,
-		final ResourceFinder resourceFinder
-	) {
-		super(app);
+	CssServable(final ResourceFinder resourceFinder) {
 		this.resourceFinder = resourceFinder;
 	}
 

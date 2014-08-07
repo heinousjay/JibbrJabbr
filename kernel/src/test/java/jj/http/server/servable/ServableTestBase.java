@@ -15,15 +15,12 @@
  */
 package jj.http.server.servable;
 
-import static org.mockito.BDDMockito.*;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.JJ;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;
@@ -40,7 +37,6 @@ public abstract class ServableTestBase {
 	
 	Path appPath;
 	
-	@Mock PathResolver app;
 	@Mock ResourceFinder resourceFinder;
 	
 	@Mock HttpServerRequest request;
@@ -53,8 +49,6 @@ public abstract class ServableTestBase {
 			JJ.resourcePath(ServableTestBase.class).replace(ServableTestBase.class.getSimpleName() + ".class", "0.txt");
 		
 		appPath = Paths.get(ServableTestBase.class.getResource(path).toURI()).getParent();
-		
-		given(app.path()).willReturn(appPath);
 	}
 
 }

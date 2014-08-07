@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.AbstractFileResource;
+import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
 import jj.resource.MimeTypes;
 import jj.resource.TransferableResource;
@@ -40,15 +41,22 @@ public class StaticResource extends AbstractFileResource implements Transferable
 
 	private final String mime;
 	
+	private final boolean safeToServe;
+	
 	/**
 	 * @param baseName
 	 * @param path
 	 * @throws IOException
 	 */
 	@Inject
-	StaticResource(final Dependencies dependencies, final Path path) throws IOException {
+	StaticResource(
+		final Dependencies dependencies,
+		final Path path,
+		final PathResolver pathResolver
+	) throws IOException {
 		super(dependencies, path, false);
 		mime = MimeTypes.get(name);
+		safeToServe = base.internal() || pathResolver.pathInBase(path);
 	}
 	
 	@Override
@@ -76,5 +84,10 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	@Override
 	public String serverPath() {
 		return "/" + sha1() + "/" + name();
+	}
+	
+	@Override
+	public boolean safeToServe() {
+		return safeToServe;
 	}
 }

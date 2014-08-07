@@ -32,6 +32,8 @@ public interface PathResolver {
 	 * The base path of the application
 	 */
 	Path path();
+	
+	boolean pathInBase(Path path);
 
 	/**
 	 * resolve the given location and name against

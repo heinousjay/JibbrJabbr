@@ -63,6 +63,11 @@ public class Application implements PathResolver {
 		if (result == null) result = Paths.get(DEFAULT_APP_PATH);
 		return result;
 	}
+	
+	@Override
+	public boolean pathInBase(final Path path) {
+		return path.startsWith(path());
+	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {

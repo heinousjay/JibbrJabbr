@@ -56,11 +56,29 @@ public interface Location {
 			// never should even get called
 			throw new AssertionError("called parentInDirectory on a Location.Bundle. should never happen");
 		}
+		
+		@Override
+		public boolean representsFilesystem() {
+			// bundles cannot be used in this way
+			// never should even get called
+			throw new AssertionError("called representsFilesystem on a Location.Bundle. should never happen");
+		}
+		
+		@Override
+		public boolean internal() {
+			// bundles cannot be used in this way
+			// never should even get called
+			throw new AssertionError("called internal on a Location.Bundle. should never happen");
+		}
 	}
 	
 	Location and(Location location);
 	
 	List<Location> locations();
 	
+	boolean representsFilesystem();
+	
 	boolean parentInDirectory();
+	
+	boolean internal();
 }

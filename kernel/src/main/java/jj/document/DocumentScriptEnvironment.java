@@ -169,6 +169,11 @@ public class DocumentScriptEnvironment
 	public String serverPath() {
 		return serverPath;
 	}
+	
+	@Override
+	public boolean safeToServe() {
+		return true;
+	}
 
 	@Override
 	public String mime() {

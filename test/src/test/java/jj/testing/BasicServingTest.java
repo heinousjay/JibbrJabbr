@@ -142,8 +142,8 @@ public class BasicServingTest {
 				@Override
 				public void ready(EmbeddedHttpResponse response) {
 					try {
-						assertThat(response.status(), is(HttpResponseStatus.OK));
-						assertThat(response.bodyContentAsBytes(), is(request.bytes));
+						assertThat(request.uri, response.status(), is(HttpResponseStatus.OK));
+						assertThat(request.uri, response.bodyContentAsBytes(), is(request.bytes));
 					} catch (Throwable t) {
 						error.addSuppressed(t);
 //						try {

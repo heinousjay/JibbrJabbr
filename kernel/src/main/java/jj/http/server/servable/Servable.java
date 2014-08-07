@@ -1,50 +1,17 @@
 package jj.http.server.servable;
 
 
-import static jj.configuration.resolution.AppLocation.*;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
 
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.uri.URIMatch;
-import jj.resource.FileResource;
-import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
+import jj.resource.ServableResource;
 import io.netty.handler.codec.http.HttpHeaders;
 
-public abstract class Servable<T extends Resource> {
-	
-	protected final PathResolver pathResolver;
-	
-	protected Servable(final PathResolver pathResolver) {
-		this.pathResolver = pathResolver;
-	}
-	
-	// TODO probably removing this?
-	private Path appPath() {
-		return pathResolver.path();
-	}
-	
-	/**
-	 * ensures that the path we end up with is real and under our base path. some
-	 * servables care, some don't
-	 * @param result
-	 * @return
-	 */
-	@ResourceThread
-	protected boolean isServableResource(final FileResource resource) {
-		boolean result = (resource.base() == Assets || resource.base() == Virtual);
-		if (result == false) {
-			final Path normalized = resource.path().normalize();
-			result = Files.exists(normalized, LinkOption.NOFOLLOW_LINKS) && normalized.startsWith(appPath());
-		}
-		return result;
-	}
+public abstract class Servable<T extends ServableResource> {
 	
 	/**
 	 * Indicates if the incoming request can potentially be served by this servable.
