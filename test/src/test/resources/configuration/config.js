@@ -3,6 +3,10 @@
 require('jj/jasmine-configuration').autorunSpecs(false);
 require('jj/repl-configuration').activate(true).port(33445); // on an abnormal port to avoid startup conflicts
 
+require('jj/i18n-configuration')
+	.allowNonISO(true)
+	.defaultLocale('en-gb');
+
 // the http-server-socket module returns an object that can configure
 // its namesake
 require('jj/http-server-socket-configuration')

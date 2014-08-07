@@ -24,7 +24,7 @@ import jj.document.DocumentProcessingModule;
 import jj.engine.HostApiModule;
 import jj.event.EventModule;
 import jj.execution.ExecutionModule;
-import jj.i18n.MessagingModule;
+import jj.i18n.I18NModule;
 import jj.jasmine.JasmineModule;
 import jj.jjmessage.JJMessageModule;
 import jj.logging.LoggingModule;
@@ -82,7 +82,7 @@ public class CoreModule extends JJModule {
 		
 		install(new HttpModule());
 		
-		install(new MessagingModule());
+		install(new I18NModule());
 
 		install(new DocumentProcessingModule());
 		

@@ -21,10 +21,17 @@ import jj.JJModule;
  * @author jason
  *
  */
-public class MessagingModule extends JJModule {
+public class I18NModule extends JJModule {
 
 	@Override
 	protected void configure() {
+		
+		addAPIModulePath("/jj/i18n/api");
+		
+		bindConfiguration().to(I18NConfiguration.class);
+		
+		addConverterBinding().to(StringToLocaleConverter.class);
+		
 		
 		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		bindCreation().of(MessagesResource.class).to(MessagesResourceCreator.class);

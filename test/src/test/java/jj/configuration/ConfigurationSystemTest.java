@@ -22,6 +22,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
@@ -32,6 +33,7 @@ import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
 import jj.http.uri.Route;
 import jj.http.uri.RouterConfiguration;
+import jj.i18n.I18NConfiguration;
 import jj.css.LessConfiguration;
 import jj.document.DocumentConfiguration;
 import jj.event.Listener;
@@ -74,6 +76,9 @@ public class ConfigurationSystemTest {
 	
 	@Inject
 	private ResourceConfiguration resourceConfiguration;
+	
+	@Inject
+	private I18NConfiguration i18nConfiguration;
 	
 	volatile boolean loaded;
 	final CountDownLatch loadedLatch = new CountDownLatch(1);
@@ -129,6 +134,9 @@ public class ConfigurationSystemTest {
 		assertThat(lessConfiguration.maxLineLen(), is(1024));
 		
 		assertThat(resourceConfiguration.maxFileSizeToLoad(), is(102400000000L));
+		
+		assertThat(i18nConfiguration.allowNonISO(), is(true));
+		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String destination) {
