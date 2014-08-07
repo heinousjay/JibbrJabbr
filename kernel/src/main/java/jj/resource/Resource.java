@@ -24,34 +24,38 @@ public interface Resource {
 	
 	/**
 	 * The name of this resource
-	 * @return
 	 */
 	String name();
 
 	/**
 	 * uri to this resource
-	 * @return
 	 */
 	URI uri();
 	
 	/**
 	 * sha1 of the resource
-	 * @return
 	 */
 	String sha1();
 	
 	/**
 	 * charset of the resource, if it represents text, null otherwise
-	 * @return
 	 */
 	Charset charset();
 
 	/**
 	 * Adds a dependent resource to this resource, which will propagate
 	 * reloads to the dependent
-	 * @param dependent
 	 */
 	void addDependent(Resource dependent);
 	
+	/**
+	 * The key in the cache where this resource is stored
+	 */
 	ResourceKey cacheKey();
+	
+	/**
+	 * flag indicating this live status of this resource.  a resource is considered alive
+	 * between the time of its creation and the time it is removed from the resource cache.
+	 */
+	boolean alive();
 }

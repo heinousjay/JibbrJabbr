@@ -134,6 +134,11 @@ public class ResourceInstanceCreatorTest  {
 			return null;
 		}
 		
+		@Override
+		public boolean alive() {
+			return true;
+		}
+		
 	}
 	
 	@Test

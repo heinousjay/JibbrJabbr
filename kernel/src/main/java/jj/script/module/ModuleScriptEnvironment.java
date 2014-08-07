@@ -23,7 +23,6 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.AbstractResource;
 import jj.resource.Location;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
@@ -87,7 +86,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		pendingKey = requiredModule.pendingKey();
 		
-		assert ((AbstractResource)requiredModule.parent()).alive(): "cannot require a module for a dead parent";
+		assert requiredModule.parent().alive(): "cannot require a module for a dead parent";
 		
 		// the script is loaded from the app, and if not found there, then an API module is searched
 		// internally.  this may change! but i like its simplicity
