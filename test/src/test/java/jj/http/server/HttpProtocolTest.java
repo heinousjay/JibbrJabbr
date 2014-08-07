@@ -17,7 +17,7 @@ package jj.http.server;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -137,37 +137,27 @@ public class HttpProtocolTest {
 	}
 	
 	private void testGet() throws Throwable {
-		EmbeddedHttpResponse response = testServer.request("GET / HTTP/1.1\r\n\r\n");
-		
-		response.await(2, SECONDS);
+		EmbeddedHttpResponse response = testServer.request("GET / HTTP/1.1\r\n\r\n").await(50, MILLISECONDS);
 		
 		assertThat(response.status(), is(OK));
 	}
 
 	private void testFirstLineErrors() throws Throwable {
-		EmbeddedHttpResponse response = testServer.request("this will fail\r\n\r\n");
-		
-		response.await(2, SECONDS);
+		EmbeddedHttpResponse response = testServer.request("this will fail\r\n\r\n").await(50, MILLISECONDS);
 		
 		assertThat(response.status(), is(BAD_REQUEST));
 		
-		response = testServer.request("this too\r\n\r\n");
-		
-		response.await(2, SECONDS);
+		response = testServer.request("this too\r\n\r\n").await(50, MILLISECONDS);
 		
 		assertThat(response.status(), is(BAD_REQUEST));
 		
-		response = testServer.request("not implemented HTTP/1.1\r\n\r\n");
-		
-		response.await(2, SECONDS);
+		response = testServer.request("not implemented HTTP/1.1\r\n\r\n").await(50, MILLISECONDS);
 		
 		assertThat(response.status(), is(NOT_IMPLEMENTED));
 	}
 	
 	private void testOptions() throws Throwable {
-		EmbeddedHttpResponse response = testServer.request("OPTIONS /something HTTP/1.1\r\n\r\n");
-		
-		response.await(2, SECONDS);
+		EmbeddedHttpResponse response = testServer.request("OPTIONS /something HTTP/1.1\r\n\r\n").await(50, MILLISECONDS);
 		
 		assertThat(response.status(), is(OK));
 		assertThat(response.headers().get(HttpHeaders.Names.ALLOW), is("GET,HEAD,TRACE,OPTIONS"));
