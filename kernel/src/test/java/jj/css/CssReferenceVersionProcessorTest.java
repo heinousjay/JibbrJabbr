@@ -64,7 +64,7 @@ public class CssReferenceVersionProcessorTest {
 		basePath = Paths.get(getClass().getResource("/jj/css/test").toURI());
 		app = new MockApplication(basePath);
 		
-		dependencies = new MockAbstractResourceDependencies(Base);
+		dependencies = new MockAbstractResourceDependencies(Base, REPLACEMENT_CSS);
 		
 		resourceFinder = dependencies.resourceFinder();
 	}
@@ -78,7 +78,7 @@ public class CssReferenceVersionProcessorTest {
 		StaticResource replacement = spy(StaticResourceMaker.make(app, Base, REPLACEMENT_CSS));
 		given(resourceFinder.loadResource(StaticResource.class, Base, REPLACEMENT_CSS)).willReturn(replacement);
 		
-		StylesheetResource stylesheet = new StylesheetResource(dependencies, REPLACEMENT_CSS, null, null, processor, null);
+		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null);
 		
 		
 		given(testCss.uri()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");
@@ -92,7 +92,7 @@ public class CssReferenceVersionProcessorTest {
 		given(resourceFinder.loadResource(StaticResource.class, Base, ROX_ICON)).willReturn(rox);
 		given(resourceFinder.loadResource(StaticResource.class, Base, SOX_ICON)).willReturn(sox);
 		
-		String inputString = new String(Files.readAllBytes(basePath.resolve("replacement.css")), UTF_8);
+		String inputString = new String(Files.readAllBytes(basePath.resolve(REPLACEMENT_CSS)), UTF_8);
 		
 		// when
 		String outputString = processor.fixUris(inputString, stylesheet);

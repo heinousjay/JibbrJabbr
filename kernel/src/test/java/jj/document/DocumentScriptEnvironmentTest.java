@@ -85,19 +85,21 @@ public class DocumentScriptEnvironmentTest {
 
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractScriptEnvironmentDependencies();
-		
-		cacheKey = dependencies.resourceCacheKey();
-		
-		contextMaker = dependencies.rhinoContextProvider();
-		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
-		given(contextMaker.context.newChainedScope(any(Scriptable.class))).willReturn(local);
 		
 		given(script.path()).willReturn(Paths.get("/"));
 		
 		currentDocument = new CurrentDocumentRequestProcessor();
 		
 		currentConnection = new MockCurrentWebSocketConnection();
+	}
+	
+	private void makeResourceDependencies(String name) {
+		dependencies = new MockAbstractScriptEnvironmentDependencies(name, resourceFinder);
+		
+		cacheKey = dependencies.resourceCacheKey();
+		contextMaker = dependencies.rhinoContextProvider();
+		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
+		given(contextMaker.context.newChainedScope(any(Scriptable.class))).willReturn(local);
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
@@ -117,10 +119,10 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {
+		makeResourceDependencies(baseName);
+		
 		return new DocumentScriptEnvironment(
 			dependencies,
-			baseName,
-			resourceFinder,
 			api,
 			scriptCompiler,
 			processors,

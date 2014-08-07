@@ -30,10 +30,9 @@ public class PropertiesResource extends AbstractFileResource {
 	@Inject
 	PropertiesResource(
 		final Dependencies dependencies,
-		final Path path,
-		final String name
+		final Path path
 	) throws IOException {
-		super(dependencies, name, path, false);
+		super(dependencies, path, false);
 		
 		Properties loader = new Properties();
 		loader.load(new StringReader(new String(Files.readAllBytes(path), UTF_8)));

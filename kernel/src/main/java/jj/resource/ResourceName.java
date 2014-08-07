@@ -15,27 +15,23 @@
  */
 package jj.resource;
 
-import java.io.IOException;
-import java.net.URI;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import jj.event.Publisher;
+import javax.inject.Qualifier;
 
-class MyResourceCreator extends SimpleResourceCreator<MyResource> {
-	
-	private final Publisher publisher;
-	
-	MyResourceCreator(Publisher publisher) {
-		super(new Dependencies(null, null));
-		this.publisher = publisher;
-	}
+/**
+ * Annotates the resource name String argument.
+ * @author jason
+ *
+ */
+@Qualifier
+@Documented
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ResourceName {
 
-	@Override
-	public MyResource create(Location base, String name, Object... args) throws IOException {
-		return new MyResource(name, publisher);
-	}
-
-	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		return URI.create(name);
-	}
 }

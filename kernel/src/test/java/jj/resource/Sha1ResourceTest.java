@@ -61,7 +61,7 @@ public class Sha1ResourceTest {
 	
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractResourceDependencies(resourceKey, Base);
+		dependencies = new MockAbstractResourceDependencies(resourceKey, Base, indexHtml);
 		
 		Path path = pathFor(indexSha1);
 		if (path != null && Files.exists(path)) {
@@ -90,7 +90,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + size).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, indexHtml, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));
@@ -103,7 +103,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + (size - 1L)).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, indexHtml, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));
@@ -114,7 +114,7 @@ public class Sha1ResourceTest {
 	@Test
 	public void testNonExistent() throws Exception {
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, indexHtml, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));

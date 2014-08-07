@@ -27,7 +27,7 @@ import jj.resource.AbstractResource;
 import jj.resource.Location;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceFinder;
+
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ChildScriptEnvironment;
 import jj.script.ContinuationPendingKey;
@@ -56,8 +56,6 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	public static final String API_PREFIX = "jj/";
 	
-	private final String moduleIdentifier;
-	
 	private final RequiredModule requiredModule;
 	
 	// the key to restarting whatever included this.  gets removed on first read and is null forever after
@@ -73,18 +71,16 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	@Inject
 	ModuleScriptEnvironment(
 		final Dependencies dependencies,
-		final String moduleIdentifier,
-		final RequiredModule requiredModule,
-		final ResourceFinder resourceFinder
+		final RequiredModule requiredModule
 	) {
 		super(dependencies);
 
+		String moduleIdentifier = name;
+		
 		Location base = Base;
-		if (moduleIdentifier.startsWith(API_PREFIX)) {
+		if (name.startsWith(API_PREFIX)) {
 			base = APIModules;
-			this.moduleIdentifier = moduleIdentifier.substring(API_PREFIX.length());
-		} else {
-			this.moduleIdentifier = moduleIdentifier;
+			moduleIdentifier = name.substring(API_PREFIX.length());
 		}
 		
 		this.requiredModule = requiredModule;
@@ -96,7 +92,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		// the script is loaded from the app, and if not found there, then an API module is searched
 		// internally.  this may change! but i like its simplicity
 		
-		scriptResource = resourceFinder.loadResource(ScriptResource.class, base, scriptName());
+		scriptResource = resourceFinder.loadResource(ScriptResource.class, base, moduleIdentifier + ".js");
 		
 		if (scriptResource == null) {
 			throw new NoSuchResourceException(getClass(), moduleIdentifier);
@@ -133,12 +129,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 
 	@Override
 	public String scriptName() {
-		return moduleIdentifier + ".js";
-	}
-
-	@Override
-	public String name() {
-		return moduleIdentifier;
+		return name + ".js";
 	}
 
 	@Override

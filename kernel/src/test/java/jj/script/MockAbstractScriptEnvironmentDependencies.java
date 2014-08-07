@@ -34,13 +34,14 @@ import jj.util.MockClock;
 public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 	
 	public interface MockPendingKeyProvider extends Provider<ContinuationPendingKey> {}
-
+	
 	public MockAbstractScriptEnvironmentDependencies() {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
 			mock(AbstractResourceInitializationListener.class),
 			mock(ResourceKey.class),
+			"unnamed",
 			new MockRhinoContextProvider(),
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class),
@@ -51,12 +52,47 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		);
 	}
 
-	public MockAbstractScriptEnvironmentDependencies(RealRhinoContextProvider rhinoContextProvider) {
+	public MockAbstractScriptEnvironmentDependencies(final String name) {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
 			mock(AbstractResourceInitializationListener.class),
 			mock(ResourceKey.class),
+			name,
+			new MockRhinoContextProvider(),
+			mock(MockPendingKeyProvider.class),
+			mock(RequireInnerFunction.class),
+			mock(InjectFunction.class),
+			mock(Timers.class),
+			mock(Publisher.class),
+			mock(ResourceFinder.class)
+		);
+	}
+
+	public MockAbstractScriptEnvironmentDependencies(final String name, final ResourceFinder resourceFinder) {
+		super(
+			new MockClock(),
+			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
+			mock(ResourceKey.class),
+			name,
+			new MockRhinoContextProvider(),
+			mock(MockPendingKeyProvider.class),
+			mock(RequireInnerFunction.class),
+			mock(InjectFunction.class),
+			mock(Timers.class),
+			mock(Publisher.class),
+			resourceFinder
+		);
+	}
+
+	public MockAbstractScriptEnvironmentDependencies(final RealRhinoContextProvider rhinoContextProvider, final String name) {
+		super(
+			new MockClock(),
+			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
+			mock(ResourceKey.class),
+			name,
 			rhinoContextProvider,
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class),
@@ -81,6 +117,10 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 	
 	public ResourceKey resourceCacheKey() {
 		return resourceKey;
+	}
+	
+	public String name() {
+		return name;
 	}
 	
 	public MockRhinoContextProvider rhinoContextProvider() {

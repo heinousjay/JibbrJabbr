@@ -43,8 +43,8 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	 * @throws IOException
 	 */
 	@Inject
-	StaticResource(final Dependencies dependencies, final Path path, final String name) throws IOException {
-		super(dependencies, name, path, false);
+	StaticResource(final Dependencies dependencies, final Path path) throws IOException {
+		super(dependencies, path, false);
 		mime = MimeTypes.get(name);
 	}
 	

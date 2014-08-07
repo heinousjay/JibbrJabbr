@@ -37,7 +37,6 @@ import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketMessageProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptThread;
@@ -65,8 +64,6 @@ public class DocumentScriptEnvironment
 	// --- implementation
 	
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
-
-	private final String baseName;
 	
 	private final String uri;
 	
@@ -98,8 +95,6 @@ public class DocumentScriptEnvironment
 	@Inject
 	DocumentScriptEnvironment(
 		final Dependencies dependencies,
-		final String baseName,
-		final ResourceFinder resourceFinder,
 		final EngineAPI api,
 		final ScriptCompiler compiler,
 		final WebSocketMessageProcessor processor,
@@ -107,17 +102,16 @@ public class DocumentScriptEnvironment
 		final CurrentWebSocketConnection currentConnection
 	) {
 		super(dependencies);
-		this.baseName = baseName;
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, resourceName(baseName));
+		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, resourceName(name));
 		
 		if (html == null) {
-			throw new NoSuchResourceException(getClass(), baseName + "-" + resourceName(baseName));
+			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(baseName));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(baseName));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(baseName));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(name));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(name));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(name));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -127,7 +121,7 @@ public class DocumentScriptEnvironment
 		);
 		
 
-		uri = "/" + sha1 + "/" + baseName;
+		uri = "/" + sha1 + "/" + name;
 		
 		if (serverScript == null)  {
 			socketUri = null;
@@ -136,12 +130,12 @@ public class DocumentScriptEnvironment
 		} else {
 			socketUri = uri + ".socket";
 			global = api.global();
-			scope = configureTimers(configureModuleObjects(baseName, createChainedScope(global)));
+			scope = configureTimers(configureModuleObjects(name, createChainedScope(global)));
 			
 			try {
 				compiler.compile(scope, clientScript, sharedScript, serverScript.name());
 			} catch (Exception e) {
-				throw new ResourceNotViableException(baseName, e);
+				throw new ResourceNotViableException(name, e);
 			}
 		}
 		
@@ -156,18 +150,13 @@ public class DocumentScriptEnvironment
 		this.currentConnection = currentConnection;
 	}
 
-	private String resourceName(final String baseName) {
-		return baseName + ".html";
+	private String resourceName(final String name) {
+		return name + ".html";
 	}
 
 	@Override
-	public String name() {
-		return baseName;
-	}
-	
-	@Override
 	public String scriptName() {
-		return ScriptResourceType.Client.suffix(baseName);
+		return ScriptResourceType.Client.suffix(name);
 	}
 
 	@Override

@@ -42,6 +42,8 @@ import org.mozilla.javascript.Script;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptResourceTest {
 	
+	private static final String NAME =  "test.js";
+	
 	MockAbstractResourceDependencies dependencies;
 	MockRhinoContextProvider contextProvider;
 	Path rootPath;
@@ -50,7 +52,7 @@ public class ScriptResourceTest {
 	
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractResourceDependencies(AppLocation.Base);
+		dependencies = new MockAbstractResourceDependencies(AppLocation.Base, NAME);
 		contextProvider = new MockRhinoContextProvider();
 		rootPath = Paths.get(ScriptResourceTest.class.getResource("/jj/script/module/test.js").toURI()).getParent();
 	}
@@ -58,13 +60,11 @@ public class ScriptResourceTest {
 	@Test
 	public void test() throws Exception {
 		
-		String name =  "test.js";
+		String contents = new String(Files.readAllBytes(rootPath.resolve(NAME)), UTF_8);
 		
-		String contents = new String(Files.readAllBytes(rootPath.resolve(name)), UTF_8);
+		given(contextProvider.context.compileString(contents, NAME)).willReturn(script);
 		
-		given(contextProvider.context.compileString(contents, name)).willReturn(script);
-		
-		ScriptResource resource = new ScriptResource(dependencies, rootPath.resolve(name), name, contextProvider);
+		ScriptResource resource = new ScriptResource(dependencies, rootPath.resolve(NAME), contextProvider);
 		
 		assertThat(resource.script(), is(script));
 	}

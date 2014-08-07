@@ -20,8 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.BDDMockito.isA;
 
-import java.net.URI;
-
 import jj.event.Publisher;
 
 import org.junit.Test;
@@ -44,10 +42,10 @@ public class AbstractResourceTest {
 	@Test
 	public void testDependencyAndLifetimeInteraction() {
 		
-		final AbstractResource base = new MyResource(URI.create(""), publisher);
-		final AbstractResource one = new MyResource(URI.create("1"), publisher);
-		final AbstractResource two = new MyResource(URI.create("2"), publisher);
-		final AbstractResource one_two = new MyResource(URI.create("1/2"), publisher);
+		final AbstractResource base = new MyResource("", publisher);
+		final AbstractResource one = new MyResource("1", publisher);
+		final AbstractResource two = new MyResource("2", publisher);
+		final AbstractResource one_two = new MyResource("1/2", publisher);
 		
 		base.addDependent(one);
 		base.addDependent(two);

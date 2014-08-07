@@ -46,19 +46,15 @@ class Sha1Resource extends AbstractResource {
 	private final String representedSha;
 	private final long representedFileSize;
 	
-	private final String name;
 	private final String sha1;
 
 	@Inject
 	Sha1Resource(
 		final Dependencies dependencies,
-		final String name,
 		final Path path,
 		final Sha1ResourceTarget target
 	) throws IOException {
 		super(dependencies);
-		
-		this.name = name;
 		
 		// 3 possibilities
 		// either there is no file at path, so we read in our target bytes to make one
@@ -113,11 +109,6 @@ class Sha1Resource extends AbstractResource {
 
 	public long representedFileSize() {
 		return representedFileSize;
-	}
-
-	@Override
-	public String name() {
-		return name;
 	}
 
 	@Override

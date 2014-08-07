@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 
 import jj.resource.MockAbstractResourceDependencies;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -33,23 +32,21 @@ import org.junit.Test;
  */
 public class LessResourceTest {
 	
-	MockAbstractResourceDependencies dependencies;
+	private static final String NAME = "jj/resource/test.less";
 	
-	@Before
-	public void before() {
-		dependencies = new MockAbstractResourceDependencies(Base);
-	}
+	MockAbstractResourceDependencies dependencies;
 
 	private LessResource lessResource(String name) throws Exception {
+		dependencies = new MockAbstractResourceDependencies(Base, name);
 		
 		Path path = Paths.get(LessResourceTest.class.getResource("/" + name).toURI());
 		
-		return new LessResource(dependencies, name, path);
+		return new LessResource(dependencies, path);
 	}
 	
 	@Test
 	public void test() throws Exception {
-		LessResource lr = lessResource("jj/resource/test.less");
+		LessResource lr = lessResource(NAME);
 		
 		assertThat(lr.contents(), is(notNullValue()));
 		// ehh good enough!

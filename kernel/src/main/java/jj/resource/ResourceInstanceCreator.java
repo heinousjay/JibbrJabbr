@@ -79,7 +79,7 @@ public class ResourceInstanceCreator {
 							bind(resourceClass);
 							bind(ResourceKey.class).toInstance(resourceKey);
 							bind(Location.class).toInstance(base);
-							bind(String.class).toInstance(name);
+							bind(String.class).annotatedWith(ResourceName.class).toInstance(name);
 							if (path != null) {
 								bind(Path.class).toInstance(path);
 							}

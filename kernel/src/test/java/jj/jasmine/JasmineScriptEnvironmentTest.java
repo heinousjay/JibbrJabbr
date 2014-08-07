@@ -70,7 +70,7 @@ public class JasmineScriptEnvironmentTest {
 	@Before
 	public void before() {
 		count = 0;
-		dependencies = new MockAbstractScriptEnvironmentDependencies();
+		dependencies = new MockAbstractScriptEnvironmentDependencies(specName);
 		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
 		given(dependencies.rhinoContextProvider().context.newChainedScope(global)).willReturn(global);
 		
@@ -99,7 +99,7 @@ public class JasmineScriptEnvironmentTest {
 	
 	@Test(expected = NoSuchResourceException.class)
 	public void testNotFound() {
-		new JasmineScriptEnvironment(dependencies, specName, global, resourceFinder, makeResourceLoaded(target));
+		new JasmineScriptEnvironment(dependencies, global, resourceFinder, makeResourceLoaded(target));
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class JasmineScriptEnvironmentTest {
 		fakeResource(spec);
 		given(resourceFinder.loadResource(ScriptResource.class, Base, specName)).willReturn(spec);
 		
-		JasmineScriptEnvironment jse = new JasmineScriptEnvironment(dependencies, specName, global, resourceFinder, makeResourceLoaded(target));
+		JasmineScriptEnvironment jse = new JasmineScriptEnvironment(dependencies, global, resourceFinder, makeResourceLoaded(target));
 		
 		assertThat(jse.name(), is(specName));
 		assertThat(jse.script(), is(jasmineBootScript));

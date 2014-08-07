@@ -41,15 +41,13 @@ public class DirectoryResource extends AbstractResource implements ParentedResou
 	public static final String ROOT_NAME = "";
 
 	private final Path path;
-	private final String name;
 	private final FileTime lastModified;
 	private final String sha1;
 	
 	@Inject
 	DirectoryResource(
 		final Dependencies dependencies,
-		final Path path,
-		final String name
+		final Path path
 	) throws IOException {
 		super(dependencies);
 		
@@ -66,15 +64,9 @@ public class DirectoryResource extends AbstractResource implements ParentedResou
 		}
 		
 		this.path = path;
-		this.name = name;
 		this.lastModified = attributes.lastModifiedTime();
 		
 		this.sha1 = SHA1Helper.keyFor(path.toString());
-	}
-
-	@Override
-	public String name() {
-		return name;
 	}
 
 	@Override

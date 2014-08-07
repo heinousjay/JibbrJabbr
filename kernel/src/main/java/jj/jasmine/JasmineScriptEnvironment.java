@@ -50,8 +50,6 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	static final String JASMINE_JS      = JASMINE + ".js";
 	static final String JASMINE_BOOT_JS = JASMINE + "-boot.js";
 	static final String JASMINE_RUN_JS  = JASMINE + "-run.js";
-	
-	private final String name;
 
 	private final ScriptableObject scope;
 	
@@ -76,14 +74,11 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	@Inject
 	JasmineScriptEnvironment(
 		final Dependencies dependencies,
-		final String name,
 		final @Global ScriptableObject global,
 		final ResourceFinder resourceFinder,
 		final ResourceLoaded resourceLoaded // the original event that caused us to get loaded
 	) {
 		super(dependencies);
-		
-		this.name = name;
 		
 		this.resourceLoaded = resourceLoaded;
 		
@@ -176,11 +171,6 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	@Override
 	public String scriptName() {
 		return JASMINE;
-	}
-
-	@Override
-	public String name() {
-		return name;
 	}
 
 	@Override

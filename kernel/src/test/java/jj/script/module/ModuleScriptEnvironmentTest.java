@@ -20,6 +20,7 @@ import static jj.configuration.resolution.AppLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
+import jj.resource.Location;
 import jj.resource.ResourceFinder;
 import jj.script.ContinuationPendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
@@ -45,11 +46,8 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class ModuleScriptEnvironmentTest {
 	
-	@Mock ResourceFinder resourceFinder;
-	
 	RealRhinoContextProvider contextProvider;
 	
-	String moduleIdentifier;
 	RequiredModule requiredModule;
 	
 	@Mock(extraInterfaces = { RootScriptEnvironment.class }) AbstractScriptEnvironment parent;
@@ -60,47 +58,40 @@ public class ModuleScriptEnvironmentTest {
 	
 	@Mock ScriptableObject global;
 
-	@Before
-	public void before() {
+	public void construct(String name, String moduleIdentifier, Location scriptBase) {
 		
 		contextProvider = new RealRhinoContextProvider();
-		moduleIdentifier = "id";
+		
+		MockAbstractScriptEnvironmentDependencies dependencies =
+			new MockAbstractScriptEnvironmentDependencies(contextProvider, name);
 		
 		given(((RootScriptEnvironment)parent).global()).willReturn(global);
 		
-		requiredModule = new RequiredModule((RootScriptEnvironment)parent, moduleIdentifier);
+		requiredModule = new RequiredModule((RootScriptEnvironment)parent, name);
 		requiredModule.pendingKey(new ContinuationPendingKey());
 		
 		given(parent.alive()).willReturn(true);
 		
-		given(resourceFinder.loadResource(ScriptResource.class, Base, moduleIdentifier + ".js")).willReturn(scriptResource);
+		given(dependencies.resourceFinder().loadResource(ScriptResource.class, scriptBase, moduleIdentifier + ".js")).willReturn(scriptResource);
 		
+		given(scriptResource.base()).willReturn(scriptBase);
+		given(scriptResource.name()).willReturn(moduleIdentifier);
 		given(scriptResource.source()).willReturn("");
-	}
-	
-	private void construct() {
 		
-		mse = new ModuleScriptEnvironment(
-			new MockAbstractScriptEnvironmentDependencies(contextProvider),
-			moduleIdentifier,
-			requiredModule,
-			resourceFinder
-		);
+		mse = new ModuleScriptEnvironment(dependencies, requiredModule);
 	}
 	
 	@Test
-	public void testNoInjectorBridge() {
-		construct();
+	public void testUserModuleScript() {
+		construct("module", "module", Base);
 		
 		assertThat(mse.scope().get("inject", mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
 
 	@Test
-	public void testWithInjectorBridge() {
+	public void testApiModuleScript() {
 		
-		given(scriptResource.base()).willReturn(APIModules);
-		
-		construct();
+		construct("jj/module", "module", APIModules);
 		
 		assertThat(mse.scope().get("inject", mse.scope()), is(instanceOf(Function.class)));
 	}

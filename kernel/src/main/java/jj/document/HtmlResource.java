@@ -66,10 +66,9 @@ public class HtmlResource extends AbstractFileResource {
 		final DocumentConfiguration configuration,
 		final Publisher publisher,
 		final Dependencies dependencies,
-		final String name,
 		final Path path
 	) throws IOException {
-		super(dependencies, name, path);
+		super(dependencies, path);
 		
 		this.uri = name;
 		String html = byteBuffer.toString(UTF_8);

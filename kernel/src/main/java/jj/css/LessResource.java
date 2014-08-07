@@ -39,10 +39,10 @@ import jj.resource.AbstractFileResource;
 class LessResource extends AbstractFileResource {
 
 	@Inject
-	LessResource(Dependencies dependencies, String name, Path path) {
+	LessResource(Dependencies dependencies, Path path) {
 		// don't keep the byte buffer around after processing it,
 		// just load it again ourselves when it's needed
-		super(dependencies, name, path, false);
+		super(dependencies, path, false);
 	}
 	
 	String contents() {

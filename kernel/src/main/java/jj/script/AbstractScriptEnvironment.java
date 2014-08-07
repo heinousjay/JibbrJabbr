@@ -34,6 +34,7 @@ import jj.resource.AbstractResourceInitializationListener;
 import jj.resource.ResourceConfiguration;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
+import jj.resource.ResourceName;
 import jj.util.Clock;
 import jj.util.Closer;
 
@@ -61,6 +62,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final ResourceConfiguration resourceConfiguration,
 			final AbstractResourceInitializationListener aril,
 			final ResourceKey cacheKey,
+			final @ResourceName String name,
 			final Provider<RhinoContext> contextProvider,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
@@ -69,7 +71,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Publisher publisher,
 			final ResourceFinder resourceFinder
 		) {
-			super(clock, resourceConfiguration, aril, cacheKey, AppLocation.Virtual, publisher, resourceFinder);
+			super(clock, resourceConfiguration, aril, cacheKey, AppLocation.Virtual, name, publisher, resourceFinder);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;

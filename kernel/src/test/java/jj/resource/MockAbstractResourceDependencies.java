@@ -31,37 +31,53 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	
 	public final DirectoryResource rootDirectory = mock(DirectoryResource.class);
 
-	public MockAbstractResourceDependencies(Location base) {
+	public MockAbstractResourceDependencies(Location base, String name) {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
 			mock(AbstractResourceInitializationListener.class),
 			mock(ResourceKey.class),
 			base,
+			name,
 			mock(Publisher.class),
 			mock(ResourceFinder.class)
 		);
 	}
+
+	public MockAbstractResourceDependencies(Location base, String name, ResourceFinder resourceFinder) {
+		super(
+			new MockClock(),
+			mock(ResourceConfiguration.class),
+			mock(AbstractResourceInitializationListener.class),
+			mock(ResourceKey.class),
+			base,
+			name,
+			mock(Publisher.class),
+			resourceFinder
+		);
+	}
 	
-	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base) {
+	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name) {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
 			mock(AbstractResourceInitializationListener.class),
 			resourceKey,
 			base,
+			name,
 			mock(Publisher.class),
 			mock(ResourceFinder.class)
 		);
 	}
 	
-	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, Publisher publisher) {
+	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name, Publisher publisher) {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
 			mock(AbstractResourceInitializationListener.class),
 			resourceKey,
 			base,
+			name,
 			publisher,
 			mock(ResourceFinder.class)
 		);
@@ -98,5 +114,9 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	
 	public Location base() {
 		return base;
+	}
+	
+	public String name() {
+		return name;
 	}
 }

@@ -47,6 +47,7 @@ public abstract class AbstractResource implements Resource {
 		protected final AbstractResourceInitializationListener aril;
 		protected final ResourceKey resourceKey;
 		protected final Location base;
+		protected final String name;
 		protected final Publisher publisher;
 		protected final ResourceFinder resourceFinder;
 		
@@ -57,6 +58,7 @@ public abstract class AbstractResource implements Resource {
 			final AbstractResourceInitializationListener aril,
 			final ResourceKey resourceKey,
 			final Location base,
+			final @ResourceName String name,
 			final Publisher publisher,
 			final ResourceFinder resourceFinder
 		) {
@@ -65,6 +67,7 @@ public abstract class AbstractResource implements Resource {
 			this.aril = aril;
 			this.resourceKey = resourceKey;
 			this.base = base;
+			this.name = name;
 			this.publisher = publisher;
 			this.resourceFinder = resourceFinder;
 		}
@@ -78,6 +81,8 @@ public abstract class AbstractResource implements Resource {
 	
 	protected final Location base;
 	
+	protected final String name;
+	
 	protected final Publisher publisher;
 	
 	protected final ResourceFinder resourceFinder;
@@ -90,6 +95,7 @@ public abstract class AbstractResource implements Resource {
 		this.creationTime = dependencies.clock.time();
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
+		this.name = dependencies.name;
 		this.publisher = dependencies.publisher;
 		this.resourceFinder = dependencies.resourceFinder;
 		
@@ -141,15 +147,6 @@ public abstract class AbstractResource implements Resource {
 		AbstractResource r = (AbstractResource)dependent;
 		dependents.put(r.cacheKey(), r);
 	}
-
-	/**
-	 * the arguments used to create this resource. mocking needs prevent this
-	 * from being kept package private but don't call it
-	 * @return
-	 */
-	protected Object[] creationArgs() {
-		return EMPTY_ARGS;
-	}
 	
 	Collection<AbstractResource> dependents() {
 		return Collections.unmodifiableCollection(dependents.values());
@@ -195,6 +192,20 @@ public abstract class AbstractResource implements Resource {
 	@Override
 	public Location base() {
 		return base;
+	}
+	
+	@Override
+	public String name() {
+		return name;
+	}
+
+	/**
+	 * the arguments used to create this resource. mocking needs prevent this
+	 * from being kept package private but don't call it
+	 * @return
+	 */
+	protected Object[] creationArgs() {
+		return EMPTY_ARGS;
 	}
 	
 	public String toString() {

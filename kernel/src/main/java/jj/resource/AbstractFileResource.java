@@ -22,7 +22,6 @@ import jj.util.SHA1Helper;
  */
 public abstract class AbstractFileResource extends AbstractResource implements FileResource {
 	
-	protected final String baseName;
 	protected final Path path;
 	protected final FileTime lastModified;
 	protected final long size;
@@ -34,16 +33,14 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	@ResourceThread
 	protected AbstractFileResource(
 		final Dependencies dependencies,
-		final String name,
 		final Path path
 	) {
-		this(dependencies, name, path, true);
+		this(dependencies, path, true);
 	}
 	
 	@ResourceThread
 	protected AbstractFileResource(
 		final Dependencies dependencies,
-		final String name,
 		final Path path,
 		final boolean keepBytes
 	) {
@@ -73,7 +70,6 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 				);
 			}
 			
-			this.baseName = name;
 			this.path = path;
 			this.lastModified = attributes.lastModifiedTime();
 			
@@ -101,11 +97,6 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	
 	private ByteBuf readAllBytes(final Path path) throws IOException {
 		return Unpooled.wrappedBuffer(Files.readAllBytes(path));
-	}
-	
-	@Override
-	public String name() {
-		return baseName;
 	}
 
 	@Override

@@ -30,12 +30,14 @@ import org.junit.Test;
  *
  */
 public class PropertiesResourceTest {
+	
+	private static final String NAME = "index.properties";
 
 	@Test
 	public void test() throws Exception {
-		Dependencies dependencies = new MockAbstractResourceDependencies(AppLocation.Base);
+		Dependencies dependencies = new MockAbstractResourceDependencies(AppLocation.Base, NAME);
 		
-		PropertiesResource resource = new PropertiesResource(dependencies, Base.appPath().resolve("index.properties"), "test");
+		PropertiesResource resource = new PropertiesResource(dependencies, Base.appPath().resolve(NAME));
 		
 		assertThat(resource.properties().size(), is(4));
 		assertThat(resource.properties().keySet(), containsInAnyOrder("topic", "title", "button", "welcome"));

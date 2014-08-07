@@ -20,19 +20,15 @@ import java.net.URI;
 
 import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
+import jj.util.SHA1Helper;
 
 class MyResource extends AbstractResource {
 
 	private final URI uri;
 	
-	protected MyResource(URI uri, Publisher publisher) {
-		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, uri), AppLocation.Base, publisher));
-		this.uri = uri;
-	}
-
-	@Override
-	public String name() {
-		return uri.toString();
+	protected MyResource(String name, Publisher publisher) {
+		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.Base, name, publisher));
+		this.uri = URI.create(name);
 	}
 
 	@Override
@@ -42,8 +38,7 @@ class MyResource extends AbstractResource {
 
 	@Override
 	public String sha1() {
-		// this is not important for this test
-		return "";
+		return SHA1Helper.keyFor(name);
 	}
 
 	@Override

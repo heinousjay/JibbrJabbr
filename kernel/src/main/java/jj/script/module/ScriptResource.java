@@ -29,10 +29,9 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	ScriptResource(
 		final Dependencies dependencies,
 		final Path path,
-		final String name,
 		final Provider<RhinoContext> contextProvider
 	) throws IOException {
-		super(dependencies, name, path);
+		super(dependencies, path);
 		source = byteBuffer.toString(UTF_8);
 		try (RhinoContext context = contextProvider.get()) {
 			script = context.compileString(source, name);

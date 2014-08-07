@@ -122,11 +122,6 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 
 	@Override
-	public String name() {
-		return CONFIG_NAME;
-	}
-
-	@Override
 	public String uri() {
 		return "";
 	}

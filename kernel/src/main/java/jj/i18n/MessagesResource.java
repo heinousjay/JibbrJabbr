@@ -57,7 +57,6 @@ public class MessagesResource extends AbstractResource {
 	private static final String __ = "_";
 	private static final String EXT = ".properties";
 	
-	private final String name;
 	private final Locale locale;
 	
 	private final PropertiesResource[] propertiesResources;
@@ -67,13 +66,11 @@ public class MessagesResource extends AbstractResource {
 	@Inject
 	MessagesResource(
 		final Dependencies dependencies,
-		final String name,
 		final Locale locale,
 		final ResourceFinder resourceFinder
 	) {
 		super(dependencies);
 		
-		this.name = name;
 		this.locale = locale;
 		
 		this.propertiesResources = findResources(resourceFinder);
@@ -116,12 +113,7 @@ public class MessagesResource extends AbstractResource {
 	public Locale locale() {
 		return locale;
 	}
-
-	@Override
-	public String name() {
-		return name;
-	}
-
+	
 	@Override
 	public String uri() {
 		return "/" + name() + __ + locale.toLanguageTag();

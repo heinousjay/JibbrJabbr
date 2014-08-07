@@ -69,8 +69,8 @@ public class ResourceWatchServiceLoopTest {
 		return new ResourceCreators(map);
 	}
 	
-	private MyResource makeResource(URI uri) {
-		MyResource result = spy(new MyResource(uri, publisher));
+	private MyResource makeResource(String name) {
+		MyResource result = spy(new MyResource(name, publisher));
 		resourceCache.putIfAbsent(result.cacheKey(), result);
 		return result;
 	}
@@ -82,21 +82,20 @@ public class ResourceWatchServiceLoopTest {
 		taskRunner = new MockTaskRunner();
 		loop = new ResourceWatchServiceLoop(resourceCache, resourceFinder, watcher, taskRunner);
 		
-		
 		uri1 = URI.create("resource1");
-		resource1 = makeResource(uri1);
+		resource1 = makeResource("resource1");
 		
 		uri2 = URI.create("resource2");
-		resource2 = makeResource(uri2);
+		resource2 = makeResource("resource2");
 		
 		uri3 = URI.create("resource3");
-		resource3 = makeResource(uri3);
+		resource3 = makeResource("resource3");
 		
 		uri4 = URI.create("resource4");
-		resource4 = makeResource(uri4);
+		resource4 = makeResource("resource4");
 		
 		uri5 = URI.create("resource5");
-		resource5 = makeResource(uri5);
+		resource5 = makeResource("resource5");
 	}
 	
 	@Test

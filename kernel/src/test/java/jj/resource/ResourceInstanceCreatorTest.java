@@ -69,7 +69,7 @@ public class ResourceInstanceCreatorTest  {
 	@Test
 	public void testPathCreation() {
 		
-		String name = "name";
+		final String name = "name";
 		Path path = Paths.get("/");
 		
 		given(app.resolvePath(AppLocation.Base, name)).willReturn(path);
@@ -91,7 +91,7 @@ public class ResourceInstanceCreatorTest  {
 		}, moduleCaptor.getValue());
 		
 		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
-		assertThat(testInjector.getInstance(String.class), is(name));
+		assertThat(testInjector.getInstance(Key.get(String.class, ResourceName.class)), is(name));
 		assertThat(testInjector.getInstance(Path.class), is(path));
 	}
 	
@@ -144,7 +144,7 @@ public class ResourceInstanceCreatorTest  {
 		Injector testInjector = Guice.createInjector(moduleCaptor.getValue());
 		
 		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
-		assertThat(testInjector.getInstance(String.class), is(name));
+		assertThat(testInjector.getInstance(Key.get(String.class, ResourceName.class)), is(name));
 		assertThat(testInjector.getExistingBinding(Key.get(Path.class)), is(nullValue()));
 		assertThat(testInjector.getInstance(Integer.class), is(one));
 		assertThat(testInjector.getInstance(Date.class), is(date));

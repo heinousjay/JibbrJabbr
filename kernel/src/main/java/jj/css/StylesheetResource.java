@@ -57,7 +57,6 @@ import jj.util.SHA1Helper;
 public class StylesheetResource extends AbstractResource implements LoadedResource {
 
 	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";
-	private final String name;
 	private final ByteBuf bytes;
 	private final String sha1;
 	private final Path path;
@@ -67,7 +66,6 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	@Inject
 	StylesheetResource(
 		final Dependencies dependencies,
-		final String name,
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global,
 		final CssReferenceVersionProcessor processor,
@@ -75,7 +73,6 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	) {
 		super(dependencies);
 		
-		this.name = name;
 		this.lessConfiguration = lessConfiguration;
 		
 		// is there a static css file?
@@ -153,11 +150,6 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 			NameFunction.name.set(null);
 			publisher.publish(new FinishedLessProcessing(lessName));
 		}
-	}
-
-	@Override
-	public String name() {
-		return name;
 	}
 
 	@Override

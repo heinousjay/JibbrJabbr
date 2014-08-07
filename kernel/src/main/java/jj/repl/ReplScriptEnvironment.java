@@ -108,11 +108,6 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 	}
 
 	@Override
-	public String name() {
-		return NAME;
-	}
-
-	@Override
 	public String uri() {
 		return "/" + sha1() + "/" + name();
 	}

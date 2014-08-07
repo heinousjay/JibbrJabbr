@@ -60,12 +60,6 @@ public class AbstractScriptEnvironmentTest {
 		}
 		
 		@Override
-		public String name() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		@Override
 		public String uri() {
 			// TODO Auto-generated method stub
 			return null;
