@@ -65,7 +65,7 @@ class AcceptLangHeaderReader {
 		// group 1 is the lang
 		// group 2 is the country, if any
 		// group 3 is the q-value, if any
-		Pattern.compile("^(?:([a-zA-Z]{1,8})(?:-([a-zA-Z]{1,8}))?|\\*)(?:;q=((?:0\\.\\d{1,3})|1|0))?$");
+		Pattern.compile("^(?:([a-zA-Z]{1,8}(?:-[a-zA-Z]{1,8})?)|\\*)(?:;q=((?:0\\.\\d{1,3})|1|0))?$");
 	
 	private final List<Locale> locales;
 	
@@ -88,16 +88,14 @@ class AcceptLangHeaderReader {
 				badRequest = true;
 				break;
 			}
-			String lang = matcher.group(1);
-			String country = matcher.group(2);
-			String qValue = matcher.group(3);
+			String languageTag = matcher.group(1);
+			String qValue = matcher.group(2);
 			if (qValue == null) qValue = "1";
-			Locale locale = country == null ?
-				(new Locale(lang)) :
-				(new Locale(lang, country));
+			Locale locale = Locale.forLanguageTag(languageTag);
 			
 			if (!"0".equals(qValue)) {
-				// "0" means don't use... which really we can't guarantee
+				// "0" means don't use... which really we can't guarantee,
+				// if, for instance, it's the only Locale we support
 				holder.add(new SortableLocale(locale, qValue));
 			}
 		}
