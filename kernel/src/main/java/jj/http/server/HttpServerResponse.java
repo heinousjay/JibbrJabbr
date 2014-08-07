@@ -138,8 +138,8 @@ public interface HttpServerResponse {
 	 */
 	String contentsString();
 
-	HttpServerResponse sendUncachedResource(Resource resource) throws IOException;
+	HttpServerResponse sendUncachableResource(Resource resource) throws IOException;
 
-	HttpServerResponse sendCachedResource(Resource resource) throws IOException;
+	HttpServerResponse sendCachableResource(Resource resource) throws IOException;
 
 }

@@ -29,13 +29,16 @@ import jj.resource.ServableResource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-public class ServableTest extends ServableTestBase {
+@RunWith(MockitoJUnitRunner.class)
+public class ServableTest {
 	
 	static final String SHA1 = "1234567890123456789012345678901234567890";
 	static final String ZERO_TXT = "0.txt";
@@ -68,6 +71,9 @@ public class ServableTest extends ServableTestBase {
 	
 	ServableImpl si;
 	
+	@Mock HttpServerRequest request;
+	@Mock HttpServerResponse response;
+	
 	@Before
 	public void before() {
 		si = new ServableImpl();
@@ -81,7 +87,7 @@ public class ServableTest extends ServableTestBase {
 		
 		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
-		verify(response).sendUncachedResource(resource);
+		verify(response).sendUncachableResource(resource);
 	}
 	
 	@Test
@@ -94,7 +100,7 @@ public class ServableTest extends ServableTestBase {
 		
 		si.makeStandardRequestProcessor(request, response, match, resource).process();
 		
-		verify(response).sendCachedResource(resource);
+		verify(response).sendCachableResource(resource);
 	}
 	
 	@Test

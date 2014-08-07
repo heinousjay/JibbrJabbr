@@ -273,7 +273,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 
 	@Override
-	public HttpServerResponse sendUncachedResource(Resource resource) throws IOException {
+	public HttpServerResponse sendUncachableResource(Resource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE);
 		if (resource instanceof TransferableResource) {
@@ -286,7 +286,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 
 	@Override
-	public HttpServerResponse sendCachedResource(Resource resource) throws IOException {
+	public HttpServerResponse sendCachableResource(Resource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
 		if (resource instanceof TransferableResource) {

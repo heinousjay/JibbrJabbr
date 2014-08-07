@@ -21,19 +21,24 @@ import static org.mockito.BDDMockito.*;
 import io.netty.handler.codec.http.HttpHeaders;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.http.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.script.module.ScriptResource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-public class DocumentScriptServableTest extends ServableTestBase {
+@RunWith(MockitoJUnitRunner.class)
+public class DocumentScriptServableTest {
 	
 	static final String SHA1 = "1234567890123456789012345678901234567890";
 
@@ -43,6 +48,9 @@ public class DocumentScriptServableTest extends ServableTestBase {
 	@Mock ScriptResource scriptResource1;
 	@Mock ScriptResource scriptResource2;
 	@Mock ScriptResource scriptResource3;
+	
+	@Mock HttpServerRequest request;
+	@Mock HttpServerResponse response;
 	URIMatch match;
 	
 	@Before
@@ -84,7 +92,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 		
 		as.makeRequestProcessor(request, response).process();
 		
-		verify(response).sendCachedResource(scriptResource1);
+		verify(response).sendCachableResource(scriptResource1);
 	}
 
 	@Test
@@ -93,7 +101,7 @@ public class DocumentScriptServableTest extends ServableTestBase {
 		
 		as.makeRequestProcessor(request, response).process();
 		
-		verify(response).sendCachedResource(scriptResource2);
+		verify(response).sendCachableResource(scriptResource2);
 	}
 
 	@Test

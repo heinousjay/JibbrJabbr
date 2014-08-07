@@ -22,11 +22,16 @@ import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentRequestProcessor;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.http.uri.URIMatch;
+import jj.resource.ResourceFinder;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -35,11 +40,17 @@ import com.google.inject.Injector;
  * @author jason
  *
  */
-public class DocumentServableTest extends ServableTestBase {
+@RunWith(MockitoJUnitRunner.class)
+public class DocumentServableTest {
 	
 	@Mock DocumentScriptEnvironment resource;
 	@Mock Injector parentInjector;
 	@Mock DocumentRequestProcessor requestProcessor;
+	
+	@Mock ResourceFinder resourceFinder;
+	
+	@Mock HttpServerRequest request;
+	@Mock HttpServerResponse response;
 	
 	DocumentServable ds;
 	

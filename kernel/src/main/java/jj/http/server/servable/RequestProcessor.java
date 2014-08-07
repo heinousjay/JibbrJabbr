@@ -7,6 +7,7 @@ import java.io.IOException;
  * @author jason
  *
  */
+@FunctionalInterface
 public interface RequestProcessor {
 	
 	/**
@@ -14,6 +15,4 @@ public interface RequestProcessor {
 	 * required.
 	 */
 	void process() throws IOException;
-	
-	
 }

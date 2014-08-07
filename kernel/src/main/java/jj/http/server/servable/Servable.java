@@ -45,45 +45,40 @@ public abstract class Servable<T extends ServableResource> {
 		final URIMatch match,
 		final Resource resource
 	) {
-		return new RequestProcessor() {
-
-			@Override
-			public void process() throws IOException {
-				try {
+		return () -> {
+			try {
+				
+				// if the e-tag matches our SHA, 304
+				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
+					resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 					
-					// if the e-tag matches our SHA, 304
-					if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
-						resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
-						
-						response.sendNotModified(resource, match.versioned);
+					response.sendNotModified(resource, match.versioned);
+				
+				// if the URI was versioned, we send a cacheable resource if
+				// there was no SHA in the URL, or the SHA matches the resource
+				} else if (
+					match.versioned && 
+					(match.sha1 == null || match.sha1.equals(resource.sha1()))
+				) {
 					
-					// if the URI was versioned, we send a cacheable resource if
-					// there was no SHA in the URL, or the SHA matches the resource
-					} else if (
-						match.versioned && 
-						(match.sha1 == null || match.sha1.equals(resource.sha1()))
-					) {
-						
-						response.sendCachedResource(resource);
-						
-					// if the URI was versioned with a SHA that doesn't match our
-					// resource, redirect to the right URI
-					} else if (match.versioned) {
-						
-						response.sendTemporaryRedirect(resource);
-						
-					// if the URI was not versioned, respond with an uncached resource
-					// (but with proper e-tags, if we loaded the resource
-					} else {
-						
-						response.sendUncachedResource(resource);
-						
-					}
-				} catch (Exception e) {
-					response.error(e);
+					response.sendCachableResource(resource);
+					
+				// if the URI was versioned with a SHA that doesn't match our
+				// resource, redirect to the right URI
+				} else if (match.versioned) {
+					
+					response.sendTemporaryRedirect(resource);
+					
+				// if the URI was not versioned, respond with an uncached resource
+				// (but with proper e-tags, if we loaded the resource
+				} else {
+					
+					response.sendUncachableResource(resource);
+					
 				}
+			} catch (Exception e) {
+				response.error(e);
 			}
-			
 		};
 	}
 

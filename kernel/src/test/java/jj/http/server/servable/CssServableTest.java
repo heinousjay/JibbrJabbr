@@ -8,18 +8,28 @@ import java.io.IOException;
 
 import jj.configuration.resolution.AppLocation;
 import jj.css.StylesheetResource;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.http.server.servable.CssServable;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.uri.URIMatch;
+import jj.resource.ResourceFinder;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-
-public class CssServableTest extends ServableTestBase {
+@RunWith(MockitoJUnitRunner.class)
+public class CssServableTest {
 	
 	@Mock StylesheetResource cssResource;
+	
+	@Mock ResourceFinder resourceFinder;
+	
+	@Mock HttpServerRequest request;
+	@Mock HttpServerResponse response;
 	
 	CssServable cs;
 	

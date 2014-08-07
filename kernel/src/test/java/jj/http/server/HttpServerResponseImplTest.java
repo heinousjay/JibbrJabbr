@@ -84,7 +84,7 @@ public class HttpServerResponseImplTest {
 	}
 
 	private void testCachedResource(Resource resource) throws IOException {
-		response.sendCachedResource(resource);
+		response.sendCachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
 		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));
@@ -94,7 +94,7 @@ public class HttpServerResponseImplTest {
 	}
 
 	private void testUncachedResource(Resource resource) throws IOException {
-		response.sendUncachedResource(resource);
+		response.sendUncachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
 		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));

@@ -21,23 +21,34 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.*;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 import jj.http.uri.URIMatch;
+import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
-public class StaticServableTest extends ServableTestBase {
+@RunWith(MockitoJUnitRunner.class)
+public class StaticServableTest {
 	
 	static final String ZERO_TXT = "0.txt";
 	static final String NOT_ZERO_TXT = "../not-servable/0.txt";
 	
 	@Mock StaticResource resource;
+	
+	@Mock ResourceFinder resourceFinder;
+	
+	@Mock HttpServerRequest request;
+	@Mock HttpServerResponse response;
 	
 	StaticServable ss;
 	
@@ -64,7 +75,6 @@ public class StaticServableTest extends ServableTestBase {
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/" + NOT_ZERO_TXT));
 		given(resourceFinder.loadResource(StaticResource.class, Base.and(Assets), NOT_ZERO_TXT)).willReturn(resource);
-		given(resource.path()).willReturn(appPath.resolve(NOT_ZERO_TXT));
 		
 		RequestProcessor rp = ss.makeRequestProcessor(request, response);
 		

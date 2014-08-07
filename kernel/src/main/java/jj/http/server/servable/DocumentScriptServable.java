@@ -70,7 +70,7 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 					
 				} else {
 				
-					response.sendCachedResource(script);
+					response.sendCachableResource(script);
 				}
 			}
 		};
