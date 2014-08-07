@@ -20,6 +20,8 @@ import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -108,8 +110,8 @@ public class ResourceInstanceCreatorTest  {
 		}
 
 		@Override
-		public String uri() {
-			return null;
+		public URI uri() {
+			return URI.create("");
 		}
 
 		@Override
@@ -124,6 +126,11 @@ public class ResourceInstanceCreatorTest  {
 
 		@Override
 		public void addDependent(Resource dependent) {
+		}
+
+		@Override
+		public Charset charset() {
+			return null;
 		}
 		
 	}

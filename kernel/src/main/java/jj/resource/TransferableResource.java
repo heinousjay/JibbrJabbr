@@ -27,7 +27,7 @@ import java.nio.channels.FileChannel;
  * @author jason
  *
  */
-public interface TransferableResource extends FileResource {
+public interface TransferableResource extends FileResource, ServableResource {
 	
 	FileChannel fileChannel() throws IOException;
 

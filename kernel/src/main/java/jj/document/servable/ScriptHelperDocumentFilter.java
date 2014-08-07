@@ -73,7 +73,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			StaticResource jj = resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS);
 			jj.addDependent(documentRequestProcessor.documentScriptEnvironment());
 			Element jjScript = 
-				makeScriptTag(documentRequestProcessor.document(), jj.uri())
+				makeScriptTag(documentRequestProcessor.document(), jj.serverPath())
 				.attr("id", "jj-connector-script")
 				.attr("data-jj-socket-url", wsURI)
 				.attr(
@@ -89,10 +89,10 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			
 			// associated scripts
 			if (scriptEnvironment.sharedScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptEnvironment.uri()));
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptEnvironment.serverPath()));
 			}
 			if (scriptEnvironment.clientScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptEnvironment.uri()));
+				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptEnvironment.serverPath()));
 			}
 		}
 	}

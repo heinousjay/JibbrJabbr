@@ -28,7 +28,6 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	protected final ByteBuf byteBuffer;
 	
 	private String sha1;
-	private String uri;
 	
 	@ResourceThread
 	protected AbstractFileResource(
@@ -91,17 +90,10 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 		} catch (IOException ioe) {
 			throw new ResourceNotViableException(path, ioe);
 		}
-		
-		uri = "/" + sha1 + "/" + name;
 	}
 	
 	private ByteBuf readAllBytes(final Path path) throws IOException {
 		return Unpooled.wrappedBuffer(Files.readAllBytes(path));
-	}
-
-	@Override
-	public String uri() {
-		return uri;
 	}
 
 	@Override

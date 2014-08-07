@@ -132,7 +132,6 @@ public class JasmineScriptEnvironmentTest {
 		// this is sort of future-prep but this might become a target for socket connections at
 		// some point, to deliver test run results to the browser.  maybe
 		assertThat(jse.sha1(), is("2aa82b3b93e7e4ed4cb7b8aa7c350e84016a0014"));
-		assertThat(jse.uri(), is("/2aa82b3b93e7e4ed4cb7b8aa7c350e84016a0014/" + specName));
 	}
 	
 }

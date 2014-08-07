@@ -113,11 +113,6 @@ public class MessagesResource extends AbstractResource {
 	public Locale locale() {
 		return locale;
 	}
-	
-	@Override
-	public String uri() {
-		return "/" + name() + __ + locale.toLanguageTag();
-	}
 
 	@Override
 	public String sha1() {

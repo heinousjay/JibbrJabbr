@@ -15,16 +15,15 @@
  */
 package jj.resource;
 
-import io.netty.buffer.ByteBuf;
-
-
 /**
+ * A resource that the server can send to a client. LoadedResource
+ * and TransferableResource
  * @author jason
  *
  */
-public interface LoadedResource extends ServableResource {
+public interface ServableResource extends Resource {
+
+	String serverPath();
 	
-	ByteBuf bytes();
-	
-	long size();
+	String mime();
 }

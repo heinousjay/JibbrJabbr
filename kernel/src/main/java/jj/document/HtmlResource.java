@@ -1,8 +1,8 @@
 package jj.document;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,6 @@ import javax.inject.Singleton;
 
 import jj.event.Publisher;
 import jj.resource.AbstractFileResource;
-
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
@@ -30,7 +29,6 @@ import org.jsoup.select.NodeVisitor;
 @Singleton
 public class HtmlResource extends AbstractFileResource {
 
-	private final String uri;
 	private final Document document;
 	
 	private static final class CommentKiller implements NodeVisitor {
@@ -70,7 +68,6 @@ public class HtmlResource extends AbstractFileResource {
 	) throws IOException {
 		super(dependencies, path);
 		
-		this.uri = name;
 		String html = byteBuffer.toString(UTF_8);
 		
 		Parser parser = Parser.htmlParser().setTrackErrors(configuration.showParsingErrors() ? Integer.MAX_VALUE : 0);
@@ -89,17 +86,12 @@ public class HtmlResource extends AbstractFileResource {
 		}
 	}
 	
-	@Override
-	public String uri() {
-		return uri;
-	}
-	
 	public Document document() {
 		return document;
 	}
 	
 	@Override
-	public String mime() {
-		return "text/html; charset=UTF-8";
+	public Charset charset() {
+		return UTF_8;
 	}
 }

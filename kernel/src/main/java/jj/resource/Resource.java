@@ -1,5 +1,8 @@
 package jj.resource;
 
+import java.net.URI;
+import java.nio.charset.Charset;
+
 
 
 /**
@@ -26,16 +29,22 @@ public interface Resource {
 	String name();
 
 	/**
-	 * uri to this resource, expressed as a relative path
+	 * uri to this resource
 	 * @return
 	 */
-	String uri();
+	URI uri();
 	
 	/**
 	 * sha1 of the resource
 	 * @return
 	 */
 	String sha1();
+	
+	/**
+	 * charset of the resource, if it represents text, null otherwise
+	 * @return
+	 */
+	Charset charset();
 
 	/**
 	 * Adds a dependent resource to this resource, which will propagate

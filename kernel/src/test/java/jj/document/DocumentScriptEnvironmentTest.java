@@ -222,7 +222,7 @@ public class DocumentScriptEnvironmentTest {
 		verify(script, times(3)).addDependent(result);
 		
 		assertThat(result.sha1().length(), is(40));
-		assertThat(result.uri(), is("/" + result.sha1() + "/" + name));
+		assertThat(result.serverPath(), is("/" + result.sha1() + "/" + name));
 		assertThat(result.socketUri(), is("/" + result.sha1() + "/" + name + ".socket"));
 	}
 	
@@ -238,7 +238,7 @@ public class DocumentScriptEnvironmentTest {
 		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);
 		
 		assertThat(result.sha1().length(), is(40));
-		assertThat(result.uri(), is("/" + result.sha1() + "/" + name));
+		assertThat(result.serverPath(), is("/" + result.sha1() + "/" + name));
 		assertThat(result.socketUri(), is(nullValue()));
 		
 		assertThat(result.scope(), is(nullValue()));

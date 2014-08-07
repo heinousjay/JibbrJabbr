@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import jj.http.server.servable.Servables;
 import jj.http.uri.URIMatch;
-import jj.resource.Resource;
+import jj.resource.ServableResource;
 
 import org.jsoup.nodes.Element;
 
@@ -54,9 +54,9 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 			String path = url.substring(URI_PREPEND.length());
 			URIMatch uriMatch = new URIMatch(path);
 			if (!uriMatch.versioned && uriMatch.baseName != null) {
-				Resource resource = servables.loadResource(uriMatch);
+				ServableResource resource = servables.loadResource(uriMatch);
 				if (resource != null && uriMatch.sha1 == null) {
-					return resource.uri();
+					return resource.serverPath();
 				}
 			}
 			return path;

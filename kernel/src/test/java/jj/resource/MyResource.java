@@ -23,17 +23,9 @@ import jj.event.Publisher;
 import jj.util.SHA1Helper;
 
 class MyResource extends AbstractResource {
-
-	private final URI uri;
 	
 	protected MyResource(String name, Publisher publisher) {
 		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.Base, name, publisher));
-		this.uri = URI.create(name);
-	}
-
-	@Override
-	public String uri() {
-		return uri.toString();
 	}
 
 	@Override

@@ -24,7 +24,7 @@ import jj.css.StylesheetResource;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
 import jj.http.uri.URIMatch;
-import jj.resource.Resource;
+import jj.resource.ServableResource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.rules.TestRule;
@@ -60,8 +60,8 @@ public class MockServablesRule implements TestRule {
 	}
 	
 	@SafeVarargs
-	private final List<Servable<? extends Resource>> asList(Servable<? extends Resource>...servable) {
-		return Arrays.<Servable<? extends Resource>>asList(servable);
+	private final List<Servable<? extends ServableResource>> asList(Servable<? extends ServableResource>...servable) {
+		return Arrays.<Servable<? extends ServableResource>>asList(servable);
 	}
 
 	@Override

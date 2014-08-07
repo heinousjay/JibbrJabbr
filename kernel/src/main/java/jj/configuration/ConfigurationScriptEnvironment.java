@@ -122,11 +122,6 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 
 	@Override
-	public String uri() {
-		return "";
-	}
-
-	@Override
 	public String sha1() {
 		return config.sha1();
 	}

@@ -57,8 +57,6 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	
 	private final String sha1;
 	
-	private final String uri;
-	
 	private final ScriptResource jasmine;
 	
 	private final ScriptResource target;
@@ -124,8 +122,6 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		runner.addDependent(this);
 		
 		sha1 = SHA1Helper.keyFor(target.sha1(), spec.sha1(), jasmine.sha1(), boot.sha1(), runner.sha1());
-		
-		uri = "/" + sha1 + "/" + name;
 	}
 	
 	@Override
@@ -171,11 +167,6 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	@Override
 	public String scriptName() {
 		return JASMINE;
-	}
-
-	@Override
-	public String uri() {
-		return uri;
 	}
 
 	@Override

@@ -16,6 +16,8 @@
 package jj.resource;
 
 import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
@@ -185,8 +187,18 @@ public abstract class AbstractResource implements Resource {
 	}
 	
 	@Override
+	public Charset charset() {
+		return null; // by default, resources don't have one at all.  might not be text!
+	}
+	
+	@Override
 	public ResourceKey cacheKey() {
 		return cacheKey;
+	}
+
+	@Override
+	public final URI uri() {
+		return cacheKey.uri();
 	}
 	
 	@Override

@@ -30,7 +30,7 @@ import jj.http.server.websocket.WebSocketFrameHandlerCreator;
 import jj.http.server.websocket.WebSocketRequestChecker;
 import jj.logging.Emergency;
 import jj.resource.ResourceTask;
-import jj.resource.Resource;
+import jj.resource.ServableResource;
 
 /**
  * Reads incoming http messages and looks for ways to respond
@@ -137,7 +137,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		//  - but it may not matter since all threads will generally be warm under load and it's no big deal otherwise
 		// see if the request can get handled
 		// return 404 if not
-		final List<Servable<? extends Resource>> list = servables.findMatchingServables(request.uriMatch());
+		final List<Servable<? extends ServableResource>> list = servables.findMatchingServables(request.uriMatch());
 		
 		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
 		taskRunner.execute(new ResourceTask("JJEngine core processing") {
@@ -145,7 +145,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 			public void run() {
 				try {
 					boolean found = false;
-					for (Servable<? extends Resource> servable : list) {
+					for (Servable<? extends ServableResource> servable : list) {
 						RequestProcessor requestProcessor = servable.makeRequestProcessor(request, response);
 						if (requestProcessor != null) {
 							requestProcessor.process();

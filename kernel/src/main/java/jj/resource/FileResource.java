@@ -42,11 +42,4 @@ public interface FileResource extends Resource, ParentedResource {
 	 * @return
 	 */
 	long size();
-	
-	/**
-	 * the mime of the resource, including charset if it
-	 * is textual.  (always utf-8)
-	 * @return
-	 */
-	String mime();
 }

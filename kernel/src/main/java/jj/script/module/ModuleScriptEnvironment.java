@@ -131,11 +131,6 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	public String scriptName() {
 		return name + ".js";
 	}
-
-	@Override
-	public String uri() {
-		return "/"; // can not be loaded directly
-	}
 	
 	@Override
 	protected Object[] creationArgs() {

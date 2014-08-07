@@ -67,13 +67,13 @@ public class ResourceUrlDocumentFilterTest {
 	public void test() {
 		
 		given(m.servables.loadResource(m.cssUri)).willReturn(cssResource);
-		given(cssResource.uri()).willReturn("/substitutesha" + m.cssUri.uri);
+		given(cssResource.serverPath()).willReturn("/substitutesha" + m.cssUri.uri);
 		
 		given(m.servables.loadResource(m.assetUri)).willReturn(staticResource2);
-		given(staticResource2.uri()).willReturn("/substitutesha" + m.assetUri.uri);
+		given(staticResource2.serverPath()).willReturn("/substitutesha" + m.assetUri.uri);
 		
 		given(m.servables.loadResource(m.staticUri)).willReturn(staticResource1);
-		given(staticResource1.uri()).willReturn("/substitutesha" + m.staticUri.uri);
+		given(staticResource1.serverPath()).willReturn("/substitutesha" + m.staticUri.uri);
 		
 		given(documentRequestProcessor.uri()).willReturn("/");
 		filter.filter(documentRequestProcessor);

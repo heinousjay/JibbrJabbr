@@ -35,9 +35,11 @@ import jj.http.server.websocket.ConnectionBroadcastStack;
 import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketMessageProcessor;
+import jj.resource.MimeTypes;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceNotViableException;
+import jj.resource.ServableResource;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptThread;
 import jj.script.module.RootScriptEnvironment;
@@ -57,7 +59,7 @@ import jj.util.SHA1Helper;
 @Singleton
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
-	implements CurrentResourceAware, RootScriptEnvironment {
+	implements CurrentResourceAware, RootScriptEnvironment, ServableResource {
 	
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	
@@ -65,11 +67,11 @@ public class DocumentScriptEnvironment
 	
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
 	
-	private final String uri;
-	
 	private final String socketUri;
 	
 	private final String sha1;
+	
+	private final String serverPath;
 	
 	private final ScriptableObject scope;
 	
@@ -119,16 +121,15 @@ public class DocumentScriptEnvironment
 			sharedScript == null ? "none" : sharedScript.sha1(),
 			serverScript == null ? "none" : serverScript.sha1()
 		);
-		
 
-		uri = "/" + sha1 + "/" + name;
+		serverPath = "/" + sha1 + "/" + name;
 		
 		if (serverScript == null)  {
 			socketUri = null;
 			global = null;
 			scope = null;
 		} else {
-			socketUri = uri + ".socket";
+			socketUri = serverPath + ".socket";
 			global = api.global();
 			scope = configureTimers(configureModuleObjects(name, createChainedScope(global)));
 			
@@ -160,13 +161,18 @@ public class DocumentScriptEnvironment
 	}
 
 	@Override
-	public String uri() {
-		return uri;
+	public String sha1() {
+		return sha1;
 	}
 
 	@Override
-	public String sha1() {
-		return sha1;
+	public String serverPath() {
+		return serverPath;
+	}
+
+	@Override
+	public String mime() {
+		return MimeTypes.get("html");
 	}
 	
 	@Override

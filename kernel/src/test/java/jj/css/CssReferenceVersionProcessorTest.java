@@ -81,7 +81,7 @@ public class CssReferenceVersionProcessorTest {
 		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null);
 		
 		
-		given(testCss.uri()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");
+		given(testCss.serverPath()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");
 		given(testCss.path()).willReturn(basePath.resolve(TEST_CSS));
 		given(resourceFinder.loadResource(StylesheetResource.class, Base, TEST_CSS)).willReturn(testCss);
 		

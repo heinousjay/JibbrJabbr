@@ -24,8 +24,8 @@ import javax.inject.Singleton;
 import jj.configuration.resolution.AppLocation;
 import jj.http.uri.URIMatch;
 import jj.resource.PathResolver;
-import jj.resource.Resource;
 import jj.resource.ResourceFinder;
+import jj.resource.ServableResource;
 import jj.resource.stat.ic.StaticResource;
 
 /**
@@ -75,7 +75,7 @@ class CssReferenceVersionProcessor {
 		final Pattern pattern,
 		final String prefix,
 		final String suffix,
-		final Class<? extends Resource> type
+		final Class<? extends ServableResource> type
 	) {
 		// yuck.  the API was never updated
 		StringBuffer sb = new StringBuffer();
@@ -95,14 +95,14 @@ class CssReferenceVersionProcessor {
 						.toString();
 				
 				}
-				Resource dependency = resourceFinder.loadResource(type, AppLocation.Base, name);
+				ServableResource dependency = resourceFinder.loadResource(type, AppLocation.Base, name);
 				
 				if (dependency != null) {
 					dependency.addDependent(resource);
 					URIMatch uriMatch = new URIMatch("/" + name);
 					if (!uriMatch.versioned) {
 						// we only want to replace uris that weren't already versioned
-						replacement = dependency.uri();
+						replacement = dependency.serverPath();
 					} else {
 						// replace with the absolute path
 						replacement = "/" + name;

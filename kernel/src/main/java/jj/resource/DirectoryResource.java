@@ -70,11 +70,6 @@ public class DirectoryResource extends AbstractResource implements ParentedResou
 	}
 
 	@Override
-	public String uri() {
-		return "/" + name;
-	}
-
-	@Override
 	public String sha1() {
 		return sha1;
 	}

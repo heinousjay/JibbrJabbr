@@ -53,10 +53,4 @@ class LessResource extends AbstractFileResource {
 		}
 	}
 
-	@Override
-	public String mime() {
-		// doesn't matter, this will never be served
-		return null;
-	}
-
 }

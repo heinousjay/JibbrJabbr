@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -54,5 +55,15 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 	@Override
 	public ByteBuf bytes() {
 		return Unpooled.wrappedBuffer(byteBuffer);
+	}
+	
+	@Override
+	public Charset charset() {
+		return UTF_8;
+	}
+	
+	@Override
+	public String serverPath() {
+		return "/" + sha1() + "/" + name();
 	}
 }

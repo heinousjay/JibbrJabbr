@@ -50,10 +50,4 @@ public class PropertiesResource extends AbstractFileResource {
 	public Map<String, String> properties() {
 		return properties;
 	}
-	
-	@Override
-	public String mime() {
-		return "text/plain; charset=UTF-8";
-	}
-
 }

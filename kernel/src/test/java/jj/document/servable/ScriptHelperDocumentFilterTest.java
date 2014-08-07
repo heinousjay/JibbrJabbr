@@ -61,7 +61,7 @@ public class ScriptHelperDocumentFilterTest {
 		socketUri = scriptUri + ".socket";
 		webSocketUri = "ws://localhost:8080" + socketUri;
 		
-		given(documentScriptEnvironment.uri()).willReturn(scriptUri);
+		given(documentScriptEnvironment.serverPath()).willReturn(scriptUri);
 		given(documentScriptEnvironment.socketUri()).willReturn(socketUri);
 		given(documentScriptEnvironment.hasServerScript()).willReturn(true);
 		given(documentRequestProcessor.documentScriptEnvironment()).willReturn(documentScriptEnvironment);
@@ -78,11 +78,11 @@ public class ScriptHelperDocumentFilterTest {
 		given(resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS))
 			.willReturn(jjJs);
 		
-		given(jqueryJs.uri()).willReturn(JQUERY_URI);
+		given(jqueryJs.serverPath()).willReturn(JQUERY_URI);
 		given(jqueryJs.name()).willReturn(JQUERY_JS);
 		
 		given(jjJs.sha1()).willReturn(JJ_SHA);
-		given(jjJs.uri()).willReturn(JJ_URI);
+		given(jjJs.serverPath()).willReturn(JJ_URI);
 		
 		given(configuration.clientDebug()).willReturn(true);
 	}

@@ -97,11 +97,6 @@ class Sha1Resource extends AbstractResource {
 		
 		target.resource.addDependent(this);
 	}
-
-	@Override
-	public String uri() {
-		return "/" + name + Sha1ResourceCreator.EXTENSION;
-	}
 	
 	public String representedSha() {
 		return representedSha;

@@ -25,7 +25,7 @@ import java.util.Set;
 
 import jj.css.StylesheetResource;
 import jj.http.uri.URIMatch;
-import jj.resource.Resource;
+import jj.resource.ServableResource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
@@ -56,7 +56,7 @@ public class ServablesTest {
 		given(staticServable.isMatchingRequest(otherMatch)).willReturn(true);
 		given(staticServable.isMatchingRequest(cssMatch)).willReturn(true);
 		
-		Set<Servable<? extends Resource>>  servablesSet = new HashSet<>();
+		Set<Servable<? extends ServableResource>>  servablesSet = new HashSet<>();
 		servablesSet.add(cssServable);
 		servablesSet.add(staticServable);
 		
@@ -67,11 +67,11 @@ public class ServablesTest {
 	@Test
 	public void testMatchingRequest() {
 		
-		List<Servable<? extends Resource>> result;
+		List<Servable<? extends ServableResource>> result;
 		
 		result = servables.findMatchingServables(cssMatch);
 		assertThat(result.size(), is(2));
-		assertThat(result, containsInAnyOrder((Servable<? extends Resource>)cssServable, staticServable));
+		assertThat(result, containsInAnyOrder((Servable<? extends ServableResource>)cssServable, staticServable));
 		
 		result = servables.findMatchingServables(otherMatch);
 		assertThat(result.size(), is(1));

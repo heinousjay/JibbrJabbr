@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
 import jj.resource.Location;
-import jj.resource.ResourceFinder;
 import jj.script.ContinuationPendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
@@ -31,7 +30,6 @@ import jj.script.module.RequiredModule;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

@@ -15,9 +15,12 @@
  */
 package jj.resource.stat.ic;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -53,6 +56,11 @@ public class StaticResource extends AbstractFileResource implements Transferable
 		return mime;
 	}
 	
+	public Charset charset() {
+		// need to get this from some outside source too
+		return UTF_8;
+	}
+	
 	@Override
 	@ResourceThread
 	public FileChannel fileChannel() throws IOException {
@@ -63,5 +71,10 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	@ResourceThread
 	public RandomAccessFile randomAccessFile() throws IOException {
 		return new RandomAccessFile(path.toFile(), "r");
+	}
+
+	@Override
+	public String serverPath() {
+		return "/" + sha1() + "/" + name();
 	}
 }

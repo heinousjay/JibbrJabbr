@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.http.uri.URIMatch;
-import jj.resource.Resource;
+import jj.resource.ServableResource;
 
 /**
  * @author jason
@@ -33,18 +33,18 @@ import jj.resource.Resource;
 @Singleton
 public class Servables {
 
-	private final Set<Servable<? extends Resource>> servables;
+	private final Set<Servable<? extends ServableResource>> servables;
 	
 	@Inject
-	Servables(final Set<Servable<? extends Resource>> servables) {
+	Servables(final Set<Servable<? extends ServableResource>> servables) {
 		this.servables = servables;
 	}
 	
-	public List<Servable<? extends Resource>> findMatchingServables(final URIMatch uriMatch) {
+	public List<Servable<? extends ServableResource>> findMatchingServables(final URIMatch uriMatch) {
 		
-		List<Servable<? extends Resource>> result = new ArrayList<>();
+		List<Servable<? extends ServableResource>> result = new ArrayList<>();
 		
-		for (final Servable<? extends Resource> servable : servables) {
+		for (final Servable<? extends ServableResource> servable : servables) {
 			if (servable.isMatchingRequest(uriMatch)) {
 				result.add(servable);
 			}
@@ -58,10 +58,10 @@ public class Servables {
 	 * @return
 	 */
 	
-	public Resource loadResource(final URIMatch uriMatch) {
+	public ServableResource loadResource(final URIMatch uriMatch) {
 		
-		for (Servable<? extends Resource> servable : findMatchingServables(uriMatch)) {
-			Resource resource = servable.loadResource(uriMatch);
+		for (Servable<? extends ServableResource> servable : findMatchingServables(uriMatch)) {
+			ServableResource resource = servable.loadResource(uriMatch);
 			if (resource != null) {
 				return resource;
 			}
