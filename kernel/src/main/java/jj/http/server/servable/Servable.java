@@ -42,11 +42,12 @@ public abstract class Servable<T extends ServableResource> {
 	protected RequestProcessor makeStandardRequestProcessor(
 		final HttpServerRequest request,
 		final HttpServerResponse response,
-		final URIMatch match,
 		final Resource resource
 	) {
 		return () -> {
 			try {
+				
+				final URIMatch match = request.uriMatch();
 				
 				// if the e-tag matches our SHA, 304
 				if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&

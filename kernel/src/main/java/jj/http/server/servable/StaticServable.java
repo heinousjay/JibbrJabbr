@@ -62,7 +62,7 @@ public class StaticServable extends Servable<StaticResource> {
 	) throws IOException {
 		final StaticResource resource = loadResource(request.uriMatch());
 		if (resource != null && resource.safeToServe()) {
-			return makeStandardRequestProcessor(request, response, request.uriMatch(), resource);
+			return makeStandardRequestProcessor(request, response, resource);
 		}
 		
 		return null;

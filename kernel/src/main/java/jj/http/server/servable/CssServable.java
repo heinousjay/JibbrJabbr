@@ -41,12 +41,10 @@ class CssServable extends Servable<StylesheetResource> {
 		final HttpServerResponse response
 	) throws IOException {
 		
-		final URIMatch match = request.uriMatch();
-		
-		StylesheetResource resource = loadResource(match);
+		StylesheetResource resource = loadResource(request.uriMatch());
 		RequestProcessor result = null;
 		if (resource != null) {
-			result = makeStandardRequestProcessor(request, response, match, resource);
+			result = makeStandardRequestProcessor(request, response, resource);
 		}
 		return result;
 	}

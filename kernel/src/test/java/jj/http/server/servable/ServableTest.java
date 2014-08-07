@@ -83,9 +83,9 @@ public class ServableTest {
 	public void testStandardResponseUncachedResource() throws Exception {
 		
 		given(request.uri()).willReturn(UNVERSIONED_URI);
-		URIMatch match = new URIMatch(UNVERSIONED_URI);
+		given(request.uriMatch()).willReturn(new URIMatch(UNVERSIONED_URI));
 		
-		si.makeStandardRequestProcessor(request, response, match, resource).process();
+		si.makeStandardRequestProcessor(request, response, resource).process();
 		
 		verify(response).sendUncachableResource(resource);
 	}
@@ -94,11 +94,11 @@ public class ServableTest {
 	public void testStandardResponseCachedResource() throws Exception {
 		
 		given(request.uri()).willReturn(VERSIONED_URI);
-		URIMatch match = new URIMatch(VERSIONED_URI);
+		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
-		si.makeStandardRequestProcessor(request, response, match, resource).process();
+		si.makeStandardRequestProcessor(request, response, resource).process();
 		
 		verify(response).sendCachableResource(resource);
 	}
@@ -107,14 +107,14 @@ public class ServableTest {
 	public void testStandardResponseNotModifiedCachable() throws Exception {
 		
 		given(request.uri()).willReturn(VERSIONED_URI);
-		URIMatch match = new URIMatch(VERSIONED_URI);
+		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
 		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		si.makeStandardRequestProcessor(request, response, match, resource).process();
+		si.makeStandardRequestProcessor(request, response, resource).process();
 		
 		verify(response).sendNotModified(resource, true);
 	}
@@ -123,14 +123,14 @@ public class ServableTest {
 	public void testStandardResponseNotModifiedNotCachable() throws Exception {
 		
 		given(request.uri()).willReturn(UNVERSIONED_URI);
-		URIMatch match = new URIMatch(UNVERSIONED_URI);
+		given(request.uriMatch()).willReturn(new URIMatch(UNVERSIONED_URI));
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
 		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		si.makeStandardRequestProcessor(request, response, match, resource).process();
+		si.makeStandardRequestProcessor(request, response, resource).process();
 		
 		verify(response).sendNotModified(resource, false);
 	}
@@ -139,11 +139,11 @@ public class ServableTest {
 	public void testStandardResponseTemporaryRedirect() throws Exception {
 		
 		given(request.uri()).willReturn(VERSIONED_URI);
-		URIMatch match = new URIMatch(VERSIONED_URI);
+		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn("some other sha1");
 		
-		si.makeStandardRequestProcessor(request, response, match, resource).process();
+		si.makeStandardRequestProcessor(request, response, resource).process();
 		
 		verify(response).sendTemporaryRedirect(resource);
 	}
@@ -152,7 +152,7 @@ public class ServableTest {
 	public void testStandardResponseError() throws Exception {
 		
 		given(request.uri()).willReturn(VERSIONED_URI);
-		URIMatch match = new URIMatch(VERSIONED_URI);
+		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn("some other sha1");
 		
@@ -160,7 +160,7 @@ public class ServableTest {
 		
 		given(response.sendTemporaryRedirect(resource)).willThrow(toThrow);
 		
-		si.makeStandardRequestProcessor(request, response, match, resource).process();
+		si.makeStandardRequestProcessor(request, response, resource).process();
 		
 		verify(response).error(toThrow);
 	}
