@@ -17,7 +17,11 @@ package jj.i18n;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -59,9 +63,9 @@ public class MessagesResource extends AbstractResource {
 	
 	private final Locale locale;
 	
-	private final PropertiesResource[] propertiesResources;
-	
 	private final String sha;
+	
+	private final Map<String, String> messages;
 
 	@Inject
 	MessagesResource(
@@ -73,21 +77,27 @@ public class MessagesResource extends AbstractResource {
 		
 		this.locale = locale;
 		
-		this.propertiesResources = findResources(resourceFinder);
+		ArrayList<PropertiesResource> propertiesResources = findResources(resourceFinder);
 		
-		if (propertiesResources.length == 0) {
+		if (propertiesResources.isEmpty()) {
 			throw new NoSuchResourceException(MessagesResource.class, name);
 		}
 		
-		String[] shas = new String[propertiesResources.length];
+		String[] shas = new String[propertiesResources.size()];
 		int count = 0;
+		HashMap<String, String> messagesMaker = new HashMap<>();
+		
 		for (PropertiesResource r : propertiesResources) {
 			shas[count++] = r.sha1();
+			messagesMaker.putAll(r.properties());
 		}
+		
+		messages = Collections.unmodifiableMap(messagesMaker);
+		
 		sha = SHA1Helper.keyFor(shas);
 	}
 	
-	private PropertiesResource[] findResources(final ResourceFinder resourceFinder) {
+	private ArrayList<PropertiesResource> findResources(final ResourceFinder resourceFinder) {
 		ArrayList<PropertiesResource> result = new ArrayList<>(4);
 		for (String candidateName : candidateNames()) {
 			PropertiesResource resource =
@@ -98,15 +108,15 @@ public class MessagesResource extends AbstractResource {
 			} // else somehow flag that we want to know if it gets created
 		}
 		
-		return result.toArray(new PropertiesResource[result.size()]);
+		return result;
 	}
 	
 	private String[] candidateNames() {
 		return new String[] {
-			name + __ + locale.getLanguage() + __ + locale.getCountry() + __ + locale.getVariant() + EXT,
-			name + __ + locale.getLanguage() + __ + locale.getCountry() + EXT,
+			name + EXT,
 			name + __ + locale.getLanguage() + EXT,
-			name + EXT
+			name + __ + locale.getLanguage() + __ + locale.getCountry() + EXT,
+			name + __ + locale.getLanguage() + __ + locale.getCountry() + __ + locale.getVariant() + EXT
 		};
 	}
 	
@@ -120,27 +130,15 @@ public class MessagesResource extends AbstractResource {
 	}
 	
 	public boolean containsKey(String key) {
-		boolean result = false;
-		for (PropertiesResource resource : propertiesResources) {
-			if (resource.properties().containsKey(key)) {
-				result = true;
-				break;
-			}
-		}
-		
-		return result;
+		return messages.containsKey(key);
 	}
 	
 	public String message(String key) {
-		String result = null;
-		for (PropertiesResource resource : propertiesResources) {
-			if (resource.properties().containsKey(key)) {
-				result = resource.properties().get(key);
-				break;
-			}
-		}
-		
-		return result;
+		return messages.get(key);
+	}
+	
+	public Set<String> keys() {
+		return messages.keySet();
 	}
 	
 	@Override

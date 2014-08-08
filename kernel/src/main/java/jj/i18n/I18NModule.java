@@ -16,6 +16,7 @@
 package jj.i18n;
 
 import jj.JJModule;
+import jj.i18n.ScriptMessages.ScriptMessagesLoaderBundle;
 
 /**
  * @author jason
@@ -31,6 +32,8 @@ public class I18NModule extends JJModule {
 		bindConfiguration().to(I18NConfiguration.class);
 		
 		addConverterBinding().to(StringToLocaleConverter.class);
+		
+		dispatch().continuationOf(ScriptMessagesLoaderBundle.class).to(ScriptMessages.class);
 		
 		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
 		bindCreation().of(MessagesResource.class).to(MessagesResourceCreator.class);
