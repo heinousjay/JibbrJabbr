@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.jsoup.nodes.Document;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Script;
@@ -56,7 +54,6 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@Singleton
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
 	implements CurrentResourceAware, RootScriptEnvironment, ServableResource {

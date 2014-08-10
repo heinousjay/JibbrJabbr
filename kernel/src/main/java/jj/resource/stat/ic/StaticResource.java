@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import jj.resource.AbstractFileResource;
 import jj.resource.PathResolver;
@@ -36,7 +35,6 @@ import jj.resource.TransferableResource;
  * @author jason
  *
  */
-@Singleton
 public class StaticResource extends AbstractFileResource implements TransferableResource {
 
 	private final String mime;

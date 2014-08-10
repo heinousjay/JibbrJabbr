@@ -21,8 +21,6 @@ import static jj.configuration.resolution.AppLocation.*;
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import jj.resource.Location;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
@@ -50,7 +48,6 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-@Singleton
 public class ModuleScriptEnvironment extends AbstractScriptEnvironment implements ChildScriptEnvironment {
 	
 	public static final String API_PREFIX = "jj/";

@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import jj.event.Publisher;
 import jj.resource.AbstractFileResource;
 import org.jsoup.nodes.Comment;
@@ -26,7 +24,6 @@ import org.jsoup.select.NodeVisitor;
  * @author jason
  *
  */
-@Singleton
 public class HtmlResource extends AbstractFileResource {
 
 	private final Document document;

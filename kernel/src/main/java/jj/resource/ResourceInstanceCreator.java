@@ -66,13 +66,13 @@ public class ResourceInstanceCreator {
 		final String name,
 		final Path path,
 		final Object...args
-	) {	
+	) {
 		
 		try {
 			
 			try {
 				
-				return parentInjector.createChildInjector(
+				Injector inj = parentInjector.createChildInjector(
 					new AbstractModule() {
 						@Override
 						protected void configure() {
@@ -94,7 +94,9 @@ public class ResourceInstanceCreator {
 							bind(type).toInstance((V)instance);
 						}
 					}
-				).getInstance(resourceClass);
+				);
+				
+				return inj.getInstance(resourceClass);
 				
 			} catch (ProvisionException | CreationException ce) {
 				

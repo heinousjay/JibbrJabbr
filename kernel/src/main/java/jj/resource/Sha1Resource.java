@@ -26,8 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import jj.resource.Sha1ResourceCreator.Sha1ResourceTarget;
 import jj.util.SHA1Helper;
 
@@ -37,7 +35,6 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@Singleton
 class Sha1Resource extends AbstractResource {
 	
 	// empirical magic numbers - the sha1 hash is 40 hex digits, and the max long value as a decimal is 19 digits

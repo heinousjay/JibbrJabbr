@@ -11,8 +11,6 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.inject.Singleton;
-
 import org.mozilla.javascript.Script;
 
 import jj.resource.AbstractFileResource;
@@ -21,7 +19,6 @@ import jj.resource.MimeTypes;
 import jj.resource.PathResolver;
 import jj.script.RhinoContext;
 
-@Singleton
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	
 	private final String source;

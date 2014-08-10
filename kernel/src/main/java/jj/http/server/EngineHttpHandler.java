@@ -18,6 +18,7 @@ import javax.inject.Inject;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.Provides;
 
 import jj.event.Publisher;
@@ -67,8 +68,8 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		this.publisher = publisher;
 	}
 	
-	private Injector makeInjector(final ChannelHandlerContext ctx, final FullHttpRequest request) {
-		return parentInjector.createChildInjector(new AbstractModule() {
+	private Module makeRequestResponseModule(final ChannelHandlerContext ctx, final FullHttpRequest request) {
+		return new AbstractModule() {
 			
 			@Override
 			protected void configure() {
@@ -76,6 +77,15 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 				bind(FullHttpRequest.class).toInstance(request);
 				bind(HttpServerRequest.class).to(HttpServerRequestImpl.class);
 				bind(HttpServerResponse.class).to(HttpServerResponseImpl.class);
+			}
+		};
+	}
+	
+	private Module makeWebSocketHandshakerModule(final FullHttpRequest request) {
+		return new AbstractModule() {
+			
+			@Override
+			protected void configure() {
 				bind(WebSocketConnectionMaker.class);
 				bind(WebSocketFrameHandlerCreator.class);
 			}
@@ -89,25 +99,33 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 				
 				return new WebSocketServerHandshakerFactory(uri, null, false);
 			}
-		});
+		};
 	}
 
 	@Override
 	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
-
-		//long time = System.nanoTime();
-		Injector injector = makeInjector(ctx, request);
-		//System.out.println("takes " + MILLISECONDS.convert(System.nanoTime() - time, NANOSECONDS));
 		
+		//long time = System.nanoTime();
+		// injector creation is split apart here because it's measurably slower to include the websocket bindings
 		if (!request.getDecoderResult().isSuccess()) {
 		
+			Injector injector = parentInjector.createChildInjector(makeRequestResponseModule(ctx, request));
+			//System.out.printf("made req/res injector in %s millis%n", MILLISECONDS.convert(System.nanoTime() - time, NANOSECONDS));
+			
 			injector.getInstance(HttpServerResponse.class).sendError(HttpResponseStatus.BAD_REQUEST);
 		
 		} else if (webSocketRequestChecker.isWebSocketRequest(request)) {
 			
+			Injector injector = parentInjector.createChildInjector(makeRequestResponseModule(ctx, request), makeWebSocketHandshakerModule(request));
+			//System.out.printf("made websocket handshake injector in %s millis%n", MILLISECONDS.convert(System.nanoTime() - time, NANOSECONDS));
+			
 			injector.getInstance(WebSocketConnectionMaker.class).handshakeWebsocket();
 			
 		} else {
+		
+			Injector injector = parentInjector.createChildInjector(makeRequestResponseModule(ctx, request));
+			//System.out.printf("made req/res injector in %s millis%n", MILLISECONDS.convert(System.nanoTime() - time, NANOSECONDS));
+			
 			handleHttpRequest(injector.getInstance(HttpServerRequest.class), injector.getInstance(HttpServerResponse.class));
 		}
 	}

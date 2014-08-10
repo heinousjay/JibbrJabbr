@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import jj.resource.AbstractFileResource;
 
 /**
@@ -22,7 +20,6 @@ import jj.resource.AbstractFileResource;
  * @author jason
  *
  */
-@Singleton
 public class PropertiesResource extends AbstractFileResource {
 	
 	private final Map<String, String> properties;

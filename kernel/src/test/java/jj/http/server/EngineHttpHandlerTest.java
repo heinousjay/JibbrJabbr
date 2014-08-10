@@ -38,7 +38,6 @@ import jj.http.server.EngineHttpHandler;
 import jj.http.server.HttpServerRequestImpl;
 import jj.http.server.servable.RequestProcessor;
 import jj.http.server.websocket.WebSocketConnectionMaker;
-import jj.http.server.websocket.WebSocketFrameHandlerCreator;
 import jj.http.server.websocket.WebSocketRequestChecker;
 import jj.logging.Emergency;
 
@@ -121,6 +120,7 @@ public class EngineHttpHandlerTest {
 		given(injector.getInstance(HttpServerResponse.class)).willReturn(httpResponse);
 		given(injector.getInstance(WebSocketConnectionMaker.class)).willReturn(webSocketConnectionMaker);
 		given(injector.createChildInjector(any(Module.class))).willReturn(injector);
+		given(injector.createChildInjector(any(Module.class), any(Module.class))).willReturn(injector);
 		given(binder.bind((Class)any())).willReturn(abb);
 	}
 	
@@ -173,8 +173,6 @@ public class EngineHttpHandlerTest {
 		verify(abb).to(HttpServerRequestImpl.class);
 		verify(binder).bind(HttpServerResponse.class);
 		verify(abb).to(HttpServerResponseImpl.class);
-		verify(binder).bind(WebSocketConnectionMaker.class);
-		verify(binder).bind(WebSocketFrameHandlerCreator.class);
 		
 		verifyNoMoreInteractions(binder, abb);
 	}
