@@ -18,6 +18,7 @@ package jj.configuration;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -39,6 +40,7 @@ import jj.document.DocumentConfiguration;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceConfiguration;
+import jj.resource.ResourceSettings;
 import jj.script.ScriptError;
 import jj.testing.JibbrJabbrTestServer;
 
@@ -134,6 +136,20 @@ public class ConfigurationSystemTest {
 		assertThat(lessConfiguration.maxLineLen(), is(1024));
 		
 		assertThat(resourceConfiguration.maxFileSizeToLoad(), is(102400000000L));
+		// just some basic checks here
+		assertThat(resourceConfiguration.typeConfigurations().size(), is(41));
+		
+		ResourceSettings rs = resourceConfiguration.typeConfigurations().get("html");
+		assertThat(rs, is(notNullValue()));
+		assertThat(rs.mimeType(), is("text/html"));
+		assertThat(rs.charset(), is(UTF_8));
+		assertThat(rs.compressible(), is(true));
+		
+		rs = resourceConfiguration.typeConfigurations().get("mp4");
+		assertThat(rs, is(notNullValue()));
+		assertThat(rs.mimeType(), is("video/mp4"));
+		assertThat(rs.charset(), is(nullValue()));
+		assertThat(rs.compressible(), is(false));
 		
 		assertThat(i18nConfiguration.allowNonISO(), is(true));
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));

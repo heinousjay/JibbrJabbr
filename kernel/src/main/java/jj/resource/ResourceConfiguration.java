@@ -15,6 +15,8 @@
  */
 package jj.resource;
 
+import java.util.Map;
+
 import jj.configuration.Default;
 
 /**
@@ -35,4 +37,15 @@ public interface ResourceConfiguration {
 	
 	@Default(MAX_IN_MEMORY_SIZE + "") // hi java! you suck sometimes!
 	long maxFileSizeToLoad();
+	
+	// this isn't actually exposed for configuration, it's more or
+	// less a constant
+	@Default("application/octet-stream")
+	String defaultMimeType();
+	
+	/**
+	 * various settings for file-based resources, organized by extension
+	 * @return
+	 */
+	Map<String, ResourceSettings> typeConfigurations();
 }

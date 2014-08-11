@@ -62,6 +62,8 @@ require('jj/resource-system-configuration')
 	.ioThreads(10)
 	.maxFileSizeToLoad(102400000000); // test a bigun
 
+require('jj/default-resource-properties'); // configure normally
+
 // this is a silly helper, it just copies the exports
 // of the given script into the given object
 var globalize = require('jj/globalize');

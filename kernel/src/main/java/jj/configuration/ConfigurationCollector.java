@@ -65,10 +65,22 @@ public class ConfigurationCollector {
 		list.add(value);
 	}
 	
+	public void addConfigurationMappedElement(String key, String valueKey, Object valueValue) {
+		if (!inProgress.containsKey(key)) {
+			inProgress.put(key, new HashMap<String, Object>());
+		}
+		@SuppressWarnings("unchecked")
+		HashMap<String, Object> map = ((HashMap<String, Object>)inProgress.get(key));
+		map.put(valueKey, valueValue);
+	}
+	
 	<T> T get(String key, Class<T> type, Object defaultValue) {
 		Map<String, Object> map = current.get();
 		if (List.class.isAssignableFrom(type) && defaultValue == null) {
 			defaultValue = Collections.EMPTY_LIST;
+		}
+		if (Map.class.isAssignableFrom(type) && defaultValue == null) {
+			defaultValue = Collections.EMPTY_MAP;
 		}
 		return converters.convert(map != null && map.containsKey(key) ? map.get(key) : defaultValue, type);
 	}
@@ -79,6 +91,10 @@ public class ConfigurationCollector {
 			if (inProgress.get(key) instanceof List) {
 				List<?> list = Collections.unmodifiableList((List<?>)inProgress.get(key));
 				inProgress.put(key, list);
+			}
+			if (inProgress.get(key) instanceof Map) {
+				Map<?, ?> map = Collections.unmodifiableMap((Map<?, ?>)inProgress.get(key));
+				inProgress.put(key, map);
 			}
 		}
 		

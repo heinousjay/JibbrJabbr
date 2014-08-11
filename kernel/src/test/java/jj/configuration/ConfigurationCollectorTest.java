@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
@@ -50,6 +51,8 @@ public class ConfigurationCollectorTest {
 		collector.addConfigurationElement("key2", 2);
 		collector.addConfigurationMultiElement("key3", true);
 		collector.addConfigurationMultiElement("key3", false);
+		collector.addConfigurationMappedElement("key4", "key1", 1);
+		collector.addConfigurationMappedElement("key4", "key2", 2);
 		
 		collector.configurationComplete();
 		
@@ -72,6 +75,23 @@ public class ConfigurationCollectorTest {
 		
 		assertThat(list, is(notNullValue()));
 		assertTrue(list.isEmpty());
+		
+		Map<String, Integer> map = collector.get("key4", Map.class, null);
+		
+		assertThat(map, is(notNullValue()));
+		assertThat(map.size(), is(2));
+		assertThat(map.get("key1"), is(1));
+		assertThat(map.get("key2"), is(2));
+		
+		map = collector.get("notAKey", Map.class, null);
+		
+		assertThat(map, is(notNullValue()));
+		assertTrue(map.isEmpty());
+		
+		map = collector.get("alsoNotAKey", Map.class, Collections.EMPTY_MAP);
+		
+		assertThat(map, is(notNullValue()));
+		assertTrue(map.isEmpty());
 	}
 
 }
