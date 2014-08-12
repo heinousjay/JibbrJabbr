@@ -15,9 +15,6 @@
  */
 package jj.css;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -47,9 +44,9 @@ class LessResource extends AbstractFileResource {
 	
 	String contents() {
 		try {
-			return new String(Files.readAllBytes(path), UTF_8);
-		} catch (IOException ioe) {
-			throw new AssertionError("couldn't read the contents at " + path(), ioe);
+			return new String(Files.readAllBytes(path), charset());
+		} catch (Exception e) {
+			throw new AssertionError("couldn't read the contents at " + path(), e);
 		}
 	}
 

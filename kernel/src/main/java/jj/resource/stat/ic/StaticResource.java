@@ -15,12 +15,9 @@
  */
 package jj.resource.stat.ic;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -28,7 +25,6 @@ import javax.inject.Inject;
 import jj.resource.AbstractFileResource;
 import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
-import jj.resource.MimeTypes;
 import jj.resource.TransferableResource;
 
 /**
@@ -36,8 +32,6 @@ import jj.resource.TransferableResource;
  *
  */
 public class StaticResource extends AbstractFileResource implements TransferableResource {
-
-	private final String mime;
 	
 	private final boolean safeToServe;
 	
@@ -53,18 +47,17 @@ public class StaticResource extends AbstractFileResource implements Transferable
 		final PathResolver pathResolver
 	) throws IOException {
 		super(dependencies, path, false);
-		mime = MimeTypes.get(name);
 		safeToServe = base.internal() || pathResolver.pathInBase(path);
 	}
 	
 	@Override
-	public String mime() {
-		return mime;
+	public String contentType() {
+		return settings.mimeType() + (charset() == null ? "" : "; charset=" + charset().name());
 	}
 	
-	public Charset charset() {
-		// need to get this from some outside source too
-		return UTF_8;
+	@Override
+	public boolean compressible() {
+		return settings.compressible();
 	}
 	
 	@Override

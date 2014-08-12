@@ -89,6 +89,8 @@ public abstract class AbstractResource implements Resource {
 	
 	protected final ResourceFinder resourceFinder;
 	
+	protected final ResourceConfiguration resourceConfiguration;
+	
 	private final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
 	
 	private final AtomicBoolean alive = new AtomicBoolean(true);
@@ -100,6 +102,7 @@ public abstract class AbstractResource implements Resource {
 		this.name = dependencies.name;
 		this.publisher = dependencies.publisher;
 		this.resourceFinder = dependencies.resourceFinder;
+		this.resourceConfiguration = dependencies.resourceConfiguration;
 		
 		if ((this instanceof ParentedResource) && this.base().parentInDirectory()) {
 			dependencies.aril.awaitInitialization(this);

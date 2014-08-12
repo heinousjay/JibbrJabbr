@@ -16,24 +16,9 @@
 package jj.resource;
 
 /**
- * A resource that the server can send to a client. LoadedResource
- * and TransferableResource
  * @author jason
  *
  */
-public interface ServableResource extends Resource {
-
-	String serverPath();
+public class ContentTypeRenderer {
 	
-	/**
-	 * The mime of resource suitably formatted for response
-	 * in the Content-Type header (specifically, including a
-	 * charset parameter if needed.)
-	 * @return
-	 */
-	String contentType();
-	
-	boolean compressible();
-	
-	boolean safeToServe();
 }

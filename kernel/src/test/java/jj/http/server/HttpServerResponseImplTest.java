@@ -174,7 +174,7 @@ public class HttpServerResponseImplTest {
 		
 		LoadedResource lr = mock(LoadedResource.class);
 		given(lr.sha1()).willReturn(sha1);
-		given(lr.mime()).willReturn(mime);
+		given(lr.contentType()).willReturn(mime);
 		given(lr.size()).willReturn(size);
 		given(lr.bytes()).willReturn(bytes);
 		return lr;
@@ -212,7 +212,7 @@ public class HttpServerResponseImplTest {
 		
 		TransferableResource tr = mock(TransferableResource.class);
 		given(tr.sha1()).willReturn(sha1);
-		given(tr.mime()).willReturn(mime);
+		given(tr.contentType()).willReturn(mime);
 		given(tr.size()).willReturn(size);
 		given(tr.fileChannel()).willReturn(mock(FileChannel.class));
 		

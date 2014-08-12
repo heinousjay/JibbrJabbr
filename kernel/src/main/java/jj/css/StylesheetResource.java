@@ -15,12 +15,12 @@
  */
 package jj.css;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static jj.configuration.resolution.AppLocation.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -36,10 +36,10 @@ import org.mozilla.javascript.Undefined;
 
 import jj.resource.AbstractResource;
 import jj.resource.LoadedResource;
-import jj.resource.MimeTypes;
 import jj.resource.NoSuchResourceException;
 import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
+import jj.resource.ResourceSettings;
 import jj.resource.stat.ic.StaticResource;
 import jj.script.Global;
 import jj.script.RhinoContext;
@@ -65,6 +65,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	private final long size;
 	private final boolean safeToServe;
 	private final LessConfiguration lessConfiguration;
+	private final ResourceSettings settings;
 
 	@Inject
 	StylesheetResource(
@@ -106,9 +107,8 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		} else {
 			path = css.path();
 			css.addDependent(this);
-			// somehow, hook up a watch for the less file too. 
 			try {
-				result = new String(Files.readAllBytes(path), UTF_8);
+				result = new String(Files.readAllBytes(path), css.charset());
 			} catch (IOException ioe) {
 				throw new ResourceNotViableException(path, ioe);
 			}
@@ -118,8 +118,10 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 
 		result = processor.fixUris(result, this);
 
+		settings = resourceConfiguration.typeConfigurations().get("css");
+		
 		sha1 = SHA1Helper.keyFor(result);
-		bytes = Unpooled.copiedBuffer(result, UTF_8);
+		bytes = Unpooled.copiedBuffer(result, charset());
 		size = bytes.readableBytes();
 		serverPath = "/" + sha1 + "/" + name;
 	}
@@ -184,8 +186,18 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	}
 
 	@Override
-	public String mime() {
-		return MimeTypes.get("css");
+	public String contentType() {
+		return settings.mimeType() + (charset() == null ? "" : "; charset=" + charset().name());
+	}
+	
+	@Override
+	public boolean compressible() {
+		return settings.compressible();
+	}
+	
+	@Override
+	public Charset charset() {
+		return settings.charset();
 	}
 
 	@Override

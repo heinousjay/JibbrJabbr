@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -15,7 +16,7 @@ import jj.util.SHA1Helper;
 
 /**
  * <p>
- * Provides base services for {@link FileResource} instances
+ * Provides base services for {@link FileResource} instances.
  * 
  * @author jason
  *
@@ -26,8 +27,8 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	protected final FileTime lastModified;
 	protected final long size;
 	protected final ByteBuf byteBuffer;
-	
-	private String sha1;
+	protected final ResourceSettings settings;
+	protected final String sha1;
 	
 	@ResourceThread
 	protected AbstractFileResource(
@@ -60,16 +61,17 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 			}
 			
 			size = attributes.size();
-			boolean large = size > dependencies.resourceConfiguration.maxFileSizeToLoad();
+			boolean large = size > resourceConfiguration.maxFileSizeToLoad();
 			
 			if (large && keepBytes) {
 				throw new ResourceNotViableException(path, 
 					"resource is " + size + " bytes but configured maximum is " + 
-					dependencies.resourceConfiguration.maxFileSizeToLoad() + " bytes"
+					resourceConfiguration.maxFileSizeToLoad() + " bytes"
 				);
 			}
 			
 			this.path = path;
+			this.settings = findResourceSettings(dependencies);
 			this.lastModified = attributes.lastModifiedTime();
 			
 			if (keepBytes) { // read it all in
@@ -92,6 +94,19 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 		}
 	}
 	
+	private ResourceSettings findResourceSettings(final Dependencies dependencies) {
+		ResourceSettings settings = resourceConfiguration.typeConfigurations().get(extension());
+		
+		assert settings != null : "couldn't find settings for " + extension();
+		
+		return settings;
+	}
+	
+	private String extension() {
+		String base = path.getFileName().toString();
+		return base.substring(base.lastIndexOf(".") + 1);
+	}
+	
 	private ByteBuf readAllBytes(final Path path) throws IOException {
 		return Unpooled.wrappedBuffer(Files.readAllBytes(path));
 	}
@@ -109,6 +124,11 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	@Override
 	public boolean isDirectory() {
 		return false;
+	}
+	
+	@Override
+	public Charset charset() {
+		return settings.charset();
 	}
 
 	@Override

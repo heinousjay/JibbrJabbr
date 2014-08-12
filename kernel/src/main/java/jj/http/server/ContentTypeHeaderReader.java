@@ -16,7 +16,6 @@
 package jj.http.server;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -32,27 +31,22 @@ class ContentTypeHeaderReader {
 	
 	private static final String MULTIPART = "multipart";
 	
-	private static final String TEXT = "text";
-	
 	private static final String CHARSET = "charset";
 	
-	private static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
+	private static final String BOUNDARY = "boundary";
 	
 	private final MimeType value;
 	
 	private final boolean badRequest;
 	
 	private final Charset charset;
-	
-	private final boolean unsupportedMediaType;
 
 	ContentTypeHeaderReader(final HttpHeaders httpHeaders) {
 		String headerValue = httpHeaders.get(HttpHeaders.Names.CONTENT_TYPE);
 		assert headerValue != null : "can't read a nonexistent header";
 		value = mimeType(headerValue);
 		badRequest = value == null;
-		charset = isText() ? findCharset() : null;
-		unsupportedMediaType = isText() && charset == null;
+		charset = value != null ? findCharset() : null;
 	}
 	
 	private MimeType mimeType(String headerValue) {
@@ -67,16 +61,12 @@ class ContentTypeHeaderReader {
 		return badRequest;
 	}
 	
-	public boolean isUnsupportedMediaType() {
-		return unsupportedMediaType;
-	}
-	
 	public boolean isMultipart() {
 		return !badRequest && MULTIPART.equals(value.getPrimaryType());
 	}
 	
 	public boolean isText() {
-		return !badRequest && TEXT.equals(value.getPrimaryType());
+		return charset != null;
 	}
 	
 	public String mimeType() {
@@ -87,15 +77,24 @@ class ContentTypeHeaderReader {
 		return charset;
 	}
 	
+	public String boundary() {
+		return value == null ? null : value.getParameter(BOUNDARY); 
+	}
+	
 	private Charset findCharset() {
 		String name = value.getParameter(CHARSET);
 		if (StringUtils.isEmpty(name)) {
-			return DEFAULT_CHARSET;
+			return null;
 		}
 		try {
 			return Charset.forName(name);
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "value: " + value + ", charset: " + charset;
 	}
 }

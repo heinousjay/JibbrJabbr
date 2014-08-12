@@ -19,17 +19,24 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
+import javax.inject.Provider;
+
 /**
- * Provides a default value for a configuration property that
- * takes its value from an argument.  The value is converted
- * to the return type of the method, so registering a converter
- * may be necessary.
+ * <p>
+ * Designates an implementation of {@link Provider} that will
+ * provide a default value for a complicated configuration property.
+ * 
+ * <p>
+ * Unfortunately the type system won't let me specify the types, so it's
+ * a runtime check, but it goes without saying that the implementation
+ * should provide the return type of the method. But I said it anyway.
  * 
  * @author jason
  *
  */
 @Target(ElementType.METHOD)
 @Documented
-public @interface Default {
-	String value();
+public @interface DefaultProvider {
+	
+	Class<? extends Provider<?>> value();
 }

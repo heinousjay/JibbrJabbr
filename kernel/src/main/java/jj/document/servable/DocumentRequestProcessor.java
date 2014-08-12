@@ -1,7 +1,5 @@
 package jj.document.servable;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.ResourceTask;
-import jj.resource.MimeTypes;
 import jj.script.ContinuationCoordinator;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
@@ -202,12 +199,12 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		// into the output if there are text nodes next to element node
 		// and it gets REALLY ANNOYING
 		document.outputSettings().prettyPrint(false).indentAmount(0);
-		byte[] bytes = document.toString().getBytes(UTF_8);
+		byte[] bytes = document.toString().getBytes(documentScriptEnvironment.charset());
 		httpResponse
 			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
 			// clients shouldn't cache these responses at all
 			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-			.header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"))
+			.header(HttpHeaders.Names.CONTENT_TYPE, documentScriptEnvironment.contentType())
 			.content(bytes)
 			.end();
 	}

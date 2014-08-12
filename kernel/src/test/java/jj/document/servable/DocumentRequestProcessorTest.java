@@ -20,7 +20,6 @@ import jj.execution.MockTaskRunner;
 import jj.execution.TaskHelper;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.resource.MimeTypes;
 import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 import jj.script.DependsOnScriptEnvironmentInitialization;
@@ -104,6 +103,8 @@ public class DocumentRequestProcessorTest {
 		
 		given(documentScriptEnvironment.name()).willReturn(baseName);
 		given(documentScriptEnvironment.document()).willReturn(document);
+		given(documentScriptEnvironment.charset()).willReturn(UTF_8);
+		given(documentScriptEnvironment.contentType()).willReturn("text/html; charset=UTF-8");
 		
 		given(httpRequest.uri()).willReturn("/");
 		
@@ -143,7 +144,7 @@ public class DocumentRequestProcessorTest {
 
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"));
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
 		verify(httpResponse).content(bytes);
 	}
 	
@@ -188,7 +189,7 @@ public class DocumentRequestProcessorTest {
 		
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"));
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
 		verify(httpResponse).content(bytes);
 		
 		verifyZeroInteractions(initializer);
@@ -211,7 +212,7 @@ public class DocumentRequestProcessorTest {
 		
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"));
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
 		verify(httpResponse).content(bytes);
 		
 		verifyZeroInteractions(initializer);
@@ -252,7 +253,7 @@ public class DocumentRequestProcessorTest {
 		// then
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, MimeTypes.get(".html"));
+		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
 		verify(httpResponse).content(bytes);
 	}
 

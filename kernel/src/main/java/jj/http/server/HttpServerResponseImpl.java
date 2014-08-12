@@ -312,7 +312,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	protected HttpServerResponse sendResource(final LoadedResource resource) {
 		return header(HttpHeaders.Names.ETAG, resource.sha1())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
-			.header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+			.header(HttpHeaders.Names.CONTENT_TYPE, resource.contentType())
 			.content(resource.bytes())
 			.end();
 	}
@@ -325,7 +325,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	protected HttpServerResponse sendResource(TransferableResource resource) throws IOException {
-		header(HttpHeaders.Names.CONTENT_TYPE, resource.mime())
+		header(HttpHeaders.Names.CONTENT_TYPE, resource.contentType())
 			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size())
 			.header(HttpHeaders.Names.DATE, new Date());
 		

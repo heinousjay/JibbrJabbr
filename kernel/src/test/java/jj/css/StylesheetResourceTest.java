@@ -68,11 +68,13 @@ public class StylesheetResourceTest {
 	
 	@Before
 	public void before() throws Exception {
+		
 		contextProvider = new RealRhinoContextProvider();
 		
 		cssPath = Paths.get(StylesheetResourceTest.class.getResource("/jj/css/test/test.css").toURI());
 		app = new MockApplication(cssPath.getParent());
 		given(cssResource.path()).willReturn(cssPath);
+		given(cssResource.charset()).willReturn(UTF_8);
 	}
 	
 	private StylesheetResource newStylesheet(MockAbstractResourceDependencies dependencies) {

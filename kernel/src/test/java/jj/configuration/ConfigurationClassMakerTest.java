@@ -33,6 +33,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationClassMakerTest {
 	
+	static final String COMPLICATED_VALUE = "THIS WORKED!";
+	
 	public interface ConfigurationInterface {
 		
 		String something();
@@ -45,6 +47,9 @@ public class ConfigurationClassMakerTest {
 		int undefinedThing();
 		
 		String otherUndefinedThing();
+		
+		@DefaultProvider(ComplicatedDefaultProvider.class)
+		String complicatedDefault();
 	}
 	
 	@InjectMocks ConfigurationClassMaker ccl;
@@ -57,11 +62,11 @@ public class ConfigurationClassMakerTest {
 		
 		assertTrue(clazz.isAnnotationPresent(Singleton.class));
 		
-		Constructor<? extends ConfigurationInterface> ctor = clazz.getConstructor(ConfigurationCollector.class);
+		Constructor<? extends ConfigurationInterface> ctor = clazz.getConstructor(ConfigurationCollector.class, ComplicatedDefaultProvider.class);
 		
 		assertTrue(ctor.isAnnotationPresent(Inject.class));
 		
-		ConfigurationInterface iface1 = ctor.newInstance(collector);
+		ConfigurationInterface iface1 = ctor.newInstance(collector, new ComplicatedDefaultProvider());
 		
 		assertThat(iface1, is(notNullValue()));
 		
@@ -69,11 +74,13 @@ public class ConfigurationClassMakerTest {
 		given(collector.get(base + "something", String.class, null)).willReturn("something");
 		given(collector.get(base + "otherThing", Integer.class, null)).willReturn(45);
 		given(collector.get(base + "defaultedThing", Object.class, "default")).willReturn("default");
+		given(collector.get(base + "complicatedDefault", String.class, COMPLICATED_VALUE)).willReturn(COMPLICATED_VALUE);
 		assertThat(iface1.something(), is("something"));
 		assertThat(iface1.otherThing(), is(45));
 		assertThat(iface1.defaultedThing(), is((Object)"default"));
 		assertThat(iface1.undefinedThing(), is(0));
 		assertThat(iface1.otherUndefinedThing(), is(nullValue()));
+		assertThat(iface1.complicatedDefault(), is(COMPLICATED_VALUE));
 	}
 
 }

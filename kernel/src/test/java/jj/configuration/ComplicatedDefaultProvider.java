@@ -13,27 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.configuration;
 
-/**
- * A resource that the server can send to a client. LoadedResource
- * and TransferableResource
- * @author jason
- *
- */
-public interface ServableResource extends Resource {
+import javax.inject.Provider;
 
-	String serverPath();
-	
-	/**
-	 * The mime of resource suitably formatted for response
-	 * in the Content-Type header (specifically, including a
-	 * charset parameter if needed.)
-	 * @return
-	 */
-	String contentType();
-	
-	boolean compressible();
-	
-	boolean safeToServe();
+public class ComplicatedDefaultProvider implements Provider<String> {
+	@Override
+	public String get() {
+		
+		return ConfigurationClassMakerTest.COMPLICATED_VALUE;
+	}
 }

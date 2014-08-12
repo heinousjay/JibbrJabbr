@@ -16,6 +16,10 @@
 package jj.configuration;
 
 import static jj.util.CodeGenHelper.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -41,16 +45,14 @@ class ConfigurationClassMaker {
 	
 	private final ClassPool classPool;
 	
-	private final CtClass[] constructionParameters;
+	private final CtClass configurationCollector;
 	
 	private final CtClass[] constructionExceptions = new CtClass[0];
 	
 	@Inject
 	ConfigurationClassMaker() throws Exception {
 		classPool = CodeGenHelper.classPool();
-		constructionParameters = new CtClass[] { 
-			classPool.get(ConfigurationCollector.class.getName())
-		};
+		configurationCollector = classPool.get(ConfigurationCollector.class.getName());
 	}
 	
 	<T> Class<? extends T> make(Class<T> configurationInterface) throws Exception {
@@ -73,8 +75,10 @@ class ConfigurationClassMaker {
 		CtClass result = classPool.makeClass(name);
 		result.addInterface(resultInterface);
 		
+		List<CtClass> collaborators = gatherCollaborators(resultInterface);
+		
 		// make it!
-		prepareForInjection(result);
+		prepareForInjection(result, collaborators);
 		implement(result, resultInterface);
 		
 		try {
@@ -88,17 +92,38 @@ class ConfigurationClassMaker {
 		}
 	}
 	
-	private void prepareForInjection(final CtClass result) throws CannotCompileException {
+	private List<CtClass> gatherCollaborators(final CtClass resultInterface) throws Exception {
 		
-		CtField collectorField = CtField.make("private final " + ConfigurationCollector.class.getName() + " collector;", result);
-		result.addField(collectorField);
+		ArrayList<CtClass> result = new ArrayList<>();
 		
-		CtConstructor ctor = CtNewConstructor.make(constructionParameters, constructionExceptions, result);
-		ctor.setBody(
-			"{" +
-				"this.collector = $1;" +
-			"}"
-		);
+		for (CtMethod method : resultInterface.getMethods()) {
+			if (method.hasAnnotation(DefaultProvider.class)) {
+				Class<?> providerClass = ((DefaultProvider)method.getAnnotation(DefaultProvider.class)).value();
+				result.add(classPool.get(providerClass.getName()));
+			}
+		}
+		
+		return result;
+	}
+	
+	private void prepareForInjection(final CtClass result, final List<CtClass> collaborators) throws CannotCompileException {
+		
+		collaborators.add(0, configurationCollector);
+		
+		int index = 1;
+		StringBuilder body = new StringBuilder("{");
+		
+		for (CtClass collaborator : collaborators) {
+			CtField field = CtField.make("private final " + collaborator.getName() + " " + collaborator.getSimpleName() + ";", result);
+			result.addField(field);
+			body.append("this.").append(collaborator.getSimpleName()).append(" = $").append(index++).append(";");
+		}
+		
+		body.append("}");
+		
+		
+		CtConstructor ctor = CtNewConstructor.make(collaborators.toArray(new CtClass[collaborators.size()]), constructionExceptions, result);
+		ctor.setBody(body.toString());
 		result.addConstructor(ctor);
 		
 		// @Inject
@@ -117,6 +142,19 @@ class ConfigurationClassMaker {
 			Default defaultAnnotation = (Default)method.getAnnotation(Default.class);
 			String defaultValue = defaultAnnotation != null ? "\"" + defaultAnnotation.value() + "\"" : null;
 			
+			DefaultProvider defaultProviderAnnotation = (DefaultProvider)method.getAnnotation(DefaultProvider.class);
+			
+			if (defaultAnnotation != null && defaultProviderAnnotation != null) {
+				throw new AssertionError("only one of @Default and @DefaultProvider can be declared for a given method");
+			}
+			
+			if (defaultProviderAnnotation != null) {
+				// assert the return type == the provider type
+				
+				
+				defaultValue = defaultProviderAnnotation.value().getSimpleName() + ".get()";
+			}
+			
 			String name = resultInterface.getName() + "." + newMethod.getName();
 			
 			if (method.getReturnType().isPrimitive()) {
@@ -126,7 +164,7 @@ class ConfigurationClassMaker {
 				
 				newMethod.setBody(
 					"{" +
-						"Object value = collector.get(\"" + name + "\", " + type + ".class, " + defaultValue + ");" +
+						"Object value = " + configurationCollector.getSimpleName() + ".get(\"" + name + "\", " + type + ".class, " + defaultValue + ");" +
 						"if (value == null) { return " + primitiveDefaults.get(type) + "; }" +
 						"else { return ($r)value; }" +
 					"}"
@@ -136,7 +174,7 @@ class ConfigurationClassMaker {
 				
 				newMethod.setBody(
 					"{" +
-						"return ($r)collector.get(\"" + name + "\", " + method.getReturnType().getName() + ".class, " + defaultValue + ");" +
+						"return ($r)" + configurationCollector.getSimpleName() + ".get(\"" + name + "\", " + method.getReturnType().getName() + ".class, " + defaultValue + ");" +
 					"}"
 				);
 				

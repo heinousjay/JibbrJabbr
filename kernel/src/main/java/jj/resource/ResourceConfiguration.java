@@ -18,6 +18,7 @@ package jj.resource;
 import java.util.Map;
 
 import jj.configuration.Default;
+import jj.configuration.DefaultProvider;
 
 /**
  * @author jason
@@ -45,7 +46,7 @@ public interface ResourceConfiguration {
 	
 	/**
 	 * various settings for file-based resources, organized by extension
-	 * @return
 	 */
+	@DefaultProvider(DefaultTypeConfigurationsProvider.class)
 	Map<String, ResourceSettings> typeConfigurations();
 }

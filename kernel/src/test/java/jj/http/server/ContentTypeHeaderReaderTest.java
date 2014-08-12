@@ -15,7 +15,6 @@
  */
 package jj.http.server;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
@@ -46,40 +45,40 @@ public class ContentTypeHeaderReaderTest {
 		establishObjects("text/html; charset=UTF-8");
 		
 		assertThat(cth.isBadRequest(), is(false));
-		assertThat(cth.isUnsupportedMediaType(), is(false));
 		assertThat(cth.isMultipart(), is(false));
 		assertThat(cth.isText(), is(true));
 		assertThat(cth.charset(), is(UTF_8));
+		assertThat(cth.boundary(), is(nullValue()));
 		assertThat(cth.mimeType(), is("text/html"));
 		
 		
 		establishObjects("text/html");
 
 		assertThat(cth.isBadRequest(), is(false));
-		assertThat(cth.isUnsupportedMediaType(), is(false));
-		assertThat(cth.isMultipart(), is(false));
-		assertThat(cth.isText(), is(true));
-		assertThat(cth.charset(), is(ISO_8859_1));
-		assertThat(cth.mimeType(), is("text/html"));
-		
-		
-		establishObjects("application/json");
-
-		assertThat(cth.isBadRequest(), is(false));
-		assertThat(cth.isUnsupportedMediaType(), is(false));
 		assertThat(cth.isMultipart(), is(false));
 		assertThat(cth.isText(), is(false));
 		assertThat(cth.charset(), is(nullValue()));
+		assertThat(cth.boundary(), is(nullValue()));
+		assertThat(cth.mimeType(), is("text/html"));
+		
+		
+		establishObjects("application/json; charset=UTF-8");
+
+		assertThat(cth.isBadRequest(), is(false));
+		assertThat(cth.isMultipart(), is(false));
+		assertThat(cth.isText(), is(true));
+		assertThat(cth.charset(), is(UTF_8));
+		assertThat(cth.boundary(), is(nullValue()));
 		assertThat(cth.mimeType(), is("application/json"));
 		
 		
 		establishObjects("multipart/form-data; boundary=-111kjnsdnajf9ajdf9jasdf");
 
 		assertThat(cth.isBadRequest(), is(false));
-		assertThat(cth.isUnsupportedMediaType(), is(false));
 		assertThat(cth.isMultipart(), is(true));
 		assertThat(cth.isText(), is(false));
 		assertThat(cth.charset(), is(nullValue()));
+		assertThat(cth.boundary(), is("-111kjnsdnajf9ajdf9jasdf"));
 		assertThat(cth.mimeType(), is("multipart/form-data"));
 	}
 
@@ -88,23 +87,10 @@ public class ContentTypeHeaderReaderTest {
 		establishObjects("gibberish.  nothing makes sense here at all");
 		
 		assertThat(cth.isBadRequest(), is(true));
-		assertThat(cth.isUnsupportedMediaType(), is(false));
 		assertThat(cth.isMultipart(), is(false));
 		assertThat(cth.isText(), is(false));
 		assertThat(cth.charset(), is(nullValue()));
+		assertThat(cth.boundary(), is(nullValue()));
 		assertThat(cth.mimeType(), is(nullValue()));
-	}
-	
-	@Test
-	public void testUnsupportedMediaType() {
-		
-		establishObjects("text/html; charset=UHURU-50");
-		
-		assertThat(cth.isBadRequest(), is(false));
-		assertThat(cth.isUnsupportedMediaType(), is(true));
-		assertThat(cth.isMultipart(), is(false));
-		assertThat(cth.isText(), is(true));
-		assertThat(cth.charset(), is(nullValue()));
-		assertThat(cth.mimeType(), is("text/html"));
 	}
 }
