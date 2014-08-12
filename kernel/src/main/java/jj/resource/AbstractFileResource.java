@@ -94,6 +94,8 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	
 	@Override
 	protected String extension() {
+		// file resources get a path based on their name, right?
+		// at least in all cases where these settings matter, anyway
 		return name.substring(name.lastIndexOf(".") + 1);
 	}
 	

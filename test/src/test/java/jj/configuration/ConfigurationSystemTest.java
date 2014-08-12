@@ -137,19 +137,21 @@ public class ConfigurationSystemTest {
 		
 		assertThat(resourceConfiguration.maxFileSizeToLoad(), is(102400000000L));
 		// just some basic checks here
-		assertThat(resourceConfiguration.typeConfigurations().size(), is(41));
+		assertThat(resourceConfiguration.fileTypeSettings().size(), is(41));
 		
-		ResourceSettings rs = resourceConfiguration.typeConfigurations().get("html");
+		ResourceSettings rs = resourceConfiguration.fileTypeSettings().get("html");
 		assertThat(rs, is(notNullValue()));
 		assertThat(rs.mimeType(), is("text/html"));
 		assertThat(rs.charset(), is(UTF_8));
 		assertThat(rs.compressible(), is(true));
 		
-		rs = resourceConfiguration.typeConfigurations().get("mp4");
+		rs = resourceConfiguration.fileTypeSettings().get("mp4");
 		assertThat(rs, is(notNullValue()));
 		assertThat(rs.mimeType(), is("video/mp4"));
 		assertThat(rs.charset(), is(nullValue()));
 		assertThat(rs.compressible(), is(false));
+		
+		assertThat(resourceConfiguration.defaultSettings().mimeType(), is("application/octet-stream"));
 		
 		assertThat(i18nConfiguration.allowNonISO(), is(true));
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));

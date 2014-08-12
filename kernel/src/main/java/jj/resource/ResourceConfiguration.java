@@ -39,14 +39,16 @@ public interface ResourceConfiguration {
 	@Default(MAX_IN_MEMORY_SIZE + "") // hi java! you suck sometimes!
 	long maxFileSizeToLoad();
 	
-	// this isn't actually exposed for configuration, it's more or
-	// less a constant
-	@Default("application/octet-stream")
-	String defaultMimeType();
-	
 	/**
 	 * various settings for file-based resources, organized by extension
 	 */
 	@DefaultProvider(DefaultTypeConfigurationsProvider.class)
-	Map<String, ResourceSettings> typeConfigurations();
+	Map<String, ResourceSettings> fileTypeSettings();
+
+	/**
+	 * provides a default ResourceSettings object, not actually exposed
+	 * for configuration but this is a good place to centralize it
+	 */
+	@DefaultProvider(DefaultResourceSettingsProvider.class)
+	ResourceSettings defaultSettings();
 }

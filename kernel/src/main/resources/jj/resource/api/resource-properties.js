@@ -74,7 +74,7 @@ module.exports = {
 		}
 		
 		return {
-			is: makeIs(base + 'typeConfigurations', ext)
+			is: makeIs(base + 'fileTypeSettings', ext)
 		};
 	},
 	

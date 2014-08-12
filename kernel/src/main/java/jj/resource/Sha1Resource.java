@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+
 import jj.resource.Sha1ResourceCreator.Sha1ResourceTarget;
 import jj.util.SHA1Helper;
 
@@ -93,6 +94,11 @@ class Sha1Resource extends AbstractResource {
 		sha1 = SHA1Helper.keyFor(representedSha, String.valueOf(size));
 		
 		target.resource.addDependent(this);
+	}
+	
+	@Override
+	protected String extension() {
+		return Sha1ResourceCreator.EXTENSION;
 	}
 	
 	public String representedSha() {

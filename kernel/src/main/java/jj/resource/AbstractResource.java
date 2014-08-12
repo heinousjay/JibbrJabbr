@@ -33,8 +33,13 @@ import jj.event.Subscriber;
 import jj.util.Clock;
 
 /**
- * internal helper for manipulating a resource.  ALL RESOURCES
- * MUST EXTEND THIS!
+ * <p>
+ * basic resource behavior.  ALL RESOURCES MUST EXTEND THIS
+ * 
+ * <p>
+ * Provides all of the interesting hooks into the system, as well
+ * as default implementations of most of the core {@link Resource}
+ * interface, excluding {@link Resource#sha1()}
  * 
  * @author jason
  *
@@ -110,7 +115,14 @@ public abstract class AbstractResource implements Resource {
 			dependencies.aril.awaitInitialization(this);
 		}
 		
-		settings = resourceConfiguration.typeConfigurations().get(extension());
+		ResourceSettings base = resourceConfiguration.fileTypeSettings().get(extension());
+		if (base == null) {
+			base = resourceConfiguration.defaultSettings();
+		}
+		
+		// and specific based on the type/base/name?  need to figure out how to represent that tuple.  maybe just name?
+		
+		settings = base;
 	}
 	
 	void resourceLoaded() {
@@ -132,6 +144,10 @@ public abstract class AbstractResource implements Resource {
 		dependents.remove(event.resourceKey);
 	}
 	
+	/**
+	 * Override this implementation to provide a specific extension, used to determine base settings.
+	 * AbstractFileResource provides an implementation that suffices in most cases.
+	 */
 	protected String extension() {
 		return "";
 	}

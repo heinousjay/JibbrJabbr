@@ -106,7 +106,7 @@ describe('resource-properties.js', function() {
 			
 			module.exports.extension('ext').is({mimeType:'text/plain', charset:'us-ascii', compressible: true});
 			var call = mockCollector.addConfigurationMappedElement.calls.mostRecent();
-			expect(call.args[0]).toBe('jj.resource.ResourceConfiguration.typeConfigurations');
+			expect(call.args[0]).toBe('jj.resource.ResourceConfiguration.fileTypeSettings');
 			expect(call.args[1]).toBe('ext');
 			expect(call.args[2].mimeType()).toEqual(valueOf('text/plain'));
 			expect(call.args[2].charset().name()).toEqual(valueOf('US-ASCII'));
@@ -114,7 +114,7 @@ describe('resource-properties.js', function() {
 			
 			module.exports.extension('ext2').is({mimeType:'text/html', charset:'utf-8'});
 			call = mockCollector.addConfigurationMappedElement.calls.mostRecent();
-			expect(call.args[0]).toBe('jj.resource.ResourceConfiguration.typeConfigurations');
+			expect(call.args[0]).toBe('jj.resource.ResourceConfiguration.fileTypeSettings');
 			expect(call.args[1]).toBe('ext2');
 			expect(call.args[2].mimeType()).toEqual(valueOf('text/html'));
 			expect(call.args[2].charset().name()).toEqual(valueOf('UTF-8'));

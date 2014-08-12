@@ -29,7 +29,7 @@ import jj.script.RhinoContext;
 
 /**
  * provides the default set of type configurations for
- * {@link ResourceConfiguration#typeConfigurations()}
+ * {@link ResourceConfiguration#fileTypeSettings()}
  * 
  * @author jason
  *
