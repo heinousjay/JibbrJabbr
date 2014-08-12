@@ -27,7 +27,6 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	protected final FileTime lastModified;
 	protected final long size;
 	protected final ByteBuf byteBuffer;
-	protected final ResourceSettings settings;
 	protected final String sha1;
 	
 	@ResourceThread
@@ -71,7 +70,6 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 			}
 			
 			this.path = path;
-			this.settings = findResourceSettings(dependencies);
 			this.lastModified = attributes.lastModifiedTime();
 			
 			if (keepBytes) { // read it all in
@@ -94,17 +92,9 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 		}
 	}
 	
-	private ResourceSettings findResourceSettings(final Dependencies dependencies) {
-		ResourceSettings settings = resourceConfiguration.typeConfigurations().get(extension());
-		
-		assert settings != null : "couldn't find settings for " + extension();
-		
-		return settings;
-	}
-	
-	private String extension() {
-		String base = path.getFileName().toString();
-		return base.substring(base.lastIndexOf(".") + 1);
+	@Override
+	protected String extension() {
+		return name.substring(name.lastIndexOf(".") + 1);
 	}
 	
 	private ByteBuf readAllBytes(final Path path) throws IOException {

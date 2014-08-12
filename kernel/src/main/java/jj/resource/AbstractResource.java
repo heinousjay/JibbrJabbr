@@ -90,6 +90,8 @@ public abstract class AbstractResource implements Resource {
 	protected final ResourceFinder resourceFinder;
 	
 	protected final ResourceConfiguration resourceConfiguration;
+
+	protected final ResourceSettings settings;
 	
 	private final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
 	
@@ -107,6 +109,8 @@ public abstract class AbstractResource implements Resource {
 		if ((this instanceof ParentedResource) && this.base().parentInDirectory()) {
 			dependencies.aril.awaitInitialization(this);
 		}
+		
+		settings = resourceConfiguration.typeConfigurations().get(extension());
 	}
 	
 	void resourceLoaded() {
@@ -126,6 +130,10 @@ public abstract class AbstractResource implements Resource {
 	@Listener
 	void resourceKilled(ResourceKilled event) {
 		dependents.remove(event.resourceKey);
+	}
+	
+	protected String extension() {
+		return "";
 	}
 	
 	@ResourceThread

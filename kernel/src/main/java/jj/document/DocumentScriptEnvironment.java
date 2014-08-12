@@ -35,7 +35,6 @@ import jj.http.server.websocket.ConnectionBroadcastStack;
 import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketMessageProcessor;
-import jj.resource.ResourceSettings;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceNotViableException;
@@ -71,8 +70,6 @@ public class DocumentScriptEnvironment
 	private final String sha1;
 	
 	private final String serverPath;
-	
-	private final ResourceSettings resourceSettings;
 	
 	private final ScriptableObject scope;
 	
@@ -150,8 +147,11 @@ public class DocumentScriptEnvironment
 		
 		this.currentDocument = currentDocument;
 		this.currentConnection = currentConnection;
-		
-		resourceSettings = resourceConfiguration.typeConfigurations().get("html");
+	}
+	
+	@Override
+	protected String extension() {
+		return "html";
 	}
 
 	private String resourceName(final String name) {
@@ -180,17 +180,17 @@ public class DocumentScriptEnvironment
 
 	@Override
 	public String contentType() {
-		return resourceSettings.mimeType() + "; charset=" + charset().name();
+		return settings.contentType();
 	}
 	
 	@Override
 	public boolean compressible() {
-		return resourceSettings.compressible();
+		return settings.compressible();
 	}
 	
 	@Override
 	public Charset charset() {
-		return resourceSettings.charset();
+		return settings.charset();
 	}
 	
 	@Override

@@ -67,7 +67,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 
 	@Override
 	public String contentType() {
-		return settings.mimeType() + (charset() == null ? "" : "; charset=" + charset().name());
+		return settings.contentType();
 	}
 
 	@Override

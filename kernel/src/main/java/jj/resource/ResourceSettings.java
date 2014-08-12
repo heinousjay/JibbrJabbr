@@ -70,4 +70,11 @@ public class ResourceSettings {
 			compressible
 		);
 	}
+
+	/**
+	 * @return
+	 */
+	public String contentType() {
+		return mimeType() + (charset == null ? "" : "; charset=" + charset.name());
+	}
 }

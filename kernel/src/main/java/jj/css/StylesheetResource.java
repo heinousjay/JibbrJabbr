@@ -39,7 +39,6 @@ import jj.resource.LoadedResource;
 import jj.resource.NoSuchResourceException;
 import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
-import jj.resource.ResourceSettings;
 import jj.resource.stat.ic.StaticResource;
 import jj.script.Global;
 import jj.script.RhinoContext;
@@ -65,7 +64,6 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	private final long size;
 	private final boolean safeToServe;
 	private final LessConfiguration lessConfiguration;
-	private final ResourceSettings settings;
 
 	@Inject
 	StylesheetResource(
@@ -117,8 +115,6 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		safeToServe = path.startsWith(pathResolver.path());
 
 		result = processor.fixUris(result, this);
-
-		settings = resourceConfiguration.typeConfigurations().get("css");
 		
 		sha1 = SHA1Helper.keyFor(result);
 		bytes = Unpooled.copiedBuffer(result, charset());
@@ -160,6 +156,11 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 			publisher.publish(new FinishedLessProcessing(lessName));
 		}
 	}
+	
+	@Override
+	protected String extension() {
+		return "css";
+	}
 
 	@Override
 	public String sha1() {
@@ -187,7 +188,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 
 	@Override
 	public String contentType() {
-		return settings.mimeType() + (charset() == null ? "" : "; charset=" + charset().name());
+		return settings.contentType();
 	}
 	
 	@Override
