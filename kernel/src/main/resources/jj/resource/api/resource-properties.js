@@ -40,7 +40,7 @@ function makeIs(key, valueKey) {
 		validateMimeType(mime);
 		
 		if (typeof props.charset !== 'undefined' && typeof props.charset !== 'string') {
-			throw new Error("charset must be a string if present")
+			throw new Error("charset must be a string if present");
 		}
 		
 		// charset can be null, but if not null and we get null back, error!
@@ -50,8 +50,9 @@ function makeIs(key, valueKey) {
 			throw new Error(props.charset + " is not a recognized charset");
 		}
 		
-		// compressible can be null, that's false, but we just use null here
-		// so nothing to check
+		if (typeof props.compressible != 'undefined' && typeof props.compressible !== 'boolean') {
+			throw new Error("compressible must be a boolean if present");
+		}
 		
 		var settings = new ResourceSettings(mime, charset, props.compressible || null);
 		

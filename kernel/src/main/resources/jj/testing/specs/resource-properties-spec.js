@@ -95,6 +95,22 @@ describe('resource-properties.js', function() {
 			}).toThrow(new Error("charset must be a string if present"));
 		});
 		
+		it('requires compressible to be a boolean, if present', function() {
+
+			expect(function() {
+				module.exports.extension('ext').is({mimeType: 'text/plain', compressible: null});
+			}).toThrow(new Error("compressible must be a boolean if present"));
+			expect(function() {
+				module.exports.extension('ext').is({mimeType: 'text/plain', compressible: 1});
+			}).toThrow(new Error("compressible must be a boolean if present"));
+			expect(function() {
+				module.exports.extension('ext').is({mimeType: 'text/plain', compressible: {}});
+			}).toThrow(new Error("compressible must be a boolean if present"));
+			expect(function() {
+				module.exports.extension('ext').is({mimeType: 'text/plain', compressible: "true"});
+			}).toThrow(new Error("compressible must be a boolean if present"));
+		});
+		
 		it('rejects unrecognized charsets', function() {
 			expect(function() {
 				module.exports.extension('ext').is({mimeType: 'text/plain', charset: "whatever"});
