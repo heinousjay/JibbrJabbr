@@ -87,8 +87,10 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	{
 		given(resourceFinder.findResource(DirectoryResource.class, Base, "")).willReturn(rootDirectory);
 		given(resourceConfiguration.maxFileSizeToLoad()).willReturn(1024 * 1024 * 10L);
-		DefaultTypeConfigurationsProvider provider = new DefaultTypeConfigurationsProvider(new RealRhinoContextProvider());
+		FileTypeSettingsDefaultProvider provider = new FileTypeSettingsDefaultProvider(new RealRhinoContextProvider());
 		given(resourceConfiguration.fileTypeSettings()).willReturn(provider.get());
+		DefaultSettingsDefaultProvider provider2 = new DefaultSettingsDefaultProvider();
+		given(resourceConfiguration.defaultSettings()).willReturn(provider2.get());
 	}
 	
 	public MockClock clock() {

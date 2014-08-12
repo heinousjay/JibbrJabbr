@@ -35,7 +35,7 @@ import jj.script.RhinoContext;
  *
  */
 @Singleton
-public class DefaultTypeConfigurationsProvider implements Provider<Map<String, ResourceSettings>> {
+public class FileTypeSettingsDefaultProvider implements Provider<Map<String, ResourceSettings>> {
 
 // this class has to be public or the config system can't find it
 // and the error is WEIRD, seriously not even comprehensible, since it's just
@@ -44,7 +44,7 @@ public class DefaultTypeConfigurationsProvider implements Provider<Map<String, R
 	private final Map<String, ResourceSettings> settings;
 	
 	@Inject
-	DefaultTypeConfigurationsProvider(final Provider<RhinoContext> rhinoContextProvider) {
+	FileTypeSettingsDefaultProvider(final Provider<RhinoContext> rhinoContextProvider) {
 		HashMap<String, ResourceSettings> result = new HashMap<>();
 		
 		

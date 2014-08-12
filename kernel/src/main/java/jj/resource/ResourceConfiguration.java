@@ -42,13 +42,13 @@ public interface ResourceConfiguration {
 	/**
 	 * various settings for file-based resources, organized by extension
 	 */
-	@DefaultProvider(DefaultTypeConfigurationsProvider.class)
+	@DefaultProvider(FileTypeSettingsDefaultProvider.class)
 	Map<String, ResourceSettings> fileTypeSettings();
 
 	/**
 	 * provides a default ResourceSettings object, not actually exposed
 	 * for configuration but this is a good place to centralize it
 	 */
-	@DefaultProvider(DefaultResourceSettingsProvider.class)
+	@DefaultProvider(DefaultSettingsDefaultProvider.class)
 	ResourceSettings defaultSettings();
 }

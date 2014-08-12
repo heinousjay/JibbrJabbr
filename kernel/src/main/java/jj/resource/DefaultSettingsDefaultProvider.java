@@ -21,7 +21,7 @@ import javax.inject.Provider;
  * @author jason
  *
  */
-public class DefaultResourceSettingsProvider implements Provider<ResourceSettings> {
+public class DefaultSettingsDefaultProvider implements Provider<ResourceSettings> {
 	
 	private final ResourceSettings settings = new ResourceSettings("application/octet-stream", null, false);
 
