@@ -1,0 +1,151 @@
+{
+	"html": {
+		"mimeType": "text/html",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"htm": {
+		"mimeType": "text/html",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"js": {
+		"mimeType": "application/javascript",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"css": {
+		"mimeType": "text/css",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"less": {
+		"mimeType": "text/css",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"txt": {
+		"mimeType": "text/plain",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"csv": {
+		"mimeType": "text/csv",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"properties": {
+		"mimeType": "text/plain",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"coffeescript": {
+		"mimeType": "text/coffeescript",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"xml": {
+		"mimeType": "application/xml",
+		"charset": "UTF-8",
+		"compressible": true
+	},
+	"json": {
+		"mimeType": "application/json",
+		"compressible": true
+	},
+	"pdf": {
+		"mimeType": "application/pdf",
+		"compressible": true
+	},
+	"zip": {
+		"mimeType": "application/zip"
+	},
+	"tar": {
+		"mimeType": "application/x-tar"
+	},
+	"gzip": {
+		"mimeType": "application/x-gzip"
+	},
+	"gz": {
+		"mimeType": "application/x-gzip"
+	},
+	"bmp": {
+		"mimeType": "image/bmp"
+	},
+	"gif": {
+		"mimeType": "image/gif"
+	},
+	"jpe": {
+		"mimeType": "image/jpeg"
+	},
+	"jpg": {
+		"mimeType": "image/jpeg"
+	},
+	"jpeg": {
+		"mimeType": "image/jpeg"
+	},
+	"png": {
+		"mimeType": "image/png"
+	},
+	"tiff": {
+		"mimeType": "image/tiff"
+	},
+	"tif": {
+		"mimeType": "image/tiff"
+	},
+	"svg": {
+		"mimeType": "image/svg+xml", 
+		"compressible": true
+	},
+	"ico": {
+		"mimeType": "image/vnd.microsoft.icon"
+	},
+	"eot": {
+		"mimeType": "application/vnd.ms-fontobject",
+		"compressible": true
+	},
+	"otf": {
+		"mimeType": "application/font-sfnt",
+		"compressible": true
+	},
+	"ttf": {
+		"mimeType": "application/font-sfnt",
+		"compressible": true
+	},
+	"woff": {
+		"mimeType": "application/font-woff"
+	},
+	"aac": {
+		"mimeType": "audio/aac"
+	},
+	"m4a": {
+		"mimeType": "audio/mp4"
+	},
+	"mp1": {
+		"mimeType": "audio/mpeg"
+	},
+	"mp2": {
+		"mimeType": "audio/mpeg"
+	},
+	"mp3": {
+		"mimeType": "audio/mpeg"
+	},
+	"oga": {
+		"mimeType": "audio/ogg"
+	},
+	"ogg": {
+		"mimeType": "audio/ogg"
+	},
+	"wav": {
+		"mimeType": "audio/wav"
+	},
+	"mp4": {
+		"mimeType": "video/mp4"
+	},
+	"ogv": {
+		"mimeType": "video/ogv"
+	},
+	"webm": {
+		"mimeType": "video/webm"
+	}
+}

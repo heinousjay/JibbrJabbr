@@ -15,17 +15,17 @@
  */
 package jj.resource;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.script.RhinoContext;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * provides the default set of type configurations for
@@ -41,33 +41,34 @@ public class FileTypeSettingsDefaultProvider implements Provider<Map<String, Res
 // and the error is WEIRD, seriously not even comprehensible, since it's just
 // an immutable set of data, it's fine
 	
-	private final Map<String, ResourceSettings> settings;
+	private static final Map<String, ResourceSettings> settings;
 	
-	@Inject
-	FileTypeSettingsDefaultProvider(final Provider<RhinoContext> rhinoContextProvider) {
-		HashMap<String, ResourceSettings> result = new HashMap<>();
-		
-		
-		// need to read these from a file that the default-resource-properties module also uses
-		// i guess JSON! then i can parse it out pretty trivially in both places.
-		result.put("html", new ResourceSettings("text/html", UTF_8, true));
-		result.put("js", new ResourceSettings("application/javascript", UTF_8, true));
-		result.put("txt", new ResourceSettings("text/plain", UTF_8, true));
-		result.put("properties", new ResourceSettings("text/plain", UTF_8, true));
-		result.put("less", new ResourceSettings("text/plain", UTF_8, true));
-		result.put("css", new ResourceSettings("text/css", UTF_8, true));
-		result.put("jpg", new ResourceSettings("image/jpeg", null, false));
-		result.put("gif", new ResourceSettings("image/gif", null, false));
-		result.put("png", new ResourceSettings("image/png", null, false));
-		
-		
-		settings = Collections.unmodifiableMap(result);
-		
-		try (RhinoContext context = rhinoContextProvider.get()) {
-			// validating this is going to work cause Guice gets pissy
-			// if your constructor does work, sometimes
+	static {
+		try (InputStream is = FileTypeSettingsDefaultProvider.class.getResourceAsStream("api/resource-configurations.json")) {
+			
+			ObjectMapper objectMapper = new ObjectMapper();
+			Map<String, Map<String, Object>> configuration =
+				objectMapper.readValue(is, new TypeReference<Map<String, Map<String, Object>>>() {});
+			
+			HashMap<String, ResourceSettings> result = new HashMap<>(configuration.size() * 2);
+			
+			for (String ext : configuration.keySet()) {
+				result.put(ext, makeSettings(configuration.get(ext)));
+			}
+			settings = Collections.unmodifiableMap(result);
+			
+		} catch (Exception e) {
+			throw new AssertionError("trouble reading default resource configurations", e);
 		}
 	}
+	
+	private static ResourceSettings makeSettings(Map<String, Object> input) {
+		String mimeType = (String)input.get("mimeType");
+		Charset charset = input.containsKey("charset") ? Charset.forName((String)input.get("charset")) : null;
+		boolean compressible = input.containsKey("compressible") && Boolean.TRUE.equals(input.get("compressible"));
+		
+		return new ResourceSettings(mimeType, charset, compressible);
+ 	}
 
 	@Override
 	public Map<String, ResourceSettings> get() {

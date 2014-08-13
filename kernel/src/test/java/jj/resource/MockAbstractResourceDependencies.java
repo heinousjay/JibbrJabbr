@@ -19,7 +19,6 @@ import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.Base;
 import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;
-import jj.script.RealRhinoContextProvider;
 import jj.util.MockClock;
 
 /**
@@ -87,7 +86,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	{
 		given(resourceFinder.findResource(DirectoryResource.class, Base, "")).willReturn(rootDirectory);
 		given(resourceConfiguration.maxFileSizeToLoad()).willReturn(1024 * 1024 * 10L);
-		FileTypeSettingsDefaultProvider provider = new FileTypeSettingsDefaultProvider(new RealRhinoContextProvider());
+		FileTypeSettingsDefaultProvider provider = new FileTypeSettingsDefaultProvider();
 		given(resourceConfiguration.fileTypeSettings()).willReturn(provider.get());
 		DefaultSettingsDefaultProvider provider2 = new DefaultSettingsDefaultProvider();
 		given(resourceConfiguration.defaultSettings()).willReturn(provider2.get());
