@@ -15,25 +15,26 @@
  */
 package jj.script.module;
 
-import jj.JJModule;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.resource.Location;
+import jj.resource.SimpleResourceCreator;
 
 /**
- * Initializes the module.
- * 
  * @author jason
  *
  */
-public class ScriptResourceModule extends JJModule {
+@Singleton
+class JSONResourceCreator extends SimpleResourceCreator<JSONResource> {
 
-	@Override
-	protected void configure() {
-		
-		bindCreation().of(JSONResource.class).to(JSONResourceCreator.class);
-		bindCreation().of(ScriptResource.class).to(ScriptResourceCreator.class);
-		bindCreation().of(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
-		
-		dispatch().continuationOf(RequiredModule.class).to(RequiredModuleContinuationProcessor.class);
+	@Inject
+	JSONResourceCreator(jj.resource.SimpleResourceCreator.Dependencies dependencies) {
+		super(dependencies);
 	}
-
-
+	
+	@Override
+	protected boolean arguments(Location base, String name) {
+		return name.endsWith(".json");
+	}
 }

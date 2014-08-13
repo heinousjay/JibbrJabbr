@@ -19,5 +19,5 @@ exports.doIt = function() {
 		throw new Error('My insides are screwy');
 	}
 	
-	$('title').text('titled');
+	$('title').text(require('values').value);
 }

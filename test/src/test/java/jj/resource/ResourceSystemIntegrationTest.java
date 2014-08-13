@@ -23,6 +23,7 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpServer;
+import jj.script.module.JSONResource;
 import jj.script.module.ModuleScriptEnvironment;
 import jj.script.module.RequiredModule;
 import jj.script.module.ScriptResource;
@@ -57,6 +58,9 @@ public class ResourceSystemIntegrationTest {
 	
 	ModuleScriptEnvironment mse2;
 	ScriptResource scriptResource2;
+	
+	ModuleScriptEnvironment mse3;
+	JSONResource jsonResource1;
 	
 	String createDirectoriesOne = "created/1/directory/structure";
 	String createDirectoriesTwo = "created/1/other/structure";
@@ -102,10 +106,17 @@ public class ResourceSystemIntegrationTest {
 		mse1 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module"));
 		scriptResource1 = finder.findResource(ScriptResource.class, Base, "deep/module.js");
 		assertTrue(deep.dependents().contains(scriptResource1));
+		assertTrue(((AbstractResource)dse).dependents().contains(mse1));
 		
 		mse2 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"));
 		scriptResource2 = finder.findResource(ScriptResource.class, Base, "deep/nesting/module.js");
 		assertTrue(nesting.dependents().contains(scriptResource2));
+		assertTrue(((AbstractResource)dse).dependents().contains(mse2));
+		
+		mse3 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/values", new RequiredModule(dse, "deep/nesting/values"));
+		jsonResource1 = finder.findResource(JSONResource.class, Base, "deep/nesting/values.json");
+		assertTrue(nesting.dependents().contains(jsonResource1));
+		assertTrue(((AbstractResource)dse).dependents().contains(mse3));
 		
 		assertTrue(dse.alive());
 		assertTrue(htmlResource.alive());
@@ -113,6 +124,8 @@ public class ResourceSystemIntegrationTest {
 		assertTrue(scriptResource1.alive());
 		assertTrue(mse2.alive());
 		assertTrue(scriptResource2.alive());
+		assertTrue(mse3.alive());
+		assertTrue(jsonResource1.alive());
 		
 		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesOne), is(nullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesTwo), is(nullValue()));
@@ -142,33 +155,47 @@ public class ResourceSystemIntegrationTest {
 		// single wait point!
 		
 		// wait count is 9 for the directories created above
-		// + 4 kills from scriptResource2, mse2, mse1, and dse
-		// + 1 reload of dse.  note that scriptResource1 and
-		// html resource are left alone in the tree, and that the
+		// + 5 kills from scriptResource2, mse3, mse2, mse1, and dse
+		// + 1 reload of dse.  note that scriptResource1 and jsonResource1 and
+		// htmlResource are left alone in the cache, and that the
 		// modules don't load again without another request
 		
-		assertTrue("timed out", waitForCount(9 + 4 + 1));
+		assertTrue("timed out", waitForCount(9 + 5 + 1));
 		assertFalse("couldn't update things correctly", failed.get());
 		
 		assertFalse(scriptResource2.alive());
 		// should be removed upon death
 		assertFalse(nesting.dependents().contains(scriptResource2));
+		assertFalse(mse3.alive());
 		assertFalse(mse2.alive());
 		assertFalse(mse1.alive());
 		assertFalse(dse.alive());
 
+		assertTrue(jsonResource1.alive());
 		assertTrue(scriptResource1.alive());
 		assertTrue(htmlResource.alive());
+		
+		assertThat(
+			finder.findResource(DocumentScriptEnvironment.class, Virtual, "deep/nested"),
+			is(notNullValue())
+		);
 		
 		assertThat(dse, is(not(sameInstance(
 			finder.findResource(DocumentScriptEnvironment.class, Virtual, "deep/nested")
 		))));
-		assertThat(mse1, is(not(sameInstance(
-			finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module"))
-		))));
-		assertThat(mse2, is(not(sameInstance(
-			finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"))
-		))));
+		
+		assertThat(
+			finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module")),
+			is(nullValue())
+		);
+		assertThat(
+			finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module")),
+			is(nullValue())
+		);
+		assertThat(
+			finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/values", new RequiredModule(dse, "deep/nesting/values")),
+			is(nullValue())
+		);
 		
 		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesOne), is(notNullValue()));
 		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesTwo), is(notNullValue()));

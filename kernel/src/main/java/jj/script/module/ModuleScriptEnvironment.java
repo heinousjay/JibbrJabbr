@@ -21,13 +21,14 @@ import static jj.configuration.resolution.AppLocation.*;
 import java.io.IOException;
 
 import javax.inject.Inject;
+
 import jj.resource.Location;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
-
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ChildScriptEnvironment;
 import jj.script.ContinuationPendingKey;
+import jj.script.RhinoContext;
 import jj.script.ScriptEnvironment;
 
 import org.mozilla.javascript.Script;
@@ -36,14 +37,31 @@ import org.mozilla.javascript.ScriptableObject;
 
 /**
  * <p>
- * Coordinates module script execution. Instances of this environment are per
- * parent script environment, which is to say requiring the same module from
- * two different parents will result in two independent copies.  This is not
- * a method of communication between environments.
+ * Provides the notion of a script module, which is the standard unit of execution
+ * in the JibbrJabbr system. A module must belong to a parent script environment of
+ * some sort, which provides the top-level execution semantics, but in principle, all
+ * modules are interchangable.
  * 
  * <p>
+ * Modules are identified by a tuple of identifier and parent, so the same script loaded
+ * from two different parents will have independent scopes
  * 
+ * <p>
+ * Modules can be either executable scripts, which can assign to the provided module.exports
+ * or exports variables within their scopes, or they can be a single serialized JSON object,
+ * which will be exported directly.
  * 
+ * <p>
+ * Modules that are provided by the server are prepending with jj/ to identify them.  This means if
+ * you have a directory in your application named jj, you will have weird times getting to modules
+ * in that directory, so don't do it.
+ * 
+ * <p>
+ * Otherwise, name resolution works like directory resolution, relative paths are resolved
+ * against the current module identifier much like changing directories in a shell.  paths that
+ * start with / are resolved from the application root.  it is possible to navigate "below" the
+ * root with enough .. units in the module path, but that may not stick around so don't get
+ * too excited about it.
  * 
  * @author jason
  *
@@ -60,7 +78,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	private final ScriptableObject scope;
 	
-	private final ScriptResource scriptResource;
+	private final Script script;
 	
 	private final String sha1;
 	
@@ -85,26 +103,41 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		assert requiredModule.parent().alive(): "cannot require a module for a dead parent";
 		
-		// the script is loaded from the app, and if not found there, then an API module is searched
-		// internally.  this may change! but i like its simplicity
+		// we look for a script and a JSON file, with script taking precedence
 		
-		scriptResource = resourceFinder.loadResource(ScriptResource.class, base, moduleIdentifier + ".js");
+		ScriptResource scriptResource = resourceFinder.loadResource(ScriptResource.class, base, moduleIdentifier + ".js");
+		JSONResource   jsonResource   = resourceFinder.loadResource(JSONResource.class, base, moduleIdentifier + ".json");
 		
-		if (scriptResource == null) {
+		if (scriptResource == null && jsonResource == null) {
+			
 			throw new NoSuchResourceException(getClass(), moduleIdentifier);
+			
+		} else if (scriptResource == null) {
+			
+			jsonResource.addDependent(requiredModule.parent());
+			sha1 = jsonResource.sha1();
+			scope = configureModuleObjects(moduleIdentifier, createChainedScope(requiredModule.parent().global()));
+			script = null;
+			
+			try (RhinoContext context = contextProvider.get()) {
+				Scriptable module = (Scriptable)context.evaluateString(scope, "module", "");
+				module.put("exports", module, jsonResource.contents());
+			}
+			
+		} else {
+			
+			scriptResource.addDependent(requiredModule.parent());
+			sha1 = scriptResource.sha1();
+			scope = configureTimers(configureModuleObjects(moduleIdentifier, createChainedScope(requiredModule.parent().global())));
+			script = scriptResource.script();
+			
+			if (scriptResource.base() == APIModules) { 
+				configureInjectFunction(scope);
+			}
 		}
 		
 		// we need to reload each other on changes
-		scriptResource.addDependent(requiredModule.parent());
 		requiredModule.parent().addDependent(this);
-		
-		sha1 = scriptResource.sha1();
-		scope = configureTimers(configureModuleObjects(moduleIdentifier, createChainedScope(requiredModule.parent().global())));
-		
-		// externalize this to the parent! pass it the resource and let it decide?
-		if (scriptResource.base() == APIModules) { 
-			configureInjectFunction(scope);
-		}
 	}
 	
 
@@ -115,7 +148,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 
 	@Override
 	public Script script() {
-		return scriptResource.script();
+		return script;
 	}
 
 	@Override
@@ -151,6 +184,6 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 		// we are obselete when our script is
 		// but we don't listen as a dependent, our parent
 		// does. we'll get reloaded anyway
-		return scriptResource.needsReplacing();
+		return false;
 	}
 }

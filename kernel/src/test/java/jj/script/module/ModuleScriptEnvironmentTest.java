@@ -52,12 +52,15 @@ public class ModuleScriptEnvironmentTest {
 	
 	@Mock ScriptResource scriptResource;
 	
+	@Mock JSONResource jsonResource;
+	
+	@Mock ScriptableObject contents;
+	
 	ModuleScriptEnvironment mse;
 	
 	@Mock ScriptableObject global;
 
-	public void construct(String name, String moduleIdentifier, Location scriptBase) {
-		
+	private MockAbstractScriptEnvironmentDependencies construct(String name) {
 		contextProvider = new RealRhinoContextProvider();
 		
 		MockAbstractScriptEnvironmentDependencies dependencies =
@@ -69,6 +72,12 @@ public class ModuleScriptEnvironmentTest {
 		requiredModule.pendingKey(new ContinuationPendingKey());
 		
 		given(parent.alive()).willReturn(true);
+		return dependencies;
+	}
+
+	public void constructScriptModule(String name, String moduleIdentifier, Location scriptBase) {
+		
+		MockAbstractScriptEnvironmentDependencies dependencies = construct(name);
 		
 		given(dependencies.resourceFinder().loadResource(ScriptResource.class, scriptBase, moduleIdentifier + ".js")).willReturn(scriptResource);
 		
@@ -78,19 +87,49 @@ public class ModuleScriptEnvironmentTest {
 		
 		mse = new ModuleScriptEnvironment(dependencies, requiredModule);
 	}
+
+	public void constructJSONModule(String name, String moduleIdentifier, Location jsonBase) {
+		
+		MockAbstractScriptEnvironmentDependencies dependencies = construct(name);
+		
+		given(dependencies.resourceFinder().loadResource(JSONResource.class, jsonBase, moduleIdentifier + ".json")).willReturn(jsonResource);
+		
+		given(jsonResource.base()).willReturn(jsonBase);
+		given(jsonResource.name()).willReturn(moduleIdentifier);
+		given(jsonResource.contents()).willReturn(contents);
+		
+		mse = new ModuleScriptEnvironment(dependencies, requiredModule);
+	}
 	
 	@Test
-	public void testUserModuleScript() {
-		construct("module", "module", Base);
+	public void testUserScriptModule() {
+		
+		constructScriptModule("module", "module", Base);
 		
 		assertThat(mse.scope().get("inject", mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
 
 	@Test
-	public void testApiModuleScript() {
+	public void testApiScriptModule() {
 		
-		construct("jj/module", "module", APIModules);
+		constructScriptModule("jj/module", "module", APIModules);
 		
 		assertThat(mse.scope().get("inject", mse.scope()), is(instanceOf(Function.class)));
+	}
+	
+	@Test
+	public void testUserJSONModule() {
+		
+		constructJSONModule("module", "module", Base);
+		
+		assertThat(mse.exports(), is(contents));
+	}
+
+	@Test
+	public void testApiJSONModule() {
+		
+		constructJSONModule("jj/module", "module", APIModules);
+		
+		assertThat(mse.exports(), is(contents));
 	}
 }
