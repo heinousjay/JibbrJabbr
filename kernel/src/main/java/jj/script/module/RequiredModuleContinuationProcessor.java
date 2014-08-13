@@ -109,14 +109,19 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		if (scriptEnvironment == null) {
 			loadEnvironment(requiredModule);
 		}
+		
+		// if it's dead or broken then restart with an error
+		else if (scriptEnvironment.initializationDidError() || !scriptEnvironment.alive()) {
+			requiredModule.pendingKey().resume(false);
+		}
+		
 		// if it's not yet initialized then we throw it in the smacker
 		else if (!scriptEnvironment.initialized()) {
 			initializer.resumeOnInitialization(scriptEnvironment, requiredModule.pendingKey());
 		} 
+		
 		// otherwise ready to restart already.
 		else {
-			
-			// if broken, restart with an error!
 			requiredModule.pendingKey().resume(scriptEnvironment.exports());
 		}
 	}

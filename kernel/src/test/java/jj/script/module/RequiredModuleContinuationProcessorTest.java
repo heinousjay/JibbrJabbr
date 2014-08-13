@@ -136,6 +136,7 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		given(moduleScriptEnvironment.exports()).willReturn(exports);
 		given(moduleScriptEnvironment.initialized()).willReturn(true);
+		given(moduleScriptEnvironment.alive()).willReturn(true);
 		givenAScriptEnvironment();
 		
 		// when
@@ -143,6 +144,32 @@ public class RequiredModuleContinuationProcessorTest {
 		
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
 		assertThat(result, is((Object)exports));
+	}
+	
+	@Test
+	public void testRequireOfDeadModule() {
+
+		given(moduleScriptEnvironment.initialized()).willReturn(true);
+		given(moduleScriptEnvironment.alive()).willReturn(false); // explicit
+		givenAScriptEnvironment();
+		
+		processor.process(continuationState);
+		
+		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
+		assertThat(result, is(false));
+	}
+	
+	@Test
+	public void testRequireOfBrokenModule() {
+
+		given(moduleScriptEnvironment.initializationDidError()).willReturn(true);
+		given(moduleScriptEnvironment.alive()).willReturn(true);
+		givenAScriptEnvironment();
+		
+		processor.process(continuationState);
+		
+		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
+		assertThat(result, is(false));
 	}
 
 }
