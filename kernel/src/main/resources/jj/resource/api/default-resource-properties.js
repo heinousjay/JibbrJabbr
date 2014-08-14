@@ -6,3 +6,5 @@ var rp = require('jj/resource-properties');
 Object.keys(props).forEach(function(ext) {
 	rp.extension(ext).is(props[ext]);
 });
+
+module.exports = rp;

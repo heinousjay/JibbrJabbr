@@ -60,9 +60,11 @@ require('jj/document-system-configuration')
 
 require('jj/resource-system-configuration')
 	.ioThreads(10)
-	.maxFileSizeToLoad(102400000000); // test a bigun
+	.maxFileSizeToLoad(102400000000) // test a bigun
+	.watchFiles(false);  // just to check it
 
-require('jj/default-resource-properties'); // configure normally
+require('jj/default-resource-properties')
+	.extension('stupid').is({mimeType: 'text/stupid'}); // configure normally
 
 // this is a silly helper, it just copies the exports
 // of the given script into the given object
