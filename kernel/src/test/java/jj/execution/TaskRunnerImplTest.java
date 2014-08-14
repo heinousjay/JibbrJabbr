@@ -91,12 +91,16 @@ public class TaskRunnerImplTest {
 		given(scriptEnvironment.name()).willReturn(baseName);
 	}
 	
-	private void runTask() {
+	private Runnable getRunnable() {
 		verify(serverExecutor).submit(runnableCaptor.capture(), eq(0L), eq(MILLISECONDS));
-		// reset before each task run so that a test can control execution
+		// reset after pulling a runnable so that a test can control execution
 		// one task at a time
 		reset(serverExecutor);
-		runnableCaptor.getValue().run();
+		return runnableCaptor.getValue();
+	}
+	
+	private void runTask() {
+		getRunnable().run();
 	}
 	
 	@Test
@@ -170,6 +174,50 @@ public class TaskRunnerImplTest {
 		runTask();
 		
 		assertThat(publisher.events.get(0), is(instanceOf(Emergency.class)));
+	}
+	
+	@Test
+	public void testInterruption() throws Throwable {
+		
+		final CountDownLatch latch1 = new CountDownLatch(1);
+		final CountDownLatch latch2 = new CountDownLatch(1);
+		final AtomicBoolean completed = new AtomicBoolean();
+		final AtomicBoolean interrupted = new AtomicBoolean();
+		
+		final ServerTask task = new ServerTask("interruption test task") {
+			@Override
+			protected void run() throws Exception {
+				latch1.countDown();
+				try {
+					Thread.sleep(300000);
+					completed.set(true);
+				} catch (InterruptedException ie) {
+					latch2.countDown();
+					interrupted.set(true);
+					throw ie;
+				}
+			}
+		};
+		
+		final ServerTask task2 = new ServerTask("promised and ignored test task") {
+			@Override
+			protected void run() throws Exception {
+				// doesn't even matter, just shouldn't end up even trying
+			}
+		};
+		
+		executor.execute(task).then(task2);
+		Thread runningThread = new Thread(getRunnable());
+		runningThread.setDaemon(true);
+		runningThread.start();
+		
+		assertTrue(latch1.await(500, MILLISECONDS));
+		task.interrupt();
+		assertTrue(latch2.await(500, MILLISECONDS));
+		assertTrue(interrupted.get());
+		assertFalse(completed.get());
+		
+		verifyZeroInteractions(serverExecutor);
 	}
 	
 	@Ignore // this refuses to work consistently

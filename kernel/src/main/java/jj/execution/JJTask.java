@@ -47,6 +47,17 @@ public abstract class JJTask {
 	
 	private final Promise promise = new Promise();
 	
+	// ugly! but certain threads need to be interruptable explicitly
+	volatile Thread runningThread;
+	
+	public void interrupt() {
+		try {
+			runningThread.interrupt();
+		} catch (NullPointerException npe) {
+			// eat on purpose, it's a no-op if any of the chain is null anyway
+		}
+	}
+	
 	protected JJTask(final String name) {
 		this.name = name;
 	}

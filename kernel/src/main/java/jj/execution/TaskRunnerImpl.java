@@ -77,8 +77,6 @@ class TaskRunnerImpl implements TaskRunner {
 		tracker.enqueue();
 		queuedTasks.add(tracker);
 		
-		// sometimes, the injecting happens manually
-		
 		task.addRunnableToExecutor(executors, new Runnable() {
 			
 			@Override
@@ -87,43 +85,43 @@ class TaskRunnerImpl implements TaskRunner {
 				String oldName = Thread.currentThread().getName();
 				String threadName = oldName + " - " + task.name();
 				Thread.currentThread().setName(threadName);
+
+				boolean interrupted = false;
+				queuedTasks.remove(tracker);
+				tracker.start();
 				
-				
+				try (Closer closer = currentTask.enterScope(task)) {
+					task.runningThread = Thread.currentThread();
+					task.run();
+				} catch (InterruptedException ie) {
+					Thread.interrupted(); // clear the status in case the thread can get reused
+					interrupted = true;
+				} catch (OutOfMemoryError e) {
+					throw e; // just in case
+				} catch (Throwable t) {
+					if (!task.errored(t)) {
+						publisher.publish(new Emergency("Task [" + task.name() + "] ended in exception", t));
+						tracker.endedInError();
+					}
+
+				} finally {
+					task.runningThread = null;
+					tracker.end();
 					
-					boolean interrupted = false;
-					queuedTasks.remove(tracker);
-					tracker.start();
-					
-					try (Closer closer = currentTask.enterScope(task)) {
-						task.run();
-					} catch (InterruptedException ie) {
-						interrupted = true;
-					} catch (OutOfMemoryError e) {
-						throw e; // just in case
-					} catch (Throwable t) {
-						if (!task.errored(t)) {
-							publisher.publish(new Emergency("Task [" + task.name() + "] ended in exception", t));
-							tracker.endedInError();
-						}
-	
-					} finally {
-						
-						tracker.end();
-						
-						// interruption means shutdown, don't bother keeping promises
-						if (!interrupted) {
-							List<JJTask> tasks = promise.done();
-							if (tasks != null) {
-								for (JJTask t : tasks) {
-									execute(t);
-								}
+					// interruption means don't bother keeping promises
+					if (!interrupted) {
+						List<JJTask> tasks = promise.done();
+						if (tasks != null) {
+							for (JJTask t : tasks) {
+								execute(t);
 							}
 						}
-						
-						publisher.publish(tracker);
-						Thread.currentThread().setName(oldName);
-						
 					}
+					
+					publisher.publish(tracker);
+					Thread.currentThread().setName(oldName);
+					
+				}
 
 			}
 		});
