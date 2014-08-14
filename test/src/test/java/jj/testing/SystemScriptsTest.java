@@ -62,7 +62,7 @@ public class SystemScriptsTest {
 	@Inject
 	ResourceLoader resourceLoader;
 	
-	final int total = 7; // well, it's manual but maybe the phaser does what i need?
+	final int total = 8; // well, it's manual but maybe the phaser does what i need?
 	final CountDownLatch testCountLatch = new CountDownLatch(total);
 	final AtomicInteger successCount = new AtomicInteger();
 	final AtomicInteger failureCount = new AtomicInteger();
@@ -92,6 +92,7 @@ public class SystemScriptsTest {
 		load("local-storage.js");
 		load("server-events.js");
 		load("resource-properties.js");
+		load("env.js");
 		
 		// could take a while!
 		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));

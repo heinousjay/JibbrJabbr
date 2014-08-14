@@ -1,0 +1,1 @@
+module.exports = inject('jj.configuration.Environment');

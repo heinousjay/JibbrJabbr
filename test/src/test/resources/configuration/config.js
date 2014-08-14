@@ -1,4 +1,3 @@
-
 // including these scripts for the SystemScriptsTest but we configure off
 require('jj/jasmine-configuration').autorunSpecs(false);
 require('jj/repl-configuration').activate(true).port(33445); // on an abnormal port to avoid startup conflicts
