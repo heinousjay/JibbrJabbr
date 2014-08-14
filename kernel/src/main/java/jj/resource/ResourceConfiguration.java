@@ -36,11 +36,25 @@ public interface ResourceConfiguration {
 	@Default("20")
 	int ioThreads();
 	
+	/**
+	 * The largest size in bytes to load into memory. This MUST be
+	 * large enough to accommodate any scripts or HTML documents or
+	 * anything that the system will need to load for processing,
+	 * so be careful!
+	 */
 	@Default(MAX_IN_MEMORY_SIZE + "") // hi java! you suck sometimes!
 	long maxFileSizeToLoad();
 	
 	/**
+	 * Should the system watch files for changes and reload them?
+	 */
+	@Default("true")
+	boolean watchFiles();
+	
+	/**
 	 * various settings for file-based resources, organized by extension
+	 * 
+	 * @see ResourceSettings
 	 */
 	@DefaultProvider(FileTypeSettingsDefaultProvider.class)
 	Map<String, ResourceSettings> fileTypeSettings();

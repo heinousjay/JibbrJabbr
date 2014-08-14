@@ -35,9 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * I would like to ramp this up a bit, thinking along the lines of providing a
- * small abstract class that can act as a container and expose a wait point, so i can
- * keep it to the dang 10+ seconds but not exceed it
+ * Validates the various complex behaviors of the resource system
  * @author jason
  *
  */

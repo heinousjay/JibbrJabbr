@@ -26,7 +26,6 @@ public class ResourceModule extends JJModule {
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
 		
 		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
-		addStartupListenerBinding().to(ResourceWatchServiceImpl.class);
 		
 		addStartupListenerBinding().to(DirectoryStructureLoader.class);
 		

@@ -38,6 +38,8 @@ class ResourceWatchServiceLoop extends ServerTask {
 	
 	private final TaskRunner taskRunner;
 	
+	private volatile boolean run = true;
+	
 	@Inject
 	ResourceWatchServiceLoop(
 		final ResourceCache resourceCache,
@@ -86,9 +88,19 @@ class ResourceWatchServiceLoop extends ServerTask {
 		}
 	}
 	
+	void start() {
+		run = true;
+		taskRunner.execute(this);
+	}
+	
+	void stop() {
+		run = false;
+		interrupt();
+	}
+	
 	@Override
 	protected void run() throws Exception {
-		while (true) {
+		while (run) {
 			Map<URI, Boolean> uris = watcher.awaitChangedUris();
 			for (URI uri : uris.keySet()) {
 				for (final Resource resource : resourceCache.findAllByUri(uri)) {

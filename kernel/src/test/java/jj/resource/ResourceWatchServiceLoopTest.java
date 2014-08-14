@@ -99,6 +99,13 @@ public class ResourceWatchServiceLoopTest {
 	}
 	
 	@Test
+	public void testStart() {
+		loop.start();
+		
+		assertThat(taskRunner.firstTask(), is(loop));
+	}
+	
+	@Test
 	public void testDependencyTreeAllDeletes() throws Exception {
 		
 		// we should only delete because only resource 5 is set to be reloaded

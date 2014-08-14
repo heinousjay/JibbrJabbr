@@ -3,54 +3,48 @@ package jj.resource;
 import java.io.IOException;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
-import jj.configuration.Arguments;
-import jj.execution.TaskRunner;
+import jj.configuration.ConfigurationLoaded;
+import jj.event.Listener;
+import jj.event.Subscriber;
 
 /**
- * watches for file changes on resources we've already loaded
+ * manages the resource watch service by bridging into the configuration
+ * for lifecycle control and provides an endpoint for allowing file watching
  * @author jason
  *
  */
 @Singleton
-class ResourceWatchServiceImpl implements ResourceWatchService, JJServerStartupListener {
+@Subscriber
+class ResourceWatchServiceImpl implements ResourceWatchService {
 	
-	private final TaskRunner taskRunner;
-	
-	private final boolean run;
+	private final ResourceWatchSwitch resourceWatchSwitch;
 	
 	private final ResourceWatchServiceLoop loop;
 	
 	@Inject
 	ResourceWatchServiceImpl(
-		final TaskRunner taskRunner,
-		final Arguments arguments,
-		final Provider<ResourceWatchServiceLoop> provider
+		final ResourceWatchSwitch resourceWatchSwitch,
+		final ResourceWatchServiceLoop loop
 	) {
-		this.taskRunner = taskRunner;
-		run = arguments.get("fileWatcher", boolean.class, true);
-		loop = run ? provider.get() : null;
+		this.resourceWatchSwitch = resourceWatchSwitch;
+		this.loop = loop;
 	}
 
 	@Override
 	public void watch(ParentedResource resource) throws IOException {
-		if (run) {
+		if (resourceWatchSwitch.runFileWatcher()) {
 			loop.watch(resource);
 		}
 	}
 	
-	@Override
-	public void start() {
-		if (run) {
-			taskRunner.execute(loop);
+	@Listener
+	void configurationLoaded(ConfigurationLoaded event) {
+		if (resourceWatchSwitch.runFileWatcher()) {
+			loop.start();
+		} else {
+			loop.stop();
 		}
-	}
-	
-	@Override
-	public Priority startPriority() {
-		return Priority.Highest;
 	}
 }

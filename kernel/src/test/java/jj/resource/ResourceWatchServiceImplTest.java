@@ -17,11 +17,6 @@ package jj.resource;
 
 import static org.mockito.BDDMockito.*;
 
-import javax.inject.Provider;
-
-import jj.configuration.Arguments;
-import jj.execution.TaskRunner;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -31,37 +26,36 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceWatchServiceImplTest {
 
-	@Mock Provider<ResourceWatchServiceLoop> loopProvider;
 	@Mock ResourceWatchServiceLoop loop;
-	@Mock TaskRunner taskRunner;
-	@Mock Arguments arguments;
+	@Mock ResourceWatchSwitch resourceWatchSwitch;
 	@Mock DirectoryResource resource;
 	
 	@Test
-	public void testNoRun() {
+	public void testNoRun() throws Exception {
 		// given
-		given(arguments.get("fileWatcher", boolean.class, true)).willReturn(false);
+		given(resourceWatchSwitch.runFileWatcher()).willReturn(false); // just to be explicit
 		
 		// when
-		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(taskRunner, arguments, loopProvider);
-		service.start();
+		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(resourceWatchSwitch, loop);
+		service.configurationLoaded(null);
+		service.watch(resource);
 		
 		// then
-		verify(loopProvider, never()).get();
-		verifyZeroInteractions(taskRunner);
+		verify(loop).stop();
+		verifyNoMoreInteractions(loop);
 	}
 	
 	@Test
 	public void testRun() throws Exception {
 
-		given(arguments.get("fileWatcher", boolean.class, true)).willReturn(true);
-		given(loopProvider.get()).willReturn(loop);
+		given(resourceWatchSwitch.runFileWatcher()).willReturn(true);
+
 		
-		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(taskRunner, arguments, loopProvider);
-		service.start();
+		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(resourceWatchSwitch, loop);
+		service.configurationLoaded(null);
 		service.watch(resource);
 		
-		verify(taskRunner).execute(loop);
+		verify(loop).start();
 		verify(loop).watch(resource);
 	}
 }
