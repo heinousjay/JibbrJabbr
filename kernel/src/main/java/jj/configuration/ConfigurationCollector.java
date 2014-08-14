@@ -65,12 +65,12 @@ public class ConfigurationCollector {
 		list.add(value);
 	}
 	
-	public void addConfigurationMappedElement(String key, String valueKey, Object valueValue) {
+	public void addConfigurationMappedElement(String key, Object valueKey, Object valueValue) {
 		if (!inProgress.containsKey(key)) {
-			inProgress.put(key, new HashMap<String, Object>());
+			inProgress.put(key, new HashMap<Object, Object>());
 		}
 		@SuppressWarnings("unchecked")
-		HashMap<String, Object> map = ((HashMap<String, Object>)inProgress.get(key));
+		HashMap<Object, Object> map = ((HashMap<Object, Object>)inProgress.get(key));
 		map.put(valueKey, valueValue);
 	}
 	

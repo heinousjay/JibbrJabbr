@@ -77,20 +77,5 @@ module.exports = {
 		return {
 			is: makeIs(base + 'fileTypeSettings', ext)
 		};
-	},
-	
-	resourceAt: function(relativePath) {
-		
-		// relativePath must be present, must be string
-		if (typeof ext !== 'string') {
-			throw new Error("resource path must be a string");
-		}
-		
-		// otherwise, whatever.  if it doesn't match, be it on the user
-		// but we do trim it, to be nice
-		
-		return {
-			is: makeIs(base + 'resourceConfigurations', relativePath.trim())
-		};
 	}
 };
