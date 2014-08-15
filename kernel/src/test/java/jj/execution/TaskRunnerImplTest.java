@@ -189,11 +189,11 @@ public class TaskRunnerImplTest {
 			protected void run() throws Exception {
 				latch1.countDown();
 				try {
-					Thread.sleep(300000);
+					Thread.sleep(300);
 					completed.set(true);
 				} catch (InterruptedException ie) {
-					latch2.countDown();
 					interrupted.set(true);
+					latch2.countDown();
 					throw ie;
 				}
 			}
