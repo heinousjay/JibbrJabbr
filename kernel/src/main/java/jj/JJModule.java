@@ -25,7 +25,7 @@ import jj.execution.ExecutorBinder;
 import jj.http.server.methods.HttpMethodHandlerBinder;
 import jj.http.server.websocket.WebSocketConnectionHostBinder;
 import jj.logging.LoggingBinder;
-import jj.resource.ResourceCreatorBinder;
+import jj.resource.ResourceBinder;
 import jj.script.ContinuationProcessorBinder;
 
 import com.google.inject.AbstractModule;
@@ -39,7 +39,7 @@ import com.google.inject.multibindings.Multibinder;
  */
 public abstract class JJModule extends AbstractModule {
 	
-	private ResourceCreatorBinder resources;
+	private ResourceBinder resources;
 	
 	private ContinuationProcessorBinder continuationProcessors;
 	
@@ -96,9 +96,9 @@ public abstract class JJModule extends AbstractModule {
 		apiPaths.addBinding().toInstance(path);
 	}
 	
-	protected ResourceCreatorBinder bindCreation() {
+	protected ResourceBinder bindCreation() {
 		if (resources == null) {
-			resources = new ResourceCreatorBinder(binder());
+			resources = new ResourceBinder(binder());
 		}
 		return resources;
 	}

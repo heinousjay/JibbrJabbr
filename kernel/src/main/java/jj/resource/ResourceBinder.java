@@ -19,26 +19,36 @@ import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 
 /**
  * @author jason
  *
  */
-public class ResourceCreatorBinder {
+public class ResourceBinder {
 
 	private final MapBinder<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
 	
-	public ResourceCreatorBinder(final Binder binder) {
+	private final Multibinder<Class<? extends ServableResource>> servableResourceBinder;
+	
+	public ResourceBinder(final Binder binder) {
 		resourceCreatorBinder = 
 			MapBinder.newMapBinder(
 				binder,
 				new TypeLiteral<Class<? extends AbstractResource>>() {},
 				new TypeLiteral<SimpleResourceCreator<? extends AbstractResource>>() {}
 			);
+		
+		servableResourceBinder = Multibinder.newSetBinder(binder, new TypeLiteral<Class<? extends ServableResource>>() {});
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractResource, U extends SimpleResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
+		
+		if (ServableResource.class.isAssignableFrom(key)) {
+			servableResourceBinder.addBinding().toInstance((Class<? extends ServableResource>)key);
+		}
+		
 		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);
 	}
 }
