@@ -16,12 +16,11 @@
 package jj.repl;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.*;
+import static java.util.concurrent.TimeUnit.*;
 import static org.junit.Assert.*;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -31,9 +30,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
@@ -74,15 +72,23 @@ public class ReplIntegrationTest {
 	}
 	
 	@Test
-	public void test() throws Exception {
-		assertTrue("timed out", latch.await(1, SECONDS));
-		
-		assertTrue("somehow not activated?", config.activate());
-		
-		final HashSet<String> responses = new HashSet<>(Arrays.asList("Welcome to JibbrJabbr\n>", "ReferenceError: \"whatever\" is not defined.", "\n>"));
+	public void test() throws Throwable {
+		assertTrue("timed out waiting for init", latch.await(500, MILLISECONDS));
 		
 		// well... it started so that's something
-		// connect to 9955 and send in some commands? why not
+		// connect to config.port() and send in some commands? why not
+		latch = new CountDownLatch(1);
+		
+		final AtomicReference<Throwable> failure = new AtomicReference<>();
+		
+		final StringBuilder response = new StringBuilder()
+			.append("Welcome to JibbrJabbr\n>")
+			.append("ReferenceError: \"whatever\" is not defined.\n")
+			.append("	at repl-console:1\n")
+			.append("	at base-repl-system.js:8 ($$print)\n")
+			.append("	at repl-console:1\n")
+			.append("\n>");
+		
 		bootstrap = new Bootstrap()
 			.group(new NioEventLoopGroup(1))
 			.channel(NioSocketChannel.class)
@@ -97,25 +103,28 @@ public class ReplIntegrationTest {
 
 							@Override
 							protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-								responses.remove(msg);
-								latch.countDown();
+								if (msg.equals(response.substring(0, msg.length()))) {
+									response.delete(0, msg.length());
+								}
+								if (response.length() == 0) {
+									latch.countDown();
+								}
 							}
 						});
 				}
 			});
-		latch = new CountDownLatch(4);
-		bootstrap.connect("localhost", config.port()).addListener(new ChannelFutureListener() {
-			
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				if (future.isSuccess()) {
-					future.channel().writeAndFlush("whatever\n");
-				}
+		bootstrap.connect("localhost", config.port()).addListener((ChannelFuture future) -> {
+			if (future.isSuccess()) {
+				future.channel().writeAndFlush("whatever\n");
+			} else {
+				failure.set(future.cause());
 			}
 		});
 		
-		assertTrue("timed out", latch.await(1, SECONDS));
-		assertThat(responses, is(empty()));
+		assertTrue("timed out waiting for response", latch.await(1, SECONDS));
+		if (failure.get() != null) {
+			throw failure.get();
+		}
 	}
 
 }
