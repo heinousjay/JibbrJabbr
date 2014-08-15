@@ -93,6 +93,7 @@ public class SystemScriptsTest {
 		load("server-events.js");
 		load("resource-properties.js");
 		load("env.js");
+		load("system-properties.js");
 		
 		// could take a while!
 		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));

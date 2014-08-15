@@ -35,13 +35,13 @@ import org.mozilla.javascript.ScriptableObject;
  *
  */
 @Singleton
-public class Environment implements Scriptable {
+public class SystemPropertiesScriptable implements Scriptable {
 	
 	private final Scriptable parentScope;
 	private final Scriptable prototype;
 	
 	@Inject
-	Environment(final @Global ScriptableObject global) {
+	SystemPropertiesScriptable(final @Global ScriptableObject global) {
 		parentScope = global;
 		prototype = NativeObject.getObjectPrototype(parentScope);
 	}
@@ -53,7 +53,7 @@ public class Environment implements Scriptable {
 
 	@Override
 	public Object get(String name, Scriptable start) {
-		String result = System.getenv(name);
+		String result = System.getProperty(name);
 		return result == null ? NOT_FOUND : result;
 	}
 
@@ -64,7 +64,7 @@ public class Environment implements Scriptable {
 
 	@Override
 	public boolean has(String name, Scriptable start) {
-		return System.getenv(name) != null;
+		return System.getProperty(name) != null;
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class Environment implements Scriptable {
 
 	@Override
 	public Object[] getIds() {
-		return System.getenv().keySet().toArray();
+		return System.getProperties().keySet().toArray();
 	}
 
 	@Override

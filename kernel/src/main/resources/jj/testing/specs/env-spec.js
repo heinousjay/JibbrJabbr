@@ -1,6 +1,6 @@
 var env = {key:'value'};
 var inject = function(id) {
-	if (id == 'jj.configuration.Environment') {
+	if (id == 'jj.configuration.EnvironmentScriptable') {
 		return env;
 	}
 	
@@ -8,7 +8,7 @@ var inject = function(id) {
 }
 
 describe('env.js', function() {
-	it('delegates entirely to the Environment object', function() {
+	it('delegates entirely to the EnvironmentScriptable object', function() {
 		expect(module.exports).toBe(env);
 	});
 });

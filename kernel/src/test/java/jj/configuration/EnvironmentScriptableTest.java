@@ -28,11 +28,13 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-public class EnvironmentTest {
+public class EnvironmentScriptableTest {
+
+	private static final String PATH = "PATH";
 
 	ScriptableObject global;
 	
-	Environment env;
+	EnvironmentScriptable env;
 	
 	@Before
 	public void before() {
@@ -40,14 +42,14 @@ public class EnvironmentTest {
 			global = context.initStandardObjects(true);
 		}
 		
-		env = new Environment(global);
+		env = new EnvironmentScriptable(global);
  	}
 	
 	@Test
 	public void test() {
 		
-		assertTrue(env.has("PATH", env));
-		assertThat(env.get("PATH", env), is(System.getenv("PATH")));
+		assertTrue(env.has(PATH, env)); // this is always there?
+		assertThat(env.get(PATH, env), is(System.getenv(PATH)));
 	}
 
 }

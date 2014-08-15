@@ -1,1 +1,1 @@
-module.exports = inject('jj.configuration.Environment');
+module.exports = inject('jj.configuration.EnvironmentScriptable');
