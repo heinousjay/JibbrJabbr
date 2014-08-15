@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 
 import jj.resource.AbstractFileResource;
+import jj.resource.PathPattern;
 import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
 import jj.resource.TransferableResource;
@@ -31,6 +32,7 @@ import jj.resource.TransferableResource;
  * @author jason
  *
  */
+@PathPattern(".*")
 public class StaticResource extends AbstractFileResource implements TransferableResource {
 	
 	private final boolean safeToServe;

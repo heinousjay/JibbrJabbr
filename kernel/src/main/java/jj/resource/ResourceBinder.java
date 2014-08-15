@@ -15,11 +15,13 @@
  */
 package jj.resource;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
 
 /**
  * @author jason
@@ -29,24 +31,33 @@ public class ResourceBinder {
 
 	private final MapBinder<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
 	
-	private final Multibinder<Class<? extends ServableResource>> servableResourceBinder;
+	private final MapBinder<Pattern, Class<? extends ServableResource>> servableResourceBinder;
 	
 	public ResourceBinder(final Binder binder) {
-		resourceCreatorBinder = 
-			MapBinder.newMapBinder(
-				binder,
-				new TypeLiteral<Class<? extends AbstractResource>>() {},
-				new TypeLiteral<SimpleResourceCreator<? extends AbstractResource>>() {}
-			);
+		resourceCreatorBinder = MapBinder.newMapBinder(
+			binder,
+			new TypeLiteral<Class<? extends AbstractResource>>() {},
+			new TypeLiteral<SimpleResourceCreator<? extends AbstractResource>>() {}
+		);
 		
-		servableResourceBinder = Multibinder.newSetBinder(binder, new TypeLiteral<Class<? extends ServableResource>>() {});
+		servableResourceBinder = MapBinder.newMapBinder(
+			binder,
+			new TypeLiteral<Pattern>() {},
+			new TypeLiteral<Class<? extends ServableResource>>() {}
+		);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractResource, U extends SimpleResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
 		
 		if (ServableResource.class.isAssignableFrom(key)) {
-			servableResourceBinder.addBinding().toInstance((Class<? extends ServableResource>)key);
+			assert key.isAnnotationPresent(PathPattern.class) : key.getName() + " requires " + PathPattern.class.getSimpleName() + " annotation";
+			try {
+				Pattern pattern = Pattern.compile(key.getAnnotation(PathPattern.class).value());
+				servableResourceBinder.addBinding(pattern).toInstance((Class<? extends ServableResource>)key);
+			} catch (PatternSyntaxException pse) {
+				throw new AssertionError(key.getName() + " " + PathPattern.class.getSimpleName() + " annotation has invalid pattern", pse);
+			}
 		}
 		
 		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);

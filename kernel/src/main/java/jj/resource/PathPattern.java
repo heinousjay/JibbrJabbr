@@ -15,30 +15,19 @@
  */
 package jj.resource;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * <p>
- * A resource that the server can send to a client. LoadedResource
- * and TransferableResource
- * 
- * <p>
- * Resource classes that implement this interface must be annotated
- * with {@link PathPattern}
  * @author jason
  *
  */
-public interface ServableResource extends Resource {
-
-	String serverPath();
-	
-	/**
-	 * The mime of resource suitably formatted for response
-	 * in the Content-Type header (specifically, including a
-	 * charset parameter if needed.)
-	 * @return
-	 */
-	String contentType();
-	
-	boolean compressible();
-	
-	boolean safeToServe();
+@Documented
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PathPattern {
+	String value();
 }

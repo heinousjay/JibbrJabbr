@@ -14,9 +14,11 @@ import org.mozilla.javascript.Script;
 
 import jj.resource.AbstractFileResource;
 import jj.resource.LoadedResource;
+import jj.resource.PathPattern;
 import jj.resource.PathResolver;
 import jj.script.RhinoContext;
 
+@PathPattern("\\.js$")
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	
 	private final String source;
