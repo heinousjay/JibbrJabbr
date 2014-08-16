@@ -55,9 +55,9 @@ public class ResourceUrlDocumentFilterTest {
 	@Before
 	public void before() {
 		document = Jsoup.parse(
-			"<a href='" + m.cssUri.baseName + "'>" +
-				"<img src='" + m.staticUri.baseName + "'/>" +
-			"</a><link href='" + m.assetUri.baseName + "'/>");
+			"<a href='" + m.cssUri.path + "'>" +
+				"<img src='" + m.staticUri.path + "'/>" +
+			"</a><link href='" + m.assetUri.path + "'/>");
 		given(documentRequestProcessor.document()).willReturn(document);
 		
 		filter = new ResourceUrlDocumentFilter(m.servables);

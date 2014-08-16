@@ -75,7 +75,7 @@ class DocumentServable extends Servable<DocumentScriptEnvironment> {
 					
 				} else {
 					
-					preloadResources(request.uriMatch().baseName);
+					preloadResources(request.uriMatch().path);
 				
 					result = parentInjector.createChildInjector(new AbstractModule() {
 						
@@ -95,6 +95,6 @@ class DocumentServable extends Servable<DocumentScriptEnvironment> {
 
 	@Override
 	public DocumentScriptEnvironment loadResource(URIMatch match) {
-		return resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, match.baseName);
+		return resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, match.path);
 	}
 }

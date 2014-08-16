@@ -79,7 +79,7 @@ class DocumentScriptServable extends Servable<ScriptResource> {
 	@Override
 	public ScriptResource loadResource(final URIMatch match) {
 		ScriptResource result = null;
-		Matcher typeMatcher = TYPE_PATTERN.matcher(match.baseName);
+		Matcher typeMatcher = TYPE_PATTERN.matcher(match.path);
 		if (match.sha1 != null && typeMatcher.matches()) {
 			
 			DocumentScriptEnvironment scriptEnvironment = 

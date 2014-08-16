@@ -61,8 +61,12 @@ public class URIMatch {
 	/** the extension */
 	public final String extension;
 	
-	/** name + '.' + extension */
-	public final String baseName;
+	/**
+	 * the path from the public root, analogous to a resource name,
+	 * although route matching rules may virtualize this.
+	 * composed of name + '.' + extension.  the initial / is not included
+	 */
+	public final String path;
 	
 	/**
 	 * true if considered to be versioned as detailed in the class comment
@@ -83,7 +87,7 @@ public class URIMatch {
 		sha1 = shaCandidate;
 		name = nameCandidate;
 		extension = extensionCandidate;
-		baseName = name == null ? null : name + (extensionCandidate == null ? "" : "." + extensionCandidate);
+		path = name == null ? null : name + (extensionCandidate == null ? "" : "." + extensionCandidate);
 		versioned = sha1 != null || (nameCandidate != null && VERSION_PATTERN.matcher(nameCandidate).find());
 	}
 	
@@ -99,7 +103,7 @@ public class URIMatch {
 			", sha1: " + sha1 +
 			", name: " + name +
 			", extension: " + extension + 
-			", baseName: " + baseName +
+			", baseName: " + path +
 			", versioned: " + versioned + " }";
 	}
 }

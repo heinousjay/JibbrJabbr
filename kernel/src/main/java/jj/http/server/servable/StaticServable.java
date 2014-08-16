@@ -71,7 +71,7 @@ public class StaticServable extends Servable<StaticResource> {
 
 	@Override
 	public StaticResource loadResource(URIMatch match) {
-		return resourceFinder.loadResource(StaticResource.class, Base.and(Assets), match.baseName);
+		return resourceFinder.loadResource(StaticResource.class, Base.and(Assets), match.path);
 	}
 
 }

@@ -53,7 +53,7 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 		if (url.startsWith(URI_PREPEND)) {
 			String path = url.substring(URI_PREPEND.length());
 			URIMatch uriMatch = new URIMatch(path);
-			if (!uriMatch.versioned && uriMatch.baseName != null) {
+			if (!uriMatch.versioned && uriMatch.path != null) {
 				ServableResource resource = servables.loadResource(uriMatch);
 				if (resource != null && uriMatch.sha1 == null) {
 					return resource.serverPath();

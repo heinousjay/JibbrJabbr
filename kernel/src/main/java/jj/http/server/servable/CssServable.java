@@ -32,7 +32,7 @@ class CssServable extends Servable<StylesheetResource> {
 	
 	@Override
 	public StylesheetResource loadResource(final URIMatch match) {
-		return resourceFinder.loadResource(StylesheetResource.class, AppLocation.Base, match.baseName);
+		return resourceFinder.loadResource(StylesheetResource.class, AppLocation.Base, match.path);
 	}
 
 	@Override
