@@ -45,7 +45,7 @@ public class URIMatch {
 	private static final Pattern URI_PATTERN = Pattern.compile("^/(?:([\\da-f]{40})/)?(.*?)(?:\\.([^.]+))?$");
 	private static final Pattern VERSION_PATTERN = Pattern.compile("-\\d+(?:[.]\\d+)*(?:[.-]?(?:alpha|beta|pre))?(?:(?:[.-](?:min|pack))?$|/)");
 
-	/** the complete URI including the leading / */
+	/** the complete URI including any leading and trailing / */
 	public final String uri;
 	
 	/** the resource SHA1 hash, if present */
@@ -53,18 +53,22 @@ public class URIMatch {
 	
 	/** 
 	 * the name portion of the uri. this is the portion after any
-	 * sha1 hash, without a leading slash, ending before the last
-	 * dot in the path which separates the extension
+	 * sha1 hash, without leading or trailing slashes,
+	 * and also not including any extensions
 	 */
 	public final String name;
 	
-	/** the extension */
+	/**
+	 * the extension, as commonly understood - the portion following the last dot in the path,
+	 * not including the dot or any trailing slash
+	 */
 	public final String extension;
 	
 	/**
 	 * the path from the public root, analogous to a resource name,
 	 * although route matching rules may virtualize this.
-	 * composed of name + '.' + extension.  the initial / is not included
+	 * composed of name + '.' + extension.
+	 * does not include leading or trailing slashes
 	 */
 	public final String path;
 	
@@ -82,7 +86,13 @@ public class URIMatch {
 		if (matcher.matches()) {
 			shaCandidate = matcher.group(1);
 			nameCandidate = matcher.group(2);
+			if (nameCandidate != null && nameCandidate.endsWith("/")) {
+				nameCandidate = nameCandidate.substring(0, nameCandidate.length() - 1);
+			}
 			extensionCandidate = matcher.group(3);
+			if (extensionCandidate != null && extensionCandidate.endsWith("/")) {
+				extensionCandidate = extensionCandidate.substring(0, extensionCandidate.length() - 1);
+			}
 		}
 		sha1 = shaCandidate;
 		name = nameCandidate;
@@ -103,7 +113,7 @@ public class URIMatch {
 			", sha1: " + sha1 +
 			", name: " + name +
 			", extension: " + extension + 
-			", baseName: " + path +
+			", path: " + path +
 			", versioned: " + versioned + " }";
 	}
 }

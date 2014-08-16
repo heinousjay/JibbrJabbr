@@ -28,6 +28,34 @@ import org.junit.Test;
 public class URIMatchTest {
 	
 	@Test
+	public void testDirectories() {
+		URIMatch match = new URIMatch("/");
+		assertThat(match.sha1, is(nullValue()));
+		assertTrue(match.name.isEmpty());
+		assertThat(match.extension, is(nullValue()));
+		assertTrue(match.path.isEmpty());
+		assertFalse(match.versioned);
+		
+		// we drop the trailing slash,
+		// it can make route matching ambiguous
+		match = new URIMatch("/hi/");
+		System.out.println(match);
+		assertThat(match.sha1, is(nullValue()));
+		assertThat(match.name, is("hi"));
+		assertThat(match.extension, is(nullValue()));
+		assertThat(match.path, is("hi"));
+		assertFalse(match.versioned);
+		
+		match = new URIMatch("/hi/there/");
+		System.out.println(match);
+		assertThat(match.sha1, is(nullValue()));
+		assertThat(match.name, is("hi/there"));
+		assertThat(match.extension, is(nullValue()));
+		assertThat(match.path, is("hi/there"));
+		assertFalse(match.versioned);
+	}
+	
+	@Test
 	public void testVersioned() {
 		URIMatch match = new URIMatch("/be03b9352e1e254cae9a58cff2b20e0c8d513e47/jj.js");
 		assertThat(match.versioned, is(true));
