@@ -19,8 +19,6 @@ import static io.netty.handler.codec.http.HttpMethod.*;
 
 import io.netty.handler.codec.http.HttpMethod;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -33,7 +31,8 @@ import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
 
 /**
- * Collects routing configuration
+ * The public interface to the routing system.  mainly just mediates
+ * between configuration loading and requests into the system
  * 
  * @author jason
  *
@@ -62,9 +61,7 @@ public class Router {
 			@Override
 			protected void run() throws Exception {
 				RouteTrie newTrie = new RouteTrie();
-				for (Route route: configuration.routes()) {
-					newTrie.addRoute(route);
-				}
+				configuration.routes().forEach(route -> newTrie.addRoute(route));
 				
 				// default routes. this should get smarter!
 				newTrie.addRoute(new Route(GET, "/*path", ""));
@@ -76,12 +73,10 @@ public class Router {
 		});
 	}
 	
-	public RouteMatch matchURI(final HttpMethod method, final String uri) {
+	public RouteMatch matchURI(final HttpMethod method, final URIMatch uriMatch) {
 		RouteTrie routes = trie.get();
-		assert routes != null : "can't route without configuration!";
+		assert routes != null : "can't route before configuration is complete!";
 		
-		Path path = uri.startsWith("/") ? Paths.get(uri) : Paths.get("/" + uri);
-		
-		return routes.find(method, path.normalize().toAbsolutePath().toString());
+		return routes.find(method, uriMatch);
 	}
 }

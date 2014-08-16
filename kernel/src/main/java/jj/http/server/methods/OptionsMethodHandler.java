@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import com.google.inject.Provider;
 
 import jj.http.uri.Router;
+import jj.http.uri.URIMatch;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -59,7 +60,7 @@ class OptionsMethodHandler extends HttpMethodHandler {
 			}
 			sb.deleteCharAt(sb.length() - 1);
 		} else {
-			for (HttpMethod method : router.matchURI(OPTIONS, request.getUri()).routes.keySet()) {
+			for (HttpMethod method : router.matchURI(OPTIONS, new URIMatch(request.getUri())).routes.keySet()) {
 				sb.append(method).append(",");
 			}
 			sb.append(HEAD).append(",").append(TRACE).append(",").append(OPTIONS);

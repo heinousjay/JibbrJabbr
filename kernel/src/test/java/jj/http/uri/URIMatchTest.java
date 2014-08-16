@@ -53,6 +53,13 @@ public class URIMatchTest {
 		assertThat(match.extension, is(nullValue()));
 		assertThat(match.path, is("hi/there"));
 		assertFalse(match.versioned);
+		
+		match = new URIMatch("../");
+		assertThat(match.sha1, is(nullValue()));
+		assertTrue(match.name.isEmpty());
+		assertThat(match.extension, is(nullValue()));
+		assertTrue(match.path.isEmpty());
+		assertFalse(match.versioned);
 	}
 	
 	@Test

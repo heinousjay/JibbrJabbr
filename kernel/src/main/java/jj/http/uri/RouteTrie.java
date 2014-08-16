@@ -31,9 +31,10 @@ class RouteTrie {
 	
 	private final TrieNode root = new SeparatorNode();
 	
-	void addRoute(Route route) {
+	RouteTrie addRoute(Route route) {
 		
 		root.addRoute(route);
+		return this;
 	}
 	
 	RouteTrie compress() {
@@ -41,9 +42,9 @@ class RouteTrie {
 		return this;
 	}
 	
-	RouteMatch find(HttpMethod method, String uri) {
+	RouteMatch find(HttpMethod method, URIMatch uri) {
 		assert method != null : "method is required";
-		assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
+		//assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
 		
 		// just play HEAD out as a GET
 		if (HEAD.equals(method)) { method = GET; }
@@ -51,7 +52,7 @@ class RouteTrie {
 		RouteFinderContext context = new RouteFinderContext();
 		RouteMatch result = null;
 		
-		if (root.findGoal(context, uri, 1)) {
+		if (root.findGoal(context, uri.path, 0)) {
 			// 
 			Map<HttpMethod, Route> routes = null;
 			for (Route r : context.matches.get(0).goal.values()) {

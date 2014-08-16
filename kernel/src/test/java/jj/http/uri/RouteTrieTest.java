@@ -49,21 +49,19 @@ public class RouteTrieTest {
 	
 	private RouteTrie makeParameterMatchTrie() {
 		
-		RouteTrie trie = new RouteTrie();
+		return new RouteTrie()
 		// admittedly not the best example
-		trie.addRoute(new Route(GET, "/user/:id([a-z]-[\\d]{6})/picture", result(0)));
-		trie.addRoute(new Route(GET, "/user/:name([\\w]+)/picture",       result(1)));
-		trie.addRoute(new Route(GET, "/this/:is/:the/best",               result(2)));
-		trie.addRoute(new Route(GET, "/this/:is/:the/*end",               result(3)));
-		
-		return trie;
+			.addRoute(new Route(GET, "/user/:id([a-z]-[\\d]{6})/picture", result(0)))
+			.addRoute(new Route(GET, "/user/:name([\\w]+)/picture",       result(1)))
+			.addRoute(new Route(GET, "/this/:is/:the/best",               result(2)))
+			.addRoute(new Route(GET, "/this/:is/:the/*end",               result(3)));
 	}
 	
 	@Test
 	public void testParameterMatching() {
 		RouteTrie trie = makeParameterMatchTrie().compress();
 		
-		RouteMatch result = trie.find(GET, "/user/a-123456/picture");
+		RouteMatch result = trie.find(GET, new URIMatch("/user/a-123456/picture"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(0)));
 		assertThat(result.params.get("id"), is("a-123456"));
@@ -72,7 +70,7 @@ public class RouteTrieTest {
 		assertThat(result.route.resolve(makeMap("id", "b-987654")), is("/user/b-987654/picture"));
 		assertThat(result.route.resolve(makeMap("id", "c-098765")), is("/user/c-098765/picture"));
 		
-		result = trie.find(GET, "/user/jason/picture");
+		result = trie.find(GET, new URIMatch("/user/jason/picture"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(1)));
 		assertThat(result.params.get("name"), is("jason"));
@@ -81,7 +79,7 @@ public class RouteTrieTest {
 		assertThat(result.route.resolve(makeMap("name", "jason")), is("/user/jason/picture"));
 		assertThat(result.route.resolve(makeMap("name", "test")), is("/user/test/picture"));
 		
-		result = trie.find(GET, "/this/time/it/is/personal");
+		result = trie.find(GET, new URIMatch("/this/time/it/is/personal"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(3)));
 		assertThat(result.params.get("is"), is("time"));
@@ -89,7 +87,7 @@ public class RouteTrieTest {
 		assertThat(result.params.get("end"), is("is/personal"));
 		assertThat(result.params.size(), is(3));
 		
-		result = trie.find(GET, "/this/is/not-the/best");
+		result = trie.find(GET, new URIMatch("/this/is/not-the/best"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(2)));
 		assertThat(result.params.get("is"), is("is"));
@@ -98,68 +96,72 @@ public class RouteTrieTest {
 	}
 	
 	private RouteTrie makeRouteTrie() {
-		RouteTrie trie = new RouteTrie();
+		return new RouteTrie()
 		
-		trie.addRoute(new Route(POST,   "/this/is",                 result(0)));
-		trie.addRoute(new Route(DELETE, "/this/isno",               result(-100)));
-		trie.addRoute(new Route(PUT,    "/this/isno",               result(-200)));
-		trie.addRoute(new Route(GET,    "/this/isno",               result(-300)));
-		trie.addRoute(new Route(POST,   "/this/isno",               result(-400)));
-		trie.addRoute(new Route(GET,    "/this/isnot",              result(-1)));
-		trie.addRoute(new Route(GET,    "/this/is/the/bomb",        result(1)));
-		trie.addRoute(new Route(GET,    "/this/is/the/bomberman",   result(1000)));
-		trie.addRoute(new Route(GET,    "/this/is/the/best",        result(2)));
-		trie.addRoute(new Route(GET,    "/this/is/the/best-around", result(2000)));
-		trie.addRoute(new Route(GET,    "/this/:is/:the/best",      result(3)));
-		trie.addRoute(new Route(GET,    "/this/:is/:the/*end",      result(4)));
+			.addRoute(new Route(POST,   "/this/is",                 result(0)))
+			.addRoute(new Route(DELETE, "/this/isno",               result(-100)))
+			.addRoute(new Route(PUT,    "/this/isno",               result(-200)))
+			.addRoute(new Route(GET,    "/this/isno",               result(-300)))
+			.addRoute(new Route(POST,   "/this/isno",               result(-400)))
+			.addRoute(new Route(GET,    "/this/isnot",              result(-1)))
+			.addRoute(new Route(GET,    "/this/is/the/bomb",        result(1)))
+			.addRoute(new Route(GET,    "/this/is/the/bomberman",   result(1000)))
+			.addRoute(new Route(GET,    "/this/is/the/best",        result(2)))
+			.addRoute(new Route(GET,    "/this/is/the/best-around", result(2000)))
+			.addRoute(new Route(GET,    "/this/:is/:the/best",      result(3)))
+			.addRoute(new Route(GET,    "/this/:is/:the/*end",      result(4)))
 		
 		// just to validate the structure works in order,
 		// these rules would basically eat up everything but since they're at
 		// the end, they match but don't get involved
-		trie.addRoute(new Route(GET,    "/this/*islast-and-should-not-interfere", result(4000)));
-		trie.addRoute(new Route(GET,    "/this/*islast-and-also-is-not-used",     result(5000)));
+			.addRoute(new Route(GET,    "/this/*islast-and-should-not-interfere", result(4000)))
+			.addRoute(new Route(GET,    "/this/*islast-and-also-is-not-used",     result(5000)))
 		
-		return trie;
+		// the idea here is that this should pick up ANYTHING that ends in .css and wasn't picked up by
+		// anything before this.  which implies that matching needs to ignore extensions generally?
+		// this is going to be interesting
+		// for now, since the definition gets rejected, let's circle back
+			.addRoute(new Route(GET,    "/*path", result(6000)));
 	}
 	
 	private void testRouteTrie(RouteTrie trie) {
 
-		RouteMatch result = trie.find(POST, "/this/is");
+		RouteMatch result = trie.find(POST, new URIMatch("/this/is"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(0)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(DELETE, "/this/isno");
+		result = trie.find(DELETE, new URIMatch("/this/isno"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(-100)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(GET, "/this/isnot");
+		result = trie.find(GET, new URIMatch("/this/isnot"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(-1)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(GET, "/this/is");
+		result = trie.find(GET, new URIMatch("/this/is"));
 		assertThat(result, is(nullValue()));
 		
-		result = trie.find(GET, "/this/is/the/bomb");
+		result = trie.find(GET, new URIMatch("/this/is/the/bomb"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(1)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(GET, "/this/is/the/best");
+		result = trie.find(GET, new URIMatch("/this/is/the/best"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(2)));
 		assertTrue(result.params.isEmpty());
 		
-		result = trie.find(GET, "/this/works/the/best");
+		result = trie.find(GET, new URIMatch("/this/works/the/best"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(3)));
 		assertThat(result.params.get("is"), is("works"));
 		assertThat(result.params.get("the"), is("the"));
 		assertThat(result.params.size(), is(2));
 		
-		result = trie.find(GET, "/this/makes/me/bees-knees/if-you-know/what-i-am-saying");
+		result = trie.find(GET, new URIMatch("/this/makes/me/bees-knees/if-you-know/what-i-am-saying"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(4)));
 		assertThat(result.params.get("is"), is("makes"));
@@ -181,7 +183,7 @@ public class RouteTrieTest {
 		
 		trie.compress();
 		
-		//System.out.println(trie);
+		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}
@@ -192,19 +194,19 @@ public class RouteTrieTest {
 		
 		//System.out.println(trie);
 		
-		RouteMatch routeMatch = trie.find(OPTIONS, "/this/isno");
+		RouteMatch routeMatch = trie.find(OPTIONS, new URIMatch("/this/isno"));
 		
 		assertThat(routeMatch.routes, is(notNullValue()));
 		assertThat(routeMatch.routes.keySet(), containsInAnyOrder(GET, POST, PUT, DELETE));
 		assertThat(routeMatch.route, is(nullValue()));
 		
-		routeMatch = trie.find(OPTIONS, "/this/is/the/best");
+		routeMatch = trie.find(OPTIONS, new URIMatch("/this/is/the/best"));
 		
 		assertThat(routeMatch.routes, is(notNullValue()));
 		assertThat(routeMatch.routes.keySet(), contains(GET));
 		assertThat(routeMatch.route, is(nullValue()));
 		
-		routeMatch = trie.find(HEAD, "/this/isno");
+		routeMatch = trie.find(HEAD, new URIMatch("/this/isno"));
 		
 		assertThat(routeMatch.routes, is(notNullValue()));
 		assertThat(routeMatch.route.method(), is(GET));
@@ -214,9 +216,8 @@ public class RouteTrieTest {
 	@Test
 	public void testDuplicateRoute() {
 		
-		RouteTrie trie = new RouteTrie();
-		
-		trie.addRoute(new Route(POST, "/this/is", "/success"));
+		RouteTrie trie = new RouteTrie()
+			.addRoute(new Route(POST, "/this/is", "/success"));
 		
 		try {
 			trie.addRoute(new Route(POST, "/this/is", "/failure"));

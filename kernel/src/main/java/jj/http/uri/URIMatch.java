@@ -15,6 +15,7 @@
  */
 package jj.http.uri;
 
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,8 +79,9 @@ public class URIMatch {
 	public final boolean versioned;
 	
 	public URIMatch(final String uri) {
-		this.uri = uri;
-		Matcher matcher = URI_PATTERN.matcher(uri);
+		assert uri != null : "uri must not be null";
+		this.uri = Paths.get(uri.startsWith("/") ? uri : "/" + uri).normalize().toString();
+		Matcher matcher = URI_PATTERN.matcher(this.uri);
 		String shaCandidate = null;
 		String nameCandidate = null;
 		String extensionCandidate = null;

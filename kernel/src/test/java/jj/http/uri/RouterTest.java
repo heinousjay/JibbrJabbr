@@ -77,17 +77,17 @@ public class RouterTest {
 	@Test
 	public void test() {
 
-		RouteMatch routeMatch = router.matchURI(GET, "/");
+		RouteMatch routeMatch = router.matchURI(GET, new URIMatch("/"));
 		
 		assertThat(routeMatch.route.destination(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchURI(GET, "/something/../../");
+		routeMatch = router.matchURI(GET, new URIMatch("/something/../../"));
 		
 		assertThat(routeMatch.route.destination(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchURI(GET, "../");
+		routeMatch = router.matchURI(GET, new URIMatch("../"));
 		
 		assertThat(routeMatch.route.destination(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
