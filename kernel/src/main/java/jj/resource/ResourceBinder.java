@@ -34,7 +34,7 @@ public class ResourceBinder {
 	
 	private final MapBinder<String, Class<? extends ServableResource>> servableResourceBinder;
 	
-	private final MapBinder<Class<? extends ServableResource>, Class<? extends ResourceServer>> resourceServerBinder;
+	private final MapBinder<Class<? extends ServableResource>, ResourceServer> resourceServerBinder;
 	
 	public ResourceBinder(final Binder binder) {
 		resourceCreatorBinder = MapBinder.newMapBinder(
@@ -52,7 +52,7 @@ public class ResourceBinder {
 		resourceServerBinder = MapBinder.newMapBinder(
 			binder,
 			new TypeLiteral<Class<? extends ServableResource>>() {},
-			new TypeLiteral<Class<? extends ResourceServer>>() {}
+			new TypeLiteral<ResourceServer>() {}
 		);
 	}
 	
@@ -81,7 +81,7 @@ public class ResourceBinder {
 			}
 			
 			servableResourceBinder.addBinding(name).toInstance((Class<? extends ServableResource>)key);
-			resourceServerBinder.addBinding((Class<? extends ServableResource>)key).toInstance(resourceServerClass);
+			resourceServerBinder.addBinding((Class<? extends ServableResource>)key).to(resourceServerClass);
 		}
 		
 		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);
