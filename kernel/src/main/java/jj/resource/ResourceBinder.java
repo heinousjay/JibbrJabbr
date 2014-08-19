@@ -15,8 +15,9 @@
  */
 package jj.resource;
 
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import jj.http.server.ResourceServer;
+import jj.http.server.SimpleResourceServer;
+import jj.util.StringUtils;
 
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
@@ -31,7 +32,9 @@ public class ResourceBinder {
 
 	private final MapBinder<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
 	
-	private final MapBinder<Pattern, Class<? extends ServableResource>> servableResourceBinder;
+	private final MapBinder<String, Class<? extends ServableResource>> servableResourceBinder;
+	
+	private final MapBinder<Class<? extends ServableResource>, Class<? extends ResourceServer>> resourceServerBinder;
 	
 	public ResourceBinder(final Binder binder) {
 		resourceCreatorBinder = MapBinder.newMapBinder(
@@ -42,8 +45,14 @@ public class ResourceBinder {
 		
 		servableResourceBinder = MapBinder.newMapBinder(
 			binder,
-			new TypeLiteral<Pattern>() {},
+			new TypeLiteral<String>() {},
 			new TypeLiteral<Class<? extends ServableResource>>() {}
+		);
+		
+		resourceServerBinder = MapBinder.newMapBinder(
+			binder,
+			new TypeLiteral<Class<? extends ServableResource>>() {},
+			new TypeLiteral<Class<? extends ResourceServer>>() {}
 		);
 	}
 	
@@ -51,13 +60,28 @@ public class ResourceBinder {
 	public <T extends AbstractResource, U extends SimpleResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
 		
 		if (ServableResource.class.isAssignableFrom(key)) {
-			assert key.isAnnotationPresent(PathPattern.class) : key.getName() + " requires " + PathPattern.class.getSimpleName() + " annotation";
-			try {
-				Pattern pattern = Pattern.compile(key.getAnnotation(PathPattern.class).value());
-				servableResourceBinder.addBinding(pattern).toInstance((Class<? extends ServableResource>)key);
-			} catch (PatternSyntaxException pse) {
-				throw new AssertionError(key.getName() + " " + PathPattern.class.getSimpleName() + " annotation has invalid pattern", pse);
+			
+			String name = null;
+			Class<? extends ResourceServer> resourceServerClass = SimpleResourceServer.class;
+			
+			ServableConfiguration config = key.getAnnotation(ServableConfiguration.class);
+			if (config != null) {
+				name = config.name();
+				resourceServerClass = config.processor();
 			}
+			
+			if (StringUtils.isEmpty(name)) {
+				// figure it out! this is close but not bulletproof
+				name = key.getSimpleName();
+				int end = name.lastIndexOf("Resource");
+				if (end > 1) {
+					name = name.substring(0, end);
+				}
+				name = name.substring(0, 1).toLowerCase() + name.substring(1);
+			}
+			
+			servableResourceBinder.addBinding(name).toInstance((Class<? extends ServableResource>)key);
+			resourceServerBinder.addBinding((Class<? extends ServableResource>)key).toInstance(resourceServerClass);
 		}
 		
 		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);

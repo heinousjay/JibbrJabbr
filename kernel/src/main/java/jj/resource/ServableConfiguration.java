@@ -21,13 +21,31 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import jj.http.server.ResourceServer;
+import jj.http.server.SimpleResourceServer;
+
 /**
  * @author jason
  *
  */
 @Documented
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PathPattern {
-	String value();
+public @interface ServableConfiguration {
+
+	/**
+	 * The name by which this resource is exposed for routing. By default, will use
+	 * the simple class name, with the word "Resource" removed from the end,
+	 * and the initial letter lowercase - for example
+	 * "jj.resource.stat.ic.StaticResource" will become "static"
+	 * @return
+	 */
+	String name() default "";
+	
+	/**
+	 * The {@link ResourceServer} implementation that will process matching request.
+	 * Defaults to {@link SimpleResourceServer} 
+	 * @return
+	 */
+	Class<? extends ResourceServer> processor() default SimpleResourceServer.class;
 }

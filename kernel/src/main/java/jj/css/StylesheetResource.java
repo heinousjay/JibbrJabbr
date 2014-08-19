@@ -37,7 +37,6 @@ import org.mozilla.javascript.Undefined;
 import jj.resource.AbstractResource;
 import jj.resource.LoadedResource;
 import jj.resource.NoSuchResourceException;
-import jj.resource.PathPattern;
 import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
 import jj.resource.stat.ic.StaticResource;
@@ -55,7 +54,6 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@PathPattern("\\.css$")
 public class StylesheetResource extends AbstractResource implements LoadedResource {
 
 	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";

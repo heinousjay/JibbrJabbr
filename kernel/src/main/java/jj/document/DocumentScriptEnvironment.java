@@ -35,10 +35,10 @@ import jj.http.server.websocket.ConnectionBroadcastStack;
 import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketMessageProcessor;
-import jj.resource.PathPattern;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceNotViableException;
+import jj.resource.ServableConfiguration;
 import jj.resource.ServableResource;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptThread;
@@ -56,7 +56,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@PathPattern(".*") // potentially any URL matches us
+@ServableConfiguration(name = "document")
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
 	implements CurrentResourceAware, RootScriptEnvironment, ServableResource {
