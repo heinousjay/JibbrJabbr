@@ -39,7 +39,6 @@ public class URIMatchTest {
 		// we drop the trailing slash,
 		// it can make route matching ambiguous
 		match = new URIMatch("/hi/");
-		System.out.println(match);
 		assertThat(match.sha1, is(nullValue()));
 		assertThat(match.name, is("hi"));
 		assertThat(match.extension, is(nullValue()));
@@ -47,7 +46,6 @@ public class URIMatchTest {
 		assertFalse(match.versioned);
 		
 		match = new URIMatch("/hi/there/");
-		System.out.println(match);
 		assertThat(match.sha1, is(nullValue()));
 		assertThat(match.name, is("hi/there"));
 		assertThat(match.extension, is(nullValue()));
