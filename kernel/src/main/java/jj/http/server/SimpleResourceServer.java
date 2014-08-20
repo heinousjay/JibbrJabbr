@@ -43,23 +43,29 @@ public class SimpleResourceServer implements ResourceServer {
 		this.resourceFinder = resourceFinder;
 		this.resourceLoader = resourceLoader;
 	}
+	
+	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
+		return resourceFinder.findResource(resourceClass, Base, request.uriMatch().path); // should be Public
+	}
 
 	@Override
 	public void serve(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request, final HttpServerResponse response) {
 		
 		// need to get the resource name from the route match
 		// for now using the path!
-		ServableResource resource = resourceFinder.findResource(resourceClass, Base, request.uriMatch().path); // should be Public
+		ServableResource resource = findResource(resourceClass, request);
 		
 		if (resource == null) {
-			resourceLoader.loadResource(resourceClass,  Base, request.uriMatch().path).then(new HttpServerTask("") {
-				
-				@Override
-				protected void run() throws Exception {
-					ServableResource resource = resourceFinder.findResource(resourceClass, Base, request.uriMatch().path); // should be Public
-					serve(resource, request, response);
+			resourceLoader.loadResource(resourceClass,  Base, request.uriMatch().path).then(
+				new HttpServerTask("serving a resource.  better name!") {
+					
+					@Override
+					protected void run() throws Exception {
+						ServableResource resource = findResource(resourceClass, request);
+						serve(resource, request, response);
+					}
 				}
-			});
+			);
 		} else {
 			serve(resource, request, response);
 		}
