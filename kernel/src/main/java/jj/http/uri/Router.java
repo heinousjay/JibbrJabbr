@@ -61,10 +61,16 @@ public class Router {
 			@Override
 			protected void run() throws Exception {
 				RouteTrie newTrie = new RouteTrie();
-				configuration.routes().forEach(route -> newTrie.addRoute(route));
+				// java 8 rocks!
+				configuration.routes().forEach(newTrie::addRoute);
 				
-				// default routes. this should get smarter!
+				// default routes.
+				// this is the only route we add, it is meant to be the StaticResource mapping.
+				// since it's the catch-all, it goes last and gets added to every route trie
 				newTrie.addRoute(new Route(GET, "/*path", ""));
+				
+				// this is not for here - this should be handled by rewriting the incoming match
+				// to have the welcome file in it if it matches a DirectoryResource
 				newTrie.addRoute(new Route(GET, "/", "/" + configuration.welcomeFile()));
 				
 				newTrie.compress();
@@ -74,6 +80,18 @@ public class Router {
 	}
 	
 	public RouteMatch matchURI(final HttpMethod method, final URIMatch uriMatch) {
+		
+		// this is not the correct signature? RouteMatch is the wrong return, needs to
+		// be some object that indicates how to do the processing
+		
+		// okay, this has a few jobs to do.  let's detail them!
+		// if the incoming URI had a / on the end (except '/'), issue a redirect without it
+		// if uriMatch.path is a DirectoryResource, rewrite the URIMatch to have the welcome file on it
+		// hit the routes and see what we get back out of it
+		
+		// not sure if this is the right place for that process. maybe whatever calls this class should do
+		// the first two steps
+		
 		RouteTrie routes = trie.get();
 		assert routes != null : "can't route before configuration is complete!";
 		
