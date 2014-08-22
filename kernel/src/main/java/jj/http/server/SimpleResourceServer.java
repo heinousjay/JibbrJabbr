@@ -27,7 +27,10 @@ import jj.resource.ResourceLoader;
 import jj.resource.ServableResource;
 
 /**
- * Basic resource server implemenation that will suffice in most cases.
+ * <p>
+ * Handles basic serving of resources that don't require dealing with
+ * route mappings. This only reads the path from the URI match to determine
+ * which resource to use.  The Route is ignored
  * 
  * @author jason
  *
