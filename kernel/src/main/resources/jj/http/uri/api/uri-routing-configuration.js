@@ -1,6 +1,6 @@
-
 var base = 'jj.http.uri.RouterConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
+var srh = inject('jj.http.uri.ServableResourceHelper');
 var support = require('jj/configuration-support');
 
 var GET    = Packages.io.netty.handler.codec.http.HttpMethod.GET;
@@ -39,15 +39,24 @@ function makeSetter(method, type) {
 module.exports = {
 		
 	route: {
-		get: makeSetter(GET, route),
-		GET: makeSetter(GET, route),
-		post: makeSetter(POST, route),
-		POST: makeSetter(POST, route),
-		put: makeSetter(PUT, route),
-		PUT: makeSetter(PUT, route),
-		del: makeSetter(DELETE, route),
+		get:    makeSetter(GET,    route),
+		GET:    makeSetter(GET,    route),
+		post:   makeSetter(POST,   route),
+		POST:   makeSetter(POST,   route),
+		put:    makeSetter(PUT,    route),
+		PUT:    makeSetter(PUT,    route),
+		del:    makeSetter(DELETE, route),
 		DELETE: makeSetter(DELETE, route)
 	},
 	
 	welcomeFile: support.makeStringProperty(base, 'welcomeFile')
 }
+
+srh.arrayOfNames().forEach(function(resourceName) {
+	module.exports[resourceName] = function(mappedName) {
+		return {
+			resourceName: resourceName,
+			mappedName: mappedName
+		}
+	}
+});

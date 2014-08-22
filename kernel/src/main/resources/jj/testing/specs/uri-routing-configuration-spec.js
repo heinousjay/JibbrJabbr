@@ -1,11 +1,18 @@
 
-var inject = function() {
+var inject = function(id) {
 	return {
-		addConfigurationMultiElement: function(l, r) {
-			inject.l = l;
-			inject.r = r;
+		'jj.configuration.ConfigurationCollector' : {
+			addConfigurationMultiElement: function(l, r) {
+				inject.l = l;
+				inject.r = r;
+			}
+		},
+		'jj.http.uri.ServableResourceHelper' : {
+			arrayOfNames: function() {
+				return ['static', 'script', 'stylesheet', 'document'];
+			}
 		}
-	};
+	}[id];
 }
 var valueOf = java.lang.String.valueOf;
 var bases = [];
