@@ -33,10 +33,6 @@ import org.mozilla.javascript.ScriptableObject;
  * so configuration scripts can use them for routing without specifically hard-coding
  * the actual types.
  * 
- * 
- * <p>
- * ugly first implementation just to get the API looking good
- * 
  * @author jason
  *
  */
