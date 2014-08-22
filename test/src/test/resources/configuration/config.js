@@ -65,19 +65,5 @@ require('jj/resource-system-configuration')
 require('jj/default-resource-properties')
 	.extension('stupid').is({mimeType: 'text/stupid'}); // configure normally
 
-// this is a silly helper, it just copies the exports
-// of the given script into the given object
-var globalize = require('jj/globalize');
-
-// so bam.  life is easy.  although in this case, there
-// are only two pieces exposed
-globalize('jj/uri-routing-configuration', this);
-
-welcomeFile('root');
-
-//for example!
-route.GET('/chat/').to('/chat/list');
-route.POST('/chat/:room').to('/chat/room');
-route.PUT('/chat/:room/*secret').to('/chat/room');
-route.DELETE('/chat/:room/*secret').to('/chat/room');
-
+// configuration of routes is in a separate include because it makes scoping prettier
+require('routes');
