@@ -37,7 +37,8 @@ class ParamNode extends TrieNode {
 	}
 	
 	static String makeValue(final String uri, final int index) {
-		int end = uri.indexOf(SEPARATOR_STRING, index);
+		int end = uri.indexOf(PATH_SEPARATOR_STRING, index);
+		if (end == -1) { end = uri.indexOf(EXTENSION_SEPARATOR_CHAR, index); }
 		if (end == -1) { end = uri.length(); }
 		return uri.substring(index, end);
 	}
@@ -69,14 +70,23 @@ class ParamNode extends TrieNode {
 
 	@Override
 	void doAddChild(Route route) {
-		if (parameter.type == Type.Splat) { 
+		char current = route.currentChar();
+		// this is an assertion because it's a trie construction error
+		assert current == PATH_SEPARATOR_CHAR || current == EXTENSION_SEPARATOR_CHAR;
+		
+		if (terminal) {
+			throw new IllegalStateException("only one node type is allowed past an extension. better explanation please!");
+		}
+		
+		if (parameter.type == Type.Splat && current != EXTENSION_SEPARATOR_CHAR) { 
 			throw new IllegalArgumentException(
-				"trailing uri after a splat parameter in " + route
+				"only extensions can follow a splat parameter"
 			);
 		}
-		assert route.currentChar() == SEPARATOR_CHAR; // must be!
 		
-		child = child == null ? new SeparatorNode() : child;
+		child = child == null ? new SeparatorNode(current) : child;
+		child.terminal = current == EXTENSION_SEPARATOR_CHAR;
+		
 		child.addRoute(route.advanceIndex());
 	}
 	
@@ -95,7 +105,16 @@ class ParamNode extends TrieNode {
 			matchValue = matchParam(uri, index);
 			break;
 		case Splat:
-			matchValue = uri.substring(index);
+			int end = uri.length();
+			if (child != null) {
+				assert child.terminal : "splat followed by non-terminal child! BULLSHIT BRAH";
+				end = uri.lastIndexOf('.');
+				// if we're expecting an extension an none exist, we don't match.
+				// is returning here correct?
+				if (end == -1) return false;
+			}
+			
+			matchValue = uri.substring(index, end);
 			break;
 		}
 		
@@ -130,7 +149,7 @@ class ParamNode extends TrieNode {
 	@Override
 	void describeChildren(int indent, StringBuilder sb) {
 		if (child != null) {
-			addIndentation(indent, sb.append("\n")).append(SEPARATOR_CHAR).append(" = ");
+			addIndentation(indent, sb.append("\n")).append(child.separator).append(" = ");
 			child.describe(indent, sb);
 		}
 	}

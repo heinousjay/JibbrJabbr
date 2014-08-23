@@ -121,7 +121,7 @@ public class RouteTrieTest {
 		// anything before this.  which implies that matching needs to ignore extensions generally?
 		// this is going to be interesting
 		// for now, since the definition gets rejected, let's circle back
-			.addRoute(new Route(GET,    "/*path", result(6000)));
+			.addRoute(new Route(GET,    "/*path.css", result(6000)));
 	}
 	
 	private void testRouteTrie(RouteTrie trie) {
@@ -168,6 +168,19 @@ public class RouteTrieTest {
 		assertThat(result.params.get("the"), is("me"));
 		assertThat(result.params.get("end"), is("bees-knees/if-you-know/what-i-am-saying"));
 		assertThat(result.params.size(), is(3));
+		
+		result = trie.find(GET, new URIMatch("/jason.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(6000)));
+		assertThat(result.params.get("path"), is("jason"));
+		assertThat(result.params.size(), is(1));
+		
+		result = trie.find(GET, new URIMatch("/jason.cs"));
+		assertThat(result, is(nullValue()));
+		
+		result = trie.find(GET, new URIMatch("/jason"));
+		assertThat(result, is(nullValue()));
+		
 	}
 	
 	@Test
@@ -179,11 +192,11 @@ public class RouteTrieTest {
 	public void testCompressed() {
 		RouteTrie trie = makeRouteTrie();
 
-		//System.out.println(trie);
+		System.out.println(trie);
 		
 		trie.compress();
 		
-		//System.out.println(trie);
+		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}

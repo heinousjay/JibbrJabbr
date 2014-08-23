@@ -30,13 +30,21 @@ class SeparatorNode extends TrieNode {
 	int keyLength = 1;
 	Map<String, ParamNode> paramNodeChildren;
 	
+	final char separator;
+	
+	SeparatorNode(final char separator) {
+		this.separator = separator;
+	}
+	
 
 	@Override
 	void doAddChild(Route route) {
 		
 		char current = route.currentChar();
 		
-		assert current != SEPARATOR_CHAR : route + " has two path separators in a row";
+		// not correctly an assertion! should throw IllegalArgumentException?
+		// need to write a bunch of tests for illegal routes to validate this stuff
+		assert current != PATH_SEPARATOR_CHAR : route + " has two separators in a row";
 		
 		if (PARAM_CHARS.indexOf(current) != -1) {
 			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<String, ParamNode>(4) : paramNodeChildren;
@@ -44,6 +52,7 @@ class SeparatorNode extends TrieNode {
 			ParamNode nextNode = paramNodeChildren.get(paramValue);
 			if (nextNode == null) { 
 				nextNode = new ParamNode(route);
+				nextNode.terminal = terminal;
 				paramNodeChildren.put(paramValue, nextNode);
 			} else {
 				route.addParam(nextNode.parameter);
@@ -55,6 +64,7 @@ class SeparatorNode extends TrieNode {
 			StringNode nextNode = stringNodeChildren.get(value);
 			if (nextNode == null) {
 				nextNode = new StringNode();
+				nextNode.terminal = terminal;
 				stringNodeChildren.put(value, (StringNode)nextNode);
 			}
 			nextNode.addRoute(route.advanceIndex());

@@ -27,13 +27,19 @@ class StringNode extends TrieNode {
 	void doAddChild(Route route) {
 		children = children == null ? new LinkedHashMap<String, TrieNode>(4, 0.75f) : children;
 		TrieNode nextNode;
-		if (route.currentChar() == SEPARATOR_CHAR) {
-			nextNode = children.get(SEPARATOR_STRING);
-			if (nextNode == null) {
-				nextNode = new SeparatorNode();
-				children.put(SEPARATOR_STRING, nextNode);
+		if (route.currentChar() == PATH_SEPARATOR_CHAR) {
+			if (terminal) {
+				throw new IllegalStateException("terminal!");
 			}
 			
+			nextNode = children.get(PATH_SEPARATOR_STRING);
+			if (nextNode == null) {
+				nextNode = new SeparatorNode(PATH_SEPARATOR_CHAR);
+				children.put(PATH_SEPARATOR_STRING, nextNode);
+			}
+		
+		// else if next is an extension separator AND! there aren't any separator characters anywhere else in the path
+		// then we can do an extension separator here
 			
 		} else {
 
@@ -50,7 +56,7 @@ class StringNode extends TrieNode {
 	StringNode mergeUp(StringBuilder accumulator) {
 		if (children != null && children.size() == 1 && goal == null) {
 			String key = children.keySet().iterator().next();
-			if (!SEPARATOR_STRING.equals(key)) {
+			if (!PATH_SEPARATOR_STRING.equals(key)) {
 				StringNode node = (StringNode)children.get(key);
 				accumulator.append(key);
 				return node.mergeUp(accumulator);
@@ -65,7 +71,7 @@ class StringNode extends TrieNode {
 		if (children != null) {
 			if (children.size() == 1) {
 				String key = children.keySet().iterator().next();
-				if (!SEPARATOR_STRING.equals(key)) {
+				if (!PATH_SEPARATOR_STRING.equals(key)) {
 					StringBuilder accumulator = new StringBuilder(key);
 					StringNode node = (StringNode)children.remove(key);
 					TrieNode newNode = node.mergeUp(accumulator);

@@ -29,7 +29,7 @@ import io.netty.handler.codec.http.HttpMethod;
  */
 class RouteTrie {
 	
-	private final TrieNode root = new SeparatorNode();
+	private final TrieNode root = new SeparatorNode(TrieNode.PATH_SEPARATOR_CHAR);
 	
 	RouteTrie addRoute(Route route) {
 		
