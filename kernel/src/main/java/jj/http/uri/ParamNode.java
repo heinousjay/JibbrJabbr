@@ -26,9 +26,8 @@ import jj.http.uri.Parameter.Type;
  */
 class ParamNode extends TrieNode {
 	
-	private static final Pattern PARSER = Pattern.compile("^([:*])([\\w\\d$_-]+)(?:\\((.+)\\))?$");
-	
-	
+	private static final Pattern PARSER = Pattern.compile("^([:*])([\\w\\d$_]+)(?:\\((.+)\\))?$");
+
 	private SeparatorNode child;
 	final Parameter parameter;
 	
@@ -42,17 +41,31 @@ class ParamNode extends TrieNode {
 		if (end == -1) { end = uri.length(); }
 		return uri.substring(index, end);
 	}
+	
+	private static Pattern makeParameterPattern(String input) {
+		Pattern result = null;
+		if (input != null) {
+			if (!input.startsWith("")) {
+				input = "^" + input;
+			}
+			if (!input.endsWith("$")) {
+				input = input + "$";
+			}
+			result = Pattern.compile(input);
+		}
+		return result;
+	}
 		
 	ParamNode(Route route) {
 		String value = makeValue(route);
 		Matcher m = PARSER.matcher(value);
-		if (!m.matches()) { throw new IllegalArgumentException("[" + value + "] is not a valid parameter definition"); }
+		if (!m.matches()) { throw new AssertionError("[" + value + "] is not a valid parameter definition. validate routes first!"); }
 		parameter = new Parameter(
 			m.group(2),
 			route.index(),
 			route.index() + value.length(),
 			parseType(m.group(1)),
-			m.group(3) == null ? null : Pattern.compile("^" + m.group(3) + "$")
+			makeParameterPattern(m.group(3))
 		);
 		route.addParam(parameter);
 	}
@@ -74,14 +87,10 @@ class ParamNode extends TrieNode {
 		// this is an assertion because it's a trie construction error
 		assert current == PATH_SEPARATOR_CHAR || current == EXTENSION_SEPARATOR_CHAR;
 		
-		if (terminal) {
-			throw new IllegalStateException("only one node type is allowed past an extension. better explanation please!");
-		}
+		assert !terminal : "only one node type is allowed past an extension!";
 		
 		if (parameter.type == Type.Splat && current != EXTENSION_SEPARATOR_CHAR) { 
-			throw new IllegalArgumentException(
-				"only extensions can follow a splat parameter"
-			);
+			throw new AssertionError("only extensions can follow a splat parameter");
 		}
 		
 		child = child == null ? new SeparatorNode(current) : child;
@@ -107,7 +116,7 @@ class ParamNode extends TrieNode {
 		case Splat:
 			int end = uri.length();
 			if (child != null) {
-				assert child.terminal : "splat followed by non-terminal child! BULLSHIT BRAH";
+				assert child.terminal : "splat followed by non-terminal child!";
 				end = uri.lastIndexOf('.');
 				// if we're expecting an extension an none exist, we don't match.
 				// is returning here correct?
