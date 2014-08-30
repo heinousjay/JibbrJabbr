@@ -49,6 +49,7 @@ public class RouteUriValidatorTest {
 		assertThat(ruv.validateRouteUri("/this/*islast_and_should_not_interfere"), is(""));
 		assertThat(ruv.validateRouteUri("/this/*islast_and_also_is_not_used"), is(""));
 		assertThat(ruv.validateRouteUri("/some.directory/*path.css"), is(""));
+		assertThat(ruv.validateRouteUri("/some.directory/path.*css"), is(""));
 		assertThat(ruv.validateRouteUri("/*path.css"), is(""));
 		assertThat(ruv.validateRouteUri("/*path.:ext"), is(""));
 		assertThat(ruv.validateRouteUri("/user/:id([a-z]-[\\d]{6})/picture"), is(""));
