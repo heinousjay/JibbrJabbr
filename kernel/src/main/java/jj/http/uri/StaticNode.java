@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class StringNode extends TrieNode {
+class StaticNode extends TrieNode {
 	
 	Map<String, TrieNode> children;
 	int keyLength = 1;
@@ -27,31 +27,34 @@ class StringNode extends TrieNode {
 	void doAddChild(Route route) {
 		children = children == null ? new LinkedHashMap<String, TrieNode>(4, 0.75f) : children;
 		TrieNode nextNode;
-		if (route.currentChar() == SEPARATOR_CHAR) {
-			nextNode = children.get(SEPARATOR_STRING);
+		char cur = route.currentChar();
+		if (cur == PATH_SEPARATOR_CHAR ||
+			(cur== EXTENSION_SEPARATOR_CHAR && !route.hasRemainingSegments())) {
+			assert !terminal : "terminal node has additional trailing nodes!";
+			
+			String key = cur == PATH_SEPARATOR_CHAR ? PATH_SEPARATOR_STRING : EXTENSION_SEPARATOR_STRING;
+			
+			nextNode = children.get(key);
 			if (nextNode == null) {
-				nextNode = new SeparatorNode();
-				children.put(SEPARATOR_STRING, nextNode);
+				nextNode = new SeparatorNode(cur);
+				children.put(key, nextNode);
 			}
-			
-			
 		} else {
-
-			String current = String.valueOf(route.currentChar());
+			String current = String.valueOf(cur);
 			nextNode = children.get(current);
 			if (nextNode == null) {
-				nextNode = new StringNode();
+				nextNode = new StaticNode();
 				children.put(current, nextNode);
 			}
 		}
 		nextNode.addRoute(route.advanceIndex());
 	}
 	
-	StringNode mergeUp(StringBuilder accumulator) {
+	StaticNode mergeUp(StringBuilder accumulator) {
 		if (children != null && children.size() == 1 && goal == null) {
 			String key = children.keySet().iterator().next();
-			if (!SEPARATOR_STRING.equals(key)) {
-				StringNode node = (StringNode)children.get(key);
+			if (children.get(key) instanceof StaticNode) {
+				StaticNode node = (StaticNode)children.get(key);
 				accumulator.append(key);
 				return node.mergeUp(accumulator);
 			}
@@ -65,9 +68,9 @@ class StringNode extends TrieNode {
 		if (children != null) {
 			if (children.size() == 1) {
 				String key = children.keySet().iterator().next();
-				if (!SEPARATOR_STRING.equals(key)) {
+				if (children.get(key) instanceof StaticNode) {
 					StringBuilder accumulator = new StringBuilder(key);
-					StringNode node = (StringNode)children.remove(key);
+					StaticNode node = (StaticNode)children.remove(key);
 					TrieNode newNode = node.mergeUp(accumulator);
 					keyLength = accumulator.length();
 					newNode.compress();

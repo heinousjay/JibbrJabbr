@@ -17,7 +17,6 @@ package jj.http.uri;
 
 import io.netty.handler.codec.http.HttpMethod;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,10 +27,15 @@ import java.util.Map;
  */
 abstract class TrieNode {
 
-	static final char SEPARATOR_CHAR = '/';
-	static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHAR);
+	static final char PATH_SEPARATOR_CHAR = '/';
+	static final char EXTENSION_SEPARATOR_CHAR = '.';
+	static final String PATH_SEPARATOR_STRING = String.valueOf(PATH_SEPARATOR_CHAR);
+	static final String EXTENSION_SEPARATOR_STRING = String.valueOf(EXTENSION_SEPARATOR_CHAR);
 	static final String PARAM_CHARS = ":*";
 	
+	// this is set to true on a SeparatorNode if an exntension is found at the end of
+	// a route. it indicates that after the separator, no node type switches are allowed
+	boolean terminal;
 	
 	Map<HttpMethod, Route> goal;
 	
@@ -67,9 +71,9 @@ abstract class TrieNode {
 	abstract StringBuilder describe(int indent, StringBuilder sb);
 	
 	StringBuilder addIndentation(int indent, StringBuilder sb) {
-		char[] c = new char[indent];
-		Arrays.fill(c, ' ');
-		sb.append(c);
+		for (; indent > 0; --indent) {
+			sb.append(' ');
+		}
 		return sb;
 	}
 	

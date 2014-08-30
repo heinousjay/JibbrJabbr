@@ -26,9 +26,15 @@ import java.util.Map.Entry;
  */
 class SeparatorNode extends TrieNode {
 	
-	Map<String, StringNode> stringNodeChildren;
+	Map<String, StaticNode> stringNodeChildren;
 	int keyLength = 1;
 	Map<String, ParamNode> paramNodeChildren;
+	
+	final char separator;
+	
+	SeparatorNode(final char separator) {
+		this.separator = separator;
+	}
 	
 
 	@Override
@@ -36,7 +42,9 @@ class SeparatorNode extends TrieNode {
 		
 		char current = route.currentChar();
 		
-		assert current != SEPARATOR_CHAR : route + " has two path separators in a row";
+		// not correctly an assertion! should throw IllegalArgumentException?
+		// need to write a bunch of tests for illegal routes to validate this stuff
+		assert current != PATH_SEPARATOR_CHAR : route + " has two separators in a row";
 		
 		if (PARAM_CHARS.indexOf(current) != -1) {
 			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<String, ParamNode>(4) : paramNodeChildren;
@@ -44,18 +52,20 @@ class SeparatorNode extends TrieNode {
 			ParamNode nextNode = paramNodeChildren.get(paramValue);
 			if (nextNode == null) { 
 				nextNode = new ParamNode(route);
+				nextNode.terminal = terminal;
 				paramNodeChildren.put(paramValue, nextNode);
 			} else {
 				route.addParam(nextNode.parameter);
 			}
 			nextNode.addRoute(route.advanceIndex(paramValue.length()));
 		} else {
-			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StringNode>(4) : stringNodeChildren;
+			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StaticNode>(4) : stringNodeChildren;
 			String value = String.valueOf(current);
-			StringNode nextNode = stringNodeChildren.get(value);
+			StaticNode nextNode = stringNodeChildren.get(value);
 			if (nextNode == null) {
-				nextNode = new StringNode();
-				stringNodeChildren.put(value, (StringNode)nextNode);
+				nextNode = new StaticNode();
+				nextNode.terminal = terminal;
+				stringNodeChildren.put(value, (StaticNode)nextNode);
 			}
 			nextNode.addRoute(route.advanceIndex());
 		}
@@ -98,13 +108,13 @@ class SeparatorNode extends TrieNode {
 			if (stringNodeChildren.size() == 1) {
 				String key = stringNodeChildren.keySet().iterator().next();
 				StringBuilder accumulator = new StringBuilder(key);
-				StringNode node = stringNodeChildren.remove(key);
-				StringNode newNode = node.mergeUp(accumulator);
+				StaticNode node = stringNodeChildren.remove(key);
+				StaticNode newNode = node.mergeUp(accumulator);
 				keyLength = accumulator.length();
 				newNode.compress();
 				stringNodeChildren = Collections.singletonMap(accumulator.toString(), newNode);
 			} else {
-				for (StringNode node : stringNodeChildren.values()) {
+				for (StaticNode node : stringNodeChildren.values()) {
 					node.compress();
 				}
 				stringNodeChildren = Collections.unmodifiableMap(stringNodeChildren);

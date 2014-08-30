@@ -1,3 +1,9 @@
+var validator = {
+	validateRouteUri: function() {
+		
+	}
+}
+
 
 var inject = function(id) {
 	return {
@@ -11,7 +17,8 @@ var inject = function(id) {
 			arrayOfNames: function() {
 				return ['static', 'script', 'stylesheet', 'document'];
 			}
-		}
+		},
+		'jj.http.uri.RouteUriValidator' : validator
 	}[id];
 }
 var valueOf = java.lang.String.valueOf;
@@ -78,7 +85,10 @@ describe("makeSetter", function() {
 			ms = makeSetter(GET, route);
 		})
 		
-		it("adds Routes to the collector in the correct key", function() {
+		it("adds valid Routes to the collector in the correct key", function() {
+			
+			spyOn(validator, 'validateRouteUri').and.returnValue('');
+			
 			var beef = "/beef";
 			var chief = "/chief";
 			ms(beef).to(chief);
@@ -90,19 +100,13 @@ describe("makeSetter", function() {
 			expect(inject.r.destination()).toEqual(valueOf(chief));
 		});
 		
-		it("validates route uris", function() {
+		it("errors on validation failure", function() {
+			
+			spyOn(validator, 'validateRouteUri').and.returnValue('nope');
 			
 			expect(function(){
 				ms("nope");
-			}).toThrow(new Error("nope is not a route uri"));
-			
-			expect(function(){
-				ms("/not with spaces");
-			}).toThrow(new Error("/not with spaces is not a route uri"));
-			
-			expect(function(){
-				ms("/nøtwîth/whatever/weird/stuff");
-			}).toThrow(new Error("/nøtwîth/whatever/weird/stuff is not a route uri"));
+			}).toThrow(new Error("nope failed validation\nnope"));
 			
 		});
 	});

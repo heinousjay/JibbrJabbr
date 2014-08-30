@@ -1,5 +1,6 @@
 var base = 'jj.http.uri.RouterConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
+var validator = inject('jj.http.uri.RouteUriValidator');
 var srh = inject('jj.http.uri.ServableResourceHelper');
 var support = require('jj/configuration-support');
 
@@ -20,8 +21,10 @@ function redirect(destination) {
 function makeSetter(method, type) {
 	return function(uri) {
 		
-		if (Route.isInvalid(uri)) {
-			throw new Error(uri + " is not a route uri");
+		var errors = validator.validateRouteUri(uri);
+		
+		if (errors != '') {
+			throw new Error(uri + " failed validation\n" + errors);
 		}
 		
 		return {

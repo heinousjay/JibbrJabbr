@@ -98,30 +98,35 @@ public class RouteTrieTest {
 	private RouteTrie makeRouteTrie() {
 		return new RouteTrie()
 		
-			.addRoute(new Route(POST,   "/this/is",                 result(0)))
-			.addRoute(new Route(DELETE, "/this/isno",               result(-100)))
-			.addRoute(new Route(PUT,    "/this/isno",               result(-200)))
-			.addRoute(new Route(GET,    "/this/isno",               result(-300)))
-			.addRoute(new Route(POST,   "/this/isno",               result(-400)))
-			.addRoute(new Route(GET,    "/this/isnot",              result(-1)))
-			.addRoute(new Route(GET,    "/this/is/the/bomb",        result(1)))
-			.addRoute(new Route(GET,    "/this/is/the/bomberman",   result(1000)))
-			.addRoute(new Route(GET,    "/this/is/the/best",        result(2)))
-			.addRoute(new Route(GET,    "/this/is/the/best-around", result(2000)))
-			.addRoute(new Route(GET,    "/this/:is/:the/best",      result(3)))
-			.addRoute(new Route(GET,    "/this/:is/:the/*end",      result(4)))
+			.addRoute(new Route(POST,   "/this/is",                     result(0)))
+			.addRoute(new Route(DELETE, "/this/isno",                   result(-100)))
+			.addRoute(new Route(PUT,    "/this/isno",                   result(-200)))
+			.addRoute(new Route(GET,    "/this/isno",                   result(-300)))
+			.addRoute(new Route(POST,   "/this/isno",                   result(-400)))
+			.addRoute(new Route(GET,    "/this/isnot",                  result(-1)))
+			.addRoute(new Route(GET,    "/this/is/the/bomb",            result(1)))
+			.addRoute(new Route(GET,    "/this/is/the/bomberman",       result(1000)))
+			.addRoute(new Route(GET,    "/this/is/the/best",            result(2)))
+			.addRoute(new Route(GET,    "/this/is/the/best-around",     result(2000)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/bomb",        result(1001)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/bomberman",   result(1002)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/best",        result(2001)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/best-around", result(2002)))
+			.addRoute(new Route(GET,    "/this/:is/:the/best",          result(3)))
+			.addRoute(new Route(GET,    "/this/:is/:the/*end",          result(4)))
 		
 		// just to validate the structure works in order,
 		// these rules would basically eat up everything but since they're at
 		// the end, they match but don't get involved
-			.addRoute(new Route(GET,    "/this/*islast-and-should-not-interfere", result(4000)))
-			.addRoute(new Route(GET,    "/this/*islast-and-also-is-not-used",     result(5000)))
+			.addRoute(new Route(GET,    "/this/*islast_and_should_not_interfere", result(4000)))
+			.addRoute(new Route(GET,    "/this/*islast_and_also_is_not_used",     result(5000)))
 		
 		// the idea here is that this should pick up ANYTHING that ends in .css and wasn't picked up by
 		// anything before this.  which implies that matching needs to ignore extensions generally?
-		// this is going to be interesting
-		// for now, since the definition gets rejected, let's circle back
-			.addRoute(new Route(GET,    "/*path", result(6000)));
+			.addRoute(new Route(GET, "/some.directory/static.:ext", result(5998)))
+			.addRoute(new Route(GET, "/some.directory/*path.css", result(5999)))
+			.addRoute(new Route(GET, "/*path.css",  result(6000)))
+			.addRoute(new Route(GET, "/*path.:ext", result(7000)));
 	}
 	
 	private void testRouteTrie(RouteTrie trie) {
@@ -149,6 +154,11 @@ public class RouteTrieTest {
 		assertThat(result.route.destination(), is(result(1)));
 		assertTrue(result.params.isEmpty());
 		
+		result = trie.find(GET, new URIMatch("/this/is/the.dir/bomb"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(1001)));
+		assertTrue(result.params.isEmpty());
+		
 		result = trie.find(GET, new URIMatch("/this/is/the/best"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(2)));
@@ -168,6 +178,45 @@ public class RouteTrieTest {
 		assertThat(result.params.get("the"), is("me"));
 		assertThat(result.params.get("end"), is("bees-knees/if-you-know/what-i-am-saying"));
 		assertThat(result.params.size(), is(3));
+		
+		result = trie.find(GET, new URIMatch("/jason.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(6000)));
+		assertThat(result.params.get("path"), is("jason"));
+		assertThat(result.params.size(), is(1));
+		
+		result = trie.find(GET, new URIMatch("/jason"));
+		assertThat(result, is(nullValue()));
+		
+		result = trie.find(GET, new URIMatch("/jason/made/this/work.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(6000)));
+		assertThat(result.params.get("path"), is("jason/made/this/work"));
+		assertThat(result.params.size(), is(1));
+		
+		result = trie.find(GET, new URIMatch("/jason/made/this/work"));
+		assertThat(result, is(nullValue()));
+		
+		result = trie.find(GET, new URIMatch("/jason/made/this/work.cs1"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(7000)));
+		assertThat(result.params.get("path"), is("jason/made/this/work"));
+		assertThat(result.params.get("ext"), is("cs1"));
+		assertThat(result.params.size(), is(2));
+		
+		result = trie.find(GET, new URIMatch("/some.directory/file.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(5999)));
+		assertThat(result.params.get("path"), is("file"));
+		assertThat(result.params.size(), is(1));
+		
+		result = trie.find(GET, new URIMatch("/some.directory/static.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(5998)));
+		assertThat(result.params.get("ext"), is("css"));
+		assertThat(result.params.size(), is(1));
+		
+		
 	}
 	
 	@Test
@@ -183,7 +232,7 @@ public class RouteTrieTest {
 		
 		trie.compress();
 		
-		//System.out.println(trie);
+		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}
