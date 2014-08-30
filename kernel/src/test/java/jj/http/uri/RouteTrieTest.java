@@ -98,18 +98,22 @@ public class RouteTrieTest {
 	private RouteTrie makeRouteTrie() {
 		return new RouteTrie()
 		
-			.addRoute(new Route(POST,   "/this/is",                 result(0)))
-			.addRoute(new Route(DELETE, "/this/isno",               result(-100)))
-			.addRoute(new Route(PUT,    "/this/isno",               result(-200)))
-			.addRoute(new Route(GET,    "/this/isno",               result(-300)))
-			.addRoute(new Route(POST,   "/this/isno",               result(-400)))
-			.addRoute(new Route(GET,    "/this/isnot",              result(-1)))
-			.addRoute(new Route(GET,    "/this/is/the/bomb",        result(1)))
-			.addRoute(new Route(GET,    "/this/is/the/bomberman",   result(1000)))
-			.addRoute(new Route(GET,    "/this/is/the/best",        result(2)))
-			.addRoute(new Route(GET,    "/this/is/the/best-around", result(2000)))
-			.addRoute(new Route(GET,    "/this/:is/:the/best",      result(3)))
-			.addRoute(new Route(GET,    "/this/:is/:the/*end",      result(4)))
+			.addRoute(new Route(POST,   "/this/is",                     result(0)))
+			.addRoute(new Route(DELETE, "/this/isno",                   result(-100)))
+			.addRoute(new Route(PUT,    "/this/isno",                   result(-200)))
+			.addRoute(new Route(GET,    "/this/isno",                   result(-300)))
+			.addRoute(new Route(POST,   "/this/isno",                   result(-400)))
+			.addRoute(new Route(GET,    "/this/isnot",                  result(-1)))
+			.addRoute(new Route(GET,    "/this/is/the/bomb",            result(1)))
+			.addRoute(new Route(GET,    "/this/is/the/bomberman",       result(1000)))
+			.addRoute(new Route(GET,    "/this/is/the/best",            result(2)))
+			.addRoute(new Route(GET,    "/this/is/the/best-around",     result(2000)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/bomb",        result(1001)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/bomberman",   result(1002)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/best",        result(2001)))
+			.addRoute(new Route(GET,    "/this/is/the.dir/best-around", result(2002)))
+			.addRoute(new Route(GET,    "/this/:is/:the/best",          result(3)))
+			.addRoute(new Route(GET,    "/this/:is/:the/*end",          result(4)))
 		
 		// just to validate the structure works in order,
 		// these rules would basically eat up everything but since they're at
@@ -148,6 +152,11 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/this/is/the/bomb"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(1)));
+		assertTrue(result.params.isEmpty());
+		
+		result = trie.find(GET, new URIMatch("/this/is/the.dir/bomb"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(1001)));
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(GET, new URIMatch("/this/is/the/best"));
@@ -223,7 +232,7 @@ public class RouteTrieTest {
 		
 		trie.compress();
 		
-		//System.out.println(trie);
+		System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}
