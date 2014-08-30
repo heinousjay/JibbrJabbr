@@ -63,10 +63,6 @@ public class Route {
 		if (uri == null) {
 			throw new NullPointerException("uri");
 		}
-		
-		if (uri.isEmpty() || isInvalid(uri)) {
-			throw new IllegalArgumentException("uri " + uri + " does not fit the correct pattern");
-		}
 //		
 		// test destination!
 		
@@ -165,7 +161,7 @@ public class Route {
 	
 	@Override
 	public int hashCode() {
-		// such a cheat
+		// such a cheat, do something better!
 		return (method + " " + uri).hashCode();
 	}
 	

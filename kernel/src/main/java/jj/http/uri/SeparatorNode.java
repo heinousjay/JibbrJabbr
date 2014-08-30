@@ -26,7 +26,7 @@ import java.util.Map.Entry;
  */
 class SeparatorNode extends TrieNode {
 	
-	Map<String, StringNode> stringNodeChildren;
+	Map<String, StaticNode> stringNodeChildren;
 	int keyLength = 1;
 	Map<String, ParamNode> paramNodeChildren;
 	
@@ -59,13 +59,13 @@ class SeparatorNode extends TrieNode {
 			}
 			nextNode.addRoute(route.advanceIndex(paramValue.length()));
 		} else {
-			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StringNode>(4) : stringNodeChildren;
+			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StaticNode>(4) : stringNodeChildren;
 			String value = String.valueOf(current);
-			StringNode nextNode = stringNodeChildren.get(value);
+			StaticNode nextNode = stringNodeChildren.get(value);
 			if (nextNode == null) {
-				nextNode = new StringNode();
+				nextNode = new StaticNode();
 				nextNode.terminal = terminal;
-				stringNodeChildren.put(value, (StringNode)nextNode);
+				stringNodeChildren.put(value, (StaticNode)nextNode);
 			}
 			nextNode.addRoute(route.advanceIndex());
 		}
@@ -108,13 +108,13 @@ class SeparatorNode extends TrieNode {
 			if (stringNodeChildren.size() == 1) {
 				String key = stringNodeChildren.keySet().iterator().next();
 				StringBuilder accumulator = new StringBuilder(key);
-				StringNode node = stringNodeChildren.remove(key);
-				StringNode newNode = node.mergeUp(accumulator);
+				StaticNode node = stringNodeChildren.remove(key);
+				StaticNode newNode = node.mergeUp(accumulator);
 				keyLength = accumulator.length();
 				newNode.compress();
 				stringNodeChildren = Collections.singletonMap(accumulator.toString(), newNode);
 			} else {
-				for (StringNode node : stringNodeChildren.values()) {
+				for (StaticNode node : stringNodeChildren.values()) {
 					node.compress();
 				}
 				stringNodeChildren = Collections.unmodifiableMap(stringNodeChildren);

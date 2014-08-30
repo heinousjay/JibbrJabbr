@@ -114,14 +114,14 @@ public class RouteTrieTest {
 		// just to validate the structure works in order,
 		// these rules would basically eat up everything but since they're at
 		// the end, they match but don't get involved
-			.addRoute(new Route(GET,    "/this/*islast-and-should-not-interfere", result(4000)))
-			.addRoute(new Route(GET,    "/this/*islast-and-also-is-not-used",     result(5000)))
+			.addRoute(new Route(GET,    "/this/*islast_and_should_not_interfere", result(4000)))
+			.addRoute(new Route(GET,    "/this/*islast_and_also_is_not_used",     result(5000)))
 		
 		// the idea here is that this should pick up ANYTHING that ends in .css and wasn't picked up by
 		// anything before this.  which implies that matching needs to ignore extensions generally?
-		// this is going to be interesting
-		// for now, since the definition gets rejected, let's circle back
-			.addRoute(new Route(GET,    "/*path.css", result(6000)));
+			.addRoute(new Route(GET, "/some.directory/*path.css", result(5999)))
+			.addRoute(new Route(GET, "/*path.css",  result(6000)))
+			.addRoute(new Route(GET, "/*path.:ext", result(7000)));
 	}
 	
 	private void testRouteTrie(RouteTrie trie) {
@@ -175,11 +175,31 @@ public class RouteTrieTest {
 		assertThat(result.params.get("path"), is("jason"));
 		assertThat(result.params.size(), is(1));
 		
-		result = trie.find(GET, new URIMatch("/jason.cs"));
-		assertThat(result, is(nullValue()));
-		
 		result = trie.find(GET, new URIMatch("/jason"));
 		assertThat(result, is(nullValue()));
+		
+		result = trie.find(GET, new URIMatch("/jason/made/this/work.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(6000)));
+		assertThat(result.params.get("path"), is("jason/made/this/work"));
+		assertThat(result.params.size(), is(1));
+		
+		result = trie.find(GET, new URIMatch("/jason/made/this/work"));
+		assertThat(result, is(nullValue()));
+		
+		result = trie.find(GET, new URIMatch("/jason/made/this/work.cs1"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(7000)));
+		assertThat(result.params.get("path"), is("jason/made/this/work"));
+		assertThat(result.params.get("ext"), is("cs1"));
+		assertThat(result.params.size(), is(2));
+		
+		result = trie.find(GET, new URIMatch("/some.directory/file.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(5999)));
+		assertThat(result.params.get("path"), is("file"));
+		assertThat(result.params.size(), is(1));
+		
 		
 	}
 	
@@ -192,11 +212,11 @@ public class RouteTrieTest {
 	public void testCompressed() {
 		RouteTrie trie = makeRouteTrie();
 
-		System.out.println(trie);
+		//System.out.println(trie);
 		
 		trie.compress();
 		
-		System.out.println(trie);
+		//System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}

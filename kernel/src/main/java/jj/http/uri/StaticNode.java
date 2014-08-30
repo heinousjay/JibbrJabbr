@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class StringNode extends TrieNode {
+class StaticNode extends TrieNode {
 	
 	Map<String, TrieNode> children;
 	int keyLength = 1;
@@ -46,18 +46,18 @@ class StringNode extends TrieNode {
 			String current = String.valueOf(route.currentChar());
 			nextNode = children.get(current);
 			if (nextNode == null) {
-				nextNode = new StringNode();
+				nextNode = new StaticNode();
 				children.put(current, nextNode);
 			}
 		}
 		nextNode.addRoute(route.advanceIndex());
 	}
 	
-	StringNode mergeUp(StringBuilder accumulator) {
+	StaticNode mergeUp(StringBuilder accumulator) {
 		if (children != null && children.size() == 1 && goal == null) {
 			String key = children.keySet().iterator().next();
 			if (!PATH_SEPARATOR_STRING.equals(key)) {
-				StringNode node = (StringNode)children.get(key);
+				StaticNode node = (StaticNode)children.get(key);
 				accumulator.append(key);
 				return node.mergeUp(accumulator);
 			}
@@ -73,7 +73,7 @@ class StringNode extends TrieNode {
 				String key = children.keySet().iterator().next();
 				if (!PATH_SEPARATOR_STRING.equals(key)) {
 					StringBuilder accumulator = new StringBuilder(key);
-					StringNode node = (StringNode)children.remove(key);
+					StaticNode node = (StaticNode)children.remove(key);
 					TrieNode newNode = node.mergeUp(accumulator);
 					keyLength = accumulator.length();
 					newNode.compress();
