@@ -15,6 +15,8 @@
  */
 package jj.http.uri;
 
+import static jj.http.uri.TrieNode.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -114,6 +116,10 @@ public class Route {
 	
 	char currentChar() {
 		return uri.charAt(index);
+	}
+	
+	boolean hasRemainingSegments() {
+		return uri.indexOf(PATH_SEPARATOR_CHAR, index) > index || uri.indexOf(EXTENSION_SEPARATOR_CHAR, index) > index ;
 	}
 	
 	int index() {

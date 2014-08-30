@@ -29,7 +29,7 @@ class StaticNode extends TrieNode {
 		TrieNode nextNode;
 		if (route.currentChar() == PATH_SEPARATOR_CHAR) {
 			if (terminal) {
-				throw new IllegalStateException("terminal!");
+				throw new AssertionError("terminal!");
 			}
 			
 			nextNode = children.get(PATH_SEPARATOR_STRING);
@@ -37,9 +37,15 @@ class StaticNode extends TrieNode {
 				nextNode = new SeparatorNode(PATH_SEPARATOR_CHAR);
 				children.put(PATH_SEPARATOR_STRING, nextNode);
 			}
-		
-		// else if next is an extension separator AND! there aren't any separator characters anywhere else in the path
-		// then we can do an extension separator here
+		} else if (route.currentChar() == EXTENSION_SEPARATOR_CHAR && !route.hasRemainingSegments()) {
+			if (terminal) {
+				throw new AssertionError("terminal!");
+			}
+			nextNode = children.get(EXTENSION_SEPARATOR_STRING);
+			if (nextNode == null) {
+				nextNode = new SeparatorNode(EXTENSION_SEPARATOR_CHAR);
+				children.put(EXTENSION_SEPARATOR_STRING, nextNode);
+			}
 			
 		} else {
 
@@ -56,7 +62,7 @@ class StaticNode extends TrieNode {
 	StaticNode mergeUp(StringBuilder accumulator) {
 		if (children != null && children.size() == 1 && goal == null) {
 			String key = children.keySet().iterator().next();
-			if (!PATH_SEPARATOR_STRING.equals(key)) {
+			if (!PATH_SEPARATOR_STRING.equals(key) && !EXTENSION_SEPARATOR_STRING.equals(key)) {
 				StaticNode node = (StaticNode)children.get(key);
 				accumulator.append(key);
 				return node.mergeUp(accumulator);
@@ -71,7 +77,7 @@ class StaticNode extends TrieNode {
 		if (children != null) {
 			if (children.size() == 1) {
 				String key = children.keySet().iterator().next();
-				if (!PATH_SEPARATOR_STRING.equals(key)) {
+				if (!PATH_SEPARATOR_STRING.equals(key) && !EXTENSION_SEPARATOR_STRING.equals(key)) {
 					StringBuilder accumulator = new StringBuilder(key);
 					StaticNode node = (StaticNode)children.remove(key);
 					TrieNode newNode = node.mergeUp(accumulator);

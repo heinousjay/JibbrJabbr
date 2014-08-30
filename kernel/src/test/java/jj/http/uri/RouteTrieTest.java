@@ -119,6 +119,7 @@ public class RouteTrieTest {
 		
 		// the idea here is that this should pick up ANYTHING that ends in .css and wasn't picked up by
 		// anything before this.  which implies that matching needs to ignore extensions generally?
+			.addRoute(new Route(GET, "/some.directory/static.:ext", result(5998)))
 			.addRoute(new Route(GET, "/some.directory/*path.css", result(5999)))
 			.addRoute(new Route(GET, "/*path.css",  result(6000)))
 			.addRoute(new Route(GET, "/*path.:ext", result(7000)));
@@ -198,6 +199,12 @@ public class RouteTrieTest {
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.destination(), is(result(5999)));
 		assertThat(result.params.get("path"), is("file"));
+		assertThat(result.params.size(), is(1));
+		
+		result = trie.find(GET, new URIMatch("/some.directory/static.css"));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route.destination(), is(result(5998)));
+		assertThat(result.params.get("ext"), is("css"));
 		assertThat(result.params.size(), is(1));
 		
 		

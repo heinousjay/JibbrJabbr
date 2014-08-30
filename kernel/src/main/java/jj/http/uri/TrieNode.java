@@ -30,6 +30,7 @@ abstract class TrieNode {
 	static final char PATH_SEPARATOR_CHAR = '/';
 	static final char EXTENSION_SEPARATOR_CHAR = '.';
 	static final String PATH_SEPARATOR_STRING = String.valueOf(PATH_SEPARATOR_CHAR);
+	static final String EXTENSION_SEPARATOR_STRING = String.valueOf(EXTENSION_SEPARATOR_CHAR);
 	static final String PARAM_CHARS = ":*";
 	
 	// this is set to true on a SeparatorNode if an exntension is found at the end of
