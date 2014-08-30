@@ -27,29 +27,20 @@ class StaticNode extends TrieNode {
 	void doAddChild(Route route) {
 		children = children == null ? new LinkedHashMap<String, TrieNode>(4, 0.75f) : children;
 		TrieNode nextNode;
-		if (route.currentChar() == PATH_SEPARATOR_CHAR) {
-			if (terminal) {
-				throw new AssertionError("terminal!");
-			}
+		char cur = route.currentChar();
+		if (cur == PATH_SEPARATOR_CHAR ||
+			(cur== EXTENSION_SEPARATOR_CHAR && !route.hasRemainingSegments())) {
+			assert !terminal : "terminal node has additional trailing nodes!";
 			
-			nextNode = children.get(PATH_SEPARATOR_STRING);
-			if (nextNode == null) {
-				nextNode = new SeparatorNode(PATH_SEPARATOR_CHAR);
-				children.put(PATH_SEPARATOR_STRING, nextNode);
-			}
-		} else if (route.currentChar() == EXTENSION_SEPARATOR_CHAR && !route.hasRemainingSegments()) {
-			if (terminal) {
-				throw new AssertionError("terminal!");
-			}
-			nextNode = children.get(EXTENSION_SEPARATOR_STRING);
-			if (nextNode == null) {
-				nextNode = new SeparatorNode(EXTENSION_SEPARATOR_CHAR);
-				children.put(EXTENSION_SEPARATOR_STRING, nextNode);
-			}
+			String key = cur == PATH_SEPARATOR_CHAR ? PATH_SEPARATOR_STRING : EXTENSION_SEPARATOR_STRING;
 			
+			nextNode = children.get(key);
+			if (nextNode == null) {
+				nextNode = new SeparatorNode(cur);
+				children.put(key, nextNode);
+			}
 		} else {
-
-			String current = String.valueOf(route.currentChar());
+			String current = String.valueOf(cur);
 			nextNode = children.get(current);
 			if (nextNode == null) {
 				nextNode = new StaticNode();
@@ -62,7 +53,7 @@ class StaticNode extends TrieNode {
 	StaticNode mergeUp(StringBuilder accumulator) {
 		if (children != null && children.size() == 1 && goal == null) {
 			String key = children.keySet().iterator().next();
-			if (!PATH_SEPARATOR_STRING.equals(key) && !EXTENSION_SEPARATOR_STRING.equals(key)) {
+			if (children.get(key) instanceof StaticNode) {
 				StaticNode node = (StaticNode)children.get(key);
 				accumulator.append(key);
 				return node.mergeUp(accumulator);
@@ -77,7 +68,7 @@ class StaticNode extends TrieNode {
 		if (children != null) {
 			if (children.size() == 1) {
 				String key = children.keySet().iterator().next();
-				if (!PATH_SEPARATOR_STRING.equals(key) && !EXTENSION_SEPARATOR_STRING.equals(key)) {
+				if (children.get(key) instanceof StaticNode) {
 					StringBuilder accumulator = new StringBuilder(key);
 					StaticNode node = (StaticNode)children.remove(key);
 					TrieNode newNode = node.mergeUp(accumulator);
