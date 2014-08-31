@@ -232,7 +232,7 @@ public class RouteTrieTest {
 		
 		trie.compress();
 		
-		System.out.println(trie);
+		//System.out.println(trie);
 		
 		testRouteTrie(trie);
 	}

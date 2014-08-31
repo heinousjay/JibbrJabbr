@@ -61,9 +61,23 @@ abstract class TrieNode {
 	
 	abstract boolean findGoal(RouteFinderContext context, String uri, int index);
 	
+	private void compressGoal() {
+		if (goal != null) {
+			
+			if (goal.size() == 1) {
+				
+				HttpMethod key = goal.keySet().iterator().next();
+				goal = Collections.singletonMap(key, goal.get(key));
+				
+			} else {
+				goal = Collections.unmodifiableMap(goal);
+			}
+		}
+	}
+	
 	void compress() {
 		doCompress();
-		goal = goal == null ? null : Collections.unmodifiableMap(goal);
+		compressGoal();
 	}
 	
 	abstract void doCompress();
