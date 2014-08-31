@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -38,13 +37,6 @@ import io.netty.handler.codec.http.HttpMethod;
  *
  */
 public class Route {
-	
-	public static boolean isInvalid(String uri) {
-		return !URI_PATTERN.matcher(uri).matches();
-	}
-	
-	private static final Pattern URI_PATTERN = 
-		Pattern.compile("^(?:/|(?:/(?:[a-zA-Z0-9.-]+|:[a-zA-Z0-9.$-]+(?:\\([^/]+?\\))?))*(?:/(?:\\*[a-zA-Z0-9.$-]+(?:\\(.+?\\))?)?)?)$");
 
 	private final HttpMethod method;
 	private final String uri;
