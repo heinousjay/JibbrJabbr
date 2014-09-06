@@ -10,15 +10,7 @@ var PUT    = Packages.io.netty.handler.codec.http.HttpMethod.PUT;
 var DELETE = Packages.io.netty.handler.codec.http.HttpMethod.DELETE;
 var Route  = Packages.jj.http.uri.Route;
 
-function route(destination) {
-	return destination;
-}
-
-function redirect(destination) {
-	return destination;
-}
-
-function makeSetter(method, type) {
+function makeSetter(method) {
 	return function(uri) {
 		
 		var errors = validator.validateRouteUri(uri);
@@ -26,15 +18,18 @@ function makeSetter(method, type) {
 		if (errors != '') {
 			throw new Error(uri + " failed validation\n" + errors);
 		}
+
+		var to = {};
+
+		srh.arrayOfNames().forEach(function(resourceName) {
+			to[resourceName] = function(mappedName) {
+				var route = new Route(method, uri, resourceName, mappedName || '');
+				collector.addConfigurationMultiElement(base + 'routes', route);
+			}
+		});
 		
 		return {
-			to: function(destination) {
-				var route = new Route(method, uri, type(destination));
-				collector.addConfigurationMultiElement(base + 'routes', route);
-			},
-			to404: function() {
-				var route = new Route(method, uri);
-			}
+			to: to
 		}
 	}
 }
@@ -42,24 +37,18 @@ function makeSetter(method, type) {
 module.exports = {
 		
 	route: {
-		get:    makeSetter(GET,    route),
-		GET:    makeSetter(GET,    route),
-		post:   makeSetter(POST,   route),
-		POST:   makeSetter(POST,   route),
-		put:    makeSetter(PUT,    route),
-		PUT:    makeSetter(PUT,    route),
-		del:    makeSetter(DELETE, route),
-		DELETE: makeSetter(DELETE, route)
+		get:    makeSetter(GET),
+		GET:    makeSetter(GET),
+		post:   makeSetter(POST),
+		POST:   makeSetter(POST),
+		put:    makeSetter(PUT),
+		PUT:    makeSetter(PUT),
+		del:    makeSetter(DELETE),
+		DELETE: makeSetter(DELETE)
 	},
 	
 	welcomeFile: support.makeStringProperty(base, 'welcomeFile')
 }
 
-srh.arrayOfNames().forEach(function(resourceName) {
-	module.exports[resourceName] = function(mappedName) {
-		return {
-			resourceName: resourceName,
-			mappedName: mappedName
-		}
-	}
-});
+
+

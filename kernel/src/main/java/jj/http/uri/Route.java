@@ -40,7 +40,8 @@ public class Route {
 
 	private final HttpMethod method;
 	private final String uri;
-	private final String destination;
+	private final String resourceName;
+	private final String mappedName;
 	
 	private int index = 1;
 	
@@ -48,7 +49,7 @@ public class Route {
 	
 	private TrieNode parent;
 	
-	public Route(final HttpMethod method, final String uri, final String destination) {
+	public Route(final HttpMethod method, final String uri, final String resourceName, final String mappedName) {
 		
 		if (method == null) {
 			throw new NullPointerException("method");
@@ -62,7 +63,8 @@ public class Route {
 		
 		this.method = method;
 		this.uri = uri;
-		this.destination = destination;
+		this.resourceName = resourceName;
+		this.mappedName = mappedName;
 	}
 	
 	//---> accessors
@@ -75,8 +77,12 @@ public class Route {
 		return uri;
 	}
 	
-	public String destination() {
-		return destination;
+	public String resourceName() {
+		return resourceName;
+	}
+	
+	public String mappedName() {
+		return mappedName;
 	}
 	
 	public Map<HttpMethod, Route> allMethods() {
@@ -165,7 +171,7 @@ public class Route {
 	
 	@Override
 	public String toString() {
-		return "route " + method + " " + uri + " to " + destination + " with params " + parameters;
+		return "route " + method + " " + uri + " to " + resourceName + " mapped as '" + mappedName + "' with params " + parameters;
 	}
 
 }

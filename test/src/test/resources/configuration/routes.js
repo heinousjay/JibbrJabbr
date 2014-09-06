@@ -8,10 +8,13 @@ globalize('jj/uri-routing-configuration', this);
 welcomeFile('root');
 
 //for example!
-route.GET('/chat/').to('/chat/list');
-route.POST('/chat/:room').to('/chat/room');
-route.PUT('/chat/:room/*secret').to('/chat/room');
-route.DELETE('/chat/:room/*secret').to('/chat/room');
+route.GET('/chat/').to.document('/chat/list');
+
+var chatRoom = '/chat/room';
+
+route.POST('/chat/:room').to.document(chatRoom);
+route.PUT('/chat/:room/*secret').to.document(chatRoom);
+route.DELETE('/chat/:room/*secret').to.document(chatRoom);
 
 /*
 // but this! is what i'm aiming at

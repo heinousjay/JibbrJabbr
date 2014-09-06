@@ -37,6 +37,8 @@ import org.junit.Test;
  */
 public class RouterTest {
 	
+	private static final String STATIC = "static";
+	
 	String welcome = "something.jpg";
 	
 	MockTaskRunner mockTaskRunner = new MockTaskRunner();
@@ -51,13 +53,13 @@ public class RouterTest {
 		@Override
 		public List<Route> routes() {
 			List<Route> result = new ArrayList<>();
-			result.add(new Route(GET, "/start", "/result1"));
-			result.add(new Route(POST, "/finish", "/result1"));
-			result.add(new Route(GET, "/chat/", "/result3"));
-			result.add(new Route(POST, "/chat/:room", "/result4"));
-			result.add(new Route(DELETE, "/chat/:room", "/result5"));
-			result.add(new Route(GET, "/chat/:room", "/result6"));
-			result.add(new Route(GET, "/chat/:room/*secret", "/result7"));
+			result.add(new Route(GET, "/start", STATIC, "/result1"));
+			result.add(new Route(POST, "/finish", STATIC, "/result1"));
+			result.add(new Route(GET, "/chat/", STATIC, "/result3"));
+			result.add(new Route(POST, "/chat/:room", STATIC, "/result4"));
+			result.add(new Route(DELETE, "/chat/:room", STATIC, "/result5"));
+			result.add(new Route(GET, "/chat/:room", STATIC, "/result6"));
+			result.add(new Route(GET, "/chat/:room/*secret", STATIC, "/result7"));
 			
 			return result;
 		}
@@ -79,17 +81,20 @@ public class RouterTest {
 
 		RouteMatch routeMatch = router.matchURI(GET, new URIMatch("/"));
 		
-		assertThat(routeMatch.route.destination(), is("/" + welcome));
+		assertThat(routeMatch.route.resourceName(), is(STATIC));
+		assertThat(routeMatch.route.mappedName(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
 		routeMatch = router.matchURI(GET, new URIMatch("/something/../../"));
 		
-		assertThat(routeMatch.route.destination(), is("/" + welcome));
+		assertThat(routeMatch.route.resourceName(), is(STATIC));
+		assertThat(routeMatch.route.mappedName(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
 		routeMatch = router.matchURI(GET, new URIMatch("../"));
 		
-		assertThat(routeMatch.route.destination(), is("/" + welcome));
+		assertThat(routeMatch.route.resourceName(), is(STATIC));
+		assertThat(routeMatch.route.mappedName(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
 		

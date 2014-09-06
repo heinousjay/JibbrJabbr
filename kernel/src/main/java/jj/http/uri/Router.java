@@ -67,11 +67,11 @@ public class Router {
 				// default routes.
 				// this is the only route we add, it is meant to be the StaticResource mapping.
 				// since it's the catch-all, it goes last and gets added to every route trie
-				newTrie.addRoute(new Route(GET, "/*path", ""));
+				newTrie.addRoute(new Route(GET, "/*path", "static", ""));
 				
 				// this is not for here - this should be handled by rewriting the incoming match
 				// to have the welcome file in it if it matches a DirectoryResource
-				newTrie.addRoute(new Route(GET, "/", "/" + configuration.welcomeFile()));
+				newTrie.addRoute(new Route(GET, "/", "static", "/" + configuration.welcomeFile()));
 				
 				newTrie.compress();
 				trie.set(newTrie);
