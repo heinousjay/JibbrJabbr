@@ -1,7 +1,7 @@
 var base = 'jj.http.uri.RouterConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
 var validator = inject('jj.http.uri.RouteUriValidator');
-var srh = inject('jj.http.uri.ServableResourceHelper');
+var resourceNames = inject('jj.http.uri.ServableResourceHelper').arrayOfNames();
 var support = require('jj/configuration-support');
 
 var GET    = Packages.io.netty.handler.codec.http.HttpMethod.GET;
@@ -21,7 +21,7 @@ function makeSetter(method) {
 
 		var to = {};
 
-		srh.arrayOfNames().forEach(function(resourceName) {
+		resourceNames.forEach(function(resourceName) {
 			to[resourceName] = function(mappedName) {
 				var route = new Route(method, uri, resourceName, mappedName || '');
 				collector.addConfigurationMultiElement(base + 'routes', route);

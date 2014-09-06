@@ -54,6 +54,8 @@ public class ServableResourceHelper {
 		this.servableResources = servableResources;
 	}
 	
+	// returns a new version every time to prevent e.g. silly extensions grabbing the object
+	// and modifying it
 	public Scriptable arrayOfNames() {
 		try (RhinoContext context = contextProvider.get()) {
 			Scriptable result = context.newArray(global, servableResources.size());
@@ -63,9 +65,5 @@ public class ServableResourceHelper {
 			}
 			return result;
 		}
-	}
-	
-	public Class<? extends ServableResource> classForName(String name) {
-		return servableResources.get(name);
 	}
 }
