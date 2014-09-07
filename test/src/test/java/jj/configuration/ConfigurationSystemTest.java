@@ -170,6 +170,6 @@ public class ConfigurationSystemTest {
 		assertThat(route.method(), is(method));
 		assertThat(route.uri(), is(uri));
 		assertThat(route.resourceName(), is(resourceName));
-		assertThat(route.mappedName(), is(mappedName));
+		assertThat(route.mapping(), is(mappedName));
 	}
 }

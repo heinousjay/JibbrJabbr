@@ -67,7 +67,7 @@ public class RouteTrieTest {
 		RouteMatch result = trie.find(GET, new URIMatch("/user/a-123456/picture"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(0)));
+		assertThat(result.route.mapping(), is(result(0)));
 		assertThat(result.params.get("id"), is("a-123456"));
 		assertThat(result.params.size(), is(1));
 		
@@ -77,7 +77,7 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/user/jason/picture"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(1)));
+		assertThat(result.route.mapping(), is(result(1)));
 		assertThat(result.params.get("name"), is("jason"));
 		assertThat(result.params.size(), is(1));
 		
@@ -87,7 +87,7 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/this/time/it/is/personal"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(3)));
+		assertThat(result.route.mapping(), is(result(3)));
 		assertThat(result.params.get("is"), is("time"));
 		assertThat(result.params.get("the"), is("it"));
 		assertThat(result.params.get("end"), is("is/personal"));
@@ -96,7 +96,7 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/this/is/not-the/best"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(2)));
+		assertThat(result.route.mapping(), is(result(2)));
 		assertThat(result.params.get("is"), is("is"));
 		assertThat(result.params.get("the"), is("not-the"));
 		assertThat(result.params.size(), is(2));
@@ -141,19 +141,19 @@ public class RouteTrieTest {
 		RouteMatch result = trie.find(POST, new URIMatch("/this/is"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(0)));
+		assertThat(result.route.mapping(), is(result(0)));
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(DELETE, new URIMatch("/this/isno"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(-100)));
+		assertThat(result.route.mapping(), is(result(-100)));
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(GET, new URIMatch("/this/isnot"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(-1)));
+		assertThat(result.route.mapping(), is(result(-1)));
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(GET, new URIMatch("/this/is"));
@@ -162,25 +162,25 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/this/is/the/bomb"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(1)));
+		assertThat(result.route.mapping(), is(result(1)));
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(GET, new URIMatch("/this/is/the.dir/bomb"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(1001)));
+		assertThat(result.route.mapping(), is(result(1001)));
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(GET, new URIMatch("/this/is/the/best"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(2)));
+		assertThat(result.route.mapping(), is(result(2)));
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(GET, new URIMatch("/this/works/the/best"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(3)));
+		assertThat(result.route.mapping(), is(result(3)));
 		assertThat(result.params.get("is"), is("works"));
 		assertThat(result.params.get("the"), is("the"));
 		assertThat(result.params.size(), is(2));
@@ -188,7 +188,7 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/this/makes/me/bees-knees/if-you-know/what-i-am-saying"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(4)));
+		assertThat(result.route.mapping(), is(result(4)));
 		assertThat(result.params.get("is"), is("makes"));
 		assertThat(result.params.get("the"), is("me"));
 		assertThat(result.params.get("end"), is("bees-knees/if-you-know/what-i-am-saying"));
@@ -197,7 +197,7 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/jason.css"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(6000)));
+		assertThat(result.route.mapping(), is(result(6000)));
 		assertThat(result.params.get("path"), is("jason"));
 		assertThat(result.params.size(), is(1));
 		
@@ -207,7 +207,7 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/jason/made/this/work.css"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(6000)));
+		assertThat(result.route.mapping(), is(result(6000)));
 		assertThat(result.params.get("path"), is("jason/made/this/work"));
 		assertThat(result.params.size(), is(1));
 		
@@ -217,7 +217,7 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/jason/made/this/work.cs1"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(STATIC));
-		assertThat(result.route.mappedName(), is(result(7000)));
+		assertThat(result.route.mapping(), is(result(7000)));
 		assertThat(result.params.get("path"), is("jason/made/this/work"));
 		assertThat(result.params.get("ext"), is("cs1"));
 		assertThat(result.params.size(), is(2));
@@ -225,14 +225,14 @@ public class RouteTrieTest {
 		result = trie.find(GET, new URIMatch("/some.directory/file.css"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(5999)));
+		assertThat(result.route.mapping(), is(result(5999)));
 		assertThat(result.params.get("path"), is("file"));
 		assertThat(result.params.size(), is(1));
 		
 		result = trie.find(GET, new URIMatch("/some.directory/static.css"));
 		assertThat(result, is(notNullValue()));
 		assertThat(result.route.resourceName(), is(DOCUMENT));
-		assertThat(result.route.mappedName(), is(result(5998)));
+		assertThat(result.route.mapping(), is(result(5998)));
 		assertThat(result.params.get("ext"), is("css"));
 		assertThat(result.params.size(), is(1));
 		
@@ -279,7 +279,7 @@ public class RouteTrieTest {
 		
 		assertThat(routeMatch.routes, is(notNullValue()));
 		assertThat(routeMatch.route.method(), is(GET));
-		assertThat(routeMatch.route.mappedName(), is(result(-300)));
+		assertThat(routeMatch.route.mapping(), is(result(-300)));
 	}
 	
 	@Test

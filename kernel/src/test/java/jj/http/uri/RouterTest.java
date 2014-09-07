@@ -82,19 +82,19 @@ public class RouterTest {
 		RouteMatch routeMatch = router.matchURI(GET, new URIMatch("/"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
-		assertThat(routeMatch.route.mappedName(), is("/" + welcome));
+		assertThat(routeMatch.route.mapping(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
 		routeMatch = router.matchURI(GET, new URIMatch("/something/../../"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
-		assertThat(routeMatch.route.mappedName(), is("/" + welcome));
+		assertThat(routeMatch.route.mapping(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
 		routeMatch = router.matchURI(GET, new URIMatch("../"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
-		assertThat(routeMatch.route.mappedName(), is("/" + welcome));
+		assertThat(routeMatch.route.mapping(), is("/" + welcome));
 		assertTrue(routeMatch.params.isEmpty());
 		
 		

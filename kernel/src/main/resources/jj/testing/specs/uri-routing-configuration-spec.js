@@ -98,7 +98,7 @@ describe("makeSetter", function() {
 			expect(inject.r.method()).toEqual(GET);
 			expect(inject.r.uri()).toEqual(valueOf(beef));
 			expect(inject.r.resourceName()).toEqual(valueOf('document'));
-			expect(inject.r.mappedName()).toEqual(valueOf(chief));
+			expect(inject.r.mapping()).toEqual(valueOf(chief));
 		});
 		
 		it("errors on validation failure", function() {
