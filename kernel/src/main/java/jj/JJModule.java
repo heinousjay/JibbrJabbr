@@ -22,6 +22,8 @@ import jj.configuration.resolution.AssetPaths;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
+import jj.http.server.ServableResource;
+import jj.http.server.ServableResourceBindingProcessor;
 import jj.http.server.methods.HttpMethodHandlerBinder;
 import jj.http.server.websocket.WebSocketConnectionHostBinder;
 import jj.logging.LoggingBinder;
@@ -98,7 +100,8 @@ public abstract class JJModule extends AbstractModule {
 	
 	protected ResourceBinder bindCreation() {
 		if (resources == null) {
-			resources = new ResourceBinder(binder());
+			resources = new ResourceBinder(binder())
+				.addResourceBindingProcessor(ServableResource.class, new ServableResourceBindingProcessor(binder()));
 		}
 		return resources;
 	}
