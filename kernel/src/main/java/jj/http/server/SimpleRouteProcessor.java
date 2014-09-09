@@ -17,10 +17,14 @@ package jj.http.server;
 
 import static jj.configuration.resolution.AppLocation.Base;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.netty.handler.codec.http.HttpHeaders;
+import jj.http.uri.Route;
+import jj.http.uri.RouteProcessor;
 import jj.http.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
@@ -30,21 +34,27 @@ import jj.resource.ServableResource;
  * <p>
  * Handles basic serving of resources that don't require dealing with
  * route mappings. This only reads the path from the URI match to determine
- * which resource to use.  The Route is ignored
+ * which resource to use.  The Route mapping is ignored
  * 
  * @author jason
  *
  */
 @Singleton
-public class SimpleResourceServer implements ResourceServer {
+public class SimpleRouteProcessor implements RouteProcessor {
 	
 	private final ResourceFinder resourceFinder;
 	private final ResourceLoader resourceLoader;
+	private final Map<String, Class<? extends ServableResource>> servableResources;
 	
 	@Inject
-	SimpleResourceServer(final ResourceFinder resourceFinder, final ResourceLoader resourceLoader) {
+	SimpleRouteProcessor(
+		final ResourceFinder resourceFinder,
+		final ResourceLoader resourceLoader,
+		final Map<String, Class<? extends ServableResource>> servableResources
+	) {
 		this.resourceFinder = resourceFinder;
 		this.resourceLoader = resourceLoader;
+		this.servableResources = servableResources;
 	}
 	
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
@@ -52,7 +62,11 @@ public class SimpleResourceServer implements ResourceServer {
 	}
 
 	@Override
-	public void serve(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request, final HttpServerResponse response) {
+	public void process(final Route route, final HttpServerRequest request, final HttpServerResponse response) {
+		
+		Class<? extends ServableResource> resourceClass = servableResources.get(route.resourceName());
+		
+		assert resourceClass != null : "configured a route processor incorrectly";
 		
 		// need to get the resource name from the route match
 		// for now using the path!

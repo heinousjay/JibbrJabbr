@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server;
+package jj.http.uri;
 
-import jj.resource.ServableResource;
+import jj.http.server.HttpServerRequest;
+import jj.http.server.HttpServerResponse;
 
 /**
- * An object that can serve a {@link ServableResource} given an
- * {@link HttpServerRequest} and {@link HttpServerResponse}
+ * <p>
+ * Bridges a routed request into whatever will process it
+ * 
  * @author jason
  *
  */
-public interface ResourceServer {
-	
-	void serve(Class<? extends ServableResource> resourceType, HttpServerRequest request, HttpServerResponse response);
+public interface RouteProcessor {
 
+	void process(Route route, HttpServerRequest request, HttpServerResponse response);
 }

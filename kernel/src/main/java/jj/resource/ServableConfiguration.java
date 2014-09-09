@@ -21,8 +21,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import jj.http.server.ResourceServer;
-import jj.http.server.SimpleResourceServer;
+import jj.http.server.SimpleRouteProcessor;
+import jj.http.uri.RouteProcessor;
 
 /**
  * @author jason
@@ -47,5 +47,5 @@ public @interface ServableConfiguration {
 	 * Defaults to {@link SimpleResourceServer} 
 	 * @return
 	 */
-	Class<? extends ResourceServer> processor() default SimpleResourceServer.class;
+	Class<? extends RouteProcessor> processor() default SimpleRouteProcessor.class;
 }

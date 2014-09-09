@@ -18,21 +18,25 @@ package jj.http.server;
 import static jj.configuration.resolution.AppLocation.Base;
 import static org.mockito.BDDMockito.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.netty.handler.codec.http.HttpHeaders;
 import jj.execution.JJTask;
 import jj.execution.Promise;
 import jj.execution.TaskHelper;
+import jj.http.uri.Route;
 import jj.http.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
 import jj.resource.ServableResource;
+import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -41,8 +45,9 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SimpleResourceServerTest {
+public class SimpleRouteProcessorTest {
 	
+	static final String STATIC = "static";
 	static final String SHA1 = "1234567890123456789012345678901234567890";
 	static final String ZERO_TXT = "0.txt";
 	static final String UNVERSIONED_URI = "/" + ZERO_TXT;
@@ -52,10 +57,12 @@ public class SimpleResourceServerTest {
 	
 	@Mock ResourceFinder resourceFinder;
 	@Mock ResourceLoader resourceLoader;
+	Map<String, Class<? extends ServableResource>> servableResources;
 	
-	@InjectMocks SimpleResourceServer srs;
-
-	@Mock ServableResource resource;
+	SimpleRouteProcessor srs;
+	
+	@Mock Route route;
+	@Mock StaticResource resource;
 	@Mock HttpServerRequest request;
 	@Mock HttpServerResponse response;
 	
@@ -65,17 +72,25 @@ public class SimpleResourceServerTest {
 	
 	@Before
 	public void before() {
+		
+		servableResources = new HashMap<>();
+		servableResources.put(STATIC, StaticResource.class);
+		
+		given(route.resourceName()).willReturn(STATIC);
+		
 		given(request.uriMatch()).willReturn(new URIMatch("/hi/there"));
 		
 		given(resourceLoader.loadResource(any(), any(), anyString())).willReturn(promise);
 		
 		given(resource.sha1()).willReturn(SHA1);
+		
+		srs = new SimpleRouteProcessor(resourceFinder, resourceLoader, servableResources);
 	}
 	
 	@Test
 	public void testNotFound() throws Exception {
 		
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		
 		verify(promise).then(taskCaptor.capture());
 		
@@ -88,13 +103,13 @@ public class SimpleResourceServerTest {
 		URIMatch match = new URIMatch(uri);
 		
 		given(request.uriMatch()).willReturn(match);
-		given(resourceFinder.findResource(ServableResource.class, Base, match.path)).willReturn(resource);
+		given(resourceFinder.findResource(StaticResource.class, Base, match.path)).willReturn(resource);
 	}
 	
 	@Test
 	public void testLoadedResource() throws Exception {
 		
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		verify(promise).then(taskCaptor.capture());
 		
 		givenResourceRequest(UNVERSIONED_URI);
@@ -109,7 +124,7 @@ public class SimpleResourceServerTest {
 		
 		givenResourceRequest(UNVERSIONED_URI);
 		
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		
 		verify(response).sendUncachableResource(resource);
 	}
@@ -119,7 +134,7 @@ public class SimpleResourceServerTest {
 		
 		givenResourceRequest(VERSIONED_URI);
 		
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		
 		verify(response).sendCachableResource(resource);
 	}
@@ -132,7 +147,7 @@ public class SimpleResourceServerTest {
 		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		
 		verify(response).sendNotModified(resource, true);
 	}
@@ -145,7 +160,7 @@ public class SimpleResourceServerTest {
 		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		
 		verify(response).sendNotModified(resource, false);
 	}
@@ -157,7 +172,7 @@ public class SimpleResourceServerTest {
 		
 		given(resource.sha1()).willReturn("some other sha1");
 
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		
 		verify(response).sendTemporaryRedirect(resource);
 	}
@@ -173,7 +188,7 @@ public class SimpleResourceServerTest {
 		
 		given(response.sendTemporaryRedirect(resource)).willThrow(toThrow);
 
-		srs.serve(ServableResource.class, request, response);
+		srs.process(route, request, response);
 		
 		verify(response).error(toThrow);
 	}

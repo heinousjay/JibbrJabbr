@@ -15,8 +15,8 @@
  */
 package jj.resource;
 
-import jj.http.server.ResourceServer;
-import jj.http.server.SimpleResourceServer;
+import jj.http.server.SimpleRouteProcessor;
+import jj.http.uri.RouteProcessor;
 import jj.util.StringUtils;
 
 import com.google.inject.Binder;
@@ -34,7 +34,7 @@ public class ResourceBinder {
 	
 	private final MapBinder<String, Class<? extends ServableResource>> servableResourceBinder;
 	
-	private final MapBinder<Class<? extends ServableResource>, ResourceServer> resourceServerBinder;
+	private final MapBinder<Class<? extends ServableResource>, RouteProcessor> resourceServerBinder;
 	
 	public ResourceBinder(final Binder binder) {
 		resourceCreatorBinder = MapBinder.newMapBinder(
@@ -52,7 +52,7 @@ public class ResourceBinder {
 		resourceServerBinder = MapBinder.newMapBinder(
 			binder,
 			new TypeLiteral<Class<? extends ServableResource>>() {},
-			new TypeLiteral<ResourceServer>() {}
+			new TypeLiteral<RouteProcessor>() {}
 		);
 	}
 	
@@ -62,7 +62,7 @@ public class ResourceBinder {
 		if (ServableResource.class.isAssignableFrom(key)) {
 			
 			String name = null;
-			Class<? extends ResourceServer> resourceServerClass = SimpleResourceServer.class;
+			Class<? extends RouteProcessor> resourceServerClass = SimpleRouteProcessor.class;
 			
 			ServableConfiguration config = key.getAnnotation(ServableConfiguration.class);
 			if (config != null) {
