@@ -20,7 +20,7 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import jj.resource.ServableResource;
+import jj.http.server.ServableResource;
 
 /**
  * Used for a {@link ServableResource} that contributes no {@link Route)s

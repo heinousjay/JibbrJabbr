@@ -17,7 +17,7 @@ package jj.http.server.uri;
 
 import java.util.List;
 
-import jj.resource.ServableConfiguration;
+import jj.http.server.ServableConfiguration;
 
 /**
  * Implement to contribute {@link Route}s to the routing system

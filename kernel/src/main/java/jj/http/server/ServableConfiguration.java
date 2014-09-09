@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.http.server;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -21,7 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import jj.http.server.SimpleRouteProcessor;
 import jj.http.server.uri.EmptyRouteContributor;
 import jj.http.server.uri.RouteContributor;
 import jj.http.server.uri.RouteProcessor;

@@ -31,7 +31,6 @@ import jj.http.server.websocket.WebSocketFrameHandlerCreator;
 import jj.http.server.websocket.WebSocketRequestChecker;
 import jj.logging.Emergency;
 import jj.resource.ResourceTask;
-import jj.resource.ServableResource;
 
 /**
  * Reads incoming http messages and looks for ways to respond

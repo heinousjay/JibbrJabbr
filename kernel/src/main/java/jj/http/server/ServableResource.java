@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.http.server;
+
+import jj.resource.Resource;
 
 /**
  * <p>

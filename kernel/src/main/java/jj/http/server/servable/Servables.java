@@ -23,8 +23,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.server.ServableResource;
 import jj.http.server.uri.URIMatch;
-import jj.resource.ServableResource;
 
 /**
  * @author jason

@@ -21,9 +21,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.resource.ServableResource;
 import jj.script.Global;
 import jj.script.RhinoContext;
+
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 

@@ -22,10 +22,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
+import jj.http.server.ServableResource;
 import jj.http.server.uri.URIMatch;
 import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
-import jj.resource.ServableResource;
 import jj.resource.stat.ic.StaticResource;
 
 /**

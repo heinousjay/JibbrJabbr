@@ -22,10 +22,10 @@ import java.io.IOException;
 
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.ServableResource;
 import jj.http.server.uri.URIMatch;
 import jj.resource.FileResource;
 import jj.resource.ResourceThread;
-import jj.resource.ServableResource;
 
 import org.junit.Before;
 import org.junit.Test;

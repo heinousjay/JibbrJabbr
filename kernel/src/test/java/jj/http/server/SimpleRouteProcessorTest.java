@@ -29,7 +29,6 @@ import jj.http.server.uri.Route;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
-import jj.resource.ServableResource;
 import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;

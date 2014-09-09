@@ -28,7 +28,6 @@ import jj.http.server.uri.RouteProcessor;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
-import jj.resource.ServableResource;
 
 /**
  * <p>

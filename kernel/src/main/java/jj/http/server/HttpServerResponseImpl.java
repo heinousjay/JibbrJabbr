@@ -28,9 +28,7 @@ import javax.inject.Singleton;
 
 import jj.Version;
 import jj.event.Publisher;
-import jj.resource.LoadedResource;
 import jj.resource.Resource;
-import jj.resource.TransferableResource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;

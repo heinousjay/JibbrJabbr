@@ -1,7 +1,7 @@
 package jj.http.server.servable;
 
 import jj.JJModule;
-import jj.resource.ServableResource;
+import jj.http.server.ServableResource;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;

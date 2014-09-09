@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.http.server;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
+import io.netty.buffer.ByteBuf;
+
 
 /**
- * Optional interface a resource can implement to indicate that
- * it can be transferred from the file system directly to a
- * network socket.
- * 
  * @author jason
  *
  */
-public interface TransferableResource extends FileResource, ServableResource {
+public interface LoadedResource extends ServableResource {
 	
-	FileChannel fileChannel() throws IOException;
-
-	RandomAccessFile randomAccessFile() throws IOException;
+	ByteBuf bytes();
+	
+	long size();
 }

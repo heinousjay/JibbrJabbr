@@ -22,10 +22,10 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 
+import jj.http.server.TransferableResource;
 import jj.resource.AbstractFileResource;
 import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
-import jj.resource.TransferableResource;
 
 /**
  * @author jason

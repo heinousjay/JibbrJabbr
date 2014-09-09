@@ -15,6 +15,8 @@
  */
 package jj.resource;
 
+import jj.http.server.ServableConfiguration;
+import jj.http.server.ServableResource;
 import jj.http.server.SimpleRouteProcessor;
 import jj.http.server.uri.RouteProcessor;
 import jj.util.StringUtils;
