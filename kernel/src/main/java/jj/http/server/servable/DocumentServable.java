@@ -18,7 +18,7 @@ import jj.resource.stat.ic.StaticResource;
 import jj.util.StringUtils;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 
 @Singleton
 class DocumentServable extends Servable<DocumentScriptEnvironment> {

@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.uri;
+package jj.http.server.uri;
 
 import java.util.List;
 
-import jj.resource.ServableConfiguration;
+import jj.configuration.Default;
 
 /**
- * Implement to contribute {@link Route}s to the routing system
- * and configure the type name in the {@link ServableConfiguration}
- * 
  * @author jason
  *
  */
-public interface RouteContributor {
+public interface RouterConfiguration {
+	
+	@Default("index")
+	String welcomeFile();
 
-	List<Route> contribute();
+	List<Route> routes();
 }

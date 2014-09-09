@@ -9,7 +9,7 @@ import jj.configuration.resolution.AppLocation;
 import jj.css.StylesheetResource;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 
 // TODO! move this to the css package

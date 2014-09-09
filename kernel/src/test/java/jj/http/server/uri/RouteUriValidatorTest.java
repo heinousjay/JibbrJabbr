@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.uri;
+package jj.http.server.uri;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import jj.http.server.uri.RouteUriValidator;
 
 import org.junit.Test;
 

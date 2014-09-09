@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.http.server.uri;
+
+import jj.JJModule;
+
 /**
- * <p>
- * implements the routing system.
- * 
- * <p>
- * during system configuration ({@link jj.configuration}):
- * <pre class="brush:js">
- * let { 
- *   route: route,
- *   redirect: redirect,
- *   welcomeFile: welcomeFile
- * } = require('uri-routing-configuration');
- * 
- * welcomeFile('index');
- * 
- * route.GET('/chat/').to('/chat/lobby');
- * route.GET('/chat/room/*name').to('/chat/room');
- * route.POST('/chat/upload').to('/chat/room');
- * </pre>
- * 
  * @author jason
- * 
+ *
  */
-package jj.http.uri;
+public class URIModule extends JJModule {
+
+
+	@Override
+	protected void configure() {
+		
+		addAPIModulePath("/jj/http/server/uri/api");
+		
+		bindConfiguration().to(RouterConfiguration.class);
+	}
+
+}

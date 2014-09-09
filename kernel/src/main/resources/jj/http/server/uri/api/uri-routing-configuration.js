@@ -1,14 +1,14 @@
-var base = 'jj.http.uri.RouterConfiguration.';
+var base = 'jj.http.server.uri.RouterConfiguration.';
 var collector = inject('jj.configuration.ConfigurationCollector');
-var validator = inject('jj.http.uri.RouteUriValidator');
-var resourceNames = inject('jj.http.uri.ServableResourceHelper').arrayOfNames();
+var validator = inject('jj.http.server.uri.RouteUriValidator');
+var resourceNames = inject('jj.http.server.ServableResourceHelper').arrayOfNames();
 var support = require('jj/configuration-support');
 
 var GET    = Packages.io.netty.handler.codec.http.HttpMethod.GET;
 var POST   = Packages.io.netty.handler.codec.http.HttpMethod.POST;
 var PUT    = Packages.io.netty.handler.codec.http.HttpMethod.PUT;
 var DELETE = Packages.io.netty.handler.codec.http.HttpMethod.DELETE;
-var Route  = Packages.jj.http.uri.Route;
+var Route  = Packages.jj.http.server.uri.Route;
 
 function makeSetter(method) {
 	return function(uri) {

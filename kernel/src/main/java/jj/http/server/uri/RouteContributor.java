@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.uri;
+package jj.http.server.uri;
 
-import io.netty.handler.codec.http.HttpMethod;
+import java.util.List;
 
-import java.util.Map;
+import jj.resource.ServableConfiguration;
 
-public class RouteMatch {
-	
-	public final Route route;
-	public final Map<HttpMethod, Route> routes;
-	public final Map<String, String> params;
-	
-	RouteMatch(final HttpMethod method, final Map<HttpMethod, Route> routes, final Map<String, String> params) {
-		this.route = routes.get(method);
-		this.routes = routes;
-		this.params = params;
-	}
+/**
+ * Implement to contribute {@link Route}s to the routing system
+ * and configure the type name in the {@link ServableConfiguration}
+ * 
+ * @author jason
+ *
+ */
+public interface RouteContributor {
+
+	List<Route> contribute();
 }

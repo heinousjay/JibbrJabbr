@@ -37,7 +37,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 
 /**

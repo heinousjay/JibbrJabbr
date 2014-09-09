@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.uri;
+package jj.http.server.uri;
 
+import java.util.Collections;
 import java.util.List;
 
-import jj.configuration.Default;
+import javax.inject.Singleton;
+
+import jj.resource.ServableResource;
 
 /**
+ * Used for a {@link ServableResource} that contributes no {@link Route)s
  * @author jason
  *
  */
-public interface RouterConfiguration {
-	
-	@Default("index")
-	String welcomeFile();
+@Singleton
+public class EmptyRouteContributor implements RouteContributor {
 
-	List<Route> routes();
+	@Override
+	public List<Route> contribute() {
+		return Collections.emptyList();
+	}
+
 }

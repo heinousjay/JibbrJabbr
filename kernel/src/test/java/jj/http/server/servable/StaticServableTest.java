@@ -23,7 +23,7 @@ import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.*;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.stat.ic.StaticResource;
 

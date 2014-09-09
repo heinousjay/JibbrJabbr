@@ -23,8 +23,8 @@ import javax.inject.Inject;
 
 import com.google.inject.Provider;
 
-import jj.http.uri.Router;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.Router;
+import jj.http.server.uri.URIMatch;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;

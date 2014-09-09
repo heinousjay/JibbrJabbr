@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.uri;
+package jj.http.server.uri;
 
-import static jj.http.uri.TrieNode.*;
+import static jj.http.server.uri.TrieNode.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

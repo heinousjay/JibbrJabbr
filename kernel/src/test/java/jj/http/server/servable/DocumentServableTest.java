@@ -24,7 +24,7 @@ import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;

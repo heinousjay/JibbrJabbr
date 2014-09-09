@@ -16,7 +16,7 @@
 package jj.resource;
 
 import jj.http.server.SimpleRouteProcessor;
-import jj.http.uri.RouteProcessor;
+import jj.http.server.uri.RouteProcessor;
 import jj.util.StringUtils;
 
 import com.google.inject.Binder;

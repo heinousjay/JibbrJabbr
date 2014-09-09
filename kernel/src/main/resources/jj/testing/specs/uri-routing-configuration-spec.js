@@ -13,12 +13,12 @@ var inject = function(id) {
 				inject.r = r;
 			}
 		},
-		'jj.http.uri.ServableResourceHelper' : {
+		'jj.http.server.uri.ServableResourceHelper' : {
 			arrayOfNames: function() {
 				return ['static', 'script', 'stylesheet', 'document'];
 			}
 		},
-		'jj.http.uri.RouteUriValidator' : validator
+		'jj.http.server.uri.RouteUriValidator' : validator
 	}[id];
 }
 var valueOf = java.lang.String.valueOf;

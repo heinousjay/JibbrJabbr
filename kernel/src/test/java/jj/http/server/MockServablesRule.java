@@ -23,7 +23,7 @@ import java.util.List;
 import jj.css.StylesheetResource;
 import jj.http.server.servable.Servable;
 import jj.http.server.servable.Servables;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ServableResource;
 import jj.resource.stat.ic.StaticResource;
 

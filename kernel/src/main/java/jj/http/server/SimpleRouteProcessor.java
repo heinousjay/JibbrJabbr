@@ -23,9 +23,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.netty.handler.codec.http.HttpHeaders;
-import jj.http.uri.Route;
-import jj.http.uri.RouteProcessor;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.Route;
+import jj.http.server.uri.RouteProcessor;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
 import jj.resource.ServableResource;

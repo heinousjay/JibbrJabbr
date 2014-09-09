@@ -27,7 +27,7 @@ import jj.Version;
 import jj.event.Publisher;
 import jj.http.server.HttpServerRequestImpl;
 import jj.http.server.HttpServerResponseImpl;
-import jj.http.uri.RouteFinder;
+import jj.http.server.uri.RouteFinder;
 import jj.logging.LoggedEvent;
 import jj.resource.LoadedResource;
 import jj.resource.Resource;
