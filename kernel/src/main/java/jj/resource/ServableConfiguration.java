@@ -22,6 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import jj.http.server.SimpleRouteProcessor;
+import jj.http.uri.EmptyRouteContributor;
+import jj.http.uri.RouteContributor;
 import jj.http.uri.RouteProcessor;
 
 /**
@@ -48,4 +50,11 @@ public @interface ServableConfiguration {
 	 * @return
 	 */
 	Class<? extends RouteProcessor> processor() default SimpleRouteProcessor.class;
+	
+	/**
+	 * The {@link RouteContributor} implementation that will add {@link Route}s to the
+	 * routing system
+	 * @return
+	 */
+	Class<? extends RouteContributor> routeContributor() default EmptyRouteContributor.class;
 }
