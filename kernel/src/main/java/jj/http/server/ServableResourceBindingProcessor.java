@@ -18,6 +18,7 @@ package jj.http.server;
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 
 import jj.resource.Resource;
 import jj.resource.ResourceBindingProcessor;
@@ -31,7 +32,9 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 	
 	private final MapBinder<String, Class<? extends ServableResource>> servableResourceBinder;
 	
-	private final MapBinder<Class<? extends ServableResource>, RouteProcessor> resourceServerBinder;
+	private final MapBinder<String, RouteProcessor> routeProcessorBinder;
+	
+	private final Multibinder<RouteContributor> routeContributorBinder;
 	
 	public ServableResourceBindingProcessor(Binder binder) {
 		servableResourceBinder = MapBinder.newMapBinder(
@@ -40,11 +43,9 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 			new TypeLiteral<Class<? extends ServableResource>>() {}
 		);
 		
-		resourceServerBinder = MapBinder.newMapBinder(
-			binder,
-			new TypeLiteral<Class<? extends ServableResource>>() {},
-			new TypeLiteral<RouteProcessor>() {}
-		);
+		routeProcessorBinder = MapBinder.newMapBinder(binder, String.class, RouteProcessor.class);
+		
+		routeContributorBinder = Multibinder.newSetBinder(binder, RouteContributor.class);
 	}
 
 	@Override
@@ -56,12 +57,14 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 		Class<? extends ServableResource> resourceClassBinding = (Class<? extends ServableResource>)binding;
 		
 		String name = null;
-		Class<? extends RouteProcessor> resourceServerClass = SimpleRouteProcessor.class;
+		Class<? extends RouteProcessor> routeProcessorClass = SimpleRouteProcessor.class;
+		Class<? extends RouteContributor> routeContributorClass = EmptyRouteContributor.class;
 		
 		ServableResourceConfiguration config = resourceClassBinding.getAnnotation(ServableResourceConfiguration.class);
 		if (config != null) {
 			name = config.name();
-			resourceServerClass = config.processor();
+			routeProcessorClass = config.processor();
+			routeContributorClass = config.routeContributor();
 		}
 		
 		if (StringUtils.isEmpty(name)) {
@@ -75,7 +78,11 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 		}
 		
 		servableResourceBinder.addBinding(name).toInstance(resourceClassBinding);
-		resourceServerBinder.addBinding(resourceClassBinding).to(resourceServerClass);
+		routeProcessorBinder.addBinding(name).to(routeProcessorClass);
+		
+		if (routeContributorClass != EmptyRouteContributor.class) {
+			routeContributorBinder.addBinding().to(routeContributorClass);
+		}
 	}
 
 }
