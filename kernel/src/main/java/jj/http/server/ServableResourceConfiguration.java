@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ServableConfiguration {
+public @interface ServableResourceConfiguration {
 
 	/**
 	 * The name by which this resource is exposed for routing. By default, will use

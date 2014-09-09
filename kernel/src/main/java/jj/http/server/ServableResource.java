@@ -25,12 +25,14 @@ import jj.resource.Resource;
  * which is totally allowed
  * 
  * <p>
- * Resource classes that implement this interface must be annotated
- * with {@link PathPattern}
+ * Resource classes that implement this interface can be annotated
+ * with {@link ServableResourceConfiguration} to provide configuration, although
+ * there are reasonable defaults
  * @author jason
  *
  */
 public interface ServableResource extends Resource {
+
 
 	String serverPath();
 	

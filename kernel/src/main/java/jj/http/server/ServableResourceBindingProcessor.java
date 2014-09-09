@@ -58,7 +58,7 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 		String name = null;
 		Class<? extends RouteProcessor> resourceServerClass = SimpleRouteProcessor.class;
 		
-		ServableConfiguration config = resourceClassBinding.getAnnotation(ServableConfiguration.class);
+		ServableResourceConfiguration config = resourceClassBinding.getAnnotation(ServableResourceConfiguration.class);
 		if (config != null) {
 			name = config.name();
 			resourceServerClass = config.processor();

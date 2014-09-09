@@ -21,7 +21,7 @@ import jj.http.server.uri.Route;
 
 /**
  * Implement to contribute {@link Route}s to the routing system
- * and configure the type name in the {@link ServableConfiguration}
+ * and configure the type name in the {@link ServableResourceConfiguration}
  * 
  * @author jason
  *

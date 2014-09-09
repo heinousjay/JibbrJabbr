@@ -30,7 +30,7 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.configuration.resolution.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
-import jj.http.server.ServableConfiguration;
+import jj.http.server.ServableResourceConfiguration;
 import jj.http.server.ServableResource;
 import jj.http.server.websocket.AbstractWebSocketConnectionHost;
 import jj.http.server.websocket.ConnectionBroadcastStack;
@@ -56,7 +56,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@ServableConfiguration(name = "document")
+@ServableResourceConfiguration(name = "document")
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
 	implements CurrentResourceAware, RootScriptEnvironment, ServableResource {
