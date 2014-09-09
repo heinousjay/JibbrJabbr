@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server.uri;
+package jj.http.server;
 
-import jj.http.server.HttpServerRequest;
-import jj.http.server.HttpServerResponse;
+import java.util.List;
+
+import jj.http.server.uri.Route;
 
 /**
- * <p>
- * Bridges a routed request into whatever will process it
+ * Implement to contribute {@link Route}s to the routing system
+ * and configure the type name in the {@link ServableConfiguration}
  * 
  * @author jason
  *
  */
-public interface RouteProcessor {
+public interface RouteContributor {
 
-	void process(Route route, HttpServerRequest request, HttpServerResponse response);
+	List<Route> contribute();
 }

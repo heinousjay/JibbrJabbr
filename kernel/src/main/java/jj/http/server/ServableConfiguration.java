@@ -21,10 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import jj.http.server.uri.EmptyRouteContributor;
-import jj.http.server.uri.RouteContributor;
-import jj.http.server.uri.RouteProcessor;
-
 /**
  * @author jason
  *

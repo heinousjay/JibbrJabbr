@@ -20,7 +20,9 @@ import jj.resource.Resource;
 /**
  * <p>
  * A resource that the server can send to a client. LoadedResource
- * and TransferableResource
+ * and TransferableResource are the best place to implement this,
+ * unless your RouteProcessor handles the transfer to the response,
+ * which is totally allowed
  * 
  * <p>
  * Resource classes that implement this interface must be annotated

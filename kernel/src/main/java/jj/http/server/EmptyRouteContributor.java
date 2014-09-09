@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server.uri;
+package jj.http.server;
 
+import java.util.Collections;
 import java.util.List;
 
-import jj.http.server.ServableConfiguration;
+import javax.inject.Singleton;
+
+import jj.http.server.uri.Route;
 
 /**
- * Implement to contribute {@link Route}s to the routing system
- * and configure the type name in the {@link ServableConfiguration}
- * 
+ * Used for a {@link ServableResource} that contributes no {@link Route)s
  * @author jason
  *
  */
-public interface RouteContributor {
+@Singleton
+public class EmptyRouteContributor implements RouteContributor {
 
-	List<Route> contribute();
+	@Override
+	public List<Route> contribute() {
+		return Collections.emptyList();
+	}
+
 }
