@@ -35,6 +35,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import jj.http.server.LoadedResource;
+import jj.http.server.ServableResourceConfiguration;
 import jj.resource.AbstractResource;
 import jj.resource.NoSuchResourceException;
 import jj.resource.PathResolver;
@@ -54,6 +55,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
+@ServableResourceConfiguration(routeContributor = StylesheetResourceRouteContributor.class)
 public class StylesheetResource extends AbstractResource implements LoadedResource {
 
 	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";
