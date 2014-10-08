@@ -31,7 +31,7 @@ import jj.http.server.uri.Route;
 public class EmptyRouteContributor implements RouteContributor {
 
 	@Override
-	public List<Route> contribute() {
+	public List<Route> contributions() {
 		return Collections.emptyList();
 	}
 

@@ -34,7 +34,7 @@ import jj.http.server.uri.Route;
 class StylesheetResourceRouteContributor implements RouteContributor {
 
 	@Override
-	public List<Route> contribute() {
+	public List<Route> contributions() {
 		return Collections.singletonList(new Route(HttpMethod.GET, "/*path.css", "stylesheet", ""));
 	}
 }

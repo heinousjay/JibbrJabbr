@@ -16,9 +16,9 @@
 package jj.http.server.uri;
 
 import static io.netty.handler.codec.http.HttpMethod.*;
-
 import io.netty.handler.codec.http.HttpMethod;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -29,6 +29,7 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
+import jj.http.server.RouteContributor;
 
 /**
  * The public interface to the routing system.  mainly just mediates
@@ -42,15 +43,18 @@ import jj.execution.TaskRunner;
 public class Router {
 
 	private final RouterConfiguration configuration;
+	private final Set<RouteContributor> routeContributors;
 	private final TaskRunner taskRunner;
 	private final AtomicReference<RouteTrie> trie = new AtomicReference<>();
 	
 	@Inject
 	Router(
 		final RouterConfiguration configuration,
+		final Set<RouteContributor> routeContributors,
 		final TaskRunner taskRunner
 	) {
 		this.configuration = configuration;
+		this.routeContributors = routeContributors;
 		this.taskRunner = taskRunner;
 	}
 	
@@ -64,16 +68,14 @@ public class Router {
 				// java 8 rocks!
 				configuration.routes().forEach(newTrie::addRoute);
 				
-				// default routes.
-				// this is the only route we add, it is meant to be the StaticResource mapping.
+				routeContributors.forEach((contributor) -> contributor.contributions().forEach(newTrie::addRoute));
+			
+				// this is the only default route we add, it is meant to be the StaticResource mapping.
 				// since it's the catch-all, it goes last and gets added to every route trie
 				newTrie.addRoute(new Route(GET, "/*path", "static", ""));
 				
-				// this is not for here - this should be handled by rewriting the incoming match
-				// to have the welcome file in it if it matches a DirectoryResource
-				newTrie.addRoute(new Route(GET, "/", "static", "/" + configuration.welcomeFile()));
-				
 				newTrie.compress();
+				
 				trie.set(newTrie);
 			}
 		});

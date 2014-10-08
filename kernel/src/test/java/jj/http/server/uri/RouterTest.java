@@ -20,9 +20,14 @@ import static org.junit.Assert.*;
 import static io.netty.handler.codec.http.HttpMethod.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jj.execution.MockTaskRunner;
+import jj.http.server.RouteContributor;
 import jj.http.server.uri.Route;
 import jj.http.server.uri.RouteMatch;
 import jj.http.server.uri.Router;
@@ -39,6 +44,7 @@ import org.junit.Test;
 public class RouterTest {
 	
 	private static final String STATIC = "static";
+	private static final String SOMETHING = "something";
 	
 	String welcome = "something.jpg";
 	
@@ -66,12 +72,37 @@ public class RouterTest {
 		}
 	};
 	
+	Set<RouteContributor> routeContributors;
+	
+	RouteContributor routeContributor1 = new RouteContributor() {
+		
+		@Override
+		public List<Route> contributions() {
+			return Collections.singletonList(new Route(GET, "/*path.something", SOMETHING, ""));
+		}
+	};
+	
+	RouteContributor routeContributor2 = new RouteContributor() {
+		
+		@Override
+		public List<Route> contributions() {
+			return Arrays.asList(
+				new Route(POST, "/*path.something", SOMETHING, ""),
+				new Route(DELETE, "/*path.something", SOMETHING, "")
+			);
+		}
+	};
+	
 	Router router;
 
 	@Before
 	public void before() throws Exception {
 		
-		router = new Router(config, mockTaskRunner);
+		routeContributors = new HashSet<>();
+		routeContributors.add(routeContributor1);
+		routeContributors.add(routeContributor2);
+		
+		router = new Router(config, routeContributors, mockTaskRunner);
 		router.configurationLoaded(null);
 		mockTaskRunner.runFirstTask();
 	}
@@ -80,23 +111,44 @@ public class RouterTest {
 	@Test
 	public void test() {
 
-		RouteMatch routeMatch = router.matchURI(GET, new URIMatch("/"));
+		RouteMatch routeMatch = router.matchURI(GET, new URIMatch("/start"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
-		assertThat(routeMatch.route.mapping(), is("/" + welcome));
+		assertThat(routeMatch.route.mapping(), is("/result1"));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchURI(GET, new URIMatch("/something/../../"));
+		routeMatch = router.matchURI(GET, new URIMatch("/something/../../start"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
-		assertThat(routeMatch.route.mapping(), is("/" + welcome));
+		assertThat(routeMatch.route.mapping(), is("/result1"));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchURI(GET, new URIMatch("../"));
+		routeMatch = router.matchURI(POST, new URIMatch("../finish"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
-		assertThat(routeMatch.route.mapping(), is("/" + welcome));
+		assertThat(routeMatch.route.mapping(), is("/result1"));
 		assertTrue(routeMatch.params.isEmpty());
+		
+		routeMatch = router.matchURI(GET, new URIMatch("/some/path/to.something"));
+		
+		assertThat(routeMatch.route.resourceName(), is(SOMETHING));
+		assertThat(routeMatch.route.mapping(), is(""));
+		assertThat(routeMatch.params.size(), is(1));
+		assertThat(routeMatch.params.get("path"), is("some/path/to"));
+		
+		routeMatch = router.matchURI(POST, new URIMatch("/some/path/to.something"));
+		
+		assertThat(routeMatch.route.resourceName(), is(SOMETHING));
+		assertThat(routeMatch.route.mapping(), is(""));
+		assertThat(routeMatch.params.size(), is(1));
+		assertThat(routeMatch.params.get("path"), is("some/path/to"));
+		
+		routeMatch = router.matchURI(DELETE, new URIMatch("/some/path/to.something"));
+		
+		assertThat(routeMatch.route.resourceName(), is(SOMETHING));
+		assertThat(routeMatch.route.mapping(), is(""));
+		assertThat(routeMatch.params.size(), is(1));
+		assertThat(routeMatch.params.get("path"), is("some/path/to"));
 		
 		
 //		assertThat(router.find("/index"), is("/index"));

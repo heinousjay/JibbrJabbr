@@ -28,5 +28,5 @@ import jj.http.server.uri.Route;
  */
 public interface RouteContributor {
 
-	List<Route> contribute();
+	List<Route> contributions();
 }
