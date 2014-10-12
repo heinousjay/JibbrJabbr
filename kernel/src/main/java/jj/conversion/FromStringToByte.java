@@ -15,29 +15,19 @@
  */
 package jj.conversion;
 
-import jj.JJModule;
-
 /**
  * @author jason
  *
  */
-public class ConversionModule extends JJModule {
+class FromStringToByte implements Converter<String, Byte> {
 
 	@Override
-	protected void configure() {
-		addConverterBinding().to(FromStringToPath.class);
-		
-		addConverterBinding().to(FromStringToBoolean.class);
-		addConverterBinding().to(FromStringToCharacter.class);
-		addConverterBinding().to(FromStringToByte.class);
-		addConverterBinding().to(FromStringToShort.class);
-		addConverterBinding().to(FromStringToInteger.class);
-		addConverterBinding().to(FromStringToLong.class);
-		addConverterBinding().to(FromStringToFloat.class);
-		addConverterBinding().to(FromStringToDouble.class);
-		
-		addConverterBinding().to(FromDoubleToInteger.class);
-		
+	public Byte convert(String in) {
+		try {
+			return Byte.decode(in);
+		} catch (NumberFormatException nfe) {
+			return null;
+		}
 	}
 
 }

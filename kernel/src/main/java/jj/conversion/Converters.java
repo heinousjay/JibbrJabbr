@@ -19,6 +19,7 @@ import static jj.util.CodeGenHelper.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,22 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class Converters {
+	
+	private static final Map<Class<?>, Object> primitiveDefaults;
+	
+	static {
+		Map<Class<?>, Object> primitiveDefaultsBuilder = new HashMap<>();
+		primitiveDefaultsBuilder.put(Boolean.TYPE,   false);
+		primitiveDefaultsBuilder.put(Character.TYPE, (char)0);
+		primitiveDefaultsBuilder.put(Byte.TYPE,      (byte)0);
+		primitiveDefaultsBuilder.put(Short.TYPE,     (short)0);
+		primitiveDefaultsBuilder.put(Integer.TYPE,   0);
+		primitiveDefaultsBuilder.put(Long.TYPE,      0L);
+		primitiveDefaultsBuilder.put(Float.TYPE,     0F);
+		primitiveDefaultsBuilder.put(Double.TYPE,    0.0);
+		
+		primitiveDefaults = Collections.unmodifiableMap(primitiveDefaultsBuilder);
+	}
 
 	private final Map<Class<?>, Map<Class<?>, Converter<?, ?>>> converters = new HashMap<>();
 	
@@ -112,6 +129,8 @@ public class Converters {
 	 */
 	public <From, To> To convert(From from, Class<To> to) {
 		
+		assert to != null; // gotta be there
+		
 		if (from == null) {
 			if (primitiveDefaults.containsKey(to)) {
 				return cast(primitiveDefaults.get(to));
@@ -133,6 +152,7 @@ public class Converters {
 					return eTo;
 				}
 			}
+			return null;
 		}
 		
 		Map<Class<?>, Converter<?, ?>> fromConverters = converters.get(fromClass);
@@ -156,6 +176,11 @@ public class Converters {
 		Object value = converter.convert(from);
 		
 		To result = cast(primitivesToWrappers.containsKey(to) ? primitivesToWrappers.get(to).cast(value) : value);
+		
+		if (result == null && primitiveDefaults.containsKey(to)) {
+			result = cast(primitiveDefaults.get(to));
+		}
+		
 		return result;
 	}
 	

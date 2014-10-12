@@ -26,10 +26,17 @@ public class ConverterSetMaker {
 
 	public static Set<Converter<?, ?>> converters() {
 		HashSet<Converter<?, ?>> output = new HashSet<>();
-		output.add(new FromStringToBoolean());
 		output.add(new FromStringToPath());
+		
+		output.add(new FromStringToBoolean());
+		output.add(new FromStringToCharacter());
+		output.add(new FromStringToByte());
+		output.add(new FromStringToShort());
 		output.add(new FromStringToInteger());
 		output.add(new FromStringToLong());
+		output.add(new FromStringToFloat());
+		output.add(new FromStringToDouble());
+		
 		output.add(new FromDoubleToInteger());
 		return output;
 	}

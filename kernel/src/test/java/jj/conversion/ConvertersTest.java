@@ -16,6 +16,7 @@
 package jj.conversion;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 
 import java.nio.file.Path;
@@ -102,14 +103,64 @@ public class ConvertersTest {
 	}
 
 	@Test
+	public void testFromStringToChar() {
+		assertThat(converters.convert("a", char.class), is('a'));
+		assertThat(converters.convert("a", Character.class), is('a'));
+		assertThat(converters.convert("", char.class), is((char)0));
+		assertThat(converters.convert("", Character.class), is(nullValue()));
+		assertThat(converters.convert("too long", char.class), is((char)0));
+		assertThat(converters.convert("too long", Character.class), is(nullValue()));
+	}
+
+	@Test
+	public void testFromStringToByte() {
+		assertThat(converters.convert("1", byte.class), is((byte)1));
+		assertThat(converters.convert("1", Byte.class), is((byte)1));
+		assertThat(converters.convert("nope", byte.class), is((byte)0));
+		assertThat(converters.convert("nope", Byte.class), is(nullValue()));
+	}
+
+	@Test
+	public void testFromStringToShort() {
+		assertThat(converters.convert("1", short.class), is((short)1));
+		assertThat(converters.convert("1", Short.class), is((short)1));
+		assertThat(converters.convert("nope", short.class), is((short)0));
+		assertThat(converters.convert("nope", Short.class), is(nullValue()));
+	}
+
+	@Test
 	public void testFromStringToInteger() {
 		assertThat(converters.convert("1", int.class), is(1));
+		assertThat(converters.convert("1", Integer.class), is(1));
+		assertThat(converters.convert("nope", int.class), is(0));
+		assertThat(converters.convert("nope", Integer.class), is(nullValue()));
 	}
 	
 	@Test
 	public void testFromStringToLong() {
 		long now = System.currentTimeMillis();
 		assertThat(converters.convert(String.valueOf(now), long.class), is(now));
+		assertThat(converters.convert(String.valueOf(now), Long.class), is(now));
+		assertThat(converters.convert("nope", long.class), is(0L));
+		assertThat(converters.convert("nope", Long.class), is(nullValue()));
+	}
+	
+	@Test
+	public void testFromStringToFloat() {
+		float f = 1.23f;
+		assertThat(converters.convert(String.valueOf(f), float.class), is(f));
+		assertThat(converters.convert(String.valueOf(f), Float.class), is(f));
+		assertThat(converters.convert("nope", float.class), is(0.0F));
+		assertThat(converters.convert("nope", Float.class), is(nullValue()));
+	}
+	
+	@Test
+	public void testFromStringToDouble() {
+		double d = 1.23;
+		assertThat(converters.convert(String.valueOf(d), double.class), is(d));
+		assertThat(converters.convert(String.valueOf(d), Double.class), is(d));
+		assertThat(converters.convert("nope", double.class), is(0.0));
+		assertThat(converters.convert("nope", Double.class), is(nullValue()));
 	}
 	
 	enum ConverterEnums {
@@ -120,6 +171,12 @@ public class ConvertersTest {
 		What;
 	}
 	
+	enum MoreEnums {
+		Value,
+		OtherValue,
+		AndAnother;
+	}
+	
 	@Test
 	public void testEnums() {
 		assertThat(converters.convert("One", ConverterEnums.class), is(ConverterEnums.One));
@@ -127,5 +184,11 @@ public class ConvertersTest {
 		assertThat(converters.convert("Ready", ConverterEnums.class), is(ConverterEnums.Ready));
 		assertThat(converters.convert("Steady", ConverterEnums.class), is(ConverterEnums.Steady));
 		assertThat(converters.convert("What", ConverterEnums.class), is(ConverterEnums.What));
+		assertThat(converters.convert("Nope", ConverterEnums.class), is(nullValue()));
+		
+		assertThat(converters.convert("Value", MoreEnums.class), is(MoreEnums.Value));
+		assertThat(converters.convert("OtherValue", MoreEnums.class), is(MoreEnums.OtherValue));
+		assertThat(converters.convert("AndAnother", MoreEnums.class), is(MoreEnums.AndAnother));
+		assertThat(converters.convert("Nope", MoreEnums.class), is(nullValue()));
 	}
 }

@@ -15,29 +15,22 @@
  */
 package jj.conversion;
 
-import jj.JJModule;
+import javax.inject.Singleton;
 
 /**
  * @author jason
  *
  */
-public class ConversionModule extends JJModule {
+@Singleton
+class FromStringToDouble implements Converter<String, Double> {
 
 	@Override
-	protected void configure() {
-		addConverterBinding().to(FromStringToPath.class);
-		
-		addConverterBinding().to(FromStringToBoolean.class);
-		addConverterBinding().to(FromStringToCharacter.class);
-		addConverterBinding().to(FromStringToByte.class);
-		addConverterBinding().to(FromStringToShort.class);
-		addConverterBinding().to(FromStringToInteger.class);
-		addConverterBinding().to(FromStringToLong.class);
-		addConverterBinding().to(FromStringToFloat.class);
-		addConverterBinding().to(FromStringToDouble.class);
-		
-		addConverterBinding().to(FromDoubleToInteger.class);
-		
+	public Double convert(String in) {
+		try {
+			return Double.parseDouble(in);
+		} catch (NumberFormatException nfe) {
+			return null;
+		}
 	}
 
 }
