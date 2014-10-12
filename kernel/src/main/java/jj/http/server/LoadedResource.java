@@ -19,6 +19,10 @@ import io.netty.buffer.ByteBuf;
 
 
 /**
+ * <p>
+ * Optional interface that can be implemented by a {@link ServableResource}
+ * if the bytes that make up the resource are loaded and can be served directly.
+ * 
  * @author jason
  *
  */

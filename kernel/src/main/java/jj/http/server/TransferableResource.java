@@ -22,9 +22,10 @@ import java.nio.channels.FileChannel;
 import jj.resource.FileResource;
 
 /**
- * Optional interface a resource can implement to indicate that
- * it can be transferred from the file system directly to a
- * network socket.
+ * <p>
+ * Optional interface a {@link ServableResource} can implement
+ * to indicate that serving should be done by transferring the
+ * resource directly to the socket, if available
  * 
  * @author jason
  *
