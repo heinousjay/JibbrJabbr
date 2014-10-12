@@ -23,18 +23,23 @@ import org.slf4j.Logger;
  */
 public class JasmineTestError extends JasmineTestResult {
 	
+	static final String MESSAGE_1 = "Jasmine spec error!\nrunning {} errored\nwhile evaluating {}\ntargeting {}";
+	static final String MESSAGE_2 = "";
+	
 	private final JasmineScriptEnvironment jse;
+	private final String context;
 	private final Throwable cause;
 	
-	JasmineTestError(final JasmineScriptEnvironment jse, final Throwable cause) {
+	JasmineTestError(final JasmineScriptEnvironment jse, final String context, final Throwable cause) {
 		this.jse = jse;
+		this.context = context;
 		this.cause = cause;
 	}
 
 	@Override
 	public void describeTo(Logger logger) {
-		logger.error("Jasmine spec error!\nrunning {} errored\ntargeting {}", jse.spec(), jse.target());
-		logger.error("", cause);
+		logger.error(MESSAGE_1, jse.spec(), context, jse.target());
+		logger.error(MESSAGE_2, cause);
 	}
 
 }

@@ -86,10 +86,9 @@ public class SpecCoordinatorTest {
 		
 		// should be three tasks to run one after the other
 		taskRunner.runFirstTask();
-		
 		taskRunner.runFirstTask();
-		
 		taskRunner.runFirstTask();
+		assertTrue(taskRunner.tasks.isEmpty());
 
 		// should have the continuation coordinator execute in this order 
 		InOrder io = inOrder(continuationCoordinator);
@@ -101,7 +100,7 @@ public class SpecCoordinatorTest {
 		assertTrue(publisher.events.isEmpty());
 	}
 	
-	private void verifyErrorEvent() {
+	private void verifyErrorEvent(final String context) {
 		
 		assertThat(publisher.events.size(), is(1));
 		assertThat(publisher.events.get(0), is(instanceOf(JasmineTestError.class)));
@@ -109,8 +108,8 @@ public class SpecCoordinatorTest {
 		JasmineTestError e = (JasmineTestError)publisher.events.get(0);
 		e.describeTo(logger);
 		
-		verify(logger).error("Jasmine spec error!\nrunning {} errored\ntargeting {}", spec, target);
-		verify(logger).error("", exception);
+		verify(logger).error(JasmineTestError.MESSAGE_1, spec, context, target);
+		verify(logger).error(JasmineTestError.MESSAGE_2, exception);
 	}
 	
 	@Test
@@ -124,11 +123,12 @@ public class SpecCoordinatorTest {
 		
 		// then
 		taskRunner.runFirstTask();
+		assertTrue(taskRunner.tasks.isEmpty());
 		
 		verify(continuationCoordinator).execute(jse, specScript);
 		verifyNoMoreInteractions(continuationCoordinator);
 		
-		verifyErrorEvent();
+		verifyErrorEvent(SpecCoordinator.CONTEXT_SPEC);
 	}
 	
 	@Test
@@ -143,13 +143,14 @@ public class SpecCoordinatorTest {
 		// then
 		taskRunner.runFirstTask();
 		taskRunner.runFirstTask();
+		assertTrue(taskRunner.tasks.isEmpty());
 		
 		InOrder io = inOrder(continuationCoordinator);
 		io.verify(continuationCoordinator).execute(jse, specScript);
 		io.verify(continuationCoordinator).execute(jse, targetScript);
 		verifyNoMoreInteractions(continuationCoordinator);
 		
-		verifyErrorEvent();
+		verifyErrorEvent(SpecCoordinator.CONTEXT_TARGET);
 	}
 	
 	@Test
@@ -165,13 +166,14 @@ public class SpecCoordinatorTest {
 		taskRunner.runFirstTask();
 		taskRunner.runFirstTask();
 		taskRunner.runFirstTask();
+		assertTrue(taskRunner.tasks.isEmpty());
 		
 		InOrder io = inOrder(continuationCoordinator);
 		io.verify(continuationCoordinator).execute(jse, specScript);
 		io.verify(continuationCoordinator).execute(jse, targetScript);
 		io.verify(continuationCoordinator).execute(jse, runnerScript);
 		
-		verifyErrorEvent();
+		verifyErrorEvent(SpecCoordinator.CONTEXT_RUNNER);
 	}
 
 }

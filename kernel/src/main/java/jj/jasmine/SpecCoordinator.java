@@ -37,6 +37,10 @@ import jj.script.ScriptTask;
 @Singleton
 @Subscriber
 class SpecCoordinator {
+	
+	static final String CONTEXT_SPEC = "spec";
+	static final String CONTEXT_TARGET = "target";
+	static final String CONTEXT_RUNNER = "runner";
 
 	private final ContinuationCoordinator continuationCoordinator;
 	private final TaskRunner taskRunner;
@@ -61,8 +65,6 @@ class SpecCoordinator {
 		}
 	}
 	
-	
-	
 	private final class SpecEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
 		SpecEvaluationTask(
@@ -79,7 +81,7 @@ class SpecCoordinator {
 		
 		@Override
 		protected boolean errored(Throwable cause) {
-			publisher.publish(new JasmineTestError(scriptEnvironment, cause));
+			publisher.publish(new JasmineTestError(scriptEnvironment, CONTEXT_SPEC, cause));
 			return true;
 		}
 		
@@ -105,7 +107,7 @@ class SpecCoordinator {
 		
 		@Override
 		protected boolean errored(Throwable cause) {
-			publisher.publish(new JasmineTestError(scriptEnvironment, cause));
+			publisher.publish(new JasmineTestError(scriptEnvironment, CONTEXT_TARGET, cause));
 			return true;
 		}
 		
@@ -126,7 +128,7 @@ class SpecCoordinator {
 		
 		@Override
 		protected boolean errored(Throwable cause) {
-			publisher.publish(new JasmineTestError(scriptEnvironment, cause));
+			publisher.publish(new JasmineTestError(scriptEnvironment, CONTEXT_RUNNER, cause));
 			return true;
 		}
 
