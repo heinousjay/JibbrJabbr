@@ -51,8 +51,13 @@ public class MockTaskRunner implements TaskRunner {
 		assert(!tasks.isEmpty());
 		
 		JJTask task = tasks.remove(0);
-		
-		task.run();
+		try {
+			task.run();
+		} catch (Exception cause) {
+			if (!task.errored(cause)) {
+				throw cause;
+			}
+		}
 		
 		return task;
 	}
