@@ -13,7 +13,7 @@ var inject = function(id) {
 				inject.r = r;
 			}
 		},
-		'jj.http.server.uri.ServableResourceHelper' : {
+		'jj.http.server.ServableResourceHelper' : {
 			arrayOfNames: function() {
 				return ['static', 'script', 'stylesheet', 'document'];
 			}
