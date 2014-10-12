@@ -25,11 +25,11 @@ import io.netty.handler.codec.http.HttpHeaders;
 import jj.execution.JJTask;
 import jj.execution.Promise;
 import jj.execution.TaskHelper;
+import jj.http.server.resource.StaticResource;
 import jj.http.server.uri.Route;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
-import jj.resource.stat.ic.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;

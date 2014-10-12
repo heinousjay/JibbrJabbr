@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource.stat.ic;
+package jj.http.server.resource;
 
 import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
+import jj.http.server.resource.StaticResource;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.PathResolver;
 import jj.resource.ResourceKey;

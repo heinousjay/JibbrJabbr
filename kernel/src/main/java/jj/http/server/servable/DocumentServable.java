@@ -14,10 +14,10 @@ import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
 import jj.util.StringUtils;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.resource.StaticResource;
 import jj.http.server.uri.URIMatch;
 
 @Singleton

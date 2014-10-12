@@ -28,7 +28,7 @@ import java.util.Date;
 
 import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
-import jj.resource.stat.ic.StaticResource;
+import jj.http.server.resource.StaticResource;
 
 import org.junit.Before;
 import org.junit.Test;

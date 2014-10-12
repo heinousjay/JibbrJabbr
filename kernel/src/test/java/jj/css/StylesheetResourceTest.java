@@ -27,10 +27,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.configuration.resolution.MockApplication;
+import jj.http.server.resource.StaticResource;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
 import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;

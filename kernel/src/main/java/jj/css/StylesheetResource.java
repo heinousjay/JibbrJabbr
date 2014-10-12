@@ -36,11 +36,11 @@ import org.mozilla.javascript.Undefined;
 
 import jj.http.server.LoadedResource;
 import jj.http.server.ServableResourceConfiguration;
+import jj.http.server.resource.StaticResource;
 import jj.resource.AbstractResource;
 import jj.resource.NoSuchResourceException;
 import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
-import jj.resource.stat.ic.StaticResource;
 import jj.script.Global;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;

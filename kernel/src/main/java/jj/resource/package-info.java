@@ -19,8 +19,8 @@
  * of computation for the JibbrJabbr system.
  * 
  * <p>
- * At the most basic level, the {@link jj.resource.stat.ic.StaticResource} represents a generic file in
- * the file system.  only metadata is kept.
+ * At the most basic level, a {@link jj.resource.FileResource} represents a generic file in
+ * the file system. specific implementations provide the details
  * 
  * <p>
  * At a more complicated level, script execution environments are composed of several

@@ -8,7 +8,7 @@ import static jj.configuration.resolution.AppLocation.*;
 import jj.configuration.resolution.AppLocation;
 import jj.event.Publisher;
 import jj.execution.CurrentTask;
-import jj.resource.stat.ic.StaticResource;
+import jj.http.server.resource.StaticResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

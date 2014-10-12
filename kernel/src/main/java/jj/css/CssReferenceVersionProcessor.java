@@ -23,10 +23,10 @@ import javax.inject.Singleton;
 
 import jj.configuration.resolution.AppLocation;
 import jj.http.server.ServableResource;
+import jj.http.server.resource.StaticResource;
 import jj.http.server.uri.URIMatch;
 import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
 
 /**
  * <p>

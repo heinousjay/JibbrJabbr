@@ -16,9 +16,9 @@ import jj.document.ScriptResourceType;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.ScriptHelperDocumentFilter;
 import jj.http.server.HttpServerRequest;
+import jj.http.server.resource.StaticResource;
 import jj.jjmessage.JJMessage;
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
 import jj.script.module.ScriptResource;
 
 import org.jsoup.Jsoup;
