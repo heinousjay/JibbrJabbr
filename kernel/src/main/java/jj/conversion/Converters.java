@@ -108,7 +108,7 @@ public class Converters {
 	 * </p>
 	 * @param from The object being converted
 	 * @param to The type to convert to
-	 * @return
+	 * @return the converted value, or null if the conversion could not be performed
 	 */
 	public <From, To> To convert(From from, Class<To> to) {
 		
