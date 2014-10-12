@@ -81,7 +81,7 @@ public class Router {
 		});
 	}
 	
-	public RouteMatch matchURI(final HttpMethod method, final URIMatch uriMatch) {
+	public RouteMatch matchRequest(final HttpMethod method, final URIMatch uriMatch) {
 		
 		// this is not the correct signature? RouteMatch is the wrong return, needs to
 		// be some object that indicates how to do the processing
