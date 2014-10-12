@@ -22,6 +22,14 @@ package jj.execution;
  */
 public interface TaskRunner {
 	
+	/**
+	 * Schedules the given task for execution in the appropriate execution context. This method
+	 * returns immediately if the relevant executor is asynchronous, which should always be
+	 * the case.
+	 * 
+	 * @param task The task to execute.
+	 * @return The {@link Promise} from the given task.
+	 */
 	Promise execute(final JJTask task);
 
 }
