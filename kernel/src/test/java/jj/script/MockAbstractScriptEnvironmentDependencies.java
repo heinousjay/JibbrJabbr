@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import javax.inject.Provider;
 
 import jj.event.Publisher;
-import jj.resource.AbstractResourceInitializationListener;
+import jj.resource.AbstractResourceEventDemuxer;
 import jj.resource.ResourceConfiguration;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
@@ -39,7 +39,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			mock(ResourceKey.class),
 			"unnamed",
 			new MockRhinoContextProvider(),
@@ -56,7 +56,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			mock(ResourceKey.class),
 			name,
 			new MockRhinoContextProvider(),
@@ -73,7 +73,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			mock(ResourceKey.class),
 			name,
 			new MockRhinoContextProvider(),
@@ -90,7 +90,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			mock(ResourceKey.class),
 			name,
 			rhinoContextProvider,
@@ -111,8 +111,8 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		return resourceConfiguration;
 	}
 	
-	public AbstractResourceInitializationListener abstractResourceInitializationListener() {
-		return aril;
+	public AbstractResourceEventDemuxer abstractResourceInitializationListener() {
+		return demuxer;
 	}
 	
 	public ResourceKey resourceCacheKey() {

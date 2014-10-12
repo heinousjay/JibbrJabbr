@@ -33,9 +33,9 @@ import jj.event.Subscriber;
  */
 @Singleton
 @Subscriber
-public class AbstractResourceInitializationListener {
+public class AbstractResourceEventDemuxer {
 	
-	AbstractResourceInitializationListener() {}
+	AbstractResourceEventDemuxer() {}
 	
 	private final ConcurrentHashMap<ResourceKey, AbstractResource> waitingResources = new ConcurrentHashMap<>();
 

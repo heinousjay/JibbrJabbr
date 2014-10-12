@@ -35,7 +35,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			mock(ResourceKey.class),
 			base,
 			name,
@@ -48,7 +48,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			mock(ResourceKey.class),
 			base,
 			name,
@@ -61,7 +61,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			resourceKey,
 			base,
 			name,
@@ -74,7 +74,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		super(
 			new MockClock(),
 			mock(ResourceConfiguration.class),
-			mock(AbstractResourceInitializationListener.class),
+			mock(AbstractResourceEventDemuxer.class),
 			resourceKey,
 			base,
 			name,
@@ -100,8 +100,8 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		return resourceConfiguration;
 	}
 	
-	public AbstractResourceInitializationListener abstractResourceInitializationListener() {
-		return aril;
+	public AbstractResourceEventDemuxer abstractResourceInitializationListener() {
+		return demuxer;
 	}
 
 	public ResourceFinder resourceFinder() {

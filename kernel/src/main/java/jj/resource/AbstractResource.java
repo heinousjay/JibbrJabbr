@@ -34,7 +34,8 @@ import jj.util.Clock;
 
 /**
  * <p>
- * basic resource behavior.  ALL RESOURCES MUST EXTEND THIS
+ * basic {@link Resource} behavior.  ALL RESOURCES MUST EXTEND THIS. the binders will not
+ * bind classes that do not.
  * 
  * <p>
  * Provides all of the interesting hooks into the system, as well
@@ -47,11 +48,20 @@ import jj.util.Clock;
 @Subscriber
 public abstract class AbstractResource implements Resource {
 	
+	/**
+	 * technique used to bundle up all of the dependencies for the base
+	 * class, to avoid changing the constructor signature for descendants
+	 * all the time. public so it can be overridden, as the script system
+	 * does.
+	 * 
+	 * @author jason
+	 *
+	 */
 	public static class Dependencies {
 		
 		protected final Clock clock;
 		protected final ResourceConfiguration resourceConfiguration;
-		protected final AbstractResourceInitializationListener aril;
+		protected final AbstractResourceEventDemuxer demuxer;
 		protected final ResourceKey resourceKey;
 		protected final Location base;
 		protected final String name;
@@ -62,7 +72,7 @@ public abstract class AbstractResource implements Resource {
 		public Dependencies(
 			final Clock clock,
 			final ResourceConfiguration resourceConfiguration,
-			final AbstractResourceInitializationListener aril,
+			final AbstractResourceEventDemuxer demuxer,
 			final ResourceKey resourceKey,
 			final Location base,
 			final @ResourceName String name,
@@ -71,7 +81,7 @@ public abstract class AbstractResource implements Resource {
 		) {
 			this.clock = clock;
 			this.resourceConfiguration = resourceConfiguration;
-			this.aril = aril;
+			this.demuxer = demuxer;
 			this.resourceKey = resourceKey;
 			this.base = base;
 			this.name = name;
@@ -112,7 +122,7 @@ public abstract class AbstractResource implements Resource {
 		this.resourceConfiguration = dependencies.resourceConfiguration;
 		
 		if ((this instanceof ParentedResource) && this.base().parentInDirectory()) {
-			dependencies.aril.awaitInitialization(this);
+			dependencies.demuxer.awaitInitialization(this);
 		}
 		
 		ResourceSettings base = resourceConfiguration.fileTypeSettings().get(extension());
@@ -139,6 +149,15 @@ public abstract class AbstractResource implements Resource {
 		}
 	}
 	
+	/**
+	 * handles cleaning up dependency tracking when resources are killed. since that only happens from the watch thread,
+	 * and only happens when there are modifications to resources, which are both rare events in a sense (and things
+	 * that should never matter in a production setting) then having this listener live in every resource in the system
+	 * seems like a reasonable thing.  Note that the loaded event is demuxed in a separate component because that event
+	 * is going to be thrown around like crazy and will cause resource creation to slow as more resource are created.
+	 * 
+	 * @param event the event
+	 */
 	@Listener
 	void resourceKilled(ResourceKilled event) {
 		dependents.remove(event.resourceKey);
@@ -152,9 +171,24 @@ public abstract class AbstractResource implements Resource {
 		return "";
 	}
 	
+	/**
+	 * A resource-specific test to indicate if the given resource should be replaced when the
+	 * watch system becomes aware of it. any sort of check is allowed at this point. this method is
+	 * only used if the resource is still considered "alive" so if the resource has been killed by
+	 * some other method (such as dependency propagation) this has no effect
+	 * @return true to be replaced
+	 * @throws IOException
+	 */
 	@ResourceThread
 	public abstract boolean needsReplacing() throws IOException;
 
+	/**
+	 * indicates if the resource is obselete - either it is no longer alive, or {@link #needsReplacing()}
+	 * has returned true
+	 * 
+	 * @return obsolescence status
+	 * @throws IOException if something happens.
+	 */
 	@ResourceThread
 	boolean isObselete() throws IOException {
 		return !alive.get() || needsReplacing();
@@ -177,10 +211,18 @@ public abstract class AbstractResource implements Resource {
 		dependents.put(r.cacheKey(), r);
 	}
 	
+	/**
+	 * retrieve an unmodifiable collection of this resource's dependents
+	 * @return
+	 */
 	Collection<AbstractResource> dependents() {
 		return Collections.unmodifiableCollection(dependents.values());
 	}
 	
+	/**
+	 * DO NOT LIKE THIS HERE!
+	 * @param to the scriptable to fill with a description
+	 */
 	void describe(Scriptable to) {
 		// put the basics in place, then start calling
 		// downstream to add more?  sure
@@ -198,10 +240,17 @@ public abstract class AbstractResource implements Resource {
 		to.put("creationTime", to, creationTime);
 	}
 	
+	/**
+	 * flag tracking if this resource is considered alive. when this method begins returning
+	 * false, the resource has been taken out of service.
+	 */
 	public boolean alive() {
 		return alive.get();
 	}
 	
+	/**
+	 * kills this resource.
+	 */
 	void kill() {
 		if (alive.getAndSet(false)) {
 			publisher.publish(new ResourceKilled(this));
@@ -209,6 +258,10 @@ public abstract class AbstractResource implements Resource {
 		}
 	}
 	
+	/**
+	 * internal notification that this resource has died, so some descendant class can
+	 * make something of the information. the base implementation does nothing
+	 */
 	protected void died() {
 		// mainly to allow AbstractScriptEnvironment to publish its own death event
 	}
