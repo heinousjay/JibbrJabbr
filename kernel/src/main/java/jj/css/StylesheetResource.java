@@ -52,6 +52,11 @@ import jj.util.SHA1Helper;
  * stylesheet, or a stylesheet that has run through less
  * processing.
  * 
+ * <p>
+ * The stylesheet represented by this resource will be processed to have
+ * all internal URIs replaced with long-term cacheable URIs.  This might
+ * get put into configuration to disable it.
+ * 
  * @author jason
  *
  */
