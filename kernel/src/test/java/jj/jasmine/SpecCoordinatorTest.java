@@ -16,6 +16,7 @@
 package jj.jasmine;
 
 import static org.mockito.BDDMockito.*;
+import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 import jj.script.ContinuationCoordinator;
 import jj.script.ScriptEnvironmentInitialized;
@@ -36,6 +37,7 @@ public class SpecCoordinatorTest {
 
 	@Mock ContinuationCoordinator continuationCoordinator;
 	MockTaskRunner taskRunner;
+	@Mock Publisher publisher;
 	
 	SpecCoordinator sc;
 	
@@ -53,7 +55,7 @@ public class SpecCoordinatorTest {
 		given(jse.targetScript()).willReturn(targetScript);
 		given(jse.runnerScript()).willReturn(runnerScript);
 		
-		sc = new SpecCoordinator(continuationCoordinator, taskRunner);
+		sc = new SpecCoordinator(continuationCoordinator, taskRunner, publisher);
 	}
 	
 	@Test

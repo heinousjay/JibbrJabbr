@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.event.Listener;
+import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 import jj.script.ContinuationCoordinator;
@@ -39,14 +40,17 @@ class SpecCoordinator {
 
 	private final ContinuationCoordinator continuationCoordinator;
 	private final TaskRunner taskRunner;
+	private final Publisher publisher;
 	
 	@Inject
 	SpecCoordinator(
 		final ContinuationCoordinator continuationCoordinator,
-		final TaskRunner taskRunner
+		final TaskRunner taskRunner,
+		final Publisher publisher
 	) {
 		this.continuationCoordinator = continuationCoordinator;
 		this.taskRunner = taskRunner;
+		this.publisher = publisher;
 	}
 	
 	@Listener
@@ -74,6 +78,12 @@ class SpecCoordinator {
 		}
 		
 		@Override
+		protected boolean errored(Throwable cause) {
+			publisher.publish(new JasmineTestError(scriptEnvironment, cause));
+			return true;
+		}
+		
+		@Override
 		protected void complete() throws Exception {
 			taskRunner.execute(new TargetEvaluationTask(scriptEnvironment, continuationCoordinator));
 		}
@@ -94,6 +104,12 @@ class SpecCoordinator {
 		}
 		
 		@Override
+		protected boolean errored(Throwable cause) {
+			publisher.publish(new JasmineTestError(scriptEnvironment, cause));
+			return true;
+		}
+		
+		@Override
 		protected void complete() throws Exception {
 			taskRunner.execute(new RunnerEvaluationTask(scriptEnvironment, continuationCoordinator));
 		}
@@ -106,6 +122,12 @@ class SpecCoordinator {
 			final ContinuationCoordinator continuationCoordinator
 		) {
 			super("runner execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		}
+		
+		@Override
+		protected boolean errored(Throwable cause) {
+			publisher.publish(new JasmineTestError(scriptEnvironment, cause));
+			return true;
 		}
 
 		@Override

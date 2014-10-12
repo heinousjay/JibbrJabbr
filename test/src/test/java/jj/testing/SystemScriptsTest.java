@@ -29,6 +29,7 @@ import jj.App;
 import jj.JJModule;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.jasmine.JasmineTestError;
 import jj.jasmine.JasmineTestFailure;
 import jj.jasmine.JasmineTestSuccess;
 import jj.resource.ResourceLoader;
@@ -62,7 +63,8 @@ public class SystemScriptsTest {
 	@Inject
 	ResourceLoader resourceLoader;
 	
-	final int total = 8; // well, it's manual but maybe the phaser does what i need?
+	// needs to be hard-coded ahead of time. boo
+	final int total = 9; // well, it's manual but maybe the phaser does what i need?
 	final CountDownLatch testCountLatch = new CountDownLatch(total);
 	final AtomicInteger successCount = new AtomicInteger();
 	final AtomicInteger failureCount = new AtomicInteger();
@@ -79,6 +81,12 @@ public class SystemScriptsTest {
 		testCountLatch.countDown();
 	}
 	
+	@Listener
+	void testErrored(JasmineTestError error) {
+		failureCount.incrementAndGet();
+		testCountLatch.countDown();
+	}
+	
 	private void load(String name) {
 		resourceLoader.loadResource(ScriptResource.class, APIModules, name);
 	}
@@ -87,15 +95,16 @@ public class SystemScriptsTest {
 	public void test() throws Exception {
 		
 		// load everything we care about here!
-		load("globalize.js");
 		load("broadcast.js");
-		load("local-storage.js");
-		load("server-events.js");
-		load("resource-properties.js");
+		// load("configuration-support.js");
 		load("env.js");
+		load("globalize.js");
+		load("local-storage.js");
+		load("resource-properties.js");
+		load("server-events.js");
 		load("system-properties.js");
+		// load("uri-routing-configuration.js");
 		
-		// could take a while!
 		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
 		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
 		assertThat(successCount.get(), is(total)); // just for certainty?
