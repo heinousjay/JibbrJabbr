@@ -28,6 +28,9 @@ import jj.resource.PathResolver;
 import jj.resource.ResourceThread;
 
 /**
+ * Basic representation of a file. no assumptions are made about content, and the bytes are
+ * not loaded.  Mainly a bridge from filesystem elements to the serving system
+ * 
  * @author jason
  *
  */
@@ -35,11 +38,6 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	
 	private final boolean safeToServe;
 	
-	/**
-	 * @param baseName
-	 * @param path
-	 * @throws IOException
-	 */
 	@Inject
 	StaticResource(
 		final Dependencies dependencies,
