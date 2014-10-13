@@ -80,7 +80,7 @@ class ResourceWatchServiceLoop extends ServerTask {
 		);
 	}
 	
-	void watch(ParentedResource resource) throws IOException {
+	void watch(FileSystemResource resource) throws IOException {
 		Path path = resource.path();
 		
 		if (path.getFileSystem() == FileSystems.getDefault()) {

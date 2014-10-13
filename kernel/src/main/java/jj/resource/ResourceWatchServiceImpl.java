@@ -33,7 +33,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 	}
 
 	@Override
-	public void watch(ParentedResource resource) throws IOException {
+	public void watch(FileSystemResource resource) throws IOException {
 		if (resourceWatchSwitch.runFileWatcher()) {
 			loop.watch(resource);
 		}

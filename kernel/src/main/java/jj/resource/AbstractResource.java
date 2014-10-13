@@ -121,7 +121,7 @@ public abstract class AbstractResource implements Resource {
 		this.resourceFinder = dependencies.resourceFinder;
 		this.resourceConfiguration = dependencies.resourceConfiguration;
 		
-		if ((this instanceof ParentedResource) && this.base().parentInDirectory()) {
+		if ((this instanceof FileSystemResource) && this.base().parentInDirectory()) {
 			dependencies.demuxer.awaitInitialization(this);
 		}
 		

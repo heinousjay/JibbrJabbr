@@ -18,12 +18,16 @@ package jj.resource;
 import java.nio.file.Path;
 
 /**
+ * The basic interface to a resource that lives in a file system
+ * 
  * @author jason
  *
  */
-interface ParentedResource {
-
+interface FileSystemResource {
+	
+	/** the {@link Path} to the resource */
 	Path path();
 	
+	/** true if this resource represents a directory. */
 	boolean isDirectory();
 }
