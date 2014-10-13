@@ -16,14 +16,4 @@ route.POST('/chat/:room').to.document(chatRoom);
 route.PUT('/chat/:room/*secret').to.document(chatRoom);
 route.DELETE('/chat/:room/*secret').to.document(chatRoom);
 
-/*
-// but this! is what i'm aiming at
-route.GET('/chat/').to(document('/chat/list'));
-
-var chatRoom = document('/chat/room');
-
-route.POST('/chat/:room').to(chatRoom);
-route.PUT('/chat/:room/*secret').to(chatRoom);
-route.DELETE('/chat/:room/*secret').to(chatRoom);
-*/
 
