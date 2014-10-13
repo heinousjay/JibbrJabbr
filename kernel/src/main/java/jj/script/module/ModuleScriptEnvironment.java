@@ -74,6 +74,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	
 	// the key to restarting whatever included this.  gets removed on first read and is null forever after
 	// maybe not a good spot? it's not necessarily the same as the overall root environment
+	// does not need to be volatile because this interaction is guaranteed to be from one thread
 	private ContinuationPendingKey pendingKey;
 	
 	private final ScriptableObject scope;
@@ -172,7 +173,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 
 	@Override
-	public ContinuationPendingKey pendingKey() {
+	public ContinuationPendingKey initializationContinuationPendingKey() {
 		ContinuationPendingKey result = pendingKey;
 		pendingKey = null;
 		return result;

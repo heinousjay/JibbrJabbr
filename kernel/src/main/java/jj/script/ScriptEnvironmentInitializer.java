@@ -170,7 +170,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		}
 		
 		private void checkParentResumption(Object result) {
-			ContinuationPendingKey pendingKey = scriptEnvironment.pendingKey();
+			ContinuationPendingKey pendingKey = scriptEnvironment.initializationContinuationPendingKey();
 			if (pendingKey != null) {
 				pendingKey.resume(result);
 			}

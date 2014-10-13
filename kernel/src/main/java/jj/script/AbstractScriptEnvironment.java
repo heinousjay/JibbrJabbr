@@ -39,6 +39,14 @@ import jj.util.Clock;
 import jj.util.Closer;
 
 /**
+ * <p>
+ * Provides basic services for {@link ScriptEnvironment}s.  In particular, integrations
+ * into the continuation system are the main point, allowing resumable execution.
+ * 
+ * <p>
+ * also provides methods for building rhino scopes, setting up the module loading system,
+ * and other small basic niceties for hooking into the system
+ * 
  * @author jason
  *
  */
@@ -60,7 +68,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		Dependencies(
 			final Clock clock,
 			final ResourceConfiguration resourceConfiguration,
-			final AbstractResourceEventDemuxer aril,
+			final AbstractResourceEventDemuxer demuxer,
 			final ResourceKey cacheKey,
 			final @ResourceName String name,
 			final Provider<RhinoContext> contextProvider,
@@ -71,7 +79,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Publisher publisher,
 			final ResourceFinder resourceFinder
 		) {
-			super(clock, resourceConfiguration, aril, cacheKey, AppLocation.Virtual, name, publisher, resourceFinder);
+			super(clock, resourceConfiguration, demuxer, cacheKey, AppLocation.Virtual, name, publisher, resourceFinder);
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
@@ -89,13 +97,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	private final Dependencies dependencies;
 	
-	private ScriptExecutionState state = Unitialized;
+	private volatile ScriptExecutionState state = Unitialized;
 	
-	private Throwable initializationError;
+	private volatile Throwable initializationError;
 	
-	/**
-	 * @param cacheKey
-	 */
 	protected AbstractScriptEnvironment(
 		Dependencies dependencies
 	) {
@@ -104,8 +109,6 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		this.dependencies = dependencies;
 	}
 	
-	//protected abstract void initializeScopes();
-	
 	@Override
 	public ScriptableObject newObject() {
 		try (RhinoContext context = contextProvider.get()) {
@@ -113,36 +116,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		}
 	}
 	
-	// this is a nasty mess and really needs a wash
-
 	@Override
 	public boolean initialized() {
 		return state == Initialized;
 	}
 
 	@Override
-	public void initialized(boolean initialized) {
-		if (initialized) {
-			state = Initialized;
-		}
-	}
-
-	@Override
 	public boolean initializing() {
 		return state == Initializing;
-	}
-
-	@Override
-	public void initializing(boolean initializing) {
-		if (initializing && state == Unitialized) {
-			state = Initializing;
-		}
-	}
-	
-	@Override
-	public void initializationError(Throwable cause) {
-		state = Errored;
-		this.initializationError = cause;
 	}
 	
 	@Override
@@ -154,12 +135,43 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	public boolean initializationDidError() {
 		return state == Errored;
 	}
+
+	/**
+	 * mark this environment as being initialized
+	 */
+	void initialized(boolean initialized) {
+		if (initialized) {
+			state = Initialized;
+		}
+	}
+
+	/**
+	 * mark this environment as undergoing initialization
+	 */
+	void initializing(boolean initializing) {
+		if (initializing && state == Unitialized) {
+			state = Initializing;
+		}
+	}
 	
+	/**
+	 * mark this environment as having experienced an initalization error
+	 */
+	void initializationError(Throwable cause) {
+		state = Errored;
+		this.initializationError = cause;
+	}
+	
+	@Override
 	protected void died() {
 		state = Dead;
 		publisher.publish(new ScriptEnvironmentDied(this));
 	}
 	
+	/**
+	 * prepare this environment for a continuation
+	 * @return the key to resume the continuation, with a fully saved context
+	 */
 	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
 		ContinuationPendingKey key = dependencies.pendingKeyProvider.get();
 		continuationPendings.put(key, continuationPending);
@@ -167,16 +179,26 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return key;
 	}
 	
+	/**
+	 * @return the captured execution state for a given key
+	 */
 	ContinuationPending continuationPending(final ContinuationPendingKey key) {
 		assert continuationPendings.containsKey(key) : "trying to retrieve a nonexistent continuation for " + key;
 		return continuationPendings.remove(key);
 	}
 	
+	/**
+	 * Implement to perform environment-specific context capture for a continuation, associated to the given key
+	 */
 	protected void captureContextForKey(ContinuationPendingKey key) {
 		// nothing to do in the abstract, but specific type will have things
 		// DocumentScriptEnvironment needs to save connections and documents, for example
 	}
 	
+	/**
+	 * restore an environment-specific context for the continuation associated to the given key.
+	 * @return a {@link Closer} to clean up any restored context when the 
+	 */
 	protected Closer restoreContextForKey(ContinuationPendingKey key) {
 		return new Closer() {
 			
@@ -187,10 +209,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		};
 	}
 
-	/**
-	 * @return the exports property of the module object in the script's scope.  This could be
-	 * anything at all, scripts are able to export whatever they want.
-	 */
+	@Override
 	public Object exports() {
 		try (RhinoContext context = contextProvider.get()) {
 			return scope() == null ? Undefined.instance : context.evaluateString(scope(), "module.exports", "evaluating exports");
@@ -199,24 +218,40 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	/**
 	 * @return a pendingKey if the completion of the initialization task should resume something
-	 * or null if nothing
-	 * <p>
-	 * maybe more things will be on this list later or the mechanism may expand
+	 * or null if nothing. the abstract returns null
 	 */
-	protected ContinuationPendingKey pendingKey() {
+	protected ContinuationPendingKey initializationContinuationPendingKey() {
 		return null;
 	}
-
-	public String toString() {
-		return super.toString() + " {state=" + state + "}";
-	}
 	
+	/**
+	 * <p>
+	 * creates a child scope for the given parent.  lookups will delegate to the parent if a given
+	 * reference is not found in the child, but all creation will occur in the child. the parent is typically
+	 * sealed and cannot be impacted in any case
+	 * 
+	 * <p>
+	 * Generally, you want to inject the {@link Global} scope, and use that as a parent.  it has all the
+	 * standard javascript objects initialized, but it is sealed and intended to be shared server-wide
+	 * 
+	 * @return the new child scope
+	 */
 	protected ScriptableObject createChainedScope(final ScriptableObject parent) {
 		try (RhinoContext context = contextProvider.get()) {
 			return context.newChainedScope(parent);
 		}
 	}
 	
+	/**
+	 * <p>
+	 * creates the usual timer functions in the supplied scope. 
+	 * 
+	 * <p>
+	 * functions are setInterval, setTimeout, clearInterval, and clearTimeout.  they behave much like
+	 * their browser progenitors
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureTimers(final ScriptableObject localScope) {
 		assert !localScope.isSealed() : "cannot configure timers on a sealed scope";
 		localScope.defineProperty("setInterval", dependencies.timers.setInterval, ScriptableObject.EMPTY);
@@ -226,16 +261,33 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return localScope;
 	}
 	
+	/**
+	 * Installs the {@link InjectFunction} under the standard name defined in {@link InjectFunction#NAME}
+	 * into the supplied scope.
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureInjectFunction(final ScriptableObject localScope) {
 		return configureInjectFunction(localScope, InjectFunction.NAME);
 	}
 	
+	/**
+	 * Installs the {@link InjectFunction} under the supplied name into the supplied scope.
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureInjectFunction(final ScriptableObject localScope, final String name) {
 		assert !localScope.isSealed() : "cannot configure inject function on a sealed scope";
 		localScope.defineProperty(name, dependencies.injectFunction, ScriptableObject.CONST);
 		return localScope;
 	}
 	
+	/**
+	 * Creates the CommonJS module set-up in the supplied scope, and adds a require function under the name
+	 * "require"
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureModuleObjects(
 		final String moduleIdentifier,
 		final ScriptableObject localScope
@@ -245,10 +297,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 
 	/**
 	 * Configures top-level module objects in a given scope, including a require function and assignable exports
-	 * that are made available via {@link #exports()}
-	 * @param moduleIdentifier must be fully qualified or further module resolution will fail
-	 * @param localScope must not be sealed
-	 * @return localScope, post configuration, for chaining
+	 * that are made available via {@link #exports()}. the require function is installed under the supplied name
 	 */
 	protected ScriptableObject configureModuleObjects(
 		final String moduleIdentifier,
@@ -305,4 +354,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return localScope;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " {state=" + state + "}";
+	}
 }
