@@ -117,7 +117,7 @@ public class RouterTest {
 		assertThat(routeMatch.route.mapping(), is("/result1"));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchRequest(GET, new URIMatch("/something/../../start"));
+		routeMatch = router.matchRequest(GET, new URIMatch("/something/../../../../../start"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
 		assertThat(routeMatch.route.mapping(), is("/result1"));
