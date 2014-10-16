@@ -12,8 +12,8 @@ import javax.inject.Provider;
 
 import org.mozilla.javascript.Script;
 
+import jj.http.server.LoadedResource;
 import jj.resource.AbstractFileResource;
-import jj.resource.LoadedResource;
 import jj.resource.PathResolver;
 import jj.script.RhinoContext;
 

@@ -24,5 +24,16 @@ package jj.conversion;
  */
 public interface Converter<From, To> {
 
+	/**
+	 * <p>
+	 * Convert the incoming value to the outgoing type. If the conversion cannot be
+	 * performed, return null.
+	 * 
+	 * <p>
+	 * DO NOT THROW EXCEPTIONS FROM THIS METHOD
+	 * 
+	 * @param in the incoming value
+	 * @return the converted value
+	 */
 	To convert(From in);
 }

@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.event.Listener;
+import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 import jj.script.ContinuationCoordinator;
@@ -36,17 +37,24 @@ import jj.script.ScriptTask;
 @Singleton
 @Subscriber
 class SpecCoordinator {
+	
+	static final String CONTEXT_SPEC = "spec";
+	static final String CONTEXT_TARGET = "target";
+	static final String CONTEXT_RUNNER = "runner";
 
 	private final ContinuationCoordinator continuationCoordinator;
 	private final TaskRunner taskRunner;
+	private final Publisher publisher;
 	
 	@Inject
 	SpecCoordinator(
 		final ContinuationCoordinator continuationCoordinator,
-		final TaskRunner taskRunner
+		final TaskRunner taskRunner,
+		final Publisher publisher
 	) {
 		this.continuationCoordinator = continuationCoordinator;
 		this.taskRunner = taskRunner;
+		this.publisher = publisher;
 	}
 	
 	@Listener
@@ -56,8 +64,6 @@ class SpecCoordinator {
 			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment(), continuationCoordinator));
 		}
 	}
-	
-	
 	
 	private final class SpecEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
@@ -71,6 +77,12 @@ class SpecCoordinator {
 		@Override
 		protected void begin() throws Exception {
 			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.specScript());
+		}
+		
+		@Override
+		protected boolean errored(Throwable cause) {
+			publisher.publish(new JasmineTestError(scriptEnvironment, CONTEXT_SPEC, cause));
+			return true;
 		}
 		
 		@Override
@@ -94,6 +106,12 @@ class SpecCoordinator {
 		}
 		
 		@Override
+		protected boolean errored(Throwable cause) {
+			publisher.publish(new JasmineTestError(scriptEnvironment, CONTEXT_TARGET, cause));
+			return true;
+		}
+		
+		@Override
 		protected void complete() throws Exception {
 			taskRunner.execute(new RunnerEvaluationTask(scriptEnvironment, continuationCoordinator));
 		}
@@ -106,6 +124,12 @@ class SpecCoordinator {
 			final ContinuationCoordinator continuationCoordinator
 		) {
 			super("runner execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		}
+		
+		@Override
+		protected boolean errored(Throwable cause) {
+			publisher.publish(new JasmineTestError(scriptEnvironment, CONTEXT_RUNNER, cause));
+			return true;
 		}
 
 		@Override

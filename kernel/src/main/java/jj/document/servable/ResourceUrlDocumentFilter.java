@@ -18,9 +18,9 @@ package jj.document.servable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.server.ServableResource;
 import jj.http.server.servable.Servables;
-import jj.http.uri.URIMatch;
-import jj.resource.ServableResource;
+import jj.http.server.uri.URIMatch;
 
 import org.jsoup.nodes.Element;
 

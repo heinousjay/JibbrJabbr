@@ -26,10 +26,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.configuration.resolution.MockApplication;
+import jj.http.server.resource.StaticResource;
+import jj.http.server.resource.StaticResourceMaker;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
-import jj.resource.stat.ic.StaticResourceMaker;
 
 import org.junit.Before;
 import org.junit.Test;

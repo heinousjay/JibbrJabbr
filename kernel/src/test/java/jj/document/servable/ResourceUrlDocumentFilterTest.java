@@ -22,7 +22,7 @@ import jj.css.StylesheetResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.ResourceUrlDocumentFilter;
 import jj.http.server.MockServablesRule;
-import jj.resource.stat.ic.StaticResource;
+import jj.http.server.resource.StaticResource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

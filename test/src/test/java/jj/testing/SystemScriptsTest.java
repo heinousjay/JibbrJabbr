@@ -20,15 +20,23 @@ import static jj.configuration.resolution.AppLocation.APIModules;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
 import jj.App;
+import jj.JJ;
 import jj.JJModule;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.jasmine.JasmineTestError;
 import jj.jasmine.JasmineTestFailure;
 import jj.jasmine.JasmineTestSuccess;
 import jj.resource.ResourceLoader;
@@ -46,23 +54,54 @@ import org.junit.Test;
  */
 @Subscriber
 public class SystemScriptsTest {
+	
+	private static final String SPEC_PATH = "/jj/testing/specs";
+	private static final int total;
+	
+	private static int count(Path in) throws Exception {
+
+		// the cast is ugly but if i ever end up with more than 2.1 billion
+		// specs i guess addressing this will be a pleasure haha
+		
+		return (int)Files.list(in).filter(path -> { return path.toString().endsWith(".js"); }).count();
+	}
+	
+	static {
+		try {
+			
+			
+			URI specUri = App.class.getResource(SPEC_PATH).toURI();
+			Path jarPath = JJ.jarPath(specUri);
+			if (jarPath != null) {
+				try (FileSystem jar = FileSystems.newFileSystem(jarPath, null)) {
+					total = count(jar.getPath(SPEC_PATH));
+				}
+			} else {
+				total = count(Paths.get(specUri));
+			}
+			
+			//System.out.println(total + " specs found in " + specUri);
+			
+		} catch (Exception e) {
+			throw new AssertionError(e);
+		}
+	}
+	
 
 	@Rule
 	public JibbrJabbrTestServer server =
-		new JibbrJabbrTestServer(App.configuration)        // we use the configuration because that loads all the core configuration scripts
-			.runAllSpecs()                                 // this defaults to off.  that might not survive now!
-			.injectInstance(this)                          // well, sure
+		new JibbrJabbrTestServer(App.configuration) // we use the configuration because that loads all the core configuration scripts
+			.runAllSpecs()                          // this defaults to off.  that might not survive now!
+			.injectInstance(this)                   // well, sure
 			.withModule(new JJModule() {
-				@Override
 				protected void configure() {
-					addAPIModulePath("/jj/testing/specs"); // and put the specs on the path
+					addAPIModulePath(SPEC_PATH);    // and put the specs on the path
 				}
 			});
 	
 	@Inject
 	ResourceLoader resourceLoader;
 	
-	final int total = 8; // well, it's manual but maybe the phaser does what i need?
 	final CountDownLatch testCountLatch = new CountDownLatch(total);
 	final AtomicInteger successCount = new AtomicInteger();
 	final AtomicInteger failureCount = new AtomicInteger();
@@ -79,6 +118,12 @@ public class SystemScriptsTest {
 		testCountLatch.countDown();
 	}
 	
+	@Listener
+	void testErrored(JasmineTestError error) {
+		failureCount.incrementAndGet();
+		testCountLatch.countDown();
+	}
+	
 	private void load(String name) {
 		resourceLoader.loadResource(ScriptResource.class, APIModules, name);
 	}
@@ -87,19 +132,19 @@ public class SystemScriptsTest {
 	public void test() throws Exception {
 		
 		// load everything we care about here!
-		load("globalize.js");
 		load("broadcast.js");
-		load("local-storage.js");
-		load("server-events.js");
-		load("resource-properties.js");
+		load("configuration-support.js"); // loaded by configuration
 		load("env.js");
+		load("globalize.js");
+		load("local-storage.js");
+		load("resource-properties.js");
+		load("server-events.js");
 		load("system-properties.js");
+		load("uri-routing-configuration.js"); // loaded by configuration
 		
-		// could take a while!
 		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
 		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
 		assertThat(successCount.get(), is(total)); // just for certainty?
-		
 	}
 	
 }

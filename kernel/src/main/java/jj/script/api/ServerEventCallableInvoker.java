@@ -39,7 +39,7 @@ abstract class ServerEventCallableInvoker {
 	
 	private Callable callable;
 	
-	private boolean alive = true;
+	private volatile boolean alive = true;
 	
 	protected ServerEventCallableInvoker(final TaskRunner taskRunner, final ContinuationCoordinator continuationCoordinator) {
 		this.taskRunner = taskRunner;
@@ -67,7 +67,9 @@ abstract class ServerEventCallableInvoker {
 			) {
 				@Override
 				protected void begin() throws Exception {
-					pendingKey = continuationCoordinator.execute(scriptEnvironment, callable, event);
+					if (alive) {
+						pendingKey = continuationCoordinator.execute(scriptEnvironment, callable, event);
+					}
 				}
 			});
 		}

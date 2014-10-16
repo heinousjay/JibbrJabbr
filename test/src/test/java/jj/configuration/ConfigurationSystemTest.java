@@ -32,8 +32,8 @@ import javax.inject.Singleton;
 import jj.App;
 import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
-import jj.http.uri.Route;
-import jj.http.uri.RouterConfiguration;
+import jj.http.server.uri.Route;
+import jj.http.server.uri.RouterConfiguration;
 import jj.i18n.I18NConfiguration;
 import jj.css.LessConfiguration;
 import jj.document.DocumentConfiguration;
@@ -125,7 +125,7 @@ public class ConfigurationSystemTest {
 		assertThat(routerConfiguration.welcomeFile(), is("root"));
 		List<Route> routes = routerConfiguration.routes();
 		assertThat(routes.size(), is(4));
-		assertRoute(routes.get(0), GET, "/chat/", "/chat/list");
+		assertRoute(routes.get(0), GET, "/chat/", "document", "/chat/list");
 //		route.GET('/chat/').to('/chat/list');
 //		route.POST('/chat/:room').to('/chat/room');
 //		route.PUT('/chat/:room/*secret').to('/chat/room');
@@ -166,9 +166,10 @@ public class ConfigurationSystemTest {
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));
 	}
 	
-	private void assertRoute(Route route, HttpMethod method, String uri, String destination) {
+	private void assertRoute(Route route, HttpMethod method, String uri, String resourceName, String mappedName) {
 		assertThat(route.method(), is(method));
 		assertThat(route.uri(), is(uri));
-		assertThat(route.destination(), is(destination));
+		assertThat(route.resourceName(), is(resourceName));
+		assertThat(route.mapping(), is(mappedName));
 	}
 }

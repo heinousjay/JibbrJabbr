@@ -23,6 +23,6 @@ import java.io.IOException;
  */
 interface ResourceWatchService {
 
-	void watch(ParentedResource resource) throws IOException;
+	void watch(FileSystemResource resource) throws IOException;
 
 }

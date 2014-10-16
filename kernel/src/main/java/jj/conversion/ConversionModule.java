@@ -25,10 +25,17 @@ public class ConversionModule extends JJModule {
 
 	@Override
 	protected void configure() {
-		addConverterBinding().to(FromStringToBoolean.class);
 		addConverterBinding().to(FromStringToPath.class);
+		
+		addConverterBinding().to(FromStringToBoolean.class);
+		addConverterBinding().to(FromStringToCharacter.class);
+		addConverterBinding().to(FromStringToByte.class);
+		addConverterBinding().to(FromStringToShort.class);
 		addConverterBinding().to(FromStringToInteger.class);
 		addConverterBinding().to(FromStringToLong.class);
+		addConverterBinding().to(FromStringToFloat.class);
+		addConverterBinding().to(FromStringToDouble.class);
+		
 		addConverterBinding().to(FromDoubleToInteger.class);
 		
 	}

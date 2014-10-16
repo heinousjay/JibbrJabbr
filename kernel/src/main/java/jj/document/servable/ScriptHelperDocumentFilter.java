@@ -9,8 +9,8 @@ import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.ScriptResourceType;
+import jj.http.server.resource.StaticResource;
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 
 /**
  * Represents the incoming HTTP request

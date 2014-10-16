@@ -5,10 +5,10 @@ import java.io.IOException;
 
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.ServableResource;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceThread;
 import jj.resource.Resource;
-import jj.resource.ServableResource;
 import io.netty.handler.codec.http.HttpHeaders;
 
 public abstract class Servable<T extends ServableResource> {

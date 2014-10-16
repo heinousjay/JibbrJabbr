@@ -39,11 +39,11 @@ import jj.AnswerWithSelf;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.http.server.websocket.WebSocketConnectionMaker;
 import jj.http.server.websocket.WebSocketFrameHandler;
 import jj.http.server.websocket.WebSocketFrameHandlerCreator;
-import jj.http.uri.URIMatch;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;

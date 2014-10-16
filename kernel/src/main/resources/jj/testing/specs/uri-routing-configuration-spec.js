@@ -13,12 +13,12 @@ var inject = function(id) {
 				inject.r = r;
 			}
 		},
-		'jj.http.uri.ServableResourceHelper' : {
+		'jj.http.server.ServableResourceHelper' : {
 			arrayOfNames: function() {
 				return ['static', 'script', 'stylesheet', 'document'];
 			}
 		},
-		'jj.http.uri.RouteUriValidator' : validator
+		'jj.http.server.uri.RouteUriValidator' : validator
 	}[id];
 }
 var valueOf = java.lang.String.valueOf;
@@ -82,7 +82,7 @@ describe("makeSetter", function() {
 		var ms;
 		
 		beforeEach(function() {
-			ms = makeSetter(GET, route);
+			ms = makeSetter(GET);
 		})
 		
 		it("adds valid Routes to the collector in the correct key", function() {
@@ -91,13 +91,14 @@ describe("makeSetter", function() {
 			
 			var beef = "/beef";
 			var chief = "/chief";
-			ms(beef).to(chief);
+			ms(beef).to.document(chief);
 			
 			expect(inject.l).toBe(base + 'routes');
 			expect(inject.r).toBeDefined();
 			expect(inject.r.method()).toEqual(GET);
 			expect(inject.r.uri()).toEqual(valueOf(beef));
-			expect(inject.r.destination()).toEqual(valueOf(chief));
+			expect(inject.r.resourceName()).toEqual(valueOf('document'));
+			expect(inject.r.mapping()).toEqual(valueOf(chief));
 		});
 		
 		it("errors on validation failure", function() {

@@ -23,10 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.resource.StaticResource;
+import jj.http.server.uri.URIMatch;
 
 /**
  * @author jason

@@ -1,8 +1,6 @@
 package jj.resource;
 
 import jj.JJModule;
-import jj.resource.stat.ic.StaticResource;
-import jj.resource.stat.ic.StaticResourceCreator;
 
 
 public class ResourceModule extends JJModule {
@@ -32,8 +30,6 @@ public class ResourceModule extends JJModule {
 		bindCreation().of(DirectoryResource.class).to(DirectoryResourceCreator.class);
 		
 		bindCreation().of(Sha1Resource.class).to(Sha1ResourceCreator.class);
-		
-		bindCreation().of(StaticResource.class).to(StaticResourceCreator.class);
 		
 		bindLoggedEvents().annotatedWith(ResourceLogger.class).toLogger(ResourceLogger.NAME);
 	}

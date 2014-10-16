@@ -34,12 +34,13 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
+import jj.http.server.LoadedResource;
+import jj.http.server.ServableResourceConfiguration;
+import jj.http.server.resource.StaticResource;
 import jj.resource.AbstractResource;
-import jj.resource.LoadedResource;
 import jj.resource.NoSuchResourceException;
 import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
-import jj.resource.stat.ic.StaticResource;
 import jj.script.Global;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;
@@ -51,9 +52,15 @@ import jj.util.SHA1Helper;
  * stylesheet, or a stylesheet that has run through less
  * processing.
  * 
+ * <p>
+ * The stylesheet represented by this resource will be processed to have
+ * all internal URIs replaced with long-term cacheable URIs.  This might
+ * get put into configuration to disable it.
+ * 
  * @author jason
  *
  */
+@ServableResourceConfiguration(routeContributor = StylesheetResourceRouteContributor.class)
 public class StylesheetResource extends AbstractResource implements LoadedResource {
 
 	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";
