@@ -113,12 +113,12 @@ class HttpServer implements JJServerStartupListener {
 				int port = binding.port();
 				
 				if (!StringUtils.isEmpty(host)) {
-					publisher.publish(new BindingHttpServer(host, port));
+					
 					serverBootstrap.bind(host, port).sync();
 				} else {
-					publisher.publish(new BindingHttpServer(null, port));
 					serverBootstrap.bind(port).sync();
 				}
+				publisher.publish(new BindingHttpServer(binding));
 			}
 		} catch (Exception e) {
 			serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
