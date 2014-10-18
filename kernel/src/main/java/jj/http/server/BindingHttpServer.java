@@ -27,20 +27,18 @@ import jj.logging.LoggedEvent;
 @ServerLogger
 class BindingHttpServer extends LoggedEvent {
 	
-	private final String host;
-	private final int port;
+	private final Binding binding;
 	
-	BindingHttpServer(String host, int port) {
-		this.host = host;
-		this.port = port;
+	BindingHttpServer(Binding binding) {
+		this.binding = binding;
 	}
 
 	@Override
 	public void describeTo(Logger logger) {
-		if (host == null) {
-			logger.info("Binding to {}", port);
+		if (binding.host() == null) {
+			logger.info("Binding to {}", binding.port());
 		} else {
-			logger.info("Binding to {}:{}", host, port);
+			logger.info("Binding to {}:{}", binding.host(), binding.port());
 		}
 	}
 
