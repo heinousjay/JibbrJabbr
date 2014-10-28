@@ -15,9 +15,7 @@
  */
 package jj.testing;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
+import static java.nio.charset.StandardCharsets.*;
 
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -25,10 +23,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 
 import org.junit.runners.model.Statement;
 
@@ -65,13 +63,18 @@ enum HttpTraceMode {
 			if (!Files.exists(path)) {
 				throw new AssertionError("cannot find " + path.toUri());
 			}
-			assertThat(bytes, is(byteCache.computeIfAbsent(name, key -> {
+			if (!Arrays.equals(bytes, byteCache.computeIfAbsent(name, key -> {
 				try {
 					return Files.readAllBytes(path);
 				} catch (Exception e) {
 					throw new AssertionError(e);
 				}
-			})));
+			}))) {
+				System.out.println("OUTPUT:");
+				System.out.println(new String(bytes, UTF_8));
+				
+				throw new AssertionError(name + " does not match the recorded output");
+			}
 			
 			break;
 			

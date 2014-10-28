@@ -18,7 +18,6 @@ package jj.testing;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.configuration.resolution.Assets.*;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,15 +82,6 @@ public class BasicServingTest {
 	@Inject EmbeddedHttpServer server;
 	
 	@Inject TraceModeSwitch trace;
-	
-	static interface Namer {
-		String name(int i);
-		Path path(int i);
-	}
-	
-	static interface RequestMaker {
-		VerifiableRequest make();
-	}
 	
 	private void runBasicStressTest(final int timeout, final int totalClients, final List<String> uris) throws Throwable {
 		final AssertionError error = new AssertionError("failure!");
