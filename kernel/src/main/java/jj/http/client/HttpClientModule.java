@@ -15,11 +15,6 @@
  */
 package jj.http.client;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.AsyncHttpClientConfig;
-import org.asynchttpclient.AsyncHttpProvider;
-import org.asynchttpclient.providers.netty.NettyAsyncHttpProvider;
-
 import jj.JJModule;
 
 /**

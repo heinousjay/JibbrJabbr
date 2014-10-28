@@ -15,9 +15,6 @@
  */
 package jj.http.client;
 
-import org.asynchttpclient.Request;
-import org.asynchttpclient.RequestBuilder;
-
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 
@@ -49,12 +46,6 @@ class HttpClientRequest implements Continuation {
 		assert this.pendingKey == null;
 		assert pendingKey != null;
 		this.pendingKey = pendingKey;
-	}
-	
-	Request request() {
-		return new RequestBuilder(method)
-			.setUrl(uri)
-			.build();
 	}
 	
 	@Override
