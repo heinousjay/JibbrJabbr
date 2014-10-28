@@ -54,7 +54,7 @@ allprojects {
 		// it's looking interesting
 		core 'com.google.inject:guice:3.0'
 		core 'com.google.inject.extensions:guice-multibindings:3.0'
-		core 'org.javassist:javassist:3.18.1-GA'
+		core 'org.javassist:javassist:3.18.2-GA'
 		core 'org.slf4j:slf4j-api:1.7.6'
 		core('ch.qos.logback:logback-classic:1.0.7') {
 			exclude group: 'org.slf4j'
@@ -69,7 +69,7 @@ allprojects {
 		}
 		
 		serverCore configurations.core
-		serverCore 'io.netty:netty-all:4.0.21.Final'
+		serverCore 'io.netty:netty-all:4.0.23.Final'
 		serverCore 'org.asynchttpclient:async-http-client-netty-provider:2.0.0-SNAPSHOT'
 		serverCore 'org.mozilla:rhino:1.7R4'
 		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
