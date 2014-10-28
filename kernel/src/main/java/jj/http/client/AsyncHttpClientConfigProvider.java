@@ -43,7 +43,7 @@ class AsyncHttpClientConfigProvider implements Provider<AsyncHttpClientConfig> {
 		
 		return new AsyncHttpClientConfig.Builder()
 			.setAsyncHttpClientProviderConfig(nettyConfig)
-			.setMaximumConnectionsPerHost(configuration.maximumConnectionsPerHost())
+			.setMaxConnectionsPerHost(configuration.maximumConnectionsPerHost())
 			.setUserAgent(configuration.userAgent())
 			.build();
 	}

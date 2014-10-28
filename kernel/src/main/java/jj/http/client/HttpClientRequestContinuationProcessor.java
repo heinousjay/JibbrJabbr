@@ -15,18 +15,7 @@
  */
 package jj.http.client;
 
-import java.io.IOException;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-
-import org.asynchttpclient.AsyncHandler;
-import org.asynchttpclient.AsyncHandler.STATE;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.HttpResponseBodyPart;
-import org.asynchttpclient.HttpResponseHeaders;
-import org.asynchttpclient.HttpResponseStatus;
 
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
@@ -37,57 +26,10 @@ import jj.script.ContinuationState;
  */
 @Singleton
 class HttpClientRequestContinuationProcessor implements ContinuationProcessor {
-	
-	private final Provider<AsyncHttpClient> httpClient;
-	
-	@Inject
-	HttpClientRequestContinuationProcessor(final Provider<AsyncHttpClient> httpClient) {
-		this.httpClient = httpClient;
-	}
 
 	@Override
 	public void process(ContinuationState continuationState) {
-		final HttpClientRequest c = continuationState.continuationAs(HttpClientRequest.class);
-		
-		// dispatch the request
-		try {
-			httpClient.get().executeRequest(c.request(), new AsyncHandler<Void>() {
-
-				@Override
-				public void onThrowable(Throwable t) {
-					c.pendingKey().resume(t);
-				}
-
-				@Override
-				public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
-					// accumulate the body part into the response
-					return STATE.CONTINUE;
-				}
-
-				@Override
-				public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
-					
-					return STATE.CONTINUE;
-				}
-
-				@Override
-				public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
-					
-					return STATE.CONTINUE;
-				}
-
-				@Override
-				public Void onCompleted() throws Exception {
-					c.pendingKey().resume("well, we tried something");
-					return null;
-				}
-				
-			});
-		} catch (IOException e) {
-			c.pendingKey().resume(e);
-		}
-		
-		
+		continuationState.continuationAs(HttpClientRequest.class);
 	}
 
 }
