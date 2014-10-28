@@ -45,6 +45,21 @@ public class Arguments {
 	
 	private final Map<String, String> arguments;
 	private final Converters converters;
+	
+	private static <E extends Enum<E>> String from(Class<E> enumClass) {
+		String name = enumClass.getSimpleName();
+		StringBuilder out = new StringBuilder(name.length() * 2); // pretty worst case
+		out.append(Character.toLowerCase(name.charAt(0)));
+		for (int i = 1; i < name.length(); ++i) {
+			char c = name.charAt(i);
+			if (Character.isUpperCase(c)) {
+				out.append('-');
+				c = Character.toLowerCase(c);
+			}
+			out.append(c);
+		}
+		return out.toString();
+	}
 
 	@Inject
 	Arguments(final @CommandLine String[] arguments, final Converters converters) {
@@ -68,6 +83,16 @@ public class Arguments {
 			throw new InitializationException("all arguments must be name=value pairs, the following were not understood\n" + badArgs);
 		}
 		return Collections.unmodifiableMap(result);
+	}
+	
+	public <E extends Enum<E>> E get(Class<E> enumClass) {
+		return converters.convert(arguments.get(from(enumClass)), enumClass);
+	}
+	
+	public <E extends Enum<E>> E get(Class<E> enumClass, E defaultValue) {
+		E result = converters.convert(arguments.get(from(enumClass)), enumClass);
+		
+		return result == null ? defaultValue : result;
 	}
 	
 	/**

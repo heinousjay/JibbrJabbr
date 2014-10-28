@@ -44,7 +44,7 @@ public class EmbeddedHttpServer {
 	private final TaskRunner taskRunner;
 	
 	public interface ResponseReady {
-		void ready(EmbeddedHttpResponse response);
+		void ready(EmbeddedHttpResponse response) throws Exception;
 	}
 	
 	@Inject
