@@ -15,6 +15,8 @@
  */
 package jj.testing;
 
+import static jj.testing.HttpTraceMode.*;
+
 import java.net.URI;
 import java.util.ArrayList;
 
@@ -39,13 +41,15 @@ import com.google.inject.Stage;
  * method, and torn down immediately after.
  * 
  * <p>
- * 
+ * There are some fluent configuration methods
  * 
  * 
  * @author jason
  *
  */
 public class JibbrJabbrTestServer implements TestRule {
+	
+	private HttpTraceMode mode = Nothing;
 	
 	private final String appPath;
 	
@@ -80,10 +84,20 @@ public class JibbrJabbrTestServer implements TestRule {
 		this.appPath = appURI.getPath();
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
+	public JibbrJabbrTestServer verifying() {
+		assertNotStarted();
+		
+		mode = Verifying;
+		return this;
+	}
+	
+	public JibbrJabbrTestServer recording() {
+		assertNotStarted();
+		
+		mode = Recording;
+		return this;
+	}
+	
 	public JibbrJabbrTestServer withFileWatcher() {
 		assertNotStarted();
 		
@@ -143,7 +157,7 @@ public class JibbrJabbrTestServer implements TestRule {
 			new WebDriverRule().driverProvider(webDriverProvider);
 		
 		if (httpPort != 0) {
-			result.baseUrl("http://localhost:" + httpPort);
+			result.baseUrl("http://0.0.0.0:" + httpPort);
 		}
 		
 		return result;
@@ -179,10 +193,10 @@ public class JibbrJabbrTestServer implements TestRule {
 		builder.add("fileWatcher=" + fileWatcher);
 		builder.add("httpServer=" + httpServer);
 		builder.add("runAllSpecs=" + runAllSpecs);
+		builder.add("http-trace-mode=" + mode);
 		if (httpPort > 1023 && httpPort < 65536) {
 			builder.add("httpPort=" + httpPort);
 		}
-		
 		injector = Guice.createInjector(
 			Stage.PRODUCTION,
 			new TestModule(this, builder.toArray(new String[builder.size()]), base, description, httpServer)
@@ -202,6 +216,6 @@ public class JibbrJabbrTestServer implements TestRule {
 			statement = createInjectionStatement(statement);
 		}
 		
-		return statement;
+		return mode.traceStatement(statement, description.getClassName() + "." + description.getMethodName());
 	}
 }

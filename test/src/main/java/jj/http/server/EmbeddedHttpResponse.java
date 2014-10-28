@@ -65,7 +65,7 @@ public class EmbeddedHttpResponse {
 		return this;
 	}
 	
-	void responseReady() {
+	void responseReady() throws Exception {
 		responded.countDown();
 		if (responseReady != null) {
 			responseReady.ready(this);

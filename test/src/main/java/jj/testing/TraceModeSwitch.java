@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.client;
+package jj.testing;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.AsyncHttpClientConfig;
-import org.asynchttpclient.AsyncHttpProvider;
-import org.asynchttpclient.providers.netty.NettyAsyncHttpProvider;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import jj.JJModule;
+import jj.configuration.Arguments;
 
 /**
  * @author jason
  *
  */
-public class HttpClientModule extends JJModule {
+@Singleton
+public class TraceModeSwitch {
 
-	@Override
-	protected void configure() {
-
-		addAPIModulePath("/jj/http/client/api");
-		
-		dispatch().continuationOf(HttpClientRequest.class).to(HttpClientRequestContinuationProcessor.class);
-		
-		bindExecutor(HttpClientNioEventLoopGroup.class);
+	private final Arguments arguments;
+	
+	@Inject
+	TraceModeSwitch(final Arguments arguments) {
+		this.arguments = arguments;
 	}
-
+	
+	public HttpTraceMode mode() {
+		return arguments.get(HttpTraceMode.class, HttpTraceMode.Nothing);
+	}
 }

@@ -13,29 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.client;
-
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.AsyncHttpClientConfig;
-import org.asynchttpclient.AsyncHttpProvider;
-import org.asynchttpclient.providers.netty.NettyAsyncHttpProvider;
-
-import jj.JJModule;
+package jj.testing;
 
 /**
  * @author jason
  *
  */
-public class HttpClientModule extends JJModule {
-
-	@Override
-	protected void configure() {
-
-		addAPIModulePath("/jj/http/client/api");
-		
-		dispatch().continuationOf(HttpClientRequest.class).to(HttpClientRequestContinuationProcessor.class);
-		
-		bindExecutor(HttpClientNioEventLoopGroup.class);
-	}
+public abstract class TestRequest {
 
 }
