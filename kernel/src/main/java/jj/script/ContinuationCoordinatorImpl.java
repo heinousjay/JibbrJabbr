@@ -56,11 +56,11 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		publisher.publish(new ScriptExecutionError(scriptEnvironment, t));
 	} 
 	
-	private ContinuationState execute(final ContinuationExecution execution, final ScriptEnvironment scriptEnvironment) {
+	private ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment, final ContinuationExecution execution) {
 		try (RhinoContext context = contextProvider.get()) {
 			execution.run(context);
 		} catch (ContinuationPending continuation) {
-			return extractContinuationState(continuation);
+			return processContinuationState(extractContinuationState(continuation));
 		} catch (RhinoException re) {
 			// this is handled inside the RhinoContext
 			throw re;
@@ -76,15 +76,11 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
-		return processContinuationState(execute(new ContinuationExecution() {
-			
-			@Override
-			public void run(RhinoContext context) {
-				try (Closer closer = env.enterScope(scriptEnvironment)) {
-					context.executeScriptWithContinuations(script, scriptEnvironment.scope());
-				}
+		return execute(scriptEnvironment, context -> {
+			try (Closer closer = env.enterScope(scriptEnvironment)) {
+				context.executeScriptWithContinuations(script, scriptEnvironment.scope());
 			}
-		}, scriptEnvironment));
+		});
 	}
 	
 	/**
@@ -95,15 +91,11 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
-		return processContinuationState(execute(new ContinuationExecution() {
-			
-			@Override
-			public void run(RhinoContext context) {
-				try (Closer closer = env.enterScope(scriptEnvironment)) {
-					context.executeScriptWithContinuations(scriptEnvironment.script(), scriptEnvironment.scope());
-				}
+		return execute(scriptEnvironment, context -> {
+			try (Closer closer = env.enterScope(scriptEnvironment)) {
+				context.executeScriptWithContinuations(scriptEnvironment.script(), scriptEnvironment.scope());
 			}
-		}, scriptEnvironment));
+		});
 	}
 	
 	@Override
@@ -113,15 +105,11 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		if (function != null) {
 
-			return processContinuationState(execute(new ContinuationExecution() {
-				
-				@Override
-				public void run(RhinoContext context) {
-					try (Closer closer = env.enterScope(scriptEnvironment)) {
-						context.callFunctionWithContinuations(function, scriptEnvironment.scope(), args);
-					}
+			return execute(scriptEnvironment, context -> {
+				try (Closer closer = env.enterScope(scriptEnvironment)) {
+					context.callFunctionWithContinuations(function, scriptEnvironment.scope(), args);
 				}
-			}, scriptEnvironment));
+			});
 			
 		}
 		publisher.publish(new CannotFindFunction(scriptEnvironment));
@@ -147,20 +135,18 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		assert scriptEnvironment instanceof AbstractScriptEnvironment : "all script environments must be abstract script environments";
 		
+		assert pendingKey != null : "cannot resume without a pending key";
+		
 		final AbstractScriptEnvironment environment = (AbstractScriptEnvironment)scriptEnvironment;
 		
 		final ContinuationPending continuation = ((AbstractScriptEnvironment)scriptEnvironment).continuationPending(pendingKey);
 		if (continuation != null) {
 
-			return processContinuationState(execute(new ContinuationExecution() {
-				
-				@Override
-				public void run(RhinoContext context) {
-					try (Closer closer = env.enterScope(environment, pendingKey)) {
-						context.resumeContinuation(continuation.getContinuation(), environment.scope(), result);
-					}
+			return execute(scriptEnvironment, context -> {
+				try (Closer closer = env.enterScope(environment, pendingKey)) {
+					context.resumeContinuation(continuation.getContinuation(), environment.scope(), result);
 				}
-			}, scriptEnvironment));
+			});
 		}
 		
 		publisher.publish(new CannotFindContinuation(scriptEnvironment, pendingKey));
