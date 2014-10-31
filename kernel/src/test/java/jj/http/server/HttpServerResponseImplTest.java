@@ -47,7 +47,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -256,45 +255,4 @@ public class HttpServerResponseImplTest {
 		testUncachedNotModifiedResource(givenATransferableResource());
 		verifyInlineResponse();
 	}
-	
-	/*
-	 * move this to a test of the logging class
-	@Test
-	public void testAccessLog() throws IOException {
-		
-		// given
-		given(logger.isInfoEnabled()).willReturn(true);
-		given(logger.isTraceEnabled()).willReturn(true);
-		String location = "home";
-		byte[] bytes = "this is the contents".getBytes(UTF_8);
-		long length = 100L;
-		
-		
-		response.status(HttpResponseStatus.FOUND)
-			.header(HttpHeaders.Names.ACCEPT_RANGES, HttpHeaders.Values.BYTES)
-			.header(HttpHeaders.Names.LOCATION, location)
-			.header(HttpHeaders.Names.CONTENT_LENGTH, length)
-			.content(bytes)
-			.end();
-		
-		verifyRequestRespondedIsPublished();
-		
-		// have to do this outside the verification or mockito gets all jacked up inside
-		String remoteAddress = ctx.channel().remoteAddress().toString();
-		
-		verify(logger).info(
-			eq("{} - - {} \"{} {} {}\" {} {} {} {}"),
-			eq(remoteAddress),
-			anyString(), // the date, not going to try to make this work
-			eq(request.method()),
-			eq(request.request().getUri()),
-			eq(request.request().getProtocolVersion()),
-			eq(response.status().code()),
-			eq("100"),
-			eq("-"),
-			eq("-")
-		);
-	}
-	*/
-
 }
