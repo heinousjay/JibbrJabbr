@@ -44,8 +44,8 @@ import org.mozilla.javascript.ScriptableObject;
 public class ConfigurationScriptEnvironmentTest {
 	
 	MockAbstractScriptEnvironmentDependencies dependencies;
-	@Mock ResourceFinder resourceFinder;
-	@Mock Publisher publisher;
+	ResourceFinder resourceFinder;
+	Publisher publisher;
 	@Mock ScriptableObject global;
 	@Mock ConfigurationCollector collector;
 	
@@ -60,16 +60,16 @@ public class ConfigurationScriptEnvironmentTest {
 
 		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
 		given(dependencies.rhinoContextProvider().context.newChainedScope(global)).willReturn(global);
+		
+		resourceFinder = dependencies.resourceFinder();
+		publisher = dependencies.publisher();
 	}
 
 	@Test
 	public void testInitialization() {
 		given(resourceFinder.loadResource(ScriptResource.class, Base, CONFIG_SCRIPT_NAME)).willReturn(configScript);
 		
-		cse = new ConfigurationScriptEnvironment(
-			dependencies,
-			resourceFinder, publisher, global, collector
-		);
+		cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
 		
 		verify(publisher).publish(isA(ConfigurationLoading.class));
 		verify(configScript).addDependent(cse);
@@ -91,10 +91,7 @@ public class ConfigurationScriptEnvironmentTest {
 	public void testDefaultConfiguration() {
 		
 		try {
-			cse = new ConfigurationScriptEnvironment(
-				dependencies,
-				resourceFinder, publisher, global, collector
-			);
+			cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
 			fail("should have thrown");
 		} catch (NoSuchResourceException nsre) {
 			assertThat(nsre, is(notNullValue()));

@@ -27,10 +27,8 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.event.Listener;
-import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceFinder;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.Global;
 import jj.script.ScriptEnvironmentInitialized;
@@ -51,8 +49,6 @@ import jj.script.module.ScriptResource;
 @Subscriber
 class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
 	
-	private final Publisher publisher;
-	
 	private final ScriptableObject global;
 	
 	private final ScriptableObject scope;
@@ -64,14 +60,10 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	@Inject
 	ConfigurationScriptEnvironment(
 		final Dependencies dependencies,
-		final ResourceFinder resourceFinder,
-		final Publisher publisher,
 		final @Global ScriptableObject global,
 		final ConfigurationCollector collector
 	) {
 		super(dependencies);
-		
-		this.publisher = publisher;
 		
 		this.global = global;
 		
