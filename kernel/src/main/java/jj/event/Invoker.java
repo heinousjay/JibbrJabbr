@@ -16,11 +16,18 @@
 package jj.event;
 
 /**
+ * <p>
  * The API into the generated listener invoking instances.
- * Implementing this statically doesn't do anything in this system.
+ * Implementing this statically doesn't do anything in this system,
+ * it's only public because it has to be.
  * @author jason
  *
  */
 public interface Invoker {
+	
+	/** a description of the target listener, for debugging */
+	String target();
+	
+	/** invoke the target method */
 	void invoke(Object arg);
 }

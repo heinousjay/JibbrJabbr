@@ -45,7 +45,7 @@ class PublisherImpl implements Publisher {
 					try {
 						invoker.invoke(event);
 					} catch (Exception e) {
-						throw new AssertionError("broken event listener! " + invoker.getClass().getName(), e);
+						throw new AssertionError("broken event listener! " + invoker.target(), e);
 					}
 				}
 			}
