@@ -94,7 +94,7 @@ class RangeHeaderReader {
 		this.responseSize = responseSize;
 		this.overlapDistance = overlapDistance;
 		this.maxRanges = maxRanges;
-		parseRanges(requestHeaders.get(HttpHeaders.Names.RANGE));
+		parseRanges(requestHeaders.get(HttpHeaders.Names.RANGE).toString());
 	}
 	
 	private void parseRanges(String headerValue) {

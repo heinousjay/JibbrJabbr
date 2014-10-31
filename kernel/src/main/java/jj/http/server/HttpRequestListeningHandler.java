@@ -71,17 +71,17 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 	}
 	
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
+	protected void messageReceived(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
 		this.request = request;
 		
-		if (request.getDecoderResult().isFailure()) {
+		if (request.decoderResult().isFailure()) {
 			// respond with BAD_REQUEST and close the connection
 			// (unless we are being proxied and the connection is keep-alive, that is)
 			BAD_REQUEST.writeAndFlush(ctx).addListener(ChannelFutureListener.CLOSE);
 			
-		} else if (methodHandlers.containsKey(request.getMethod())) {
+		} else if (methodHandlers.containsKey(request.method())) {
 
-			HttpMethodHandler methodHandler = methodHandlers.get(request.getMethod()).get();
+			HttpMethodHandler methodHandler = methodHandlers.get(request.method()).get();
 			methodHandler.request(request);
 
 			ChannelPipeline p = ctx.pipeline();

@@ -16,6 +16,7 @@ import jj.http.server.uri.RouteFinder;
 import jj.http.server.uri.URIMatch;
 import jj.util.Sequence;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.AsciiString;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
@@ -26,9 +27,9 @@ class HttpServerRequestImpl implements HttpServerRequest {
 	
 	private static final Sequence sequence = new Sequence();
 	
-	private static final String HEADER_X_HOST = "x-host";
+	private static final AsciiString HEADER_X_HOST = new AsciiString("X-Host");
 	
-	private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
+	private static final AsciiString HEADER_X_FORWARDED_PROTO = new AsciiString("X-Forwarded-Proto");
 	
 	private final long startTime = System.nanoTime();
 	
@@ -45,7 +46,7 @@ class HttpServerRequestImpl implements HttpServerRequest {
 	@Inject
 	HttpServerRequestImpl(final FullHttpRequest request, final RouteFinder routeFinder, final ChannelHandlerContext ctx) {
 		this.request = request;
-		QueryStringDecoder decoder = new QueryStringDecoder(request.getUri());
+		QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
 		this.uri = routeFinder.find(QueryStringDecoder.decodeComponent(decoder.path()));
 		this.uriMatch = new URIMatch(uri);
 		this.ctx = ctx;
@@ -67,9 +68,9 @@ class HttpServerRequestImpl implements HttpServerRequest {
 
 	@Override
 	public String host() {
-		String xHost = header(HEADER_X_HOST);
-		String host = header(HttpHeaders.Names.HOST);
-		return xHost == null ? host : xHost;
+		CharSequence xHost = header(HEADER_X_HOST);
+		CharSequence host = header(HttpHeaders.Names.HOST);
+		return (xHost == null ? host : xHost).toString();
 	}
 
 	@Override
@@ -122,7 +123,7 @@ class HttpServerRequestImpl implements HttpServerRequest {
 	 * @return
 	 */
 	@Override
-	public boolean hasHeader(String ifNoneMatch) {
+	public boolean hasHeader(AsciiString ifNoneMatch) {
 		return request.headers().contains(ifNoneMatch);
 	}
 
@@ -131,7 +132,7 @@ class HttpServerRequestImpl implements HttpServerRequest {
 	 * @return
 	 */
 	@Override
-	public String header(String name) {
+	public CharSequence header(AsciiString name) {
 		return request.headers().get(name);
 	}
 
@@ -148,14 +149,14 @@ class HttpServerRequestImpl implements HttpServerRequest {
 	 */
 	@Override
 	public HttpMethod method() {
-		return request.getMethod();
+		return request.method();
 	}
 
 	/**
 	 * @return
 	 */
 	@Override
-	public List<Entry<String, String>> allHeaders() {
+	public List<Entry<CharSequence, CharSequence>> allHeaders() {
 		return request.headers().entries();
 	}
 	

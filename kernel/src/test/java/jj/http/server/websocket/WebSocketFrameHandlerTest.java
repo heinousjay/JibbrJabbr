@@ -103,7 +103,7 @@ public class WebSocketFrameHandlerTest {
 		String text = "text";
 		TextWebSocketFrame textFrame = new TextWebSocketFrame(text);
 		
-		wsfh.channelRead0(ctx, textFrame);
+		wsfh.messageReceived(ctx, textFrame);
 		
 		verify(connection).markActivity();
 		verify(webSocketConnectionHost).message(connection, text);
@@ -114,7 +114,7 @@ public class WebSocketFrameHandlerTest {
 		
 		TextWebSocketFrame textFrame = new TextWebSocketFrame("jj-hi");
 		
-		wsfh.channelRead0(ctx, textFrame);
+		wsfh.messageReceived(ctx, textFrame);
 		
 		verify(connection).markActivity();
 		verifyZeroInteractions(executor);
@@ -127,7 +127,7 @@ public class WebSocketFrameHandlerTest {
 		
 		PingWebSocketFrame pingFrame = new PingWebSocketFrame(byteBuf);
 		
-		wsfh.channelRead0(ctx, pingFrame);
+		wsfh.messageReceived(ctx, pingFrame);
 		
 		verify(connection).markActivity();
 		verify(ctx).writeAndFlush(pongFrameCaptor.capture());
@@ -140,7 +140,7 @@ public class WebSocketFrameHandlerTest {
 		
 		PongWebSocketFrame pongFrame = new PongWebSocketFrame(byteBuf);
 		
-		wsfh.channelRead0(ctx, pongFrame);
+		wsfh.messageReceived(ctx, pongFrame);
 		
 		verify(connection).markActivity();
 		//verify(handler).ponged(connection, byteBuf);
@@ -151,7 +151,7 @@ public class WebSocketFrameHandlerTest {
 		
 		BinaryWebSocketFrame binaryFrame = new BinaryWebSocketFrame(byteBuf);
 		
-		wsfh.channelRead0(ctx, binaryFrame);
+		wsfh.messageReceived(ctx, binaryFrame);
 		
 		verify(connection).markActivity();
 		//verify(handler).messageReceived(connection, byteBuf);
@@ -162,7 +162,7 @@ public class WebSocketFrameHandlerTest {
 		
 		CloseWebSocketFrame closeFrame = new CloseWebSocketFrame(1000, "");
 		
-		wsfh.channelRead0(ctx, closeFrame);
+		wsfh.messageReceived(ctx, closeFrame);
 		
 		verify(handshaker).close(ctx.channel(), closeFrame);
 	}

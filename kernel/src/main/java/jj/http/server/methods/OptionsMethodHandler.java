@@ -54,13 +54,13 @@ class OptionsMethodHandler extends HttpMethodHandler {
 	protected void handleHttpRequest(ChannelHandlerContext ctx, HttpRequest request) {
 		DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 		StringBuilder sb = new StringBuilder();
-		if ("*".equals(request.getUri())) {
+		if ("*".equals(request.uri())) {
 			for (HttpMethod method : methodHandlers.keySet()) {
 				sb.append(method).append(",");
 			}
 			sb.deleteCharAt(sb.length() - 1);
 		} else {
-			for (HttpMethod method : router.matchRequest(OPTIONS, new URIMatch(request.getUri())).routes.keySet()) {
+			for (HttpMethod method : router.matchRequest(OPTIONS, new URIMatch(request.uri())).routes.keySet()) {
 				sb.append(method).append(",");
 			}
 			sb.append(HEAD).append(",").append(TRACE).append(",").append(OPTIONS);

@@ -25,7 +25,7 @@ import java.util.Map;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -56,7 +56,7 @@ public class HttpProtocolTest {
 	
 	private final int MAKE_THIS_TEST_WORK = 1;
 	
-	public static class ProtocolTestResponseAdapter extends ChannelOutboundHandlerAdapter {
+	public static class ProtocolTestResponseAdapter extends ChannelHandlerAdapter {
 		
 		private final EmbeddedHttpResponse response;
 		

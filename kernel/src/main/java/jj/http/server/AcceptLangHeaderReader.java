@@ -73,10 +73,7 @@ class AcceptLangHeaderReader {
 
 	// need to get a hold of the server default locale somewhere?
 	AcceptLangHeaderReader(final HttpHeaders requestHeaders) {
-		
-		String headerValue = requestHeaders.get(HttpHeaders.Names.ACCEPT_LANGUAGE);
-		
-		locales = parseLocales(LIST_SPLITTER.split(headerValue));
+		locales = parseLocales(LIST_SPLITTER.split(requestHeaders.get(HttpHeaders.Names.ACCEPT_LANGUAGE)));
 	}
 	
 	private List<Locale> parseLocales(String[] incomingValues) {

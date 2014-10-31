@@ -69,7 +69,7 @@ allprojects {
 		}
 		
 		serverCore configurations.core
-		serverCore 'io.netty:netty-all:4.0.23.Final'
+		serverCore 'io.netty:netty-all:5.0.0.Alpha2-SNAPSHOT'
 		serverCore 'org.mozilla:rhino:1.7R4'
 		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
 		serverCore 'org.jsoup:jsoup:1.8.1'

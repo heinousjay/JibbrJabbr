@@ -127,11 +127,11 @@ public class EngineHttpHandlerTest {
 	@Test
 	public void testChannelRead0BadRequest() throws Exception {
 		FullHttpRequest fullHttpRequest = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
-		given(fullHttpRequest.getDecoderResult().isSuccess()).willReturn(false);
+		given(fullHttpRequest.decoderResult().isSuccess()).willReturn(false);
 		
 		prepareInjectorStubbing();
 		
-		handler.channelRead0(ctx, fullHttpRequest);
+		handler.messageReceived(ctx, fullHttpRequest);
 		
 		verify(httpResponse).sendError(HttpResponseStatus.BAD_REQUEST);
 	}
@@ -144,7 +144,7 @@ public class EngineHttpHandlerTest {
 		
 		prepareInjectorStubbing();
 		
-		handler.channelRead0(ctx, fullHttpRequest);
+		handler.messageReceived(ctx, fullHttpRequest);
 		
 		verify(webSocketConnectionMaker).handshakeWebsocket();
 	}
@@ -156,7 +156,7 @@ public class EngineHttpHandlerTest {
 		
 		prepareInjectorStubbing();
 		
-		handler.channelRead0(ctx, fullHttpRequest);
+		handler.messageReceived(ctx, fullHttpRequest);
 		
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		
@@ -204,7 +204,7 @@ public class EngineHttpHandlerTest {
 		
 		FullHttpResponse response = responseCaptor.getValue();
 		
-		assertThat(response.getStatus(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
+		assertThat(response.status(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
 		
 		verify(channelFuture).addListener(futureListenerCaptor.capture());
 		

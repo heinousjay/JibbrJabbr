@@ -20,6 +20,7 @@ import static jj.configuration.resolution.AppLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Provider;
@@ -66,6 +67,7 @@ public class ReplServerTest {
 	
 	@Mock Publisher publisher;
 	@Mock ResourceLoader resourceLoader;
+	@Mock UncaughtExceptionHandler uncaughtExceptionHandler;
 	
 	ReplServer server;
 	
@@ -75,7 +77,8 @@ public class ReplServerTest {
 			configuration, 
 			new ReplServerChannelInitializer(replHandlerProvider),
 			publisher,
-			resourceLoader
+			resourceLoader,
+			uncaughtExceptionHandler
 		);
 	}
 	

@@ -79,7 +79,7 @@ public class EmbeddedHttpResponse {
 	
 	public HttpResponseStatus status() throws Throwable {
 		checkError();
-		return (responded.getCount() == 0) ? response.getStatus() : null;
+		return (responded.getCount() == 0) ? response.status() : null;
 	}
 	
 	public String bodyContentAsString() throws Throwable {

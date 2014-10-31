@@ -18,6 +18,7 @@ package jj.http.server;
 import static org.mockito.BDDMockito.*;
 import static org.junit.Assert.*;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +51,8 @@ public class HttpServerTest {
 	@Mock HttpServerSwitch httpServerSwitch;
 	
 	@Mock Publisher publisher;
+	
+	@Mock UncaughtExceptionHandler uncaughtExceptionHandler;
 	
 	HttpServerSocketConfiguration configuration = new HttpServerSocketConfiguration() {
 		
@@ -115,7 +118,8 @@ public class HttpServerTest {
 			new HttpServerChannelInitializer(engineProvider),
 			configuration,
 			httpServerSwitch,
-			publisher
+			publisher,
+			uncaughtExceptionHandler
 		);
 		
 		try {
@@ -144,7 +148,8 @@ public class HttpServerTest {
 			new HttpServerChannelInitializer(engineProvider),
 			configuration,
 			httpServerSwitch,
-			publisher
+			publisher,
+			uncaughtExceptionHandler
 		);
 
 		try {
