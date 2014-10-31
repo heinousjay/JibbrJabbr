@@ -59,8 +59,6 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 	
 	private String name;
 	
-	private HttpRequest request;
-	
 	@Inject
 	HttpRequestListeningHandler(
 		final Publisher publisher,
@@ -72,7 +70,6 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 	
 	@Override
 	protected void messageReceived(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
-		this.request = request;
 		
 		if (request.decoderResult().isFailure()) {
 			// respond with BAD_REQUEST and close the connection
@@ -98,7 +95,7 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		publisher.publish(new RequestErrored(request, cause));
+		publisher.publish(new RequestErrored(cause));
 		INTERNAL_SERVER_ERROR.writeAndFlush(ctx).addListener(ChannelFutureListener.CLOSE);
 	}
 	

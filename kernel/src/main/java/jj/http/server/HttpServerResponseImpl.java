@@ -368,7 +368,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	
 	@Override
 	public HttpServerResponse error(Throwable t) {
-		publisher.publish(new RequestErrored(request.request(), t));
+		publisher.publish(new RequestErrored(t));
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		return this;
 	}
