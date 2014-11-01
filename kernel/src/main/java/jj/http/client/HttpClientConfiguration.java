@@ -15,7 +15,10 @@
  */
 package jj.http.client;
 
+import java.util.List;
+
 import jj.configuration.Default;
+import jj.configuration.DefaultProvider;
 
 /**
  * @author jason
@@ -23,8 +26,8 @@ import jj.configuration.Default;
  */
 public interface HttpClientConfiguration {
 	
-	@Default("8")
-	int maximumConnectionsPerHost();
+	@DefaultProvider(NameServersDefaultProvider.class)
+	List<String> nameservers();
 	
 	@Default("JibbrJabbr") // hmmm want interpolations here.  maybe
 	String userAgent();

@@ -19,6 +19,7 @@ import jj.execution.JJTask;
 
 /**
  * Simple integration to ensure running in the HTTP client thread pool.
+ * Dunno if anything will use this
  * 
  * @author jason
  *

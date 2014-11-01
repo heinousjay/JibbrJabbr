@@ -31,6 +31,8 @@ public class HttpClientModule extends JJModule {
 		dispatch().continuationOf(HttpClientRequest.class).to(HttpClientRequestContinuationProcessor.class);
 		
 		bindExecutor(HttpClientNioEventLoopGroup.class);
+		
+		bindConfiguration().to(HttpClientConfiguration.class);
 	}
 
 }
