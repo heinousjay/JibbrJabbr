@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Singleton;
 
+import jj.event.help.BrokenListener;
 import jj.event.help.ChildSub;
 import jj.event.help.ConcreteListener;
 import jj.event.help.ConcurrentSub;
@@ -66,8 +67,6 @@ import com.google.inject.spi.Message;
 @RunWith(MockitoJUnitRunner.class)
 public class EventSystemTest {
 	
-	final Exception toThrow = new Exception();
-	
 	@Singleton
 	public static class PublisherChild extends PublisherImpl {
 		
@@ -95,7 +94,6 @@ public class EventSystemTest {
 			@Override
 			protected void configure() {
 				bind(TaskRunner.class).to(MockTaskRunner.class);
-				bind(Exception.class).toInstance(toThrow);
 			}
 		});
 		
@@ -124,6 +122,21 @@ public class EventSystemTest {
 			Message m = c.iterator().next();
 			assertThat(m.getMessage(), is(NoListeners.class.getName() + " is annotated as a @Subscriber but has no @Listener methods"));
 		}
+	}
+	
+	@Test
+	public void testBrokenListener() {
+		
+		injector.getInstance(BrokenListener.class);
+		boolean worked = false;
+		try {
+			pub.publish(new Event());
+			worked = true;
+		} catch (AssertionError ae) {
+			assertThat(ae.getMessage(), is("broken event listener! jj.event.help.BrokenListener.throwAnException(jj.event.help.Event)"));
+		}
+		
+		assertFalse(worked);
 	}
 	
 	@Test
@@ -202,6 +215,9 @@ public class EventSystemTest {
 		assertThat(pub.listenerMap.get(Event.class).size(), is(1));
 		assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
 		assertThat(pub.listenerMap.get(UnrelatedIEvent.class).size(), is(1));
+		
+		// and one little validation of the target method
+		assertThat(pub.listenerMap.get(IEvent.class).peek().target(), is("jj.event.help.Sub.listen(jj.event.help.IEvent)"));
 		
 		return pub;
 	}
