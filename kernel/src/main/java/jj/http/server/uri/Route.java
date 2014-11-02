@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -160,13 +161,14 @@ public class Route {
 	public boolean equals(Route route) {
 		return route != null &&
 			method.equals(route.method) &&
-			uri.equals(route.uri);
+			uri.equals(route.uri) &&
+			resourceName.equals(resourceName) &&
+			mapping.equals(mapping);
 	}
 	
 	@Override
 	public int hashCode() {
-		// such a cheat, do something better!
-		return (method + " " + uri).hashCode();
+		return Objects.hash(method, uri, resourceName, mapping);
 	}
 	
 	@Override

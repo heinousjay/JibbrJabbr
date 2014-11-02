@@ -48,4 +48,9 @@ public class Binding {
 			port +
 			");";
 	}
+	
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
 }
