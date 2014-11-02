@@ -39,7 +39,22 @@ public class ConfigurationClassMakerTest {
 		
 		String something();
 		
-		int otherThing();
+		@Default("true")
+		boolean boolThing();
+		
+		boolean boolOtherThing();
+		
+		byte byteThing();
+		
+		short shortThing();
+		
+		int intThing();
+		
+		long longThing();
+		
+		float floatThing();
+		
+		double doubleThing();
 		
 		@Default("default")
 		Object defaultedThing();
@@ -66,21 +81,27 @@ public class ConfigurationClassMakerTest {
 		
 		assertTrue(ctor.isAnnotationPresent(Inject.class));
 		
-		ConfigurationInterface iface1 = ctor.newInstance(collector, new ComplicatedDefaultProvider());
-		
-		assertThat(iface1, is(notNullValue()));
-		
 		String base = ConfigurationInterface.class.getName() + ".";
 		given(collector.get(base + "something", String.class, null)).willReturn("something");
-		given(collector.get(base + "otherThing", Integer.class, null)).willReturn(45);
+		given(collector.get(base + "intThing", Integer.class, null)).willReturn(45);
 		given(collector.get(base + "defaultedThing", Object.class, "default")).willReturn("default");
 		given(collector.get(base + "complicatedDefault", String.class, COMPLICATED_VALUE)).willReturn(COMPLICATED_VALUE);
+		
+		ConfigurationInterface iface1 = ctor.newInstance(collector, new ComplicatedDefaultProvider());
+		ConfigurationInterface iface2 = ctor.newInstance(collector, new ComplicatedDefaultProvider());
+		
+		assertThat(iface1, is(notNullValue()));
+		assertThat(iface2, is(notNullValue()));
+		assertThat(iface1.hashCode(), is(iface2.hashCode()));
+		
 		assertThat(iface1.something(), is("something"));
-		assertThat(iface1.otherThing(), is(45));
+		assertThat(iface1.intThing(), is(45));
 		assertThat(iface1.defaultedThing(), is((Object)"default"));
 		assertThat(iface1.undefinedThing(), is(0));
 		assertThat(iface1.otherUndefinedThing(), is(nullValue()));
 		assertThat(iface1.complicatedDefault(), is(COMPLICATED_VALUE));
+		
+		
 	}
 
 }

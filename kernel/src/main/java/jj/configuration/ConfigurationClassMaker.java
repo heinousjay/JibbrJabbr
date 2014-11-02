@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.util.CodeGenHelper;
+import jj.util.RandomHelper;
 
 /**
  * @author jason
@@ -42,6 +43,8 @@ import jj.util.CodeGenHelper;
 class ConfigurationClassMaker {
 	
 	private static final String NAME_FORMAT = "jj.configuration.GeneratedImplementationFor$$%s$$%s";
+	
+	private static final String HASHCODE_LINE = "result = 37 * result + (";
 	
 	private final ClassPool classPool;
 	
@@ -135,6 +138,7 @@ class ConfigurationClassMaker {
 	
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {
 		
+		StringBuilder hashCodeBody = new StringBuilder("public int hashCode() {\nint result = ").append(RandomHelper.nextInt()).append(";\n");
 
 		for (CtMethod method : resultInterface.getDeclaredMethods()) {
 			CtMethod newMethod = CtNewMethod.copy(method, result, null);
@@ -169,6 +173,38 @@ class ConfigurationClassMaker {
 						"else { return ($r)value; }" +
 					"}"
 				);
+
+				switch (returnType) {
+				
+				// If the field f is a boolean: calculate (f ? 0 : 1);
+				case "boolean":
+					hashCodeBody.append(HASHCODE_LINE).append(newMethod.getName()).append("() ? 0 : 1);\n");
+					break;
+
+				// If the field f is a byte, char, short or int: calculate (int)f;
+				case "byte":
+				case "char":
+				case "short":
+				case "int":
+					hashCodeBody.append(HASHCODE_LINE).append("(int)").append(newMethod.getName()).append("());\n");
+					break;
+
+				// If the field f is a long: calculate (int)(f ^ (f >>> 32));
+				case "long":
+					hashCodeBody.append(HASHCODE_LINE).append("(int)(").append(newMethod.getName()).append("() ^ (").append(newMethod.getName()).append("() >>> 32)));\n");
+					break;
+
+				// If the field f is a float: calculate Float.floatToIntBits(f);
+				case "float":
+					hashCodeBody.append(HASHCODE_LINE).append("Float.floatToIntBits(").append(newMethod.getName()).append("()));\n");
+					break;
+
+				// If the field f is a double: calculate Double.doubleToLongBits(f) and handle the return value like every long value;
+				case "double":
+					hashCodeBody.append("long ").append(newMethod.getName()).append(" = ").append("Double.doubleToLongBits(").append(newMethod.getName()).append("());\n");
+					hashCodeBody.append(HASHCODE_LINE).append("(int)(").append(newMethod.getName()).append(" ^ (").append(newMethod.getName()).append(" >>> 32)));\n");
+					break;
+				}
 				
 			} else {
 				
@@ -177,13 +213,24 @@ class ConfigurationClassMaker {
 						"return ($r)" + configurationCollector.getSimpleName() + ".get(\"" + name + "\", " + method.getReturnType().getName() + ".class, " + defaultValue + ");" +
 					"}"
 				);
+
+//				// If the field f is an object: Use the result of the hashCode() method or 0 if f == null;
+				hashCodeBody.append(method.getReturnType().getName()).append(" ").append(newMethod.getName()).append(" = ").append( newMethod.getName()).append("();\n");
+				hashCodeBody.append(HASHCODE_LINE).append( newMethod.getName()).append(" == null ? 0 : ").append(newMethod.getName()).append(".hashCode());\n");
 				
 				// if the return type is in the same package as the resultInterface,
 				// we can detach it
 			}
 			
 			result.addMethod(newMethod);
+			
+			// and now deal with the hashcode
+			// luckily we do not support arrays!
+//			If the field f is an array: See every field as separate element and calculate the hash value in a recursive fashion and combine the values as described next.
 		}
 		
+		hashCodeBody.append("return result;\n}");
+		
+		result.addMethod(CtNewMethod.make(hashCodeBody.toString(), result));
 	}
 }
