@@ -18,6 +18,7 @@ package jj.http.server;
 import java.util.List;
 
 import jj.configuration.Default;
+import jj.configuration.DefaultProvider;
 
 /**
  * @author jason
@@ -45,5 +46,6 @@ public interface HttpServerSocketConfiguration {
 	@Default("65536")
 	int receiveBufferSize();
 	
+	@DefaultProvider(HttpBindingDefaultProvider.class)
 	List<Binding> bindings();
 }

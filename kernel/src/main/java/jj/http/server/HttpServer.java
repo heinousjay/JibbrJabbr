@@ -18,7 +18,6 @@ package jj.http.server;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,10 +47,7 @@ import jj.util.StringUtils;
 @Subscriber
 class HttpServer implements JJServerStartupListener {
 	
-	/**
-	 * 
-	 */
-	private static final int DEFAULT_BINDING_PORT = 8080;
+	
 	
 
 	private static ExecutorService executorService(final int threads, final UncaughtExceptionHandler uncaughtExceptionHandler) {
@@ -108,7 +104,7 @@ class HttpServer implements JJServerStartupListener {
 		
 			assert (serverBootstrap == null) : "cannot start an already started server";
 			
-			List<Binding> bindings = getBindings();
+			List<Binding> bindings = configuration.bindings();
 			
 			makeServerBootstrap(bindings.size());
 			
@@ -137,22 +133,6 @@ class HttpServer implements JJServerStartupListener {
 			serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
 			throw e;
 		}
-	}
-	
-	private List<Binding> getBindings() {
-		
-		List<Binding> result;
-		
-		final int overridePort = httpServerSwitch.port();
-		if (overridePort > 1023 && overridePort < 65536) {
-			result = Arrays.asList(new Binding(overridePort));
-		} else {
-			result = configuration.bindings();
-		}
-		
-		if (result.isEmpty()) result = Arrays.asList(new Binding(DEFAULT_BINDING_PORT));
-		
-		return result;
 	}
 
 	private void makeServerBootstrap(int bindingCount) {
