@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.stream.ChunkedNioFile;
+import io.netty.util.ReferenceCountUtil;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -95,7 +96,7 @@ public class EmbeddedHttpServer {
 		}
 		
 		private void addBodyComponent(ByteBuf content) {
-			response.buffer.addComponent(content.retain());
+			response.buffer.addComponent(ReferenceCountUtil.releaseLater(content.retain()));
 			response.buffer.writerIndex(response.buffer.writerIndex() + content.writerIndex());
 		}
 		

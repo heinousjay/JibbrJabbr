@@ -16,6 +16,10 @@
 package jj.testing;
 
 import static jj.testing.HttpTraceMode.*;
+import io.netty.util.ResourceLeakDetector;
+import io.netty.util.ResourceLeakDetector.Level;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -48,6 +52,13 @@ import com.google.inject.Stage;
  *
  */
 public class JibbrJabbrTestServer implements TestRule {
+	
+	static {
+		ResourceLeakDetector.setLevel(Level.PARANOID);
+		InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+		// need to create a test logger that searches the log output for leaks
+		// and fail the test and kill the world
+	}
 	
 	private HttpTraceMode mode = Nothing;
 	
