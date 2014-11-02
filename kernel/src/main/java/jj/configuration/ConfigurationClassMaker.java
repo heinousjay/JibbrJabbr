@@ -138,7 +138,13 @@ class ConfigurationClassMaker {
 	
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {
 		
-		StringBuilder hashCodeBody = new StringBuilder("public int hashCode() {\nint result = ").append(RandomHelper.nextInt()).append(";\n");
+		// don't allow pathological values!
+		int baseInt = 0;
+		do {
+			baseInt = RandomHelper.nextInt();
+		} while (baseInt == 0 || baseInt == -1 || baseInt == 1);
+		
+		StringBuilder hashCodeBody = new StringBuilder("public int hashCode() {\nint result = ").append(baseInt).append(";\n");
 
 		for (CtMethod method : resultInterface.getDeclaredMethods()) {
 			CtMethod newMethod = CtNewMethod.copy(method, result, null);
