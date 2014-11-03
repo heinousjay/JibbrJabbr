@@ -36,37 +36,11 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 	public interface MockPendingKeyProvider extends Provider<ContinuationPendingKey> {}
 	
 	public MockAbstractScriptEnvironmentDependencies() {
-		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
-			mock(ResourceKey.class),
-			"unnamed",
-			new MockRhinoContextProvider(),
-			mock(MockPendingKeyProvider.class),
-			mock(RequireInnerFunction.class),
-			mock(InjectFunction.class),
-			mock(Timers.class),
-			mock(Publisher.class),
-			mock(ResourceFinder.class)
-		);
+		this("unnamed");
 	}
 
 	public MockAbstractScriptEnvironmentDependencies(final String name) {
-		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
-			mock(ResourceKey.class),
-			name,
-			new MockRhinoContextProvider(),
-			mock(MockPendingKeyProvider.class),
-			mock(RequireInnerFunction.class),
-			mock(InjectFunction.class),
-			mock(Timers.class),
-			mock(Publisher.class),
-			mock(ResourceFinder.class)
-		);
+		this(name, mock(ResourceFinder.class));
 	}
 
 	public MockAbstractScriptEnvironmentDependencies(final String name, final ResourceFinder resourceFinder) {
@@ -77,6 +51,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(ResourceKey.class),
 			name,
 			new MockRhinoContextProvider(),
+			mock(ContinuationPendingCache.class),
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class),
 			mock(InjectFunction.class),
@@ -94,6 +69,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(ResourceKey.class),
 			name,
 			rhinoContextProvider,
+			mock(ContinuationPendingCache.class),
 			mock(MockPendingKeyProvider.class),
 			mock(RequireInnerFunction.class),
 			mock(InjectFunction.class),
@@ -125,6 +101,10 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 	
 	public MockRhinoContextProvider rhinoContextProvider() {
 		return (MockRhinoContextProvider)contextProvider;
+	}
+	
+	public ContinuationPendingCache continuationPendingCache() {
+		return continuationPendingCache;
 	}
 	
 	public MockPendingKeyProvider pendingKeyProvider() {

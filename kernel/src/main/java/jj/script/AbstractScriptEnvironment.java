@@ -59,6 +59,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	public static class Dependencies extends AbstractResource.Dependencies {
 		
 		final Provider<RhinoContext> contextProvider;
+		final ContinuationPendingCache continuationPendingCache;
 		final Provider<ContinuationPendingKey> pendingKeyProvider;
 		final RequireInnerFunction requireInnerFunction;
 		final InjectFunction injectFunction;
@@ -72,6 +73,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final ResourceKey cacheKey,
 			final @ResourceName String name,
 			final Provider<RhinoContext> contextProvider,
+			final ContinuationPendingCache continuationPendingCache,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
 			final InjectFunction injectFunction,
@@ -80,6 +82,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final ResourceFinder resourceFinder
 		) {
 			super(clock, resourceConfiguration, demuxer, cacheKey, AppLocation.Virtual, name, publisher, resourceFinder);
+			this.continuationPendingCache = continuationPendingCache;
 			this.contextProvider = contextProvider;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
@@ -164,7 +167,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	@Override
 	protected void died() {
+		// mark dead
 		state = Dead;
+		// when a script environment dies, we can dump any pending tasks on the floor
+		dependencies.continuationPendingCache.removePendingTasks(continuationPendings.keySet());
+		// and publish it to the world
 		publisher.publish(new ScriptEnvironmentDied(this));
 	}
 	
