@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 
 import javax.inject.Provider;
 
-import jj.event.Publisher;
+import jj.event.MockPublisher;
 import jj.resource.AbstractResourceEventDemuxer;
 import jj.resource.ResourceConfiguration;
 import jj.resource.ResourceFinder;
@@ -56,7 +56,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(RequireInnerFunction.class),
 			mock(InjectFunction.class),
 			mock(Timers.class),
-			mock(Publisher.class),
+			new MockPublisher(),
 			resourceFinder
 		);
 	}
@@ -74,7 +74,7 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 			mock(RequireInnerFunction.class),
 			mock(InjectFunction.class),
 			mock(Timers.class),
-			mock(Publisher.class),
+			new MockPublisher(),
 			mock(ResourceFinder.class)
 		);
 	}
@@ -119,8 +119,8 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 		return timers;
 	}
 	
-	public Publisher publisher() {
-		return publisher;
+	public MockPublisher publisher() {
+		return (MockPublisher)publisher;
 	}
 	
 	public ResourceFinder resourceFinder() {
