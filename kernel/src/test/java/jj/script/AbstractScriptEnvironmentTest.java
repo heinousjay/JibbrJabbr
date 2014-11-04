@@ -20,6 +20,8 @@ import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -88,6 +90,23 @@ public class AbstractScriptEnvironmentTest {
 	}
 	
 	@Test
+	public void testDeath() {
+		// given
+		given(dependencies.pendingKeyProvider.get()).willReturn(pendingKey);
+		ase.createContinuationContext(continuationPending);
+		
+		// when
+		ase.died();
+		
+		// then
+		verify(dependencies.continuationPendingCache).removePendingTasks(new HashSet<>(Arrays.asList(pendingKey)));
+		assertThat(dependencies.publisher().events.size(), is(1));
+		assertTrue(dependencies.publisher().events.get(0) instanceof ScriptEnvironmentDied);
+		ScriptEnvironmentDied event = (ScriptEnvironmentDied)dependencies.publisher().events.get(0);
+		assertThat(event.scriptEnvironment(), is(ase));
+	}
+	
+	@Test
 	public void testNewObject() {
 		
 		ase.newObject();
@@ -106,9 +125,14 @@ public class AbstractScriptEnvironmentTest {
 	@Test
 	public void testPendingKey() {
 		
+		// given
 		given(dependencies.pendingKeyProvider.get()).willReturn(pendingKey);
 		
-		assertThat(ase.createContinuationContext(continuationPending), is(pendingKey));
+		// when
+		ContinuationPendingKey newKey = ase.createContinuationContext(continuationPending);
+		
+		// then
+		assertThat(newKey, is(pendingKey));
 		
 		assertThat(ase.continuationPending(pendingKey), is(continuationPending));
 	}

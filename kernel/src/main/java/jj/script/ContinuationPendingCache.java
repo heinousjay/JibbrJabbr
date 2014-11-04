@@ -15,6 +15,7 @@
  */
 package jj.script;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -31,14 +32,6 @@ import jj.util.SecureRandomHelper;
 @Singleton
 class ContinuationPendingCache {
 	
-	// does this require an inner task to clean up the the map?
-	// on the presumption that spots can be reserved and abandoned
-	// due to errors or malice
-	
-	// that would mean changing the value to be a tuple
-	// not convinced its necessary yet.  maybe once i've declared
-	// a ServerTask + executor it will be time
-
 	private final TaskRunner taskRunner;
 	
 	@Inject
@@ -56,15 +49,25 @@ class ContinuationPendingCache {
 		};
 	
 	/**
-	 * tasks awaiting resumption. can this be stored per executor somehow?
+	 * tasks awaiting resumption.
 	 */
 	private final ConcurrentMap<String, ScriptTask<?>> resumableTasks = new ConcurrentHashMap<>();
+	
+	/**
+	 * bulk removable of pending tasks
+	 * @param keys A collection of {@link ContinuationPendingKey}s to remove
+	 */
+	void removePendingTasks(Collection<ContinuationPendingKey> keys) {
+		keys.forEach(key -> {
+			resumableTasks.remove(key.id());
+		});
+	}
 	
 	String uniqueID() {
 		// wow.  a do...while!
 		String result;
 		do {
-			result = Integer.toHexString(SecureRandomHelper.nextInt());
+			result = Long.toHexString(SecureRandomHelper.nextLong());
 		} while (resumableTasks.putIfAbsent(result, sentinel) != null);
 		
 		return result;
