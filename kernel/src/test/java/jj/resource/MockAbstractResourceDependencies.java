@@ -32,13 +32,13 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	
 	public final DirectoryResource rootDirectory = mock(DirectoryResource.class);
 	
-	public static class MockInnerDependencies extends AbstractResource.AbstractResourceDependencies {
+	public static class MockInnerAbstractResourceDependencies extends AbstractResource.AbstractResourceDependencies {
 
-		public MockInnerDependencies() {
+		public MockInnerAbstractResourceDependencies() {
 			this(mock(ResourceFinder.class));
 		}
 		
-		public MockInnerDependencies(
+		public MockInnerAbstractResourceDependencies(
 			ResourceFinder resourceFinder
 		) {
 			super(
@@ -51,7 +51,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		}
 
 		
-		public MockInnerDependencies(
+		public MockInnerAbstractResourceDependencies(
 			Publisher publisher
 		) {
 			super(
@@ -82,7 +82,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 
 	public MockAbstractResourceDependencies(Location base, String name, ResourceFinder resourceFinder) {
 		super(
-			new MockInnerDependencies(resourceFinder),
+			new MockInnerAbstractResourceDependencies(resourceFinder),
 			mock(ResourceKey.class),
 			base,
 			name
@@ -91,7 +91,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name) {
 		super(
-			new MockInnerDependencies(),
+			new MockInnerAbstractResourceDependencies(),
 			resourceKey,
 			base,
 			name
@@ -100,7 +100,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name, Publisher publisher) {
 		super(
-			new MockInnerDependencies(publisher),
+			new MockInnerAbstractResourceDependencies(publisher),
 			resourceKey,
 			base,
 			name

@@ -31,13 +31,13 @@ import jj.script.AbstractScriptEnvironment.AbstractScriptEnvironmentDependencies
  */
 public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnvironment.Dependencies {
 	
-	public static class MockInnerAbstractScriptEnvironmentDependenciesDependencies extends AbstractScriptEnvironmentDependencies {
+	public static class MockInnerAbstractScriptEnvironmentDependencies extends AbstractScriptEnvironmentDependencies {
 
-		public MockInnerAbstractScriptEnvironmentDependenciesDependencies() {
+		public MockInnerAbstractScriptEnvironmentDependencies() {
 			this(new MockRhinoContextProvider());
 		}
 		
-		MockInnerAbstractScriptEnvironmentDependenciesDependencies(Provider<RhinoContext> rhinoContextProvider) {
+		MockInnerAbstractScriptEnvironmentDependencies(Provider<RhinoContext> rhinoContextProvider) {
 			super(
 				mock(ContinuationPendingCache.class),
 				mock(MockPendingKeyProvider.class),
@@ -66,8 +66,8 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 
 	public MockAbstractScriptEnvironmentDependencies(final String name, final ResourceFinder resourceFinder) {
 		super(
-			new MockAbstractResourceDependencies.MockInnerDependencies(resourceFinder),
-			new MockInnerAbstractScriptEnvironmentDependenciesDependencies(),
+			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(resourceFinder),
+			new MockInnerAbstractScriptEnvironmentDependencies(),
 			mock(ResourceKey.class),
 			name
 		);
@@ -75,15 +75,15 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 
 	public MockAbstractScriptEnvironmentDependencies(final RealRhinoContextProvider rhinoContextProvider, final String name) {
 		super(
-			new MockAbstractResourceDependencies.MockInnerDependencies(),
-			new MockInnerAbstractScriptEnvironmentDependenciesDependencies(rhinoContextProvider),
+			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
+			new MockInnerAbstractScriptEnvironmentDependencies(rhinoContextProvider),
 			mock(ResourceKey.class),
 			name
 		);
 	}
 	
 	public MockPublisher publisher() {
-		return ((MockAbstractResourceDependencies.MockInnerDependencies)abstractResourceDependencies).publisher();
+		return ((MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies)abstractResourceDependencies).publisher();
 	}
 
 	public ResourceKey cacheKey() {
@@ -91,7 +91,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 	}
 
 	public ResourceFinder resourceFinder() {
-		return ((MockAbstractResourceDependencies.MockInnerDependencies)abstractResourceDependencies).resourceFinder();
+		return ((MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies)abstractResourceDependencies).resourceFinder();
 	}
 
 	public MockRhinoContextProvider mockRhinoContextProvider() {

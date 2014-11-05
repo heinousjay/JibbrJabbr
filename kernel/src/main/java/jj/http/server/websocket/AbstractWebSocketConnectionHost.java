@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.resource.ResourceKey;
 import jj.resource.ResourceName;
@@ -31,12 +32,24 @@ import jj.script.ScriptThread;
  */
 public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvironment implements WebSocketConnectionHost {
 	
+	@Singleton
+	public static class AbstractWebSocketConnectionHostDependencies {
+		
+		@Inject
+		protected AbstractWebSocketConnectionHostDependencies() {
+			
+		}
+	}
+	
 	public static class Dependencies extends AbstractScriptEnvironment.Dependencies {
 
+		protected final AbstractWebSocketConnectionHostDependencies abstractWebSocketConnectionHostDependencies;
+		
 		@Inject
 		protected Dependencies(
 			final AbstractResourceDependencies abstractResourceDependencies,
 			final AbstractScriptEnvironmentDependencies abstractScriptEnvironmentDependencies,
+			final AbstractWebSocketConnectionHostDependencies abstractWebSocketConnectionHostDependencies,
 			final ResourceKey cacheKey,
 			final @ResourceName String name
 		) {
@@ -46,12 +59,11 @@ public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvi
 				cacheKey,
 				name
 			);
+			
+			this.abstractWebSocketConnectionHostDependencies = abstractWebSocketConnectionHostDependencies;
 		}
 	}
 
-	/**
-	 * @param dependencies
-	 */
 	protected AbstractWebSocketConnectionHost(Dependencies dependencies) {
 		super(dependencies);
 	}
