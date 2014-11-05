@@ -20,18 +20,39 @@ import static org.mockito.Mockito.mock;
 import javax.inject.Provider;
 
 import jj.event.MockPublisher;
-import jj.resource.AbstractResourceEventDemuxer;
-import jj.resource.ResourceConfiguration;
+import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
-import jj.script.AbstractScriptEnvironment.Dependencies;
-import jj.util.MockClock;
+import jj.script.AbstractScriptEnvironment.AbstractScriptEnvironmentDependencies;
 
 /**
  * @author jason
  *
  */
-public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
+public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnvironment.Dependencies {
+	
+	public static class MockInnerAbstractScriptEnvironmentDependenciesDependencies extends AbstractScriptEnvironmentDependencies {
+
+		public MockInnerAbstractScriptEnvironmentDependenciesDependencies() {
+			this(new MockRhinoContextProvider());
+		}
+		
+		MockInnerAbstractScriptEnvironmentDependenciesDependencies(Provider<RhinoContext> rhinoContextProvider) {
+			super(
+				mock(ContinuationPendingCache.class),
+				mock(MockPendingKeyProvider.class),
+				mock(RequireInnerFunction.class),
+				mock(InjectFunction.class),
+				mock(Timers.class),
+				rhinoContextProvider
+			);
+			
+		}
+		
+		public MockRhinoContextProvider mockRhinoContextProvider() {
+			return (MockRhinoContextProvider)contextProvider;
+		}
+	}
 	
 	public interface MockPendingKeyProvider extends Provider<ContinuationPendingKey> {}
 	
@@ -45,85 +66,35 @@ public class MockAbstractScriptEnvironmentDependencies extends Dependencies {
 
 	public MockAbstractScriptEnvironmentDependencies(final String name, final ResourceFinder resourceFinder) {
 		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
+			new MockAbstractResourceDependencies.MockInnerDependencies(resourceFinder),
+			new MockInnerAbstractScriptEnvironmentDependenciesDependencies(),
 			mock(ResourceKey.class),
-			name,
-			new MockRhinoContextProvider(),
-			mock(ContinuationPendingCache.class),
-			mock(MockPendingKeyProvider.class),
-			mock(RequireInnerFunction.class),
-			mock(InjectFunction.class),
-			mock(Timers.class),
-			new MockPublisher(),
-			resourceFinder
+			name
 		);
 	}
 
 	public MockAbstractScriptEnvironmentDependencies(final RealRhinoContextProvider rhinoContextProvider, final String name) {
 		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
+			new MockAbstractResourceDependencies.MockInnerDependencies(),
+			new MockInnerAbstractScriptEnvironmentDependenciesDependencies(rhinoContextProvider),
 			mock(ResourceKey.class),
-			name,
-			rhinoContextProvider,
-			mock(ContinuationPendingCache.class),
-			mock(MockPendingKeyProvider.class),
-			mock(RequireInnerFunction.class),
-			mock(InjectFunction.class),
-			mock(Timers.class),
-			new MockPublisher(),
-			mock(ResourceFinder.class)
+			name
 		);
 	}
 	
-	public MockClock clock() {
-		return (MockClock)clock;
-	}
-	
-	public ResourceConfiguration resourceConfiguration() {
-		return resourceConfiguration;
-	}
-	
-	public AbstractResourceEventDemuxer abstractResourceInitializationListener() {
-		return demuxer;
-	}
-	
-	public ResourceKey resourceCacheKey() {
-		return resourceKey;
-	}
-	
-	public String name() {
-		return name;
-	}
-	
-	public MockRhinoContextProvider rhinoContextProvider() {
-		return (MockRhinoContextProvider)contextProvider;
-	}
-	
-	public ContinuationPendingCache continuationPendingCache() {
-		return continuationPendingCache;
-	}
-	
-	public MockPendingKeyProvider pendingKeyProvider() {
-		return (MockPendingKeyProvider)pendingKeyProvider;
+	public MockPublisher publisher() {
+		return ((MockAbstractResourceDependencies.MockInnerDependencies)abstractResourceDependencies).publisher();
 	}
 
-	public RequireInnerFunction requireInnerFunction() {
-		return requireInnerFunction;
+	public ResourceKey cacheKey() {
+		return resourceKey;
 	}
-	
-	public Timers timers() {
-		return timers;
-	}
-	
-	public MockPublisher publisher() {
-		return (MockPublisher)publisher;
-	}
-	
+
 	public ResourceFinder resourceFinder() {
-		return resourceFinder;
+		return ((MockAbstractResourceDependencies.MockInnerDependencies)abstractResourceDependencies).resourceFinder();
+	}
+
+	public MockRhinoContextProvider mockRhinoContextProvider() {
+		return (MockRhinoContextProvider)scriptEnvironmentDependencies.contextProvider;
 	}
 }

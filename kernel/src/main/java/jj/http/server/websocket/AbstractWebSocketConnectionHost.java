@@ -18,6 +18,10 @@ package jj.http.server.websocket;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import javax.inject.Inject;
+
+import jj.resource.ResourceKey;
+import jj.resource.ResourceName;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ScriptThread;
 
@@ -26,6 +30,24 @@ import jj.script.ScriptThread;
  *
  */
 public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvironment implements WebSocketConnectionHost {
+	
+	public static class Dependencies extends AbstractScriptEnvironment.Dependencies {
+
+		@Inject
+		protected Dependencies(
+			final AbstractResourceDependencies abstractResourceDependencies,
+			final AbstractScriptEnvironmentDependencies abstractScriptEnvironmentDependencies,
+			final ResourceKey cacheKey,
+			final @ResourceName String name
+		) {
+			super(
+				abstractResourceDependencies,
+				abstractScriptEnvironmentDependencies,
+				cacheKey,
+				name
+			);
+		}
+	}
 
 	/**
 	 * @param dependencies
@@ -49,6 +71,7 @@ public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvi
 	@ScriptThread
 	public void connected(WebSocketConnection connection) {
 		connections.add(connection);
+		
 	}
 	
 	@Override
