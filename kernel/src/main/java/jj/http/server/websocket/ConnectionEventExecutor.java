@@ -26,7 +26,7 @@ import jj.util.Closer;
 import org.mozilla.javascript.Callable;
 
 /**
- * 
+ * Executes a function registered as an event in the context of a connection.
  * 
  * @author jason
  *
@@ -52,14 +52,17 @@ public class ConnectionEventExecutor {
 	}
 	
 	public void submit(final WebSocketConnection connection, final String event, final Object...args) {
-		taskRunner.execute(new ConnectionEventTask("host event " + event + " on WebSocket connection", connection.webSocketConnectionHost(), continuationCoordinator, args, connection, event));	
+		taskRunner.execute(
+			new ConnectionEventTask(
+				"host event " + event + " on WebSocket connection",
+				connection,
+				continuationCoordinator,
+				args,
+				event
+			)
+		);	
 	}
 	
-
-	/**
-	 * @author jason
-	 *
-	 */
 	private final class ConnectionEventTask extends ScriptTask<WebSocketConnectionHost> {
 
 		private final Object[] args;
@@ -70,13 +73,12 @@ public class ConnectionEventExecutor {
 
 		private ConnectionEventTask(
 			String name,
-			WebSocketConnectionHost scriptEnvironment,
+			WebSocketConnection connection,
 			ContinuationCoordinator continuationCoordinator,
 			Object[] args,
-			WebSocketConnection connection,
 			String event
 		) {
-			super(name, scriptEnvironment, continuationCoordinator);
+			super(name, connection.webSocketConnectionHost(), continuationCoordinator);
 			this.args = args;
 			this.connection = connection;
 			this.event = event;
