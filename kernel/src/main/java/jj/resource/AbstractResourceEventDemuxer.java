@@ -33,7 +33,7 @@ import jj.event.Subscriber;
  */
 @Singleton
 @Subscriber
-public class AbstractResourceEventDemuxer {
+class AbstractResourceEventDemuxer {
 	
 	AbstractResourceEventDemuxer() {}
 	

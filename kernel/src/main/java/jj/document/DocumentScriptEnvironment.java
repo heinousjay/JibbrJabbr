@@ -91,9 +91,6 @@ public class DocumentScriptEnvironment
 	
 	private final HashMap<ContinuationPendingKey, Context<?>> contexts = new HashMap<>(10);
 	
-	/**
-	 * @param cacheKey
-	 */
 	@Inject
 	DocumentScriptEnvironment(
 		final Dependencies dependencies,

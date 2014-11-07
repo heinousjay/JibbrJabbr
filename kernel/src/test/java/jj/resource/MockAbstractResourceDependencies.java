@@ -17,6 +17,7 @@ package jj.resource;
 
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.resolution.AppLocation.Base;
+import jj.event.MockPublisher;
 import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;
 import jj.util.MockClock;
@@ -30,86 +31,109 @@ import jj.util.MockClock;
 public class MockAbstractResourceDependencies extends Dependencies {
 	
 	public final DirectoryResource rootDirectory = mock(DirectoryResource.class);
+	
+	public static class MockInnerAbstractResourceDependencies extends AbstractResource.AbstractResourceDependencies {
+
+		public MockInnerAbstractResourceDependencies() {
+			this(mock(ResourceFinder.class));
+		}
+		
+		public MockInnerAbstractResourceDependencies(
+			ResourceFinder resourceFinder
+		) {
+			super(
+				new MockClock(),
+				mock(ResourceConfiguration.class),
+				mock(AbstractResourceEventDemuxer.class),
+				new MockPublisher(),
+				resourceFinder
+			);
+		}
+
+		
+		public MockInnerAbstractResourceDependencies(
+			Publisher publisher
+		) {
+			super(
+				new MockClock(),
+				mock(ResourceConfiguration.class),
+				mock(AbstractResourceEventDemuxer.class),
+				publisher,
+				mock(ResourceFinder.class)
+			);
+		}
+		
+		public MockPublisher publisher() {
+			return (MockPublisher)publisher;
+		}
+
+		public ResourceFinder resourceFinder() {
+			return resourceFinder;
+		}
+	}
 
 	public MockAbstractResourceDependencies(Location base, String name) {
-		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
-			mock(ResourceKey.class),
+		this(
 			base,
 			name,
-			mock(Publisher.class),
 			mock(ResourceFinder.class)
 		);
 	}
 
 	public MockAbstractResourceDependencies(Location base, String name, ResourceFinder resourceFinder) {
 		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
+			new MockInnerAbstractResourceDependencies(resourceFinder),
 			mock(ResourceKey.class),
 			base,
-			name,
-			mock(Publisher.class),
-			resourceFinder
+			name
 		);
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name) {
 		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
+			new MockInnerAbstractResourceDependencies(),
 			resourceKey,
 			base,
-			name,
-			mock(Publisher.class),
-			mock(ResourceFinder.class)
+			name
 		);
 	}
 	
 	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name, Publisher publisher) {
 		super(
-			new MockClock(),
-			mock(ResourceConfiguration.class),
-			mock(AbstractResourceEventDemuxer.class),
+			new MockInnerAbstractResourceDependencies(publisher),
 			resourceKey,
 			base,
-			name,
-			publisher,
-			mock(ResourceFinder.class)
+			name
 		);
 	}
 	
 	{
-		given(resourceFinder.findResource(DirectoryResource.class, Base, "")).willReturn(rootDirectory);
-		given(resourceConfiguration.maxFileSizeToLoad()).willReturn(1024 * 1024 * 10L);
+		given(abstractResourceDependencies.resourceFinder.findResource(DirectoryResource.class, Base, "")).willReturn(rootDirectory);
+		given(abstractResourceDependencies.resourceConfiguration.maxFileSizeToLoad()).willReturn(1024 * 1024 * 10L);
 		FileTypeSettingsDefaultProvider provider = new FileTypeSettingsDefaultProvider();
-		given(resourceConfiguration.fileTypeSettings()).willReturn(provider.get());
+		given(abstractResourceDependencies.resourceConfiguration.fileTypeSettings()).willReturn(provider.get());
 		DefaultSettingsDefaultProvider provider2 = new DefaultSettingsDefaultProvider();
-		given(resourceConfiguration.defaultSettings()).willReturn(provider2.get());
+		given(abstractResourceDependencies.resourceConfiguration.defaultSettings()).willReturn(provider2.get());
 	}
 	
 	public MockClock clock() {
-		return (MockClock)clock;
+		return (MockClock)abstractResourceDependencies.clock;
 	}
 	
 	public ResourceConfiguration resourceConfiguration() {
-		return resourceConfiguration;
+		return abstractResourceDependencies.resourceConfiguration;
 	}
 	
 	public AbstractResourceEventDemuxer abstractResourceInitializationListener() {
-		return demuxer;
+		return abstractResourceDependencies.demuxer;
 	}
 
 	public ResourceFinder resourceFinder() {
-		return resourceFinder;
+		return abstractResourceDependencies.resourceFinder;
 	}
 	
-	public Publisher publisher() {
-		return publisher;
+	public MockPublisher publisher() {
+		return (MockPublisher)abstractResourceDependencies.publisher;
 	}
 	
 	public ResourceKey resourceKey() {

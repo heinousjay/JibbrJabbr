@@ -17,6 +17,7 @@ package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static jj.configuration.resolution.AppLocation.*;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -27,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.configuration.resolution.MockApplication;
+import jj.event.MockPublisher;
 import jj.http.server.resource.StaticResource;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.NoSuchResourceException;
@@ -147,10 +149,15 @@ public class StylesheetResourceTest {
 			assertThat(sr.bytes().toString(UTF_8), is(new String(Files.readAllBytes(cssPath), UTF_8)));
 		}
 		
-		verify(dependencies.publisher()).publish(isA(StartingLessProcessing.class));
-		verify(dependencies.publisher()).publish(isA(FinishedLessProcessing.class));
-		verify(dependencies.publisher(), times(3)).publish(isA(LoadingLessResource.class));
-		verify(dependencies.publisher()).publish(isA(LessResourceNotFound.class));
+		MockPublisher publisher = dependencies.publisher();
+		
+		assertThat(publisher.events.size(), is(6));
+		assertThat(publisher.events.get(0), is(instanceOf(StartingLessProcessing.class)));
+		assertThat(publisher.events.get(1), is(instanceOf(LoadingLessResource.class)));
+		assertThat(publisher.events.get(2), is(instanceOf(LoadingLessResource.class)));
+		assertThat(publisher.events.get(3), is(instanceOf(LoadingLessResource.class)));
+		assertThat(publisher.events.get(4), is(instanceOf(LessResourceNotFound.class)));
+		assertThat(publisher.events.get(5), is(instanceOf(FinishedLessProcessing.class)));
 	}
 
 	private String getLessScript() throws Exception {
