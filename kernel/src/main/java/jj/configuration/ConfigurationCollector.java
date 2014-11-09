@@ -18,6 +18,7 @@ package jj.configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,6 +40,7 @@ import jj.conversion.Converters;
 public class ConfigurationCollector {
 	
 	private final AtomicReference<Map<String, Object>> current = new AtomicReference<>();
+	private LinkedHashMap<String, List<String>> errors = new LinkedHashMap<>(0);
 	private HashMap<String, Object> inProgress = new HashMap<>();
 	private final Converters converters;
 	
@@ -74,6 +76,12 @@ public class ConfigurationCollector {
 		map.put(valueKey, valueValue);
 	}
 	
+	public void accumulateError(String key, String error) {
+		errors.computeIfAbsent(key, k -> {
+			return new ArrayList<>(1);
+		}).add(error);
+	}
+	
 	<T> T get(String key, Class<T> type, Object defaultValue) {
 		Map<String, Object> map = current.get();
 		if (List.class.isAssignableFrom(type) && defaultValue == null) {
@@ -85,7 +93,13 @@ public class ConfigurationCollector {
 		return converters.convert(map != null && map.containsKey(key) ? map.get(key) : defaultValue, type);
 	}
 	
-	void configurationComplete() {
+	ConfigurationErrored configurationComplete() {
+		
+		if (!errors.isEmpty()) {
+			LinkedHashMap<String, List<String>> e = errors;
+			errors = new LinkedHashMap<>();
+			return new ConfigurationErrored(e);
+		}
 		
 		for (String key : inProgress.keySet()) {
 			if (inProgress.get(key) instanceof List) {
@@ -100,6 +114,8 @@ public class ConfigurationCollector {
 		
 		current.set(Collections.unmodifiableMap(inProgress));
 		inProgress = new HashMap<>();
+		
+		return null;
 	}
 	
 	@Override

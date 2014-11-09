@@ -87,8 +87,12 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 	
 	private void configurationComplete() {
-		collector.configurationComplete();
-		publisher.publish(new ConfigurationLoaded());
+		ConfigurationErrored errored = collector.configurationComplete();
+		if (errored != null) {
+			publisher.publish(errored);
+		} else {
+			publisher.publish(new ConfigurationLoaded());
+		}
 	}
 	
 	@Listener
