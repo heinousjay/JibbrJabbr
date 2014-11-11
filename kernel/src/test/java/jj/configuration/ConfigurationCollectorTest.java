@@ -17,6 +17,7 @@ package jj.configuration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,23 +25,32 @@ import java.util.Map;
 
 import jj.conversion.ConverterSetMaker;
 import jj.conversion.Converters;
+import jj.script.CurrentScriptEnvironment;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author jason
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ConfigurationCollectorTest {
 	
+	@Mock CurrentScriptEnvironment env;
+	@Mock ConfigurationScriptEnvironment cse;
 	Converters converters;
 	ConfigurationCollector collector;
 
 	@Before
 	public void before() {
+		given(env.currentRootScriptEnvironment()).willReturn(cse);
+		
 		converters = new Converters(ConverterSetMaker.converters());
-		collector = new ConfigurationCollector(converters);
+		collector = new ConfigurationCollector(converters, env);
 	}
 	
 	@Test

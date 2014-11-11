@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.conversion.Converters;
+import jj.script.CurrentScriptEnvironment;
 
 /**
  * server component used to implement the configuration API. it's
@@ -43,10 +44,20 @@ public class ConfigurationCollector {
 	private LinkedHashMap<String, List<String>> errors = new LinkedHashMap<>(0);
 	private HashMap<String, Object> inProgress = new HashMap<>();
 	private final Converters converters;
+	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	ConfigurationCollector(final Converters converters) {
+	ConfigurationCollector(final Converters converters, final CurrentScriptEnvironment env) {
 		this.converters = converters;
+		this.env = env;
+	}
+	
+	private void assertConfig() {
+		assert isConfig() : "only available from a config script";
+	}
+	
+	public boolean isConfig() {
+		return env.currentRootScriptEnvironment() instanceof ConfigurationScriptEnvironment;
 	}
 	
 	/**
@@ -55,10 +66,12 @@ public class ConfigurationCollector {
 	 * @param value
 	 */
 	public void addConfigurationElement(String key, Object value) {
+		assertConfig();
 		inProgress.put(key, value);
 	}
 	
 	public void addConfigurationMultiElement(String key, Object value) {
+		assertConfig();
 		if (!inProgress.containsKey(key)) {
 			inProgress.put(key, new ArrayList<Object>());
 		}
@@ -68,6 +81,7 @@ public class ConfigurationCollector {
 	}
 	
 	public void addConfigurationMappedElement(String key, Object valueKey, Object valueValue) {
+		assertConfig();
 		if (!inProgress.containsKey(key)) {
 			inProgress.put(key, new HashMap<Object, Object>());
 		}
@@ -77,6 +91,7 @@ public class ConfigurationCollector {
 	}
 	
 	public void accumulateError(String key, String error) {
+		assertConfig();
 		errors.computeIfAbsent(key, k -> {
 			return new ArrayList<>(1);
 		}).add(error);
