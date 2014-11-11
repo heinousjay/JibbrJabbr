@@ -1,197 +1,296 @@
 var location, value;
 
 var valueOf = java.lang.String.valueOf;
+var collectorMock = {
+	addConfigurationElement: function() {},
+	accumulateError: function() {}
+}
 
 // replacing inject('jj.configuration.ConfigurationCollector')
 function inject(obj) {
-	return {
-		addConfigurationElement: function(l, v) {
-			location = l;
-			value = v;
-		}
-	}
+	return collectorMock;
 }
 
-describe("function addElement", function() {
-	it("passes location and value to the collector", function() {
-		addElement("location", "value");
-		expect(location).toBe("location");
-		expect(value).toBe("value");
-	});
-});
+describe("configuration-support.js", function() {
+	
+	var base = "base";
+	var name = "name";
+	var basename = base + '.' + name;
+	
+	function failingValidator(n, arg) {
+		module.exports(base).accumulateError(n, "error");
+		return false;
+	}
 
-describe("function makeBooleanProperty", function() {
+	function passingValidator(n, arg) {
+		return true;
+	}
 	
-	it("rejects values that are not booleans", function() {
-		var testFunc = module.exports.makeBooleanProperty('base', 'name');
-		
-		expect(function() {
-			testFunc("not a boolean")
-		}).toThrow(new TypeError("name must be a boolean"));
-		
-		expect(function() {
-			testFunc(1)
-		}).toThrow(new TypeError("name must be a boolean"));
+	beforeEach(function() {
+		spyOn(collectorMock, 'accumulateError');
+		spyOn(collectorMock, 'addConfigurationElement');
 	});
 	
-	it("sets boolean values to the collector", function() {
-		var testFunc = module.exports.makeBooleanProperty('base', 'name');
+	describe("function makeBooleanProperty", function() {
 		
-		testFunc(true);
-		expect(location).toBe("basename");
-		expect(value).toBe(true);
-
-		testFunc(false);
-		expect(location).toBe("basename");
-		expect(value).toBe(false);
+		var testFunc;
+		var mustBeABoolean = 'must be a boolean';
 		
+		beforeEach(function() {
+			testFunc = module.exports(base).makeBooleanProperty(name);
+		});
+		
+		it("rejects string values", function() {
+			testFunc("not a boolean");
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean);
+		});
+		
+		it("rejects number values", function() {
+			testFunc(1);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean);
+		});
+		
+		it("rejects object values", function() {
+			testFunc({});
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean);
+		});
+		
+		it("rejects array values", function() {
+			testFunc([]);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean);
+		});
+		
+		it("rejects null values", function() {
+			testFunc(null);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean);
+		});
+		
+		it("accumulates validator failures", function() {
+			module.exports(base).makeBooleanProperty(name, failingValidator)(true);
+			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'error');
+		});
+		
+		it("calls a passing validator function", function() {
+			module.exports(base).makeBooleanProperty(name, passingValidator)(true);
+			expect(collector.addConfigurationElement).toHaveBeenCalledWith(basename, true);
+		});
+		
+		it("sets boolean values to the collector", function() {
+			
+			testFunc(true);
+			expect(collector.addConfigurationElement).toHaveBeenCalledWith(basename, true);
+	
+			testFunc(false);
+			expect(collector.addConfigurationElement).toHaveBeenCalledWith(basename, false);
+			
+		});
 	});
 	
-	it("calls a given validator function", function() {
-		var name, arg;
+	describe("function makeIntProperty", function() {
 		
-		function validator(n, a) {
-			name = n;
-			arg = a;
-		}
+		var testFunc;
+		var mustBeAnInteger = 'must be an integer';
+		var isOutOfIntegerRange = 'is out of integer range';
 		
-		var testFunc = module.exports.makeBooleanProperty('base', 'name', validator);
+		beforeEach(function() {
+			testFunc = module.exports(base).makeIntProperty(name);
+		});
 		
-		testFunc(true);
-		expect(name).toBe("name");
-		expect(arg).toBe(true);
-	});
-});
-
-describe("function makeIntProperty", function() {
-	
-	it("rejects values that are not integers", function() {
-		var testFunc = module.exports.makeIntProperty('base', 'name');
+		it("rejects string values", function() {
+			testFunc("not an int");
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger);
+		});
 		
-		expect(function() {
-			testFunc("not an int")
-		}).toThrow(new TypeError("name must be an integer"));
+		it("rejects boolean values", function() {
+			testFunc(true);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger);
+		});
 		
-		expect(function() {
-			testFunc(true)
-		}).toThrow(new TypeError("name must be an integer"));
+		it("rejects object values", function() {
+			testFunc({});
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger);
+		});
 		
-		expect(function() {
-			testFunc(java.lang.Integer.MAX_VALUE + 1)
-		}).toThrow(new TypeError("name is out of integer range"));
+		it("rejects array values", function() {
+			testFunc([]);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger);
+		});
 		
-		expect(function() {
+		it("rejects null values", function() {
+			testFunc(null);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger);
+		});
+		
+		it("rejects too large values", function() {
+			testFunc(java.lang.Integer.MAX_VALUE + 1);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, isOutOfIntegerRange);
+		});
+		
+		it("rejects too small values", function() {
 			testFunc(java.lang.Integer.MIN_VALUE - 1)
-		}).toThrow(new TypeError("name is out of integer range"));
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, isOutOfIntegerRange);
+		});
+		
+		it("accumulates validator failures", function() {
+			module.exports(base).makeIntProperty(name, failingValidator)(1);
+			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'error');
+		});
+		
+		it("calls a passing validator function", function() {
+			var val = 1;
+			module.exports(base).makeIntProperty(name, passingValidator)(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBeCloseTo(val);
+		});
+		
+		it("sets integer values to the collector", function() {
+			
+			var val = 1;
+			testFunc(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBeCloseTo(val);
+	
+			val = 5000;
+			testFunc(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBeCloseTo(val);
+			
+		});
 	});
 	
-	it("sets integer values to the collector", function() {
-		var testFunc = module.exports.makeIntProperty('base', 'name');
+	describe("function makeLongProperty", function() {
 		
-		var val = 1;
-		testFunc(val);
-		expect(location).toBe("basename");
-		expect(value).toBeCloseTo(val, 0);
-
-		val = 5000;
-		testFunc(val);
-		expect(location).toBe("basename");
-		expect(value).toBeCloseTo(val, 0);
+		var testFunc;
+		var mustBeALong = 'must be a long';
 		
+		beforeEach(function() {
+			testFunc = module.exports(base).makeLongProperty(name);
+		});
+		
+		it("rejects string values", function() {
+			testFunc("not an int");
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong);
+		});
+		
+		it("rejects boolean values", function() {
+			testFunc(true);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong);
+		});
+		
+		it("rejects object values", function() {
+			testFunc({});
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong);
+		});
+		
+		it("rejects array values", function() {
+			testFunc([]);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong);
+		});
+		
+		it("rejects null values", function() {
+			testFunc(null);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong);
+		});
+		
+		it("accumulates validator failures", function() {
+			module.exports(base).makeLongProperty(name, failingValidator)(1);
+			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'error');
+		});
+		
+		it("calls a passing validator function", function() {
+			var val = 123428892398;
+			module.exports(base).makeLongProperty(name, passingValidator)(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBeCloseTo(val);
+		});
+		
+		it("sets long values to the collector", function() {
+			var testFunc = module.exports(base).makeLongProperty(name);
+			
+			var val = 1;
+			testFunc(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBeCloseTo(val);
+	
+			val = 5000;
+			testFunc(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBeCloseTo(val);
+			
+		});
 	});
 	
-	it("calls a given validator function", function() {
-		var name, arg;
-		
-		function validator(n, a) {
-			name = n;
-			arg = a;
-		}
-		
-		var testFunc = module.exports.makeIntProperty('base', 'name', validator);
-		
-		testFunc(1);
-		expect(name).toBe("name");
-		expect(arg).toBe(1);
-	});
-});
+	describe("function makeStringProperty", function() {
 
-describe("function makeLongProperty", function() {
+		var testFunc;
+		var mustBeAString = 'must be a string';
+		
+		beforeEach(function() {
+			testFunc = module.exports(base).makeStringProperty(name);
+		});
+		
+		it("rejects numeric values", function() {
+			testFunc(1);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString);
+		});
+		
+		it("rejects boolean values", function() {
+			testFunc(true);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString);
+		});
+		
+		it("rejects object values", function() {
+			testFunc({});
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString);
+		});
+		
+		it("rejects array values", function() {
+			testFunc([]);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString);
+		});
+		
+		it("rejects null values", function() {
+			testFunc(null);
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString);
+		});
+		
+		it("accumulates validator failures", function() {
+			module.exports(base).makeStringProperty(name, failingValidator)("1");
+			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'error');
+		});
+		
+		it("calls a passing validator function", function() {
+			var val = "1";
+			module.exports(base).makeStringProperty(name, passingValidator)(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBe(valueOf(val));
+		});
+		
+		it("sets string values to the collector", function() {
+			
+			var val = "1";
+			testFunc(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBe(valueOf(val));
 	
-	it("rejects values that are not longs", function() {
-		var testFunc = module.exports.makeLongProperty('base', 'name');
-		
-		expect(function() {
-			testFunc("not an int")
-		}).toThrow(new TypeError("name must be an long"));
-		
-		expect(function() {
-			testFunc(true)
-		}).toThrow(new TypeError("name must be an long"));
-	});
-	
-	it("sets long values to the collector", function() {
-		var testFunc = module.exports.makeLongProperty('base', 'name');
-		
-		var val = 1;
-		testFunc(val);
-		expect(location).toBe("basename");
-		expect(value).toBeCloseTo(val, 0);
-
-		val = 5000;
-		testFunc(val);
-		expect(location).toBe("basename");
-		expect(value).toBeCloseTo(val, 0);
-		
-	});
-	
-	it("calls a given validator function", function() {
-		var name, arg;
-		
-		function validator(n, a) {
-			name = n;
-			arg = a;
-		}
-		
-		var testFunc = module.exports.makeLongProperty('base', 'name', validator);
-		
-		testFunc(1);
-		expect(name).toBe("name");
-		expect(arg).toBe(1);
-	});
-});
-
-describe("function makeStringProperty", function() {
-	
-	it("sets values to the collector", function() {
-		var testFunc = module.exports.makeStringProperty('base', 'name');
-
-		testFunc("hi");
-		expect(location).toEqual("basename");
-		expect(value).toEqual(valueOf("hi"));
-
-		testFunc(1);
-		expect(location).toEqual("basename");
-		expect(value).toEqual(valueOf(1));
-
-		testFunc(true);
-		expect(location).toEqual("basename");
-		expect(value).toEqual(valueOf("true"));
-		
-	});
-	
-	it("calls a given validator function", function() {
-		var name, arg;
-		
-		function validator(n, a) {
-			name = n;
-			arg = a;
-		}
-		
-		var testFunc = module.exports.makeStringProperty('base', 'name', validator);
-		
-		testFunc(1);
-		expect(name).toEqual("name");
-		expect(arg).toEqual(1);
+			val = "5000";
+			testFunc(val);
+			var args = collector.addConfigurationElement.calls.mostRecent().args;
+			expect(args[0]).toBe(basename)
+			expect(args[1]).toBe(valueOf(val));
+			
+		});
 	});
 });

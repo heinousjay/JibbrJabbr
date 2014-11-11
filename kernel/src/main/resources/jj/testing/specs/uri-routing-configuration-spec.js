@@ -7,12 +7,6 @@ var validator = {
 
 var inject = function(id) {
 	return {
-		'jj.configuration.ConfigurationCollector' : {
-			addConfigurationMultiElement: function(l, r) {
-				inject.l = l;
-				inject.r = r;
-			}
-		},
 		'jj.http.server.ServableResourceHelper' : {
 			arrayOfNames: function() {
 				return ['static', 'script', 'stylesheet', 'document'];
@@ -22,17 +16,18 @@ var inject = function(id) {
 	}[id];
 }
 var valueOf = java.lang.String.valueOf;
-var bases = [];
 var names = [];
 var stringProperty = function() {}
+var support = {
+	makeStringProperty:function(name) {
+		names.push(name);
+		return stringProperty;
+	},
+	accumulateError: function() {},
+	addToList: function() {}
+};
 var mocks = {
-	'jj/configuration-support' : {
-		makeStringProperty:function(base, name) {
-			bases.push(base);
-			names.push(name);
-			return stringProperty;
-		}
-	}
+	'jj/configuration-support' : function(base) { return support; }
 };
 
 var require = function(id) {
@@ -44,7 +39,6 @@ describe("exports", function() {
 	describe("welcomeFile", function() {
 		
 		it("sets up using makeStringProperty", function() {
-			expect(bases[0]).toBe(base);
 			expect(names[0]).toBe("welcomeFile");
 		});
 		
@@ -88,27 +82,29 @@ describe("makeSetter", function() {
 		it("adds valid Routes to the collector in the correct key", function() {
 			
 			spyOn(validator, 'validateRouteUri').and.returnValue('');
+			spyOn(support, 'addToList');
 			
 			var beef = "/beef";
 			var chief = "/chief";
 			ms(beef).to.document(chief);
 			
-			expect(inject.l).toBe(base + 'routes');
-			expect(inject.r).toBeDefined();
-			expect(inject.r.method()).toEqual(GET);
-			expect(inject.r.uri()).toEqual(valueOf(beef));
-			expect(inject.r.resourceName()).toEqual(valueOf('document'));
-			expect(inject.r.mapping()).toEqual(valueOf(chief));
+			expect(support.addToList).toHaveBeenCalled();
+			expect(support.addToList.calls.mostRecent().args[0]).toBe('routes');
+			var r = support.addToList.calls.mostRecent().args[1];
+			expect(r.method()).toEqual(GET);
+			expect(r.uri()).toEqual(valueOf(beef));
+			expect(r.resourceName()).toEqual(valueOf('document'));
+			expect(r.mapping()).toEqual(valueOf(chief));
 		});
 		
 		it("errors on validation failure", function() {
 			
 			spyOn(validator, 'validateRouteUri').and.returnValue('nope');
-			
-			expect(function(){
-				ms("nope");
-			}).toThrow(new Error("nope failed validation\nnope"));
-			
+			spyOn(support, 'accumulateError');
+			var result = ms("nope");
+			expect(result).toBeDefined();
+			expect(typeof result.to).toBe('function');
+			expect(support.accumulateError).toHaveBeenCalled();
 		});
 	});
 });

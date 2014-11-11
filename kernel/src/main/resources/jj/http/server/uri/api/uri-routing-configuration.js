@@ -1,8 +1,7 @@
-var base = 'jj.http.server.uri.RouterConfiguration.';
-var collector = inject('jj.configuration.ConfigurationCollector');
+
 var validator = inject('jj.http.server.uri.RouteUriValidator');
 var resourceNames = inject('jj.http.server.ServableResourceHelper').arrayOfNames();
-var support = require('jj/configuration-support');
+var support = require('jj/configuration-support')('jj.http.server.uri.RouterConfiguration');
 
 var GET    = Packages.io.netty.handler.codec.http.HttpMethod.GET;
 var POST   = Packages.io.netty.handler.codec.http.HttpMethod.POST;
@@ -16,20 +15,25 @@ function makeSetter(method) {
 		var errors = validator.validateRouteUri(uri);
 		
 		if (errors != '') {
-			throw new Error(uri + " failed validation\n" + errors);
-		}
-
-		var to = {};
-
-		resourceNames.forEach(function(resourceName) {
-			to[resourceName] = function(mappedName) {
-				var route = new Route(method, uri, resourceName, mappedName || '');
-				collector.addConfigurationMultiElement(base + 'routes', route);
+			support.accumulateError('routes', uri + " failed validation\n" + errors);
+			return {
+				to: function() {}
 			}
-		});
-		
-		return {
-			to: to
+			
+		} else {
+
+			var to = {};
+	
+			resourceNames.forEach(function(resourceName) {
+				to[resourceName] = function(mappedName) {
+					var route = new Route(method, uri, resourceName, mappedName || '');
+					support.addToList('routes', route);
+				}
+			});
+			
+			return {
+				to: to
+			}
 		}
 	}
 }
@@ -47,7 +51,7 @@ module.exports = {
 		DELETE: makeSetter(DELETE)
 	},
 	
-	welcomeFile: support.makeStringProperty(base, 'welcomeFile')
+	welcomeFile: support.makeStringProperty('welcomeFile')
 }
 
 

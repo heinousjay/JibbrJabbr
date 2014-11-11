@@ -1,5 +1,4 @@
 var collector = inject('jj.configuration.ConfigurationCollector');
-var base = 'jj.resource.ResourceConfiguration.';
 
 var ResourceSettings = Packages.jj.resource.ResourceSettings;
 
@@ -75,7 +74,7 @@ module.exports = {
 		}
 		
 		return {
-			is: makeIs(base + 'fileTypeSettings', ext)
+			is: makeIs('jj.resource.ResourceConfiguration.fileTypeSettings', ext)
 		};
 	}
 };
