@@ -17,9 +17,11 @@ module.exports = {
 		} else if (typeof host == 'number' && typeof port == 'undefined') {
 			binding = new Packages.jj.http.server.Binding(new java.lang.Integer(parseInt(host)).intValue());
 		} else {
-			throw new TypeError('bind requires an optional host name as a string, and a mandatory integer port');
+			support.accumulateError('bindings', 'bind requires an optional host name as a string, and a mandatory integer port');
 		}
-		support.addToList('bindings', binding);
+		if (binding != null) {
+			support.addToList('bindings', binding);
+		}
 		return this;
 	}
 }

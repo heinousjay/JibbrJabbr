@@ -2,7 +2,7 @@ var support = require('jj/configuration-support')('jj.http.client.HttpClientConf
 
 function validateIpAddress(name, address) {
 	if (typeof address !== 'string') {
-		support.accumulateError(name, " must be a string") 
+		return support.accumulateError(name, " must be a string");
 	}
 }
 

@@ -8,10 +8,8 @@ module.exports = {
 	
 	maxLineLen: support.makeIntProperty('maxLineLen', function(name, arg) {
 		if (arg < 1) {
-			support.accumulateError('maxLineLen', 'must be positive');
-			return false;
+			return support.accumulateError('maxLineLen', 'must be positive');
 		}
-		return true;
 	}),
 	
 	/** no optimizations */

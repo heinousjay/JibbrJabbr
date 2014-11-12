@@ -23,6 +23,7 @@ import jj.util.Closer;
 
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
@@ -55,11 +56,21 @@ public class RhinoContext implements Closer {
 	
 	private final Publisher publisher;
 	
+	private final ContextFactory contextFactory = new ContextFactory() {
+
+		@Override
+		public boolean hasFeature(Context cx, int featureIndex) {
+		
+			return featureIndex == Context.FEATURE_LOCATION_INFORMATION_IN_ERROR ||
+				super.hasFeature(cx, featureIndex);
+		}
+	};
+	
 	@Inject
 	RhinoContext(final Publisher publisher) {
 		this.publisher = publisher;
 		
-		this.context = Context.enter();
+		this.context = contextFactory.enterContext();
 		
 		context.setLanguageVersion(Context.VERSION_1_8);
 		context.setOptimizationLevel(-1);

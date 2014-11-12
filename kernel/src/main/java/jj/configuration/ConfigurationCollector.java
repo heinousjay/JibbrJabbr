@@ -62,42 +62,42 @@ public class ConfigurationCollector {
 	
 	/**
 	 * This is the interface for the API modules
-	 * @param key
+	 * @param name
 	 * @param value
 	 */
-	public void addConfigurationElement(String key, Object value) {
+	public void addConfigurationElement(String name, Object value) {
 		assertConfig();
-		inProgress.put(key, value);
+		inProgress.put(name, value);
 	}
 	
-	public void addConfigurationMultiElement(String key, Object value) {
+	public void addConfigurationMultiElement(String name, Object value) {
 		assertConfig();
-		if (!inProgress.containsKey(key)) {
-			inProgress.put(key, new ArrayList<Object>());
+		if (!inProgress.containsKey(name)) {
+			inProgress.put(name, new ArrayList<Object>());
 		}
 		@SuppressWarnings("unchecked")
-		ArrayList<Object> list = ((ArrayList<Object>)inProgress.get(key));
+		ArrayList<Object> list = ((ArrayList<Object>)inProgress.get(name));
 		list.add(value);
 	}
 	
-	public void addConfigurationMappedElement(String key, Object valueKey, Object valueValue) {
+	public void addConfigurationMappedElement(String name, Object key, Object value) {
 		assertConfig();
-		if (!inProgress.containsKey(key)) {
-			inProgress.put(key, new HashMap<Object, Object>());
+		if (!inProgress.containsKey(name)) {
+			inProgress.put(name, new HashMap<Object, Object>());
 		}
 		@SuppressWarnings("unchecked")
-		HashMap<Object, Object> map = ((HashMap<Object, Object>)inProgress.get(key));
-		map.put(valueKey, valueValue);
+		HashMap<Object, Object> map = ((HashMap<Object, Object>)inProgress.get(name));
+		map.put(key, value);
 	}
 	
-	public void accumulateError(String key, String error) {
+	public void accumulateError(String name, String error) {
 		assertConfig();
-		errors.computeIfAbsent(key, k -> {
+		errors.computeIfAbsent(name, k -> {
 			return new ArrayList<>(1);
 		}).add(error);
 	}
 	
-	<T> T get(String key, Class<T> type, Object defaultValue) {
+	<T> T get(String name, Class<T> type, Object defaultValue) {
 		Map<String, Object> map = current.get();
 		if (List.class.isAssignableFrom(type) && defaultValue == null) {
 			defaultValue = Collections.EMPTY_LIST;
@@ -105,7 +105,7 @@ public class ConfigurationCollector {
 		if (Map.class.isAssignableFrom(type) && defaultValue == null) {
 			defaultValue = Collections.EMPTY_MAP;
 		}
-		return converters.convert(map != null && map.containsKey(key) ? map.get(key) : defaultValue, type);
+		return converters.convert(map != null && map.containsKey(name) ? map.get(name) : defaultValue, type);
 	}
 	
 	ConfigurationErrored configurationComplete() {
@@ -116,14 +116,14 @@ public class ConfigurationCollector {
 			return new ConfigurationErrored(e);
 		}
 		
-		for (String key : inProgress.keySet()) {
-			if (inProgress.get(key) instanceof List) {
-				List<?> list = Collections.unmodifiableList((List<?>)inProgress.get(key));
-				inProgress.put(key, list);
+		for (String name : inProgress.keySet()) {
+			if (inProgress.get(name) instanceof List) {
+				List<?> list = Collections.unmodifiableList((List<?>)inProgress.get(name));
+				inProgress.put(name, list);
 			}
-			if (inProgress.get(key) instanceof Map) {
-				Map<?, ?> map = Collections.unmodifiableMap((Map<?, ?>)inProgress.get(key));
-				inProgress.put(key, map);
+			if (inProgress.get(name) instanceof Map) {
+				Map<?, ?> map = Collections.unmodifiableMap((Map<?, ?>)inProgress.get(name));
+				inProgress.put(name, map);
 			}
 		}
 		
