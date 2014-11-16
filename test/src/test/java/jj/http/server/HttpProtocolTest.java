@@ -54,7 +54,7 @@ import org.junit.Test;
  */
 public class HttpProtocolTest {
 	
-	private final int MAKE_THIS_TEST_WORK = 1;
+	private final int BASE_THIS_TEST_ON_HTTP_CLIENT_MAKE_A_SPECIAL_REQUESTER_IN_THIS_PROJECT_THAT_CAN_WRITE_RAW_TO_THE_REQUEST = 1;
 	
 	public static class ProtocolTestResponseAdapter extends ChannelHandlerAdapter {
 		
