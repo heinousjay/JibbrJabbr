@@ -62,6 +62,8 @@ public class RhinoContext implements Closer {
 		public boolean hasFeature(Context cx, int featureIndex) {
 		
 			return featureIndex == Context.FEATURE_LOCATION_INFORMATION_IN_ERROR ||
+				featureIndex == Context.FEATURE_STRICT_MODE ||
+				//featureIndex == Context.FEATURE_WARNING_AS_ERROR ||
 				super.hasFeature(cx, featureIndex);
 		}
 	};

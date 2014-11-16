@@ -44,6 +44,7 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
@@ -134,7 +135,8 @@ public class StylesheetResourceTest {
 		
 		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			global = context.initStandardObjects();
-			given(lessScriptResource.script()).willReturn(context.compileString(getLessScript(), "less script"));
+			Script script = context.compileString(getLessScript(), "less script");
+			given(lessScriptResource.script()).willReturn(script);
 			
 			
 		// when
