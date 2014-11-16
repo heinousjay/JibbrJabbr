@@ -15,10 +15,7 @@
  */
 package jj.http.client;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 
 import io.netty.bootstrap.Bootstrap;
@@ -28,13 +25,14 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.resolver.dns.DnsNameResolverGroup;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import jj.configuration.ConfigurationLoaded;
+import jj.configuration.ConfigurationLoading;
 import jj.event.Listener;
 import jj.event.Subscriber;
-
-import com.google.inject.Inject;
 
 /**
  * @author jason
@@ -42,54 +40,70 @@ import com.google.inject.Inject;
  */
 @Singleton
 @Subscriber
-public class HttpClient {
+class HttpClient {
 
 	private final HttpClientNioEventLoopGroup eventLoop;
 	private final HttpClientChannelInitializer initializer;
-	private final HttpClientConfiguration configuration;
+	private final HttpClientConfigurationReader configuration;
+	private final Provider<Bootstrap> bootstrapProvider;
 	private volatile Bootstrap bootstrap;
+	
+	// we can store this to verify that the configuration is the same
+	// and not restart
+	// no need to be volatile as it will only ever be used from the
+	// configuration script thread
+	private int configurationHashCode;
 	
 	@Inject
 	HttpClient(
 		final HttpClientNioEventLoopGroup eventLoop,
 		final HttpClientChannelInitializer initializer,
-		final HttpClientConfiguration configuration
-	) throws Exception {
+		final HttpClientConfigurationReader configuration,
+		final Provider<Bootstrap> bootstrapProvider
+	) {
 		this.eventLoop = eventLoop;
 		this.initializer = initializer;
 		this.configuration = configuration;
+		this.bootstrapProvider = bootstrapProvider;
+	}
+	
+	@Listener
+	void configurationLoading(ConfigurationLoading event) {
+		makeBootstrap();
 	}
 	
 	@Listener
 	void configurationLoaded(ConfigurationLoaded event) {
+		makeBootstrap();
+	}
+	
+	private void makeBootstrap() {
 		
-		List<InetSocketAddress> nameservers = new ArrayList<>(configuration.nameservers().size());
-		for (String nameserver : configuration.nameservers()) {
-			try {
-				nameservers.add(new InetSocketAddress(InetAddress.getByName(nameserver), 53));
-			} catch (UnknownHostException uhe) {
-				// publish it!
-			}
-		}
-		
-		if (nameservers.isEmpty()) {
-			// publish it!
-			bootstrap = null;
-		} else {
-		
-			Bootstrap b = new Bootstrap()
-				.group(eventLoop)
-				.handler(initializer)
-				.channel(NioSocketChannel.class)
-				.resolver(new DnsNameResolverGroup(NioDatagramChannel.class, nameservers))
-				.option(ChannelOption.TCP_NODELAY, true)
-				.validate();
+		if (configuration.hashCode() != configurationHashCode) {
+			configurationHashCode = configuration.hashCode();
 			
-			bootstrap = b;
+			List<InetSocketAddress> nameservers = configuration.nameservers();
+			
+			if (nameservers.isEmpty()) {
+				// publish it!
+				bootstrap = null;
+			} else {
+			
+				Bootstrap b = bootstrapProvider.get()
+					.group(eventLoop)
+					.handler(initializer)
+					.channel(NioSocketChannel.class)
+					.localAddress(configuration.localClientAddress())
+					.resolver(new DnsNameResolverGroup(NioDatagramChannel.class, configuration.localNameserverAddress(), nameservers))
+					.option(ChannelOption.TCP_NODELAY, true)
+					.validate();
+				
+				bootstrap = b;
+			}
 		}
 	}
 	
-	ChannelFuture connect(String host, int port) {
+	ChannelFuture connect(boolean secure, String host, int port) {
 		assert (bootstrap != null) : "don't call this yet!";
 		// better error
 		return bootstrap.connect(host, port);

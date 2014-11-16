@@ -15,18 +15,12 @@
  */
 package jj.http.client;
 
-import static java.nio.charset.StandardCharsets.*;
-
 import javax.inject.Singleton;
 
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpResponse;
 
 /**
  * @author jason
@@ -39,23 +33,7 @@ class HttpClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
 		
-		ch.pipeline()
-			.addLast(new HttpClientCodec())
-			.addLast(new SimpleChannelInboundHandler<HttpResponse>() {
-
-				@Override
-				protected void messageReceived(ChannelHandlerContext ctx, HttpResponse msg) throws Exception {
-					System.out.println(msg);
-				}
-			})
-			.addLast(new SimpleChannelInboundHandler<HttpContent> () {
-
-				@Override
-				protected void messageReceived(ChannelHandlerContext ctx, HttpContent msg) throws Exception {
-					System.out.println(msg.content().toString(UTF_8));
-				}
-				
-			});
+		ch.pipeline().addLast(new HttpClientCodec());
 	}
 
 }

@@ -229,4 +229,11 @@ public class JibbrJabbrTestServer implements TestRule {
 		
 		return mode.traceStatement(statement, description.getClassName() + "." + description.getMethodName());
 	}
+
+	/**
+	 * @return The base URL of the HTTP server
+	 */
+	public String baseUrl() {
+		return "http://localhost:" + (httpPort > 1023 && httpPort < 65536 ? httpPort : 8080);
+	}
 }

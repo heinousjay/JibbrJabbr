@@ -59,7 +59,7 @@ class HttpClientRequestContinuationProcessor implements ContinuationProcessor {
 			protected void run() throws Exception {
 				URI uri = request.uri();
 				int port = uri.getPort() == -1 ? 80 : uri.getPort();
-				client.connect(uri.getHost(), port).addListener(new ChannelFutureListener() {
+				client.connect(false, uri.getHost(), port).addListener(new ChannelFutureListener() {
 					
 					@Override
 					public void operationComplete(ChannelFuture future) throws Exception {

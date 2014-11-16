@@ -15,19 +15,20 @@
  */
 package jj.http.client;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+
+import io.netty.buffer.ByteBuf;
 import javax.inject.Inject;
 
 import jj.App;
 import jj.testing.JibbrJabbrTestServer;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,26 +37,36 @@ public class HttpClientIntegrationTest {
 
 	@Rule
 	public JibbrJabbrTestServer server =
-		new JibbrJabbrTestServer(App.one)
+		new JibbrJabbrTestServer(App.httpClient)
+			.withHttp()
 			.injectInstance(this);
 	
-	@Inject HttpClient client;
+	@Inject HttpRequester requester;
 	
-	@Ignore
 	@Test
 	public void test() throws Exception {
-		client.connect("jibbrjabbr.com", 80).addListener(new ChannelFutureListener() {
-			
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				DefaultHttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-				request.headers()
-					.add(HttpHeaders.Names.HOST, "jibbrjabbr.com")
-					.add(HttpHeaders.Names.ACCEPT, "text/html");
-				future.channel().writeAndFlush(request);
-			}
-		});
 		
-		Thread.sleep(1000);
+		final AtomicReference<String> response = new AtomicReference<>();
+		final CountDownLatch latch = new CountDownLatch(1);
+		
+		requester.requestTo(server.baseUrl() + "/test.txt")
+			.get()
+			.begin(new HttpResponseListener() {
+				
+				@Override
+				protected void bodyPart(ByteBuf bodyPart) {
+					response.set(bodyPart.toString(UTF_8));
+				}
+				
+				@Override
+				protected void responseComplete() {
+					latch.countDown();
+				}
+				
+			});
+		
+		
+		assertTrue("timed out", latch.await(250, MILLISECONDS));
+		assertThat(response.get(), is("I am the text"));
 	}
 }
