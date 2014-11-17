@@ -71,7 +71,7 @@ public class HttpRequesterTest {
 			.header(HttpHeaders.Names.ACCEPT, "application/json")
 			.begin(new HttpResponseListener() {
 				@Override
-				protected void responseComplete() {
+				protected void responseComplete(HttpHeaders trailingHeaders) {
 					called.set(true);
 				}
 			});

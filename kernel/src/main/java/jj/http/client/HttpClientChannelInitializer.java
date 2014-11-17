@@ -21,6 +21,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpContentDecompressor;
 
 /**
  * @author jason
@@ -29,11 +30,15 @@ import io.netty.handler.codec.http.HttpClientCodec;
 @Singleton
 @Sharable
 class HttpClientChannelInitializer extends ChannelInitializer<SocketChannel> {
+	
+	static final String CODEC = "codec";
 
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
 		
-		ch.pipeline().addLast(new HttpClientCodec());
+		ch.pipeline()
+			.addLast(new HttpClientCodec())
+			.addLast(new HttpContentDecompressor());
 	}
 
 }

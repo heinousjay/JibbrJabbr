@@ -24,6 +24,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaders;
+
 import javax.inject.Inject;
 
 import jj.App;
@@ -59,7 +61,7 @@ public class HttpClientIntegrationTest {
 				}
 				
 				@Override
-				protected void responseComplete() {
+				protected void responseComplete(HttpHeaders trailingHeaders) {
 					latch.countDown();
 				}
 				

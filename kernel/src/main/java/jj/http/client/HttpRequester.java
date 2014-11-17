@@ -193,9 +193,10 @@ public class HttpRequester {
 						// possibly close
 						// ch(f).close();
 						
+					} else {
+						ch.pipeline().addLast(listener.handler());
 					}
 				});
-				ch.pipeline().addLast(listener.handler());
 			});
 		}
 	}

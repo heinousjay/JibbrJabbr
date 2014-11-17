@@ -19,6 +19,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
 
@@ -28,35 +29,38 @@ import io.netty.handler.codec.http.LastHttpContent;
  *
  */
 public abstract class HttpResponseListener {
-	
+
 	ChannelHandlerAdapter handler() {
 		return handler;
 	}
-	
+
 	private ChannelHandlerAdapter handler = new ChannelHandlerAdapter() {
-		
+
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-			
 			if (msg instanceof HttpResponse) {
-				
-				responseStart((HttpResponse)msg);
-				
+
+				HttpResponse response = (HttpResponse)msg;
+				responseStart(response);
+
 			} else if (msg instanceof LastHttpContent) {
-				
+
 				LastHttpContent content = (LastHttpContent)msg;
 				bodyPart(content.content());
-				// do something!
-				content.trailingHeaders();
-				
-				responseComplete();
+				responseComplete(content.trailingHeaders());
+
 			} else if (msg instanceof HttpContent) {
-				;
+
 				bodyPart(((HttpContent)msg).content());
-				
+
 			} else {
 				throw new AssertionError("UNEXPECTED RESPONSE OBJECT " + msg.getClass());
 			}
+		}
+
+		@Override
+		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+			requestErrored(cause);
 		}
 	};
 
@@ -65,8 +69,10 @@ public abstract class HttpResponseListener {
 	 * @param response
 	 */
 	protected void responseStart(HttpResponse response) {}
-	
+
 	protected void bodyPart(ByteBuf bodyPart) {}
+
+	protected void responseComplete(HttpHeaders trailingHeaders) {}
 	
-	protected void responseComplete() {}
+	protected void requestErrored(Throwable cause) {}
 }
