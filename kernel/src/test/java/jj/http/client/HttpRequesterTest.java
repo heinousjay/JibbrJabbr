@@ -18,8 +18,12 @@ package jj.http.client;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -56,6 +60,7 @@ public class HttpRequesterTest {
 		HttpRequester requester = new HttpRequester(client);
 		given(client.connect(false, "foaas.com", 80)).willReturn(future);
 		given(future.channel()).willReturn(ch);
+		final AtomicBoolean called = new AtomicBoolean();
 		
 		// when
 		requester.requestTo("http://foaas.com/off/:to/:from")
@@ -64,7 +69,12 @@ public class HttpRequesterTest {
 			.param("me", "awesome")
 			.get()
 			.header(HttpHeaders.Names.ACCEPT, "application/json")
-			.begin(new HttpResponseListener() {});
+			.begin(new HttpResponseListener() {
+				@Override
+				protected void responseComplete() {
+					called.set(true);
+				}
+			});
 		
 		// then
 		verify(future).addListener(listenerCaptor.capture());
@@ -80,6 +90,11 @@ public class HttpRequesterTest {
 		assertThat(request.uri(), is("/off/joe/iou?me=awesome"));
 		assertThat(request.headers().get(HttpHeaders.Names.HOST), is("foaas.com"));
 		assertThat(request.headers().get(HttpHeaders.Names.ACCEPT), is("application/json"));
+		
+		// when
+		ch.pipeline().removeFirst();
+		ch.writeInbound(new DefaultLastHttpContent());
+		assertTrue(called.get());
 	}
 
 }
