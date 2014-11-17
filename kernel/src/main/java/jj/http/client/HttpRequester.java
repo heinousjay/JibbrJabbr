@@ -182,17 +182,11 @@ public class HttpRequester {
 		}
 
 		public void begin(HttpResponseListener listener) throws Exception {
-			// do something to activate SSL!
-			
 			client.connect(secure, host, port).addListener(future -> {
 				Channel ch = ch(future);
 				ch.writeAndFlush(request).addListener(f -> {
 					if (!f.isSuccess()) {
-						// TODO something about this
-						System.out.println("failed!");
-						// possibly close
-						// ch(f).close();
-						
+						listener.requestErrored(f.cause());
 					} else {
 						ch.pipeline().addLast(listener.handler());
 					}
