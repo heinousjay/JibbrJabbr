@@ -76,14 +76,11 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	protected abstract void begin() throws Exception;
 	
 	/**
-	 * Implement this method to have control over resumption.  If all you do is pass the result
-	 * to the ContinuationCoordinator, don't worry about it, you're covered
-	 * @throws Exception
+	 * Resumes executing the task
 	 */
-	protected void resume() throws Exception {
+	void resume() {
 		pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
 	}
-	
 	/**
 	 * Implement this method to run after completion of either the begin or resume methods, when no
 	 * continuation is pending. this will only be called if the begin/resume methods complete 
