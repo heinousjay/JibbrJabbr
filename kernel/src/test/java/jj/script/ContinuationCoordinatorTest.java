@@ -89,6 +89,8 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock ContinuationPendingCache cache;
 	
+	@Mock IsThread is;
+	
 	@Mock Closer closer;
 	
 	@Before
@@ -110,7 +112,9 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, publisher, continuationProcessors, cache);
+		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, publisher, continuationProcessors, cache, is);
+		
+		given(is.forScriptEnvironment(any(ScriptEnvironment.class))).willReturn(true);
 	}
 	
 	@Test
