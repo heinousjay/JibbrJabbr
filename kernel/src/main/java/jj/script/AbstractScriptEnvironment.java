@@ -207,13 +207,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * @return a {@link Closer} to clean up any restored context when the 
 	 */
 	protected Closer restoreContextForKey(ContinuationPendingKey key) {
-		return new Closer() {
-			
-			@Override
-			public void close() {
-				// nothing to do in the abstract
-			}
-		};
+		return () -> { /* nothing to do */ };
 	}
 
 	@Override
