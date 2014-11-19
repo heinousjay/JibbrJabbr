@@ -1,5 +1,5 @@
-var collector = inject('jj.configuration.ConfigurationCollector');
-var key = 'jj.logging.LoggingConfiguration.loggingLevels';
+var support = require('jj/configuration-support')('jj.logging.LoggingConfiguration');
+var key = 'loggingLevels';
 var helper = inject('jj.logging.LoggingConfigurator');
 var level = Packages.jj.logging.Level;
 var levels = [level.Off, level.Error, level.Warn, level.Info, level.Debug, level.Trace];
@@ -7,7 +7,7 @@ var names = helper.loggerNames();
 
 function makeLevelSetter(logger, level) {
 	return function() {
-		collector.addConfigurationMappedElement(key, logger, level);
+		support.addToMap(key, logger, level);
 		return module.exports;
 	}
 }
