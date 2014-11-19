@@ -48,6 +48,8 @@ public abstract class HttpResponseListener {
 				LastHttpContent content = (LastHttpContent)msg;
 				bodyPart(content.content());
 				responseComplete(content.trailingHeaders());
+				// temporary! until keep-alive is in here
+				ctx.close();
 
 			} else if (msg instanceof HttpContent) {
 

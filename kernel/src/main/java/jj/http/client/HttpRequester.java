@@ -80,8 +80,15 @@ public class HttpRequester {
 			this.uri = uri;
 		}
 		
-		public Method param(String name, String value) {
-			params.computeIfAbsent(name, n -> { return new ArrayList<>(1); }).add(value);
+		public Method param(CharSequence name, CharSequence value) {
+			params.computeIfAbsent(name.toString(), n -> {
+				return new ArrayList<>(1);
+			}).add(value.toString());
+			return this;
+		}
+		
+		public Method params(Map<? extends CharSequence, ? extends CharSequence> params) {
+			params.forEach(this::param);
 			return this;
 		}
 		
@@ -169,7 +176,8 @@ public class HttpRequester {
 			this.host = host;
 			this.port = port;
 			request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpMethod, uri);
-			request.headers().add(HttpHeaders.Names.HOST, host);
+			header(HttpHeaders.Names.HOST, host);
+			header(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
 		}
 	
 		public Headers header(CharSequence name, CharSequence value) {

@@ -16,6 +16,7 @@
 package jj.http.client;
 
 import jj.JJModule;
+import jj.http.client.api.RestOperation;
 
 /**
  * @author jason
@@ -28,7 +29,7 @@ public class HttpClientModule extends JJModule {
 
 		addAPIModulePath("/jj/http/client/api");
 		
-		dispatch().continuationOf(HttpClientRequest.class).to(HttpClientRequestContinuationProcessor.class);
+		dispatch().continuationOf(RestOperation.class).to(HttpClientRequestContinuationProcessor.class);
 		
 		bindExecutor(HttpClientNioEventLoopGroup.class);
 		

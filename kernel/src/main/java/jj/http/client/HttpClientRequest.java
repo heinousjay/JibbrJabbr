@@ -15,38 +15,18 @@
  */
 package jj.http.client;
 
-import io.netty.handler.codec.http.HttpMethod;
-
-import java.net.URI;
-
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 
 /**
- * 
- * 
  * @author jason
  *
  */
-class HttpClientRequest implements Continuation {
-
-	private final HttpMethod method;
-	private final URI uri;
+public abstract class HttpClientRequest implements Continuation {
+	
+	protected abstract void begin();
 
 	private ContinuationPendingKey pendingKey;
-	
-	HttpClientRequest(final String method, final URI uri) {
-		this.method = HttpMethod.valueOf(method);
-		this.uri = uri;
-	}
-	
-	HttpMethod method() {
-		return method;
-	}
-	
-	URI uri() {
-		return uri;
-	}
 	
 	@Override
 	public ContinuationPendingKey pendingKey() {
@@ -59,10 +39,4 @@ class HttpClientRequest implements Continuation {
 		assert pendingKey != null;
 		this.pendingKey = pendingKey;
 	}
-	
-	@Override
-	public String toString() {
-		return HttpClientRequest.class.getSimpleName() + "[method: " + method + ", uri: " + uri + "]";
-	}
-
 }

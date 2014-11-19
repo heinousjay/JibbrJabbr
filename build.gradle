@@ -39,6 +39,11 @@ allprojects {
 		}
 	}
 	
+	configurations.all {
+		// check for updates every build
+		resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	}
+	
 	jar {
 		manifest {
 			attributes(
@@ -69,7 +74,7 @@ allprojects {
 		}
 		
 		serverCore configurations.core
-		serverCore 'io.netty:netty-all:5.0.0.Alpha2-SNAPSHOT'
+		serverCore group: 'io.netty', name: 'netty-all', version: '5.0.0.Alpha2-SNAPSHOT', changing: true
 		serverCore 'com.jcraft:jzlib:1.1.3'
 		serverCore 'org.mozilla:rhino:1.7R4'
 		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'

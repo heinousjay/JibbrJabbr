@@ -15,18 +15,10 @@
  */
 package jj.http.client;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
-
-import java.net.URI;
-
 import javax.inject.Singleton;
 
-import com.google.inject.Inject;
+import org.mozilla.javascript.Undefined;
 
-import jj.execution.TaskRunner;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
 
@@ -37,38 +29,14 @@ import jj.script.ContinuationState;
 @Singleton
 class HttpClientRequestContinuationProcessor implements ContinuationProcessor {
 	
-	private final HttpClient client;
-	private final TaskRunner taskRunner;
 	
-	@Inject
-	HttpClientRequestContinuationProcessor(
-		final HttpClient client,
-		final TaskRunner taskRunner
-	) {
-		this.client = client;
-		this.taskRunner = taskRunner;
-	}
 
 	@Override
 	public void process(ContinuationState continuationState) {
-		final HttpClientRequest request = continuationState.continuationAs(HttpClientRequest.class);
+		HttpClientRequest clientRequest = continuationState.continuationAs(HttpClientRequest.class);
 		
-		taskRunner.execute(new HttpClientTask("dispatching request " + request) {
-			
-			@Override
-			protected void run() throws Exception {
-				URI uri = request.uri();
-				int port = uri.getPort() == -1 ? 80 : uri.getPort();
-				client.connect(false, uri.getHost(), port).addListener(new ChannelFutureListener() {
-					
-					@Override
-					public void operationComplete(ChannelFuture future) throws Exception {
-						DefaultFullHttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, request.method(), uri.getRawPath());
-						future.channel().writeAndFlush(req);
-					}
-				});
-			}
-		});
+		clientRequest.begin();
+		clientRequest.pendingKey().resume(Undefined.instance);
 	}
 
 }

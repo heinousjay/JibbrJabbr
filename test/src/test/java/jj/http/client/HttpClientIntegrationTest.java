@@ -25,10 +25,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponse;
 
 import javax.inject.Inject;
 
 import jj.App;
+import jj.JJModule;
+import jj.http.client.api.RestOperation;
 import jj.testing.JibbrJabbrTestServer;
 
 import org.junit.Rule;
@@ -41,19 +44,38 @@ public class HttpClientIntegrationTest {
 	public JibbrJabbrTestServer server =
 		new JibbrJabbrTestServer(App.httpClient)
 			.withHttp()
+			.withModule(new JJModule() {
+				
+				@Override
+				protected void configure() {
+					addAPIModulePath("/http/client/test");
+				}
+			})
 			.injectInstance(this);
 	
 	@Inject HttpRequester requester;
 	
+	@Inject RestOperation restOperation;
+	
 	@Test
-	public void test() throws Exception {
+	public void testHttpRequester() throws Throwable {
 		
 		final AtomicReference<String> response = new AtomicReference<>();
 		final CountDownLatch latch = new CountDownLatch(1);
 		
-		requester.requestTo(server.baseUrl() + "/test.txt")
+		requester.requestTo(server.baseUrl() + "/test2.txt")
 			.get()
 			.begin(new HttpResponseListener() {
+				
+				@Override
+				protected void responseStart(HttpResponse response) {
+					//System.out.println(response);
+				}
+
+				@Override
+				protected void requestErrored(Throwable cause) {
+					latch.countDown();
+				}
 				
 				@Override
 				protected void bodyPart(ByteBuf bodyPart) {
@@ -68,7 +90,7 @@ public class HttpClientIntegrationTest {
 			});
 		
 		
-		assertTrue("timed out", latch.await(250, MILLISECONDS));
+		assertTrue("timed out", latch.await(500, MILLISECONDS));
 		assertThat(response.get(), is("I am the text"));
 	}
 }
