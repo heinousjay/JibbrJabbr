@@ -37,7 +37,7 @@ public abstract class HttpMethodHandler extends SimpleChannelInboundHandler<Obje
 	}
 
 	@Override
-	protected final void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+	protected final void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
 		
 		assert request != null : "request was not set!";
 		

@@ -2,6 +2,109 @@ var require = function(id) {
 	return $$realRequire(id);
 	
 }
+var fakeRestOperation = {};
+var inject = function() {
+	return fakeRestOperation;
+}
+
+describe("rest-service-factory.js", function() {
+	
+	var rsf = 
+		
+	beforeEach(function() {
+		rsf = module.exports;
+	});
+	
+	it("requires an object parameter", function() {
+		expect(function() {
+			rsf();
+		}).toThrow(new Error(SERVICE_FACTORY_REQUIRES_OBJECT));
+		
+		expect(function() {
+			rsf(1);
+		}).toThrow(new Error(SERVICE_FACTORY_REQUIRES_OBJECT));
+		
+		expect(function() {
+			rsf(true);
+		}).toThrow(new Error(SERVICE_FACTORY_REQUIRES_OBJECT));
+		
+		expect(function() {
+			rsf("balls");
+		}).toThrow(new Error(SERVICE_FACTORY_REQUIRES_OBJECT));
+	});
+	
+	it("requires a baseUri key in the options", function() {
+		expect(function() {
+			rsf({});
+		}).toThrow(new Error(OPTIONS_REQUIRE_BASEURI));
+	});
+	
+	it("requires at least one operation definition", function() {
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri'
+			});
+		}).toThrow(new Error(OPTIONS_REQUIRE_OPERATIONS));
+		
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri',
+				operations: []
+			});
+		}).toThrow(new Error(OPTIONS_REQUIRE_OPERATIONS));
+
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri',
+				operations: true
+			});
+		}).toThrow(new Error(OPTIONS_REQUIRE_OPERATIONS));
+
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri',
+				operations: 1
+			});
+		}).toThrow(new Error(OPTIONS_REQUIRE_OPERATIONS));
+
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri',
+				operations: "balls"
+			});
+		}).toThrow(new Error(OPTIONS_REQUIRE_OPERATIONS));
+	});
+	
+	it("requires operation definitions to be objects", function() {
+		
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri',
+				operations: {
+					op: true
+				}
+			})
+		}).toThrow(new Error(OPERATION_DEFINITIONS_ARE_OBJECTS));
+		
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri',
+				operations: {
+					op: 1
+				}
+			})
+		}).toThrow(new Error(OPERATION_DEFINITIONS_ARE_OBJECTS));
+
+		expect(function() {
+			rsf({
+				baseUri: 'baseUri',
+				operations: {
+					op: "balls"
+				}
+			})
+		}).toThrow(new Error(OPERATION_DEFINITIONS_ARE_OBJECTS));
+	});
+});
 
 describe("mergeObject", function() {
 	it('should merge two objects together', function() {

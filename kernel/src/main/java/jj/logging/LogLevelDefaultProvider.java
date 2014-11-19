@@ -32,16 +32,10 @@ import javax.inject.Singleton;
 @Singleton
 public class LogLevelDefaultProvider implements Provider<Map<String, Level>> {
 	
-	private final Map<String, String> loggerNames;
+	private final Map<String, Level> levels;
 	
 	@Inject
 	LogLevelDefaultProvider(@LoggerNames Map<String, String> loggerNames) {
-		this.loggerNames = loggerNames;
-	}
-
-	@Override
-	public Map<String, Level> get() {
-		
 		Map<String, Level> result = new HashMap<>();
 		for (String logger : loggerNames.values()) {
 			result.put(logger, Level.Info);
@@ -52,7 +46,12 @@ public class LogLevelDefaultProvider implements Provider<Map<String, Level>> {
 		result.put("io.netty", Level.Off);
 		// log the config at info by default
 		result.put("script@config", Level.Info);
-		return Collections.unmodifiableMap(result);
+		levels = Collections.unmodifiableMap(result);
+	}
+
+	@Override
+	public Map<String, Level> get() {
+		return levels;
 	}
 
 	

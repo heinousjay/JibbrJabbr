@@ -87,7 +87,7 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 	}
 	
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
+	protected void messageReceived(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
 		
 		connection.markActivity();
 		

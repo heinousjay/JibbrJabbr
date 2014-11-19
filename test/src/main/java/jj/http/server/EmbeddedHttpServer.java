@@ -17,7 +17,7 @@ package jj.http.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.stream.ChunkedNioFile;
+import io.netty.util.ReferenceCountUtil;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -69,7 +70,7 @@ public class EmbeddedHttpServer {
 		final EmbeddedChannel channel = new EmbeddedChannel(new ReceiverAdapter(response), handlerProvider.get());
 		
 		final FullHttpRequest msg = request.fullHttpRequest();
-		taskRunner.execute(new HttpServerTask("submitting embedded request for " + request.request.getUri()) {
+		taskRunner.execute(new HttpServerTask("submitting embedded request for " + request.request.uri()) {
 			
 			@Override
 			protected void run() throws Exception {
@@ -81,7 +82,7 @@ public class EmbeddedHttpServer {
 		return response;
 	}
 	
-	private final class ReceiverAdapter extends ChannelOutboundHandlerAdapter {
+	private final class ReceiverAdapter extends ChannelHandlerAdapter {
 		
 		private final EmbeddedHttpResponse response;
 		
@@ -95,7 +96,7 @@ public class EmbeddedHttpServer {
 		}
 		
 		private void addBodyComponent(ByteBuf content) {
-			response.buffer.addComponent(content.retain());
+			response.buffer.addComponent(ReferenceCountUtil.releaseLater(content.retain()));
 			response.buffer.writerIndex(response.buffer.writerIndex() + content.writerIndex());
 		}
 		

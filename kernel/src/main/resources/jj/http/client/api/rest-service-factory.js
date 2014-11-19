@@ -18,6 +18,15 @@ require('jj/globalize')('jj/rest-service-constants', this);
 var console = require('jj/console');
 var parameterRegex = /:([\w]+)/g;
 var http = Packages.io.netty.handler.codec.http;
+const restOperation = inject('jj.http.client.api.RestOperation');
+const print = require('jj/print');
+const parameterRegex = /:([\w]+)/g;
+const http = Packages.io.netty.handler.codec.http;
+
+const SERVICE_FACTORY_REQUIRES_OBJECT = 'REST service factory requires an options object as an argument';
+const OPTIONS_REQUIRE_BASEURI = 'A base URI must be specified under the \"baseUri\" key of the options argument';
+const OPTIONS_REQUIRE_OPERATIONS = 'At least one service operation must be specified under the \"operations\" key of the options argument';
+const OPERATION_DEFINITIONS_ARE_OBJECTS = 'Operation definitions must be objects';
 
 function mergeObject(base, merge) {
 	Object.keys(merge).forEach(function(key) {
@@ -60,10 +69,19 @@ function makeUriNoBody(baseUri, operationUri, parameters) {
 	return new String(qse.toString()); // have to force the conversion? UGLY
 }
 
+function concatUri(baseUri, operationUri) {
+	var uri = baseUri.charAt(baseUri.length - 1) == '/' ? baseUri.substring(0, baseUri.length - 1) : baseUri;
+	uri += operationUri.charAt(0) == '/' ? operationUri : '/' + operationUri;
+	return uri;
+}
+
 function makeServiceCallFunction(baseUri, operation) {
-	return function(args) {
+	return function(parameters) {
 		
+		var uri = concatUri(baseUri, operation.uri);
 		
+		print(uri);
+		restOperation.request(operation.method, uri, parameters);
 		// for now
 		var uri = (operation.allowBody) ?
 			makeUriNoBody(baseUri, operation.uri, parameters) :
@@ -93,23 +111,70 @@ var methods = {
 	GET: {
 		defaults: {
 			accept: JSON,
-			produce: FORM,
+			produce: null,
 			allowBody: false
-		}
+		},
+		method: http.HttpMethod.GET
 	},
+	POST: {
+		defaults: {
+			accept: JSON,
+			produce: JSON,
+			allowBody: true
+		},
+		method: http.HttpMethod.PUT
+	},
+	PUT: {
+		defaults: {
+			accept: JSON,
+			produce: JSON,
+			allowBody: true
+		},
+		method: http.HttpMethod.POST
+	},
+	DELETE: {
+		defaults: {
+			accept: JSON,
+			produce: null,
+			allowBody: false
+		},
+		method: http.HttpMethod.DELETE
+	}
 }
 
 module.exports = function(config) {
-	var baseUri = config.baseUri || '';
+	if (typeof config !== 'object') {
+		throw new Error(SERVICE_FACTORY_REQUIRES_OBJECT);
+	}
+	
+	if (typeof config.baseUri !== 'string') {
+		throw new Error(OPTIONS_REQUIRE_BASEURI);
+	}
+	
+	if (typeof config.operations !== 'object') {
+		throw new Error(OPTIONS_REQUIRE_OPERATIONS);
+	}
+	
+	var operations = Object.keys(config.operations || {});
+	
+	if (operations.length == 0) {
+		throw new Error(OPTIONS_REQUIRE_OPERATIONS);
+	}
+	
 	var result = {};
-	Object.keys(config.operations || {}).forEach(function(operation) {
+	operations.forEach(function(operation) {
+		
 		var operationConfig = config.operations[operation];
+		if (typeof operationConfig !== 'object') {
+			throw new Error(OPERATION_DEFINITIONS_ARE_OBJECTS);
+		}
 		var method = methods[(operationConfig.method || GET)];
 		if (method == null) {
 			throw new Error('method not recognized: ' + operationConfig.method);
 		}
 		var actualConfig = mergeObject(mergeObject({}, method.defaults), operationConfig);
-		result[operation] = makeServiceCallFunction(baseUri, actualConfig);
+		actualConfig.method = method.method;
+		result[operation] = makeServiceCallFunction(config.baseUri, actualConfig);
 	});
 	return result;
 };

@@ -15,7 +15,10 @@
  */
 package jj.http.client;
 
+import java.util.List;
+
 import jj.configuration.Default;
+import jj.configuration.DefaultProvider;
 
 /**
  * @author jason
@@ -23,8 +26,30 @@ import jj.configuration.Default;
  */
 public interface HttpClientConfiguration {
 	
-	@Default("8")
-	int maximumConnectionsPerHost();
+	/**
+	 * the ip address of the local interface to use for http client communication
+	 * if left null, will use the wildcard (all local interfaces)
+	 * if the string "loopback" will use the loopback address
+	 * otherwise it has to be a valid ipv4 or ipv6 address
+	 */
+	String localClientAddress();
+	
+	/**
+	 * the ip address of the local interface to use for name resolution
+	 * if left null, will use the wildcard (all local interfaces)
+	 * if the string "loopback" will use the loopback address
+	 * otherwise it has to be a valid ipv4 or ipv6 address
+	 */
+	String localNameserverAddress();
+	
+	/**
+	 * 1 or more nameservers to use for domain name resolution. by default, attempts
+	 * to read the system configuration. if that cannot be found, falls back to
+	 * OpenDNS on 208.67.222.222 and 208.67.220.220
+	 * all addresses must be valid ipv4 or ipv6 addresses
+	 */
+	@DefaultProvider(NameServersDefaultProvider.class)
+	List<String> nameservers();
 	
 	@Default("JibbrJabbr") // hmmm want interpolations here.  maybe
 	String userAgent();

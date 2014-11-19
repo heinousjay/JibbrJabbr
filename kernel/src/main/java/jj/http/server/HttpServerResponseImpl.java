@@ -34,7 +34,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.AsciiString;
 import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderUtil;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
@@ -91,7 +93,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 
 	@Override
 	public HttpResponseStatus status() {
-		return response.getStatus();
+		return response.status();
 	}
 
 	/**
@@ -107,14 +109,14 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 
 	@Override
-	public HttpServerResponse header(final String name, final String value) {
+	public HttpServerResponse header(final AsciiString name, final CharSequence value) {
 		assertNotCommitted();
 		response.headers().add(name, value);
 		return this;
 	}
 
 	@Override
-	public HttpServerResponse headerIfNotSet(final String name, final String value) {
+	public HttpServerResponse headerIfNotSet(final AsciiString name, final CharSequence value) {
 		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
@@ -123,7 +125,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 
 	@Override
-	public HttpServerResponse headerIfNotSet(final String name, final long value) {
+	public HttpServerResponse headerIfNotSet(final AsciiString name, final long value) {
 		assertNotCommitted();
 		if (!containsHeader(name)) {
 			header(name, value);
@@ -132,21 +134,21 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 	
 	@Override
-	public boolean containsHeader(String name) {
+	public boolean containsHeader(AsciiString name) {
 		return response.headers().contains(name);
 	}
 
 	@Override
-	public HttpServerResponse header(final String name, final Date date) {
+	public HttpServerResponse header(final AsciiString name, final Date date) {
 		assertNotCommitted();
-		response.headers().add(name, date);
+		response.headers().addObject(name, date);
 		return this;
 	}
 
 	@Override
-	public HttpServerResponse header(final String name, final long value) {
+	public HttpServerResponse header(final AsciiString name, final long value) {
 		assertNotCommitted();
-		response.headers().add(name, value);
+		response.headers().addLong(name, value);
 		return this;
 	}
 
@@ -154,14 +156,19 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	@Override
-	public List<Entry<String, String>> allHeaders() {
+	public List<Entry<CharSequence, CharSequence>> allHeaders() {
 		// TODO make unmodifiable if committed
 		return response.headers().entries();
 	}
 
 	@Override
+	public CharSequence header(AsciiString name) {
+		return response.headers().get(name);
+	}
+
+	@Override
 	public HttpVersion version() {
-		return response.getProtocolVersion();
+		return response.protocolVersion();
 	}
 	
 	protected ByteBuf content() {
@@ -183,11 +190,6 @@ class HttpServerResponseImpl implements HttpServerResponse {
 		assertNotCommitted();
 		content().writeBytes(buffer);
 		return this;
-	}
-
-	@Override
-	public String header(String name) {
-		return response.headers().get(name);
 	}
 
 	/**
@@ -335,7 +337,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 	
 	private ChannelFuture maybeClose(final ChannelFuture f) {
-		if (!HttpHeaders.isKeepAlive(request.request())) {
+		if (!HttpHeaderUtil.isKeepAlive(request.request())) {
 			f.addListener(ChannelFutureListener.CLOSE);
 		}
 		
@@ -366,7 +368,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	
 	@Override
 	public HttpServerResponse error(Throwable t) {
-		publisher.publish(new RequestErrored(request.request(), t));
+		publisher.publish(new RequestErrored(t));
 		sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		return this;
 	}

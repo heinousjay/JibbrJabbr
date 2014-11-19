@@ -37,19 +37,23 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	
 	private final ContinuationPendingCache cache;
 	
+	private final IsThread is;
+	
 	@Inject
 	ContinuationCoordinatorImpl(
 		final Provider<RhinoContext> contextProvider,
 		final CurrentScriptEnvironment env,
 		final Publisher publisher,
 		final Map<Class<? extends Continuation>, ContinuationProcessor> continuationProcessors,
-		final ContinuationPendingCache cache
+		final ContinuationPendingCache cache,
+		final IsThread is
 	) {
 		this.contextProvider = contextProvider;
 		this.env = env;
 		this.publisher = publisher;
 		this.continuationProcessors = continuationProcessors;
 		this.cache = cache;
+		this.is = is;
 	}
 	
 	private void log(final Throwable t, final ScriptEnvironment scriptEnvironment) {
@@ -76,6 +80,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
+		assert is.forScriptEnvironment(scriptEnvironment) : "only execute this in the right script environment!";
+		
 		return execute(scriptEnvironment, context -> {
 			try (Closer closer = env.enterScope(scriptEnvironment)) {
 				context.executeScriptWithContinuations(script, scriptEnvironment.scope());
@@ -91,6 +97,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
+		assert is.forScriptEnvironment(scriptEnvironment) : "only execute this in the right script environment!";
+		
 		return execute(scriptEnvironment, context -> {
 			try (Closer closer = env.enterScope(scriptEnvironment)) {
 				context.executeScriptWithContinuations(scriptEnvironment.script(), scriptEnvironment.scope());
@@ -102,6 +110,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 	public ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
+		
+		assert is.forScriptEnvironment(scriptEnvironment) : "only execute this in the right script environment!";
 		
 		if (function != null) {
 
@@ -134,6 +144,8 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
 		assert scriptEnvironment instanceof AbstractScriptEnvironment : "all script environments must be abstract script environments";
+		
+		assert is.forScriptEnvironment(scriptEnvironment) : "only execute this in the right script environment!";
 		
 		assert pendingKey != null : "cannot resume without a pending key";
 		

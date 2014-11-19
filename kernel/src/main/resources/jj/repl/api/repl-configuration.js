@@ -1,11 +1,10 @@
-var support = require('jj/configuration-support');
-var base = 'jj.repl.ReplConfiguration.';
+var support = require('jj/configuration-support')('jj.repl.ReplConfiguration');
 
 module.exports = {
-	activate: support.makeBooleanProperty(base, 'activate'),
-	port: support.makeIntProperty(base, 'port', function(name, arg) {
+	activate: support.makeBooleanProperty('activate'),
+	port: support.makeIntProperty('port', function(name, arg) {
 		if (arg < 1024 || arg > 65535) {
-			throw new TypeError(name + " must be greater than 1023 and less than 65536");
+			return support.accumulateError(name, " must be greater than 1023 and less than 65536");
 		}
 	})
 };

@@ -17,6 +17,8 @@ package jj.http.client;
 
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.Undefined;
+
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
 
@@ -26,10 +28,15 @@ import jj.script.ContinuationState;
  */
 @Singleton
 class HttpClientRequestContinuationProcessor implements ContinuationProcessor {
+	
+	
 
 	@Override
 	public void process(ContinuationState continuationState) {
-		continuationState.continuationAs(HttpClientRequest.class);
+		HttpClientRequest clientRequest = continuationState.continuationAs(HttpClientRequest.class);
+		
+		clientRequest.begin();
+		clientRequest.pendingKey().resume(Undefined.instance);
 	}
 
 }

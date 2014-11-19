@@ -74,16 +74,18 @@ public class LoggingConfigurator {
 	private final LoggingConfiguration config;
 	
 	private final ScriptableObject loggerNames;
+	
+	private final LogLevelDefaultProvider logLevelDefaultProvider;
 
 	@Inject
 	LoggingConfigurator(
 		final LoggingConfiguration config,
 		final @LoggerNames Map<String, String> loggerNames,
 		final @Global ScriptableObject global,
-		final Provider<RhinoContext> contextProvider
+		final Provider<RhinoContext> contextProvider,
+		final LogLevelDefaultProvider logLevelDefaultProvider
 	) {
 		this.config = config;
-		setLevels();
 		
 		try (RhinoContext context = contextProvider.get()) {
 			this.loggerNames = context.newObject(global);
@@ -91,6 +93,9 @@ public class LoggingConfigurator {
 				this.loggerNames.put(name, this.loggerNames, loggerNames.get(name));
 			}
 		}
+		
+		this.logLevelDefaultProvider = logLevelDefaultProvider;
+		setLevels();
 	}
 	
 	@Listener
@@ -103,10 +108,15 @@ public class LoggingConfigurator {
 	}
 	
 	private void setLevels() {
-		//logger(Logger.ROOT_LOGGER_NAME, Level.OFF);
+		logger(Logger.ROOT_LOGGER_NAME, Level.OFF);
 		logger(EmergencyLogger.NAME, Level.INFO);
-		for (String logger : config.loggingLevels().keySet()) {
-			logger(logger, config.loggingLevels().get(logger).logbackLevel());
+		setLevels(logLevelDefaultProvider.get());
+		setLevels(config.loggingLevels());
+	}
+	
+	private void setLevels(Map<String, jj.logging.Level> levelMap) {
+		for (String logger : levelMap.keySet()) {
+			logger(logger, levelMap.get(logger).logbackLevel());
 		}
 	}
 	

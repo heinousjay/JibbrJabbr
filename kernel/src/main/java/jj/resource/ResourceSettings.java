@@ -16,6 +16,7 @@
 package jj.resource;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * value object to configure resources according
@@ -78,6 +79,11 @@ public class ResourceSettings {
 			charset,
 			compressible
 		);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(mimeType, charset, compressible);
 	}
 
 	/**

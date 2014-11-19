@@ -15,6 +15,7 @@
  */
 package jj.http.server;
 
+import io.netty.handler.codec.AsciiString;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.math.BigDecimal;
@@ -47,7 +48,7 @@ public interface HttpServerRequest {
 	 * Host header if that is not present.
 	 * @return
 	 */
-	String host();
+	CharSequence host();
 
 	/**
 	 * Flag if the request is secure.  Since JibbrJabbr does not support SSL
@@ -83,12 +84,17 @@ public interface HttpServerRequest {
 	/**
 	 * check for the presence of a header.  case-insensitive
 	 */
-	boolean hasHeader(String headerName);
+	boolean hasHeader(AsciiString headerName);
 
 	/**
 	 * The first value of the given header
 	 */
-	String header(String name);
+	CharSequence header(AsciiString name);
+
+	/**
+	 * Every header from the request
+	 */
+	List<Entry<CharSequence, CharSequence>> allHeaders();
 
 	/**
 	 * A unique ID for the request
@@ -109,11 +115,6 @@ public interface HttpServerRequest {
 	 * The method from the initial line
 	 */
 	HttpMethod method();
-
-	/**
-	 * Every header from the request
-	 */
-	List<Entry<String, String>> allHeaders();
 	
 	/**
 	 * The locale requested.  This gets a little complicated

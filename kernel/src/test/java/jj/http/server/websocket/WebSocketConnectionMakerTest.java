@@ -115,7 +115,7 @@ public class WebSocketConnectionMakerTest {
 		String sha = "1234567890123456789012345678901234567890";
 		String uri = "/" + sha + "/somethign.socket";
 		given(scriptEnvironment.sha1()).willReturn(sha);
-		given(request.getUri()).willReturn(uri);
+		given(request.uri()).willReturn(uri);
 		given(resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, new URIMatch(uri).name)).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
@@ -157,7 +157,7 @@ public class WebSocketConnectionMakerTest {
 		
 		// given
 		String uri = "/1234567890123456789012345678901234567890/uri.socket";
-		given(request.getUri()).willReturn(uri);
+		given(request.uri()).willReturn(uri);
 		given(scriptEnvironment.sha1()).willReturn("ABCDEF");
 		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), eq(AppLocation.Virtual), anyString())).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);

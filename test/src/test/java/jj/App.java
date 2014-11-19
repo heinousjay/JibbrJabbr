@@ -39,6 +39,8 @@ public class App {
 	public static final String configuration;
 	
 	public static final String css;
+	
+	public static final String httpClient;
 
 	public static final String repl;
 
@@ -53,6 +55,7 @@ public class App {
 			minimal = getPath("/minimal/app/");
 			configuration = getPath("/configuration/");
 			css = getPath("/css/");
+			httpClient = getPath("/http/client/");
 			repl = getPath("/repl/");
 			module = getPath("/module/");
 			jasmine = getPath("/jasmine/");

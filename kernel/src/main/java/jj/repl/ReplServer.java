@@ -18,6 +18,9 @@ package jj.repl;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.configuration.resolution.AppLocation.Virtual;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -65,6 +68,7 @@ class ReplServer {
 	private final ReplServerChannelInitializer channelInitializer;
 	private final Publisher publisher;
 	private final ResourceLoader resourceLoader;
+	private final UncaughtExceptionHandler uncaughtExceptionHandler;
 	
 	private volatile ServerBootstrap server;
 	private volatile int port;
@@ -74,12 +78,14 @@ class ReplServer {
 		final ReplConfiguration configuration,
 		final ReplServerChannelInitializer channelInitializer,
 		final Publisher publisher,
-		final ResourceLoader resourceLoader
+		final ResourceLoader resourceLoader,
+		final UncaughtExceptionHandler uncaughtExceptionHandler
 	) {
 		this.configuration = configuration;
 		this.channelInitializer = channelInitializer;
 		this.publisher = publisher;
 		this.resourceLoader = resourceLoader;
+		this.uncaughtExceptionHandler = uncaughtExceptionHandler;
 	}
 	
 	@Listener
@@ -129,7 +135,10 @@ class ReplServer {
 		port = (configuration.port() < 1023 || configuration.port() > 65535) ? DEFAULT_PORT : configuration.port();
 		
 		final ServerBootstrap bootstrap = new ServerBootstrap()
-			.group(new NioEventLoopGroup(1, bossThreadFactory), new NioEventLoopGroup(1, workerThreadFactory))
+			.group(
+				new NioEventLoopGroup(1, executorService(uncaughtExceptionHandler, "JibbrJabbr REPL Boss ")),
+				new NioEventLoopGroup(1, executorService(uncaughtExceptionHandler, "JibbrJabbr REPL Worker "))
+			)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(channelInitializer);
 		
@@ -156,26 +165,20 @@ class ReplServer {
 		publisher.publish(new ReplStopped());
 	}
 	
-	private static final ThreadFactory bossThreadFactory = new ThreadFactory() {
-		
-		private final AtomicInteger id = new AtomicInteger();
-		
-		@Override
-		public Thread newThread(Runnable r) {
-			
-			return new Thread(r, "JibbrJabbr REPL Boss " + id.incrementAndGet());
-		}
-	};
+	private static ExecutorService executorService(final UncaughtExceptionHandler uncaughtExceptionHandler, final String name) {
 	
-	private static final ThreadFactory workerThreadFactory = new ThreadFactory() {
-		
-		private final AtomicInteger id = new AtomicInteger();
-		
-		@Override
-		public Thread newThread(Runnable r) {
+		return Executors.newFixedThreadPool(1, new ThreadFactory() {
 			
-			return new Thread(r, "JibbrJabbr REPL Worker " + id.incrementAndGet());
-		}
-	};
+			private final AtomicInteger id = new AtomicInteger();
+			
+			@Override
+			public Thread newThread(Runnable r) {
+				
+				Thread thread = new Thread(r, name + id.incrementAndGet());
+				thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+				return thread;
+			}
+		});
+	}
 
 }

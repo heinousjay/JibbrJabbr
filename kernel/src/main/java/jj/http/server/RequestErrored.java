@@ -15,13 +15,11 @@
  */
 package jj.http.server;
 
-import io.netty.handler.codec.http.HttpRequest;
 import jj.logging.Emergency;
 
 public class RequestErrored extends Emergency {
 	
-	RequestErrored(final HttpRequest request, final Throwable t) {
+	RequestErrored(final Throwable t) {
 		super("response ended in error", t);
 	}
-	
 }

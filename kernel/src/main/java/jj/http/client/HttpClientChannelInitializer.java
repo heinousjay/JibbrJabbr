@@ -15,22 +15,30 @@
  */
 package jj.http.client;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.asynchttpclient.AsyncHttpClient;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpContentDecompressor;
 
 /**
  * @author jason
  *
  */
 @Singleton
-class HttpClientImpl {
-
-	private final AsyncHttpClient httpClient;
+@Sharable
+class HttpClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 	
-	@Inject
-	HttpClientImpl(final AsyncHttpClient httpClient) {
-		this.httpClient = httpClient;
+	static final String CODEC = "codec";
+
+	@Override
+	protected void initChannel(SocketChannel ch) throws Exception {
+		
+		ch.pipeline()
+			.addLast(new HttpClientCodec())
+			.addLast(new HttpContentDecompressor());
 	}
+
 }

@@ -1,9 +1,8 @@
 
-var support = require('jj/configuration-support');
-var base = 'jj.document.DocumentConfiguration.';
+var support = require('jj/configuration-support')('jj.document.DocumentConfiguration');
 
 module.exports = {
-	clientDebug: support.makeBooleanProperty(base, 'clientDebug'),
-	showParsingErrors: support.makeBooleanProperty(base, 'showParsingErrors'),
-	removeComments: support.makeBooleanProperty(base, 'removeComments')
+	clientDebug: support.makeBooleanProperty('clientDebug'),
+	showParsingErrors: support.makeBooleanProperty('showParsingErrors'),
+	removeComments: support.makeBooleanProperty('removeComments')
 }

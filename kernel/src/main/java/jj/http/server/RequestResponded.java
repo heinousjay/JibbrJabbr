@@ -56,8 +56,8 @@ class RequestResponded extends LoggedEvent {
 				extractIP(request.remoteAddress()),
 				DateFormatHelper.nowInAccessLogFormat(),
 				request.method(),
-				request.request().getUri(),
-				request.request().getProtocolVersion(),
+				request.request().uri(),
+				request.request().protocolVersion(),
 				response.status().code(),
 				extractContentLength(),
 				extractReferer(request),
@@ -67,14 +67,14 @@ class RequestResponded extends LoggedEvent {
 		
 		if (logger.isTraceEnabled()) {
 			StringBuilder output = new StringBuilder("Request Headers:");
-			for (Entry<String, String> header : request.allHeaders()) {
+			for (Entry<CharSequence, CharSequence> header : request.allHeaders()) {
 				output.append("\n").append(header.getKey()).append(" : ").append(header.getValue());
 			}
 			
 			logger.trace("{}\n", output);
 			
 			output = new StringBuilder("Response Headers:");
-			for (Entry<String, String> header : response.allHeaders()) {
+			for (Entry<CharSequence, CharSequence> header : response.allHeaders()) {
 				output.append("\n").append(header.getKey()).append(" : ").append(header.getValue());
 			}
 			logger.trace("{}\n", output);
@@ -102,7 +102,7 @@ class RequestResponded extends LoggedEvent {
 			"-";
 	}
 	
-	private String extractContentLength() {
+	private CharSequence extractContentLength() {
 		if (response.containsHeader(HttpHeaders.Names.CONTENT_LENGTH)) {
 			return response.header(HttpHeaders.Names.CONTENT_LENGTH);
 		}

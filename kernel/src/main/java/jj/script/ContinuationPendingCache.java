@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.execution.CurrentTask;
 import jj.execution.TaskRunner;
 import jj.util.SecureRandomHelper;
 
@@ -34,17 +35,29 @@ class ContinuationPendingCache {
 	
 	private final TaskRunner taskRunner;
 	
+	private final CurrentTask currentTask;
+	
 	@Inject
-	ContinuationPendingCache(final TaskRunner taskRunner) {
+	ContinuationPendingCache(final TaskRunner taskRunner, final CurrentTask currentTask) {
 		this.taskRunner = taskRunner;
+		this.currentTask = currentTask;
 	}
 	
-	private final ScriptTask<ScriptEnvironment> sentinel = 
+	private final ScriptTask<ScriptEnvironment> reserved = 
 		new ScriptTask<ScriptEnvironment>("", null, null) {
 		
 			@Override
 			protected void begin() throws Exception {
-				// will never be run
+				throw new AssertionError("reserved sentinel was run!");
+			}
+		};
+		
+	private final ScriptTask<ScriptEnvironment> alreadyResumed =
+		new ScriptTask<ScriptEnvironment>("", null, null) {
+			
+			@Override
+			protected void begin() throws Exception {
+				throw new AssertionError("already resumed sentinel was run!");
 			}
 		};
 	
@@ -67,8 +80,8 @@ class ContinuationPendingCache {
 		// wow.  a do...while!
 		String result;
 		do {
-			result = Long.toHexString(SecureRandomHelper.nextLong());
-		} while (resumableTasks.putIfAbsent(result, sentinel) != null);
+			result = Integer.toHexString(SecureRandomHelper.nextInt());
+		} while (resumableTasks.putIfAbsent(result, reserved) != null);
 		
 		return result;
 	}
@@ -77,7 +90,9 @@ class ContinuationPendingCache {
 		ContinuationPendingKey pendingKey = task.pendingKey();
 		
 		if (pendingKey != null) {
-			if (!resumableTasks.replace(pendingKey.id(), sentinel, task)) {
+			if (!resumableTasks.replace(pendingKey.id(), reserved, task) &&
+				!resumableTasks.remove(pendingKey.id(), alreadyResumed)
+			) {
 				throw new AssertionError("pending key being stored was not reserved or is already in use!");
 			}
 		}
@@ -91,8 +106,15 @@ class ContinuationPendingCache {
 		// we will just ignore them.  but that will be when one can do things like run with kernel assertions off :D
 		// so NOT YET
 		assert task != null : "asked to resume a nonexistent task";
-		assert task != sentinel : "key reserved was never stored";
-		task.resumeWith(result);
+		if (task != reserved) {
+			task.resumeWith(result);
+		} else if (currentTask.currentIs(ScriptTask.class)) { // it resumed immediately, via some stroke of luck
+			resumableTasks.putIfAbsent(pendingKey.id(), alreadyResumed);
+			task = currentTask.currentAs(ScriptTask.class);   // so reschedule the current task to run again
+			task.resumeWith(result);
+		} else {
+			throw new AssertionError("asked to resume an unstored key from a non-ScriptTask. weird error, weird message!");
+		}
 		
 		taskRunner.execute(task);
 	}

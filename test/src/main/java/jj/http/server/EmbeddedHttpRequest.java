@@ -55,7 +55,7 @@ public class EmbeddedHttpRequest {
 	
 	FullHttpRequest fullHttpRequest() {
 		DefaultFullHttpRequest result = 
-			new DefaultFullHttpRequest(request.getProtocolVersion(), request.getMethod(), request.getUri());
+			new DefaultFullHttpRequest(request.protocolVersion(), request.method(), request.uri());
 		result.headers().add(request.headers());
 		return result;
 	}

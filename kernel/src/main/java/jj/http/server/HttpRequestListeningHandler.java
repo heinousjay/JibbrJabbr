@@ -59,8 +59,6 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 	
 	private String name;
 	
-	private HttpRequest request;
-	
 	@Inject
 	HttpRequestListeningHandler(
 		final Publisher publisher,
@@ -71,17 +69,16 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 	}
 	
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
-		this.request = request;
+	protected void messageReceived(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
 		
-		if (request.getDecoderResult().isFailure()) {
+		if (request.decoderResult().isFailure()) {
 			// respond with BAD_REQUEST and close the connection
 			// (unless we are being proxied and the connection is keep-alive, that is)
 			BAD_REQUEST.writeAndFlush(ctx).addListener(ChannelFutureListener.CLOSE);
 			
-		} else if (methodHandlers.containsKey(request.getMethod())) {
+		} else if (methodHandlers.containsKey(request.method())) {
 
-			HttpMethodHandler methodHandler = methodHandlers.get(request.getMethod()).get();
+			HttpMethodHandler methodHandler = methodHandlers.get(request.method()).get();
 			methodHandler.request(request);
 
 			ChannelPipeline p = ctx.pipeline();
@@ -98,7 +95,7 @@ class HttpRequestListeningHandler extends SimpleChannelInboundHandler<HttpReques
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		publisher.publish(new RequestErrored(request, cause));
+		publisher.publish(new RequestErrored(cause));
 		INTERNAL_SERVER_ERROR.writeAndFlush(ctx).addListener(ChannelFutureListener.CLOSE);
 	}
 	

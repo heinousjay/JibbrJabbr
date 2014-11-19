@@ -42,16 +42,16 @@ class ContentTypeHeaderReader {
 	private final Charset charset;
 
 	ContentTypeHeaderReader(final HttpHeaders httpHeaders) {
-		String headerValue = httpHeaders.get(HttpHeaders.Names.CONTENT_TYPE);
+		CharSequence headerValue = httpHeaders.get(HttpHeaders.Names.CONTENT_TYPE);
 		assert headerValue != null : "can't read a nonexistent header";
 		value = mimeType(headerValue);
 		badRequest = value == null;
 		charset = value != null ? findCharset() : null;
 	}
 	
-	private MimeType mimeType(String headerValue) {
+	private MimeType mimeType(CharSequence headerValue) {
 		try {
-			return new MimeType(headerValue);
+			return new MimeType(headerValue.toString());
 		} catch (MimeTypeParseException e) {
 			return null;
 		}

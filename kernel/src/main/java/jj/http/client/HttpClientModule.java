@@ -15,12 +15,8 @@
  */
 package jj.http.client;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.AsyncHttpClientConfig;
-import org.asynchttpclient.AsyncHttpProvider;
-import org.asynchttpclient.providers.netty.NettyAsyncHttpProvider;
-
 import jj.JJModule;
+import jj.http.client.api.RestOperation;
 
 /**
  * @author jason
@@ -33,9 +29,11 @@ public class HttpClientModule extends JJModule {
 
 		addAPIModulePath("/jj/http/client/api");
 		
-		dispatch().continuationOf(HttpClientRequest.class).to(HttpClientRequestContinuationProcessor.class);
+		dispatch().continuationOf(RestOperation.class).to(HttpClientRequestContinuationProcessor.class);
 		
 		bindExecutor(HttpClientNioEventLoopGroup.class);
+		
+		bindConfiguration().to(HttpClientConfiguration.class);
 	}
 
 }

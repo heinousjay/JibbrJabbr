@@ -1,57 +1,56 @@
-var support = require('jj/configuration-support');
-var base = 'jj.css.LessConfiguration.';
+var support = require('jj/configuration-support')('jj.css.LessConfiguration');
 
 module.exports = {
 	
-	compress: support.makeBooleanProperty(base, 'compress'),
+	compress: support.makeBooleanProperty('compress'),
 	
-	cleancss: support.makeBooleanProperty(base, 'cleancss'),
+	cleancss: support.makeBooleanProperty('cleancss'),
 	
-	maxLineLen: support.makeIntProperty(base, 'maxLineLen', function(name, arg) {
+	maxLineLen: support.makeIntProperty('maxLineLen', function(name, arg) {
 		if (arg < 1) {
-			throw new TypeError(name + " must be positive");
+			return support.accumulateError('maxLineLen', 'must be positive');
 		}
 	}),
 	
 	/** no optimizations */
 	O0: function() {
-		support.addElement(base + "optimization", 0);
+		support.addElement("optimization", 0);
 		return this;
 	},
 	/** optimization level 1 */
 	O1: function() {
-		support.addElement(base + "optimization", 1);
+		support.addElement("optimization", 1);
 		return this;
 	},
 	/** optimization level 2 */
 	O2: function() {
-		support.addElement(base + "optimization", 2);
+		support.addElement("optimization", 2);
 		return this;
 	},
 	
-	depends: support.makeBooleanProperty(base, 'depends'),
+	depends: support.makeBooleanProperty('depends'),
 	
-	silent: support.makeBooleanProperty(base, 'silent'),
+	silent: support.makeBooleanProperty('silent'),
 	
-	verbose: support.makeBooleanProperty(base, 'verbose'),
+	verbose: support.makeBooleanProperty('verbose'),
 	
-	lint: support.makeBooleanProperty(base, 'lint'),
+	lint: support.makeBooleanProperty('lint'),
 	
-	color: support.makeBooleanProperty(base, 'color'),
+	color: support.makeBooleanProperty('color'),
 	
-	strictImports: support.makeBooleanProperty(base, 'strictImports'),
+	strictImports: support.makeBooleanProperty('strictImports'),
 	
-	relativeUrls: support.makeBooleanProperty(base, 'relativeUrls'),
+	relativeUrls: support.makeBooleanProperty('relativeUrls'),
 	
-	ieCompat: support.makeBooleanProperty(base, 'ieCompat'),
+	ieCompat: support.makeBooleanProperty('ieCompat'),
 	
-	strictMath: support.makeBooleanProperty(base, 'strictMath'),
+	strictMath: support.makeBooleanProperty('strictMath'),
 	
-	strictUnits: support.makeBooleanProperty(base, 'strictUnits'),
+	strictUnits: support.makeBooleanProperty('strictUnits'),
 	
-	javascriptEnabled: support.makeBooleanProperty(base, 'javascriptEnabled'),
+	javascriptEnabled: support.makeBooleanProperty('javascriptEnabled'),
 	
-	sourceMaps: support.makeBooleanProperty(base, 'sourceMaps'),
+	sourceMaps: support.makeBooleanProperty('sourceMaps'),
 	
-	rootpath: support.makeStringProperty(base, 'rootpath')
+	rootpath: support.makeStringProperty('rootpath')
 };

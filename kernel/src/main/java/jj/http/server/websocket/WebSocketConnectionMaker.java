@@ -107,7 +107,7 @@ public class WebSocketConnectionMaker {
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
 					
-					URIMatch uriMatch = new URIMatch(request.getUri());
+					URIMatch uriMatch = new URIMatch(request.uri());
 					
 
 					WebSocketConnectionHost host = null;

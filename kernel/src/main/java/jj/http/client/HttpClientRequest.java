@@ -15,29 +15,18 @@
  */
 package jj.http.client;
 
-import org.asynchttpclient.Request;
-import org.asynchttpclient.RequestBuilder;
-
 import jj.script.Continuation;
 import jj.script.ContinuationPendingKey;
 
 /**
- * 
- * 
  * @author jason
  *
  */
-class HttpClientRequest implements Continuation {
-
-	private final String method;
-	private final String uri;
+public abstract class HttpClientRequest implements Continuation {
+	
+	protected abstract void begin();
 
 	private ContinuationPendingKey pendingKey;
-	
-	HttpClientRequest(final String method, final String uri) {
-		this.method = method;
-		this.uri = uri;
-	}
 	
 	@Override
 	public ContinuationPendingKey pendingKey() {
@@ -50,16 +39,4 @@ class HttpClientRequest implements Continuation {
 		assert pendingKey != null;
 		this.pendingKey = pendingKey;
 	}
-	
-	Request request() {
-		return new RequestBuilder(method)
-			.setUrl(uri)
-			.build();
-	}
-	
-	@Override
-	public String toString() {
-		return HttpClientRequest.class.getSimpleName() + "[method: " + method + ", uri: " + uri + "]";
-	}
-
 }

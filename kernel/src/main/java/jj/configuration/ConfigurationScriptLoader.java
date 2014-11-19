@@ -53,6 +53,11 @@ class ConfigurationScriptLoader implements JJServerStartupListener {
 		latch.countDown();
 	}
 	
+	@Listener
+	void configurationErrored(ConfigurationErrored event) {
+		latch.countDown();
+	}
+	
 	private void load() {
 		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
 	}

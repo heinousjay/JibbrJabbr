@@ -16,8 +16,10 @@
 package jj.http.server;
 
 import static org.mockito.BDDMockito.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +52,8 @@ public class HttpServerTest {
 	@Mock HttpServerSwitch httpServerSwitch;
 	
 	@Mock Publisher publisher;
+	
+	@Mock UncaughtExceptionHandler uncaughtExceptionHandler;
 	
 	HttpServerSocketConfiguration configuration = new HttpServerSocketConfiguration() {
 		
@@ -94,57 +98,46 @@ public class HttpServerTest {
 		}
 	};
 	
+	HttpServer httpServer;
+	
 	// TODO validate the configuration is used correctly.  but how? spy via factory for the ServerBootstrap?
 	
 	@Test
-	public void testServerStart() throws Exception {
+	public void testServer() throws Exception {
 		
-		// this is all in one test for order control.  we need to be assured that overriding the port
-		// through an argument prevents configured bindings from being used, but the http server
-		// startup/shutdown is asynchronous, so we need to order these tests or they execute too quickly
-		// to prove correctness - if the configured bindings are made first, then the override binding
-		// is made, the configured bindings won't yet be shut down by the test time, and we won't be
-		// able to prove that the configured bindings weren't made
-		
-		// TODO - may need to recast this test in any case, since it's not guaranteed that 8080/8090/5678 are available
-		
-		given(httpServerSwitch.on()).willReturn(true);
-		given(httpServerSwitch.port()).willReturn(5678);
-		HttpServer httpServer = new HttpServer(
-			new MockHttpServerNioEventLoopGroup(),
-			new HttpServerChannelInitializer(engineProvider),
-			configuration,
-			httpServerSwitch,
-			publisher
-		);
-		
-		try {
-			// when
-			httpServer.start();
-			
-			
-			// then
-			SocketFactory.getDefault().createSocket("localhost", 5678).close();
-			
-			try {
-				SocketFactory.getDefault().createSocket("localhost", 8080);
-				fail("should not have a binding to 8080!");
-			} catch (ConnectException e) {
-				// yay!
-			}
-			
-		} finally {
-			httpServer.stop(null);
-		}
+		// in the same test to ensure that the 'off' test runs first
 		
 		// given
-		given(httpServerSwitch.port()).willReturn(-1);
 		httpServer = new HttpServer(
 			new MockHttpServerNioEventLoopGroup(),
 			new HttpServerChannelInitializer(engineProvider),
 			configuration,
 			httpServerSwitch,
-			publisher
+			publisher,
+			uncaughtExceptionHandler
+		);
+		
+		// when
+		httpServer.start();
+		
+		// then
+		try {
+			SocketFactory.getDefault().createSocket("localhost", 8080).close();
+			fail("NO NO NO");
+		} catch (ConnectException e) {
+			assertThat(e.getMessage(), is("Connection refused"));
+		}
+		
+		
+		// given
+		given(httpServerSwitch.on()).willReturn(true);
+		httpServer = new HttpServer(
+			new MockHttpServerNioEventLoopGroup(),
+			new HttpServerChannelInitializer(engineProvider),
+			configuration,
+			httpServerSwitch,
+			publisher,
+			uncaughtExceptionHandler
 		);
 
 		try {

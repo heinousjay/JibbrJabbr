@@ -17,8 +17,10 @@ package jj.http.server;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import java.util.Arrays;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,21 +47,24 @@ import jj.util.StringUtils;
 @Subscriber
 class HttpServer implements JJServerStartupListener {
 	
-	/**
-	 * 
-	 */
-	private static final int DEFAULT_BINDING_PORT = 8080;
+	
+	
 
-	private static final ThreadFactory threadFactory = new ThreadFactory() {
-		
-		private final AtomicInteger id = new AtomicInteger();
-		
-		@Override
-		public Thread newThread(Runnable r) {
+	private static ExecutorService executorService(final int threads, final UncaughtExceptionHandler uncaughtExceptionHandler) {
+	
+		return Executors.newFixedThreadPool(threads, new ThreadFactory() {
 			
-			return new Thread(r, "JibbrJabbr HTTP Boss Handler  " + id.incrementAndGet());
-		}
-	};
+			private final AtomicInteger id = new AtomicInteger();
+			
+			@Override
+			public Thread newThread(Runnable r) {
+				
+				Thread thread = new Thread(r, "JibbrJabbr HTTP Boss Handler  " + id.incrementAndGet());
+				thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+				return thread;
+			}
+		});
+	}
 	
 	private final HttpServerNioEventLoopGroup ioEventLoopGroup;
 	
@@ -67,11 +72,13 @@ class HttpServer implements JJServerStartupListener {
 	
 	private final HttpServerSocketConfiguration configuration;
 	
-	private ServerBootstrap serverBootstrap;
-	
 	private final HttpServerSwitch httpServerSwitch;
 	
 	private final Publisher publisher;
+	
+	private final UncaughtExceptionHandler uncaughtExceptionHandler;
+	
+	private ServerBootstrap serverBootstrap;
 	
 	@Inject
 	HttpServer(
@@ -79,13 +86,15 @@ class HttpServer implements JJServerStartupListener {
 		final HttpServerChannelInitializer initializer,
 		final HttpServerSocketConfiguration configuration,
 		final HttpServerSwitch httpServerSwitch,
-		final Publisher publisher
+		final Publisher publisher,
+		final UncaughtExceptionHandler uncaughtExceptionHandler
 	) {
 		this.ioEventLoopGroup = ioEventLoopGroup;
 		this.initializer = initializer;
 		this.configuration = configuration;
 		this.httpServerSwitch = httpServerSwitch;
 		this.publisher = publisher;
+		this.uncaughtExceptionHandler = uncaughtExceptionHandler;
 	}
 	
 	@Override
@@ -95,7 +104,7 @@ class HttpServer implements JJServerStartupListener {
 		
 			assert (serverBootstrap == null) : "cannot start an already started server";
 			
-			List<Binding> bindings = getBindings();
+			List<Binding> bindings = configuration.bindings();
 			
 			makeServerBootstrap(bindings.size());
 			
@@ -125,26 +134,10 @@ class HttpServer implements JJServerStartupListener {
 			throw e;
 		}
 	}
-	
-	private List<Binding> getBindings() {
-		
-		List<Binding> result;
-		
-		final int overridePort = httpServerSwitch.port();
-		if (overridePort > 1023 && overridePort < 65536) {
-			result = Arrays.asList(new Binding(overridePort));
-		} else {
-			result = configuration.bindings();
-		}
-		
-		if (result.isEmpty()) result = Arrays.asList(new Binding(DEFAULT_BINDING_PORT));
-		
-		return result;
-	}
 
 	private void makeServerBootstrap(int bindingCount) {
 		serverBootstrap = new ServerBootstrap()
-			.group(new NioEventLoopGroup(bindingCount, threadFactory), ioEventLoopGroup)
+			.group(new NioEventLoopGroup(bindingCount, executorService(bindingCount, uncaughtExceptionHandler)), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(initializer)
 			.option(ChannelOption.SO_KEEPALIVE, configuration.keepAlive())
