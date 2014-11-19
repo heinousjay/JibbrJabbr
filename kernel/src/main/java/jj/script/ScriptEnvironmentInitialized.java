@@ -21,7 +21,7 @@ import org.slf4j.Logger;
  * @author jason
  *
  */
-public class ScriptEnvironmentInitialized extends ExecutionEvent {
+public class ScriptEnvironmentInitialized extends ScriptSystemEvent {
 	
 	private final ScriptEnvironment scriptEnvironment;
 

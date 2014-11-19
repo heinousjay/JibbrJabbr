@@ -15,15 +15,15 @@
  */
 package jj.script;
 
-import jj.logging.Emergency;
+import jj.logging.LoggedEvent;
 
 /**
- * @author jason
+ * Events that descend from this interface will
+ * be logged to the execution trace logger.
  *
+ * @author jason
  */
-public class CannotFindContinuation extends Emergency {
+@ScriptSystemLogger
+public abstract class ScriptSystemEvent extends LoggedEvent {
 
-	CannotFindContinuation(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
-		super("attempting to resume a non-existent continuation in " + scriptEnvironment + " keyed by " + pendingKey + "\nhelpful stacktrace:", new Exception());
-	}
 }

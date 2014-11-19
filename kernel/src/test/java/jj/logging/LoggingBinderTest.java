@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.logging;
 
-import jj.logging.Emergency;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
+import static jj.logging.LoggingBinder.camelCaseName;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public class CannotFindContinuation extends Emergency {
-
-	CannotFindContinuation(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
-		super("attempting to resume a non-existent continuation in " + scriptEnvironment + " keyed by " + pendingKey + "\nhelpful stacktrace:", new Exception());
+public class LoggingBinderTest {
+	
+	@Test
+	public void testCamelCasing() {
+		assertThat(camelCaseName("this is a name"), is("thisIsAName"));
 	}
+
 }

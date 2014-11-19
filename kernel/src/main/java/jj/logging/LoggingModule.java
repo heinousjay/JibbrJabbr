@@ -15,6 +15,8 @@
  */
 package jj.logging;
 
+import static jj.logging.LoggingBinder.registerBuiltins;
+
 import jj.JJModule;
 
 /**
@@ -22,24 +24,21 @@ import jj.JJModule;
  *
  */
 public class LoggingModule extends JJModule {
-	
-	private final boolean isTest;
-	
-	public LoggingModule(final boolean isTest) {
-		this.isTest = isTest;
-	}
 
 	@Override
 	protected void configure() {
 		
-		// this gets instantiated before anything might write to a log
-		// actually that won't matter anymore soon! yay! the "test" parameter can get killed off
-		bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
+		addAPIModulePath("/jj/logging/api");
+		
+		bindConfiguration().to(LoggingConfiguration.class);
+		
+		bind(LoggingConfigurator.class).asEagerSingleton();
 		
 		addStartupListenerBinding().to(SystemLogger.class);
 		
 		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
 		
+		registerBuiltins(binder());
 	}
 
 }

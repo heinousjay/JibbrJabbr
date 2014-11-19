@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
@@ -35,6 +36,8 @@ import jj.http.server.HttpServerSocketConfiguration;
 import jj.http.server.uri.Route;
 import jj.http.server.uri.RouterConfiguration;
 import jj.i18n.I18NConfiguration;
+import jj.logging.Level;
+import jj.logging.LoggingConfiguration;
 import jj.css.LessConfiguration;
 import jj.document.DocumentConfiguration;
 import jj.event.Listener;
@@ -81,6 +84,9 @@ public class ConfigurationSystemTest {
 	
 	@Inject
 	private I18NConfiguration i18nConfiguration;
+	
+	@Inject
+	private LoggingConfiguration loggingConfiguration;
 	
 	volatile boolean loaded;
 	final CountDownLatch loadedLatch = new CountDownLatch(1);
@@ -164,6 +170,17 @@ public class ConfigurationSystemTest {
 		
 		assertThat(i18nConfiguration.allowNonISO(), is(true));
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));
+		
+		Map<String, Level> loggingLevels = loggingConfiguration.loggingLevels();
+		assertThat(loggingLevels.get("access"), is(Level.Off));
+		assertThat(loggingLevels.get("io.netty"), is(Level.Off));
+		assertThat(loggingLevels.get("script system"), is(Level.Off));
+		assertThat(loggingLevels.get("resource system"), is(Level.Off));
+		assertThat(loggingLevels.get("server"), is(Level.Debug));
+		assertThat(loggingLevels.get("test runner"), is(Level.Debug));
+		assertThat(loggingLevels.get("script@index"), is(Level.Trace));
+		assertThat(loggingLevels.get("script@d3/index"), is(Level.Trace));
+		assertThat(loggingLevels.get("script@chat/index"), is(Level.Off));
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String resourceName, String mappedName) {

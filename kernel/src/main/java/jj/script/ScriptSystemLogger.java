@@ -15,15 +15,30 @@
  */
 package jj.script;
 
-import jj.logging.Emergency;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import jj.logging.LoggedEvent;
+
+import org.slf4j.Logger;
 
 /**
+ * <p>
+ * Identifies a bound {@link Logger}, as well as {@link LoggedEvent}s that use it
+ * 
  * @author jason
  *
  */
-public class CannotFindContinuation extends Emergency {
+@Documented
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@interface ScriptSystemLogger {
 
-	CannotFindContinuation(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
-		super("attempting to resume a non-existent continuation in " + scriptEnvironment + " keyed by " + pendingKey + "\nhelpful stacktrace:", new Exception());
-	}
+	public static final String NAME = "script system";
+
 }

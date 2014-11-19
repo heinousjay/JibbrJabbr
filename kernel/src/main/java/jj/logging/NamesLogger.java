@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
-
-import jj.logging.LoggedEvent;
+package jj.logging;
 
 /**
- * Events that descend from this interface will
- * be logged to the execution trace logger.
- *
+ * Implemented by LoggedEvents that wish to name their logger.
+ * Only use this if you have a great reason to make your own
+ * logger, otherwise prefer the annotated system
+ * 
  * @author jason
+ *
  */
-@ExecutionTraceLogger
-public abstract class ExecutionEvent extends LoggedEvent {
+public interface NamesLogger {
+
+	String loggerName();
 
 }

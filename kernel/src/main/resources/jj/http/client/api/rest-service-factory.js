@@ -15,7 +15,7 @@
  * service.find({thing: 'value'}); // makes a GET to http://localhost:8080/find/value
  */
 require('jj/globalize')('jj/rest-service-constants', this);
-var print = require('jj/print');
+var console = require('jj/console');
 var parameterRegex = /:([\w]+)/g;
 var http = Packages.io.netty.handler.codec.http;
 

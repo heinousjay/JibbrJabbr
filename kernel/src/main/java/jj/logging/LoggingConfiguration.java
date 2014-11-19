@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.logging;
 
-import jj.logging.Emergency;
+import java.util.Map;
+
+import jj.configuration.DefaultProvider;
 
 /**
  * @author jason
  *
  */
-public class CannotFindContinuation extends Emergency {
+public interface LoggingConfiguration {
 
-	CannotFindContinuation(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
-		super("attempting to resume a non-existent continuation in " + scriptEnvironment + " keyed by " + pendingKey + "\nhelpful stacktrace:", new Exception());
-	}
+	@DefaultProvider(LogLevelDefaultProvider.class)
+	Map<String, Level> loggingLevels();
 }

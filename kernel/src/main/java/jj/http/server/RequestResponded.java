@@ -66,15 +66,18 @@ class RequestResponded extends LoggedEvent {
 		}
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace("Request Headers");
+			StringBuilder output = new StringBuilder("Request Headers:");
 			for (Entry<String, String> header : request.allHeaders()) {
-				logger.trace(header.getKey() + " : " + header.getValue());
+				output.append("\n").append(header.getKey()).append(" : ").append(header.getValue());
 			}
 			
-			logger.trace("Response Headers");
+			logger.trace("{}\n", output);
+			
+			output = new StringBuilder("Response Headers:");
 			for (Entry<String, String> header : response.allHeaders()) {
-				logger.trace(header.getKey() + " : " + header.getValue());
+				output.append("\n").append(header.getKey()).append(" : ").append(header.getValue());
 			}
+			logger.trace("{}\n", output);
 		}
 	}
 	

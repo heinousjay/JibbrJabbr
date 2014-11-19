@@ -16,29 +16,15 @@
 package jj.script;
 
 import org.mozilla.javascript.RhinoException;
-import org.slf4j.Logger;
-
-import jj.logging.EmergencyLogger;
-import jj.logging.LoggedEvent;
+import jj.logging.Emergency;
 
 /**
  * @author jason
  *
  */
-@EmergencyLogger
-public class ScriptError extends LoggedEvent {
-	
-	private final String description;
-	private final RhinoException re;
+public class ScriptError extends Emergency {
 	
 	ScriptError(final String description, final RhinoException re) {
-		this.description = description;
-		this.re = re;
+		super(description, re.getMessage(), re.getScriptStackTrace());
 	}
-
-	@Override
-	public void describeTo(Logger logger) {
-		logger.error(description, re.getMessage(), re.getScriptStackTrace());
-	}
-
 }

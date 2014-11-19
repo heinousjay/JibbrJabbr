@@ -25,6 +25,6 @@ public class ScriptModule extends JJModule {
 		
 		bind(ScriptableObject.class).annotatedWith(Global.class).toProvider(GlobalStandardObjects.class);
 		
-		bindLoggedEvents().annotatedWith(ExecutionTraceLogger.class).toLogger(ExecutionTraceLogger.NAME);
+		bindLoggedEvents().annotatedWith(ScriptSystemLogger.class).toLogger(ScriptSystemLogger.NAME);
 	}
 }

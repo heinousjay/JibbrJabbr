@@ -31,9 +31,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmergencyLogger {
 
-	/**
-	 * 
-	 */
 	public static final String NAME = "emergency";
 
 }

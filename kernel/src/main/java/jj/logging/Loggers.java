@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * produces Loggers for a given LoggedEvent descendent
@@ -41,13 +42,16 @@ class Loggers {
 	
 	Logger findLogger(LoggedEvent event) {
 		Logger result = null;
-		for (Class<? extends Annotation> annotation : loggers.keySet()) {
-			if (event.getClass().getAnnotation(annotation) != null) {
-				result = loggers.get(annotation);
-				break;
+		if (event instanceof NamesLogger) {
+			result = LoggerFactory.getLogger(((NamesLogger)event).loggerName());
+		} else {
+			for (Class<? extends Annotation> annotation : loggers.keySet()) {
+				if (event.getClass().getAnnotation(annotation) != null) {
+					result = loggers.get(annotation);
+					break;
+				}
 			}
 		}
-		
 		assert result != null : "No logger registered for LoggedEvent " + event;
 		
 		return result;
