@@ -20,3 +20,11 @@ for (name in names) {
 		});
 	})(name, names[name]);
 }
+
+module.exports.script = function(path) {
+	var x = {};
+	levels.forEach(function(level) {
+		x[level.name().toLowerCase()] = makeLevelSetter("script@" + path, level);
+	});
+	return x;
+}

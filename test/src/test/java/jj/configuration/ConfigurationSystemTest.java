@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
@@ -170,12 +171,16 @@ public class ConfigurationSystemTest {
 		assertThat(i18nConfiguration.allowNonISO(), is(true));
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));
 		
-		assertThat(loggingConfiguration.loggingLevels().get("io.netty"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("access"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("script system"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("resource system"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("server"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("test runner"), is(Level.Off));
+		Map<String, Level> loggingLevels = loggingConfiguration.loggingLevels();
+		assertThat(loggingLevels.get("access"), is(Level.Off));
+		assertThat(loggingLevels.get("io.netty"), is(Level.Off));
+		assertThat(loggingLevels.get("script system"), is(Level.Off));
+		assertThat(loggingLevels.get("resource system"), is(Level.Off));
+		assertThat(loggingLevels.get("server"), is(Level.Off));
+		assertThat(loggingLevels.get("test runner"), is(Level.Off));
+		assertThat(loggingLevels.get("script@index"), is(Level.Trace));
+		assertThat(loggingLevels.get("script@d3/index"), is(Level.Trace));
+		assertThat(loggingLevels.get("script@chat/index"), is(Level.Off));
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String resourceName, String mappedName) {
