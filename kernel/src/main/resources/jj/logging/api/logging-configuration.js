@@ -2,35 +2,21 @@ var collector = inject('jj.configuration.ConfigurationCollector');
 var key = 'jj.logging.LoggingConfiguration.loggingLevels';
 var helper = inject('jj.logging.LoggingConfigurator');
 var level = Packages.jj.logging.Level;
+var levels = [level.Off, level.Error, level.Warn, level.Info, level.Debug, level.Trace];
 var names = helper.loggerNames();
+
+function makeLevelSetter(logger, level) {
+	return function() {
+		collector.addConfigurationMappedElement(key, logger, level);
+		return module.exports;
+	}
+}
 
 for (name in names) {
 	(function(name, logger) {
-		module.exports[name] = {
-			off: function() {
-				collector.addConfigurationMappedElement(key, logger, level.Off);
-				return module.exports;
-			},
-			error: function() {
-				collector.addConfigurationMappedElement(key, logger, level.Error);
-				return module.exports;
-			},
-			warn: function() {
-				collector.addConfigurationMappedElement(key, logger, level.Warn);
-				return module.exports;
-			},
-			info: function() {
-				collector.addConfigurationMappedElement(key, logger, level.Info);
-				return module.exports;
-			},
-			debug: function() {
-				collector.addConfigurationMappedElement(key, logger, level.Debug);
-				return module.exports;
-			},
-			trace: function() {
-				collector.addConfigurationMappedElement(key, logger, level.Trace);
-				return module.exports;
-			}
-		}
+		var x = module.exports[name] = {};
+		levels.forEach(function(level) {
+			x[level.name().toLowerCase()] = makeLevelSetter(logger, level);
+		});
 	})(name, names[name]);
 }

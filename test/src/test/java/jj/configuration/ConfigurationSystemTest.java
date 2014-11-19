@@ -171,12 +171,11 @@ public class ConfigurationSystemTest {
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));
 		
 		assertThat(loggingConfiguration.loggingLevels().get("io.netty"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("server"), is(Level.Off));
 		assertThat(loggingConfiguration.loggingLevels().get("access"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("resource system"), is(Level.Off));
 		assertThat(loggingConfiguration.loggingLevels().get("script system"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("resource system"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("server"), is(Level.Off));
 		assertThat(loggingConfiguration.loggingLevels().get("test runner"), is(Level.Off));
-		assertThat(loggingConfiguration.loggingLevels().get("emergency"), is(Level.Trace));
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String resourceName, String mappedName) {

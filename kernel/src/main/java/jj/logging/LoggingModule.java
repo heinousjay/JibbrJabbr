@@ -15,6 +15,8 @@
  */
 package jj.logging;
 
+import static jj.logging.LoggingBinder.registerBuiltins;
+
 import jj.JJModule;
 
 /**
@@ -30,16 +32,13 @@ public class LoggingModule extends JJModule {
 		
 		bindConfiguration().to(LoggingConfiguration.class);
 		
-		// this gets instantiated before anything might write to a log
-		// actually that won't matter anymore soon! yay! the "test" parameter can get killed off
-		//bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
-		
 		bind(LoggingConfigurator.class).asEagerSingleton();
 		
 		addStartupListenerBinding().to(SystemLogger.class);
 		
 		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
 		
+		registerBuiltins(binder());
 	}
 
 }

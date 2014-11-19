@@ -69,7 +69,6 @@ require('jj/default-resource-properties')
 require('routes');
 
 require('jj/logging-configuration')
-	.emergency.trace()
 	.netty.off()
 	.access.off()
 	.scriptSystem.off()

@@ -33,8 +33,6 @@ import com.google.inject.multibindings.MapBinder;
  */
 public class LoggingBinder {
 	
-	private static boolean nettyAdded = false;
-	
 	private final MapBinder<String, String> loggerNameBinder;
 	
 	private final MapBinder<Class<? extends Annotation>, Logger> loggerBinder;
@@ -51,11 +49,10 @@ public class LoggingBinder {
 			new TypeLiteral<Class<? extends Annotation>>() {},
 			new TypeLiteral<Logger>() {}
 		);
-		
-		if (!nettyAdded) {
-			nettyAdded = true;
-			loggerNameBinder.addBinding("netty").toInstance("io.netty");
-		}
+	}
+	
+	static void registerBuiltins(Binder binder) {
+		new LoggingBinder(binder).loggerNameBinder.addBinding("netty").toInstance("io.netty");
 	}
 
 	public BindingBuilder annotatedWith(final Class<? extends Annotation> annotation) {
@@ -65,8 +62,9 @@ public class LoggingBinder {
 			@Override
 			public void toLogger(String loggerName) {
 				
-				loggerNameBinder.addBinding(camelCaseName(loggerName)).toInstance(loggerName);
-				
+				if (EmergencyLogger.NAME != loggerName) {
+					loggerNameBinder.addBinding(camelCaseName(loggerName)).toInstance(loggerName);
+				}
 				loggerBinder.addBinding(annotation).toInstance(LoggerFactory.getLogger(loggerName));
 			}
 		};
@@ -83,7 +81,7 @@ public class LoggingBinder {
 					c = Character.toUpperCase(c);
 				}
 				assert (!isFirst || Character.isJavaIdentifierStart(c)) && Character.isJavaIdentifierPart(c) :
-					"logger names must be composed of characters that are valid in java identifiers";
+					"logger names must be composed of characters that are valid in java identifiers and whitespace";
 				output.append(c);
 			}
 			isFirst = false;
