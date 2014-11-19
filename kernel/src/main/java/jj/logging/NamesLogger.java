@@ -16,10 +16,14 @@
 package jj.logging;
 
 /**
+ * Implemented by LoggedEvents that wish to name their logger.
+ * Only use this if you have a great reason to make your own
+ * logger, otherwise prefer the annotated system
+ * 
  * @author jason
  *
  */
-interface NamesLogger {
+public interface NamesLogger {
 
 	String loggerName();
 
