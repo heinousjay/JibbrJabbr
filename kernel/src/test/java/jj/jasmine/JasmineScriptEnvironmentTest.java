@@ -71,8 +71,8 @@ public class JasmineScriptEnvironmentTest {
 	public void before() {
 		count = 0;
 		dependencies = new MockAbstractScriptEnvironmentDependencies(specName);
-		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
-		given(dependencies.rhinoContextProvider().context.newChainedScope(global)).willReturn(global);
+		given(dependencies.mockRhinoContextProvider().context.newObject(global)).willReturn(global);
+		given(dependencies.mockRhinoContextProvider().context.newChainedScope(global)).willReturn(global);
 		
 		given(jasmine.script()).willReturn(jasmineScript);
 		given(jasmineBoot.script()).willReturn(jasmineBootScript);
@@ -120,7 +120,7 @@ public class JasmineScriptEnvironmentTest {
 		verifyDependentSetup(spec, jse);
 		
 		// make sure we ran our setup (at least the part that matters internally)
-		verify(dependencies.rhinoContextProvider().context).executeScript(jasmineScript, global);
+		verify(dependencies.mockRhinoContextProvider().context).executeScript(jasmineScript, global);
 		
 		// TODO VERIFY THE SCOPE!
 		// need some test tools for this

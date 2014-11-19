@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.mozilla.javascript.Scriptable;
 
@@ -48,6 +49,32 @@ import jj.util.Clock;
 @Subscriber
 public abstract class AbstractResource implements Resource {
 	
+	@Singleton
+	public static class AbstractResourceDependencies {
+
+		protected final Clock clock;
+		protected final ResourceConfiguration resourceConfiguration;
+		protected final AbstractResourceEventDemuxer demuxer;
+		protected final Publisher publisher;
+		protected final ResourceFinder resourceFinder;
+		
+		@Inject
+		protected AbstractResourceDependencies(
+			final Clock clock,
+			final ResourceConfiguration resourceConfiguration,
+			final AbstractResourceEventDemuxer demuxer,
+			final Publisher publisher,
+			final ResourceFinder resourceFinder
+		) {
+			this.clock = clock;
+			this.resourceConfiguration = resourceConfiguration;
+			this.demuxer = demuxer;
+			this.publisher = publisher;
+			this.resourceFinder = resourceFinder;
+		}
+		
+	}
+	
 	/**
 	 * technique used to bundle up all of the dependencies for the base
 	 * class, to avoid changing the constructor signature for descendants
@@ -59,34 +86,22 @@ public abstract class AbstractResource implements Resource {
 	 */
 	public static class Dependencies {
 		
-		protected final Clock clock;
-		protected final ResourceConfiguration resourceConfiguration;
-		protected final AbstractResourceEventDemuxer demuxer;
+		protected final AbstractResourceDependencies abstractResourceDependencies;
 		protected final ResourceKey resourceKey;
 		protected final Location base;
 		protected final String name;
-		protected final Publisher publisher;
-		protected final ResourceFinder resourceFinder;
 		
 		@Inject
-		public Dependencies(
-			final Clock clock,
-			final ResourceConfiguration resourceConfiguration,
-			final AbstractResourceEventDemuxer demuxer,
+		protected Dependencies(
+			final AbstractResourceDependencies abstractResourceDependencies,
 			final ResourceKey resourceKey,
 			final Location base,
-			final @ResourceName String name,
-			final Publisher publisher,
-			final ResourceFinder resourceFinder
+			final @ResourceName String name
 		) {
-			this.clock = clock;
-			this.resourceConfiguration = resourceConfiguration;
-			this.demuxer = demuxer;
+			this.abstractResourceDependencies = abstractResourceDependencies;
 			this.resourceKey = resourceKey;
 			this.base = base;
 			this.name = name;
-			this.publisher = publisher;
-			this.resourceFinder = resourceFinder;
 		}
 	}
 
@@ -94,11 +109,11 @@ public abstract class AbstractResource implements Resource {
 	
 	protected final ResourceKey cacheKey;
 	
-	protected final long creationTime;
-	
 	protected final Location base;
 	
 	protected final String name;
+	
+	protected final long creationTime;
 	
 	protected final Publisher publisher;
 	
@@ -113,16 +128,16 @@ public abstract class AbstractResource implements Resource {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	
 	protected AbstractResource(final Dependencies dependencies) {
-		this.creationTime = dependencies.clock.time();
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
 		this.name = dependencies.name;
-		this.publisher = dependencies.publisher;
-		this.resourceFinder = dependencies.resourceFinder;
-		this.resourceConfiguration = dependencies.resourceConfiguration;
+		this.creationTime = dependencies.abstractResourceDependencies.clock.time();
+		this.publisher = dependencies.abstractResourceDependencies.publisher;
+		this.resourceFinder = dependencies.abstractResourceDependencies.resourceFinder;
+		this.resourceConfiguration = dependencies.abstractResourceDependencies.resourceConfiguration;
 		
 		if ((this instanceof FileSystemResource) && this.base().parentInDirectory()) {
-			dependencies.demuxer.awaitInitialization(this);
+			dependencies.abstractResourceDependencies.demuxer.awaitInitialization(this);
 		}
 		
 		ResourceSettings base = resourceConfiguration.fileTypeSettings().get(extension());

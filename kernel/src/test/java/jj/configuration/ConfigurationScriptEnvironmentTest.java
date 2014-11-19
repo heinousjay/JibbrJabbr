@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import static jj.configuration.resolution.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
-import jj.event.Publisher;
+import jj.event.MockPublisher;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
@@ -45,7 +45,7 @@ public class ConfigurationScriptEnvironmentTest {
 	
 	MockAbstractScriptEnvironmentDependencies dependencies;
 	ResourceFinder resourceFinder;
-	Publisher publisher;
+	MockPublisher publisher;
 	@Mock ScriptableObject global;
 	@Mock ConfigurationCollector collector;
 	
@@ -58,8 +58,8 @@ public class ConfigurationScriptEnvironmentTest {
 		
 		dependencies = new MockAbstractScriptEnvironmentDependencies();
 
-		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
-		given(dependencies.rhinoContextProvider().context.newChainedScope(global)).willReturn(global);
+		given(dependencies.mockRhinoContextProvider().context.newObject(global)).willReturn(global);
+		given(dependencies.mockRhinoContextProvider().context.newChainedScope(global)).willReturn(global);
 		
 		resourceFinder = dependencies.resourceFinder();
 		publisher = dependencies.publisher();
@@ -71,20 +71,23 @@ public class ConfigurationScriptEnvironmentTest {
 		
 		cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
 		
-		verify(publisher).publish(isA(ConfigurationLoading.class));
 		verify(configScript).addDependent(cse);
-		verify(publisher).publish(isA(ConfigurationFound.class));
 		
 		// make sure it only triggers on its own initialization
 		cse.scriptInitialized(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
 
 		verify(collector, never()).configurationComplete();
-		verify(publisher, never()).publish(isA(ConfigurationLoaded.class));
+		
+		assertThat(publisher.events.size(), is(2));
+		assertTrue(publisher.events.get(0) instanceof ConfigurationLoading);
+		assertTrue(publisher.events.get(1) instanceof ConfigurationFound);
 		
 		cse.scriptInitialized(new ScriptEnvironmentInitialized(cse));
 		
 		verify(collector).configurationComplete();
-		verify(publisher).publish(isA(ConfigurationLoaded.class));
+		
+		assertThat(publisher.events.size(), is(3));
+		assertTrue(publisher.events.get(2) instanceof ConfigurationLoaded);
 	}
 	
 	@Test
@@ -97,9 +100,11 @@ public class ConfigurationScriptEnvironmentTest {
 			assertThat(nsre, is(notNullValue()));
 		}
 		
-		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
 		verify(collector).configurationComplete();
-		verify(publisher).publish(isA(ConfigurationLoaded.class));
+		assertThat(publisher.events.size(), is(3));
+		assertTrue(publisher.events.get(0) instanceof ConfigurationLoading);
+		assertTrue(publisher.events.get(1) instanceof UsingDefaultConfiguration);
+		assertTrue(publisher.events.get(2) instanceof ConfigurationLoaded);
 	}
 
 }

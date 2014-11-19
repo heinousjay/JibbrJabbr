@@ -10,11 +10,11 @@ import javax.inject.Singleton;
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.websocket.CurrentWebSocketConnection;
-import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
 
 import org.jsoup.nodes.Element;
+
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -89,15 +89,20 @@ final class DollarFunction extends BaseFunction implements HostObject {
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 		
-		WebSocketConnectionHost webSocketConnectionHost = ((WebSocketConnectionHost)env.current());
+		DocumentScriptEnvironment dse = env.currentAs(DocumentScriptEnvironment.class);
 		
-		if (args.length == 1 && (args[0] instanceof Function)) {
+		if (
+			args.length == 1 && 
+			(args[0] instanceof Function) && 
+			dse.initializing() &&
+			dse.getFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY) == null
+		) {
 			
 			// this works in three modes - initial execution, it registers a function
 			// document in scope, it's a selection API
 			// connection in scope, it's a remote control
 			
-			webSocketConnectionHost.addFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY, (Function)args[0]);
+			dse.addFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY, (Function)args[0]);
 			return this; 
 		}
 		

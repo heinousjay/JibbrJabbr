@@ -28,14 +28,9 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import jj.configuration.resolution.AppLocation;
-import jj.event.Publisher;
 import jj.resource.AbstractResource;
-import jj.resource.AbstractResourceEventDemuxer;
-import jj.resource.ResourceConfiguration;
-import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceName;
-import jj.util.Clock;
 import jj.util.Closer;
 
 /**
@@ -52,39 +47,49 @@ import jj.util.Closer;
  */
 public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
 	
-	// bundles up the dependencies for this object, so that descendents don't need to
-	// to be updated when this changes, cause it just might change more!
-	// package-private access on the fields for testing
 	@Singleton
-	public static class Dependencies extends AbstractResource.Dependencies {
-		
-		final Provider<RhinoContext> contextProvider;
-		final Provider<ContinuationPendingKey> pendingKeyProvider;
-		final RequireInnerFunction requireInnerFunction;
-		final InjectFunction injectFunction;
-		final Timers timers;
+	protected static class AbstractScriptEnvironmentDependencies {
+		protected final ContinuationPendingCache continuationPendingCache;
+		protected final Provider<ContinuationPendingKey> pendingKeyProvider;
+		protected final RequireInnerFunction requireInnerFunction;
+		protected final InjectFunction injectFunction;
+		protected final Timers timers;
+		protected final Provider<RhinoContext> contextProvider;
 		
 		@Inject
-		Dependencies(
-			final Clock clock,
-			final ResourceConfiguration resourceConfiguration,
-			final AbstractResourceEventDemuxer demuxer,
-			final ResourceKey cacheKey,
-			final @ResourceName String name,
-			final Provider<RhinoContext> contextProvider,
+		AbstractScriptEnvironmentDependencies(
+			final ContinuationPendingCache continuationPendingCache,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
 			final InjectFunction injectFunction,
 			final Timers timers,
-			final Publisher publisher,
-			final ResourceFinder resourceFinder
+			final Provider<RhinoContext> contextProvider
 		) {
-			super(clock, resourceConfiguration, demuxer, cacheKey, AppLocation.Virtual, name, publisher, resourceFinder);
-			this.contextProvider = contextProvider;
+			this.continuationPendingCache = continuationPendingCache;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
 			this.injectFunction = injectFunction;
 			this.timers = timers;
+			this.contextProvider = contextProvider;
+		}
+	}
+	
+	// bundles up the dependencies for this object, so that descendents don't need to
+	// to be updated when this changes, cause it just might change more!
+	// package-private access on the fields for testing
+	public static class Dependencies extends AbstractResource.Dependencies {
+		
+		protected final AbstractScriptEnvironmentDependencies scriptEnvironmentDependencies;
+		
+		@Inject
+		protected Dependencies(
+			final AbstractResourceDependencies abstractResourceDependencies,
+			final AbstractScriptEnvironmentDependencies abstractScriptEnvironmentDependencies,
+			final ResourceKey cacheKey,
+			final @ResourceName String name
+		) {
+			super(abstractResourceDependencies, cacheKey, AppLocation.Virtual, name);
+			this.scriptEnvironmentDependencies = abstractScriptEnvironmentDependencies;
 		}
 	}
 	
@@ -101,11 +106,9 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	private volatile Throwable initializationError;
 	
-	protected AbstractScriptEnvironment(
-		Dependencies dependencies
-	) {
+	protected AbstractScriptEnvironment(Dependencies dependencies) {
 		super(dependencies);
-		this.contextProvider = dependencies.contextProvider;
+		this.contextProvider = dependencies.scriptEnvironmentDependencies.contextProvider;
 		this.dependencies = dependencies;
 	}
 	
@@ -164,7 +167,11 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	@Override
 	protected void died() {
+		// mark dead
 		state = Dead;
+		// when a script environment dies, we can dump any pending tasks on the floor
+		dependencies.scriptEnvironmentDependencies.continuationPendingCache.removePendingTasks(continuationPendings.keySet());
+		// and publish it to the world
 		publisher.publish(new ScriptEnvironmentDied(this));
 	}
 	
@@ -173,7 +180,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * @return the key to resume the continuation, with a fully saved context
 	 */
 	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
-		ContinuationPendingKey key = dependencies.pendingKeyProvider.get();
+		ContinuationPendingKey key = dependencies.scriptEnvironmentDependencies.pendingKeyProvider.get();
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;
@@ -254,10 +261,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 */
 	protected ScriptableObject configureTimers(final ScriptableObject localScope) {
 		assert !localScope.isSealed() : "cannot configure timers on a sealed scope";
-		localScope.defineProperty("setInterval", dependencies.timers.setInterval, ScriptableObject.EMPTY);
-		localScope.defineProperty("setTimeout", dependencies.timers.setTimeout, ScriptableObject.EMPTY);
-		localScope.defineProperty("clearInterval", dependencies.timers.clearInterval, ScriptableObject.EMPTY);
-		localScope.defineProperty("clearTimeout", dependencies.timers.clearTimeout, ScriptableObject.EMPTY);
+		localScope.defineProperty("setInterval", dependencies.scriptEnvironmentDependencies.timers.setInterval, ScriptableObject.EMPTY);
+		localScope.defineProperty("setTimeout", dependencies.scriptEnvironmentDependencies.timers.setTimeout, ScriptableObject.EMPTY);
+		localScope.defineProperty("clearInterval", dependencies.scriptEnvironmentDependencies.timers.clearInterval, ScriptableObject.EMPTY);
+		localScope.defineProperty("clearTimeout", dependencies.scriptEnvironmentDependencies.timers.clearTimeout, ScriptableObject.EMPTY);
 		return localScope;
 	}
 	
@@ -278,7 +285,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 */
 	protected ScriptableObject configureInjectFunction(final ScriptableObject localScope, final String name) {
 		assert !localScope.isSealed() : "cannot configure inject function on a sealed scope";
-		localScope.defineProperty(name, dependencies.injectFunction, ScriptableObject.CONST);
+		localScope.defineProperty(name, dependencies.scriptEnvironmentDependencies.injectFunction, ScriptableObject.CONST);
 		return localScope;
 	}
 	
@@ -316,7 +323,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			ScriptableObject exports = context.newObject(localScope);
 			module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
 			module.defineProperty("exports", exports, ScriptableObject.EMPTY);
-			module.defineProperty("requireInner", dependencies.requireInnerFunction, ScriptableObject.EMPTY);
+			module.defineProperty("requireInner", dependencies.scriptEnvironmentDependencies.requireInnerFunction, ScriptableObject.EMPTY);
 			
 			localScope.defineProperty("module", module, ScriptableObject.CONST);
 			localScope.defineProperty("exports", exports, ScriptableObject.CONST);

@@ -34,6 +34,7 @@ import jj.document.ScriptCompiler;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.http.server.websocket.CurrentWebSocketConnection;
+import jj.http.server.websocket.MockAbstractWebSocketConnectionHostDependencies;
 import jj.http.server.websocket.MockCurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.resource.NoSuchResourceException;
@@ -42,7 +43,6 @@ import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptSystemEvent;
-import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
 import jj.util.Closer;
@@ -73,7 +73,7 @@ public class DocumentScriptEnvironmentTest {
 	
 	ResourceKey cacheKey;
 	MockRhinoContextProvider contextMaker;
-	MockAbstractScriptEnvironmentDependencies dependencies;
+	MockAbstractWebSocketConnectionHostDependencies dependencies;
 	
 	@Mock WebSocketConnection connection;
 	
@@ -94,10 +94,10 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void makeResourceDependencies(String name) {
-		dependencies = new MockAbstractScriptEnvironmentDependencies(name, resourceFinder);
+		dependencies = new MockAbstractWebSocketConnectionHostDependencies(name, resourceFinder);
 		
-		cacheKey = dependencies.resourceCacheKey();
-		contextMaker = dependencies.rhinoContextProvider();
+		cacheKey = dependencies.cacheKey();
+		contextMaker = dependencies.mockRhinoContextProvider();
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
 		given(contextMaker.context.newChainedScope(any(Scriptable.class))).willReturn(local);
 	}
