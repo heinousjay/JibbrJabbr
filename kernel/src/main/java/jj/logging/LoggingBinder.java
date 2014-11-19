@@ -70,7 +70,7 @@ public class LoggingBinder {
 		};
 	}
 	
-	private String camelCaseName(String loggerName) {
+	static String camelCaseName(String loggerName) {
 		
 		final StringBuilder output = new StringBuilder(loggerName.length());
 		boolean isFirst = true;
