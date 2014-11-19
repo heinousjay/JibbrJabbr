@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
+ * qualifies the map of logger names
  * @author jason
  *
  */
