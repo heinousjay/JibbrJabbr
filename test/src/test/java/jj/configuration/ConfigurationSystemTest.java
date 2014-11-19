@@ -176,8 +176,8 @@ public class ConfigurationSystemTest {
 		assertThat(loggingLevels.get("io.netty"), is(Level.Off));
 		assertThat(loggingLevels.get("script system"), is(Level.Off));
 		assertThat(loggingLevels.get("resource system"), is(Level.Off));
-		assertThat(loggingLevels.get("server"), is(Level.Off));
-		assertThat(loggingLevels.get("test runner"), is(Level.Off));
+		assertThat(loggingLevels.get("server"), is(Level.Debug));
+		assertThat(loggingLevels.get("test runner"), is(Level.Debug));
 		assertThat(loggingLevels.get("script@index"), is(Level.Trace));
 		assertThat(loggingLevels.get("script@d3/index"), is(Level.Trace));
 		assertThat(loggingLevels.get("script@chat/index"), is(Level.Off));

@@ -103,7 +103,8 @@ public class LoggingConfigurator {
 	}
 	
 	private void setLevels() {
-		logger(Logger.ROOT_LOGGER_NAME, Level.OFF);
+		//logger(Logger.ROOT_LOGGER_NAME, Level.OFF);
+		logger(EmergencyLogger.NAME, Level.INFO);
 		for (String logger : config.loggingLevels().keySet()) {
 			logger(logger, config.loggingLevels().get(logger).logbackLevel());
 		}

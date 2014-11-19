@@ -18,7 +18,7 @@ var broadcast = require('jj/broadcast');
 
 var localStorage = require('jj/local-storage');
 
-var print = require('jj/print');
+var console = require('jj/console');
 
 var messages = (function() {
 	// need some unique ids per line
@@ -96,9 +96,9 @@ var users = (function() {
 		connected: function(user) {
 			var userName = processUserName(user.name);
 			var userId = user.id || id();
-			print('user connected: ' + userName + ', ' + userId);
+			console.log('user connected', userName, userId);
 			if (!(userId in list)) {
-				print('did not find the user, creating new');
+				console.log('did not find the user, creating new');
 				list[userId] = {
 					id: userId,
 					name: userName
@@ -218,22 +218,18 @@ $(function(e) {
 	// defining a ready function inside a ready function is an error
 	// but not one that i am catching yet. just don't do it
 	
-	print("prerendering the topic");
+	console.log("prerendering the topic");
 	$('#topic').html(topic);
 	
-	// prints to the console on the server. 
-	// going to be moved into a console object
-	// so you can do console.log, console.warn, console.error
-	// print will be retargeted to print to the output?
-	// so that responses can be made of whole cloth
-	print("prerendering the messages");
+	// prints to the console on the server.
+	console.log("prerendering the messages");
 	// addMessage is defined in index.shared.js
 	// used here and in the index.js definition
 	// of showMessage, which also scrolls the 
 	// chatbox to the message enter.
 	messages.forEach(addMessage);
 	
-	print("prerendering the list of users");
+	console.log("prerendering the list of users");
 	users.forEach(function(user) {
 		$('#users').append($('<div>', {id: user.id, 'class': 'user'}).html(user.name));
 	});
@@ -357,7 +353,7 @@ clientDisconnected(function() {
 	// function being broadcast
 	var user = users.disconnected(clientStorage.user);
 	
-	print('disconnected ' + JSON.stringify(user));
+	console.log('disconnected ' + JSON.stringify(user));
 	// we can avoid notifying ourselves.
 	// which is what ultimately happens
 	// anyway, but this avoids even trying
