@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
 
 /**
  * probably each major subsystem will declare a logger,
@@ -34,7 +33,9 @@ import com.google.inject.multibindings.Multibinder;
  */
 public class LoggingBinder {
 	
-	private final Multibinder<String> loggerNameBinder;
+	private static boolean nettyAdded = false;
+	
+	private final MapBinder<String, String> loggerNameBinder;
 	
 	private final MapBinder<Class<? extends Annotation>, Logger> loggerBinder;
 	
@@ -43,13 +44,18 @@ public class LoggingBinder {
 	}
 	
 	public LoggingBinder(Binder binder) {
-		loggerNameBinder = Multibinder.newSetBinder(binder, String.class, LoggerNames.class);
+		loggerNameBinder = MapBinder.newMapBinder(binder, String.class, String.class, LoggerNames.class);
 		
 		loggerBinder = MapBinder.newMapBinder(
 			binder,
 			new TypeLiteral<Class<? extends Annotation>>() {},
 			new TypeLiteral<Logger>() {}
 		);
+		
+		if (!nettyAdded) {
+			nettyAdded = true;
+			loggerNameBinder.addBinding("netty").toInstance("io.netty");
+		}
 	}
 
 	public BindingBuilder annotatedWith(final Class<? extends Annotation> annotation) {
@@ -59,7 +65,7 @@ public class LoggingBinder {
 			@Override
 			public void toLogger(String loggerName) {
 				
-				loggerNameBinder.addBinding().toInstance(camelCaseName(loggerName));
+				loggerNameBinder.addBinding(camelCaseName(loggerName)).toInstance(loggerName);
 				
 				loggerBinder.addBinding(annotation).toInstance(LoggerFactory.getLogger(loggerName));
 			}

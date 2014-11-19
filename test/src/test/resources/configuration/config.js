@@ -67,3 +67,12 @@ require('jj/default-resource-properties')
 
 // configuration of routes is in a separate include because it makes scoping prettier
 require('routes');
+
+require('jj/logging-configuration')
+	.emergency.trace()
+	.netty.off()
+	.access.off()
+	.scriptSystem.off()
+	.resourceSystem.off()
+	.server.off()
+	.testRunner.off();

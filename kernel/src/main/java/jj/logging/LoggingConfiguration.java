@@ -15,31 +15,16 @@
  */
 package jj.logging;
 
-import jj.JJModule;
+import java.util.Map;
+
+import jj.configuration.DefaultProvider;
 
 /**
  * @author jason
  *
  */
-public class LoggingModule extends JJModule {
+public interface LoggingConfiguration {
 
-	@Override
-	protected void configure() {
-		
-		addAPIModulePath("/jj/logging/api");
-		
-		bindConfiguration().to(LoggingConfiguration.class);
-		
-		// this gets instantiated before anything might write to a log
-		// actually that won't matter anymore soon! yay! the "test" parameter can get killed off
-		//bind(LogConfigurator.class).toInstance(new LogConfigurator(isTest));
-		
-		bind(LoggingConfigurator.class).asEagerSingleton();
-		
-		addStartupListenerBinding().to(SystemLogger.class);
-		
-		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
-		
-	}
-
+	@DefaultProvider(LogLevelDefaultProvider.class)
+	Map<String, Level> loggingLevels();
 }

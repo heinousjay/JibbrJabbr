@@ -35,6 +35,8 @@ import jj.http.server.HttpServerSocketConfiguration;
 import jj.http.server.uri.Route;
 import jj.http.server.uri.RouterConfiguration;
 import jj.i18n.I18NConfiguration;
+import jj.logging.Level;
+import jj.logging.LoggingConfiguration;
 import jj.css.LessConfiguration;
 import jj.document.DocumentConfiguration;
 import jj.event.Listener;
@@ -81,6 +83,9 @@ public class ConfigurationSystemTest {
 	
 	@Inject
 	private I18NConfiguration i18nConfiguration;
+	
+	@Inject
+	private LoggingConfiguration loggingConfiguration;
 	
 	volatile boolean loaded;
 	final CountDownLatch loadedLatch = new CountDownLatch(1);
@@ -164,6 +169,14 @@ public class ConfigurationSystemTest {
 		
 		assertThat(i18nConfiguration.allowNonISO(), is(true));
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));
+		
+		assertThat(loggingConfiguration.loggingLevels().get("io.netty"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("server"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("access"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("resource system"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("script system"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("test runner"), is(Level.Off));
+		assertThat(loggingConfiguration.loggingLevels().get("emergency"), is(Level.Trace));
 	}
 	
 	private void assertRoute(Route route, HttpMethod method, String uri, String resourceName, String mappedName) {
