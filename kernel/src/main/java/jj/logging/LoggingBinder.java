@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 
 /**
  * probably each major subsystem will declare a logger,
@@ -33,6 +34,8 @@ import com.google.inject.multibindings.MapBinder;
  */
 public class LoggingBinder {
 	
+	private final Multibinder<String> loggerNameBinder;
+	
 	private final MapBinder<Class<? extends Annotation>, Logger> loggerBinder;
 	
 	public interface BindingBuilder {
@@ -40,6 +43,8 @@ public class LoggingBinder {
 	}
 	
 	public LoggingBinder(Binder binder) {
+		loggerNameBinder = Multibinder.newSetBinder(binder, String.class, LoggerNames.class);
+		
 		loggerBinder = MapBinder.newMapBinder(
 			binder,
 			new TypeLiteral<Class<? extends Annotation>>() {},
@@ -53,8 +58,32 @@ public class LoggingBinder {
 			
 			@Override
 			public void toLogger(String loggerName) {
+				
+				loggerNameBinder.addBinding().toInstance(camelCaseName(loggerName));
+				
 				loggerBinder.addBinding(annotation).toInstance(LoggerFactory.getLogger(loggerName));
 			}
 		};
+	}
+	
+	private String camelCaseName(String loggerName) {
+		
+		final StringBuilder output = new StringBuilder(loggerName.length());
+		boolean isFirst = true;
+		boolean lastWasSpace = false;
+		for (char c : loggerName.toCharArray()) {
+			if (!Character.isWhitespace(c)) {
+				if (lastWasSpace) {
+					c = Character.toUpperCase(c);
+				}
+				assert (!isFirst || Character.isJavaIdentifierStart(c)) && Character.isJavaIdentifierPart(c) :
+					"logger names must be composed of characters that are valid in java identifiers";
+				output.append(c);
+			}
+			isFirst = false;
+			lastWasSpace = Character.isWhitespace(c);
+		}
+		
+		return output.toString();
 	}
 }
