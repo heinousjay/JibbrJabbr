@@ -37,8 +37,8 @@ import org.slf4j.Logger;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@interface ExecutionTraceLogger {
+@interface ScriptSystemLogger {
 
-	public static final String NAME = "execution trace";
+	public static final String NAME = "script system";
 
 }

@@ -23,7 +23,7 @@ import jj.logging.LoggedEvent;
  *
  * @author jason
  */
-@ExecutionTraceLogger
-public abstract class ExecutionEvent extends LoggedEvent {
+@ScriptSystemLogger
+public abstract class ScriptSystemEvent extends LoggedEvent {
 
 }

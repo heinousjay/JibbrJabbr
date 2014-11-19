@@ -41,7 +41,7 @@ import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.ContinuationPendingKey;
-import jj.script.ExecutionEvent;
+import jj.script.ScriptSystemEvent;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
@@ -81,7 +81,7 @@ public class DocumentScriptEnvironmentTest {
 	
 	CurrentWebSocketConnection currentConnection;
 	
-	@Captor ArgumentCaptor<ExecutionEvent> eventCaptor;
+	@Captor ArgumentCaptor<ScriptSystemEvent> eventCaptor;
 
 	@Before
 	public void before() throws Exception {
