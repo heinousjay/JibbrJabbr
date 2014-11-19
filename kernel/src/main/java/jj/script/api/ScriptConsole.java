@@ -17,6 +17,8 @@ package jj.script.api;
 
 import static jj.logging.Level.*;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -40,28 +42,28 @@ public class ScriptConsole {
 		this.publisher = publisher;
 	}
 	
-	private void publish(Level level, String[] args) {
+	private void publish(Level level, List<String> args) {
 		assert env.current() != null;
 		publisher.publish(new ConsoleLoggingEvent(env.currentRootScriptEnvironment().name(), level, args));
 	}
 	
-	public void trace(String...args) {
+	public void trace(List<String> args) {
 		publish(Trace, args);
 	}
 	
-	public void debug(String...args) {
+	public void debug(List<String> args) {
 		publish(Debug, args);
 	}
 	
-	public void info(String...args) {
+	public void info(List<String> args) {
 		publish(Info, args);
 	}
 	
-	public void warn(String...args) {
+	public void warn(List<String> args) {
 		publish(Warn, args);
 	}
 	
-	public void error(String...args) {
+	public void error(List<String> args) {
 		publish(Error, args);
 	}
 }

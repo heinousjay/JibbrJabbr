@@ -15,6 +15,8 @@
  */
 package jj.script.api;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 
 import jj.logging.Level;
@@ -27,7 +29,7 @@ import jj.logging.NamesLogger;
  */
 class ConsoleLoggingEvent extends LoggedEvent implements NamesLogger {
 	
-	private static String join(String[] args) {
+	private static String join(List<String> args) {
 		StringBuilder result = new StringBuilder();
 		for (String arg : args) {
 			result.append(arg).append(" ");
@@ -38,9 +40,9 @@ class ConsoleLoggingEvent extends LoggedEvent implements NamesLogger {
 	
 	private final String scriptName;
 	private final Level level;
-	private final String[] args;
+	private final List<String> args;
 	
-	ConsoleLoggingEvent(final String scriptName, final Level level, final String...args) {
+	ConsoleLoggingEvent(final String scriptName, final Level level, final List<String> args) {
 		this.scriptName = scriptName;
 		this.level = level;
 		this.args = args;

@@ -134,6 +134,7 @@ public class SystemScriptsTest {
 		// load everything we care about here!
 		load("broadcast.js");
 		load("configuration-support.js"); // loaded by configuration
+		load("console.js");
 		load("env.js");
 		load("globalize.js");
 		load("local-storage.js");

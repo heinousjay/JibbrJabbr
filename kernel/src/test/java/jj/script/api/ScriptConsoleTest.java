@@ -18,6 +18,9 @@ package jj.script.api;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+
+import java.util.Arrays;
+
 import jj.event.MockPublisher;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.module.RootScriptEnvironment;
@@ -63,7 +66,7 @@ public class ScriptConsoleTest {
 	@Test
 	public void testTrace() {
 		// when
-		sc.trace("arg1", "arg2");
+		sc.trace(Arrays.asList("arg1", "arg2"));
 		
 		// when
 		ConsoleLoggingEvent cle = (ConsoleLoggingEvent)publisher.events.get(0);
@@ -77,7 +80,7 @@ public class ScriptConsoleTest {
 	@Test
 	public void testDebug() {
 		// when
-		sc.debug("arg1", "arg2");
+		sc.debug(Arrays.asList("arg1", "arg2"));
 		
 		// when
 		ConsoleLoggingEvent cle = (ConsoleLoggingEvent)publisher.events.get(0);
@@ -91,7 +94,7 @@ public class ScriptConsoleTest {
 	@Test
 	public void testInfo() {
 		// when
-		sc.info("arg1", "arg2");
+		sc.info(Arrays.asList("arg1", "arg2"));
 		
 		// when
 		ConsoleLoggingEvent cle = (ConsoleLoggingEvent)publisher.events.get(0);
@@ -105,7 +108,7 @@ public class ScriptConsoleTest {
 	@Test
 	public void testWarn() {
 		// when
-		sc.warn("arg1", "arg2");
+		sc.warn(Arrays.asList("arg1", "arg2"));
 		
 		// when
 		ConsoleLoggingEvent cle = (ConsoleLoggingEvent)publisher.events.get(0);
@@ -119,7 +122,7 @@ public class ScriptConsoleTest {
 	@Test
 	public void testError() {
 		// when
-		sc.error("arg1", "arg2");
+		sc.error(Arrays.asList("arg1", "arg2"));
 		
 		// when
 		ConsoleLoggingEvent cle = (ConsoleLoggingEvent)publisher.events.get(0);
