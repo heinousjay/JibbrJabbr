@@ -16,25 +16,12 @@
 package jj.http.server;
 
 import io.netty.handler.codec.http.HttpRequest;
-import jj.logging.EmergencyLogger;
-import jj.logging.LoggedEvent;
+import jj.logging.Emergency;
 
-import org.slf4j.Logger;
-
-@EmergencyLogger
-public class RequestErrored extends LoggedEvent {
-	
-	private final HttpRequest request;
-	private final Throwable t;
+public class RequestErrored extends Emergency {
 	
 	RequestErrored(final HttpRequest request, final Throwable t) {
-		this.request = request;
-		this.t = t;
-	}
-
-	@Override
-	public void describeTo(Logger logger) {
-		logger.error("response ended in error", t);
+		super("response ended in error", t);
 	}
 	
 }

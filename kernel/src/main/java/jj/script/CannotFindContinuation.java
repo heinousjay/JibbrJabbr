@@ -15,30 +15,15 @@
  */
 package jj.script;
 
-import org.slf4j.Logger;
-
-import jj.logging.EmergencyLogger;
-import jj.logging.LoggedEvent;
+import jj.logging.Emergency;
 
 /**
  * @author jason
  *
  */
-@EmergencyLogger
-public class CannotFindContinuation extends LoggedEvent {
+public class CannotFindContinuation extends Emergency {
 
-	private final ScriptEnvironment scriptEnvironment;
-	private final ContinuationPendingKey pendingKey;
-	
 	CannotFindContinuation(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
-		this.scriptEnvironment = scriptEnvironment;
-		this.pendingKey = pendingKey;
+		super("attempting to resume a non-existent continuation in " + scriptEnvironment + " keyed by " + pendingKey + "\nhelpful stacktrace:", new Exception());
 	}
-
-	@Override
-	public void describeTo(Logger logger) {
-		logger.error("attempting to resume a non-existent continuation in {} keyed by {}", scriptEnvironment, pendingKey);
-		logger.error("helpful stacktrace", new Exception());
-	}
-
 }

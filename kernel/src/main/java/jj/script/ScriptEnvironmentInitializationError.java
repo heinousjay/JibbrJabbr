@@ -15,22 +15,18 @@
  */
 package jj.script;
 
-import jj.logging.EmergencyLogger;
-import jj.logging.LoggedEvent;
-
-import org.slf4j.Logger;
-
+import jj.logging.Emergency;
 /**
  * @author jason
  *
  */
-@EmergencyLogger
-public class ScriptEnvironmentInitializationError extends LoggedEvent {
+public class ScriptEnvironmentInitializationError extends Emergency {
 	
 	private final ScriptEnvironment scriptEnvironment;
 	private final Throwable cause;
 
-	public ScriptEnvironmentInitializationError(final ScriptEnvironment scriptEnvironment, final Throwable cause) {
+	ScriptEnvironmentInitializationError(final ScriptEnvironment scriptEnvironment, final Throwable cause) {
+		super("script environment errored during initialization: " + scriptEnvironment, cause);
 		this.scriptEnvironment = scriptEnvironment;
 		this.cause = cause;
 	}
@@ -41,11 +37,5 @@ public class ScriptEnvironmentInitializationError extends LoggedEvent {
 	
 	public Throwable cause() {
 		return cause;
-	}
-
-	@Override
-	public void describeTo(Logger log) {
-		log.error("script environment errored during initialization: {}", scriptEnvironment);
-		log.error("", cause);
 	}
 }
