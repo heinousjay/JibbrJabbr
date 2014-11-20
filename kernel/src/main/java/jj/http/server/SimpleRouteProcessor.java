@@ -27,6 +27,7 @@ import jj.http.server.uri.Route;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
+import jj.resource.ResourceThread;
 
 /**
  * <p>
@@ -58,6 +59,12 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
 		return resourceFinder.findResource(resourceClass, Base.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
 	}
+	
+	@ResourceThread
+	@Override
+	public ServableResource loadResource(final Class<? extends ServableResource> resourceClass, final URIMatch uriMatch, final Route route) {
+		return resourceFinder.loadResource(resourceClass, Base.and(Assets), uriMatch.path); // should be Public.and(Assets)
+	}
 
 	@Override
 	public void process(final Route route, final HttpServerRequest request, final HttpServerResponse response) {
@@ -69,6 +76,7 @@ public class SimpleRouteProcessor implements RouteProcessor {
 		ServableResource resource = findResource(resourceClass, request);
 
 		if (resource == null) {
+			// TODO - just use the task runner
 			resourceLoader.loadResource(resourceClass, Base.and(Assets), request.uriMatch().path).then(
 				new HttpServerTask("serving a resource.  better name!") {
 

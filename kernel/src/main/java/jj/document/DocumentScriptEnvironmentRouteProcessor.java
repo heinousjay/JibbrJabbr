@@ -30,10 +30,13 @@ import jj.execution.TaskRunner;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.RouteProcessor;
+import jj.http.server.ServableResource;
 import jj.http.server.resource.StaticResource;
 import jj.http.server.uri.Route;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceTask;
+import jj.resource.ResourceThread;
 
 /**
  * @author jason
@@ -73,6 +76,12 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 		} else {
 			serve(dse, request, response);
 		}
+	}
+	
+	@ResourceThread
+	@Override
+	public ServableResource loadResource(final Class<? extends ServableResource> resourceClass, final URIMatch uriMatch, final Route route) {
+		return resourceFinder.loadResource(DocumentScriptEnvironment.class, Virtual, route.mapping());
 	}
 	
 	private void preloadResources() {

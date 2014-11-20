@@ -16,6 +16,7 @@
 package jj.http.server;
 
 import jj.http.server.uri.Route;
+import jj.http.server.uri.URIMatch;
 
 /**
  * <p>
@@ -27,4 +28,6 @@ import jj.http.server.uri.Route;
 public interface RouteProcessor {
 
 	void process(Route route, HttpServerRequest request, HttpServerResponse response);
+
+	ServableResource loadResource(Class<? extends ServableResource> resourceClass, final URIMatch uriMatch, Route route);
 }

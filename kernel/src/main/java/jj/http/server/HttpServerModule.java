@@ -4,7 +4,6 @@ import jj.JJModule;
 import jj.http.server.methods.HttpMethodHandlerModule;
 import jj.http.server.resource.StaticResource;
 import jj.http.server.resource.StaticResourceCreator;
-import jj.http.server.servable.ServableModule;
 import jj.http.server.websocket.WebSocketConnectionTracker;
 
 public class HttpServerModule extends JJModule {
@@ -27,7 +26,6 @@ public class HttpServerModule extends JJModule {
 		
 		bindCreationOf(StaticResource.class).to(StaticResourceCreator.class);
 		
-		install(new ServableModule());
 		install(new HttpMethodHandlerModule());
 	}
 }
