@@ -20,12 +20,12 @@ import io.netty.handler.codec.http.HttpMethod;
 import java.util.Map;
 
 public class RouteMatch {
-	
+
 	final URIMatch uriMatch;
 	final Route route;
 	public final Map<HttpMethod, Route> routes;
 	final Map<String, String> params;
-	
+
 	RouteMatch(final URIMatch uriMatch, final HttpMethod method, final Map<HttpMethod, Route> routes, final Map<String, String> params) {
 		this.uriMatch = uriMatch;
 		this.route = routes == null ? null : routes.get(method);
@@ -36,14 +36,18 @@ public class RouteMatch {
 	public boolean matched() {
 		return route != null;
 	}
-	
+
+	public Route route() {
+		return route;
+	}
+
 	/**
 	 * @return the resource name of the matched route, if any
 	 */
 	public String resourceName() {
 		return route == null ? null : route.resourceName();
 	}
-	
+
 	public String toString() {
 		return new StringBuilder("RouteMatch(\n")
 			.append("  uriMatch=").append(uriMatch).append("\n")

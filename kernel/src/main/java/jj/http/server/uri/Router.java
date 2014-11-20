@@ -80,19 +80,7 @@ public class Router {
 		});
 	}
 	
-	public RouteMatch matchRequest(final HttpMethod method, final URIMatch uriMatch) {
-		
-		// this is not the correct signature? RouteMatch is the wrong return, needs to
-		// be some object that indicates how to do the processing
-		
-		// okay, this has a few jobs to do.  let's detail them!
-		// if the incoming URI had a / on the end (except '/'), issue a redirect without it
-		// if uriMatch.path is a DirectoryResource, rewrite the URIMatch to have the welcome file on it
-		// hit the routes and see what we get back out of it
-		
-		// not sure if this is the right place for that process. maybe whatever calls this class should do
-		// the first two steps
-		
+	public RouteMatch routeRequest(final HttpMethod method, final URIMatch uriMatch) {
 		RouteTrie routes = trie.get();
 		assert routes != null : "can't route before configuration is complete!";
 		

@@ -16,6 +16,7 @@
 package jj.http.server;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -42,16 +43,19 @@ public class ServableResources {
 	private final ScriptableObject global;
 	private final Provider<RhinoContext> contextProvider;
 	private final Map<String, Class<? extends ServableResource>> servableResources;
+	private final Map<String, RouteProcessor> routeProcessors;
 	
 	@Inject
 	ServableResources(
 		final @Global ScriptableObject global,
 		final Provider<RhinoContext> contextProvider,
-		final Map<String, Class<? extends ServableResource>> servableResources
+		final Map<String, Class<? extends ServableResource>> servableResources,
+		final Map<String, RouteProcessor> routeProcessors
 	) {
 		this.global = global;
 		this.contextProvider = contextProvider;
 		this.servableResources = servableResources;
+		this.routeProcessors = routeProcessors;
 	}
 	
 	// returns a new version every time to prevent e.g. silly extensions grabbing the object
@@ -69,5 +73,18 @@ public class ServableResources {
 	
 	public Class<? extends ServableResource> classFor(String name) {
 		return servableResources.get(name);
+	}
+	
+	public String nameFor(Class<? extends ServableResource> servableResourceClass) {
+		for (Entry<String, Class<? extends ServableResource>> entry : servableResources.entrySet()) {
+			if (entry.getValue() == servableResourceClass) {
+				return entry.getKey();
+			}
+		}
+		return null;
+	}
+
+	public RouteProcessor routeProcessor(String resourceName) {
+		return routeProcessors.get(resourceName);
 	}
 }

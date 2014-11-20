@@ -60,7 +60,7 @@ class OptionsMethodHandler extends HttpMethodHandler {
 			}
 			sb.deleteCharAt(sb.length() - 1);
 		} else {
-			for (HttpMethod method : router.matchRequest(OPTIONS, new URIMatch(request.uri())).routes.keySet()) {
+			for (HttpMethod method : router.routeRequest(OPTIONS, new URIMatch(request.uri())).routes.keySet()) {
 				sb.append(method).append(",");
 			}
 			sb.append(HEAD).append(",").append(TRACE).append(",").append(OPTIONS);
