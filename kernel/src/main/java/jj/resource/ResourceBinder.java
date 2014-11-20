@@ -29,7 +29,7 @@ import com.google.inject.multibindings.MapBinder;
  */
 public class ResourceBinder {
 	
-	private final Map<Class<? extends Resource>, ResourceBindingProcessor<?>> bindingProcessors = new HashMap<>();
+	private final Map<Class<? extends Resource>, ResourceBindingProcessor<? extends Resource>> bindingProcessors = new HashMap<>();
 
 	private final MapBinder<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
 	
@@ -51,7 +51,8 @@ public class ResourceBinder {
 		
 		for (Class<? extends Resource> resourceInterface : bindingProcessors.keySet()) {
 			if (resourceInterface.isAssignableFrom(key)) {
-				bindingProcessors.get(resourceInterface).process(key);
+				ResourceBindingProcessor<T> processor = (ResourceBindingProcessor<T>)bindingProcessors.get(resourceInterface);
+				processor.process(key);
 			}
 		}
 		

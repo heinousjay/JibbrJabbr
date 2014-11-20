@@ -26,12 +26,12 @@ public class JasmineModule extends JJModule {
 	@Override
 	protected void configure() {
 
-		addAssetPath("/jj/jasmine/assets");
-		addAPIModulePath("/jj/jasmine/api");
+		bindAssetPath("/jj/jasmine/assets");
+		bindAPIModulePath("/jj/jasmine/api");
 
-		bindCreation().of(JasmineScriptEnvironment.class).to(JasmineScriptEnvironmentCreator.class);
+		bindCreationOf(JasmineScriptEnvironment.class).to(JasmineScriptEnvironmentCreator.class);
 		
-		bindConfiguration().to(JasmineConfiguration.class);
+		bindConfiguration(JasmineConfiguration.class);
 
 		// we basically just initialize some event listeners and wait for things to happen
 		bind(SpecRunner.class).asEagerSingleton();

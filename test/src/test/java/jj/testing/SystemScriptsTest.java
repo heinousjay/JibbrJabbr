@@ -95,7 +95,7 @@ public class SystemScriptsTest {
 			.injectInstance(this)                   // well, sure
 			.withModule(new JJModule() {
 				protected void configure() {
-					addAPIModulePath(SPEC_PATH);    // and put the specs on the path
+					bindAPIModulePath(SPEC_PATH);    // and put the specs on the path
 				}
 			});
 	

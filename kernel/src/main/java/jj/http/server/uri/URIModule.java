@@ -27,9 +27,9 @@ public class URIModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAPIModulePath("/jj/http/server/uri/api");
+		bindAPIModulePath("/jj/http/server/uri/api");
 		
-		bindConfiguration().to(RouterConfiguration.class);
+		bindConfiguration(RouterConfiguration.class);
 	}
 
 }

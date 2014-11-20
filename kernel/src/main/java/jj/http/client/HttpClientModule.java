@@ -27,13 +27,13 @@ public class HttpClientModule extends JJModule {
 	@Override
 	protected void configure() {
 
-		addAPIModulePath("/jj/http/client/api");
+		bindAPIModulePath("/jj/http/client/api");
 		
-		dispatch().continuationOf(RestOperation.class).to(HttpClientRequestContinuationProcessor.class);
+		bindContinuationProcessingOf(RestOperation.class).to(HttpClientRequestContinuationProcessor.class);
 		
 		bindExecutor(HttpClientNioEventLoopGroup.class);
 		
-		bindConfiguration().to(HttpClientConfiguration.class);
+		bindConfiguration(HttpClientConfiguration.class);
 	}
 
 }

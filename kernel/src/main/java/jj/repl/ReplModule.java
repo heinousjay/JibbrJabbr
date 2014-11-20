@@ -25,11 +25,11 @@ public class ReplModule extends JJModule {
 
 	@Override
 	protected void configure() {
-		addAssetPath("/jj/repl/assets");
-		addAPIModulePath("/jj/repl/api");
-		bindConfiguration().to(ReplConfiguration.class);
+		bindAssetPath("/jj/repl/assets");
+		bindAPIModulePath("/jj/repl/api");
+		bindConfiguration(ReplConfiguration.class);
 		bind(ReplServer.class).asEagerSingleton();
-		bindCreation().of(ReplScriptEnvironment.class).to(ReplScriptEnvironmentCreator.class);
+		bindCreationOf(ReplScriptEnvironment.class).to(ReplScriptEnvironmentCreator.class);
 	}
 
 }

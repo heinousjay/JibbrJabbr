@@ -28,15 +28,15 @@ public class LoggingModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAPIModulePath("/jj/logging/api");
+		bindAPIModulePath("/jj/logging/api");
 		
-		bindConfiguration().to(LoggingConfiguration.class);
+		bindConfiguration(LoggingConfiguration.class);
 		
 		bind(LoggingConfigurator.class).asEagerSingleton();
 		
-		addStartupListenerBinding().to(SystemLogger.class);
+		bindStartupListener(SystemLogger.class);
 		
-		bindLoggedEvents().annotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
+		bindLoggedEventsAnnotatedWith(EmergencyLogger.class).toLogger(EmergencyLogger.NAME);
 		
 		registerBuiltins(binder());
 	}

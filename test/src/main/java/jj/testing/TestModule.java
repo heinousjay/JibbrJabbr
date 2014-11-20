@@ -56,7 +56,7 @@ class TestModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addStartupListenerBinding().to(TestListener.class);
+		bindStartupListener(TestListener.class);
 		
 		bind(JibbrJabbrTestServer.class).toInstance(testServer);
 		
@@ -64,7 +64,7 @@ class TestModule extends JJModule {
 		
 		bind(Description.class).toInstance(description);
 		
-		bindLoggedEvents().annotatedWith(TestRunnerLogger.class).toLogger(TestRunnerLogger.NAME);
+		bindLoggedEventsAnnotatedWith(TestRunnerLogger.class).toLogger(TestRunnerLogger.NAME);
 		
 		if (!withHttpServer) {
 			bind(Channel.class).toInstance(mock(Channel.class));

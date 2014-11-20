@@ -28,11 +28,11 @@ public class ScriptResourceModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		bindCreation().of(JSONResource.class).to(JSONResourceCreator.class);
-		bindCreation().of(ScriptResource.class).to(ScriptResourceCreator.class);
-		bindCreation().of(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
+		bindCreationOf(JSONResource.class).to(JSONResourceCreator.class);
+		bindCreationOf(ScriptResource.class).to(ScriptResourceCreator.class);
+		bindCreationOf(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
 		
-		dispatch().continuationOf(RequiredModule.class).to(RequiredModuleContinuationProcessor.class);
+		bindContinuationProcessingOf(RequiredModule.class).to(RequiredModuleContinuationProcessor.class);
 	}
 
 

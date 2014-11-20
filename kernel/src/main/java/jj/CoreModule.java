@@ -67,7 +67,7 @@ public class CoreModule extends JJModule {
 		bind(ResourceResolver.class).toInstance(resourceResolver);
 		bind(Version.class).to(VersionImpl.class);
 		
-		bindLoggedEvents().annotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
+		bindLoggedEventsAnnotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		
 		// first our key pieces
 		install(new ConfigurationModule());
