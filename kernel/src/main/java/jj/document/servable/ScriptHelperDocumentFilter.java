@@ -8,7 +8,6 @@ import javax.inject.Singleton;
 import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
-import jj.document.ScriptResourceType;
 import jj.http.server.resource.StaticResource;
 import jj.resource.ResourceFinder;
 
@@ -89,10 +88,10 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			
 			// associated scripts
 			if (scriptEnvironment.sharedScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptEnvironment.serverPath()));
+				addScript(documentRequestProcessor.document(), scriptEnvironment.sharedScriptResource().serverPath());
 			}
 			if (scriptEnvironment.clientScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptEnvironment.serverPath()));
+				addScript(documentRequestProcessor.document(), scriptEnvironment.clientScriptResource().serverPath());
 			}
 		}
 	}
