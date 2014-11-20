@@ -61,6 +61,7 @@ public class HttpClientIntegrationTest {
 	public void testHttpRequester() throws Throwable {
 		
 		final AtomicReference<String> response = new AtomicReference<>();
+		final AtomicReference<Throwable> cause = new AtomicReference<>();
 		final CountDownLatch latch = new CountDownLatch(1);
 		
 		requester.requestTo(server.baseUrl() + "/test2.txt")
@@ -68,12 +69,13 @@ public class HttpClientIntegrationTest {
 			.begin(new HttpResponseListener() {
 				
 				@Override
-				protected void responseStart(HttpResponse response) {
+				protected void responseStart(HttpResponse r) {
 					//System.out.println(response);
 				}
 
 				@Override
-				protected void requestErrored(Throwable cause) {
+				protected void requestErrored(Throwable c) {
+					cause.set(c);
 					latch.countDown();
 				}
 				
@@ -91,6 +93,9 @@ public class HttpClientIntegrationTest {
 		
 		
 		assertTrue("timed out", latch.await(500, MILLISECONDS));
+		if (cause.get() != null) {
+			throw cause.get();
+		}
 		assertThat(response.get(), is("I am the text"));
 	}
 }
