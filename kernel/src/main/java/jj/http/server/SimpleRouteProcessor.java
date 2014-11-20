@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.configuration.resolution.AppLocation.*;
 
 import java.util.Map;
 
@@ -56,7 +56,7 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	}
 	
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
-		return resourceFinder.findResource(resourceClass, Base, request.uriMatch().path); // should be Public
+		return resourceFinder.findResource(resourceClass, Base.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class SimpleRouteProcessor implements RouteProcessor {
 		ServableResource resource = findResource(resourceClass, request);
 		
 		if (resource == null) {
-			resourceLoader.loadResource(resourceClass,  Base, request.uriMatch().path).then(
+			resourceLoader.loadResource(resourceClass,  Base.and(Assets), request.uriMatch().path).then(
 				new HttpServerTask("serving a resource.  better name!") {
 					
 					@Override
