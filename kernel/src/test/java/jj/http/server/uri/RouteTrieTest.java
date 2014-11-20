@@ -37,9 +37,17 @@ import org.junit.Test;
 public class RouteTrieTest {
 	
 	private static final String DOCUMENT = "document";
+	private static final String REST_RESOURCE = "restResource";
 	private static final String SCRIPT = "script";
 	private static final String STYLESHEET = "stylesheet";
 	private static final String STATIC   = "static";
+	
+	RouteMatch result;
+	
+	@Before
+	public void before() {
+		result = null;
+	}
 	
 	private String result(int index) {
 		return "/result" + index;
@@ -58,24 +66,76 @@ public class RouteTrieTest {
 		return new RouteTrie()
 			.addRoute(new Route(GET, "/d3", DOCUMENT, "d3/index"))
 			.addRoute(new Route(GET, "/chat", DOCUMENT, "chat/index"))
+			
+			// pretty normal to have a prefix to the API i think
+			.addRoute(new Route(GET, "/rest/resource-type", REST_RESOURCE, "services/resource-type"))
+			.addRoute(new Route(GET, "/rest/resource-type/:id(\\d+)", REST_RESOURCE, "services/resource-type"))
+			.addRoute(new Route(POST, "/rest/resource-type", REST_RESOURCE, "services/resource-type"))
+			.addRoute(new Route(PUT, "/rest/resource-type/:id(\\d+)", REST_RESOURCE, "services/resource-type"))
+			.addRoute(new Route(DELETE, "/rest/resource-type/:id(\\d+)", REST_RESOURCE, "services/resource-type"))
+			.addRoute(new Route(PATCH, "/rest/resource-type/:id(\\d+)", REST_RESOURCE, "services/resource-type"))
+			
+			.addRoute(new Route(GET, "/rest/resource-other", REST_RESOURCE, "services/resource-other"))
+			.addRoute(new Route(GET, "/rest/resource-other/:id(\\d+)", REST_RESOURCE, "services/resource-other"))
+			.addRoute(new Route(POST, "/rest/resource-other", REST_RESOURCE, "services/resource-other"))
+			.addRoute(new Route(PUT, "/rest/resource-other/:id(\\d+)", REST_RESOURCE, "services/resource-other"))
+			.addRoute(new Route(DELETE, "/rest/resource-other/:id(\\d+)", REST_RESOURCE, "services/resource-other"))
+			.addRoute(new Route(PATCH, "/rest/resource-other/:id(\\d+)", REST_RESOURCE, "services/resource-other"))
+			
+			.addRoute(new Route(GET, "/rest/resource-otter", REST_RESOURCE, "services/resource-otter"))
+			.addRoute(new Route(GET, "/rest/resource-otter/:id(\\d+)", REST_RESOURCE, "services/resource-otter"))
+			.addRoute(new Route(POST, "/rest/resource-otter", REST_RESOURCE, "services/resource-otter"))
+			.addRoute(new Route(PUT, "/rest/resource-otter/:id(\\d+)", REST_RESOURCE, "services/resource-otter"))
+			.addRoute(new Route(DELETE, "/rest/resource-otter/:id(\\d+)", REST_RESOURCE, "services/resource-otter"))
+			.addRoute(new Route(PATCH, "/rest/resource-otter/:id(\\d+)", REST_RESOURCE, "services/resource-otter"))
+			
+			.addRoute(new Route(GET, "/rest/resource-otter/:id(\\d+)/nipples", REST_RESOURCE, "services/resource-otter-nipples"))
+			.addRoute(new Route(GET, "/rest/resource-otter/:id(\\d+)/:part", REST_RESOURCE, "services/resource-otter-parts"))
+			
+			.addRoute(new Route(GET, "/rest/:letters([A-Za-z]+)", REST_RESOURCE, "services/letter-echo"))
+			
+			// these are normally added automatically at the end so let's test em!
 			.addRoute(new Route(GET, "/*path.css", STYLESHEET, ""))
 			.addRoute(new Route(GET, "/*path.js", SCRIPT, ""))
-			//.addRoute(new Route(GET, "/*path.:ext", STATIC, ""))
 			.addRoute(new Route(GET, "/*fallthrough", STATIC, ""));
-	}
-	
-	RouteMatch result;
-	
-	@Before
-	public void before() {
-		result = null;
 	}
 	
 	@Test
 	public void testMixedUp() {
 		RouteTrie rt = makeMixedUpTrie().compress();
-		
-		System.out.println(rt);
+		checkTrie(rt);
+//		System.out.println(rt);
+//		
+//		for (int i = 0; i < 1000; ++i) {
+//			checkTrie(rt);
+//		}
+//		
+//		long now = System.currentTimeMillis();
+//		for (int i = 0; i < 10000; ++i) {
+//			checkTrie(rt);
+//		}
+//		System.out.println(System.currentTimeMillis() - now);
+//		
+//		now = System.currentTimeMillis();
+//		for (int i = 0; i < 10000; ++i) {
+//			checkTrie(rt);
+//		}
+//		System.out.println(System.currentTimeMillis() - now);
+//		
+//		now = System.currentTimeMillis();
+//		for (int i = 0; i < 10000; ++i) {
+//			checkTrie(rt);
+//		}
+//		System.out.println(System.currentTimeMillis() - now);
+//		
+//		now = System.currentTimeMillis();
+//		for (int i = 0; i < 30000; ++i) {
+//			checkTrie(rt);
+//		}
+//		System.out.println(System.currentTimeMillis() - now);
+	}
+	
+	private void checkTrie(RouteTrie rt) {
 		
 		result = rt.find(GET, new URIMatch("/d3/"));
 		assertResult(DOCUMENT, "d3/index");
@@ -109,6 +169,38 @@ public class RouteTrieTest {
 		
 		result = rt.find(GET, new URIMatch("/something/else"));
 		assertResult(STATIC, "");
+		
+		result = rt.find(PATCH, new URIMatch("/rest/resource-other/22"));
+		assertResult(REST_RESOURCE, "services/resource-other");
+		assertThat(result.params.get("id"), is("22"));
+
+		result = rt.find(GET, new URIMatch("/rest/resource-other/22"));
+		assertResult(REST_RESOURCE, "services/resource-other");
+		result = rt.find(GET, new URIMatch("/rest/resource-other/a22"));
+		assertResult(STATIC, "");
+		result = rt.find(GET, new URIMatch("/rest/resource-other/22a"));
+		assertResult(STATIC, "");
+		result = rt.find(GET, new URIMatch("/rest/resource-other/22/and-more"));
+		assertResult(STATIC, "");
+		
+		result = rt.find(GET, new URIMatch("/rest/resource-otter/2332"));
+		assertResult(REST_RESOURCE, "services/resource-otter");
+		assertThat(result.params.get("id"), is("2332"));
+		
+		result = rt.find(GET, new URIMatch("/rest/resource"));
+		assertResult(REST_RESOURCE, "services/letter-echo");
+		assertThat(result.params.get("letters"), is("resource"));
+		
+		result = rt.find(GET, new URIMatch("/rest/resource-static"));
+		assertResult(STATIC, "");
+		
+		result = rt.find(GET, new URIMatch("/rest/resource-otter/2332/nipples"));
+		assertResult(REST_RESOURCE, "services/resource-otter-nipples");
+		assertThat(result.params.get("id"), is("2332"));
+		
+		result = rt.find(GET, new URIMatch("/rest/resource-otter/2332/knees"));
+		assertResult(REST_RESOURCE, "services/resource-otter-parts");
+		assertThat(result.params.get("part"), is("knees"));
 	}
 	
 	private void assertResult(String resourceName, String mapping) {
