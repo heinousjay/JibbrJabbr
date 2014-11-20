@@ -7,7 +7,7 @@ var validator = {
 
 var inject = function(id) {
 	return {
-		'jj.http.server.ServableResourceHelper' : {
+		'jj.http.server.ServableResources' : {
 			arrayOfNames: function() {
 				return ['static', 'script', 'stylesheet', 'document'];
 			}

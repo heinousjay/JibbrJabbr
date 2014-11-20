@@ -1,6 +1,6 @@
 
 var validator = inject('jj.http.server.uri.RouteUriValidator');
-var resourceNames = inject('jj.http.server.ServableResourceHelper').arrayOfNames();
+var resourceNames = inject('jj.http.server.ServableResources').arrayOfNames();
 var support = require('jj/configuration-support')('jj.http.server.uri.RouterConfiguration');
 
 var GET    = Packages.io.netty.handler.codec.http.HttpMethod.GET;

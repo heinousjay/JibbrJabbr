@@ -37,14 +37,14 @@ import org.mozilla.javascript.ScriptableObject;
  *
  */
 @Singleton
-public class ServableResourceHelper {
+public class ServableResources {
 
 	private final ScriptableObject global;
 	private final Provider<RhinoContext> contextProvider;
 	private final Map<String, Class<? extends ServableResource>> servableResources;
 	
 	@Inject
-	ServableResourceHelper(
+	ServableResources(
 		final @Global ScriptableObject global,
 		final Provider<RhinoContext> contextProvider,
 		final Map<String, Class<? extends ServableResource>> servableResources
@@ -65,5 +65,9 @@ public class ServableResourceHelper {
 			}
 			return result;
 		}
+	}
+	
+	public Class<? extends ServableResource> classFor(String name) {
+		return servableResources.get(name);
 	}
 }
