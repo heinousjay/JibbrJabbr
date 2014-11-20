@@ -45,15 +45,17 @@ class Loggers {
 		if (event instanceof NamesLogger) {
 			result = LoggerFactory.getLogger(((NamesLogger)event).loggerName());
 		} else {
+			Class<?> eventClass = event.getClass();
 			for (Class<? extends Annotation> annotation : loggers.keySet()) {
-				if (event.getClass().getAnnotation(annotation) != null) {
+				if (eventClass.isAnnotationPresent(annotation)) {
 					result = loggers.get(annotation);
 					break;
 				}
 			}
 		}
+
 		assert result != null : "No logger registered for LoggedEvent " + event;
-		
+
 		return result;
 	}
 }

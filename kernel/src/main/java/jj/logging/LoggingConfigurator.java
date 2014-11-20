@@ -109,9 +109,9 @@ public class LoggingConfigurator {
 	
 	private void setLevels() {
 		logger(Logger.ROOT_LOGGER_NAME, Level.OFF);
-		logger(EmergencyLogger.NAME, Level.INFO);
 		setLevels(logLevelDefaultProvider.get());
 		setLevels(config.loggingLevels());
+		logger(EmergencyLogger.NAME, Level.TRACE);
 	}
 	
 	private void setLevels(Map<String, jj.logging.Level> levelMap) {
