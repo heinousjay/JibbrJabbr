@@ -82,7 +82,6 @@ public class ServableTest {
 	@Test
 	public void testStandardResponseUncachedResource() throws Exception {
 		
-		given(request.uri()).willReturn(UNVERSIONED_URI);
 		given(request.uriMatch()).willReturn(new URIMatch(UNVERSIONED_URI));
 		
 		si.makeStandardRequestProcessor(request, response, resource).process();
@@ -93,7 +92,6 @@ public class ServableTest {
 	@Test
 	public void testStandardResponseCachedResource() throws Exception {
 		
-		given(request.uri()).willReturn(VERSIONED_URI);
 		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn(SHA1);
@@ -106,7 +104,6 @@ public class ServableTest {
 	@Test
 	public void testStandardResponseNotModifiedCachable() throws Exception {
 		
-		given(request.uri()).willReturn(VERSIONED_URI);
 		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn(SHA1);
@@ -122,7 +119,6 @@ public class ServableTest {
 	@Test
 	public void testStandardResponseNotModifiedNotCachable() throws Exception {
 		
-		given(request.uri()).willReturn(UNVERSIONED_URI);
 		given(request.uriMatch()).willReturn(new URIMatch(UNVERSIONED_URI));
 		
 		given(resource.sha1()).willReturn(SHA1);
@@ -138,7 +134,6 @@ public class ServableTest {
 	@Test
 	public void testStandardResponseTemporaryRedirect() throws Exception {
 		
-		given(request.uri()).willReturn(VERSIONED_URI);
 		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn("some other sha1");
@@ -151,7 +146,6 @@ public class ServableTest {
 	@Test
 	public void testStandardResponseError() throws Exception {
 		
-		given(request.uri()).willReturn(VERSIONED_URI);
 		given(request.uriMatch()).willReturn(new URIMatch(VERSIONED_URI));
 		
 		given(resource.sha1()).willReturn("some other sha1");

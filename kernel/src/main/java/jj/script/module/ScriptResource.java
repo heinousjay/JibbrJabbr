@@ -13,10 +13,12 @@ import javax.inject.Provider;
 import org.mozilla.javascript.Script;
 
 import jj.http.server.LoadedResource;
+import jj.http.server.ServableResourceConfiguration;
 import jj.resource.AbstractFileResource;
 import jj.resource.PathResolver;
 import jj.script.RhinoContext;
 
+@ServableResourceConfiguration(routeContributor = ScriptResourceRouteContributor.class)
 public class ScriptResource extends AbstractFileResource implements LoadedResource {
 	
 	private final String source;

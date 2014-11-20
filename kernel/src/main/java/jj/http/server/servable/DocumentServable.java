@@ -95,6 +95,10 @@ class DocumentServable extends Servable<DocumentScriptEnvironment> {
 
 	@Override
 	public DocumentScriptEnvironment loadResource(URIMatch match) {
-		return resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, match.path);
+		String path = match.path;
+		if (match.uri.endsWith("/") || match.uri.isEmpty()) {
+			path = path + (match.uri.equals("/") ? "" : "/") + "index";
+		}
+		return resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, path);
 	}
 }

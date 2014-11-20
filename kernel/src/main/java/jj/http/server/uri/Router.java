@@ -70,9 +70,8 @@ public class Router {
 				
 				routeContributors.forEach((contributor) -> contributor.contributions().forEach(newTrie::addRoute));
 			
-				// this is the only default route we add, it is meant to be the StaticResource mapping.
-				// since it's the catch-all, it goes last and gets added to every route trie
-				newTrie.addRoute(new Route(GET, "/*path", "static", ""));
+				// this is the catch-all, it goes last and gets added to every route trie
+				newTrie.addRoute(new Route(GET, "/*fallthrough", "static", ""));
 				
 				newTrie.compress();
 				

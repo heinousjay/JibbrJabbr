@@ -79,8 +79,7 @@ public class DocumentServableTest {
 	@Test
 	public void testBasicOperation() throws Exception {
 		
-		given(request.uri()).willReturn("/");
-		given(request.uriMatch()).willReturn(new URIMatch("/index"));
+		given(request.uriMatch()).willReturn(new URIMatch("/"));
 		given(resourceFinder.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, "index")).willReturn(resource);
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);
@@ -91,7 +90,6 @@ public class DocumentServableTest {
 	@Test
 	public void testOutsideApplicationIsRejected() throws Exception {
 		
-		given(request.uri()).willReturn("/../not-servable/index.html");
 		given(request.uriMatch()).willReturn(new URIMatch(""));
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);
@@ -102,7 +100,6 @@ public class DocumentServableTest {
 	@Test
 	public void testNotFound() throws Exception {
 		
-		given(request.uri()).willReturn("/something");
 		given(request.uriMatch()).willReturn(new URIMatch("/something"));
 		
 		RequestProcessor rp = ds.makeRequestProcessor(request, response);

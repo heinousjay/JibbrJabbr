@@ -13,34 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.http.server.uri;
+package jj.script.module;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+
+import java.util.Collections;
+import java.util.List;
+
+import jj.http.server.RouteContributor;
+import jj.http.server.uri.Route;
 
 /**
  * @author jason
  *
  */
-public class RouteFinder {
+class ScriptResourceRouteContributor implements RouteContributor {
 
-	/**
-	 * @param string
-	 * @return
-	 */
-	public String find(String uri) {
-		
-		Path path = uri.startsWith("/") ? Paths.get(uri) : Paths.get("/" + uri);
-		
-		StringBuilder sb = new StringBuilder(path.normalize().toAbsolutePath().toString());
-		
-		if (sb.charAt(sb.length() - 1) == '/') {
-			sb.append("index");
-		} else if (uri.charAt(uri.length() - 1) == '/') {
-			sb.append("/index");
-		}
-		
-		return sb.toString();
+	@Override
+	public List<Route> contributions() {
+		return Collections.singletonList(new Route(GET, "/*path.js", "script", ""));
 	}
 
 }

@@ -27,6 +27,7 @@ import jj.http.server.uri.RouteMatch;
 import jj.http.server.uri.RouteTrie;
 import jj.http.server.uri.URIMatch;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -36,6 +37,8 @@ import org.junit.Test;
 public class RouteTrieTest {
 	
 	private static final String DOCUMENT = "document";
+	private static final String SCRIPT = "script";
+	private static final String STYLESHEET = "stylesheet";
 	private static final String STATIC   = "static";
 	
 	private String result(int index) {
@@ -49,6 +52,69 @@ public class RouteTrieTest {
 			map.put(s[i], s[i + 1]);
 		}
 		return map;
+	}
+	
+	private RouteTrie makeMixedUpTrie() {
+		return new RouteTrie()
+			.addRoute(new Route(GET, "/d3", DOCUMENT, "d3/index"))
+			.addRoute(new Route(GET, "/chat", DOCUMENT, "chat/index"))
+			.addRoute(new Route(GET, "/*path.css", STYLESHEET, ""))
+			.addRoute(new Route(GET, "/*path.js", SCRIPT, ""))
+			//.addRoute(new Route(GET, "/*path.:ext", STATIC, ""))
+			.addRoute(new Route(GET, "/*fallthrough", STATIC, ""));
+	}
+	
+	RouteMatch result;
+	
+	@Before
+	public void before() {
+		result = null;
+	}
+	
+	@Test
+	public void testMixedUp() {
+		RouteTrie rt = makeMixedUpTrie().compress();
+		
+		System.out.println(rt);
+		
+		result = rt.find(GET, new URIMatch("/d3/"));
+		assertResult(DOCUMENT, "d3/index");
+		
+		result = rt.find(GET, new URIMatch("/d3"));
+		assertResult(DOCUMENT, "d3/index");
+		
+		result = rt.find(GET, new URIMatch("/chat/"));
+		assertResult(DOCUMENT, "chat/index");
+		
+		result = rt.find(GET, new URIMatch("/chat"));
+		assertResult(DOCUMENT, "chat/index");
+		
+		result = rt.find(GET, new URIMatch("/chat.html"));
+		assertResult(STATIC, "");
+		
+		result = rt.find(GET, new URIMatch("/chat/index.html"));
+		assertResult(STATIC, "");
+		
+		result = rt.find(GET, new URIMatch("/chat/index.js"));
+		assertResult(SCRIPT, "");
+		
+		result = rt.find(GET, new URIMatch("/something/else.html"));
+		assertResult(STATIC, "");
+		
+		result = rt.find(GET, new URIMatch("/something/else.css"));
+		assertResult(STYLESHEET, "");
+		
+		result = rt.find(GET, new URIMatch("/something/else.js"));
+		assertResult(SCRIPT, "");
+		
+		result = rt.find(GET, new URIMatch("/something/else"));
+		assertResult(STATIC, "");
+	}
+	
+	private void assertResult(String resourceName, String mapping) {
+		assertTrue(result.matched());
+		assertThat(result.resourceName(), is(resourceName));
+		assertThat(result.route.mapping(), is(mapping));
 	}
 	
 	private RouteTrie makeParameterMatchTrie() {
@@ -158,7 +224,10 @@ public class RouteTrieTest {
 		assertTrue(result.params.isEmpty());
 		
 		result = trie.find(GET, new URIMatch("/this/is"));
-		assertThat(result, is(nullValue()));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route, is(nullValue()));
+		assertThat(result.routes, is(nullValue()));
+		assertThat(result.params, is(nullValue()));
 		
 		result = trie.find(GET, new URIMatch("/this/is/the/bomb"));
 		assertThat(result, is(notNullValue()));
@@ -203,7 +272,10 @@ public class RouteTrieTest {
 		assertThat(result.params.size(), is(1));
 		
 		result = trie.find(GET, new URIMatch("/jason"));
-		assertThat(result, is(nullValue()));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route, is(nullValue()));
+		assertThat(result.routes, is(nullValue()));
+		assertThat(result.params, is(nullValue()));
 		
 		result = trie.find(GET, new URIMatch("/jason/made/this/work.css"));
 		assertThat(result, is(notNullValue()));
@@ -213,7 +285,10 @@ public class RouteTrieTest {
 		assertThat(result.params.size(), is(1));
 		
 		result = trie.find(GET, new URIMatch("/jason/made/this/work"));
-		assertThat(result, is(nullValue()));
+		assertThat(result, is(notNullValue()));
+		assertThat(result.route, is(nullValue()));
+		assertThat(result.routes, is(nullValue()));
+		assertThat(result.params, is(nullValue()));
 		
 		result = trie.find(GET, new URIMatch("/jason/made/this/work.cs1"));
 		assertThat(result, is(notNullValue()));

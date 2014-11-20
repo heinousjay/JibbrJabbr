@@ -27,7 +27,6 @@ import jj.Version;
 import jj.event.Publisher;
 import jj.http.server.HttpServerRequestImpl;
 import jj.http.server.HttpServerResponseImpl;
-import jj.http.server.uri.RouteFinder;
 import jj.logging.LoggedEvent;
 import jj.resource.Resource;
 import io.netty.buffer.ByteBuf;
@@ -74,7 +73,7 @@ public class HttpServerResponseImplTest {
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		nettyRequest.headers().add(HttpHeaders.Names.HOST, host);
-		request = new HttpServerRequestImpl(nettyRequest, new RouteFinder(), ctx);
+		request = new HttpServerRequestImpl(nettyRequest, ctx);
 		
 		response = new HttpServerResponseImpl(version, request, ctx, publisher);
 		assertThat(response.charset(), is(UTF_8));

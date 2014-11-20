@@ -15,6 +15,8 @@
  */
 package jj.http.server.uri;
 
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,7 +82,9 @@ public class URIMatch {
 	
 	public URIMatch(final String uri) {
 		assert uri != null : "uri must not be null";
-		this.uri = Paths.get(uri.startsWith("/") ? uri : "/" + uri).normalize().toString();
+		QueryStringDecoder qsd = new QueryStringDecoder(uri.startsWith("/") ? uri : "/" + uri);
+		
+		this.uri = "/".equals(uri) ? uri : (Paths.get(qsd.path()).normalize().toString() + (qsd.path().endsWith("/") ? "/" : ""));
 		Matcher matcher = URI_PATTERN.matcher(this.uri);
 		String shaCandidate = null;
 		String nameCandidate = null;

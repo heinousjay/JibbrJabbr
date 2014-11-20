@@ -211,7 +211,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": " + httpRequest.uri();
+		return getClass().getSimpleName() + ": " + documentScriptEnvironment;
 	}
 	
 	/**
@@ -245,6 +245,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	}
 	
 	String uri() {
-		return httpRequest.uri();
+		return httpRequest.uriMatch().uri;
 	}
 }

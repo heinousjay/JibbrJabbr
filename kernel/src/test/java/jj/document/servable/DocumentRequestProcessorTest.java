@@ -20,6 +20,7 @@ import jj.execution.MockTaskRunner;
 import jj.execution.TaskHelper;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 import jj.script.DependsOnScriptEnvironmentInitialization;
@@ -106,7 +107,7 @@ public class DocumentRequestProcessorTest {
 		given(documentScriptEnvironment.charset()).willReturn(UTF_8);
 		given(documentScriptEnvironment.contentType()).willReturn("text/html; charset=UTF-8");
 		
-		given(httpRequest.uri()).willReturn("/");
+		given(httpRequest.uriMatch()).willReturn(new URIMatch("/"));
 		
 		// auto-stubbing the builder pattern
 		httpResponse = mock(HttpServerResponse.class, ANSWER_WITH_SELF);
