@@ -15,6 +15,12 @@
  */
 package jj;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import jj.execution.JJTask;
 import jj.logging.LoggedEvent;
 
 import org.slf4j.Logger;
@@ -26,10 +32,28 @@ import org.slf4j.Logger;
 @ServerLogger
 public class ServerStarting extends LoggedEvent {
 	
+	public enum Priority {
+		Highest,
+		NearHighest,
+		Middle,
+		NearLowest,
+		Lowest;
+	}
+	
 	private final Version version;
+	
+	private final HashMap<Priority, List<JJTask>> startupTasks = new HashMap<>();
 	
 	ServerStarting(Version version) {
 		this.version = version;
+	}
+
+	public void registerStartupTask(final Priority priority, final JJTask task) {
+		startupTasks.computeIfAbsent(priority, (p) -> { return new ArrayList<>(1); }).add(task);
+	}
+
+	Map<Priority, List<JJTask>> startupTasks() {
+		return startupTasks;
 	}
 
 	@Override

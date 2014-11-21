@@ -18,6 +18,7 @@ package jj;
 import java.lang.annotation.Annotation;
 
 import io.netty.handler.codec.http.HttpMethod;
+import jj.JJServerLifecycle.StartupListeners;
 import jj.configuration.ConfigurationObjectBinder;
 import jj.configuration.resolution.APIPaths;
 import jj.configuration.resolution.AssetPaths;
@@ -64,15 +65,15 @@ public abstract class JJModule extends AbstractModule {
 
 	private HttpMethodHandlerBinder httpMethodHandlerBinder;
 
-	private Multibinder<JJServerStartupListener> startupListeners;
+	private Multibinder<Object> startupListeners;
 	private Multibinder<Converter<?, ?>> converters;
 	private Multibinder<HostObject> hostObjects;
 	private Multibinder<String> assetPaths;
 	private Multibinder<String> apiPaths;
 
-	protected void bindStartupListener(Class<? extends JJServerStartupListener> startupListenerClass) {
+	protected void bindStartupListener(Class<?> startupListenerClass) {
 		if (startupListeners == null) {
-			startupListeners =  Multibinder.newSetBinder(binder(), JJServerStartupListener.class);
+			startupListeners =  Multibinder.newSetBinder(binder(), Object.class, StartupListeners.class);
 		}
 		startupListeners.addBinding().to(startupListenerClass);
 	}

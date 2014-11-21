@@ -20,14 +20,16 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Provider;
 import javax.net.SocketFactory;
 
+import jj.MockServerStarting;
+import jj.ServerStarting.Priority;
 import jj.event.Publisher;
+import jj.execution.TaskHelper;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -116,17 +118,14 @@ public class HttpServerTest {
 			publisher,
 			uncaughtExceptionHandler
 		);
+		MockServerStarting event = new MockServerStarting();
 		
 		// when
-		httpServer.start();
+		httpServer.start(event);
 		
 		// then
-		try {
-			SocketFactory.getDefault().createSocket("localhost", 8080).close();
-			fail("NO NO NO");
-		} catch (ConnectException e) {
-			assertThat(e.getMessage(), is("Connection refused"));
-		}
+		assertThat(event.priority, is(nullValue()));
+		assertThat(event.task, is(nullValue()));
 		
 		
 		// given
@@ -142,8 +141,10 @@ public class HttpServerTest {
 
 		try {
 			// when
-			httpServer.start();
+			httpServer.start(event);
 			
+			assertThat(event.priority, is(Priority.Lowest));
+			TaskHelper.invoke(event.task);
 			
 			// then
 			SocketFactory.getDefault().createSocket("localhost", 8080).close();

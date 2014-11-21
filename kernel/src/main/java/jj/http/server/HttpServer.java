@@ -32,8 +32,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
+import jj.ServerStarting;
 import jj.ServerStopping;
+import jj.ServerStarting.Priority;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
@@ -45,10 +46,7 @@ import jj.util.StringUtils;
  */
 @Singleton
 @Subscriber
-class HttpServer implements JJServerStartupListener {
-	
-	
-	
+class HttpServer {
 
 	private static ExecutorService executorService(final int threads, final UncaughtExceptionHandler uncaughtExceptionHandler) {
 	
@@ -97,20 +95,35 @@ class HttpServer implements JJServerStartupListener {
 		this.uncaughtExceptionHandler = uncaughtExceptionHandler;
 	}
 	
-	@Override
-	public void start() throws Exception {
-		
+	@Listener
+	void start(ServerStarting event) {
 		if (httpServerSwitch.on()) {
-		
-			assert (serverBootstrap == null) : "cannot start an already started server";
-			
-			List<Binding> bindings = configuration.bindings();
-			
-			makeServerBootstrap(bindings.size());
-			
-			bindPorts(bindings);
-			
-			publisher.publish(new HttpServerStarted());
+			event.registerStartupTask(Priority.Lowest, new HttpServerTask("starting the http server") {
+				
+				@Override
+				protected void run() throws Exception {
+					assert (serverBootstrap == null) : "cannot start an already started server";
+					
+					List<Binding> bindings = configuration.bindings();
+					
+					makeServerBootstrap(bindings.size());
+					
+					bindPorts(bindings);
+					
+					publisher.publish(new HttpServerStarted());
+				}
+			});
+		}
+	}
+
+	@Listener
+	void stop(ServerStopping event) {
+		if (httpServerSwitch.on()) {
+			assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
+			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
+			serverBootstrap.childGroup().shutdownGracefully();
+			serverBootstrap = null;
+			publisher.publish(new HttpServerStopped());
 		}
 	}
 
@@ -147,23 +160,6 @@ class HttpServer implements JJServerStartupListener {
 			.option(ChannelOption.SO_BACKLOG, configuration.backlog())
 			.option(ChannelOption.SO_RCVBUF, configuration.receiveBufferSize())
 			.option(ChannelOption.SO_SNDBUF, configuration.sendBufferSize());
-	}
-	
-	@Override
-	public Priority startPriority() {
-		// we want to start last, everything else should be running first
-		return Priority.Lowest;
-	}
-
-	@Listener
-	public void stop(ServerStopping event) {
-		if (httpServerSwitch.on()) {
-			assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
-			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
-			serverBootstrap.childGroup().shutdownGracefully();
-			serverBootstrap = null;
-			publisher.publish(new HttpServerStopped());
-		}
 	}
 
 }

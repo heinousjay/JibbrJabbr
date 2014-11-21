@@ -56,8 +56,6 @@ class TestModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		bindStartupListener(TestListener.class);
-		
 		bind(JibbrJabbrTestServer.class).toInstance(testServer);
 		
 		bind(Statement.class).toInstance(base);

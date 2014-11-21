@@ -29,6 +29,8 @@ public class HttpClientModule extends JJModule {
 
 		bindAPIModulePath("/jj/http/client/api");
 		
+		bindStartupListener(HttpClient.class);
+		
 		bindContinuationProcessingOf(RestOperation.class).to(HttpClientRequestContinuationProcessor.class);
 		
 		bindExecutor(HttpClientNioEventLoopGroup.class);

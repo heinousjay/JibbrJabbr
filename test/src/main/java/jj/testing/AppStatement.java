@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 
 import jj.JJServerLifecycle;
 
+import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 @Singleton
@@ -28,16 +29,19 @@ public class AppStatement extends Statement {
 	private final JJServerLifecycle lifecycle;
 	private final TestLog testLog;
 	private final Statement base;
+	private final Description description;
 	
 	@Inject
 	AppStatement(
 		final JJServerLifecycle lifecycle,
 		final TestLog testLog,
-		final Statement base
+		final Statement base,
+		final Description description
 	) {
 		this.lifecycle = lifecycle;
 		this.testLog = testLog;
 		this.base = base;
+		this.description = description;
 	}
 	
 	
@@ -47,12 +51,14 @@ public class AppStatement extends Statement {
 		long start = System.nanoTime();
 		try {
 			testLog.info("============================================================");
+			testLog.info("{} - test start", description);
 			testLog.info(" Starting the server.");
 			lifecycle.start();
 			base.evaluate();
 		} finally {
 			lifecycle.stop();
 			testLog.info(" Server stopped.");
+			testLog.info("{} - test end", description);
 			testLog.info("finished in {} nanos", System.nanoTime() - start);
 			testLog.info("============================================================");
 		}

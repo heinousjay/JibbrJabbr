@@ -1,50 +1,77 @@
 package jj;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import static java.lang.annotation.ElementType.*;
+import static java.util.concurrent.TimeUnit.*;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
+import javax.inject.Qualifier;
 import javax.inject.Singleton;
 
 import jj.event.Publisher;
+import jj.execution.JJTask;
+import jj.execution.ServerTask;
+import jj.execution.TaskRunner;
 
 @Singleton
 public class JJServerLifecycle {
-
-	private final Set<JJServerStartupListener> startupListeners;
-	private final Publisher publisher;
-	private final Version version;
 	
+	@Qualifier
+	@Target(PARAMETER)
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface StartupListeners {}
+
+	private final Set<Object> startupListeners;
+	private final Publisher publisher;
+	private final TaskRunner taskRunner;
+	private final Version version;
+
 	@Inject
 	JJServerLifecycle(
-		final Set<JJServerStartupListener> startupListeners,
+		final @StartupListeners Set<Object> startupListeners,
 		final Publisher publisher,
+		final TaskRunner taskRunner,
 		final Version version
 	) {
 		this.startupListeners = startupListeners;
 		this.publisher = publisher;
+		this.taskRunner = taskRunner;
 		this.version = version;
 	}
 	
 	public void start() throws Exception {
-		publisher.publish(new ServerStarting(version));
-		// can't do this in the constructor because Guice gets unhappy about that.
-		// and we can't just let the event do it yet.  but soon!
-		ArrayList<JJServerStartupListener> listeners = new ArrayList<>(startupListeners);
-		Collections.sort(listeners, new Comparator<JJServerStartupListener>() {
+		
+		// well it's kinda goofy?
+		startupListeners.forEach(Objects::hashCode);
+		
+		ServerStarting startupEvent = new ServerStarting(version);
+		publisher.publish(startupEvent);
 
-			@Override
-			public int compare(JJServerStartupListener l1, JJServerStartupListener l2) {
-				return l1.startPriority().compareTo(l2.startPriority());
+		for (ServerStarting.Priority priority : ServerStarting.Priority.values()) {
+			List<JJTask> tasks = startupEvent.startupTasks().get(priority);
+			if (tasks != null) {
+				CountDownLatch latch = new CountDownLatch(tasks.size());
+				for (JJTask task : tasks) {
+					taskRunner.execute(task).then(new ServerTask("counting down " + priority + " priority startup tasks") {
+						@Override
+						protected void run() throws Exception {
+							latch.countDown();
+						}
+					});
+				}
+				
+				latch.await(1, SECONDS);
 			}
-		});
-		for (JJServerStartupListener listener: listeners) {
-			listener.start();
 		}
 	}
-	
+
 	public void stop() {
 		publisher.publish(new ServerStopping());
 	}

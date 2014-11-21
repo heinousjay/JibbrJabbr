@@ -15,7 +15,7 @@
  */
 package jj;
 
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
@@ -24,7 +24,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jj.event.Publisher;
+import jj.ServerStarting.Priority;
+import jj.event.MockPublisher;
+import jj.event.MockPublisher.OnPublish;
+import jj.execution.JJTask;
+import jj.execution.MockTaskRunner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,103 +42,107 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JJServerLifecycleTest {
 	
-	@Mock Publisher publisher;
+	MockPublisher publisher;
+	MockTaskRunner taskRunner;
+	
 	
 	@Mock Version version;
 	
+	@Mock JJTask p1;
+	@Mock JJTask p2;
+	@Mock JJTask p3;
+	
+	@Mock JJTask highest_task1;
+	@Mock JJTask highest_task2;
+	@Mock JJTask highest_task3;
+	@Mock JJTask highest_task4;
+	
+	@Mock JJTask high_task1;
+	@Mock JJTask high_task2;
+	@Mock JJTask high_task3;
+	@Mock JJTask high_task4;
+	
+	@Mock JJTask mid_task1;
+	@Mock JJTask mid_task2;
+	@Mock JJTask mid_task3;
+	@Mock JJTask mid_task4;
+	
+	@Mock JJTask low_task1;
+	@Mock JJTask low_task2;
+	@Mock JJTask low_task3;
+	@Mock JJTask low_task4;
+	
+	@Mock JJTask lowest_task1;
+	@Mock JJTask lowest_task2;
+	@Mock JJTask lowest_task3;
+	@Mock JJTask lowest_task4;
+	
+	
 	List<Integer> order = new ArrayList<>();
-	
-	class Start1 implements JJServerStartupListener {
-
-		@Override
-		public void start() throws Exception {
-			order.add(1);
-		}
-
-		@Override
-		public Priority startPriority() {
-			return Priority.Highest;
-		}
-	}
-	
-	class Start2 implements JJServerStartupListener {
-
-		@Override
-		public void start() throws Exception {
-			order.add(2);
-		}
-
-		@Override
-		public Priority startPriority() {
-			return Priority.NearHighest;
-		}
-	}
-	
-	class Start3 implements JJServerStartupListener {
-
-		@Override
-		public void start() throws Exception {
-			order.add(3);
-		}
-
-		@Override
-		public Priority startPriority() {
-			return Priority.Middle;
-		}
-	}
-	
-	class Start4 implements JJServerStartupListener {
-
-		@Override
-		public void start() throws Exception {
-			order.add(4);
-		}
-
-		@Override
-		public Priority startPriority() {
-			return Priority.NearLowest;
-		}
-	}
-	
-	class Start5 implements JJServerStartupListener {
-
-		@Override
-		public void start() throws Exception {
-			order.add(5);
-		}
-
-		@Override
-		public Priority startPriority() {
-			return Priority.Lowest;
-		}
-	}
 
 	@Test
 	public void test() throws Exception {
 		
 		// given
+		Set<Object> startups = new HashSet<>();
+		startups.add(p1);
+		startups.add(p2);
+		startups.add(p3);
 		
-		Set<JJServerStartupListener> startups = new HashSet<>();
-		startups.add(new Start3());
-		startups.add(new Start2());
-		startups.add(new Start5());
-		startups.add(new Start4());
-		startups.add(new Start1());
+		publisher = new MockPublisher();
+		publisher.onPublish = new OnPublish() {
+			
+			@Override
+			public void published(Object event) {
+				ServerStarting starting = (ServerStarting)event;
+				starting.registerStartupTask(Priority.Highest, highest_task1);
+				starting.registerStartupTask(Priority.Highest, highest_task2);
+				starting.registerStartupTask(Priority.Highest, highest_task3);
+				starting.registerStartupTask(Priority.Highest, highest_task4);
+				starting.registerStartupTask(Priority.NearHighest, high_task1);
+				starting.registerStartupTask(Priority.NearHighest, high_task2);
+				starting.registerStartupTask(Priority.NearHighest, high_task3);
+				starting.registerStartupTask(Priority.NearHighest, high_task4);
+				starting.registerStartupTask(Priority.Middle, mid_task1);
+				starting.registerStartupTask(Priority.Middle, mid_task2);
+				starting.registerStartupTask(Priority.Middle, mid_task3);
+				starting.registerStartupTask(Priority.Middle, mid_task4);
+				starting.registerStartupTask(Priority.NearLowest, low_task1);
+				starting.registerStartupTask(Priority.NearLowest, low_task2);
+				starting.registerStartupTask(Priority.NearLowest, low_task3);
+				starting.registerStartupTask(Priority.NearLowest, low_task4);
+				starting.registerStartupTask(Priority.Lowest, lowest_task1);
+				starting.registerStartupTask(Priority.Lowest, lowest_task2);
+				starting.registerStartupTask(Priority.Lowest, lowest_task3);
+				starting.registerStartupTask(Priority.Lowest, lowest_task4);
+			}
+		};
+		taskRunner = new MockTaskRunner();
 		
-		JJServerLifecycle jsl = new JJServerLifecycle(startups, publisher, version);
+		JJServerLifecycle jsl = new JJServerLifecycle(startups, publisher, taskRunner, version);
 		
 		// when
 		jsl.start();
 		
 		// then
-		assertThat(order, contains(1, 2, 3, 4, 5));
-		verify(publisher).publish(isA(ServerStarting.class));
+		
+		assertThat(taskRunner.tasks, hasItems(
+			highest_task1, highest_task2, highest_task3, highest_task4,
+			high_task1, high_task2, high_task3, high_task4,
+			mid_task1, mid_task2, mid_task3, mid_task4,
+			low_task1, low_task2, low_task3, low_task4,
+			lowest_task1, lowest_task2, lowest_task3, lowest_task4
+		));
+		
+		// given
+		publisher.events.clear();
+		publisher.onPublish = null;
 		
 		// when
 		jsl.stop();
 		
 		// then
-		verify(publisher).publish(isA(ServerStopping.class));
+		assertThat(publisher.events.get(0), is(instanceOf(ServerStopping.class)));
 	}
 
 }

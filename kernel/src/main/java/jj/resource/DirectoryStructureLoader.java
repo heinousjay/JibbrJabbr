@@ -15,20 +15,20 @@
  */
 package jj.resource;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
+import jj.ServerStarting;
+import jj.ServerStarting.Priority;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 
 /**
@@ -39,12 +39,12 @@ import jj.execution.TaskRunner;
  *
  */
 @Singleton
-class DirectoryStructureLoader implements JJServerStartupListener {
+@Subscriber
+class DirectoryStructureLoader {
 	
 	private final PathResolver pathResolver;
 	private final ResourceFinder resourceFinder;
 	private final TaskRunner taskRunner;
-	private final CountDownLatch initLatch = new CountDownLatch(1);
 	
 	@Inject
 	DirectoryStructureLoader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
@@ -53,52 +53,53 @@ class DirectoryStructureLoader implements JJServerStartupListener {
 		this.taskRunner = taskRunner;
 	}
 
-	@Override
-	public void start() throws Exception {
-		load(pathResolver.path());
-		boolean success = initLatch.await(500, MILLISECONDS);
-		assert success : "timed out reading the app directory structure";
-	}
-
-	void load(final Path path) {
-		taskRunner.execute(new ResourceTask("directory preloader") {
-			@Override
-			protected void run() throws Exception {
-				Files.walkFileTree(path, new FileVisitor<Path>() {
-
-					@Override
-					public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-						resourceFinder.loadResource(
-							DirectoryResource.class,
-							pathResolver.base(),
-							pathResolver.path().relativize(path.resolve(dir)).toString()
-						);
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-						return FileVisitResult.CONTINUE;
-					}
-				});
-				initLatch.countDown();
-			}
-		});
-	}
-
-	@Override
-	public Priority startPriority() {
-		return Priority.NearHighest;
+	@Listener
+	void start(ServerStarting event) {
+		event.registerStartupTask(Priority.NearHighest, new LoaderTask(pathResolver.path()));
 	}
 	
+	void load(final Path path) {
+		taskRunner.execute(new LoaderTask(path));
+	}
+	
+	private class LoaderTask extends ResourceTask {
+		
+		private final Path path;
+		
+		LoaderTask(final Path path) {
+			super("loading directory structure rooted at " + path);
+			this.path = path;
+		}
+		
+		@Override
+		protected void run() throws Exception {
+			Files.walkFileTree(path, new FileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+					resourceFinder.loadResource(
+						DirectoryResource.class,
+						pathResolver.base(),
+						pathResolver.path().relativize(path.resolve(dir)).toString()
+					);
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		}
+	};
 }

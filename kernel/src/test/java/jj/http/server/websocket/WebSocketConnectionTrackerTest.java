@@ -61,7 +61,7 @@ public class WebSocketConnectionTrackerTest {
 		wsct.addConnection(connection2);
 		given(connection2.lastActivity()).willReturn(System.currentTimeMillis());
 		
-		wsct.start();
+		wsct.start(null);
 		
 		verify(taskRunner).execute(activityTrackerCaptor.capture());
 		

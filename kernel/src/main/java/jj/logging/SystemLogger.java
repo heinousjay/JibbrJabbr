@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
-import jj.JJServerStartupListener;
+import jj.ServerStarting;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
@@ -40,7 +40,7 @@ import jj.util.Closer;
  */
 @Singleton
 @Subscriber
-class SystemLogger implements JJServerStartupListener {
+class SystemLogger {
 	
 	static final String THREAD_NAME = "thread";
 	
@@ -56,8 +56,9 @@ class SystemLogger implements JJServerStartupListener {
 		this.loggers = loggers;
 	}
 
-	@Override
-	public void start() throws Exception {
+	@Listener
+	void start(ServerStarting event) {
+		// just start immediately! we need to work quickly
 		taskRunner.execute(new ServerTask("System Logger") {
 			
 			@Override
@@ -94,13 +95,6 @@ class SystemLogger implements JJServerStartupListener {
 	@Listener
 	void log(LoggedEvent event) {
 		events.add(event);
-	}
-	
-
-	
-	@Override
-	public Priority startPriority() {
-		return Priority.Highest;
 	}
 
 }

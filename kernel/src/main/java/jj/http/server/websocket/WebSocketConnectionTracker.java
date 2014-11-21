@@ -9,9 +9,11 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
+import jj.http.server.HttpServerStarted;
 
 /**
  * 
@@ -19,7 +21,8 @@ import jj.execution.TaskRunner;
  *
  */
 @Singleton
-public class WebSocketConnectionTracker implements JJServerStartupListener {
+@Subscriber
+public class WebSocketConnectionTracker {
 	
 	private final class ActivityChecker extends ServerTask {
 
@@ -58,14 +61,9 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		this.taskRunner = taskRunner;
 	}
 	
-	@Override
-	public void start() {
+	@Listener
+	void start(HttpServerStarted event) {
 		taskRunner.execute(new ActivityChecker());
-	}
-	
-	@Override
-	public Priority startPriority() {
-		return Priority.Lowest;
 	}
 	
 	void addConnection(WebSocketConnection connection) {
