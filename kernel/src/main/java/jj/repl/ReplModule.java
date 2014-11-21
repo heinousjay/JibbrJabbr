@@ -28,7 +28,7 @@ public class ReplModule extends JJModule {
 		bindAssetPath("/jj/repl/assets");
 		bindAPIModulePath("/jj/repl/api");
 		bindConfiguration(ReplConfiguration.class);
-		bind(ReplServer.class).asEagerSingleton();
+		bindStartupListener(ReplServer.class);
 		bindCreationOf(ReplScriptEnvironment.class).to(ReplScriptEnvironmentCreator.class);
 	}
 

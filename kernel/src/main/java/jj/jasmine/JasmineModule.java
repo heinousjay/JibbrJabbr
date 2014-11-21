@@ -32,9 +32,9 @@ public class JasmineModule extends JJModule {
 		bindCreationOf(JasmineScriptEnvironment.class).to(JasmineScriptEnvironmentCreator.class);
 		
 		bindConfiguration(JasmineConfiguration.class);
-
+		
 		// we basically just initialize some event listeners and wait for things to happen
-		bind(SpecRunner.class).asEagerSingleton();
-		bind(SpecCoordinator.class).asEagerSingleton();
+		bindStartupListener(SpecRunner.class);
+		bindStartupListener(SpecCoordinator.class);
 	}
 }

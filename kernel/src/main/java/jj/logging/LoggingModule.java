@@ -32,7 +32,7 @@ public class LoggingModule extends JJModule {
 		
 		bindConfiguration(LoggingConfiguration.class);
 		
-		bind(LoggingConfigurator.class).asEagerSingleton();
+		bindStartupListener(LoggingConfigurator.class);
 		
 		bindStartupListener(SystemLogger.class);
 		
