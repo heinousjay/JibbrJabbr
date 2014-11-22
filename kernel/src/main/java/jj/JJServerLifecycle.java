@@ -1,16 +1,11 @@
 package jj;
 
-import static java.lang.annotation.ElementType.*;
 import static java.util.concurrent.TimeUnit.*;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
-import javax.inject.Qualifier;
 import javax.inject.Singleton;
 
 import jj.event.Publisher;
@@ -20,11 +15,6 @@ import jj.execution.TaskRunner;
 
 @Singleton
 public class JJServerLifecycle {
-	
-	@Qualifier
-	@Target(PARAMETER)
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface StartupListeners {}
 
 	private final Publisher publisher;
 	private final TaskRunner taskRunner;

@@ -15,10 +15,16 @@
  */
 package jj;
 
+import static java.lang.annotation.ElementType.*;
+
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
 
 import io.netty.handler.codec.http.HttpMethod;
-import jj.JJServerLifecycle.StartupListeners;
 import jj.configuration.ConfigurationObjectBinder;
 import jj.configuration.resolution.APIPaths;
 import jj.configuration.resolution.AssetPaths;
@@ -52,6 +58,11 @@ import com.google.inject.multibindings.Multibinder;
  *
  */
 public abstract class JJModule extends AbstractModule {
+	
+	@Qualifier
+	@Target(PARAMETER)
+	@Retention(RetentionPolicy.RUNTIME)
+	private @interface StartupListeners {}
 
 	private ResourceBinder resources;
 
@@ -65,6 +76,8 @@ public abstract class JJModule extends AbstractModule {
 
 	private HttpMethodHandlerBinder httpMethodHandlerBinder;
 
+	// nobody cares about this! but it's necessary
+	// to make the startup work
 	private Multibinder<Object> startupListeners;
 	private Multibinder<Converter<?, ?>> converters;
 	private Multibinder<HostObject> hostObjects;
