@@ -17,13 +17,8 @@ package jj;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import jj.ServerStarting.Priority;
 import jj.event.MockPublisher;
 import jj.event.MockPublisher.OnPublish;
@@ -84,11 +79,6 @@ public class JJServerLifecycleTest {
 	public void test() throws Exception {
 		
 		// given
-		Set<Object> startups = new HashSet<>();
-		startups.add(p1);
-		startups.add(p2);
-		startups.add(p3);
-		
 		publisher = new MockPublisher();
 		publisher.onPublish = new OnPublish() {
 			
@@ -119,7 +109,7 @@ public class JJServerLifecycleTest {
 		};
 		taskRunner = new MockTaskRunner();
 		
-		JJServerLifecycle jsl = new JJServerLifecycle(startups, publisher, taskRunner, version);
+		JJServerLifecycle jsl = new JJServerLifecycle(publisher, taskRunner, version);
 		
 		// when
 		jsl.start();

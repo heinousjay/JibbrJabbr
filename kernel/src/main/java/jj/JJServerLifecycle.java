@@ -7,8 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
@@ -28,29 +26,23 @@ public class JJServerLifecycle {
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface StartupListeners {}
 
-	private final Set<Object> startupListeners;
 	private final Publisher publisher;
 	private final TaskRunner taskRunner;
 	private final Version version;
 
 	@Inject
 	JJServerLifecycle(
-		final @StartupListeners Set<Object> startupListeners,
 		final Publisher publisher,
 		final TaskRunner taskRunner,
 		final Version version
 	) {
-		this.startupListeners = startupListeners;
 		this.publisher = publisher;
 		this.taskRunner = taskRunner;
 		this.version = version;
 	}
 	
 	public void start() throws Exception {
-		
-		// well it's kinda goofy?
-		startupListeners.forEach(Objects::hashCode);
-		
+
 		ServerStarting startupEvent = new ServerStarting(version);
 		publisher.publish(startupEvent);
 

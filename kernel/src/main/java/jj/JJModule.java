@@ -75,7 +75,7 @@ public abstract class JJModule extends AbstractModule {
 		if (startupListeners == null) {
 			startupListeners =  Multibinder.newSetBinder(binder(), Object.class, StartupListeners.class);
 		}
-		startupListeners.addBinding().to(startupListenerClass);
+		startupListeners.addBinding().to(startupListenerClass).asEagerSingleton();
 	}
 
 	protected void bindConverter(Class<? extends Converter<?, ?>> converterClass) {
