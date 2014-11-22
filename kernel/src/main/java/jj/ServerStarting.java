@@ -59,7 +59,7 @@ public class ServerStarting extends LoggedEvent {
 	@Override
 	public void describeTo(Logger logger) {
 		logger.info("Welcome to {} version {} commit {}", version.name(), version.version(), version.commitId());
-		logger.info("Starting the server");
+		logger.info("Starting up!");
 	}
 
 }

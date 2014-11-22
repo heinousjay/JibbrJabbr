@@ -50,6 +50,8 @@ class SystemLogger {
 	
 	private final Loggers loggers;
 	
+	private volatile boolean useQueue = true;
+	
 	@Inject
 	SystemLogger(final TaskRunner taskRunner, final Loggers loggers) {
 		this.taskRunner = taskRunner;
@@ -63,16 +65,28 @@ class SystemLogger {
 			
 			@Override
 			protected void run() throws Exception {
-				for (;;) {
-					
-					LoggedEvent event = events.take();
-					Logger logger = loggers.findLogger(event);
-					try (Closer closer = threadName(event.threadName)) {
-						event.describeTo(logger);
+				try {
+					for (;;) {
+						
+						LoggedEvent event = events.take();
+						doLog(event);
+					}
+				} catch (InterruptedException ie) {
+					LoggedEvent event;
+					useQueue = false;
+					while ((event = events.poll()) != null) {
+						doLog(event);
 					}
 				}
 			}
 		});
+	}
+
+	private void doLog(LoggedEvent event) {
+		Logger logger = loggers.findLogger(event);
+		try (Closer closer = threadName(event.threadName)) {
+			event.describeTo(logger);
+		}
 	}
 	
 	// package private because it is exposed in a test class
@@ -94,7 +108,11 @@ class SystemLogger {
 	 */
 	@Listener
 	void log(LoggedEvent event) {
-		events.add(event);
+		if (useQueue) {
+			events.add(event);
+		} else {
+			doLog(event);
+		}
 	}
 
 }
