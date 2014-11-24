@@ -23,6 +23,8 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.JJModule;
 import jj.webdriver.WebDriverProvider;
@@ -178,56 +180,104 @@ public class JibbrJabbrTestServer implements TestRule {
 		return httpPort;
 	}
 	
-	private Statement createInjectionStatement(final Statement base) {
-		return new Statement() {
-			
-			@Override
-			public void evaluate() throws Throwable {
-				if (instance != null) {
-					injector.injectMembers(instance);
-				}
-				base.evaluate();
-				
-			}
-		};
-	}
-	
 	private void assertNotStarted() {
 		assert injector == null : "server must be configured outside of runs!";
+	}
+	
+	/**
+	 * statement that injects a test instance
+	 * @author jason
+	 *
+	 */
+	@Singleton
+	private static class TestInjectionStatement extends JibbrJabbrTestStatement {
+		
+		private final Injector injector;
+		private final JibbrJabbrTestServer serverRule;
+
+		@Inject
+		TestInjectionStatement(final Injector injector, final JibbrJabbrTestServer serverRule) {
+			this.injector = injector;
+			this.serverRule = serverRule;
+		}
+		
+		@Override
+		public void evaluate() throws Throwable {
+			injector.injectMembers(serverRule.instance);
+			evaluateInner();
+		}
+	}
+	
+	/**
+	 * statement that manages the test injector, and sets its children up
+	 * @author jason
+	 *
+	 */
+	private class InjectorManagerStatement extends JibbrJabbrTestStatement {
+		
+		InjectorManagerStatement(TestMethodStatement baseStatement) {
+			ServerLifecycleStatement statement = injector.getInstance(ServerLifecycleStatement.class);
+			statement.inner(baseStatement);
+			if (httpServer) {
+				statement.inner(injector.getInstance(HttpServerStatement.class));
+			}
+			inner(statement);
+		}
+		
+		@Override
+		public void evaluate() throws Throwable {
+			try {
+				injector.injectMembers(JibbrJabbrTestServer.this);
+				evaluateInner();
+			} finally {
+				injector = null;
+			}
+		}
+	}
+	
+	/**
+	 * innermost statement that executes the test method.  this is just a debugging wrapper
+	 * @author jason
+	 *
+	 */
+	private static class TestMethodStatement extends JibbrJabbrTestStatement {
+
+		private final Statement base;
+		
+		TestMethodStatement(Statement base) {
+			this.base = base;
+		}
+		
+		@Override
+		public void evaluate() throws Throwable {
+			base.evaluate();
+		}
+		
 	}
 	
 	@Override
 	public Statement apply(final Statement base, final Description description) {
 		
-		ArrayList<String> builder = new ArrayList<>();
-		builder.add("app=" + appPath);
-		builder.add("fileWatcher=" + fileWatcher);
-		builder.add("httpServer=" + httpServer);
-		builder.add("runAllSpecs=" + runAllSpecs);
-		builder.add("http-trace-mode=" + mode);
+		ArrayList<String> argBuilder = new ArrayList<>();
+		argBuilder.add("app=" + appPath);
+		argBuilder.add("fileWatcher=" + fileWatcher);
+		argBuilder.add("httpServer=" + httpServer);
+		argBuilder.add("runAllSpecs=" + runAllSpecs);
+		argBuilder.add("http-trace-mode=" + mode);
 		if (httpPort > 1023 && httpPort < 65536) {
-			builder.add("httpPort=" + httpPort);
+			argBuilder.add("httpPort=" + httpPort);
 		}
 		injector = Guice.createInjector(
 			Stage.PRODUCTION,
-			new TestModule(this, builder.toArray(new String[builder.size()]), base, description, httpServer)
+			new TestModule(this, argBuilder.toArray(new String[argBuilder.size()]), description, httpServer)
 		);
 		
-		Statement statement = new Statement() {
-			@Override
-			public void evaluate() throws Throwable {
-				try {
-					injector.getInstance(AppStatement.class).evaluate();
-				} finally {
-					injector = null;
-				}
-			}
-		};
+		JibbrJabbrTestStatement statement = new InjectorManagerStatement(new TestMethodStatement(base));
 		if (instance != null) {
-			statement = createInjectionStatement(statement);
+			statement.inner(injector.getInstance(TestInjectionStatement.class));
 		}
-		
-		return mode.traceStatement(statement, description.getClassName() + "." + description.getMethodName());
+		statement = mode.traceStatement(statement, description.getClassName() + "." + description.getMethodName());
+		return statement;
 	}
 
 	/**

@@ -28,8 +28,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.junit.runners.model.Statement;
-
 enum HttpTraceMode {
 	Nothing,
 	Verifying,
@@ -94,29 +92,29 @@ enum HttpTraceMode {
 		return this;
 	}
 	
-	public Statement traceStatement(Statement base, String invoker) {
+	public JibbrJabbrTestStatement traceStatement(JibbrJabbrTestStatement inner, String invoker) {
 		switch(this) {
 		case Verifying:
-			return new Statement() {
+			return new JibbrJabbrTestStatement(inner) {
 
 				@Override
 				public void evaluate() throws Throwable {
 					try (FileSystem jar = jar(invoker, true)) {
 						jarFs = jar;
-						base.evaluate();
+						evaluateInner();
 					}
 				}
 				
 			};
 			
 		case Recording:
-			return new Statement() {
+			return new JibbrJabbrTestStatement(inner) {
 
 				@Override
 				public void evaluate() throws Throwable {
 					try (FileSystem jar = jar(invoker, false)) {
 						jarFs = jar;
-						base.evaluate();
+						evaluateInner();
 					}
 				}
 				
@@ -124,7 +122,7 @@ enum HttpTraceMode {
 			
 		case Nothing:
 		default:
-			return base;
+			return inner;
 		}
 	}
 }

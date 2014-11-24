@@ -28,7 +28,7 @@ import jj.webdriver.provider.PhantomJSWebDriverProvider;
 public class App {
 	
 	// this could also be a helper class that inspects system properties or vm args or whatever
-	public static final Class<? extends WebDriverProvider> DRIVER_PROVIDER = PhantomJSWebDriverProvider.class;
+	public static final Class<? extends WebDriverProvider> DRIVER_PROVIDER = PhantomJSWebDriverProvider.class; //FirefoxWebDriverProvider.class;
 	
 	public static final String one;
 	
