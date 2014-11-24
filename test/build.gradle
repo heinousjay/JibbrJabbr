@@ -31,7 +31,7 @@ class PhantomJSSetupPlugin implements Plugin<Project> {
 		
 		project.afterEvaluate {
 			project.configurations.create('phantomJS')
-			project.dependencies.add('phantomJS', "org.jboss.arquillian.extension:arquillian-phantom-binary:1.9.2:${classifier}")
+			project.dependencies.add('phantomJS', "org.jboss.arquillian.extension:arquillian-phantom-binary:1.9.7:${classifier}")
 		
 			project.task('setUpPhantomJS', type:Copy) {
 				
