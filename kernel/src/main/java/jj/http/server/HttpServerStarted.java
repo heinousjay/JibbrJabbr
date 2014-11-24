@@ -31,7 +31,7 @@ public class HttpServerStarted extends LoggedEvent {
 
 	@Override
 	public void describeTo(Logger logger) {
-		logger.info("http server started");
+		logger.info("HTTP server started");
 	}
 
 }

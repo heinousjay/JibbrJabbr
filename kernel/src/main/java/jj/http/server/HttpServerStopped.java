@@ -31,7 +31,7 @@ public class HttpServerStopped extends LoggedEvent {
 	
 	@Override
 	public void describeTo(Logger logger) {
-		logger.info("http server stopped");
+		logger.info("HTTP server stopped");
 	}
 
 }
