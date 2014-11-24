@@ -58,8 +58,9 @@ class PhantomJSSetupPlugin implements Plugin<Project> {
 }
 
 repositories {
+	//mavenLocal()
 	maven {
-		url 'https://oss.sonatype.org/content/repositories/snapshots/'
+	url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
 }
 
@@ -68,7 +69,10 @@ dependencies {
 	compile configurations.core
 	compile configurations.testPack
 	compile project(":kernel")
-	compile 'com.jibbrjabbr:pandia:0.5-SNAPSHOT'
+	compile group: 'com.jibbrjabbr', name: 'pandia', version: '0.5-SNAPSHOT', changing: true
+	compile 'org.seleniumhq.selenium:selenium-java:2.44.0'
+	compile 'org.seleniumhq.selenium:selenium-remote-driver:2.44.0'
+	compile 'org.seleniumhq.selenium:selenium-server:2.44.0'
 }
 
 test {
