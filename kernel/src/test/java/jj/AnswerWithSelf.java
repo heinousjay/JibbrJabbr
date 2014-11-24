@@ -28,7 +28,7 @@ import org.mockito.stubbing.Answer;
  */
 public class AnswerWithSelf implements Answer<Object> {
 
-	public static Answer<Object> ANSWER_WITH_SELF = new AnswerWithSelf();
+	public static final Answer<Object> ANSWER_WITH_SELF = new AnswerWithSelf();
 	
 	private final Answer<Object> delegate = new ReturnsEmptyValues();
 
