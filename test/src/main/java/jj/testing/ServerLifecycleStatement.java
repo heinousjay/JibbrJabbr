@@ -15,9 +15,6 @@
  */
 package jj.testing;
 
-import java.time.Clock;
-import java.time.Instant;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 

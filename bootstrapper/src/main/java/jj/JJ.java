@@ -16,13 +16,10 @@
 package jj;
 
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
