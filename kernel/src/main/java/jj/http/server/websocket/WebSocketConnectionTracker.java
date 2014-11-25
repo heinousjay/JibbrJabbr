@@ -5,6 +5,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -14,6 +16,7 @@ import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
 import jj.http.server.HttpServerStarted;
+import jj.http.server.HttpServerStopped;
 
 /**
  * 
@@ -41,7 +44,7 @@ public class WebSocketConnectionTracker {
 				}
 			}
 			
-			if (!Thread.currentThread().isInterrupted()) {
+			if (run.get() && !Thread.currentThread().isInterrupted()) {
 				repeat();
 			}
 		}
@@ -50,11 +53,15 @@ public class WebSocketConnectionTracker {
 		protected long delay() {
 			return TimeUnit.MILLISECONDS.convert(5, SECONDS);
 		}
+		
+		private final AtomicBoolean run = new AtomicBoolean(true);
 	}
 
 	private final ConcurrentMap<WebSocketConnection, Boolean> allConnections = new ConcurrentHashMap<>(16, 0.75F, 2);
 		
 	private final TaskRunner taskRunner;
+	
+	private final AtomicReference<ActivityChecker> currentActivityChecker = new AtomicReference<>();
 	
 	@Inject
 	public WebSocketConnectionTracker(final TaskRunner taskRunner) {
@@ -63,7 +70,17 @@ public class WebSocketConnectionTracker {
 	
 	@Listener
 	void start(HttpServerStarted event) {
-		taskRunner.execute(new ActivityChecker());
+		if (currentActivityChecker.get() == null) {
+			currentActivityChecker.set(new ActivityChecker());
+			taskRunner.execute(currentActivityChecker.get());
+		}
+	}
+	
+	@Listener
+	void stop(HttpServerStopped event) {
+		ActivityChecker current = currentActivityChecker.getAndSet(null);
+		assert current != null : "server was running with no web socket activity checker!";
+		current.run.set(false);
 	}
 	
 	void addConnection(WebSocketConnection connection) {
