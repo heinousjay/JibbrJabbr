@@ -257,26 +257,6 @@ public final class JJ {
 			messageInitError(t);
 		}
 	}
-
-	/**
-	 * @return
-	 */
-	private CountDownLatch startTicker() {
-		final CountDownLatch latch = new CountDownLatch(1);
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				System.out.print("Starting up, one moment please...");
-				try {
-					while(!latch.await(500, MILLISECONDS)) {
-						System.out.print('.');
-					}
-				} catch (InterruptedException e) {}
-			}
-		}).start();
-		return latch;
-	}
 	
 	private void messageInitError(Throwable cause) {
 		System.err.println("Couldn't initialize the server!");
@@ -286,13 +266,11 @@ public final class JJ {
 
 	public void start() throws Exception {
 		if (mainInstance != null) {
-			final CountDownLatch latch = startTicker();
+			System.out.println("Starting up, one moment please...");
 			try {
 				mainClass.getMethod("start").invoke(mainInstance);
 			} catch (InvocationTargetException ite) {
 				messageInitError(ite.getCause());
-			} finally {
-				latch.countDown();
 			}
 		}
 	}

@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
-import jj.JJServerStartupListener;
+import jj.ServerStarting;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
@@ -40,7 +40,7 @@ import jj.util.Closer;
  */
 @Singleton
 @Subscriber
-class SystemLogger implements JJServerStartupListener {
+class SystemLogger {
 	
 	static final String THREAD_NAME = "thread";
 	
@@ -50,28 +50,43 @@ class SystemLogger implements JJServerStartupListener {
 	
 	private final Loggers loggers;
 	
+	private volatile boolean useQueue = true;
+	
 	@Inject
 	SystemLogger(final TaskRunner taskRunner, final Loggers loggers) {
 		this.taskRunner = taskRunner;
 		this.loggers = loggers;
 	}
 
-	@Override
-	public void start() throws Exception {
+	@Listener
+	void start(ServerStarting event) {
+		// just start immediately! we need to work quickly
 		taskRunner.execute(new ServerTask("System Logger") {
 			
 			@Override
 			protected void run() throws Exception {
-				for (;;) {
-					
-					LoggedEvent event = events.take();
-					Logger logger = loggers.findLogger(event);
-					try (Closer closer = threadName(event.threadName)) {
-						event.describeTo(logger);
+				try {
+					for (;;) {
+						
+						LoggedEvent event = events.take();
+						doLog(event);
+					}
+				} catch (InterruptedException ie) {
+					LoggedEvent event;
+					useQueue = false;
+					while ((event = events.poll()) != null) {
+						doLog(event);
 					}
 				}
 			}
 		});
+	}
+
+	private void doLog(LoggedEvent event) {
+		Logger logger = loggers.findLogger(event);
+		try (Closer closer = threadName(event.threadName)) {
+			event.describeTo(logger);
+		}
 	}
 	
 	// package private because it is exposed in a test class
@@ -93,14 +108,11 @@ class SystemLogger implements JJServerStartupListener {
 	 */
 	@Listener
 	void log(LoggedEvent event) {
-		events.add(event);
-	}
-	
-
-	
-	@Override
-	public Priority startPriority() {
-		return Priority.Highest;
+		if (useQueue) {
+			events.add(event);
+		} else {
+			doLog(event);
+		}
 	}
 
 }

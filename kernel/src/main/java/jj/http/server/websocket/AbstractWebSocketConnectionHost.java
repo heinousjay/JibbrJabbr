@@ -83,7 +83,7 @@ public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvi
 	@ScriptThread
 	public void connected(WebSocketConnection connection) {
 		connections.add(connection);
-		
+		publisher.publish(new WebSocketClientConnected(connection));
 	}
 	
 	@Override

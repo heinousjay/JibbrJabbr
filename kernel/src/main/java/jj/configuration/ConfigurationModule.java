@@ -28,14 +28,14 @@ public class ConfigurationModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAssetPath("/jj/assets");
+		bindAssetPath("/jj/assets");
 		
-		addAPIModulePath("/jj/configuration/api");
+		bindAPIModulePath("/jj/configuration/api");
 		
-		addStartupListenerBinding().to(ConfigurationScriptLoader.class);
+		bindStartupListener(ConfigurationScriptLoader.class);
 		
 		bind(PathResolver.class).to(Application.class);
 		
-		bindCreation().of(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);
+		bindCreationOf(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);
 	}
 }

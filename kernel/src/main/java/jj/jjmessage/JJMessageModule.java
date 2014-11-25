@@ -25,7 +25,7 @@ public class JJMessageModule extends JJModule {
 
 	@Override
 	protected void configure() {
-		dispatch().continuationOf(JJMessage.class).to(JJMessageContinuationProcessor.class);
+		bindContinuationProcessingOf(JJMessage.class).to(JJMessageContinuationProcessor.class);
 	}
 
 }

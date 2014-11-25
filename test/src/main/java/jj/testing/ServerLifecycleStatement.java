@@ -15,45 +15,48 @@
  */
 package jj.testing;
 
+import java.time.Clock;
+import java.time.Instant;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerLifecycle;
 
-import org.junit.runners.model.Statement;
+import org.junit.runner.Description;
 
 @Singleton
-public class AppStatement extends Statement {
+public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 	
 	private final JJServerLifecycle lifecycle;
 	private final TestLog testLog;
-	private final Statement base;
+	private final Description description;
 	
 	@Inject
-	AppStatement(
+	ServerLifecycleStatement(
 		final JJServerLifecycle lifecycle,
 		final TestLog testLog,
-		final Statement base
+		final Description description
 	) {
 		this.lifecycle = lifecycle;
 		this.testLog = testLog;
-		this.base = base;
+		this.description = description;
 	}
-	
-	
 
 	@Override
 	public void evaluate() throws Throwable {
-		long start = System.nanoTime();
+		long start = System.currentTimeMillis();
 		try {
 			testLog.info("============================================================");
+			testLog.info("{} - test start", description);
 			testLog.info(" Starting the server.");
 			lifecycle.start();
-			base.evaluate();
+			evaluateInner();
 		} finally {
 			lifecycle.stop();
 			testLog.info(" Server stopped.");
-			testLog.info("finished in {} nanos", System.nanoTime() - start);
+			testLog.info("{} - test end", description);
+			testLog.info("finished in {} millis", System.currentTimeMillis() - start);
 			testLog.info("============================================================");
 		}
 	}

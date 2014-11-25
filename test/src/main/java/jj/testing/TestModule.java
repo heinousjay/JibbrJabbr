@@ -19,7 +19,6 @@ import static org.mockito.Mockito.mock;
 import io.netty.channel.Channel;
 
 import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 import jj.CoreModule;
 import jj.JJModule;
@@ -35,20 +34,17 @@ class TestModule extends JJModule {
 	
 	private final JibbrJabbrTestServer testServer;
 	private final String[] args;
-	private final Statement base;
 	private final Description description;
 	private final boolean withHttpServer;
 	
 	TestModule(
 		final JibbrJabbrTestServer testServer,
 		final String[] args,
-		final Statement base,
 		final Description description,
 		final boolean withHttpServer
 	) {
 		this.testServer = testServer;
 		this.args = args;
-		this.base = base;
 		this.description = description;
 		this.withHttpServer = withHttpServer;
 	}
@@ -56,15 +52,11 @@ class TestModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addStartupListenerBinding().to(TestListener.class);
-		
 		bind(JibbrJabbrTestServer.class).toInstance(testServer);
-		
-		bind(Statement.class).toInstance(base);
 		
 		bind(Description.class).toInstance(description);
 		
-		bindLoggedEvents().annotatedWith(TestRunnerLogger.class).toLogger(TestRunnerLogger.NAME);
+		bindLoggedEventsAnnotatedWith(TestRunnerLogger.class).toLogger(TestRunnerLogger.NAME);
 		
 		if (!withHttpServer) {
 			bind(Channel.class).toInstance(mock(Channel.class));

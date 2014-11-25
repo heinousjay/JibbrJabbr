@@ -15,6 +15,8 @@
  */
 package jj.http.client;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
 
@@ -42,6 +44,9 @@ import jj.event.Subscriber;
 @Subscriber
 class HttpClient {
 
+	private static final String LOCALHOST = "localhost";
+	private static final InetAddress LOCALHOST_ADDRESS = Inet6Address.getLoopbackAddress();
+	
 	private final HttpClientNioEventLoopGroup eventLoop;
 	private final HttpClientChannelInitializer initializer;
 	private final HttpClientConfigurationReader configuration;
@@ -104,8 +109,16 @@ class HttpClient {
 	}
 	
 	ChannelFuture connect(boolean secure, String host, int port) {
-		assert (bootstrap != null) : "don't call this yet!";
-		// better error
+		assert host != null && !host.isEmpty() : "supply a host!";
+		assert port > 0 && port < 65536 : "supply a valid port number!";
+		
+		if (LOCALHOST.equals(host)) { // skip right to the loopback, avoid any 
+			return bootstrap.connect(LOCALHOST_ADDRESS, port);
+		}
+		
+		// future optimization - if we're looping back onto a port bound to our http server, just
+		// pass things directly to it via embedded channels instead of going through the OS
+		
 		return bootstrap.connect(host, port);
 	}
 }

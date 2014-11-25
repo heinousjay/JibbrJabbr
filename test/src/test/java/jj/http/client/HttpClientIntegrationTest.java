@@ -48,7 +48,7 @@ public class HttpClientIntegrationTest {
 				
 				@Override
 				protected void configure() {
-					addAPIModulePath("/http/client/test");
+					bindAPIModulePath("/http/client/test");
 				}
 			})
 			.injectInstance(this);

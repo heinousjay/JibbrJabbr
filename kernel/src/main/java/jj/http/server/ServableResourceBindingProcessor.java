@@ -20,7 +20,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 
-import jj.resource.Resource;
 import jj.resource.ResourceBindingProcessor;
 import jj.util.StringUtils;
 
@@ -49,12 +48,7 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 	}
 
 	@Override
-	public void process(Class<? extends Resource> binding) {
-		
-		assert ServableResource.class.isAssignableFrom(binding);
-		
-		@SuppressWarnings("unchecked")
-		Class<? extends ServableResource> resourceClassBinding = (Class<? extends ServableResource>)binding;
+	public void process(Class<? extends ServableResource> resourceClassBinding) {
 		
 		String name = null;
 		Class<? extends RouteProcessor> routeProcessorClass = SimpleRouteProcessor.class;

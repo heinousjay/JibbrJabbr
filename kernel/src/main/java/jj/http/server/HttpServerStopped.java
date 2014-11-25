@@ -25,11 +25,13 @@ import jj.logging.LoggedEvent;
  *
  */
 @ServerLogger
-class HttpServerStopped extends LoggedEvent {
+public class HttpServerStopped extends LoggedEvent {
 
+	HttpServerStopped() {}
+	
 	@Override
 	public void describeTo(Logger logger) {
-		logger.info("http server stopped");
+		logger.info("HTTP server stopped");
 	}
 
 }

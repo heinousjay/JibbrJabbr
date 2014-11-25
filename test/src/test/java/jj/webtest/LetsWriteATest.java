@@ -29,8 +29,7 @@ import org.junit.Test;
 public class LetsWriteATest {
 	
 	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.two)
-			.withHttp();
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.two);
 	
 	
 	/** since we're running in the context of the embedded server, let that
@@ -44,8 +43,6 @@ public class LetsWriteATest {
 	@Rule
 	public WebDriverRule webDriverRule = server.webDriverRule(App.DRIVER_PROVIDER);
 	
-	// normally you would be sourcing the driver provider from some project-specific configuration
-	// but for the purposes of testing the rule, we hardcode
 	@Test
 	public void testChief() throws Exception {
 		

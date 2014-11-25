@@ -11,9 +11,9 @@ public class ResourceModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAPIModulePath("/jj/resource/api");
+		bindAPIModulePath("/jj/resource/api");
 		
-		bindConfiguration().to(ResourceConfiguration.class);
+		bindConfiguration(ResourceConfiguration.class);
 
 		bindExecutor(ResourceExecutor.class);
 		
@@ -25,12 +25,12 @@ public class ResourceModule extends JJModule {
 		
 		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
 		
-		addStartupListenerBinding().to(DirectoryStructureLoader.class);
+		bindStartupListener(DirectoryStructureLoader.class);
 		
-		bindCreation().of(DirectoryResource.class).to(DirectoryResourceCreator.class);
+		bindCreationOf(DirectoryResource.class).to(DirectoryResourceCreator.class);
 		
-		bindCreation().of(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		bindCreationOf(Sha1Resource.class).to(Sha1ResourceCreator.class);
 		
-		bindLoggedEvents().annotatedWith(ResourceLogger.class).toLogger(ResourceLogger.NAME);
+		bindLoggedEventsAnnotatedWith(ResourceLogger.class).toLogger(ResourceLogger.NAME);
 	}
 }

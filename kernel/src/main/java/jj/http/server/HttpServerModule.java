@@ -12,20 +12,20 @@ public class HttpServerModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAPIModulePath("/jj/http/server/api");
-		addAPIModulePath("/jj/http/server/websocket/api");
+		bindAPIModulePath("/jj/http/server/api");
+		bindAPIModulePath("/jj/http/server/websocket/api");
 		
-		bindConfiguration().to(HttpServerSocketConfiguration.class);
+		bindConfiguration(HttpServerSocketConfiguration.class);
 
-		addStartupListenerBinding().to(HttpServer.class);
+		bindStartupListener(HttpServer.class);
 		
-		addStartupListenerBinding().to(WebSocketConnectionTracker.class);
+		bindStartupListener(WebSocketConnectionTracker.class);
 		
-		bindLoggedEvents().annotatedWith(AccessLogger.class).toLogger(AccessLogger.NAME);
+		bindLoggedEventsAnnotatedWith(AccessLogger.class).toLogger(AccessLogger.NAME);
 		
 		bindExecutor(HttpServerNioEventLoopGroup.class);
 		
-		bindCreation().of(StaticResource.class).to(StaticResourceCreator.class);
+		bindCreationOf(StaticResource.class).to(StaticResourceCreator.class);
 		
 		install(new ServableModule());
 		install(new HttpMethodHandlerModule());

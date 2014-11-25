@@ -57,16 +57,14 @@ public class DocumentProcessingModule extends JJModule {
 		bindProcessing.of(JJMessage.Type.Element).to(ElementMessageProcessor.class);
 		bindProcessing.of(JJMessage.Type.Result).to(ResultMessageProcessor.class);
 		
-		bindCreation().of(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
-		bindCreation().of(HtmlResource.class).to(HtmlResourceCreator.class);
+		bindCreationOf(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
+		bindCreationOf(HtmlResource.class).to(HtmlResourceCreator.class);
 		
 		bind(WebSocketMessageProcessor.class).to(DocumentWebSocketMessageProcessors.class);
 		
-		bindWebSocketConnection().toHost(DocumentScriptEnvironment.class);
+		bindConfiguration(DocumentConfiguration.class);
 		
-		bindConfiguration().to(DocumentConfiguration.class);
-		
-		addAPIModulePath("/jj/document/api");
+		bindAPIModulePath("/jj/document/api");
 
 		install(new DocumentServableModule());
 	}

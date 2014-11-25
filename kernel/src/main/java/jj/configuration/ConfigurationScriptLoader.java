@@ -24,9 +24,11 @@ import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
+import jj.ServerStarting;
+import jj.ServerStarting.Priority;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.execution.ServerTask;
 import jj.resource.ResourceLoader;
 
 /**
@@ -38,7 +40,7 @@ import jj.resource.ResourceLoader;
  */
 @Singleton
 @Subscriber
-class ConfigurationScriptLoader implements JJServerStartupListener {
+class ConfigurationScriptLoader {
 	
 	private final ResourceLoader resourceLoader;
 	private final CountDownLatch latch = new CountDownLatch(1);
@@ -46,6 +48,19 @@ class ConfigurationScriptLoader implements JJServerStartupListener {
 	@Inject
 	ConfigurationScriptLoader(final ResourceLoader resourceFinder) {
 		this.resourceLoader = resourceFinder;
+	}
+	
+	@Listener
+	void start(ServerStarting event) {
+		event.registerStartupTask(Priority.Middle, new ServerTask("initial load of configuration script") {
+			
+			@Override
+			protected void run() throws Exception {
+				load();
+				boolean success = latch.await(3, SECONDS);
+				assert success : "configuration didn't load in 3 seconds";
+			}
+		});
 	}
 	
 	@Listener
@@ -60,19 +75,5 @@ class ConfigurationScriptLoader implements JJServerStartupListener {
 	
 	private void load() {
 		resourceLoader.loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
-	}
-
-	@Override
-	public void start() throws Exception {
-		
-		load();
-		
-		boolean success = latch.await(3, SECONDS);
-		assert success : "configuration didn't load in 3 seconds";
-	}
-
-	@Override
-	public Priority startPriority() {
-		return Priority.Middle;
 	}
 }

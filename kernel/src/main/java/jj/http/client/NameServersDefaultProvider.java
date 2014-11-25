@@ -30,13 +30,15 @@ import javax.inject.Provider;
  */
 public class NameServersDefaultProvider implements Provider<List<String>> {
 	
+	private static final List<String> OPEN_DNS = Arrays.asList("208.67.222.222", "208.67.220.220");
+	
 	private final List<String> nameservers;
 	
 	@SuppressWarnings("unchecked")
 	NameServersDefaultProvider() {
 		
 		// fall back on OpenDNS if there is no system configuration
-		List<String> result = Arrays.asList("208.67.222.222", "208.67.220.220");
+		List<String> result = OPEN_DNS;
 		
 		try {
 			Class<?> c = Class.forName("sun.net.dns.ResolverConfiguration");
@@ -44,6 +46,10 @@ public class NameServersDefaultProvider implements Provider<List<String>> {
 			Object instance = c.getMethod("open").invoke(null);
 			result = (List<String>)c.getMethod("nameservers").invoke(instance);
 		} catch (Exception e) {}
+		
+		if (result.isEmpty()) {
+			result = OPEN_DNS;
+		}
 		
 		nameservers = Collections.unmodifiableList(result);
 	}

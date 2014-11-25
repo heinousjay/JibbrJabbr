@@ -15,7 +15,8 @@
  */
 package jj.http.server;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
+
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
@@ -24,31 +25,42 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.Future;
+
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
+
 import jj.ServerStopping;
+import jj.configuration.ConfigurationLoaded;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
+import jj.execution.TaskRunner;
+import jj.logging.Emergency;
 import jj.util.StringUtils;
 
 /**
+ * <p>
+ * Manages the netty ServerBootstrap instance for HTTP serving.
+ * 
+ * <p>
+ * Mainly, this class acts as an interface point to the configuration system,
+ * it listens for 
+ * 
  * @author jason
  *
  */
 @Singleton
 @Subscriber
-class HttpServer implements JJServerStartupListener {
-	
-	
-	
+class HttpServer {
 
 	private static ExecutorService executorService(final int threads, final UncaughtExceptionHandler uncaughtExceptionHandler) {
 	
@@ -76,9 +88,15 @@ class HttpServer implements JJServerStartupListener {
 	
 	private final Publisher publisher;
 	
+	private final TaskRunner taskRunner;
+	
+	private final Provider<ServerBootstrap> serverBootstrapProvider;
+	
 	private final UncaughtExceptionHandler uncaughtExceptionHandler;
 	
 	private ServerBootstrap serverBootstrap;
+	
+	private volatile int configurationHashCode;
 	
 	@Inject
 	HttpServer(
@@ -87,6 +105,8 @@ class HttpServer implements JJServerStartupListener {
 		final HttpServerSocketConfiguration configuration,
 		final HttpServerSwitch httpServerSwitch,
 		final Publisher publisher,
+		final TaskRunner taskRunner,
+		final Provider<ServerBootstrap> serverBootstrapProvider,
 		final UncaughtExceptionHandler uncaughtExceptionHandler
 	) {
 		this.ioEventLoopGroup = ioEventLoopGroup;
@@ -94,49 +114,73 @@ class HttpServer implements JJServerStartupListener {
 		this.configuration = configuration;
 		this.httpServerSwitch = httpServerSwitch;
 		this.publisher = publisher;
+		this.taskRunner = taskRunner;
+		this.serverBootstrapProvider = serverBootstrapProvider;
 		this.uncaughtExceptionHandler = uncaughtExceptionHandler;
 	}
 	
-	@Override
-	public void start() throws Exception {
-		
+	@Listener
+	void configurationLoaded(ConfigurationLoaded event) {
 		if (httpServerSwitch.on()) {
-		
-			assert (serverBootstrap == null) : "cannot start an already started server";
-			
-			List<Binding> bindings = configuration.bindings();
-			
-			makeServerBootstrap(bindings.size());
-			
-			bindPorts(bindings);
-			
-			publisher.publish(new HttpServerStarted());
+			checkStart();
 		}
 	}
 
-	private void bindPorts(List<Binding> bindings) throws Exception {
-		try {
-			for (Binding binding : bindings) {
+	@Listener
+	void serverStopping(ServerStopping event) {
+		if (httpServerSwitch.on() && serverBootstrap != null) {
+			stop(serverBootstrap);
+			publisher.publish(new HttpServerStopped());
+			serverBootstrap = null;
+		}
+	}
+	
+	private void checkStart() {
+		if (configurationHashCode != configuration.hashCode()) {
+			configurationHashCode = configuration.hashCode();
+			taskRunner.execute(new HttpServerTask("starting the http server") {
 				
-				String host = binding.host();
-				int port = binding.port();
-				
-				if (!StringUtils.isEmpty(host)) {
-					
-					serverBootstrap.bind(host, port).sync();
-				} else {
-					serverBootstrap.bind(port).sync();
+				@Override
+				protected void run() throws Exception {
+					if (serverBootstrap != null) {
+						stop(serverBootstrap).addListener((future) -> {
+							serverBootstrap = null;
+							if (future.isSuccess()) {
+								publisher.publish(new HttpServerRestarting());
+								start();
+							} else {
+								publisher.publish(new Emergency("could not restart the HTTP server", future.cause()));
+							}
+						});
+					} else {
+						start();
+					}
 				}
-				publisher.publish(new BindingHttpServer(binding));
+			});
+		}
+	}
+	
+	private Future<?> stop(ServerBootstrap serverBootstrap) {
+		return serverBootstrap.group().shutdownGracefully(0, 250, MILLISECONDS).addListener((future) -> {
+			if (!future.isSuccess()) {} // uhhhh - no clue here really. can't imagine the failure mode yet
+			if (serverBootstrap.childGroup() != null) {
+				serverBootstrap.childGroup().shutdownGracefully(); // don't really care about waiting for these
 			}
-		} catch (Exception e) {
-			serverBootstrap.group().shutdownGracefully(0, 2, SECONDS);
-			throw e;
+		});
+	}
+
+	private void start() throws Exception {
+		List<Binding> bindings = configuration.bindings();
+		if (!bindings.isEmpty()) {
+			serverBootstrap = bindPorts(makeServerBootstrap(bindings.size()), bindings);
+			publisher.publish(new HttpServerStarted());
+		} else {
+			serverBootstrap = null;
 		}
 	}
 
-	private void makeServerBootstrap(int bindingCount) {
-		serverBootstrap = new ServerBootstrap()
+	private ServerBootstrap makeServerBootstrap(int bindingCount) {
+		return serverBootstrapProvider.get()
 			.group(new NioEventLoopGroup(bindingCount, executorService(bindingCount, uncaughtExceptionHandler)), ioEventLoopGroup)
 			.channel(NioServerSocketChannel.class)
 			.childHandler(initializer)
@@ -148,21 +192,27 @@ class HttpServer implements JJServerStartupListener {
 			.option(ChannelOption.SO_RCVBUF, configuration.receiveBufferSize())
 			.option(ChannelOption.SO_SNDBUF, configuration.sendBufferSize());
 	}
-	
-	@Override
-	public Priority startPriority() {
-		// we want to start last, everything else should be running first
-		return Priority.Lowest;
-	}
 
-	@Listener
-	public void stop(ServerStopping event) {
-		if (httpServerSwitch.on()) {
-			assert (serverBootstrap != null) : "cannot shut down a server that wasn't started";
-			serverBootstrap.group().shutdownGracefully(1, 5, SECONDS);
-			serverBootstrap.childGroup().shutdownGracefully();
-			serverBootstrap = null;
-			publisher.publish(new HttpServerStopped());
+	private ServerBootstrap bindPorts(ServerBootstrap serverBootstrap, List<Binding> bindings) throws Exception {
+		try {
+			for (Binding binding : bindings) {
+				
+				String host = binding.host();
+				int port = binding.port();
+				
+				if (!StringUtils.isEmpty(host)) {
+					serverBootstrap.bind(host, port).sync();
+				} else {
+					serverBootstrap.bind(port).sync();
+				}
+				publisher.publish(new BindingHttpServer(binding));
+			}
+			
+			return serverBootstrap;
+		} catch (Exception e) {
+			e.printStackTrace();
+			stop(serverBootstrap);
+			throw e;
 		}
 	}
 

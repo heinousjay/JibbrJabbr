@@ -26,17 +26,17 @@ public class I18NModule extends JJModule {
 
 	@Override
 	protected void configure() {
-		
-		addAPIModulePath("/jj/i18n/api");
-		
-		bindConfiguration().to(I18NConfiguration.class);
-		
-		addConverterBinding().to(StringToLocaleConverter.class);
-		
-		dispatch().continuationOf(ScriptMessagesLoaderBundle.class).to(ScriptMessages.class);
-		
-		bindCreation().of(PropertiesResource.class).to(PropertiesResourceCreator.class);
-		bindCreation().of(MessagesResource.class).to(MessagesResourceCreator.class);
+
+		bindAPIModulePath("/jj/i18n/api");
+
+		bindConfiguration(I18NConfiguration.class);
+
+		bindConverter(StringToLocaleConverter.class);
+
+		bindContinuationProcessingOf(ScriptMessagesLoaderBundle.class).to(ScriptMessages.class);
+
+		bindCreationOf(PropertiesResource.class).to(PropertiesResourceCreator.class);
+		bindCreationOf(MessagesResource.class).to(MessagesResourceCreator.class);
 	}
 
 }
