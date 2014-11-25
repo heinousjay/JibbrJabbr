@@ -122,12 +122,18 @@ public class MockTaskRunner implements TaskRunner {
 	public long firstTaskDelay() {
 		assert !tasks.isEmpty() && tasks.get(0) instanceof DelayedTask : "no DelayedTask at index 0";
 		
-		return ((DelayedTask<?>)tasks.get(0)).delay();
+		return delay(tasks.get(0));
+	}
+	
+	public long delay(JJTask task) {
+		assert task instanceof DelayedTask : "not a DelayedTask";
+	
+		return ((DelayedTask<?>)task).delay();
 	}
 	
 	public boolean taskWillRepeat(JJTask task) {
-		assert task instanceof DelayedTask : "no DelayedTask at index 0";
+		assert task instanceof DelayedTask : "not a DelayedTask";
 		
-		return ((DelayedTask<?>)task).willRepeat;
+		return ((DelayedTask<?>)task).willRepeat();
 	}
 }

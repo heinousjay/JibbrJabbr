@@ -15,19 +15,21 @@
  */
 package jj.http.server.websocket;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.document.DocumentScriptEnvironment;
+import jj.execution.DelayedExecutor.CancelKey;
+import jj.execution.MockTaskRunner;
 import jj.execution.ServerTask;
-import jj.execution.TaskHelper;
-import jj.execution.TaskRunner;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketConnectionTracker;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -38,8 +40,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class WebSocketConnectionTrackerTest {
 
-	@Mock TaskRunner taskRunner;
-	@InjectMocks WebSocketConnectionTracker wsct;
+	MockTaskRunner taskRunner;
+	WebSocketConnectionTracker wsct;
 	
 	@Mock WebSocketConnection connection1;
 	@Mock WebSocketConnection connection2;
@@ -49,11 +51,16 @@ public class WebSocketConnectionTrackerTest {
 	
 	@Captor ArgumentCaptor<ServerTask> activityTrackerCaptor;
 	
-	@Test
-	public void testActivityTracking() throws Exception {
-
+	@Before
+	public void before() {
+		wsct = new WebSocketConnectionTracker((taskRunner = new MockTaskRunner()));
+		
 		given(connection1.webSocketConnectionHost()).willReturn(documentScriptEnvironment1);
 		given(connection2.webSocketConnectionHost()).willReturn(documentScriptEnvironment1);
+	}
+	
+	@Test
+	public void testActivityTracking() throws Exception {
 		
 		// given
 		wsct.addConnection(connection1);
@@ -61,17 +68,37 @@ public class WebSocketConnectionTrackerTest {
 		wsct.addConnection(connection2);
 		given(connection2.lastActivity()).willReturn(System.currentTimeMillis());
 		
-		wsct.start(null);
-		
-		verify(taskRunner).execute(activityTrackerCaptor.capture());
-		
-		ServerTask activityTracker = activityTrackerCaptor.getValue();
-		
 		// when
-		TaskHelper.invoke(activityTracker);
+		wsct.start(null);
+		ServerTask task = (ServerTask)taskRunner.runFirstTask();
 		
 		// then
 		verify(connection1).close();
 		verify(connection2, never()).close();
+		
+		assertThat(taskRunner.delay(task), is(5000L));
+		assertTrue(taskRunner.taskWillRepeat(task));
+	}
+	
+	@Mock CancelKey cancelKey;
+	
+	@Test
+	public void testLifecycle() throws Exception {
+		
+		// given
+		taskRunner.cancelKey = cancelKey;
+		
+		// when
+		wsct.start(null);
+		ServerTask task = (ServerTask)taskRunner.runFirstTask();
+		
+		// then
+		assertTrue(taskRunner.taskWillRepeat(task));
+		
+		// when
+		wsct.stop(null);
+		
+		// then
+		verify(cancelKey).cancel();
 	}
 }
