@@ -44,7 +44,7 @@ class RouteTrie {
 	
 	RouteMatch find(HttpMethod method, URIMatch uri) {
 		assert method != null : "method is required";
-		//assert uri != null && !uri.isEmpty() && uri.charAt(0) == '/' : "uri is required and must start with /";
+		assert uri != null && !uri.uri.isEmpty() && uri.uri.charAt(0) == '/' : "uri is required and must start with /";
 		
 		// just play HEAD out as a GET
 		if (HEAD.equals(method)) { method = GET; }
@@ -66,8 +66,12 @@ class RouteTrie {
 			Map<String, String> params =
 				(Map<String, String>)(context.matches.get(0).params == null ? Collections.emptyMap() : Collections.unmodifiableMap(context.matches.get(0).params));
 			if (routes != null) {
-				result = new RouteMatch(method, routes, params);
+				result = new RouteMatch(uri, method, routes, params);
 			}
+		}
+		
+		if (result == null) {
+			result = new RouteMatch(uri, method, null, null);
 		}
 		
 		return result;

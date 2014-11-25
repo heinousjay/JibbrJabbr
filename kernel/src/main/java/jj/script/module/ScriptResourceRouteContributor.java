@@ -13,10 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.script.module;
+
+import static io.netty.handler.codec.http.HttpMethod.GET;
+
+import java.util.Collections;
+import java.util.List;
+
+import jj.http.server.RouteContributor;
+import jj.http.server.uri.Route;
+
 /**
- * classes for determining how to handle requests to the server
- * 
  * @author jason
  *
  */
-package jj.http.server.servable;
+class ScriptResourceRouteContributor implements RouteContributor {
+
+	@Override
+	public List<Route> contributions() {
+		return Collections.singletonList(new Route(GET, "/*path.js", "script", ""));
+	}
+
+}

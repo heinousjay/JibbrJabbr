@@ -45,7 +45,7 @@ class ParamNode extends TrieNode {
 	private static Pattern makeParameterPattern(String input) {
 		Pattern result = null;
 		if (input != null) {
-			if (!input.startsWith("")) {
+			if (!input.startsWith("^")) {
 				input = "^" + input;
 			}
 			if (!input.endsWith("$")) {

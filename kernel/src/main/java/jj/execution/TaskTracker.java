@@ -131,7 +131,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 				if (dTask.delay() > 0L) {
 					logger.trace(
 						"delayed task {} completed in {} millis, delayed for {} millis, waited for {} millis{}{}",
-						name, executionTime, dTask.delay(), enqueuedTime(), (dTask.willRepeat ? ", will repeat" : ""), (endedInError ? ", ended in error" : "")
+						name, executionTime, dTask.delay(), enqueuedTime(), (dTask.willRepeat() ? ", will repeat" : ""), (endedInError ? ", ended in error" : "")
 					);
 					logged = true;
 				}

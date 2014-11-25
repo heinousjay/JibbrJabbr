@@ -38,6 +38,8 @@ public class ScriptHelperDocumentFilterTest {
 	static final String JJ_URI = "/" + JJ_SHA + "/" + JJ_JS;
 	
 	String scriptUri;
+	String clientScriptUri = "client script uri";
+	String sharedScriptUri = "shared script uri";
 	String socketUri;
 	String webSocketUri;
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
@@ -105,7 +107,7 @@ public class ScriptHelperDocumentFilterTest {
 		// given
 		given(documentScriptEnvironment.clientScriptResource()).willReturn(scriptResource);
 		given(documentScriptEnvironment.sharedScriptResource()).willReturn(scriptResource);
-		
+		given(scriptResource.serverPath()).willReturn(sharedScriptUri, clientScriptUri);
 		// when
 		filter.filter(documentRequestProcessor);
 		
@@ -114,8 +116,8 @@ public class ScriptHelperDocumentFilterTest {
 		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
-		assertThat(document.select("script[src=" + ScriptResourceType.Client.suffix(scriptUri)+ "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptResourceType.Shared.suffix(scriptUri) + "]").size(), is(1));
+		assertThat(document.select("script[src=" + sharedScriptUri + "]").size(), is(1));
+		assertThat(document.select("script[src=" + clientScriptUri + "]").size(), is(1));
 	}
 	
 	@Test
@@ -123,6 +125,7 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// given
 		given(documentScriptEnvironment.clientScriptResource()).willReturn(scriptResource);
+		given(scriptResource.serverPath()).willReturn(clientScriptUri);
 		
 		// when
 		filter.filter(documentRequestProcessor);
@@ -132,8 +135,7 @@ public class ScriptHelperDocumentFilterTest {
 		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
-		assertThat(document.select("script[src=" + ScriptResourceType.Client.suffix(scriptUri)+ "]").size(), is(1));
-		assertThat(document.select("script[src=" + ScriptResourceType.Shared.suffix(scriptUri) + "]").size(), is(0));
+		assertThat(document.select("script[src=" + clientScriptUri + "]").size(), is(1));
 	}
 	
 	@Test
@@ -141,6 +143,7 @@ public class ScriptHelperDocumentFilterTest {
 		
 		// given
 		given(documentScriptEnvironment.sharedScriptResource()).willReturn(scriptResource);
+		given(scriptResource.serverPath()).willReturn(sharedScriptUri);
 		
 		//when
 		filter.filter(documentRequestProcessor);
@@ -150,8 +153,7 @@ public class ScriptHelperDocumentFilterTest {
 		assertThat(document.select("script[src=" + JQUERY_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").size(), is(1));
 		assertThat(document.select("script[src=" + JJ_URI + "]").attr("data-jj-socket-url"), is(webSocketUri));
-		assertThat(document.select("script[src=" + ScriptResourceType.Client.suffix(scriptUri)+ "]").size(), is(0));
-		assertThat(document.select("script[src=" + ScriptResourceType.Shared.suffix(scriptUri) + "]").size(), is(1));
+		assertThat(document.select("script[src=" + sharedScriptUri + "]").size(), is(1));
 	}
 	
 	@Test

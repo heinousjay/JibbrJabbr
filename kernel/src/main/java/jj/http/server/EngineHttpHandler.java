@@ -11,7 +11,6 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -22,15 +21,12 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 
 import jj.event.Publisher;
-import jj.execution.TaskRunner;
-import jj.http.server.servable.RequestProcessor;
-import jj.http.server.servable.Servable;
-import jj.http.server.servable.Servables;
+import jj.http.server.uri.RouteMatch;
+import jj.http.server.uri.Router;
 import jj.http.server.websocket.WebSocketConnectionMaker;
 import jj.http.server.websocket.WebSocketFrameHandlerCreator;
 import jj.http.server.websocket.WebSocketRequestChecker;
 import jj.logging.Emergency;
-import jj.resource.ResourceTask;
 
 /**
  * Reads incoming http messages and looks for ways to respond
@@ -42,9 +38,9 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	
 	private static final Pattern HTTP_REPLACER = Pattern.compile("http");
 	
-	private final TaskRunner taskRunner;
+	private final ServableResources servables;
 	
-	private final Servables servables;
+	private final Router router;
 	
 	private final Injector parentInjector;
 	
@@ -53,15 +49,15 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	private final Publisher publisher;
 	
 	@Inject
-	EngineHttpHandler( 
-		final TaskRunner taskRunner,
-		final Servables servables,
+	EngineHttpHandler(
+		final ServableResources servables,
+		final Router router,
 		final Injector parentInjector,
 		final WebSocketRequestChecker webSocketRequestChecker,
 		final Publisher publisher
 	) {
-		this.taskRunner = taskRunner;
 		this.servables = servables;
+		this.router = router;
 		this.parentInjector = parentInjector;
 		this.webSocketRequestChecker = webSocketRequestChecker;
 		this.publisher = publisher;
@@ -143,40 +139,14 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		}
 	}
 
-	void handleHttpRequest(
-		final HttpServerRequest request,
-		final HttpServerResponse response
-	) throws Exception {
-
-		// look up the candidate ways to service the request
-		// try them out to see if the request can be handled?
-		//  - TODO always in the IO thread? not sure there, maybe document servable can launch the script execution immediately
-		//  - but it may not matter since all threads will generally be warm under load and it's no big deal otherwise
-		// see if the request can get handled
-		// return 404 if not
-		final List<Servable<? extends ServableResource>> list = servables.findMatchingServables(request.uriMatch());
+	private void handleHttpRequest(final HttpServerRequest request, final HttpServerResponse response) throws Exception {
 		
-		assert (!list.isEmpty()) : "no servables found - something is misconfigured";
-		taskRunner.execute(new ResourceTask("JJEngine core processing") {
-			@Override
-			public void run() {
-				try {
-					boolean found = false;
-					for (Servable<? extends ServableResource> servable : list) {
-						RequestProcessor requestProcessor = servable.makeRequestProcessor(request, response);
-						if (requestProcessor != null) {
-							requestProcessor.process();
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						response.sendNotFound();
-					}
-				} catch (Throwable e) {
-					response.error(e);
-				}
-			}
-		});
+		RouteMatch routeMatch = router.routeRequest(request.method(), request.uriMatch());
+		RouteProcessor rp = servables.routeProcessor(routeMatch.resourceName());
+		if (rp != null) {
+			rp.process(routeMatch.route(), request, response);
+		} else {
+			response.sendNotFound();
+		}
 	}
 }

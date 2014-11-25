@@ -28,18 +28,21 @@ import javax.inject.Inject;
 
 import jj.App;
 import jj.configuration.resolution.AppLocation;
+import jj.configuration.resolution.Assets;
 import jj.document.DocumentScriptEnvironment;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpServer;
+import jj.http.server.resource.StaticResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
 import jj.script.module.ModuleScriptEnvironment;
 import jj.script.module.RequiredModule;
 import jj.testing.JibbrJabbrTestServer;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -97,6 +100,12 @@ public class ScriptEnvironmentIntegrationTest {
 				latch.countDown();
 			}
 		};
+	}
+	
+	@Before
+	public void before() {
+		resourceLoader.loadResource(StaticResource.class, AppLocation.Assets, Assets.JJ_JS);
+		resourceLoader.loadResource(StaticResource.class, AppLocation.Assets, Assets.JQUERY_JS);
 	}
 	
 	// there should be a similar test in a resource system integration test

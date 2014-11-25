@@ -5,7 +5,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -38,13 +37,13 @@ public class WebSocketConnectionTracker {
 
 		@Override
 		public void run() {
-			for (WebSocketConnection connection : allConnections.keySet()) {
-				if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
-					connection.close();
+			// do nothing if we've been interrupted
+			if (!Thread.currentThread().isInterrupted()) {
+				for (WebSocketConnection connection : allConnections.keySet()) {
+					if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
+						connection.close();
+					}
 				}
-			}
-			
-			if (run.get() && !Thread.currentThread().isInterrupted()) {
 				repeat();
 			}
 		}
@@ -53,8 +52,6 @@ public class WebSocketConnectionTracker {
 		protected long delay() {
 			return TimeUnit.MILLISECONDS.convert(5, SECONDS);
 		}
-		
-		private final AtomicBoolean run = new AtomicBoolean(true);
 	}
 
 	private final ConcurrentMap<WebSocketConnection, Boolean> allConnections = new ConcurrentHashMap<>(16, 0.75F, 2);
@@ -80,7 +77,7 @@ public class WebSocketConnectionTracker {
 	void stop(HttpServerStopped event) {
 		ActivityChecker current = currentActivityChecker.getAndSet(null);
 		assert current != null : "server was running with no web socket activity checker!";
-		current.run.set(false);
+		current.cancelKey().cancel();
 	}
 	
 	void addConnection(WebSocketConnection connection) {

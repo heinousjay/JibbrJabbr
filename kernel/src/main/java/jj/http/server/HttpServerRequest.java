@@ -70,11 +70,6 @@ public interface HttpServerRequest {
 	 * {@link System#nanoTime()} when the request was received
 	 */
 	long timestamp();
-
-	/**
-	 * The URI from the initial line
-	 */
-	String uri();
 	
 	/**
 	 * A {@link URIMatch} of the request's URI

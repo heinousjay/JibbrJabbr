@@ -56,7 +56,10 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@ServableResourceConfiguration(name = "document")
+@ServableResourceConfiguration(
+	name = "document",
+	processor = DocumentScriptEnvironmentRouteProcessor.class
+)
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
 	implements CurrentResourceAware, RootScriptEnvironment, ServableResource {

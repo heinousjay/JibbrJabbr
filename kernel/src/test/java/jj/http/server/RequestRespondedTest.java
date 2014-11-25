@@ -31,7 +31,6 @@ import java.net.SocketAddress;
 
 import jj.Version;
 import jj.event.MockPublisher;
-import jj.http.server.uri.RouteFinder;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +48,6 @@ public class RequestRespondedTest {
 	
 	@Mock Logger logger;
 	@Mock Version version;
-	@Mock RouteFinder routeFinder;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock SocketAddress socketAddress;
 	MockPublisher publisher;
@@ -58,10 +56,9 @@ public class RequestRespondedTest {
 	public void testAccessLog() throws IOException {
 		given(ctx.channel().remoteAddress()).willReturn(socketAddress);
 		given(socketAddress.toString()).willReturn("1.1.1.1");
-		given(routeFinder.find(anyString())).willReturn("/");
 		publisher = new MockPublisher();
 		HttpServerRequestImpl request =
-			new HttpServerRequestImpl(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"), routeFinder, ctx);
+			new HttpServerRequestImpl(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"), ctx);
 		
 		HttpServerResponseImpl response = new HttpServerResponseImpl(version, request, ctx, publisher);
 		

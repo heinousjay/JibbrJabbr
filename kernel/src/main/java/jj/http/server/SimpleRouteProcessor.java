@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.configuration.resolution.AppLocation.*;
 
 import java.util.Map;
 
@@ -27,6 +27,7 @@ import jj.http.server.uri.Route;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
+import jj.resource.ResourceThread;
 
 /**
  * <p>
@@ -56,24 +57,29 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	}
 	
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
-		return resourceFinder.findResource(resourceClass, Base, request.uriMatch().path); // should be Public
+		return resourceFinder.findResource(resourceClass, Base.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
+	}
+	
+	@ResourceThread
+	@Override
+	public ServableResource loadResource(final Class<? extends ServableResource> resourceClass, final URIMatch uriMatch, final Route route) {
+		return resourceFinder.loadResource(resourceClass, Base.and(Assets), uriMatch.path); // should be Public.and(Assets)
 	}
 
 	@Override
 	public void process(final Route route, final HttpServerRequest request, final HttpServerResponse response) {
 		
 		Class<? extends ServableResource> resourceClass = servableResources.get(route.resourceName());
-		
+
 		assert resourceClass != null : "configured a route processor incorrectly";
-		
-		// need to get the resource name from the route match
-		// for now using the path!
+
 		ServableResource resource = findResource(resourceClass, request);
-		
+
 		if (resource == null) {
-			resourceLoader.loadResource(resourceClass,  Base, request.uriMatch().path).then(
+			// TODO - just use the task runner
+			resourceLoader.loadResource(resourceClass, Base.and(Assets), request.uriMatch().path).then(
 				new HttpServerTask("serving a resource.  better name!") {
-					
+
 					@Override
 					protected void run() throws Exception {
 						ServableResource resource = findResource(resourceClass, request);
@@ -84,7 +90,6 @@ public class SimpleRouteProcessor implements RouteProcessor {
 		} else {
 			serve(resource, request, response);
 		}
-		
 	}
 	
 	private void serve(final ServableResource resource, final HttpServerRequest request, final HttpServerResponse response) {
@@ -93,14 +98,12 @@ public class SimpleRouteProcessor implements RouteProcessor {
 			
 			// if we get nothing, they get nothing
 			if (resource == null) {
-				
 				response.sendNotFound();
 			}
 			
 			// if the e-tag matches our SHA, 304
 			else if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
 				resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
-				
 				response.sendNotModified(resource, match.versioned);
 			} 
 
@@ -110,7 +113,6 @@ public class SimpleRouteProcessor implements RouteProcessor {
 				match.versioned && 
 				(match.sha1 == null || match.sha1.equals(resource.sha1()))
 			) {
-				
 				response.sendCachableResource(resource);
 			} 
 
@@ -118,7 +120,6 @@ public class SimpleRouteProcessor implements RouteProcessor {
 			// if the URI was versioned with a SHA that doesn't match our
 			// resource, redirect to the right URI
 			else if (match.versioned) {
-				
 				response.sendTemporaryRedirect(resource);
 			} 
 
@@ -126,7 +127,6 @@ public class SimpleRouteProcessor implements RouteProcessor {
 			// if the URI was not versioned, respond with an uncached resource
 			// (but with proper e-tags, if we loaded the resource
 			else {
-				
 				response.sendUncachableResource(resource);
 				
 			}

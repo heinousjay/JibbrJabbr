@@ -24,7 +24,6 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
-import io.netty.handler.codec.http.HttpMethod;
 import jj.configuration.ConfigurationObjectBinder;
 import jj.configuration.resolution.APIPaths;
 import jj.configuration.resolution.AssetPaths;
@@ -33,7 +32,6 @@ import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
 import jj.http.server.ServableResource;
 import jj.http.server.ServableResourceBindingProcessor;
-import jj.http.server.methods.HttpMethodHandlerBinder;
 import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.http.server.websocket.WebSocketConnectionHostBindingProcessor;
 import jj.logging.LoggingBinder;
@@ -73,8 +71,6 @@ public abstract class JJModule extends AbstractModule {
 	private LoggingBinder loggers;
 
 	private ConfigurationObjectBinder configurationObjects;
-
-	private HttpMethodHandlerBinder httpMethodHandlerBinder;
 
 	// nobody cares about this! but it's necessary
 	// to make the startup work
@@ -154,12 +150,5 @@ public abstract class JJModule extends AbstractModule {
 			configurationObjects = new ConfigurationObjectBinder(binder());
 		}
 		configurationObjects.to(configurationInterface);
-	}
-
-	protected HttpMethodHandlerBinder.With handle(HttpMethod method) {
-		if (httpMethodHandlerBinder == null) {
-			httpMethodHandlerBinder = new HttpMethodHandlerBinder(binder());
-		}
-		return httpMethodHandlerBinder.handle(method);
 	}
 }

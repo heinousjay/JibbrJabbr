@@ -47,7 +47,7 @@ class RequestResponded extends LoggedEvent {
 	public void describeTo(Logger logger) {
 		logger.info(
 			"request for [{}] completed in {} milliseconds (wall time) (stats events!)",
-			request.uri(),
+			request.uriMatch().uri,
 			request.wallTime()
 		);
 		

@@ -19,7 +19,6 @@ import jj.document.DocumentScriptEnvironment;
 import jj.execution.TaskRunner;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.server.servable.RequestProcessor;
 import jj.jjmessage.JJMessage;
 import io.netty.handler.codec.http.HttpHeaders;
 
@@ -34,7 +33,7 @@ import org.mozilla.javascript.Callable;
  *
  */
 @Singleton
-public class DocumentRequestProcessor implements RequestProcessor {
+public class DocumentRequestProcessor {
 	
 	@SuppressWarnings("serial")
 	private static class FilterList extends ArrayList<DocumentFilter> {}
@@ -105,7 +104,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		return documentScriptEnvironment.name();
 	}
 	
-	@Override
 	public void process() {
 		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment, continuationCoordinator));
 	}
@@ -211,7 +209,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": " + httpRequest.uri();
+		return getClass().getSimpleName() + ": " + documentScriptEnvironment;
 	}
 	
 	/**
@@ -245,6 +243,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	}
 	
 	String uri() {
-		return httpRequest.uri();
+		return httpRequest.uriMatch().uri;
 	}
 }

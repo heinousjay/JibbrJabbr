@@ -38,6 +38,15 @@ class RouteFinderContext {
 			if (params == null) { params = new HashMap<>(); }
 			params.put(key, value);
 		}
+		
+		@Override
+		public String toString() {
+			return new StringBuilder("Match(\n")
+				.append("  params=").append(params).append("\n")
+				.append("  goal=").append(goal).append("\n")
+				.append(")")
+				.toString();
+		}
 	}
 	
 	/** the goals we have matched thus far */
@@ -56,4 +65,6 @@ class RouteFinderContext {
 		matches.add(match);
 		currentMatch = null;
 	}
+	
+	
 }

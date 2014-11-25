@@ -111,39 +111,39 @@ public class RouterTest {
 	@Test
 	public void test() {
 
-		RouteMatch routeMatch = router.matchRequest(GET, new URIMatch("/start"));
+		RouteMatch routeMatch = router.routeRequest(GET, new URIMatch("/start"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
 		assertThat(routeMatch.route.mapping(), is("/result1"));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchRequest(GET, new URIMatch("/something/../../../../../start"));
+		routeMatch = router.routeRequest(GET, new URIMatch("/something/../../../../../start"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
 		assertThat(routeMatch.route.mapping(), is("/result1"));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchRequest(POST, new URIMatch("../finish"));
+		routeMatch = router.routeRequest(POST, new URIMatch("../finish"));
 		
 		assertThat(routeMatch.route.resourceName(), is(STATIC));
 		assertThat(routeMatch.route.mapping(), is("/result1"));
 		assertTrue(routeMatch.params.isEmpty());
 		
-		routeMatch = router.matchRequest(GET, new URIMatch("/some/path/to.something"));
+		routeMatch = router.routeRequest(GET, new URIMatch("/some/path/to.something"));
 		
 		assertThat(routeMatch.route.resourceName(), is(SOMETHING));
 		assertThat(routeMatch.route.mapping(), is(""));
 		assertThat(routeMatch.params.size(), is(1));
 		assertThat(routeMatch.params.get("path"), is("some/path/to"));
 		
-		routeMatch = router.matchRequest(POST, new URIMatch("/some/path/to.something"));
+		routeMatch = router.routeRequest(POST, new URIMatch("/some/path/to.something"));
 		
 		assertThat(routeMatch.route.resourceName(), is(SOMETHING));
 		assertThat(routeMatch.route.mapping(), is(""));
 		assertThat(routeMatch.params.size(), is(1));
 		assertThat(routeMatch.params.get("path"), is("some/path/to"));
 		
-		routeMatch = router.matchRequest(DELETE, new URIMatch("/some/path/to.something"));
+		routeMatch = router.routeRequest(DELETE, new URIMatch("/some/path/to.something"));
 		
 		assertThat(routeMatch.route.resourceName(), is(SOMETHING));
 		assertThat(routeMatch.route.mapping(), is(""));
