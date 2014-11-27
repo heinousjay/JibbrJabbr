@@ -20,7 +20,6 @@ import jj.execution.MockTaskRunner;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
-import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
@@ -45,8 +44,6 @@ public class DocumentRequestProcessorTest {
 	MockTaskRunner taskRunner;
 	
 	@Mock DependsOnScriptEnvironmentInitialization initializer;
-	
-	@Mock ContinuationCoordinator continuationCoordinator;
 
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
@@ -118,7 +115,6 @@ public class DocumentRequestProcessorTest {
 		return new DocumentRequestProcessor(
 			taskRunner,
 			initializer,
-			continuationCoordinator,
 			currentDocument,
 			documentScriptEnvironment,
 			httpRequest,
@@ -157,8 +153,6 @@ public class DocumentRequestProcessorTest {
 		taskRunner.runUntilIdle();
 		
 		verify(initializer).executeOnInitialization(eq(documentScriptEnvironment), any(ScriptTask.class));
-		
-		verifyZeroInteractions(continuationCoordinator);
 	}
 	
 	@Test
@@ -174,7 +168,7 @@ public class DocumentRequestProcessorTest {
 		
 		taskRunner.runUntilIdle();
 		
-		verify(continuationCoordinator).execute(documentScriptEnvironment, callable);
+		verify(documentScriptEnvironment).execute(callable);
 		
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);

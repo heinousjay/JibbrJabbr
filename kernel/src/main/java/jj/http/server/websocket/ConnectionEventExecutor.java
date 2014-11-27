@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.TaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.ScriptTask;
 import jj.util.Closer;
 
@@ -36,18 +35,14 @@ public class ConnectionEventExecutor {
 
 	private final TaskRunner taskRunner;
 	
-	private final ContinuationCoordinator continuationCoordinator;
-	
 	private final CurrentWebSocketConnection currentConnection;
 
 	@Inject
 	ConnectionEventExecutor(
 		final TaskRunner taskRunner,
-		final ContinuationCoordinator continuationCoordinator,
 		final CurrentWebSocketConnection currentConnection
 	) {
 		this.taskRunner = taskRunner;
-		this.continuationCoordinator = continuationCoordinator;
 		this.currentConnection = currentConnection;
 	}
 	
@@ -91,7 +86,7 @@ public class ConnectionEventExecutor {
 			
 			if (function != null) {
 				try (Closer closer = currentConnection.enterScope(connection)) {
-					pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+					pendingKey = scriptEnvironment.execute(function, args);
 				}
 			}
 		}

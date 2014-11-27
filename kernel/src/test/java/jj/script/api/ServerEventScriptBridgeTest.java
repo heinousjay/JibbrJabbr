@@ -28,7 +28,6 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.MockTaskRunner;
 import jj.execution.TaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptEnvironmentDied;
@@ -61,7 +60,6 @@ public class ServerEventScriptBridgeTest {
 	@Mock Callable callable2;
 	
 	MockTaskRunner taskRunner;
-	@Mock ContinuationCoordinator continuationCoordinator;
 	
 	@Mock ServerEventCallableInvoker seci;
 	
@@ -117,8 +115,8 @@ public class ServerEventScriptBridgeTest {
 		
 		// and now we can test the actual instance
 		ServerEventCallableInvoker instance = generated
-			.getConstructor(TaskRunner.class, ContinuationCoordinator.class)
-			.newInstance(taskRunner, continuationCoordinator);
+			.getConstructor(TaskRunner.class)
+			.newInstance(taskRunner);
 		
 		instance.invocationInstances(se, callable1);
 		
@@ -126,7 +124,7 @@ public class ServerEventScriptBridgeTest {
 		
 		taskRunner.runFirstTask();
 		
-		verify(continuationCoordinator).execute(se, callable1, sed);
+		verify(se).execute(callable1, sed);
 		
 		instance.kill();
 		

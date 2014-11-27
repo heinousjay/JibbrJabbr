@@ -40,7 +40,6 @@ import org.mozilla.javascript.ScriptableObject;
 public class TimersTest {
 	
 	MockTaskRunner taskRunner;
-	@Mock ContinuationCoordinator continuationCoordinator;
 	MockRhinoContextProvider contextProvider;
 	Timers timers;
 	
@@ -62,9 +61,9 @@ public class TimersTest {
 		env = new CurrentScriptEnvironment(contextProvider);
 		given(root.cacheKey()).willReturn(rk);
 		
-		given(continuationCoordinator.execute(any(ScriptEnvironment.class), any(Callable.class), anyVararg())).willReturn(pendingKey);
+		given(module.execute(any(Callable.class), anyVararg())).willReturn(pendingKey);
 		
-		timers = new Timers(taskRunner, continuationCoordinator, env);
+		timers = new Timers(taskRunner, env);
 	}
 	
 	@Test
@@ -166,7 +165,7 @@ public class TimersTest {
 		
 		assertThat(taskRunner.taskWillRepeat(task), is(repeat));
 		
-		verify(continuationCoordinator).execute(module, callable, args);
+		verify(module).execute(callable, args);
 	}
 
 }

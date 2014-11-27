@@ -56,7 +56,6 @@ class Timers {
 	private static final Object[] EMPTY_SLICE = new Object[0];
 	
 	private final TaskRunner taskRunner;
-	private final ContinuationCoordinator continuationCoordinator;
 	private final CurrentScriptEnvironment env;
 	
 	// there is a bit of a dance around the cancel keys.  they must be stored according to the root environment, because
@@ -68,11 +67,9 @@ class Timers {
 	@Inject
 	Timers(
 		final TaskRunner taskRunner,
-		final ContinuationCoordinator continuationCoordinator,
 		final CurrentScriptEnvironment env
 	) {
 		this.taskRunner = taskRunner;
-		this.continuationCoordinator = continuationCoordinator;
 		this.env = env;
 	}
 	
@@ -109,7 +106,7 @@ class Timers {
 						killTimerCancelKey(rootEnvironment, key);
 					}
 					
-					pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+					pendingKey = scriptEnvironment.execute(function, args);
 				}
 				
 				@Override

@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
@@ -149,8 +150,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return state == Errored;
 	}
 	
+	@Override
 	public ContinuationPendingKey executeScript(Script script) {
 		return continuationCoordinator.execute(this, script);
+	}
+	
+	@Override
+	public ContinuationPendingKey execute(Callable callable, Object...args) {
+		return continuationCoordinator.execute(this, callable, args);
 	}
 	
 	ContinuationPendingKey resumeContinuation(ContinuationPendingKey pendingKey, Object result) {
