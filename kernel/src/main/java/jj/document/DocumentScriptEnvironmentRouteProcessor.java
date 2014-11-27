@@ -33,6 +33,7 @@ import jj.http.server.RouteProcessor;
 import jj.http.server.ServableResource;
 import jj.http.server.resource.StaticResource;
 import jj.http.server.uri.Route;
+import jj.http.server.uri.RouteMatch;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceTask;
@@ -57,9 +58,11 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 	}
 
 	@Override
-	public void process(final Route route, final HttpServerRequest request, final HttpServerResponse response) {
+	public void process(final RouteMatch routeMatch, final HttpServerRequest request, final HttpServerResponse response) {
 		
-		DocumentScriptEnvironment dse = findDocumentScriptEnvironment(route);
+		Route route = routeMatch.route();
+		
+		DocumentScriptEnvironment dse = findDocumentScriptEnvironment(route.mapping());
 		
 		if (dse == null) {
 			taskRunner.execute(new ResourceTask("Loading document script at " + route.mapping()) {
@@ -67,8 +70,7 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 				@Override
 				protected void run() throws Exception {
 					preloadResources();
-					DocumentScriptEnvironment dse = 
-						resourceFinder.loadResource(DocumentScriptEnvironment.class, Virtual, route.mapping());
+					DocumentScriptEnvironment dse = loadResource(DocumentScriptEnvironment.class, null, route);
 					serve(dse, request, response);
 				}
 				
@@ -80,8 +82,9 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 	
 	@ResourceThread
 	@Override
-	public ServableResource loadResource(final Class<? extends ServableResource> resourceClass, final URIMatch uriMatch, final Route route) {
-		return resourceFinder.loadResource(DocumentScriptEnvironment.class, Virtual, route.mapping());
+	public <T extends ServableResource> T loadResource(final Class<T> resourceClass, final URIMatch uriMatch, final Route route) {
+		assert resourceClass == DocumentScriptEnvironment.class : "somehow got called for " + resourceClass;
+		return resourceFinder.loadResource(resourceClass, Virtual, route.mapping());
 	}
 	
 	private void preloadResources() {
@@ -92,8 +95,8 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 		resourceFinder.loadResource(StaticResource.class, AppLocation.Assets, Assets.JQUERY_JS);
 	}
 
-	private DocumentScriptEnvironment findDocumentScriptEnvironment(Route route) {
-		return resourceFinder.findResource(DocumentScriptEnvironment.class, Virtual, route.mapping());
+	private DocumentScriptEnvironment findDocumentScriptEnvironment(String name) {
+		return resourceFinder.findResource(DocumentScriptEnvironment.class, Virtual, name);
 	}
 	
 	private void serve(DocumentScriptEnvironment dse, HttpServerRequest request, HttpServerResponse response) {
