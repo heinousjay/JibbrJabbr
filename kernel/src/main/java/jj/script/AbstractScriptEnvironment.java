@@ -151,7 +151,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	}
 	
 	@Override
-	public ContinuationPendingKey executeScript(Script script) {
+	public ContinuationPendingKey execute(Script script) {
 		return continuationCoordinator.execute(this, script);
 	}
 	
@@ -196,7 +196,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * @return
 	 */
 	protected ContinuationPendingKey doInitialize() {
-		return script() == null ? null : executeScript(script());
+		return script() == null ? null : execute(script());
 	}
 	
 	@Override

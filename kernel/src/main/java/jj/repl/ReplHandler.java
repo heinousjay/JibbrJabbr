@@ -108,7 +108,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 					protected void begin() throws Exception {
 						
 						try (Closer closer = currentCtx.enterScope(ctx)) {
-							pendingKey = scriptEnvironment.executeScript(script);
+							pendingKey = scriptEnvironment.execute(script);
 						}
 					}
 				});

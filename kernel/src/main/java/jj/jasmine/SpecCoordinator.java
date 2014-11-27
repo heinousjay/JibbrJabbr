@@ -69,7 +69,7 @@ class SpecCoordinator {
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = scriptEnvironment.executeScript(scriptEnvironment.specScript());
+			pendingKey = scriptEnvironment.execute(scriptEnvironment.specScript());
 		}
 		
 		@Override
@@ -92,7 +92,7 @@ class SpecCoordinator {
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = scriptEnvironment.executeScript(scriptEnvironment.targetScript());
+			pendingKey = scriptEnvironment.execute(scriptEnvironment.targetScript());
 		}
 		
 		@Override
@@ -121,7 +121,7 @@ class SpecCoordinator {
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = scriptEnvironment.executeScript(scriptEnvironment.runnerScript());
+			pendingKey = scriptEnvironment.execute(scriptEnvironment.runnerScript());
 		}
 	}
 }

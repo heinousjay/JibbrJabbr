@@ -90,9 +90,9 @@ public class SpecCoordinatorTest {
 
 		// should have the continuation coordinator execute in this order 
 		InOrder io = inOrder(jse);
-		io.verify(jse).executeScript(specScript);
-		io.verify(jse).executeScript(targetScript);
-		io.verify(jse).executeScript(runnerScript);
+		io.verify(jse).execute(specScript);
+		io.verify(jse).execute(targetScript);
+		io.verify(jse).execute(runnerScript);
 		
 		// and nothing gets published
 		assertTrue(publisher.events.isEmpty());
@@ -114,7 +114,7 @@ public class SpecCoordinatorTest {
 	public void testSpecExecutionErrors() throws Exception {
 		
 		// given
-		given(jse.executeScript(specScript)).willThrow(exception);
+		given(jse.execute(specScript)).willThrow(exception);
 		
 		// when
 		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
@@ -123,7 +123,7 @@ public class SpecCoordinatorTest {
 		taskRunner.runFirstTask();
 		assertTrue(taskRunner.tasks.isEmpty());
 		
-		verify(jse).executeScript(specScript);
+		verify(jse).execute(specScript);
 		
 		verifyErrorEvent(SpecCoordinator.CONTEXT_SPEC);
 	}
@@ -132,7 +132,7 @@ public class SpecCoordinatorTest {
 	public void testTargetExecutionErrors() throws Exception {
 		
 		// given
-		given(jse.executeScript(targetScript)).willThrow(exception);
+		given(jse.execute(targetScript)).willThrow(exception);
 		
 		// when
 		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
@@ -143,8 +143,8 @@ public class SpecCoordinatorTest {
 		assertTrue(taskRunner.tasks.isEmpty());
 		
 		InOrder io = inOrder(jse);
-		io.verify(jse).executeScript(specScript);
-		io.verify(jse).executeScript(targetScript);
+		io.verify(jse).execute(specScript);
+		io.verify(jse).execute(targetScript);
 		
 		verifyErrorEvent(SpecCoordinator.CONTEXT_TARGET);
 	}
@@ -153,7 +153,7 @@ public class SpecCoordinatorTest {
 	public void testRunnerExecutionErrors() throws Exception {
 		
 		// given
-		given(jse.executeScript(runnerScript)).willThrow(exception);
+		given(jse.execute(runnerScript)).willThrow(exception);
 		
 		// when
 		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
@@ -165,9 +165,9 @@ public class SpecCoordinatorTest {
 		assertTrue(taskRunner.tasks.isEmpty());
 		
 		InOrder io = inOrder(jse);
-		io.verify(jse).executeScript(specScript);
-		io.verify(jse).executeScript(targetScript);
-		io.verify(jse).executeScript(runnerScript);
+		io.verify(jse).execute(specScript);
+		io.verify(jse).execute(targetScript);
+		io.verify(jse).execute(runnerScript);
 		
 		verifyErrorEvent(SpecCoordinator.CONTEXT_RUNNER);
 	}

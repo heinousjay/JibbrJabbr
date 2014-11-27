@@ -92,7 +92,7 @@ public class ReplHandlerTest {
 		
 		taskRunner.runFirstTask();
 		
-		verify(rse).executeScript(script);
+		verify(rse).execute(script);
 	}
 	
 	@Test

@@ -75,7 +75,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Script executedScript;
 
-	ContinuationCoordinatorImpl continuationCoordinator;
+	ContinuationCoordinator continuationCoordinator;
 	
 	final Object[] args = { new Object(), new Object() };
 	
@@ -112,7 +112,7 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, publisher, continuationProcessors, cache, is);
+		continuationCoordinator = new ContinuationCoordinator(contextProvider, env, publisher, continuationProcessors, cache, is);
 		
 		given(is.forScriptEnvironment(any(ScriptEnvironment.class))).willReturn(true);
 	}

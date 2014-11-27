@@ -85,7 +85,7 @@ public interface ScriptEnvironment extends Resource {
 	/**
 	 * Execute the given script inside the environment
 	 */
-	ContinuationPendingKey executeScript(Script script);
+	ContinuationPendingKey execute(Script script);
 	
 	/**
 	 * Execute the given {@link Callable} inside the environment
