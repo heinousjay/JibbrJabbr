@@ -22,7 +22,6 @@ import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.ScriptEnvironmentInitialized;
 import jj.script.ScriptTask;
 
@@ -41,18 +40,15 @@ class SpecCoordinator {
 	static final String CONTEXT_SPEC = "spec";
 	static final String CONTEXT_TARGET = "target";
 	static final String CONTEXT_RUNNER = "runner";
-
-	private final ContinuationCoordinator continuationCoordinator;
+	
 	private final TaskRunner taskRunner;
 	private final Publisher publisher;
 	
 	@Inject
 	SpecCoordinator(
-		final ContinuationCoordinator continuationCoordinator,
 		final TaskRunner taskRunner,
 		final Publisher publisher
 	) {
-		this.continuationCoordinator = continuationCoordinator;
 		this.taskRunner = taskRunner;
 		this.publisher = publisher;
 	}
@@ -73,7 +69,7 @@ class SpecCoordinator {
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.specScript());
+			pendingKey = scriptEnvironment.executeScript(scriptEnvironment.specScript());
 		}
 		
 		@Override
@@ -96,7 +92,7 @@ class SpecCoordinator {
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.targetScript());
+			pendingKey = scriptEnvironment.executeScript(scriptEnvironment.targetScript());
 		}
 		
 		@Override
@@ -125,7 +121,7 @@ class SpecCoordinator {
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.runnerScript());
+			pendingKey = scriptEnvironment.executeScript(scriptEnvironment.runnerScript());
 		}
 	}
 }

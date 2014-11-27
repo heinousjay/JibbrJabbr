@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
@@ -148,6 +149,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return state == Errored;
 	}
 	
+	public ContinuationPendingKey executeScript(Script script) {
+		return continuationCoordinator.execute(this, script);
+	}
+	
 	ContinuationPendingKey resumeContinuation(ContinuationPendingKey pendingKey, Object result) {
 		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
 	}
@@ -168,7 +173,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	ContinuationPendingKey beginInitializing() {
 		assert state == Unitialized : "wrong state to initialize";
 		state = Initializing;
-		return script() == null ? null : continuationCoordinator.execute(this, script());
+		return doInitialize();
 	}
 	
 	/**
@@ -177,6 +182,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	void initializationError(Throwable cause) {
 		state = Errored;
 		this.initializationError = cause;
+	}
+	
+	/**
+	 * Override this function for custom initialization functionality
+	 * @return
+	 */
+	protected ContinuationPendingKey doInitialize() {
+		return script() == null ? null : executeScript(script());
 	}
 	
 	@Override

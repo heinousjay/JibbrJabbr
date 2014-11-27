@@ -27,7 +27,6 @@ import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceReloaded;
-import jj.script.ContinuationCoordinator;
 import jj.script.RhinoContext;
 import jj.script.ScriptTask;
 import jj.util.Closer;
@@ -48,7 +47,6 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 	
 	private final ResourceFinder resourceFinder;
 	private final TaskRunner taskRunner;
-	private final ContinuationCoordinator continuationCoordinator;
 	private final CurrentReplChannelHandlerContext currentCtx;
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -58,13 +56,11 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 	ReplHandler(
 		final ResourceFinder resourceFinder,
 		final TaskRunner taskRunner,
-		final ContinuationCoordinator continuationCoordinator,
 		final CurrentReplChannelHandlerContext currentCtx,
 		final Provider<RhinoContext> contextProvider
 	) {
 		this.resourceFinder = resourceFinder;
 		this.taskRunner = taskRunner;
-		this.continuationCoordinator = continuationCoordinator;
 		this.currentCtx = currentCtx;
 		this.contextProvider = contextProvider;
 	}
@@ -112,7 +108,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 					protected void begin() throws Exception {
 						
 						try (Closer closer = currentCtx.enterScope(ctx)) {
-							pendingKey = continuationCoordinator.execute(scriptEnvironment, script);
+							pendingKey = scriptEnvironment.executeScript(script);
 						}
 					}
 				});
