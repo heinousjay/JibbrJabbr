@@ -19,7 +19,6 @@ import jj.App;
 import jj.testing.JibbrJabbrTestServer;
 import jj.webdriver.WebDriverRule;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -44,7 +43,6 @@ public class LetsWriteATest {
 	@Rule
 	public WebDriverRule webDriverRule = server.webDriverRule(App.DRIVER_PROVIDER);
 	
-	@Ignore
 	@Test
 	public void testChief() throws Exception {
 		
@@ -58,7 +56,6 @@ public class LetsWriteATest {
 		//webDriverRule.takeScreenshot();
 	}
 
-	@Ignore
 	@Test
 	public void testBeef() throws Exception {
 		

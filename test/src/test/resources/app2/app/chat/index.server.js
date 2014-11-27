@@ -16,7 +16,7 @@ var smileyify = require('helpers/smileys');
 
 var broadcast = require('jj/broadcast');
 
-var localStorage = require('jj/local-storage');
+//var localStorage = require('jj/local-storage');
 
 var console = require('jj/console');
 
@@ -171,7 +171,7 @@ var command = (function() {
 			user.name = processUserName(params);
 			// you must store it again, it's all JSON.stringified in and out
 			clientStorage.user = user;
-			localStorage.store(USER_KEY, user);
+			fStore(USER_KEY, user);
 			// and send it out to everyone
 			// with an announcement!
 			var message = messages.add('/me is now known as ' + user.name, {id: user.id, name: oldName}, true);
@@ -306,7 +306,7 @@ clientConnected(function() {
 	
 	function finish() {
 		user = users.connected(user);
-		localStorage.store(USER_KEY, user);
+		fStore(USER_KEY, user);
 		clientStorage.user = user;
 		// you can broadcast from here as well
 		broadcast(function() {
@@ -334,7 +334,7 @@ clientConnected(function() {
 		}
 	}
 	
-	var user = localStorage.retrieve(USER_KEY) || {};
+	var user = fRetrieve(USER_KEY) || {};
 	
 	if (user.id) {
 		finish();
