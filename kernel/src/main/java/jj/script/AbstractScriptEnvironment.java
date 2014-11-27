@@ -165,13 +165,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		}
 	}
 
-	/**
-	 * mark this environment as undergoing initialization
-	 */
-	void initializing(boolean initializing) {
-		if (initializing && state == Unitialized) {
-			state = Initializing;
-		}
+	ContinuationPendingKey beginInitializing() {
+		assert state == Unitialized : "wrong state to initialize";
+		state = Initializing;
+		return script() == null ? null : continuationCoordinator.execute(this, script());
 	}
 	
 	/**

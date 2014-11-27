@@ -45,7 +45,6 @@ public class ScriptEnvironmentInitializerTest {
 	ContinuationPendingKey pendingKey2;
 	
 	MockTaskRunner taskRunner;
-	@Mock ContinuationCoordinatorImpl continuationCoordinator;
 
 	ScriptEnvironmentInitializer sei;
 	
@@ -65,19 +64,19 @@ public class ScriptEnvironmentInitializerTest {
 		pendingKey2 = new ContinuationPendingKey();
 		taskRunner = new MockTaskRunner();
 		given(scriptEnvironment.script()).willReturn(script);
-		sei = new ScriptEnvironmentInitializer(taskRunner, isScriptThread, continuationCoordinator, publisher);
+		sei = new ScriptEnvironmentInitializer(taskRunner, isScriptThread, publisher);
 	}
 	
 	@Test
 	public void testRootScriptEnvironmentInitialization() throws Exception {
 		ScriptTask<?> resumable = startInitialization();
 		
-		given(continuationCoordinator.execute(scriptEnvironment)).willReturn(pendingKey1);
+		given(scriptEnvironment.beginInitializing()).willReturn(pendingKey1);
 		
 		taskRunner.runFirstTask();
 		
 		assertThat(ScriptTaskHelper.pendingKey(resumable), is(pendingKey1));
-		verify(scriptEnvironment).initializing(true);
+		verify(scriptEnvironment).beginInitializing();
 		
 		Object result = new Object();
 		ScriptTaskHelper.resumeWith(resumable, result);

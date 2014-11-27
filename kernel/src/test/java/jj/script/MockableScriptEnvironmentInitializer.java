@@ -33,10 +33,9 @@ public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentIniti
 	public MockableScriptEnvironmentInitializer(
 		TaskRunner taskRunner,
 		IsThread isScriptThread,
-		ContinuationCoordinatorImpl continuationCoordinator,
 		Publisher publisher
 	) {
-		super(taskRunner, isScriptThread, continuationCoordinator, publisher);
+		super(taskRunner, isScriptThread, publisher);
 	}
 
 	

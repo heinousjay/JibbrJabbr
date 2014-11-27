@@ -118,43 +118,6 @@ public class ContinuationCoordinatorTest {
 	}
 	
 	@Test
-	public void testInitialExecutionNoContinuation() {
-		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
-		
-		assertThat(result, is(nullValue()));
-	}
-	
-	@Test
-	public void testInitialExecutionWithContinuation() {
-		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
-		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
-		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
-
-		assertThat(result, is(pendingKey));
-		verify(continuationProcessor2).process(continuationState);
-	}
-	
-	@Test
-	public void testInitialExecutionWithUnexpectedException() {
-		
-		final RuntimeException e = new RuntimeException();
-		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(e);
-		
-		try {
-			continuationCoordinator.execute(scriptEnvironment);
-			fail();
-		} catch (RuntimeException re) {
-			assertThat(re, is(sameInstance(e)));
-		}
-		
-		verify(publisher).publish(isA(ScriptExecutionError.class));
-	}
-	
-	@Test
 	public void testFunctionExecutionNoContinuation() {
 		
 		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, function, args[0], args[1]);

@@ -89,23 +89,6 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		});
 	}
 	
-	/**
-	 * initial execution of a script environment.  only available to the Initializer task
-	 * @param scriptEnvironment The script environment
-	 */
-	ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment) {
-		
-		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
-		
-		assert is.forScriptEnvironment(scriptEnvironment) : "only execute this in the right script environment!";
-		
-		return execute(scriptEnvironment, context -> {
-			try (Closer closer = env.enterScope(scriptEnvironment)) {
-				context.executeScriptWithContinuations(scriptEnvironment.script(), scriptEnvironment.scope());
-			}
-		});
-	}
-	
 	@Override
 	public ContinuationPendingKey execute(final ScriptEnvironment scriptEnvironment, final Callable function, final Object...args) {
 		
