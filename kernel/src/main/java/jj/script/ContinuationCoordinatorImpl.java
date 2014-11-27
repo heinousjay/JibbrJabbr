@@ -21,7 +21,7 @@ import jj.util.Closer;
  *
  */
 @Singleton
-class ContinuationCoordinatorImpl implements ContinuationCoordinator {
+class ContinuationCoordinatorImpl implements ContinuationCoordinator, ContinuationResumer {
 	
 	private interface ContinuationExecution {
 		void run(RhinoContext context);

@@ -24,7 +24,7 @@ import org.mozilla.javascript.Script;
  * @author jason
  *
  */
-public interface ContinuationCoordinator {
+interface ContinuationCoordinator {
 
 	/**
 	 * continuable String evaluation within the context of {@link ScriptEnvironment}
@@ -52,12 +52,4 @@ public interface ContinuationCoordinator {
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
 	ContinuationPendingKey resumeContinuation(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey, Object result);
-	
-	/**
-	 * Resume a continuation, for use by code that constructs its own ContinuationPendingKey, such as from a network message
-	 * @param pendingKey
-	 * @param result
-	 */
-	void resume(ContinuationPendingKey pendingKey, Object result);
-
 }

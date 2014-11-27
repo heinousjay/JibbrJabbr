@@ -22,7 +22,7 @@ import jj.engine.EventSelection;
 import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.script.ContinuationCoordinator;
+import jj.script.ContinuationResumer;
 import jj.script.CurrentScriptEnvironment;
 
 /**
@@ -34,7 +34,7 @@ import jj.script.CurrentScriptEnvironment;
 @Singleton
 class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
 	
-	private final ContinuationCoordinator continuationCoordinator;
+	private final ContinuationResumer continuationResumer;
 	
 	private final CurrentWebSocketConnection currentConnection;
 	
@@ -42,18 +42,18 @@ class ElementMessageProcessor implements DocumentWebSocketMessageProcessor {
 	
 	@Inject
 	ElementMessageProcessor(
-		final ContinuationCoordinator continuationCoordinator,
+		final ContinuationResumer continuationResumer,
 		final CurrentWebSocketConnection connection,
 		final CurrentScriptEnvironment env
 	) {
-		this.continuationCoordinator = continuationCoordinator;
+		this.continuationResumer = continuationResumer;
 		this.currentConnection = connection;
 		this.env = env;
 	}
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
-		continuationCoordinator.resume(message.pendingKey(), new EventSelection(message.element().selector, currentConnection, env));
+		continuationResumer.resume(message.pendingKey(), new EventSelection(message.element().selector, currentConnection, env));
 	}
 
 }

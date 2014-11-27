@@ -22,7 +22,7 @@ import org.mozilla.javascript.Undefined;
 
 import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
-import jj.script.ContinuationCoordinator;
+import jj.script.ContinuationResumer;
 import jj.script.ScriptJSON;
 
 /**
@@ -34,20 +34,20 @@ import jj.script.ScriptJSON;
 @Singleton
 class ResultMessageProcessor implements DocumentWebSocketMessageProcessor {
 
-	private final ContinuationCoordinator continuationCoordinator;
+	private final ContinuationResumer continuationResumer;
 	
 	private final ScriptJSON json;
 	
 	@Inject
-	ResultMessageProcessor(final ContinuationCoordinator continuationCoordinator, final ScriptJSON json) {
-		this.continuationCoordinator = continuationCoordinator;
+	ResultMessageProcessor(final ContinuationResumer continuationResumer, final ScriptJSON json) {
+		this.continuationResumer = continuationResumer;
 		this.json = json;
 	}
 
 	@Override
 	public void handle(WebSocketConnection connection, JJMessage message) {
 		Object value = message.result().value == null ? Undefined.instance : json.parse(message.result().value);
-		continuationCoordinator.resume(message.pendingKey(), value);
+		continuationResumer.resume(message.pendingKey(), value);
 	}
 
 }
