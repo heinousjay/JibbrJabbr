@@ -106,7 +106,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 					"repl-console"
 				);
 	
-				taskRunner.execute(new ScriptTask<ReplScriptEnvironment>("repl execution:\n" + msg, rse, continuationCoordinator) {
+				taskRunner.execute(new ScriptTask<ReplScriptEnvironment>("repl execution:\n" + msg, rse) {
 	
 					@Override
 					protected void begin() throws Exception {

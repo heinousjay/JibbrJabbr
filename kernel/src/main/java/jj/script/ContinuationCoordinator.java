@@ -59,11 +59,5 @@ public interface ContinuationCoordinator {
 	 * @param result
 	 */
 	void resume(ContinuationPendingKey pendingKey, Object result);
-	
-	/**
-	 * Pass a task instance in to await a continuation
-	 * @param task
-	 */
-	void awaitContinuation(ScriptTask<? extends ScriptEnvironment> task);
 
 }

@@ -100,36 +100,33 @@ class Timers {
 		final String key = "jj-timer-" + cancelIds.next();
 		final ScriptEnvironment rootEnvironment = env.currentRootScriptEnvironment();
 		
-		ScriptTask<ScriptEnvironment> task = new ScriptTask<ScriptEnvironment>(
-			repeat ? "setInterval" : "setTimeout",
-			env.current(),
-			continuationCoordinator
-		) {
-			@Override
-			protected void begin() throws Exception {
-				// if this is setTimeout, kill the cancelation structure
-				if (!repeat) {
-					killTimerCancelKey(rootEnvironment, key);
+		ScriptTask<ScriptEnvironment> task =
+			new ScriptTask<ScriptEnvironment>(repeat ? "setInterval" : "setTimeout", env.current()) {
+				@Override
+				protected void begin() throws Exception {
+					// if this is setTimeout, kill the cancelation structure
+					if (!repeat) {
+						killTimerCancelKey(rootEnvironment, key);
+					}
+					
+					pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
 				}
 				
-				pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
-			}
-			
-			@Override
-			protected void complete() throws Exception {
-				// we need to repeat once the task is complete, as an artifact of the resumable structure
-				// to do otherwise would require a way to clone tasks, which should actually be doable?
-				// but for now, repeat on complete
-				if (repeat) {
-					repeat();
+				@Override
+				protected void complete() throws Exception {
+					// we need to repeat once the task is complete, as an artifact of the resumable structure
+					// to do otherwise would require a way to clone tasks, which should actually be doable?
+					// but for now, repeat on complete
+					if (repeat) {
+						repeat();
+					}
 				}
-			}
-			
-			@Override
-			protected long delay() {
-				return delay;
-			}
-		};
+				
+				@Override
+				protected long delay() {
+					return delay;
+				}
+			};
 		
 		taskRunner.execute(task);
 		

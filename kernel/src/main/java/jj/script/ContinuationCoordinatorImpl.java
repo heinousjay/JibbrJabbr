@@ -126,11 +126,6 @@ class ContinuationCoordinatorImpl implements ContinuationCoordinator {
 		return null;
 	}
 	
-	@Override
-	public void awaitContinuation(ScriptTask<? extends ScriptEnvironment> task) {
-		cache.storeForContinuation(task);
-	}
-	
 	/**
 	 * Resumes a continuation that was previously saved from an execution in this class
 	 * @param pendingKey

@@ -105,6 +105,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	private final ContinuationCoordinator continuationCoordinator;
 	
+	private final ContinuationPendingCache continuationPendingCache;
+	
 	private final Dependencies dependencies;
 	
 	private volatile ScriptExecutionState state = Unitialized;
@@ -114,6 +116,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected AbstractScriptEnvironment(Dependencies dependencies) {
 		super(dependencies);
 		this.contextProvider = dependencies.scriptEnvironmentDependencies.contextProvider;
+		this.continuationPendingCache = dependencies.scriptEnvironmentDependencies.continuationPendingCache;
 		this.continuationCoordinator = dependencies.scriptEnvironmentDependencies.continuationCoordinator;
 		this.dependencies = dependencies;
 	}
@@ -147,6 +150,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	ContinuationPendingKey resumeContinuation(ContinuationPendingKey pendingKey, Object result) {
 		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
+	}
+	
+	<T extends ScriptEnvironment> void awaitContinuation(ScriptTask<T> task) {
+		continuationPendingCache.storeForContinuation(task);
 	}
 
 	/**

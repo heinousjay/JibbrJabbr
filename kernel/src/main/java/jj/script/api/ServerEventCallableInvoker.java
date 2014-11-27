@@ -60,11 +60,8 @@ abstract class ServerEventCallableInvoker {
 		assert callable != null : "invoker invoked without set callable";
 		
 		if (alive) {
-			taskRunner.execute(new ScriptTask<ScriptEnvironment>(
-				"invoking " + target.name() + " function with server event " + event.getClass().getName(),
-				target,
-				continuationCoordinator
-			) {
+			String name = "invoking " + target.name() + " function with server event " + event.getClass().getName();
+			taskRunner.execute(new ScriptTask<ScriptEnvironment>(name, target) {
 				@Override
 				protected void begin() throws Exception {
 					if (alive) {

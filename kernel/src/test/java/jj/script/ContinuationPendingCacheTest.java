@@ -54,7 +54,7 @@ public class ContinuationPendingCacheTest {
 		/** it will never run so nulls are cool!
 		 */
 		protected HelperTask(ContinuationPendingKey pendingKey) {
-			super("", null, null);
+			super("", null);
 			this.pendingKey = pendingKey;
 		}
 

@@ -80,7 +80,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	}
 	
 	void initializeScript(AbstractScriptEnvironment se) {
-		taskRunner.execute(new InitializerTask("initializing " + se, se, continuationCoordinator));
+		taskRunner.execute(new InitializerTask("initializing " + se, se));
 	}
 	
 	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
@@ -132,8 +132,8 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		 * @param name
 		 * @param scriptEnvironment
 		 */
-		protected InitializerTask(String name, AbstractScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
-			super(name, scriptEnvironment, continuationCoordinator);
+		protected InitializerTask(String name, AbstractScriptEnvironment scriptEnvironment) {
+			super(name, scriptEnvironment);
 		}
 		
 		protected void begin() throws Exception {

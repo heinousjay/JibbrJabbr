@@ -56,7 +56,6 @@ public class ConnectionEventExecutor {
 			new ConnectionEventTask(
 				"host event " + event + " on WebSocket connection",
 				connection,
-				continuationCoordinator,
 				args,
 				event
 			)
@@ -74,11 +73,10 @@ public class ConnectionEventExecutor {
 		private ConnectionEventTask(
 			String name,
 			WebSocketConnection connection,
-			ContinuationCoordinator continuationCoordinator,
 			Object[] args,
 			String event
 		) {
-			super(name, connection.webSocketConnectionHost(), continuationCoordinator);
+			super(name, connection.webSocketConnectionHost());
 			this.args = args;
 			this.connection = connection;
 			this.event = event;

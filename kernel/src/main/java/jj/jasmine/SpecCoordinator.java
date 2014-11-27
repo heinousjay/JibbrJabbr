@@ -61,17 +61,14 @@ class SpecCoordinator {
 	void scriptInitialized(final ScriptEnvironmentInitialized event) {
 		// right now, checking this way for testing purposes, to let mocks in
 		if (JasmineScriptEnvironment.class.isAssignableFrom(event.scriptEnvironment().getClass())) {
-			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment(), continuationCoordinator));
+			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment()));
 		}
 	}
 	
 	private final class SpecEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
-		SpecEvaluationTask(
-			final JasmineScriptEnvironment scriptEnvironment,
-			final ContinuationCoordinator continuationCoordinator
-		) {
-			super("spec execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		SpecEvaluationTask(final JasmineScriptEnvironment scriptEnvironment) {
+			super("spec execution for " + scriptEnvironment, scriptEnvironment);
 		}
 
 		@Override
@@ -87,17 +84,14 @@ class SpecCoordinator {
 		
 		@Override
 		protected void complete() throws Exception {
-			taskRunner.execute(new TargetEvaluationTask(scriptEnvironment, continuationCoordinator));
+			taskRunner.execute(new TargetEvaluationTask(scriptEnvironment));
 		}
 	}
 	
 	private final class TargetEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
-		TargetEvaluationTask(
-			final JasmineScriptEnvironment scriptEnvironment,
-			final ContinuationCoordinator continuationCoordinator
-		) {
-			super("target execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		TargetEvaluationTask(final JasmineScriptEnvironment scriptEnvironment) {
+			super("target execution for " + scriptEnvironment, scriptEnvironment);
 		}
 
 		@Override
@@ -113,17 +107,14 @@ class SpecCoordinator {
 		
 		@Override
 		protected void complete() throws Exception {
-			taskRunner.execute(new RunnerEvaluationTask(scriptEnvironment, continuationCoordinator));
+			taskRunner.execute(new RunnerEvaluationTask(scriptEnvironment));
 		}
 	}
 	
 	private final class RunnerEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
-		RunnerEvaluationTask(
-			final JasmineScriptEnvironment scriptEnvironment,
-			final ContinuationCoordinator continuationCoordinator
-		) {
-			super("runner execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		RunnerEvaluationTask(final JasmineScriptEnvironment scriptEnvironment) {
+			super("runner execution for " + scriptEnvironment, scriptEnvironment);
 		}
 		
 		@Override

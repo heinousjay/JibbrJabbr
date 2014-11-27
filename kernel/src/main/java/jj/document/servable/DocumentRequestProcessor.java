@@ -105,15 +105,15 @@ public class DocumentRequestProcessor {
 	}
 	
 	public void process() {
-		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment, continuationCoordinator));
+		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment));
 	}
 	
 	private final class DocumentRequestProcessTask extends ScriptTask<DocumentScriptEnvironment> {
 		
 		private boolean run = false;
 		
-		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
-			super("processing document request at " + scriptEnvironment.name(), scriptEnvironment, continuationCoordinator);
+		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment) {
+			super("processing document request at " + scriptEnvironment.name(), scriptEnvironment);
 		}
 
 		@Override
