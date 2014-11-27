@@ -160,12 +160,28 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return continuationCoordinator.execute(this, callable, args);
 	}
 	
+	/**
+	 * Resume a continuation in this environment
+	 * @param pendingKey
+	 * @param result
+	 * @return
+	 */
 	ContinuationPendingKey resumeContinuation(ContinuationPendingKey pendingKey, Object result) {
 		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
 	}
 	
+	/**
+	 * Await a continuation in this environment
+	 * @param task
+	 */
 	<T extends ScriptEnvironment> void awaitContinuation(ScriptTask<T> task) {
 		continuationPendingCache.storeForContinuation(task);
+	}
+
+	ContinuationPendingKey beginInitializing() {
+		assert state == Unitialized : "wrong state to initialize";
+		state = Initializing;
+		return doInitialize();
 	}
 
 	/**
@@ -176,15 +192,9 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			state = Initialized;
 		}
 	}
-
-	ContinuationPendingKey beginInitializing() {
-		assert state == Unitialized : "wrong state to initialize";
-		state = Initializing;
-		return doInitialize();
-	}
 	
 	/**
-	 * mark this environment as having experienced an initalization error
+	 * mark this environment as having experienced an initialization error
 	 */
 	void initializationError(Throwable cause) {
 		state = Errored;

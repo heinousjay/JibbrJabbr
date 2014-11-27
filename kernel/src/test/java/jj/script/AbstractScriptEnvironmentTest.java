@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
@@ -51,8 +52,7 @@ public class AbstractScriptEnvironmentTest {
 		
 		@Override
 		public Script script() {
-			// TODO Auto-generated method stub
-			return null;
+			return script;
 		}
 		
 		@Override
@@ -82,11 +82,23 @@ public class AbstractScriptEnvironmentTest {
 	@Mock ContinuationPending continuationPending;
 	
 	@Mock ScriptableObject scope;
+	@Mock Script script;
 
 
 	@Before
 	public void before() throws Exception {
 		ase = new MyScriptEnvironment(dependencies = new MockAbstractScriptEnvironmentDependencies());
+	}
+	
+	@Test
+	public void testBirth() {
+		
+		// when
+		ase.beginInitializing();
+		
+		// then
+		verify(dependencies.continuationCoordinator()).execute(ase, script);
+		assertTrue(ase.initializing());
 	}
 	
 	@Test
@@ -104,6 +116,30 @@ public class AbstractScriptEnvironmentTest {
 		assertTrue(dependencies.publisher().events.get(0) instanceof ScriptEnvironmentDied);
 		ScriptEnvironmentDied event = (ScriptEnvironmentDied)dependencies.publisher().events.get(0);
 		assertThat(event.scriptEnvironment(), is(ase));
+	}
+	
+	@Test
+	public void testScriptExecution() {
+		
+		// when
+		ase.execute(script);
+		
+		// then
+		verify(dependencies.continuationCoordinator()).execute(ase, script);
+	}
+	
+	@Test
+	public void testCallableExecution() {
+		
+		// given
+		Callable callable = mock(Callable.class);
+		Object[] args = new Object[0];
+		
+		// when
+		ase.execute(callable, args);
+		
+		// then
+		verify(dependencies.continuationCoordinator()).execute(ase, callable, args);
 	}
 	
 	@Test
