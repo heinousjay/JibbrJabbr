@@ -39,8 +39,6 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	private final IsThread isScriptThread;
 	
-	private final ContinuationCoordinatorImpl continuationCoordinator;
-	
 	private final Publisher publisher;
 	
 	private static final class TaskOrKey {
@@ -70,17 +68,15 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	ScriptEnvironmentInitializer(
 		final TaskRunner taskRunner,
 		final IsThread isScriptThread,
-		final ContinuationCoordinatorImpl continuationCoordinator,
 		final Publisher publisher
 	) {
 		this.taskRunner = taskRunner;
 		this.isScriptThread = isScriptThread;
-		this.continuationCoordinator = continuationCoordinator;
 		this.publisher = publisher;
 	}
 	
 	void initializeScript(AbstractScriptEnvironment se) {
-		taskRunner.execute(new InitializerTask("initializing " + se, se, continuationCoordinator));
+		taskRunner.execute(new InitializerTask("initializing " + se, se));
 	}
 	
 	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
@@ -132,17 +128,12 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		 * @param name
 		 * @param scriptEnvironment
 		 */
-		protected InitializerTask(String name, AbstractScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
-			super(name, scriptEnvironment, continuationCoordinator);
+		protected InitializerTask(String name, AbstractScriptEnvironment scriptEnvironment) {
+			super(name, scriptEnvironment);
 		}
 		
 		protected void begin() throws Exception {
-			
-			scriptEnvironment.initializing(true);
-			
-			if (scriptEnvironment.script() != null) {
-				pendingKey = ScriptEnvironmentInitializer.this.continuationCoordinator.execute(scriptEnvironment);
-			}
+			pendingKey = scriptEnvironment.beginInitializing();
 		}
 		
 		protected void complete() throws Exception {

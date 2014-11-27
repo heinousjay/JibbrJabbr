@@ -22,7 +22,6 @@ import static org.mockito.BDDMockito.*;
 
 import jj.event.MockPublisher;
 import jj.execution.MockTaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.ScriptEnvironmentInitialized;
 import jj.script.module.ScriptResource;
 
@@ -42,7 +41,6 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public class SpecCoordinatorTest {
 
-	@Mock ContinuationCoordinator continuationCoordinator;
 	MockTaskRunner taskRunner;
 	MockPublisher publisher;
 	
@@ -73,7 +71,7 @@ public class SpecCoordinatorTest {
 		given(jse.targetScript()).willReturn(targetScript);
 		given(jse.runnerScript()).willReturn(runnerScript);
 		
-		sc = new SpecCoordinator(continuationCoordinator, taskRunner, publisher);
+		sc = new SpecCoordinator(taskRunner, publisher);
 	}
 	
 	@Test
@@ -91,10 +89,10 @@ public class SpecCoordinatorTest {
 		assertTrue(taskRunner.tasks.isEmpty());
 
 		// should have the continuation coordinator execute in this order 
-		InOrder io = inOrder(continuationCoordinator);
-		io.verify(continuationCoordinator).execute(jse, specScript);
-		io.verify(continuationCoordinator).execute(jse, targetScript);
-		io.verify(continuationCoordinator).execute(jse, runnerScript);
+		InOrder io = inOrder(jse);
+		io.verify(jse).execute(specScript);
+		io.verify(jse).execute(targetScript);
+		io.verify(jse).execute(runnerScript);
 		
 		// and nothing gets published
 		assertTrue(publisher.events.isEmpty());
@@ -116,7 +114,7 @@ public class SpecCoordinatorTest {
 	public void testSpecExecutionErrors() throws Exception {
 		
 		// given
-		given(continuationCoordinator.execute(jse, specScript)).willThrow(exception);
+		given(jse.execute(specScript)).willThrow(exception);
 		
 		// when
 		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
@@ -125,8 +123,7 @@ public class SpecCoordinatorTest {
 		taskRunner.runFirstTask();
 		assertTrue(taskRunner.tasks.isEmpty());
 		
-		verify(continuationCoordinator).execute(jse, specScript);
-		verifyNoMoreInteractions(continuationCoordinator);
+		verify(jse).execute(specScript);
 		
 		verifyErrorEvent(SpecCoordinator.CONTEXT_SPEC);
 	}
@@ -135,7 +132,7 @@ public class SpecCoordinatorTest {
 	public void testTargetExecutionErrors() throws Exception {
 		
 		// given
-		given(continuationCoordinator.execute(jse, targetScript)).willThrow(exception);
+		given(jse.execute(targetScript)).willThrow(exception);
 		
 		// when
 		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
@@ -145,10 +142,9 @@ public class SpecCoordinatorTest {
 		taskRunner.runFirstTask();
 		assertTrue(taskRunner.tasks.isEmpty());
 		
-		InOrder io = inOrder(continuationCoordinator);
-		io.verify(continuationCoordinator).execute(jse, specScript);
-		io.verify(continuationCoordinator).execute(jse, targetScript);
-		verifyNoMoreInteractions(continuationCoordinator);
+		InOrder io = inOrder(jse);
+		io.verify(jse).execute(specScript);
+		io.verify(jse).execute(targetScript);
 		
 		verifyErrorEvent(SpecCoordinator.CONTEXT_TARGET);
 	}
@@ -157,7 +153,7 @@ public class SpecCoordinatorTest {
 	public void testRunnerExecutionErrors() throws Exception {
 		
 		// given
-		given(continuationCoordinator.execute(jse, runnerScript)).willThrow(exception);
+		given(jse.execute(runnerScript)).willThrow(exception);
 		
 		// when
 		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
@@ -168,10 +164,10 @@ public class SpecCoordinatorTest {
 		taskRunner.runFirstTask();
 		assertTrue(taskRunner.tasks.isEmpty());
 		
-		InOrder io = inOrder(continuationCoordinator);
-		io.verify(continuationCoordinator).execute(jse, specScript);
-		io.verify(continuationCoordinator).execute(jse, targetScript);
-		io.verify(continuationCoordinator).execute(jse, runnerScript);
+		InOrder io = inOrder(jse);
+		io.verify(jse).execute(specScript);
+		io.verify(jse).execute(targetScript);
+		io.verify(jse).execute(runnerScript);
 		
 		verifyErrorEvent(SpecCoordinator.CONTEXT_RUNNER);
 	}

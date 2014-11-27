@@ -16,7 +16,6 @@
 package jj.script.api;
 
 import jj.execution.TaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptTask;
 
@@ -32,8 +31,6 @@ import org.mozilla.javascript.Callable;
 abstract class ServerEventCallableInvoker {
 	
 	private final TaskRunner taskRunner;
-	
-	private final ContinuationCoordinator continuationCoordinator;
 
 	private ScriptEnvironment target;
 	
@@ -41,9 +38,8 @@ abstract class ServerEventCallableInvoker {
 	
 	private volatile boolean alive = true;
 	
-	protected ServerEventCallableInvoker(final TaskRunner taskRunner, final ContinuationCoordinator continuationCoordinator) {
+	protected ServerEventCallableInvoker(final TaskRunner taskRunner) {
 		this.taskRunner = taskRunner;
-		this.continuationCoordinator = continuationCoordinator;
 	}
 	
 	void invocationInstances(final ScriptEnvironment target, final Callable callable) {
@@ -60,15 +56,12 @@ abstract class ServerEventCallableInvoker {
 		assert callable != null : "invoker invoked without set callable";
 		
 		if (alive) {
-			taskRunner.execute(new ScriptTask<ScriptEnvironment>(
-				"invoking " + target.name() + " function with server event " + event.getClass().getName(),
-				target,
-				continuationCoordinator
-			) {
+			String name = "invoking " + target.name() + " function with server event " + event.getClass().getName();
+			taskRunner.execute(new ScriptTask<ScriptEnvironment>(name, target) {
 				@Override
 				protected void begin() throws Exception {
 					if (alive) {
-						pendingKey = continuationCoordinator.execute(scriptEnvironment, callable, event);
+						pendingKey = scriptEnvironment.execute(callable, event);
 					}
 				}
 			});

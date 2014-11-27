@@ -24,7 +24,6 @@ import jj.http.server.websocket.ConnectionEventExecutor;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.jjmessage.EventNameHelper;
-import jj.script.ContinuationCoordinator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +42,6 @@ public class ConnectionEventExecutorTest {
 	@Mock WebSocketConnection connection;
 	@Mock WebSocketConnectionHost webSocketConnectionHost;
 	MockTaskRunner taskRunner;
-	@Mock ContinuationCoordinator continuationCoordinator;
 	@Mock Callable eventFunction;
 	@Mock Callable eventFunction2;
 	
@@ -53,7 +51,7 @@ public class ConnectionEventExecutorTest {
 	public void before() {
 		taskRunner = new MockTaskRunner();
 		
-		cee = new ConnectionEventExecutor(taskRunner, continuationCoordinator, new MockCurrentWebSocketConnection());
+		cee = new ConnectionEventExecutor(taskRunner, new MockCurrentWebSocketConnection());
 		
 		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
 	}
@@ -71,7 +69,7 @@ public class ConnectionEventExecutorTest {
 		taskRunner.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(webSocketConnectionHost, eventFunction);
+		verify(webSocketConnectionHost).execute(eventFunction);
 		verify(connection).getFunction(eventName);
 		verify(webSocketConnectionHost).getFunction(eventName);
 
@@ -85,7 +83,7 @@ public class ConnectionEventExecutorTest {
 		taskRunner.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator, times(2)).execute(webSocketConnectionHost, eventFunction);
+		verify(webSocketConnectionHost, times(2)).execute(eventFunction);
 		verify(connection).getFunction(eventName);
 		verify(webSocketConnectionHost, never()).getFunction(eventName);
 	}
@@ -104,7 +102,7 @@ public class ConnectionEventExecutorTest {
 		taskRunner.runUntilIdle();
 		
 		// then
-		verify(continuationCoordinator).execute(webSocketConnectionHost, eventFunction);
+		verify(webSocketConnectionHost).execute(eventFunction);
 	}
 
 }

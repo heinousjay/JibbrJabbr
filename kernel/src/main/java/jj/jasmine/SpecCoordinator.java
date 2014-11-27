@@ -22,7 +22,6 @@ import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.ScriptEnvironmentInitialized;
 import jj.script.ScriptTask;
 
@@ -41,18 +40,15 @@ class SpecCoordinator {
 	static final String CONTEXT_SPEC = "spec";
 	static final String CONTEXT_TARGET = "target";
 	static final String CONTEXT_RUNNER = "runner";
-
-	private final ContinuationCoordinator continuationCoordinator;
+	
 	private final TaskRunner taskRunner;
 	private final Publisher publisher;
 	
 	@Inject
 	SpecCoordinator(
-		final ContinuationCoordinator continuationCoordinator,
 		final TaskRunner taskRunner,
 		final Publisher publisher
 	) {
-		this.continuationCoordinator = continuationCoordinator;
 		this.taskRunner = taskRunner;
 		this.publisher = publisher;
 	}
@@ -61,22 +57,19 @@ class SpecCoordinator {
 	void scriptInitialized(final ScriptEnvironmentInitialized event) {
 		// right now, checking this way for testing purposes, to let mocks in
 		if (JasmineScriptEnvironment.class.isAssignableFrom(event.scriptEnvironment().getClass())) {
-			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment(), continuationCoordinator));
+			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment()));
 		}
 	}
 	
 	private final class SpecEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
-		SpecEvaluationTask(
-			final JasmineScriptEnvironment scriptEnvironment,
-			final ContinuationCoordinator continuationCoordinator
-		) {
-			super("spec execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		SpecEvaluationTask(final JasmineScriptEnvironment scriptEnvironment) {
+			super("spec execution for " + scriptEnvironment, scriptEnvironment);
 		}
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.specScript());
+			pendingKey = scriptEnvironment.execute(scriptEnvironment.specScript());
 		}
 		
 		@Override
@@ -87,22 +80,19 @@ class SpecCoordinator {
 		
 		@Override
 		protected void complete() throws Exception {
-			taskRunner.execute(new TargetEvaluationTask(scriptEnvironment, continuationCoordinator));
+			taskRunner.execute(new TargetEvaluationTask(scriptEnvironment));
 		}
 	}
 	
 	private final class TargetEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
-		TargetEvaluationTask(
-			final JasmineScriptEnvironment scriptEnvironment,
-			final ContinuationCoordinator continuationCoordinator
-		) {
-			super("target execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		TargetEvaluationTask(final JasmineScriptEnvironment scriptEnvironment) {
+			super("target execution for " + scriptEnvironment, scriptEnvironment);
 		}
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.targetScript());
+			pendingKey = scriptEnvironment.execute(scriptEnvironment.targetScript());
 		}
 		
 		@Override
@@ -113,17 +103,14 @@ class SpecCoordinator {
 		
 		@Override
 		protected void complete() throws Exception {
-			taskRunner.execute(new RunnerEvaluationTask(scriptEnvironment, continuationCoordinator));
+			taskRunner.execute(new RunnerEvaluationTask(scriptEnvironment));
 		}
 	}
 	
 	private final class RunnerEvaluationTask extends ScriptTask<JasmineScriptEnvironment> {
 		
-		RunnerEvaluationTask(
-			final JasmineScriptEnvironment scriptEnvironment,
-			final ContinuationCoordinator continuationCoordinator
-		) {
-			super("runner execution for " + scriptEnvironment, scriptEnvironment, continuationCoordinator);
+		RunnerEvaluationTask(final JasmineScriptEnvironment scriptEnvironment) {
+			super("runner execution for " + scriptEnvironment, scriptEnvironment);
 		}
 		
 		@Override
@@ -134,7 +121,7 @@ class SpecCoordinator {
 
 		@Override
 		protected void begin() throws Exception {
-			pendingKey = continuationCoordinator.execute(scriptEnvironment, scriptEnvironment.runnerScript());
+			pendingKey = scriptEnvironment.execute(scriptEnvironment.runnerScript());
 		}
 	}
 }

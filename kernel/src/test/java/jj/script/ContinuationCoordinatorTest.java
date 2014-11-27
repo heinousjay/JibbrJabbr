@@ -75,7 +75,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Script executedScript;
 
-	ContinuationCoordinatorImpl continuationCoordinator;
+	ContinuationCoordinator continuationCoordinator;
 	
 	final Object[] args = { new Object(), new Object() };
 	
@@ -112,46 +112,9 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, publisher, continuationProcessors, cache, is);
+		continuationCoordinator = new ContinuationCoordinator(contextProvider, env, publisher, continuationProcessors, cache, is);
 		
 		given(is.forScriptEnvironment(any(ScriptEnvironment.class))).willReturn(true);
-	}
-	
-	@Test
-	public void testInitialExecutionNoContinuation() {
-		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
-		
-		assertThat(result, is(nullValue()));
-	}
-	
-	@Test
-	public void testInitialExecutionWithContinuation() {
-		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
-		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
-		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
-
-		assertThat(result, is(pendingKey));
-		verify(continuationProcessor2).process(continuationState);
-	}
-	
-	@Test
-	public void testInitialExecutionWithUnexpectedException() {
-		
-		final RuntimeException e = new RuntimeException();
-		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(e);
-		
-		try {
-			continuationCoordinator.execute(scriptEnvironment);
-			fail();
-		} catch (RuntimeException re) {
-			assertThat(re, is(sameInstance(e)));
-		}
-		
-		verify(publisher).publish(isA(ScriptExecutionError.class));
 	}
 	
 	@Test

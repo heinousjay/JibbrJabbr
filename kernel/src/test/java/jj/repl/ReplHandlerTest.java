@@ -23,7 +23,6 @@ import static org.mockito.BDDMockito.*;
 import io.netty.channel.ChannelHandlerContext;
 import jj.execution.MockTaskRunner;
 import jj.resource.ResourceFinder;
-import jj.script.ContinuationCoordinator;
 import jj.script.MockRhinoContextProvider;
 
 import org.junit.Before;
@@ -42,7 +41,6 @@ public class ReplHandlerTest {
 	
 	@Mock ResourceFinder resourceFinder;
 	MockTaskRunner taskRunner;
-	@Mock ContinuationCoordinator continuationCoordinator;
 	MockRhinoContextProvider contextProvider;
 	
 	ReplHandler rh;
@@ -61,7 +59,6 @@ public class ReplHandlerTest {
 		rh = new ReplHandler(
 			resourceFinder,
 			taskRunner,
-			continuationCoordinator,
 			new CurrentReplChannelHandlerContext(),
 			contextProvider
 		);
@@ -95,7 +92,7 @@ public class ReplHandlerTest {
 		
 		taskRunner.runFirstTask();
 		
-		verify(continuationCoordinator).execute(rse, script);
+		verify(rse).execute(script);
 	}
 	
 	@Test

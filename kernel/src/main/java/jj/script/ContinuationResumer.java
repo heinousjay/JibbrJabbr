@@ -15,36 +15,16 @@
  */
 package jj.script;
 
-import jj.event.Publisher;
-import jj.execution.TaskRunner;
-
 /**
- * just raises the visibility of some methods for testing
- * 
  * @author jason
  *
  */
-public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentInitializer {
-
+public interface ContinuationResumer {
+	
 	/**
-	 * @param taskRunner
-	 * @param continuationCoordinator
+	 * Resume a continuation, for use by code that constructs its own ContinuationPendingKey, such as from a network message
+	 * @param pendingKey
+	 * @param result
 	 */
-	public MockableScriptEnvironmentInitializer(
-		TaskRunner taskRunner,
-		IsThread isScriptThread,
-		Publisher publisher
-	) {
-		super(taskRunner, isScriptThread, publisher);
-	}
-
-	
-	@Override
-	public void initializeScript(AbstractScriptEnvironment se) {
-		super.initializeScript(se);
-	}
-	
-	public void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
-		
-	}
+	void resume(ContinuationPendingKey pendingKey, Object result);
 }

@@ -29,8 +29,6 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	
 	protected final T scriptEnvironment;
 	
-	protected final ContinuationCoordinator continuationCoordinator;
-	
 	/** assign the result of any operation against the ContinuationCoordinator to this field */
 	protected ContinuationPendingKey pendingKey;
 	
@@ -45,10 +43,9 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 */
 	protected Object result;
 	
-	protected ScriptTask(final String name, final T scriptEnvironment, final ContinuationCoordinator continuationCoordinator) {
+	protected ScriptTask(final String name, final T scriptEnvironment) {
 		super(name);
 		this.scriptEnvironment = scriptEnvironment;
-		this.continuationCoordinator = continuationCoordinator;
 	}
 	
 	@Override
@@ -65,7 +62,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 		if (pendingKey == null) {
 			complete();
 		} else {
-			continuationCoordinator.awaitContinuation(this);
+			((AbstractScriptEnvironment)scriptEnvironment).awaitContinuation(this);
 		}
 	}
 	
@@ -79,7 +76,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 * Resumes executing the task
 	 */
 	void resume() {
-		pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
+		pendingKey = ((AbstractScriptEnvironment)scriptEnvironment).resumeContinuation(pendingKey, result);
 	}
 	/**
 	 * Implement this method to run after completion of either the begin or resume methods, when no

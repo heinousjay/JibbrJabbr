@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.ResourceTask;
-import jj.script.ContinuationCoordinator;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
 import jj.script.ScriptThread;
@@ -42,8 +41,6 @@ public class DocumentRequestProcessor {
 	
 	private final DependsOnScriptEnvironmentInitialization initializer;
 	
-	private final ContinuationCoordinator continuationCoordinator;
-	
 	private final CurrentDocumentRequestProcessor currentDocument;
 	
 	private final DocumentScriptEnvironment documentScriptEnvironment;
@@ -62,7 +59,6 @@ public class DocumentRequestProcessor {
 	DocumentRequestProcessor(
 		final TaskRunner taskRunner,
 		final DependsOnScriptEnvironmentInitialization initializer,
-		final ContinuationCoordinator continuationCoordinator,
 		final CurrentDocumentRequestProcessor currentDocument,
 		final DocumentScriptEnvironment dse,
 		final HttpServerRequest httpRequest,
@@ -72,7 +68,6 @@ public class DocumentRequestProcessor {
 	) {
 		this.taskRunner = taskRunner;
 		this.initializer = initializer;
-		this.continuationCoordinator = continuationCoordinator;
 		this.currentDocument = currentDocument;
 		this.documentScriptEnvironment = dse;
 		this.document = dse.document();
@@ -105,15 +100,15 @@ public class DocumentRequestProcessor {
 	}
 	
 	public void process() {
-		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment, continuationCoordinator));
+		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment));
 	}
 	
 	private final class DocumentRequestProcessTask extends ScriptTask<DocumentScriptEnvironment> {
 		
 		private boolean run = false;
 		
-		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
-			super("processing document request at " + scriptEnvironment.name(), scriptEnvironment, continuationCoordinator);
+		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment) {
+			super("processing document request at " + scriptEnvironment.name(), scriptEnvironment);
 		}
 
 		@Override
@@ -130,7 +125,7 @@ public class DocumentRequestProcessor {
 				if (readyFunction != null) {
 					try (Closer closer = currentDocument.enterScope(DocumentRequestProcessor.this)) {
 						// should make a request object wrapper of some sort.  and perhaps response too?
-						pendingKey = continuationCoordinator.execute(scriptEnvironment, readyFunction);
+						pendingKey = scriptEnvironment.execute(readyFunction);
 					}
 				}
 			}

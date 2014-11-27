@@ -17,16 +17,12 @@ import jj.document.DocumentScriptEnvironment;
 import jj.document.servable.DocumentFilter;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.execution.MockTaskRunner;
-import jj.execution.TaskHelper;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
-import jj.script.ContinuationCoordinator;
 import jj.script.ContinuationPendingKey;
 import jj.script.DependsOnScriptEnvironmentInitialization;
-import jj.script.ScriptEnvironment;
 import jj.script.ScriptTask;
-import jj.script.ScriptTaskHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 
@@ -48,8 +44,6 @@ public class DocumentRequestProcessorTest {
 	MockTaskRunner taskRunner;
 	
 	@Mock DependsOnScriptEnvironmentInitialization initializer;
-	
-	@Mock ContinuationCoordinator continuationCoordinator;
 
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
@@ -121,7 +115,6 @@ public class DocumentRequestProcessorTest {
 		return new DocumentRequestProcessor(
 			taskRunner,
 			initializer,
-			continuationCoordinator,
 			currentDocument,
 			documentScriptEnvironment,
 			httpRequest,
@@ -160,40 +153,6 @@ public class DocumentRequestProcessorTest {
 		taskRunner.runUntilIdle();
 		
 		verify(initializer).executeOnInitialization(eq(documentScriptEnvironment), any(ScriptTask.class));
-		
-		verifyZeroInteractions(continuationCoordinator);
-	}
-	
-	@Test
-	public void testInvokesReadyFunctionWithInitializedScriptAndContinuation() throws Exception {
-		
-		// given
-		DocumentRequestProcessor toTest = toTest(Collections.<DocumentFilter>emptySet());
-		given(documentScriptEnvironment.hasServerScript()).willReturn(true);
-		given(documentScriptEnvironment.initialized()).willReturn(true);
-		given(documentScriptEnvironment.getFunction(DocumentScriptEnvironment.READY_FUNCTION_KEY)).willReturn(callable);
-		given(continuationCoordinator.execute(documentScriptEnvironment, callable)).willReturn(pendingKey);
-		
-		toTest.process();
-		
-		@SuppressWarnings("unchecked")
-		ScriptTask<? extends ScriptEnvironment> task = (ScriptTask<? extends ScriptEnvironment>)taskRunner.firstTask();
-		taskRunner.runUntilIdle();
-		
-		assertThat(ScriptTaskHelper.pendingKey(task), is(pendingKey));
-		Object result = new Object();
-		ScriptTaskHelper.resumeWith(task, result);
-		
-		TaskHelper.invoke(task);
-		
-		verify(continuationCoordinator).resumeContinuation(documentScriptEnvironment, pendingKey, result);
-		
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
-		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
-		verify(httpResponse).content(bytes);
-		
-		verifyZeroInteractions(initializer);
 	}
 	
 	@Test
@@ -209,7 +168,7 @@ public class DocumentRequestProcessorTest {
 		
 		taskRunner.runUntilIdle();
 		
-		verify(continuationCoordinator).execute(documentScriptEnvironment, callable);
+		verify(documentScriptEnvironment).execute(callable);
 		
 		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);

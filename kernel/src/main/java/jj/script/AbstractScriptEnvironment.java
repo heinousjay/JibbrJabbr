@@ -23,7 +23,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
@@ -49,6 +51,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	@Singleton
 	protected static class AbstractScriptEnvironmentDependencies {
+		protected final ContinuationCoordinator continuationCoordinator;
 		protected final ContinuationPendingCache continuationPendingCache;
 		protected final Provider<ContinuationPendingKey> pendingKeyProvider;
 		protected final RequireInnerFunction requireInnerFunction;
@@ -58,6 +61,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		
 		@Inject
 		AbstractScriptEnvironmentDependencies(
+			final ContinuationCoordinator continuationCoordinator,
 			final ContinuationPendingCache continuationPendingCache,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
@@ -65,6 +69,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Timers timers,
 			final Provider<RhinoContext> contextProvider
 		) {
+			this.continuationCoordinator = continuationCoordinator;
 			this.continuationPendingCache = continuationPendingCache;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
@@ -100,6 +105,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	private final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
+	private final ContinuationCoordinator continuationCoordinator;
+	
+	private final ContinuationPendingCache continuationPendingCache;
+	
 	private final Dependencies dependencies;
 	
 	private volatile ScriptExecutionState state = Unitialized;
@@ -109,6 +118,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected AbstractScriptEnvironment(Dependencies dependencies) {
 		super(dependencies);
 		this.contextProvider = dependencies.scriptEnvironmentDependencies.contextProvider;
+		this.continuationPendingCache = dependencies.scriptEnvironmentDependencies.continuationPendingCache;
+		this.continuationCoordinator = dependencies.scriptEnvironmentDependencies.continuationCoordinator;
 		this.dependencies = dependencies;
 	}
 	
@@ -138,6 +149,40 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	public boolean initializationDidError() {
 		return state == Errored;
 	}
+	
+	@Override
+	public ContinuationPendingKey execute(Script script) {
+		return continuationCoordinator.execute(this, script);
+	}
+	
+	@Override
+	public ContinuationPendingKey execute(Callable callable, Object...args) {
+		return continuationCoordinator.execute(this, callable, args);
+	}
+	
+	/**
+	 * Resume a continuation in this environment
+	 * @param pendingKey
+	 * @param result
+	 * @return
+	 */
+	ContinuationPendingKey resumeContinuation(ContinuationPendingKey pendingKey, Object result) {
+		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
+	}
+	
+	/**
+	 * Await a continuation in this environment
+	 * @param task
+	 */
+	<T extends ScriptEnvironment> void awaitContinuation(ScriptTask<T> task) {
+		continuationPendingCache.storeForContinuation(task);
+	}
+
+	ContinuationPendingKey beginInitializing() {
+		assert state == Unitialized : "wrong state to initialize";
+		state = Initializing;
+		return doInitialize();
+	}
 
 	/**
 	 * mark this environment as being initialized
@@ -147,22 +192,21 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			state = Initialized;
 		}
 	}
-
-	/**
-	 * mark this environment as undergoing initialization
-	 */
-	void initializing(boolean initializing) {
-		if (initializing && state == Unitialized) {
-			state = Initializing;
-		}
-	}
 	
 	/**
-	 * mark this environment as having experienced an initalization error
+	 * mark this environment as having experienced an initialization error
 	 */
 	void initializationError(Throwable cause) {
 		state = Errored;
 		this.initializationError = cause;
+	}
+	
+	/**
+	 * Override this function for custom initialization functionality
+	 * @return
+	 */
+	protected ContinuationPendingKey doInitialize() {
+		return script() == null ? null : execute(script());
 	}
 	
 	@Override

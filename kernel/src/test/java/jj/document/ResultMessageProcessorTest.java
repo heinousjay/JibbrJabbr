@@ -20,7 +20,7 @@ import jj.document.ResultMessageProcessor;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
-import jj.script.ContinuationCoordinator;
+import jj.script.ContinuationResumer;
 import jj.script.ContinuationPendingKey;
 import jj.script.ScriptJSON;
 
@@ -38,7 +38,7 @@ import org.mozilla.javascript.Undefined;
 @RunWith(MockitoJUnitRunner.class)
 public class ResultMessageProcessorTest {
 
-	@Mock ContinuationCoordinator continuationCoordinator;
+	@Mock ContinuationResumer continuationResumer;
 	@Mock ScriptJSON json;
 	@Mock WebSocketConnection connection;
 	
@@ -52,7 +52,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(continuationCoordinator).resume(new ContinuationPendingKey(id), value);
+		verify(continuationResumer).resume(new ContinuationPendingKey(id), value);
 	}
 	
 	@Test
@@ -63,7 +63,7 @@ public class ResultMessageProcessorTest {
 		JJMessage message = MessageMaker.makeResult(id, value);
 		rmp.handle(connection, message);
 		
-		verify(continuationCoordinator).resume(new ContinuationPendingKey(id), Undefined.instance);
+		verify(continuationResumer).resume(new ContinuationPendingKey(id), Undefined.instance);
 	}
 
 }

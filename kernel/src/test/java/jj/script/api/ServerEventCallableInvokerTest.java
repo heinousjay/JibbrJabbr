@@ -13,48 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.document;
+package jj.script.api;
 
 import static org.mockito.BDDMockito.*;
-import jj.document.ElementMessageProcessor;
-import jj.engine.EventSelection;
-import jj.http.server.websocket.WebSocketConnection;
-import jj.jjmessage.JJMessage;
-import jj.jjmessage.MessageMaker;
-import jj.script.ContinuationResumer;
-import jj.script.ContinuationPendingKey;
+import jj.execution.MockTaskRunner;
+import jj.script.ScriptEnvironment;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mozilla.javascript.Callable;
 
 /**
  * @author jason
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ElementMessageProcessorTest {
+public class ServerEventCallableInvokerTest {
 	
-	@Mock ContinuationResumer continuationResumer;
+	MockTaskRunner taskRunner;
+	
+	ServerEventCallableInvoker invoker;
+	
+	@Mock ScriptEnvironment target;
+	@Mock Callable callable;
+	
+	@Before
+	public void before() {
+		taskRunner = new MockTaskRunner();
+		
+		invoker = new ServerEventCallableInvoker(taskRunner) {};
+		
+		invoker.invocationInstances(target, callable);
+	}
 
-	@Mock WebSocketConnection connection;
-	
-	@InjectMocks ElementMessageProcessor emp;
-	
 	@Test
-	public void test() {
+	public void test() throws Exception {
 		
-		//given
-		JJMessage jqm = MessageMaker.makeElement("id", "selector");
-		jqm.pendingKey(new ContinuationPendingKey());
+		Object event = new Object();
 		
-		//when
-		emp.handle(connection, jqm);
+		invoker.invoke(event);
 		
-		//then
-		verify(continuationResumer).resume(eq(jqm.pendingKey()), isA(EventSelection.class));
+		taskRunner.runFirstTask();
+		
+		verify(target).execute(callable, event);
 	}
 
 }

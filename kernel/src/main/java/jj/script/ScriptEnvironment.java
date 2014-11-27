@@ -17,6 +17,7 @@ package jj.script;
 
 import jj.resource.Resource;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -80,5 +81,15 @@ public interface ScriptEnvironment extends Resource {
 	 * The exports of this environment. may be null, may be literally anything the script decides to export
 	 */
 	Object exports();
+	
+	/**
+	 * Execute the given script inside the environment
+	 */
+	ContinuationPendingKey execute(Script script);
+	
+	/**
+	 * Execute the given {@link Callable} inside the environment
+	 */
+	ContinuationPendingKey execute(Callable callable, Object...args);
 
 }
