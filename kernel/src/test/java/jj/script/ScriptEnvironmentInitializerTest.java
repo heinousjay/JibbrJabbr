@@ -82,7 +82,7 @@ public class ScriptEnvironmentInitializerTest {
 		Object result = new Object();
 		ScriptTaskHelper.resumeWith(resumable, result);
 		
-		given(continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey1, result)).willReturn(pendingKey2);
+		given(scriptEnvironment.resumeContinuation(pendingKey1, result)).willReturn(pendingKey2);
 		
 		// put it back!
 		taskRunner.tasks.add(resumable);
@@ -97,7 +97,6 @@ public class ScriptEnvironmentInitializerTest {
 		taskRunner.tasks.add(resumable);
 		taskRunner.runFirstTask();
 		
-		verify(continuationCoordinator).resumeContinuation(scriptEnvironment, pendingKey2, result);
 		verify(scriptEnvironment).initialized(true);
 		verify(publisher).publish(initEventCaptor.capture());
 		assertThat(initEventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));

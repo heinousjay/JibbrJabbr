@@ -39,6 +39,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 		
 		MockInnerAbstractScriptEnvironmentDependencies(Provider<RhinoContext> rhinoContextProvider) {
 			super(
+				mock(ContinuationCoordinator.class),
 				mock(ContinuationPendingCache.class),
 				mock(MockPendingKeyProvider.class),
 				mock(RequireInnerFunction.class),
@@ -80,6 +81,10 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 			mock(ResourceKey.class),
 			name
 		);
+	}
+	
+	public ContinuationCoordinator continuationCoordinator() {
+		return scriptEnvironmentDependencies.continuationCoordinator;
 	}
 	
 	public MockPublisher publisher() {

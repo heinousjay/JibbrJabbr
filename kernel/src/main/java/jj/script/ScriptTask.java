@@ -79,7 +79,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 * Resumes executing the task
 	 */
 	void resume() {
-		pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
+		pendingKey = ((AbstractScriptEnvironment)scriptEnvironment).resumeContinuation(pendingKey, result);
 	}
 	/**
 	 * Implement this method to run after completion of either the begin or resume methods, when no

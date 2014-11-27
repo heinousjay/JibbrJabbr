@@ -49,6 +49,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	@Singleton
 	protected static class AbstractScriptEnvironmentDependencies {
+		protected final ContinuationCoordinator continuationCoordinator;
 		protected final ContinuationPendingCache continuationPendingCache;
 		protected final Provider<ContinuationPendingKey> pendingKeyProvider;
 		protected final RequireInnerFunction requireInnerFunction;
@@ -58,6 +59,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		
 		@Inject
 		AbstractScriptEnvironmentDependencies(
+			final ContinuationCoordinator continuationCoordinator,
 			final ContinuationPendingCache continuationPendingCache,
 			final Provider<ContinuationPendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
@@ -65,6 +67,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final Timers timers,
 			final Provider<RhinoContext> contextProvider
 		) {
+			this.continuationCoordinator = continuationCoordinator;
 			this.continuationPendingCache = continuationPendingCache;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
@@ -100,6 +103,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	private final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
+	private final ContinuationCoordinator continuationCoordinator;
+	
 	private final Dependencies dependencies;
 	
 	private volatile ScriptExecutionState state = Unitialized;
@@ -109,6 +114,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected AbstractScriptEnvironment(Dependencies dependencies) {
 		super(dependencies);
 		this.contextProvider = dependencies.scriptEnvironmentDependencies.contextProvider;
+		this.continuationCoordinator = dependencies.scriptEnvironmentDependencies.continuationCoordinator;
 		this.dependencies = dependencies;
 	}
 	
@@ -137,6 +143,10 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	@Override
 	public boolean initializationDidError() {
 		return state == Errored;
+	}
+	
+	ContinuationPendingKey resumeContinuation(ContinuationPendingKey pendingKey, Object result) {
+		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
 	}
 
 	/**
