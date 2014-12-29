@@ -144,7 +144,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 		RouteMatch routeMatch = router.routeRequest(request.method(), request.uriMatch());
 		RouteProcessor rp = servables.routeProcessor(routeMatch.resourceName());
 		if (rp != null) {
-			rp.process(routeMatch.route(), request, response);
+			rp.process(routeMatch, request, response);
 		} else {
 			response.sendNotFound();
 		}

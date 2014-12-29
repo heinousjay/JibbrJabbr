@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import jj.http.server.uri.Route;
+import jj.http.server.uri.RouteMatch;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
@@ -57,19 +58,19 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	}
 	
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
-		return resourceFinder.findResource(resourceClass, Base.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
+		return resourceLoader.findResource(resourceClass, Base.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
 	}
 	
 	@ResourceThread
 	@Override
-	public ServableResource loadResource(final Class<? extends ServableResource> resourceClass, final URIMatch uriMatch, final Route route) {
+	public <T extends ServableResource> T loadResource(final Class<T> resourceClass, final URIMatch uriMatch, final Route route) {
 		return resourceFinder.loadResource(resourceClass, Base.and(Assets), uriMatch.path); // should be Public.and(Assets)
 	}
 
 	@Override
-	public void process(final Route route, final HttpServerRequest request, final HttpServerResponse response) {
+	public void process(final RouteMatch routeMatch, final HttpServerRequest request, final HttpServerResponse response) {
 		
-		Class<? extends ServableResource> resourceClass = servableResources.get(route.resourceName());
+		Class<? extends ServableResource> resourceClass = servableResources.get(routeMatch.resourceName());
 
 		assert resourceClass != null : "configured a route processor incorrectly";
 
@@ -78,7 +79,7 @@ public class SimpleRouteProcessor implements RouteProcessor {
 		if (resource == null) {
 			// TODO - just use the task runner
 			resourceLoader.loadResource(resourceClass, Base.and(Assets), request.uriMatch().path).then(
-				new HttpServerTask("serving a resource.  better name!") {
+				new HttpServerTask("post-load, serving " + routeMatch.route()) {
 
 					@Override
 					protected void run() throws Exception {
@@ -94,6 +95,7 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	
 	private void serve(final ServableResource resource, final HttpServerRequest request, final HttpServerResponse response) {
 		URIMatch match = request.uriMatch();
+		System.out.println(match);
 		try {
 			
 			// if we get nothing, they get nothing
@@ -102,8 +104,7 @@ public class SimpleRouteProcessor implements RouteProcessor {
 			}
 			
 			// if the e-tag matches our SHA, 304
-			else if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
-				resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
+			else if (resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
 				response.sendNotModified(resource, match.versioned);
 			} 
 

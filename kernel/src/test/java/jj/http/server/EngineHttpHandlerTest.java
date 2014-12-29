@@ -177,7 +177,7 @@ public class EngineHttpHandlerTest {
 		
 		verifyNoMoreInteractions(binder, abb);
 		
-		verify(routeProcessor).process(route, httpRequest1, httpResponse);
+		verify(routeProcessor).process(routeMatch, httpRequest1, httpResponse);
 	}
 	
 	@Test

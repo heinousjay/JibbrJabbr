@@ -26,7 +26,7 @@ import jj.execution.JJTask;
 import jj.execution.Promise;
 import jj.execution.TaskHelper;
 import jj.http.server.resource.StaticResource;
-import jj.http.server.uri.Route;
+import jj.http.server.uri.RouteMatch;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
@@ -60,7 +60,7 @@ public class SimpleRouteProcessorTest {
 	
 	SimpleRouteProcessor srs;
 	
-	@Mock Route route;
+	@Mock RouteMatch routeMatch;
 	@Mock StaticResource resource;
 	@Mock HttpServerRequest request;
 	@Mock HttpServerResponse response;
@@ -75,7 +75,7 @@ public class SimpleRouteProcessorTest {
 		servableResources = new HashMap<>();
 		servableResources.put(STATIC, StaticResource.class);
 		
-		given(route.resourceName()).willReturn(STATIC);
+		given(routeMatch.resourceName()).willReturn(STATIC);
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/hi/there"));
 		
@@ -89,7 +89,7 @@ public class SimpleRouteProcessorTest {
 	@Test
 	public void testNotFound() throws Exception {
 		
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		
 		verify(promise).then(taskCaptor.capture());
 		
@@ -100,15 +100,14 @@ public class SimpleRouteProcessorTest {
 	
 	private void givenResourceRequest(String uri) {
 		URIMatch match = new URIMatch(uri);
-		
 		given(request.uriMatch()).willReturn(match);
-		given(resourceFinder.findResource(StaticResource.class, Base.and(Assets), match.path)).willReturn(resource);
+		given(resourceLoader.findResource(StaticResource.class, Base.and(Assets), match.path)).willReturn(resource);
 	}
 	
 	@Test
 	public void testLoadedResource() throws Exception {
 		
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		verify(promise).then(taskCaptor.capture());
 		
 		givenResourceRequest(UNVERSIONED_URI);
@@ -123,7 +122,7 @@ public class SimpleRouteProcessorTest {
 		
 		givenResourceRequest(UNVERSIONED_URI);
 		
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		
 		verify(response).sendUncachableResource(resource);
 	}
@@ -133,7 +132,7 @@ public class SimpleRouteProcessorTest {
 		
 		givenResourceRequest(VERSIONED_URI);
 		
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		
 		verify(response).sendCachableResource(resource);
 	}
@@ -143,10 +142,9 @@ public class SimpleRouteProcessorTest {
 		
 		givenResourceRequest(VERSIONED_URI);
 		
-		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		
 		verify(response).sendNotModified(resource, true);
 	}
@@ -159,7 +157,7 @@ public class SimpleRouteProcessorTest {
 		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
 		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
 		
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		
 		verify(response).sendNotModified(resource, false);
 	}
@@ -171,7 +169,7 @@ public class SimpleRouteProcessorTest {
 		
 		given(resource.sha1()).willReturn("some other sha1");
 
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		
 		verify(response).sendTemporaryRedirect(resource);
 	}
@@ -187,7 +185,7 @@ public class SimpleRouteProcessorTest {
 		
 		given(response.sendTemporaryRedirect(resource)).willThrow(toThrow);
 
-		srs.process(route, request, response);
+		srs.process(routeMatch, request, response);
 		
 		verify(response).error(toThrow);
 	}

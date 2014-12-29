@@ -27,6 +27,11 @@ import jj.execution.Promise;
 public interface ResourceLoader {
 
 	/**
+	 * @see ResourceFinder#findResource(Class, Location, String, Object...)
+	 */
+	<T extends Resource> T findResource(Class<T> resourceClass, Location base, String name, Object...args);
+	
+	/**
 	 * <p>
 	 * Asynchronously load the identified {@link Resource} using a {@link ResourceTask}
 	 * 
