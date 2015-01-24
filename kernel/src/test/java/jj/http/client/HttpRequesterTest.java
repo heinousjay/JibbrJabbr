@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -68,7 +69,7 @@ public class HttpRequesterTest {
 			.param("from", "iou")
 			.param("me", "awesome")
 			.get()
-			.header(HttpHeaders.Names.ACCEPT, "application/json")
+			.header(HttpHeaderNames.ACCEPT, "application/json")
 			.begin(new HttpResponseListener() {
 				@Override
 				protected void responseComplete(HttpHeaders trailingHeaders) {
@@ -88,8 +89,8 @@ public class HttpRequesterTest {
 		HttpRequest request = requestCaptor.getValue();
 		
 		assertThat(request.uri(), is("/off/joe/iou?me=awesome"));
-		assertThat(request.headers().get(HttpHeaders.Names.HOST), is("foaas.com"));
-		assertThat(request.headers().get(HttpHeaders.Names.ACCEPT), is("application/json"));
+		assertThat(request.headers().get(HttpHeaderNames.HOST), is("foaas.com"));
+		assertThat(request.headers().get(HttpHeaderNames.ACCEPT), is("application/json"));
 		
 		// when
 		ch.pipeline().removeFirst();

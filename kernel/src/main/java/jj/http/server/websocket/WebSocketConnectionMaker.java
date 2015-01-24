@@ -24,7 +24,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
@@ -84,7 +84,7 @@ public class WebSocketConnectionMaker {
 		final WebSocketServerHandshaker handshaker = handshakerFactory.newHandshaker(request);
 		if (handshaker == null) {
 			response
-				.header(Names.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue())
+				.header(HttpHeaderNames.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue())
 				.sendError(HttpResponseStatus.UPGRADE_REQUIRED);
 		} else {
 			doHandshake(ctx, request, handshaker);

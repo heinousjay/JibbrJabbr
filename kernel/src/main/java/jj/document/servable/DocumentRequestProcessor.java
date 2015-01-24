@@ -19,8 +19,8 @@ import jj.execution.TaskRunner;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.jjmessage.JJMessage;
-import io.netty.handler.codec.http.HttpHeaders;
-
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import org.jsoup.nodes.Document;
 import org.mozilla.javascript.Callable;
 
@@ -194,10 +194,10 @@ public class DocumentRequestProcessor {
 		document.outputSettings().prettyPrint(false).indentAmount(0);
 		byte[] bytes = document.toString().getBytes(documentScriptEnvironment.charset());
 		httpResponse
-			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
+			.header(HttpHeaderNames.CONTENT_LENGTH, bytes.length)
 			// clients shouldn't cache these responses at all
-			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-			.header(HttpHeaders.Names.CONTENT_TYPE, documentScriptEnvironment.contentType())
+			.header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE)
+			.header(HttpHeaderNames.CONTENT_TYPE, documentScriptEnvironment.contentType())
 			.content(bytes)
 			.end();
 	}

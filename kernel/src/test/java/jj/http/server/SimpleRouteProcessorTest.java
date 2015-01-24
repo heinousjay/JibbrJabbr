@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import jj.execution.JJTask;
 import jj.execution.Promise;
 import jj.execution.TaskHelper;
@@ -142,7 +142,7 @@ public class SimpleRouteProcessorTest {
 		
 		givenResourceRequest(VERSIONED_URI);
 		
-		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
+		given(request.header(HttpHeaderNames.IF_NONE_MATCH)).willReturn(SHA1);
 		
 		srs.process(routeMatch, request, response);
 		
@@ -154,8 +154,8 @@ public class SimpleRouteProcessorTest {
 		
 		givenResourceRequest(UNVERSIONED_URI);
 		
-		given(request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(true);
-		given(request.header(HttpHeaders.Names.IF_NONE_MATCH)).willReturn(SHA1);
+		given(request.hasHeader(HttpHeaderNames.IF_NONE_MATCH)).willReturn(true);
+		given(request.header(HttpHeaderNames.IF_NONE_MATCH)).willReturn(SHA1);
 		
 		srs.process(routeMatch, request, response);
 		

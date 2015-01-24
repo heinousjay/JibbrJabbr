@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.util.concurrent.CountDownLatch;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 import javax.inject.Inject;
 
@@ -51,8 +51,8 @@ public class EmbeddedHttpServerTest {
 	public void test() throws Throwable {
 		EmbeddedHttpResponse response = server.request(new EmbeddedHttpRequest("/")).await(3, SECONDS);
 		
-		assertThat(response.headers().get(HttpHeaders.Names.CONTENT_TYPE), is("text/html; charset=UTF-8"));
-		int contentLength = response.headers().getInt(HttpHeaders.Names.CONTENT_LENGTH, -1);
+		assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE), is("text/html; charset=UTF-8"));
+		int contentLength = response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH, -1);
 		// this comparison works because it's actually ASCII.  if at some point characters outside
 		// that range are returned then only the octets can be inspected
 		assertThat(response.bodyContentAsString().length(), is(contentLength));
@@ -70,7 +70,7 @@ public class EmbeddedHttpServerTest {
 			public void ready(EmbeddedHttpResponse response) {
 				try {
 					String body = response.bodyContentAsString();
-					int contentLength = response.headers().getInt(HttpHeaders.Names.CONTENT_LENGTH, -1);
+					int contentLength = response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH, -1);
 					assertThat(body.length(), is(contentLength)); // this only works because it's ASCII haha
 				} catch (Throwable t) {
 					testFailures.addSuppressed(t);

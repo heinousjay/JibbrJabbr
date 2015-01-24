@@ -34,7 +34,8 @@ import javax.inject.Singleton;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.DefaultHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringEncoder;
@@ -176,8 +177,8 @@ public class HttpRequester {
 			this.host = host;
 			this.port = port;
 			request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpMethod, uri);
-			header(HttpHeaders.Names.HOST, host);
-			header(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+			header(HttpHeaderNames.HOST, host);
+			header(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
 		}
 	
 		public Headers header(CharSequence name, CharSequence value) {

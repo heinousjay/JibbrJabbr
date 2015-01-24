@@ -33,7 +33,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
@@ -72,7 +73,7 @@ public class HttpServerResponseImplTest {
 	@Before
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		nettyRequest.headers().add(HttpHeaders.Names.HOST, host);
+		nettyRequest.headers().add(HttpHeaderNames.HOST, host);
 		request = new HttpServerRequestImpl(nettyRequest, ctx);
 		
 		response = new HttpServerResponseImpl(version, request, ctx, publisher);
@@ -83,28 +84,28 @@ public class HttpServerResponseImplTest {
 		response.sendCachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_LENGTH), is(String.valueOf(size)));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaderNames.CONTENT_TYPE), is(mime));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.header(HttpHeaderNames.CONTENT_LENGTH), is(String.valueOf(size)));
+		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
 	}
 
 	private void testUncachedResource(Resource resource) throws IOException {
 		response.sendUncachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_LENGTH), is(String.valueOf(size)));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpHeaders.Values.NO_CACHE));
+		assertThat(response.header(HttpHeaderNames.CONTENT_TYPE), is(mime));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.header(HttpHeaderNames.CONTENT_LENGTH), is(String.valueOf(size)));
+		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpHeaderValues.NO_CACHE));
 	}
 
 	private void testCachedNotModifiedResource(Resource resource) throws IOException {
 		response.sendNotModified(resource, true);
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
 		assertThat(response.hasNoBody(), is(true));
 	}
 
@@ -112,8 +113,8 @@ public class HttpServerResponseImplTest {
 		response.sendNotModified(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.containsHeader(HttpHeaders.Names.CACHE_CONTROL), is(false));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.containsHeader(HttpHeaderNames.CACHE_CONTROL), is(false));
 		assertThat(response.hasNoBody(), is(true));
 	}
 	
