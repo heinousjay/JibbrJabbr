@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import jj.http.server.uri.Route;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
@@ -102,8 +102,8 @@ public class SimpleRouteProcessor implements RouteProcessor {
 			}
 			
 			// if the e-tag matches our SHA, 304
-			else if (request.hasHeader(HttpHeaders.Names.IF_NONE_MATCH) &&
-				resource.sha1().equals(request.header(HttpHeaders.Names.IF_NONE_MATCH))) {
+			else if (request.hasHeader(HttpHeaderNames.IF_NONE_MATCH) &&
+				resource.sha1().equals(request.header(HttpHeaderNames.IF_NONE_MATCH))) {
 				response.sendNotModified(resource, match.versioned);
 			} 
 

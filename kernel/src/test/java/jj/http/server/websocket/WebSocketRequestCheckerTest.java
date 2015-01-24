@@ -20,7 +20,8 @@ import static org.junit.Assert.*;
 import jj.http.server.websocket.WebSocketRequestChecker;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
@@ -51,14 +52,14 @@ public class WebSocketRequestCheckerTest {
 
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, socketUri);
 		request.headers()
-			.add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.UPGRADE)
-			.add(HttpHeaders.Names.UPGRADE, HttpHeaders.Values.WEBSOCKET);
+			.add(HttpHeaderNames.CONNECTION, HttpHeaderValues.UPGRADE)
+			.add(HttpHeaderNames.UPGRADE, HttpHeaderValues.WEBSOCKET);
 		assertThat(wsrc.isWebSocketRequest(request), is(true));
 
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/some/uri");
 		request.headers()
-			.add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.UPGRADE)
-			.add(HttpHeaders.Names.UPGRADE, HttpHeaders.Values.WEBSOCKET);
+			.add(HttpHeaderNames.CONNECTION, HttpHeaderValues.UPGRADE)
+			.add(HttpHeaderNames.UPGRADE, HttpHeaderValues.WEBSOCKET);
 		assertThat(wsrc.isWebSocketRequest(request), is(false));
 		
 		request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, socketUri);

@@ -18,8 +18,8 @@ package jj.http.server;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
-
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class ContentTypeHeaderReaderTest {
 	
 	private void establishObjects(String value) {
 		requestHeaders = new DefaultHttpHeaders();
-		requestHeaders.set(HttpHeaders.Names.CONTENT_TYPE, value);
+		requestHeaders.set(HttpHeaderNames.CONTENT_TYPE, value);
 		cth = new ContentTypeHeaderReader(requestHeaders);
 	}
 

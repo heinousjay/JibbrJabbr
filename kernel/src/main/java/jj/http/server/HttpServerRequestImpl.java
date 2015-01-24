@@ -17,7 +17,7 @@ import jj.util.Sequence;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.AsciiString;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 
 @Singleton
@@ -60,7 +60,7 @@ class HttpServerRequestImpl implements HttpServerRequest {
 	@Override
 	public String host() {
 		CharSequence xHost = header(HEADER_X_HOST);
-		CharSequence host = header(HttpHeaders.Names.HOST);
+		CharSequence host = header(HttpHeaderNames.HOST);
 		return (xHost == null ? host : xHost).toString();
 	}
 

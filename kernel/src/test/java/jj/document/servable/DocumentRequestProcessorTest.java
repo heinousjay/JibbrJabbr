@@ -24,8 +24,8 @@ import jj.script.ContinuationPendingKey;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
@@ -136,9 +136,9 @@ public class DocumentRequestProcessorTest {
 		taskRunner.runUntilIdle();
 		
 
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
-		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
+		verify(httpResponse).header(HttpHeaderNames.CONTENT_LENGTH, bytes.length);
+		verify(httpResponse).header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE);
+		verify(httpResponse).header(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
 		verify(httpResponse).content(bytes);
 	}
 	
@@ -170,9 +170,9 @@ public class DocumentRequestProcessorTest {
 		
 		verify(documentScriptEnvironment).execute(callable);
 		
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
-		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
+		verify(httpResponse).header(HttpHeaderNames.CONTENT_LENGTH, bytes.length);
+		verify(httpResponse).header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE);
+		verify(httpResponse).header(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
 		verify(httpResponse).content(bytes);
 		
 		verifyZeroInteractions(initializer);
@@ -211,9 +211,9 @@ public class DocumentRequestProcessorTest {
 		taskRunner.runUntilIdle();
 		
 		// then
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
-		verify(httpResponse).header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE);
-		verify(httpResponse).header(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
+		verify(httpResponse).header(HttpHeaderNames.CONTENT_LENGTH, bytes.length);
+		verify(httpResponse).header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE);
+		verify(httpResponse).header(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
 		verify(httpResponse).content(bytes);
 	}
 

@@ -36,8 +36,9 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.AsciiString;
 import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderUtil;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
@@ -69,7 +70,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 		this.request = request;
 		this.ctx = ctx;
 		this.publisher = publisher;
-		header(HttpHeaders.Names.SERVER, String.format(
+		header(HttpHeaderNames.SERVER, String.format(
 			"%s/%s (%s)",
 			version.name(),
 			version.version(),
@@ -211,11 +212,11 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	@Override
 	public void sendError(final HttpResponseStatus status) {
 		assertNotCommitted();
-		byte[] body = status.reasonPhrase().getBytes(StandardCharsets.UTF_8);
+		byte[] body = status.reasonPhrase().toByteArray();
 		status(status)
-			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-			.header(HttpHeaders.Names.CONTENT_LENGTH, body.length)
-			.header(HttpHeaders.Names.CONTENT_TYPE, "text/plain; UTF-8")
+			.header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE)
+			.header(HttpHeaderNames.CONTENT_LENGTH, body.length)
+			.header(HttpHeaderNames.CONTENT_TYPE, "text/plain; UTF-8")
 			.content(body)
 			.end();
 	}
@@ -249,11 +250,11 @@ class HttpServerResponseImpl implements HttpServerResponse {
 		assertNotCommitted();
 		
 		if (cache) {
-			header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
+			header(HttpHeaderNames.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
 		}
 		
 		return status(HttpResponseStatus.NOT_MODIFIED)
-			.header(HttpHeaders.Names.ETAG, resource.sha1())
+			.header(HttpHeaderNames.ETAG, resource.sha1())
 			.end();
 	}
 
@@ -267,15 +268,15 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	public HttpServerResponse sendTemporaryRedirect(final Resource resource) {
 		assertNotCommitted();
 		return status(HttpResponseStatus.TEMPORARY_REDIRECT)
-			.header(HttpHeaders.Names.LOCATION, makeAbsoluteURL(resource))
-			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
+			.header(HttpHeaderNames.LOCATION, makeAbsoluteURL(resource))
+			.header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE)
 			.end();
 	}
 
 	@Override
 	public HttpServerResponse sendUncachableResource(Resource resource) throws IOException {
 		assertNotCommitted();
-		header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_CACHE);
+		header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE);
 		if (resource instanceof TransferableResource) {
 			return sendResource((TransferableResource)resource);
 		} else if (resource instanceof LoadedResource) {
@@ -288,7 +289,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	@Override
 	public HttpServerResponse sendCachableResource(Resource resource) throws IOException {
 		assertNotCommitted();
-		header(HttpHeaders.Names.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
+		header(HttpHeaderNames.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
 		if (resource instanceof TransferableResource) {
 			return sendResource((TransferableResource)resource);
 		} else if (resource instanceof LoadedResource) {
@@ -310,9 +311,9 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	protected HttpServerResponse sendResource(final LoadedResource resource) {
-		return header(HttpHeaders.Names.ETAG, resource.sha1())
-			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.bytes().readableBytes())
-			.header(HttpHeaders.Names.CONTENT_TYPE, resource.contentType())
+		return header(HttpHeaderNames.ETAG, resource.sha1())
+			.header(HttpHeaderNames.CONTENT_LENGTH, resource.bytes().readableBytes())
+			.header(HttpHeaderNames.CONTENT_TYPE, resource.contentType())
 			.content(resource.bytes())
 			.end();
 	}
@@ -325,12 +326,12 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	protected HttpServerResponse sendResource(TransferableResource resource) throws IOException {
-		header(HttpHeaders.Names.CONTENT_TYPE, resource.contentType())
-			.header(HttpHeaders.Names.CONTENT_LENGTH, resource.size())
-			.header(HttpHeaders.Names.DATE, new Date());
+		header(HttpHeaderNames.CONTENT_TYPE, resource.contentType())
+			.header(HttpHeaderNames.CONTENT_LENGTH, resource.size())
+			.header(HttpHeaderNames.DATE, new Date());
 		
 		if (resource.sha1() != null) {
-			header(HttpHeaders.Names.ETAG, resource.sha1());
+			header(HttpHeaderNames.ETAG, resource.sha1());
 		}
 		
 		return doSendTransferableResource(resource);
@@ -349,7 +350,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	@Override
 	public HttpServerResponse end() {
 		assertNotCommitted();
-		header(HttpHeaders.Names.DATE, new Date());
+		header(HttpHeaderNames.DATE, new Date());
 		ctx.write(response);
 		ctx.write(content());
 		maybeClose(ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT));

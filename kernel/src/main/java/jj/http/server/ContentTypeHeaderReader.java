@@ -21,6 +21,7 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
 import jj.util.StringUtils;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 
 /**
@@ -42,7 +43,7 @@ class ContentTypeHeaderReader {
 	private final Charset charset;
 
 	ContentTypeHeaderReader(final HttpHeaders httpHeaders) {
-		CharSequence headerValue = httpHeaders.get(HttpHeaders.Names.CONTENT_TYPE);
+		CharSequence headerValue = httpHeaders.get(HttpHeaderNames.CONTENT_TYPE);
 		assert headerValue != null : "can't read a nonexistent header";
 		value = mimeType(headerValue);
 		badRequest = value == null;

@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 
 /**
@@ -73,7 +74,7 @@ class AcceptLangHeaderReader {
 
 	// need to get a hold of the server default locale somewhere?
 	AcceptLangHeaderReader(final HttpHeaders requestHeaders) {
-		locales = parseLocales(LIST_SPLITTER.split(requestHeaders.get(HttpHeaders.Names.ACCEPT_LANGUAGE)));
+		locales = parseLocales(LIST_SPLITTER.split(requestHeaders.get(HttpHeaderNames.ACCEPT_LANGUAGE)));
 	}
 	
 	private List<Locale> parseLocales(String[] incomingValues) {

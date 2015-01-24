@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.*;
 import java.util.Locale;
 
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class AcceptLangHeaderReaderTest {
 	
 	private void establishObjects(String value) {
 		requestHeaders = new DefaultHttpHeaders();
-		requestHeaders.set(HttpHeaders.Names.ACCEPT_LANGUAGE, value);
+		requestHeaders.set(HttpHeaderNames.ACCEPT_LANGUAGE, value);
 		arh = new AcceptLangHeaderReader(requestHeaders);
 	}
 	

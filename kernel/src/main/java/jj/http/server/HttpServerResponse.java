@@ -17,7 +17,7 @@ package jj.http.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.AsciiString;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
@@ -35,7 +35,7 @@ import jj.resource.Resource;
  */
 public interface HttpServerResponse {
 	
-	public static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
+	public static final String MAX_AGE_ONE_YEAR = HttpHeaderValues.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
 
 	/**
 	 * Retrieve the status of the outgoing response.  Defaults to

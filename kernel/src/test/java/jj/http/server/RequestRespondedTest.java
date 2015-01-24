@@ -21,7 +21,8 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
@@ -71,9 +72,9 @@ public class RequestRespondedTest {
 		
 		
 		response.status(HttpResponseStatus.FOUND)
-			.header(HttpHeaders.Names.ACCEPT_RANGES, HttpHeaders.Values.BYTES)
-			.header(HttpHeaders.Names.LOCATION, location)
-			.header(HttpHeaders.Names.CONTENT_LENGTH, length)
+			.header(HttpHeaderNames.ACCEPT_RANGES, HttpHeaderValues.BYTES)
+			.header(HttpHeaderNames.LOCATION, location)
+			.header(HttpHeaderNames.CONTENT_LENGTH, length)
 			.content(bytes)
 			.end();
 		

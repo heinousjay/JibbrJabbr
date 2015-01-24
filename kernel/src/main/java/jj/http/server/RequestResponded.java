@@ -15,8 +15,7 @@
  */
 package jj.http.server;
 
-import io.netty.handler.codec.http.HttpHeaders;
-
+import io.netty.handler.codec.http.HttpHeaderNames;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map.Entry;
@@ -91,20 +90,20 @@ class RequestResponded extends LoggedEvent {
 	}
 	
 	private String extractReferer(final HttpServerRequest request) {
-		return request.hasHeader(HttpHeaders.Names.REFERER) ?
-			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :
+		return request.hasHeader(HttpHeaderNames.REFERER) ?
+			"\"" + request.header(HttpHeaderNames.REFERER) + "\"" :
 			"-";
 	}
 	
 	private String extractUserAgent(final HttpServerRequest request) {
-		return request.hasHeader(HttpHeaders.Names.USER_AGENT) ?
-			"\"" + request.header(HttpHeaders.Names.USER_AGENT) + "\"" :
+		return request.hasHeader(HttpHeaderNames.USER_AGENT) ?
+			"\"" + request.header(HttpHeaderNames.USER_AGENT) + "\"" :
 			"-";
 	}
 	
 	private CharSequence extractContentLength() {
-		if (response.containsHeader(HttpHeaders.Names.CONTENT_LENGTH)) {
-			return response.header(HttpHeaders.Names.CONTENT_LENGTH);
+		if (response.containsHeader(HttpHeaderNames.CONTENT_LENGTH)) {
+			return response.header(HttpHeaderNames.CONTENT_LENGTH);
 		}
 		return "0";
 	}
