@@ -41,7 +41,7 @@ public class CurrentWebSocketConnection extends ExecutionInstance<WebSocketConne
 	 * @return
 	 */
 	public WebSocketConnection trueCurrent() {
-		return carrier.get();
+		return super.current();
 	}
 	
 	@Override
@@ -49,7 +49,7 @@ public class CurrentWebSocketConnection extends ExecutionInstance<WebSocketConne
 		// we have to do something a little special here.  the web socket connection host, if any, may
 		// be broadcasting, and so in that case, we want to use its connection.
 		
-		WebSocketConnection current = carrier.get();
+		WebSocketConnection current = trueCurrent();
 		ScriptEnvironment se = env.current();
 		if (se != null && 
 			se instanceof WebSocketConnectionHost && 

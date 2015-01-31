@@ -15,6 +15,8 @@
  */
 package jj.execution;
 
+import javax.inject.Inject;
+
 import jj.util.Closer;
 import jj.util.CurrentResourceAware;
 
@@ -48,7 +50,10 @@ import jj.util.CurrentResourceAware;
  */
 public abstract class ExecutionInstance<T> {
 	
-	protected final ThreadLocal<T> carrier = new ThreadLocal<>();
+	// this field is initialized for unit tests,
+	// but gets replaced with the appropriate
+	// instance in the running system
+	@Inject private ExecutionInstanceStorage storage = new ExecutionInstanceStorage();
 
 	/**
 	 * Begin exposing 
@@ -56,12 +61,8 @@ public abstract class ExecutionInstance<T> {
 	 * @return
 	 */
 	public final Closer enterScope(final T instance) {
-		final String name = getClass().getSimpleName();
-		
-		assert carrier.get() == null : "attempting to nest in " + name;
-		
-		carrier.set(instance);
-		
+		assert storage.get(getClass()) == null;
+		storage.set(getClass(), instance);
 		if (instance instanceof CurrentResourceAware) {
 			((CurrentResourceAware)instance).enteredCurrentScope();
 		}
@@ -70,7 +71,7 @@ public abstract class ExecutionInstance<T> {
 			
 			@Override
 			public void close() {
-				carrier.set(null);
+				storage.clear(ExecutionInstance.this.getClass());
 				
 				if (instance instanceof CurrentResourceAware) {
 					((CurrentResourceAware)instance).exitedCurrentScope();
@@ -80,6 +81,6 @@ public abstract class ExecutionInstance<T> {
 	}
 	
 	public T current() {
-		return carrier.get();
+		return storage.get(getClass());
 	}
 }
