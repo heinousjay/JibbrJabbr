@@ -15,7 +15,10 @@
  */
 package jj.logging;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
@@ -61,10 +64,13 @@ class SystemLogger {
 	@Listener
 	void start(ServerStarting event) {
 		// just start immediately! we need to work quickly
+		// block startup!
+		final CountDownLatch startupLatch = new CountDownLatch(1);
 		taskRunner.execute(new ServerTask("System Logger") {
 			
 			@Override
 			protected void run() throws Exception {
+				startupLatch.countDown();
 				try {
 					for (;;) {
 						
@@ -80,6 +86,19 @@ class SystemLogger {
 				}
 			}
 		});
+		
+		// hacky signal from the test
+		if (event != null) {
+			try {
+				boolean started = startupLatch.await(250, MILLISECONDS);
+				assert started : 
+					"FATAL\n" +
+					"Could not start the system logger!\n" +
+					"Check out jj.execution.TaskRunnerImpl, something is probably wrong there.";
+			} catch (InterruptedException e) {
+				throw new AssertionError(e);
+			}
+		}
 	}
 
 	private void doLog(LoggedEvent event) {
