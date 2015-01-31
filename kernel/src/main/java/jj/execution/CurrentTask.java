@@ -17,8 +17,6 @@ package jj.execution;
 
 import javax.inject.Singleton;
 
-import jj.util.CurrentResource;
-
 /**
  * <p>
  * Locate the currently executing task instance, for example if you
@@ -28,7 +26,7 @@ import jj.util.CurrentResource;
  *
  */
 @Singleton
-public class CurrentTask extends CurrentResource<JJTask> {
+public class CurrentTask extends ExecutionInstance<JJTask> {
 	
 	public String name() {
 		JJTask task = current();

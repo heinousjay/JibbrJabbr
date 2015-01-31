@@ -21,9 +21,9 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
 
+import jj.execution.ExecutionInstance;
 import jj.script.module.RootScriptEnvironment;
 import jj.util.Closer;
-import jj.util.CurrentResource;
 
 /**
  * 
@@ -32,7 +32,7 @@ import jj.util.CurrentResource;
  *
  */
 @Singleton
-public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment> {
+public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironment> {
 	
 	private final Provider<RhinoContext> contextProvider;
 	

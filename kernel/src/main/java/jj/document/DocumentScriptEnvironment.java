@@ -30,6 +30,7 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.configuration.resolution.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
+import jj.execution.ExecutionInstance;
 import jj.http.server.ServableResourceConfiguration;
 import jj.http.server.ServableResource;
 import jj.http.server.websocket.AbstractWebSocketConnectionHost;
@@ -45,7 +46,6 @@ import jj.script.ScriptThread;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
 import jj.util.Closer;
-import jj.util.CurrentResource;
 import jj.util.CurrentResourceAware;
 import jj.util.SHA1Helper;
 
@@ -272,7 +272,7 @@ public class DocumentScriptEnvironment
 	
 	private static class Context<T> {
 		
-		final CurrentResource<T> source;
+		final ExecutionInstance<T> source;
 		final T current;
 		final ConnectionBroadcastStack broadcastStack;
 		
@@ -282,7 +282,7 @@ public class DocumentScriptEnvironment
 			this.broadcastStack = broadcastStack;
 		}
 		
-		Context(final CurrentResource<T> source, T resource, final ConnectionBroadcastStack broadcastStack) {
+		Context(final ExecutionInstance<T> source, T resource, final ConnectionBroadcastStack broadcastStack) {
 			this.source = source;
 			this.current = resource;
 			this.broadcastStack = broadcastStack;

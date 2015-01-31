@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.util;
+package jj.execution;
 
-import jj.execution.CurrentTask;
+import jj.util.Closer;
+import jj.util.CurrentResourceAware;
 
 /**
  * <p>
@@ -23,7 +24,8 @@ import jj.execution.CurrentTask;
  * can be used in a try-with-resources
  * <pre class="brush:java">
  * try (Closer closer = resource.enterScope(..something..)) {
- *     // use that resource
+ *     // use that resource (presumably in a disconnected part of the system)
+ *     resource.current()...;
  * }
  * </pre>
  * 
@@ -39,38 +41,45 @@ import jj.execution.CurrentTask;
  * and can be injected and queried to perform work with those resources.  For instance, the
  * currently executing task can be obtained by calling {@link CurrentTask#current()}.
  * 
+ * @param <T> The type of resource being managed
+ * 
  * @author jason
  *
  */
-public abstract class CurrentResource<RESOURCE> {
+public abstract class ExecutionInstance<T> {
 	
-	protected final ThreadLocal<RESOURCE> resources = new ThreadLocal<>();
+	protected final ThreadLocal<T> carrier = new ThreadLocal<>();
 
-	public final Closer enterScope(final RESOURCE resource) {
+	/**
+	 * Begin exposing 
+	 * @param instance
+	 * @return
+	 */
+	public final Closer enterScope(final T instance) {
 		final String name = getClass().getSimpleName();
 		
-		assert resources.get() == null : "attempting to nest in " + name;
+		assert carrier.get() == null : "attempting to nest in " + name;
 		
-		resources.set(resource);
+		carrier.set(instance);
 		
-		if (resource instanceof CurrentResourceAware) {
-			((CurrentResourceAware)resource).enteredCurrentScope();
+		if (instance instanceof CurrentResourceAware) {
+			((CurrentResourceAware)instance).enteredCurrentScope();
 		}
 		
 		return new Closer() {
 			
 			@Override
 			public void close() {
-				resources.set(null);
+				carrier.set(null);
 				
-				if (resource instanceof CurrentResourceAware) {
-					((CurrentResourceAware)resource).exitedCurrentScope();
+				if (instance instanceof CurrentResourceAware) {
+					((CurrentResourceAware)instance).exitedCurrentScope();
 				}
 			}
 		};
 	}
 	
-	public RESOURCE current() {
-		return resources.get();
+	public T current() {
+		return carrier.get();
 	}
 }

@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 import org.jsoup.nodes.Document;
 
 import jj.document.servable.DocumentRequestProcessor;
-import jj.util.CurrentResource;
+import jj.execution.ExecutionInstance;
 
 /**
  * exposes the current DocumentRequestProcessor being processed as a resource
@@ -29,7 +29,7 @@ import jj.util.CurrentResource;
  *
  */
 @Singleton
-public class CurrentDocumentRequestProcessor extends CurrentResource<DocumentRequestProcessor> {
+public class CurrentDocumentRequestProcessor extends ExecutionInstance<DocumentRequestProcessor> {
 
 	
 	public Document currentDocument() {
