@@ -32,7 +32,7 @@ import jj.util.CurrentResourceAware;
  * </pre>
  * 
  * <p>
- * Don't forget! Descendents of this class should be annotated with 
+ * Don't forget! Descendants of this class should be annotated with 
  * {@link javax.inject.Singleton} or there really is just no point
  * 
  * <p>
