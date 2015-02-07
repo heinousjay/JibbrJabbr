@@ -31,6 +31,7 @@ import jj.configuration.resolution.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.execution.ExecutionInstance;
+import jj.execution.ExecutionLifecycleAware;
 import jj.http.server.ServableResourceConfiguration;
 import jj.http.server.ServableResource;
 import jj.http.server.websocket.AbstractWebSocketConnectionHost;
@@ -46,7 +47,6 @@ import jj.script.ScriptThread;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
 import jj.util.Closer;
-import jj.util.CurrentResourceAware;
 import jj.util.SHA1Helper;
 
 /**
@@ -62,7 +62,7 @@ import jj.util.SHA1Helper;
 )
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
-	implements CurrentResourceAware, RootScriptEnvironment, ServableResource {
+	implements ExecutionLifecycleAware, RootScriptEnvironment, ServableResource {
 	
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	

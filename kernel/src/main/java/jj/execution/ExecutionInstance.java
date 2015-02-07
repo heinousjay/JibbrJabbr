@@ -18,7 +18,6 @@ package jj.execution;
 import javax.inject.Inject;
 
 import jj.util.Closer;
-import jj.util.CurrentResourceAware;
 
 /**
  * <p>
@@ -36,7 +35,7 @@ import jj.util.CurrentResourceAware;
  * {@link javax.inject.Singleton} or there really is just no point
  * 
  * <p>
- * If initialization or cleanup of the resource is needed, see {@link CurrentResourceAware}.
+ * If initialization or cleanup of the resource is needed, see {@link ExecutionLifecycleAware}.
  * 
  * <p>
  * Subclasses of this classes act as system-wide thread-scoped context locators for resources,
@@ -63,8 +62,8 @@ public abstract class ExecutionInstance<T> {
 	public final Closer enterScope(final T instance) {
 		assert storage.get(getClass()) == null;
 		storage.set(getClass(), instance);
-		if (instance instanceof CurrentResourceAware) {
-			((CurrentResourceAware)instance).enteredCurrentScope();
+		if (instance instanceof ExecutionLifecycleAware) {
+			((ExecutionLifecycleAware)instance).enteredCurrentScope();
 		}
 		
 		return new Closer() {
@@ -73,8 +72,8 @@ public abstract class ExecutionInstance<T> {
 			public void close() {
 				storage.clear(ExecutionInstance.this.getClass());
 				
-				if (instance instanceof CurrentResourceAware) {
-					((CurrentResourceAware)instance).exitedCurrentScope();
+				if (instance instanceof ExecutionLifecycleAware) {
+					((ExecutionLifecycleAware)instance).exitedCurrentScope();
 				}
 			}
 		};
