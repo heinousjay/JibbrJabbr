@@ -53,7 +53,7 @@ public class ContinuationPendingCacheTest {
 
 		/** it will never run so nulls are cool!
 		 */
-		protected HelperTask(ContinuationPendingKey pendingKey) {
+		protected HelperTask(PendingKey pendingKey) {
 			super("", null);
 			this.pendingKey = pendingKey;
 		}
@@ -75,7 +75,7 @@ public class ContinuationPendingCacheTest {
 	public void testRemoval() throws Throwable {
 		
 		// given
-		ContinuationPendingKey key = new ContinuationPendingKey(cache);
+		PendingKey key = new PendingKey(cache);
 		
 		// when
 		cache.storeForContinuation(new HelperTask(key));
@@ -98,10 +98,10 @@ public class ContinuationPendingCacheTest {
 		assertThat(KEY_COUNT % STRESS_LEVEL, is(0));
 		
 		HelperTask[] tasks = new HelperTask[KEY_COUNT];
-		ContinuationPendingKey[] pendingKeys = new ContinuationPendingKey[KEY_COUNT];
+		PendingKey[] pendingKeys = new PendingKey[KEY_COUNT];
 		
 		for (int i = 0; i < KEY_COUNT; ++i) {
-			pendingKeys[i] = new ContinuationPendingKey(cache);
+			pendingKeys[i] = new PendingKey(cache);
 			tasks[i] = new HelperTask(pendingKeys[i]);
 		}
 		
@@ -179,7 +179,7 @@ public class ContinuationPendingCacheTest {
 		
 	}
 	
-	private void assertResume(ContinuationPendingKey pendingKey) {
+	private void assertResume(PendingKey pendingKey) {
 
 		boolean asserted = false;
 		try {

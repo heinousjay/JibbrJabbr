@@ -30,7 +30,7 @@ public interface DependsOnScriptEnvironmentInitialization {
 	 * @param scriptEnvironment
 	 * @param pendingKey
 	 */
-	void resumeOnInitialization(ScriptEnvironment scriptEnvironment, ContinuationPendingKey pendingKey);
+	void resumeOnInitialization(ScriptEnvironment scriptEnvironment, PendingKey pendingKey);
 	
 	void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task);
 

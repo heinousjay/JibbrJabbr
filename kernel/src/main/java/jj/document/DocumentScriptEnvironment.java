@@ -41,7 +41,7 @@ import jj.http.server.websocket.WebSocketMessageProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceNotViableException;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.ScriptThread;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
@@ -92,7 +92,7 @@ public class DocumentScriptEnvironment
 	
 	private final CurrentWebSocketConnection currentConnection;
 	
-	private final HashMap<ContinuationPendingKey, Context<?>> contexts = new HashMap<>(10);
+	private final HashMap<PendingKey, Context<?>> contexts = new HashMap<>(10);
 	
 	@Inject
 	DocumentScriptEnvironment(
@@ -294,7 +294,7 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	protected void captureContextForKey(ContinuationPendingKey key) {
+	protected void captureContextForKey(PendingKey key) {
 		assert !contexts.containsKey(key) : "cannot capture multiple times with the same key";
 		// we can't have both a document and a connection, so this works out neatly...
 		if (currentDocument.current() != null) {
@@ -307,7 +307,7 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	protected Closer restoreContextForKey(ContinuationPendingKey key) {
+	protected Closer restoreContextForKey(PendingKey key) {
 		assert broadcastStack == null : "restoring into a DocumentScriptEnvironment with a standing broadcastStack";
 		Context<?> context = contexts.remove(key);
 		broadcastStack = context.broadcastStack;

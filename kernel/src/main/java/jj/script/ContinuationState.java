@@ -25,7 +25,7 @@ public class ContinuationState implements Serializable {
 		return type.cast(continuation);
 	}
 	
-	public ContinuationPendingKey pendingKey() {
+	public PendingKey pendingKey() {
 		return continuation.pendingKey();
 	}
 	

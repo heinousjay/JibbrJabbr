@@ -30,7 +30,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	protected final T scriptEnvironment;
 	
 	/** assign the result of any operation against the ContinuationCoordinator to this field */
-	protected ContinuationPendingKey pendingKey;
+	protected PendingKey pendingKey;
 	
 	/** 
 	 * if this field is populated when the task is run, call the resume on the ContinuationCoordinator
@@ -99,7 +99,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 * be sure to store the key for resumption
 	 * @return
 	 */
-	final ContinuationPendingKey pendingKey() {
+	final PendingKey pendingKey() {
 		return pendingKey;
 	}
 	

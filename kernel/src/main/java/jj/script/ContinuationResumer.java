@@ -26,5 +26,5 @@ public interface ContinuationResumer {
 	 * @param pendingKey
 	 * @param result
 	 */
-	void resume(ContinuationPendingKey pendingKey, Object result);
+	void resume(PendingKey pendingKey, Object result);
 }

@@ -18,7 +18,7 @@ package jj.script.module;
 import java.net.URI;
 
 import jj.script.Continuation;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.util.StringUtils;
 
 /**
@@ -33,7 +33,7 @@ public class RequiredModule implements Continuation {
 	
 	private final String toString;
 	
-	private ContinuationPendingKey pendingKey;
+	private PendingKey pendingKey;
 
 	public RequiredModule(
 		final RootScriptEnvironment parent,
@@ -59,12 +59,12 @@ public class RequiredModule implements Continuation {
 	}
 	
 	@Override
-	public ContinuationPendingKey pendingKey() {
+	public PendingKey pendingKey() {
 		return pendingKey;
 	}
 	
 	@Override
-	public void pendingKey(ContinuationPendingKey pendingKey) {
+	public void pendingKey(PendingKey pendingKey) {
 		assert this.pendingKey == null;
 		assert pendingKey != null;
 		this.pendingKey = pendingKey;

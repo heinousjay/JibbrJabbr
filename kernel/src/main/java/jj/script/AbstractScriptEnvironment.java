@@ -53,7 +53,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	protected static class AbstractScriptEnvironmentDependencies {
 		protected final ContinuationCoordinator continuationCoordinator;
 		protected final ContinuationPendingCache continuationPendingCache;
-		protected final Provider<ContinuationPendingKey> pendingKeyProvider;
+		protected final Provider<PendingKey> pendingKeyProvider;
 		protected final RequireInnerFunction requireInnerFunction;
 		protected final InjectFunction injectFunction;
 		protected final Timers timers;
@@ -63,7 +63,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		AbstractScriptEnvironmentDependencies(
 			final ContinuationCoordinator continuationCoordinator,
 			final ContinuationPendingCache continuationPendingCache,
-			final Provider<ContinuationPendingKey> pendingKeyProvider,
+			final Provider<PendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
 			final InjectFunction injectFunction,
 			final Timers timers,
@@ -103,7 +103,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 */
 	protected final Provider<RhinoContext> contextProvider;
 	
-	private final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
+	private final HashMap<PendingKey, ContinuationPending> continuationPendings = new HashMap<>();
 	
 	private final ContinuationCoordinator continuationCoordinator;
 	
@@ -151,12 +151,12 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	}
 	
 	@Override
-	public ContinuationPendingKey execute(Script script) {
+	public PendingKey execute(Script script) {
 		return continuationCoordinator.execute(this, script);
 	}
 	
 	@Override
-	public ContinuationPendingKey execute(Callable callable, Object...args) {
+	public PendingKey execute(Callable callable, Object...args) {
 		return continuationCoordinator.execute(this, callable, args);
 	}
 	
@@ -166,7 +166,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * @param result
 	 * @return
 	 */
-	ContinuationPendingKey resumeContinuation(ContinuationPendingKey pendingKey, Object result) {
+	PendingKey resumeContinuation(PendingKey pendingKey, Object result) {
 		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
 	}
 	
@@ -178,7 +178,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		continuationPendingCache.storeForContinuation(task);
 	}
 
-	ContinuationPendingKey beginInitializing() {
+	PendingKey beginInitializing() {
 		assert state == Unitialized : "wrong state to initialize";
 		state = Initializing;
 		return doInitialize();
@@ -205,7 +205,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * Override this function for custom initialization functionality
 	 * @return
 	 */
-	protected ContinuationPendingKey doInitialize() {
+	protected PendingKey doInitialize() {
 		return script() == null ? null : execute(script());
 	}
 	
@@ -223,8 +223,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * prepare this environment for a continuation
 	 * @return the key to resume the continuation, with a fully saved context
 	 */
-	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
-		ContinuationPendingKey key = dependencies.scriptEnvironmentDependencies.pendingKeyProvider.get();
+	PendingKey createContinuationContext(final ContinuationPending continuationPending) {
+		PendingKey key = dependencies.scriptEnvironmentDependencies.pendingKeyProvider.get();
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;
@@ -233,7 +233,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	/**
 	 * @return the captured execution state for a given key
 	 */
-	ContinuationPending continuationPending(final ContinuationPendingKey key) {
+	ContinuationPending continuationPending(final PendingKey key) {
 		assert continuationPendings.containsKey(key) : "trying to retrieve a nonexistent continuation for " + key;
 		return continuationPendings.remove(key);
 	}
@@ -241,7 +241,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	/**
 	 * Implement to perform environment-specific context capture for a continuation, associated to the given key
 	 */
-	protected void captureContextForKey(ContinuationPendingKey key) {
+	protected void captureContextForKey(PendingKey key) {
 		// nothing to do in the abstract, but specific type will have things
 		// DocumentScriptEnvironment needs to save connections and documents, for example
 	}
@@ -250,7 +250,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * restore an environment-specific context for the continuation associated to the given key.
 	 * @return a {@link Closer} to clean up any restored context when the 
 	 */
-	protected Closer restoreContextForKey(ContinuationPendingKey key) {
+	protected Closer restoreContextForKey(PendingKey key) {
 		return () -> { /* nothing to do */ };
 	}
 
@@ -265,7 +265,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * @return a pendingKey if the completion of the initialization task should resume something
 	 * or null if nothing. the abstract returns null
 	 */
-	protected ContinuationPendingKey initializationContinuationPendingKey() {
+	protected PendingKey initializationContinuationPendingKey() {
 		return null;
 	}
 	

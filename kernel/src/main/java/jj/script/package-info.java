@@ -31,8 +31,8 @@
  * The ContinuationProcessor will
  * then be notified with the Continuation instance, and it can do
  * as it needs to, restarting the execution by passing the
- * {@link ContinuationPendingKey} that was assigned ({@link Continuation#pendingKey()} to
- * {@link TaskRunner#resume(ContinuationPendingKey, Object)}, along
+ * {@link PendingKey} that was assigned ({@link Continuation#pendingKey()} to
+ * {@link TaskRunner#resume(PendingKey, Object)}, along
  * with whatever result should be used as the return value of the
  * continued function.
  * 

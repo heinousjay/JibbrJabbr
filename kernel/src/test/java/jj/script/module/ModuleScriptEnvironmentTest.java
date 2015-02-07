@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
 import jj.resource.Location;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
 import jj.script.AbstractScriptEnvironment;
@@ -69,7 +69,7 @@ public class ModuleScriptEnvironmentTest {
 		given(((RootScriptEnvironment)parent).global()).willReturn(global);
 		
 		requiredModule = new RequiredModule((RootScriptEnvironment)parent, name);
-		requiredModule.pendingKey(new ContinuationPendingKey());
+		requiredModule.pendingKey(new PendingKey());
 		
 		given(parent.alive()).willReturn(true);
 		return dependencies;

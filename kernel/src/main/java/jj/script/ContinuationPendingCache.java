@@ -68,9 +68,9 @@ class ContinuationPendingCache {
 	
 	/**
 	 * bulk removable of pending tasks
-	 * @param keys A collection of {@link ContinuationPendingKey}s to remove
+	 * @param keys A collection of {@link PendingKey}s to remove
 	 */
-	void removePendingTasks(Collection<ContinuationPendingKey> keys) {
+	void removePendingTasks(Collection<PendingKey> keys) {
 		keys.forEach(key -> {
 			resumableTasks.remove(key.id());
 		});
@@ -87,7 +87,7 @@ class ContinuationPendingCache {
 	}
 	
 	void storeForContinuation(final ScriptTask<?> task) {
-		ContinuationPendingKey pendingKey = task.pendingKey();
+		PendingKey pendingKey = task.pendingKey();
 		
 		if (pendingKey != null) {
 			if (!resumableTasks.replace(pendingKey.id(), reserved, task) &&
@@ -98,7 +98,7 @@ class ContinuationPendingCache {
 		}
 	}
 	
-	void resume(final ContinuationPendingKey pendingKey, final Object result) {
+	void resume(final PendingKey pendingKey, final Object result) {
 		assert pendingKey != null : "attempting to resume without a pendingKey";
 		
 		ScriptTask<?> task = resumableTasks.remove(pendingKey.id());

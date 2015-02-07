@@ -27,7 +27,7 @@ import jj.util.StringUtils;
  * @author jason
  *
  */
-public class ContinuationPendingKey {
+public class PendingKey {
 
 	/**
 	 * MUST BE UNPREDICTABLE as this is exposed to
@@ -40,13 +40,13 @@ public class ContinuationPendingKey {
 	private final ContinuationPendingCache cache;
 	
 	@Inject
-	ContinuationPendingKey(final ContinuationPendingCache cache) {
+	PendingKey(final ContinuationPendingCache cache) {
 		this.id = cache.uniqueID();
 		this.toString = makeToString();
 		this.cache = cache;
 	}
 	
-	public ContinuationPendingKey() {
+	public PendingKey() {
 		assert !JJ.isRunning : "DO NOT USE THIS CONSTRUCTOR IN THE RUNNING SYSTEM!  TEST ONLY!";
 		// I'm sure that most of the time this would be fine instead of bothering to ensure the key is
 		// unique within the system.  it's the one-in-a-billion 
@@ -57,7 +57,7 @@ public class ContinuationPendingKey {
 		cache = new ContinuationPendingKeyResultExtractorHelper();
 	}
 	
-	public ContinuationPendingKey(final String id) {
+	public PendingKey(final String id) {
 		assert !StringUtils.isEmpty(id);
 		this.id = id;
 		this.toString = makeToString();
@@ -75,8 +75,8 @@ public class ContinuationPendingKey {
 	public boolean equals(Object obj) {
 		
 		return obj != null &&
-			obj instanceof ContinuationPendingKey &&
-			((ContinuationPendingKey)obj).id.equals(id);
+			obj instanceof PendingKey &&
+			((PendingKey)obj).id.equals(id);
 	}
 	
 	@Override
@@ -92,6 +92,7 @@ public class ContinuationPendingKey {
 	 * @param eventSelection
 	 */
 	public void resume(Object result) {
+		assert cache != null;
 		cache.resume(this, result);
 	}
 }
