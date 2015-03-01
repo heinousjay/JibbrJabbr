@@ -37,7 +37,6 @@ class ExecutionInstanceStorage {
 	
 	@SuppressWarnings("unchecked")
 	<T> T get(Class<?> type) {
-		
 		return (T)bin.get().get(type);
 	}
 	
@@ -47,5 +46,17 @@ class ExecutionInstanceStorage {
 	
 	void clear(Class<?> type) {
 		bin.get().remove(type);
+	}
+	
+	interface Handle {
+		
+		void resume();
+	}
+	
+	Handle pause() {
+		Map<Object, Object> map = new HashMap<>(bin.get());
+		return () -> {
+			bin.get().putAll(map);
+		};
 	}
 }
