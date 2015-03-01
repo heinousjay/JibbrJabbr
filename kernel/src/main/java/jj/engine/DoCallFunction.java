@@ -51,9 +51,8 @@ public class DoCallFunction extends BaseFunction implements HostObject {
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		if (connection.current() == null) {
-			throw new IllegalStateException("cannot call remote functions without a connected client in context");
-		}
+		assert connection.current() != null : "cannot call remote functions without a connected client in context";
+		
 		connection.current().send(JJMessage.makeCall(String.valueOf(args[0]), String.valueOf(args[1])));
 		return Undefined.instance;
 	}

@@ -3,6 +3,7 @@ package jj.engine;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.script.CurrentScriptEnvironment;
 
@@ -16,10 +17,12 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 	
 	public static final String PROP_DO_INVOKE = "//doInvoke";
 	
+	private final CurrentWebSocketConnection connection;
 	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	public DoInvokeFunction(final CurrentScriptEnvironment env) {
+	public DoInvokeFunction(final CurrentWebSocketConnection connection, final CurrentScriptEnvironment env) {
+		this.connection = connection;
 		this.env = env;
 	}
 	
@@ -51,10 +54,11 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 	
 	@Override
 	public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-		// TODO assert that we're in a connection context
-		throw env.preparedContinuation(
-			JJMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]))
-		);
+		assert connection.current() != null : "cannot invoke remote functions without a connected client in context";
+		JJMessage message = JJMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]));
+		connection.current().send(message);
+		System.out.println("what is up hot stuff " + message);
+		throw env.preparedContinuation(message);
 	}
 	
 	@Override

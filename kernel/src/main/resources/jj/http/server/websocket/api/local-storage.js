@@ -31,8 +31,12 @@ module.exports = {
 			throw new Error('retrieve requires a string key argument');
 		}
 		
+		var message = JJMessage.makeRetrieve(key);
+		
+		connection.current().send(message);
+		
 		// lesson learned! have to return the value from env.preparedContinuation
 		// in order for it to properly continue
-		return env.preparedContinuation(JJMessage.makeRetrieve(key));
+		return env.preparedContinuation(message);
 	}
 };
