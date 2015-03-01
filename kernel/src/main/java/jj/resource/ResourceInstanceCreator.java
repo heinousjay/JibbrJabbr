@@ -20,6 +20,8 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.event.Publisher;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Injector;
@@ -38,13 +40,17 @@ public class ResourceInstanceCreator {
 
 	private final Injector parentInjector;
 	
+	private final Publisher publisher;
+	
 	@Inject
 	ResourceInstanceCreator(
 		final PathResolver pathResolver,
-		final Injector parentInjector
+		final Injector parentInjector,
+		final Publisher publisher
 	) {
 		this.pathResolver = pathResolver;
 		this.parentInjector = parentInjector;
+		this.publisher = publisher;
 	}
 	
 	public <T extends Resource> T createResource(
@@ -108,14 +114,11 @@ public class ResourceInstanceCreator {
 			}
 			
 		} catch (NoSuchResourceException nsre) {
-			
 			// don't bother logging this, it's just a "not found"
-			return null;
-			
 		} catch (Exception e) {
-			
-			throw new AssertionError("unexpected exception creating a resource", e);
-			
+			publisher.publish(new ResourceError(resourceClass, base, name, args, e));
 		}
+		
+		return null;
 	}
 }

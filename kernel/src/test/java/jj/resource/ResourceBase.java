@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.configuration.resolution.AppLocation;
+import jj.event.MockPublisher;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 	
 	protected ResourceInstanceCreator creator;
 	@Mock Injector injector;
+	MockPublisher publisher;
 	
 	protected U resource;
 	
@@ -72,7 +74,7 @@ public abstract class ResourceBase<U extends Resource, T extends ResourceCreator
 		
 		before();
 		
-		creator = new ResourceInstanceCreator(pathResolver, injector);
+		creator = new ResourceInstanceCreator(pathResolver, injector, publisher = new MockPublisher());
 		
 		toTest = toTest();
 		
