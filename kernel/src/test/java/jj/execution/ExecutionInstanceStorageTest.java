@@ -23,6 +23,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import jj.util.Closer;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,7 +48,7 @@ public class ExecutionInstanceStorageTest {
 		int count = 12;
 		latch = new CountDownLatch(count);
 		
-		final ExecutionInstanceStorage.Handle[] handles = new ExecutionInstanceStorage.Handle[count];
+		final PausedExecutionStorage[] handles = new PausedExecutionStorage[count];
 		
 		ExecutorService executor = Executors.newFixedThreadPool(count, (r) -> {
 			Thread thread = new Thread(r);
@@ -86,11 +88,10 @@ public class ExecutionInstanceStorageTest {
 				String value = String.valueOf(j);
 				assertThat(eis.get(String.class), is(nullValue()));
 				
-				handles[j].resume();
-				
-				assertThat(eis.get(String.class), is(value));
-				eis.clear(String.class);
-				
+				try (Closer closer = handles[j].resume()) {
+					
+					assertThat(eis.get(String.class), is(value));
+				}
 				assertThat(eis.get(String.class), is(nullValue()));
 				latch.countDown();
 			});

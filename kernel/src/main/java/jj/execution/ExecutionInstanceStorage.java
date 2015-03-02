@@ -48,15 +48,13 @@ class ExecutionInstanceStorage {
 		bin.get().remove(type);
 	}
 	
-	interface Handle {
-		
-		void resume();
-	}
-	
-	Handle pause() {
+	PausedExecutionStorage pause() {
 		Map<Object, Object> map = new HashMap<>(bin.get());
 		return () -> {
 			bin.get().putAll(map);
+			return () -> {
+				bin.get().clear();
+			};
 		};
 	}
 }
