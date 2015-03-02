@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.script;
+package jj.execution;
+
+import jj.util.Closer;
 
 /**
+ * A resumable handle to a paused execution, resume in try-with-resources like
+ * <pre class="brush:java">
+ * try (Closer closer = pes.resume()) { ... }
+ * </pre>
  * @author jason
- *
  */
-public interface ContinuationResumer {
+public interface PausedExecutionStorage {
 	
-	/**
-	 * Resume a continuation, for use by code that constructs its own ContinuationPendingKey, such as from a network message
-	 * @param pendingKey
-	 * @param result
-	 */
-	void resume(PendingKey pendingKey, Object result);
+	Closer resume();
 }

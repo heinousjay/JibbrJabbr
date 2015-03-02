@@ -16,7 +16,7 @@
 package jj.http.client;
 
 import jj.script.Continuation;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 
 /**
  * @author jason
@@ -26,15 +26,15 @@ public abstract class HttpClientRequest implements Continuation {
 	
 	protected abstract void begin();
 
-	private ContinuationPendingKey pendingKey;
+	private PendingKey pendingKey;
 	
 	@Override
-	public ContinuationPendingKey pendingKey() {
+	public PendingKey pendingKey() {
 		return pendingKey;
 	}
 	
 	@Override
-	public void pendingKey(ContinuationPendingKey pendingKey) {
+	public void pendingKey(PendingKey pendingKey) {
 		assert this.pendingKey == null;
 		assert pendingKey != null;
 		this.pendingKey = pendingKey;

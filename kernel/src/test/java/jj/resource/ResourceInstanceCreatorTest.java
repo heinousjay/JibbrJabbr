@@ -16,9 +16,9 @@
 package jj.resource;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.BDDMockito.*;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import jj.configuration.resolution.AppLocation;
+import jj.event.MockPublisher;
 import jj.event.Publisher;
 import jj.http.server.resource.StaticResource;
 
@@ -35,7 +36,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -47,24 +47,19 @@ import com.google.inject.Key;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceInstanceCreatorTest  {
 	
-	// TODO kill this off.  too much concrete stuff
-	public static ResourceInstanceCreator creator(
-		final PathResolver app
-	) {
-		return new ResourceInstanceCreator(app, Guice.createInjector());
-	}
-	
 	@Mock PathResolver app;
 	@Mock Injector injector;
+	MockPublisher publisher;
 	
 	@Captor ArgumentCaptor<AbstractModule> moduleCaptor;
 	
-	@InjectMocks ResourceInstanceCreator rimc;
+	ResourceInstanceCreator rimc;
 	
 	@Mock ResourceKey cacheKey;
 	
 	@Before
 	public void before() {
+		rimc = new ResourceInstanceCreator(app, injector, publisher = new MockPublisher());
 		given(injector.createChildInjector(any(AbstractModule.class))).willReturn(injector);
 	}
 	
@@ -141,12 +136,12 @@ public class ResourceInstanceCreatorTest  {
 		
 	}
 	
+	final String name = "name";
+	final Integer one = Integer.valueOf(1);
+	final Date date = new Date();
+	
 	@Test
 	public void testVirtualCreationAndArgs() {
-		
-		final String name = "name";
-		final Integer one = Integer.valueOf(1);
-		final Date date = new Date();
 		
 		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one, date);
 		
@@ -160,5 +155,21 @@ public class ResourceInstanceCreatorTest  {
 		assertThat(testInjector.getExistingBinding(Key.get(Path.class)), is(nullValue()));
 		assertThat(testInjector.getInstance(Integer.class), is(one));
 		assertThat(testInjector.getInstance(Date.class), is(date));
+	}
+	
+	@Test
+	public void testCreationError() {
+		
+		given(injector.getInstance(TestResource.class)).willThrow(new RuntimeException());
+		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one, date);
+		
+		assertThat(publisher.events.size(), is(1));
+		ResourceError re = (ResourceError)publisher.events.get(0);
+		assertThat(re.resourceKey, is(nullValue()));
+		assertThat(re.resourceClass, equalTo(TestResource.class));
+		assertThat(re.base, is(AppLocation.Virtual));
+		assertThat(re.name, is(name));
+		assertThat(re.arguments[0], is(one));
+		assertThat(re.arguments[1], is(date));
 	}
 }

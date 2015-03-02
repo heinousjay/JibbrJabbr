@@ -22,7 +22,7 @@ import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
 import jj.script.ContinuationResumer;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +48,7 @@ public class ElementMessageProcessorTest {
 		
 		//given
 		JJMessage jqm = MessageMaker.makeElement("id", "selector");
-		jqm.pendingKey(new ContinuationPendingKey());
+		jqm.pendingKey(new PendingKey());
 		
 		//when
 		emp.handle(connection, jqm);

@@ -85,11 +85,11 @@ public interface ScriptEnvironment extends Resource {
 	/**
 	 * Execute the given script inside the environment
 	 */
-	ContinuationPendingKey execute(Script script);
+	PendingKey execute(Script script);
 	
 	/**
 	 * Execute the given {@link Callable} inside the environment
 	 */
-	ContinuationPendingKey execute(Callable callable, Object...args);
+	PendingKey execute(Callable callable, Object...args);
 
 }

@@ -41,8 +41,8 @@ import org.mozilla.javascript.Script;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptEnvironmentInitializerTest {
 	
-	ContinuationPendingKey pendingKey1;
-	ContinuationPendingKey pendingKey2;
+	PendingKey pendingKey1;
+	PendingKey pendingKey2;
 	
 	MockTaskRunner taskRunner;
 
@@ -60,8 +60,8 @@ public class ScriptEnvironmentInitializerTest {
 	
 	@Before
 	public void before() {
-		pendingKey1 = new ContinuationPendingKey();
-		pendingKey2 = new ContinuationPendingKey();
+		pendingKey1 = new PendingKey();
+		pendingKey2 = new PendingKey();
 		taskRunner = new MockTaskRunner();
 		given(scriptEnvironment.script()).willReturn(script);
 		sei = new ScriptEnvironmentInitializer(taskRunner, isScriptThread, publisher);

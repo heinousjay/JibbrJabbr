@@ -42,10 +42,10 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	private final Publisher publisher;
 	
 	private static final class TaskOrKey {
-		private final ContinuationPendingKey pendingKey;
+		private final PendingKey pendingKey;
 		private final ScriptTask<? extends ScriptEnvironment> task;
 		
-		TaskOrKey(final ScriptTask<? extends ScriptEnvironment> task, final ContinuationPendingKey pendingKey) {
+		TaskOrKey(final ScriptTask<? extends ScriptEnvironment> task, final PendingKey pendingKey) {
 			this.task = task;
 			this.pendingKey = pendingKey;
 		}
@@ -115,7 +115,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	 * @param pendingKey
 	 */
 	@Override
-	public void resumeOnInitialization(final ScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
+	public void resumeOnInitialization(final ScriptEnvironment scriptEnvironment, final PendingKey pendingKey) {
 		assert isScriptThread.forScriptEnvironment(scriptEnvironment) : "only wait on script environments from their own thread!";
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(null, pendingKey));
@@ -161,7 +161,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		}
 		
 		private void checkParentResumption(Object result) {
-			ContinuationPendingKey pendingKey = scriptEnvironment.initializationContinuationPendingKey();
+			PendingKey pendingKey = scriptEnvironment.initializationContinuationPendingKey();
 			if (pendingKey != null) {
 				pendingKey.resume(result);
 			}

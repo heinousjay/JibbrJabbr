@@ -21,12 +21,14 @@ import java.util.List;
 import org.jsoup.parser.ParseError;
 import org.slf4j.Logger;
 
+import jj.ServerLogger;
 import jj.logging.LoggedEvent;
 
 /**
  * @author jason
  *
  */
+@ServerLogger
 public class HtmlParseError extends LoggedEvent {
 
 	private final Path path;

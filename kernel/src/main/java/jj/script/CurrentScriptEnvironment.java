@@ -21,9 +21,9 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.ContinuationPending;
 
+import jj.execution.ExecutionInstance;
 import jj.script.module.RootScriptEnvironment;
 import jj.util.Closer;
-import jj.util.CurrentResource;
 
 /**
  * 
@@ -32,7 +32,7 @@ import jj.util.CurrentResource;
  *
  */
 @Singleton
-public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment> {
+public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironment> {
 	
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -45,7 +45,7 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 	 * internal method, to allow continuation resumption to also involve environment-dependent
 	 * context restoration
 	 */
-	Closer enterScope(final AbstractScriptEnvironment scriptEnvironment, final ContinuationPendingKey pendingKey) {
+	Closer enterScope(final AbstractScriptEnvironment scriptEnvironment, final PendingKey pendingKey) {
 		
 		final Closer environmentCloser = enterScope(scriptEnvironment);
 		final Closer contextCloser = scriptEnvironment.restoreContextForKey(pendingKey);
@@ -84,7 +84,7 @@ public class CurrentScriptEnvironment extends CurrentResource<ScriptEnvironment>
 		assert current() != null : "can't perform a continuation unless a script is in context";
 		
 		ContinuationPending result = prepareContinuation(new ContinuationState(continuation));
-		ContinuationPendingKey pendingKey = innerCurrent().createContinuationContext(result);
+		PendingKey pendingKey = innerCurrent().createContinuationContext(result);
 		continuation.pendingKey(pendingKey);
 		throw result;
 	}

@@ -69,7 +69,7 @@ public class WebSocketConnectionTest {
 		JJMessage message1 = JJMessage.makeBind("context", "selector", "bind");
 		JJMessage message2 = JJMessage.makeInvoke("invoke", "[0]");
 		String sent = "[" + message1 + "," + message2 + "]";
-		connection.send(message1).send(message2).exitedCurrentScope();
+		connection.send(message1).send(message2).exitedScope();
 		
 		verify(ctx).writeAndFlush(textFrameCaptor.capture());
 		

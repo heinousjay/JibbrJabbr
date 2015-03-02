@@ -29,7 +29,7 @@ import jj.execution.TaskRunner;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceTask;
 import jj.script.Continuation;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationState;
 import jj.script.CurrentScriptEnvironment;
@@ -46,7 +46,7 @@ public class ScriptMessages implements ContinuationProcessor {
 	
 	static class ScriptMessagesLoaderBundle implements Continuation {
 
-		private ContinuationPendingKey pendingKey;
+		private PendingKey pendingKey;
 		
 		private final String name;
 		private final Locale locale;
@@ -64,12 +64,12 @@ public class ScriptMessages implements ContinuationProcessor {
 		}
 		
 		@Override
-		public void pendingKey(ContinuationPendingKey pendingKey) {
+		public void pendingKey(PendingKey pendingKey) {
 			this.pendingKey = pendingKey;
 		}
 
 		@Override
-		public ContinuationPendingKey pendingKey() {
+		public PendingKey pendingKey() {
 			return pendingKey;
 		}
 		

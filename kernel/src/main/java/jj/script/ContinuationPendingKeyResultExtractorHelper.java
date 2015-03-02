@@ -31,7 +31,7 @@ import jj.execution.TaskRunner;
  */
 class ContinuationPendingKeyResultExtractorHelper extends ContinuationPendingCache {
 
-	static Map<ContinuationPendingKey, Object> RESULT_MAP = new HashMap<>();
+	static Map<PendingKey, Object> RESULT_MAP = new HashMap<>();
 	
 	/**
 	 * @param taskRunner
@@ -47,7 +47,7 @@ class ContinuationPendingKeyResultExtractorHelper extends ContinuationPendingCac
 	}
 
 	@Override
-	void resume(ContinuationPendingKey pendingKey, Object result) {
+	void resume(PendingKey pendingKey, Object result) {
 		RESULT_MAP.put(pendingKey, result);
 	}
 	

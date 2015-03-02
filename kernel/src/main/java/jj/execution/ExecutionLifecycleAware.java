@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.util;
+package jj.execution;
 
 /**
  * <p>
@@ -23,15 +23,15 @@ package jj.util;
  * @author jason
  *
  */
-public interface CurrentResourceAware {
+public interface ExecutionLifecycleAware {
 
 	/**
 	 * Called when the resource has entered the current scope
 	 */
-	void enteredCurrentScope();
+	void enteredScope();
 	
 	/**
 	 * Called when the resource has exited the current scope
 	 */
-	void exitedCurrentScope();
+	void exitedScope();
 }

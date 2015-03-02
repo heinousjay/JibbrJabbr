@@ -41,7 +41,7 @@ import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.ScriptSystemEvent;
 import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
@@ -134,7 +134,7 @@ public class DocumentScriptEnvironmentTest {
 	@Test
 	public void testManagesContext() throws Exception {
 		
-		ContinuationPendingKey key = new ContinuationPendingKey();
+		PendingKey key = new PendingKey();
 		String name = "index";
 		
 		givenAnHtmlResource(name);
@@ -325,10 +325,10 @@ public class DocumentScriptEnvironmentTest {
 		assertThat(result.nextConnection(), is(true));
 		assertThat(iterated1.remove(result.currentConnection()), is(true));
 		
-		ContinuationPendingKey key = new ContinuationPendingKey();
+		PendingKey key = new PendingKey();
 		
 		result.captureContextForKey(key);
-		result.exitedCurrentScope();
+		result.exitedScope();
 		
 		assertThat(result.currentConnection(), is(nullValue()));
 		

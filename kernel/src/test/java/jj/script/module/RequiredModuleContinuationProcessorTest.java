@@ -26,7 +26,7 @@ import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.resource.ResourceNotFound;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.ContinuationPendingKeyResultExtractor;
 import jj.script.ContinuationState;
 import jj.script.DependsOnScriptEnvironmentInitialization;
@@ -49,7 +49,7 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class RequiredModuleContinuationProcessorTest {
 	
-	ContinuationPendingKey pendingKey;
+	PendingKey pendingKey;
 	
 	String baseName = "index";
 	
@@ -74,7 +74,7 @@ public class RequiredModuleContinuationProcessorTest {
 	@Before
 	public void before() {
 		
-		pendingKey = new ContinuationPendingKey();
+		pendingKey = new PendingKey();
 		
 		requiredModule = new RequiredModule(documentScriptEnvironment, module);
 		requiredModule.pendingKey(pendingKey);

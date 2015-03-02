@@ -20,7 +20,7 @@ import jj.execution.MockTaskRunner;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
 import io.netty.channel.Channel;
@@ -56,7 +56,7 @@ public class DocumentRequestProcessorTest {
 	@Mock HttpServerRequest httpRequest;
 	HttpServerResponse httpResponse;
 	
-	ContinuationPendingKey pendingKey;
+	PendingKey pendingKey;
 	
 	int filterCalls;
 	
@@ -106,7 +106,7 @@ public class DocumentRequestProcessorTest {
 		// auto-stubbing the builder pattern
 		httpResponse = mock(HttpServerResponse.class, ANSWER_WITH_SELF);
 		
-		pendingKey = new ContinuationPendingKey();
+		pendingKey = new PendingKey();
 		
 		currentDocument = new CurrentDocumentRequestProcessor();
 	}

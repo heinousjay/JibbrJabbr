@@ -8,7 +8,7 @@ import java.util.Map;
 
 import jj.http.server.websocket.WebSocketMessage;
 import jj.script.Continuation;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -347,13 +347,13 @@ public class JJMessage implements Continuation, WebSocketMessage {
 	
 	@JsonIgnore
 	@Override
-	public ContinuationPendingKey pendingKey() {
-		return (message instanceof HasResultID) ? new ContinuationPendingKey(((HasResultID)message).id) : null;
+	public PendingKey pendingKey() {
+		return (message instanceof HasResultID) ? new PendingKey(((HasResultID)message).id) : null;
 	}
 	
 	@JsonIgnore
 	@Override
-	public void pendingKey(ContinuationPendingKey pendingKey) {
+	public void pendingKey(PendingKey pendingKey) {
 		if (message instanceof HasResultID) {
 			((HasResultID)message).id = pendingKey.id();
 		}

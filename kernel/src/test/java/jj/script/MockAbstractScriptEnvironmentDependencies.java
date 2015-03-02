@@ -55,7 +55,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 		}
 	}
 	
-	public interface MockPendingKeyProvider extends Provider<ContinuationPendingKey> {}
+	public interface MockPendingKeyProvider extends Provider<PendingKey> {}
 	
 	public MockAbstractScriptEnvironmentDependencies() {
 		this("unnamed");

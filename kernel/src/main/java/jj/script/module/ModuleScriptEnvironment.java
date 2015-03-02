@@ -27,7 +27,7 @@ import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ChildScriptEnvironment;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.RhinoContext;
 import jj.script.ScriptEnvironment;
 
@@ -75,7 +75,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	// the key to restarting whatever included this.  gets removed on first read and is null forever after
 	// maybe not a good spot? it's not necessarily the same as the overall root environment
 	// does not need to be volatile because this interaction is guaranteed to be from one thread
-	private ContinuationPendingKey pendingKey;
+	private PendingKey pendingKey;
 	
 	private final ScriptableObject scope;
 	
@@ -173,8 +173,8 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 
 	@Override
-	public ContinuationPendingKey initializationContinuationPendingKey() {
-		ContinuationPendingKey result = pendingKey;
+	public PendingKey initializationContinuationPendingKey() {
+		PendingKey result = pendingKey;
 		pendingKey = null;
 		return result;
 	}

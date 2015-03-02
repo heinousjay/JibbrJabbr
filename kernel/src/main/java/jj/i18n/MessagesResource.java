@@ -129,6 +129,11 @@ public class MessagesResource extends AbstractResource {
 		return sha;
 	}
 	
+	@Override
+	protected Object[] creationArgs() {
+		return new Object[] { locale };
+	}
+	
 	public boolean containsKey(String key) {
 		return messages.containsKey(key);
 	}

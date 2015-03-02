@@ -18,16 +18,16 @@ package jj.http.server.websocket;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.execution.ExecutionInstance;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
-import jj.util.CurrentResource;
 
 /**
  * @author jason
  *
  */
 @Singleton
-public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnection> {
+public class CurrentWebSocketConnection extends ExecutionInstance<WebSocketConnection> {
 
 	private final CurrentScriptEnvironment env;
 	
@@ -41,7 +41,7 @@ public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnect
 	 * @return
 	 */
 	public WebSocketConnection trueCurrent() {
-		return resources.get();
+		return super.current();
 	}
 	
 	@Override
@@ -49,7 +49,7 @@ public class CurrentWebSocketConnection extends CurrentResource<WebSocketConnect
 		// we have to do something a little special here.  the web socket connection host, if any, may
 		// be broadcasting, and so in that case, we want to use its connection.
 		
-		WebSocketConnection current = resources.get();
+		WebSocketConnection current = trueCurrent();
 		ScriptEnvironment se = env.current();
 		if (se != null && 
 			se instanceof WebSocketConnectionHost && 

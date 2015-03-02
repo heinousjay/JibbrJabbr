@@ -78,7 +78,7 @@ public class AbstractScriptEnvironmentTest {
 	
 	MyScriptEnvironment ase;
 	
-	@Mock ContinuationPendingKey pendingKey;
+	@Mock PendingKey pendingKey;
 	@Mock ContinuationPending continuationPending;
 	
 	@Mock ScriptableObject scope;
@@ -165,7 +165,7 @@ public class AbstractScriptEnvironmentTest {
 		given(dependencies.scriptEnvironmentDependencies.pendingKeyProvider.get()).willReturn(pendingKey);
 		
 		// when
-		ContinuationPendingKey newKey = ase.createContinuationContext(continuationPending);
+		PendingKey newKey = ase.createContinuationContext(continuationPending);
 		
 		// then
 		assertThat(newKey, is(pendingKey));

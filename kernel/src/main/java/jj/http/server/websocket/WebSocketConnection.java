@@ -15,12 +15,12 @@ import javax.inject.Singleton;
 
 import org.mozilla.javascript.Callable;
 
+import jj.execution.ExecutionLifecycleAware;
 import jj.script.FunctionContext;
 import jj.util.DateFormatHelper;
-import jj.util.CurrentResourceAware;
 
 @Singleton
-public class WebSocketConnection implements FunctionContext, CurrentResourceAware {
+public class WebSocketConnection implements FunctionContext, ExecutionLifecycleAware {
 	
 	// start off with room for three functions
 	private final HashMap<String, Callable> functions = new HashMap<>(4);
@@ -98,12 +98,12 @@ public class WebSocketConnection implements FunctionContext, CurrentResourceAwar
 	}
 	
 	@Override
-	public void enteredCurrentScope() {
+	public void enteredScope() {
 		// nothing to do
 	}
 	
 	@Override
-	public void exitedCurrentScope() {
+	public void exitedScope() {
 		if (!messages.isEmpty()) {
 			String message = serialize();
 			ctx.writeAndFlush(new TextWebSocketFrame(message));

@@ -18,7 +18,7 @@ package jj.repl;
 import javax.inject.Singleton;
 
 import io.netty.channel.ChannelHandlerContext;
-import jj.util.CurrentResource;
+import jj.execution.ExecutionInstance;
 
 /**
  * Maintains the current ChannelHandlerContext for the repl system, so it knows where to print when it's done
@@ -27,6 +27,6 @@ import jj.util.CurrentResource;
  *
  */
 @Singleton
-class CurrentReplChannelHandlerContext extends CurrentResource<ChannelHandlerContext> {
+class CurrentReplChannelHandlerContext extends ExecutionInstance<ChannelHandlerContext> {
 
 }

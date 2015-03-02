@@ -51,7 +51,7 @@ public class TimersTest {
 	CurrentScriptEnvironment env;
 	
 	@Mock CancelKey cancelKey;
-	@Mock ContinuationPendingKey pendingKey;
+	@Mock PendingKey pendingKey;
 
 	@Before
 	public void before() {
