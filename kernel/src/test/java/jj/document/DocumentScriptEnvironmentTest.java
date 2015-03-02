@@ -328,7 +328,7 @@ public class DocumentScriptEnvironmentTest {
 		PendingKey key = new PendingKey();
 		
 		result.captureContextForKey(key);
-		result.exitedCurrentScope();
+		result.exitedScope();
 		
 		assertThat(result.currentConnection(), is(nullValue()));
 		

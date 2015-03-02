@@ -63,7 +63,7 @@ public abstract class ExecutionInstance<T> {
 		assert storage.get(getClass()) == null;
 		storage.set(getClass(), instance);
 		if (instance instanceof ExecutionLifecycleAware) {
-			((ExecutionLifecycleAware)instance).enteredCurrentScope();
+			((ExecutionLifecycleAware)instance).enteredScope();
 		}
 		
 		return new Closer() {
@@ -73,7 +73,7 @@ public abstract class ExecutionInstance<T> {
 				storage.clear(ExecutionInstance.this.getClass());
 				
 				if (instance instanceof ExecutionLifecycleAware) {
-					((ExecutionLifecycleAware)instance).exitedCurrentScope();
+					((ExecutionLifecycleAware)instance).exitedScope();
 				}
 			}
 		};

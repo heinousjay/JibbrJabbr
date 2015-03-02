@@ -28,10 +28,10 @@ public interface ExecutionLifecycleAware {
 	/**
 	 * Called when the resource has entered the current scope
 	 */
-	void enteredCurrentScope();
+	void enteredScope();
 	
 	/**
 	 * Called when the resource has exited the current scope
 	 */
-	void exitedCurrentScope();
+	void exitedScope();
 }

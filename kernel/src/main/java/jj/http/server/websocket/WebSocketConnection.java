@@ -98,12 +98,12 @@ public class WebSocketConnection implements FunctionContext, ExecutionLifecycleA
 	}
 	
 	@Override
-	public void enteredCurrentScope() {
+	public void enteredScope() {
 		// nothing to do
 	}
 	
 	@Override
-	public void exitedCurrentScope() {
+	public void exitedScope() {
 		if (!messages.isEmpty()) {
 			String message = serialize();
 			ctx.writeAndFlush(new TextWebSocketFrame(message));

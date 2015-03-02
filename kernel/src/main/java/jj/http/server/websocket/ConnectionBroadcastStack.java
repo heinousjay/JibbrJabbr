@@ -63,7 +63,7 @@ public class ConnectionBroadcastStack {
 	 */
 	public WebSocketConnection pop() {
 		if (current != null) {
-			current.exitedCurrentScope();
+			current.exitedScope();
 		}
 		
 		while((current = getNext()) != null) {

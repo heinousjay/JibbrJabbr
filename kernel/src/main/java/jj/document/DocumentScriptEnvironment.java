@@ -253,12 +253,12 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	public void enteredCurrentScope() {
+	public void enteredScope() {
 		// nothing to do
 	}
 	
 	@Override
-	public void exitedCurrentScope() {
+	public void exitedScope() {
 		// presumably, if there is still broadcasting to be done, then it's saved
 		// away with continuation state
 		broadcastStack = null;
