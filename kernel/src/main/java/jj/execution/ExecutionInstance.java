@@ -55,30 +55,29 @@ public abstract class ExecutionInstance<T> {
 	@Inject private ExecutionInstanceStorage storage = new ExecutionInstanceStorage();
 
 	/**
-	 * Begin exposing 
-	 * @param instance
-	 * @return
+	 * Provides a scoping mechanism for instances that are related to a specific execution,
+	 * such as HTTP state, or the currently executing tasks. 
 	 */
 	public final Closer enterScope(final T instance) {
 		assert storage.get(getClass()) == null;
 		storage.set(getClass(), instance);
+		
 		if (instance instanceof ExecutionLifecycleAware) {
 			((ExecutionLifecycleAware)instance).enteredScope();
 		}
 		
-		return new Closer() {
+		return () -> {
+			storage.clear(ExecutionInstance.this.getClass());
 			
-			@Override
-			public void close() {
-				storage.clear(ExecutionInstance.this.getClass());
-				
-				if (instance instanceof ExecutionLifecycleAware) {
-					((ExecutionLifecycleAware)instance).exitedScope();
-				}
+			if (instance instanceof ExecutionLifecycleAware) {
+				((ExecutionLifecycleAware)instance).exitedScope();
 			}
 		};
 	}
 	
+	/**
+	 * The current instance held in scope, or null if none
+	 */
 	public T current() {
 		return storage.get(getClass());
 	}
