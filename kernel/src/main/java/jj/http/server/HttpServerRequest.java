@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-import io.netty.handler.codec.AsciiString;
+import io.netty.util.AsciiString;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.math.BigDecimal;
