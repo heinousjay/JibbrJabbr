@@ -16,7 +16,6 @@
 package jj.application;
 
 import jj.resource.Location;
-import jj.resource.PathResolver;
 import jj.script.ScriptEnvironment;
 
 /**
@@ -72,7 +71,13 @@ public enum AppLocation implements Location {
 	private final boolean representsFilesystem;
 	private final boolean internal;
 	
-	private AppLocation(final String path, final AppLocation parent, final boolean ensureDirectory, final boolean representsFilesystem, final boolean internal) {
+	private AppLocation(
+		final String path,
+		final AppLocation parent,
+		final boolean ensureDirectory,
+		final boolean representsFilesystem,
+		final boolean internal
+	) {
 		this.path = path;
 		this.parent = parent;
 		this.ensureDirectory = ensureDirectory;
@@ -104,10 +109,5 @@ public enum AppLocation implements Location {
 	@Override
 	public boolean representsFilesystem() {
 		return representsFilesystem;
-	}
-	
-	@Override
-	public PathResolver resolver() {
-		return null;
 	}
 }

@@ -1,22 +1,20 @@
 package jj.system;
 
 import jj.resource.Location;
-import jj.resource.PathResolver;
 
-class SystemLocation implements Location {
+enum SystemLocation implements Location {
+	
+	Root,
+	Modules,
+	Virtual;
 
 	@Override
 	public boolean representsFilesystem() {
-		return true;
+		return this != Virtual;
 	}
 
 	@Override
 	public boolean parentInDirectory() {
-		return false; // but soon yes
-	}
-
-	@Override
-	public PathResolver resolver() {
-		return null;
+		return this == Modules;
 	}
 }
