@@ -146,7 +146,7 @@ public class ResourceInstanceCreatorTest  {
 	@Test
 	public void testVirtualCreationAndArgs() {
 		
-		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one, date);
+		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, date);
 		
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		verify(injector).getInstance(TestResource.class);
@@ -156,7 +156,6 @@ public class ResourceInstanceCreatorTest  {
 		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
 		assertThat(testInjector.getInstance(Key.get(String.class, ResourceName.class)), is(name));
 		assertThat(testInjector.getExistingBinding(Key.get(Path.class)), is(nullValue()));
-		assertThat(testInjector.getInstance(Integer.class), is(one));
 		assertThat(testInjector.getInstance(Date.class), is(date));
 	}
 	
@@ -164,7 +163,7 @@ public class ResourceInstanceCreatorTest  {
 	public void testCreationError() {
 		
 		given(injector.getInstance(TestResource.class)).willThrow(new RuntimeException());
-		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one, date);
+		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one);
 		
 		assertThat(publisher.events.size(), is(1));
 		ResourceError re = (ResourceError)publisher.events.get(0);
@@ -173,6 +172,5 @@ public class ResourceInstanceCreatorTest  {
 		assertThat(re.base, is(AppLocation.Virtual));
 		assertThat(re.name, is(name));
 		assertThat(re.arguments[0], is(one));
-		assertThat(re.arguments[1], is(date));
 	}
 }

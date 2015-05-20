@@ -60,19 +60,12 @@ public class ResourceInstanceCreator {
 		final String name,
 		final Object...args
 	) {
+		// should just be
+		// pathResolver.resolve(base, name);
+		// ideally! base.resolve(name);
+		// but that requires tricks
+		
 		final Path path = base.representsFilesystem() ? pathResolver.resolvePath(base, name).normalize().toAbsolutePath() : null;
-		
-		return createResource(resourceClass, resourceKey, base, name, path, args);
-	}
-		
-	public <T extends Resource> T createResource(
-		final Class<T> resourceClass,
-		final ResourceKey resourceKey,
-		final Location base,
-		final String name,
-		final Path path,
-		final Object...args
-	) {
 		
 		try {
 			
@@ -114,7 +107,7 @@ public class ResourceInstanceCreator {
 			}
 			
 		} catch (NoSuchResourceException nsre) {
-			// don't bother logging this, it's just a "not found"
+			// don't bother logging this, it's just a "not found" and will be handled in the ResourceLoaderImpl
 		} catch (Exception e) {
 			publisher.publish(new ResourceError(resourceClass, base, name, args, e));
 		}
