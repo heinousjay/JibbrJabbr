@@ -16,6 +16,7 @@
 package jj.resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface Location {
 		
 		private final List<Location> locations = new ArrayList<>();
 		
-		public Bundle(Location first, Location second) {
+		Bundle(Location first, Location second) {
 			locations.add(first);
 			locations.add(second);
 		}
@@ -65,20 +66,28 @@ public interface Location {
 		}
 		
 		@Override
-		public boolean internal() {
+		public PathResolver resolver() {
 			// bundles cannot be used in this way
 			// never should even get called
-			throw new AssertionError("called internal on a Location.Bundle. should never happen");
+			throw new AssertionError("called resolver on a Location.Bundle. should never happen");
 		}
 	}
 	
-	Location and(Location location);
+	default Location and(Location next) {
+		return new Bundle(this, next);
+	}
 	
-	List<Location> locations();
+	default List<Location> locations() {
+		return Collections.unmodifiableList(Arrays.asList((Location)this));
+	}
+	
+	default <T> T as(Class<T> type) {
+		return type.cast(this);
+	}
 	
 	boolean representsFilesystem();
 	
 	boolean parentInDirectory();
 	
-	boolean internal();
+	PathResolver resolver();
 }

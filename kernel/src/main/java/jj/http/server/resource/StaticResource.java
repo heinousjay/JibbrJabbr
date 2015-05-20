@@ -22,6 +22,7 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 
+import jj.configuration.resolution.AppLocation;
 import jj.http.server.TransferableResource;
 import jj.resource.AbstractFileResource;
 import jj.resource.PathResolver;
@@ -45,7 +46,7 @@ public class StaticResource extends AbstractFileResource implements Transferable
 		final PathResolver pathResolver
 	) throws IOException {
 		super(dependencies, path, false);
-		safeToServe = base.internal() || pathResolver.pathInBase(path);
+		safeToServe = base.as(AppLocation.class).internal() || pathResolver.pathInBase(path);
 	}
 	
 	@Override

@@ -15,11 +15,8 @@
  */
 package jj.configuration.resolution;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import jj.resource.Location;
+import jj.resource.PathResolver;
 import jj.script.ScriptEnvironment;
 
 /**
@@ -83,14 +80,6 @@ public enum AppLocation implements Location {
 		this.internal = internal;
 	}
 	
-	public Location and(Location next) {
-		return new Bundle(this, next);
-	}
-	
-	public List<Location> locations() {
-		return Collections.unmodifiableList(Arrays.asList((Location)this));
-	}
-	
 	public Location parent() {
 		return parent;
 	}
@@ -101,6 +90,10 @@ public enum AppLocation implements Location {
 	
 	public String path() {
 		return parent == null ? path : parent.path() + path;
+	}
+	
+	public boolean internal() {
+		return internal;
 	}
 	
 	@Override
@@ -114,7 +107,7 @@ public enum AppLocation implements Location {
 	}
 	
 	@Override
-	public boolean internal() {
-		return internal;
+	public PathResolver resolver() {
+		return null;
 	}
 }
