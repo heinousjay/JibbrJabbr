@@ -40,7 +40,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class ResourceCacheTest extends RealResourceBase {
+public class ResourceCacheTest {
 	
 	URI uri = URI.create("/resource1");
 	
