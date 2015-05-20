@@ -13,23 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.application;
 
-import jj.JJModule;
-import jj.application.Application;
-import jj.resource.PathResolver;
+import java.util.HashSet;
+import java.util.Set;
+
+import jj.BootstrapClassPath;
+import jj.application.InternalAssets;
 
 /**
  * @author jason
  *
  */
-public class ConfigurationModule extends JJModule {
-
-	@Override
-	protected void configure() {
+public class TestableAssets extends InternalAssets {
+	
+	private static final Set<String> paths;
+	
+	static {
 		
-		bindStartupListener(ConfigurationScriptLoader.class);
-		
-		bindCreationOf(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);
+		paths = new HashSet<>();
+		paths.add("/jj/assets/");
 	}
+
+	
+	public TestableAssets() {
+		super(new BootstrapClassPath(), paths);
+	}
+
 }

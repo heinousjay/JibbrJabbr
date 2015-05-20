@@ -4,20 +4,20 @@ import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 
-public class LocationPathResolverBinder {
+public class LocationResolverBinder {
 
-	private final MapBinder<Class<? extends Location>, PathResolver> pathResolverBinder;
+	private final MapBinder<Class<? extends Location>, LocationResolver> pathResolverBinder;
 	
-	public LocationPathResolverBinder(Binder binder) {
+	public LocationResolverBinder(Binder binder) {
 		pathResolverBinder = MapBinder.newMapBinder(
 			binder,
 			new TypeLiteral<Class<? extends Location>>() {},
-			new TypeLiteral<PathResolver>() {}
+			new TypeLiteral<LocationResolver>() {}
 		);
 	}
 	
 	public interface With {
-		void with(Class<? extends PathResolver> pathResolver);
+		void with(Class<? extends LocationResolver> pathResolver);
 	}
 	
 	public With resolvePathsFor(Class<? extends Location> locationClass) {

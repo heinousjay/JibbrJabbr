@@ -24,20 +24,23 @@ import java.nio.file.Path;
 public interface PathResolver {
 	
 	/**
-	 * The base location of the application
+	 * The base location of the path resolver
 	 */
 	Location base();
 	
 	/**
-	 * The base path of the application
+	 * The base path of the path resolver
 	 */
 	Path path();
 	
+	/**
+	 * True if the given path is in the base
+	 */
 	boolean pathInBase(Path path);
 
 	/**
 	 * resolve the given location and name against
-	 * the application base
+	 * the base path
 	 */
 	Path resolvePath(Location base, String name);
 

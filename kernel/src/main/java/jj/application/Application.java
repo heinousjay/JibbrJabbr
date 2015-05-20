@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import jj.configuration.Arguments;
 import jj.resource.Location;
+import jj.resource.LocationResolver;
 import jj.resource.PathResolver;
 
 /**
@@ -32,7 +33,7 @@ import jj.resource.PathResolver;
  *
  */
 @Singleton
-public class Application implements PathResolver {
+public class Application implements PathResolver, LocationResolver {
 	
 	private static final String APP_PATH_ARG_NAME = "app";
 	

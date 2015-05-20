@@ -16,6 +16,7 @@
 package jj;
 
 
+import jj.application.ApplicationModule;
 import jj.configuration.CommandLine;
 import jj.configuration.ConfigurationModule;
 import jj.conversion.ConversionModule;
@@ -70,6 +71,7 @@ public class CoreModule extends JJModule {
 		bindLoggedEventsAnnotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		
 		// first our key pieces
+		install(new ApplicationModule());
 		install(new ConfigurationModule());
 		install(new ConversionModule());
 		install(new EventModule());

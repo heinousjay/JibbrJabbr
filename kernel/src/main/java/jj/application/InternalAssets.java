@@ -24,16 +24,20 @@ import java.util.Set;
 import jj.ResourceResolver;
 
 /**
+ * provides implementation for finding assets in module jars
+ * 
+ * public because mockito requires it
+ * 
  * @author jason
  *
  */
-public class InternalAssets {
+public abstract class InternalAssets {
 
 	protected static final Path NOT_FOUND = Paths.get("/jj/assets/not-found-sentinel/");
 	private final ResourceResolver resolver;
 	private final Set<String> paths;
 
-	protected InternalAssets(
+	InternalAssets(
 		final ResourceResolver resolver,
 		final Set<String> paths
 	) {

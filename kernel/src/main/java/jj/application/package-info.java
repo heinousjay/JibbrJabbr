@@ -15,10 +15,7 @@
  */
 /**
  * <p>
- * The system responsible for resolving paths and making resources concrete.
- * 
- * <p>
- * This is the in-code configuration for the resource system
+ * configures the section of the system that is used to configure applications
  * 
  * @author jason
  *

@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.resource;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jj.BootstrapClassPath;
-import jj.application.InternalAssets;
+import java.nio.file.Path;
 
 /**
  * @author jason
  *
  */
-public class TestableAssets extends InternalAssets {
+public interface LocationResolver {
 	
-	private static final Set<String> paths;
+	/**
+	 * The base location of the path resolver
+	 */
+	Location base();
 	
-	static {
-		
-		paths = new HashSet<>();
-		paths.add("/jj/assets/");
-	}
+	/**
+	 * The base path of the path resolver
+	 */
+	Path path();
+	
+	/**
+	 * True if the given path is in the base
+	 */
+	boolean pathInBase(Path path);
 
-	
-	public TestableAssets() {
-		super(new BootstrapClassPath(), paths);
-	}
+	/**
+	 * resolve the given location and name against
+	 * the base path
+	 */
+	Path resolvePath(Location base, String name);
 
 }
