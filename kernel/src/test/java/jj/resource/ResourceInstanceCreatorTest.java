@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import jj.application.AppLocation;
+import jj.application.Application;
 import jj.event.MockPublisher;
 import jj.event.Publisher;
 import jj.http.server.resource.StaticResource;
@@ -48,6 +49,7 @@ import com.google.inject.Key;
 public class ResourceInstanceCreatorTest  {
 	
 	@Mock PathResolver app;
+	@Mock Location location;
 	@Mock Injector injector;
 	MockPublisher publisher;
 	
@@ -69,11 +71,12 @@ public class ResourceInstanceCreatorTest  {
 		final String name = "name";
 		Path path = Paths.get("/");
 		
-		given(app.resolvePath(AppLocation.Base, name)).willReturn(path);
+		given(location.representsFilesystem()).willReturn(true);
+		given(app.resolvePath(location, name)).willReturn(path);
 		
-		rimc.createResource(StaticResource.class, cacheKey, AppLocation.Base, name);
+		rimc.createResource(StaticResource.class, cacheKey, location, name);
 		
-		verify(app).resolvePath(AppLocation.Base, name);
+		verify(app).resolvePath(location, name);
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		verify(injector).getInstance(StaticResource.class);
 		
@@ -81,7 +84,7 @@ public class ResourceInstanceCreatorTest  {
 
 			@Override
 			protected void configure() {
-				bind(PathResolver.class).toInstance(app);
+				bind(Application.class).toInstance(mock(Application.class)); // ugly
 				bind(Publisher.class).toInstance(mock(Publisher.class));
 				bind(ResourceFinder.class).toInstance(mock(ResourceFinder.class));
 				bind(ResourceConfiguration.class).toInstance(mock(ResourceConfiguration.class));
@@ -96,7 +99,7 @@ public class ResourceInstanceCreatorTest  {
 	public static class TestResource implements Resource {
 
 		@Override
-		public AppLocation base() {
+		public Location base() {
 			return null;
 		}
 		

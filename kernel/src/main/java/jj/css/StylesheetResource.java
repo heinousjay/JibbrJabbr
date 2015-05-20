@@ -34,12 +34,12 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
+import jj.application.Application;
 import jj.http.server.LoadedResource;
 import jj.http.server.ServableResourceConfiguration;
 import jj.http.server.resource.StaticResource;
 import jj.resource.AbstractResource;
 import jj.resource.NoSuchResourceException;
-import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
 import jj.script.Global;
 import jj.script.RhinoContext;
@@ -79,7 +79,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		final @Global ScriptableObject global,
 		final CssReferenceVersionProcessor processor,
 		final LessConfiguration lessConfiguration,
-		final PathResolver pathResolver
+		final Application application
 	) {
 		super(dependencies);
 		
@@ -119,7 +119,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 			}
 		}
 		
-		safeToServe = path.startsWith(pathResolver.path());
+		safeToServe = application.pathInBase(path);
 
 		result = processor.fixUris(result, this);
 		

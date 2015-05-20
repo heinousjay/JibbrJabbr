@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import jj.ServerStarting;
 import jj.ServerStarting.Priority;
+import jj.application.Application;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
@@ -42,20 +43,20 @@ import jj.execution.TaskRunner;
 @Subscriber
 class DirectoryStructureLoader {
 	
-	private final PathResolver pathResolver;
+	private final Application application;
 	private final ResourceFinder resourceFinder;
 	private final TaskRunner taskRunner;
 	
 	@Inject
-	DirectoryStructureLoader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
-		this.pathResolver = pathResolver;
+	DirectoryStructureLoader(final Application application, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
+		this.application = application;
 		this.resourceFinder = resourceFinder;
 		this.taskRunner = taskRunner;
 	}
 
 	@Listener
 	void start(ServerStarting event) {
-		event.registerStartupTask(Priority.NearHighest, new LoaderTask(pathResolver.path()));
+		event.registerStartupTask(Priority.NearHighest, new LoaderTask(application.path()));
 	}
 	
 	void load(final Path path) {
@@ -79,8 +80,8 @@ class DirectoryStructureLoader {
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 					resourceFinder.loadResource(
 						DirectoryResource.class,
-						pathResolver.base(),
-						pathResolver.path().relativize(path.resolve(dir)).toString()
+						application.base(),
+						application.path().relativize(path.resolve(dir)).toString()
 					);
 					return FileVisitResult.CONTINUE;
 				}

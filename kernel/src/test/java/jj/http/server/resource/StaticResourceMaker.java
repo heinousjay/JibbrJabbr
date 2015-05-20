@@ -17,10 +17,10 @@ package jj.http.server.resource;
 
 import static org.mockito.BDDMockito.*;
 import jj.application.AppLocation;
+import jj.application.Application;
 import jj.event.Publisher;
 import jj.http.server.resource.StaticResource;
 import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.PathResolver;
 import jj.resource.ResourceKey;
 
 /**
@@ -28,7 +28,7 @@ import jj.resource.ResourceKey;
  *
  */
 public class StaticResourceMaker {
-	public static StaticResource make(PathResolver app, AppLocation base, String name) throws Exception {
+	public static StaticResource make(Application app, AppLocation base, String name) throws Exception {
 		
 		ResourceKey resourceKey = mock(ResourceKey.class);
 		Publisher publisher = mock(Publisher.class);

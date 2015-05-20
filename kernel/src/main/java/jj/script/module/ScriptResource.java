@@ -12,10 +12,10 @@ import javax.inject.Provider;
 
 import org.mozilla.javascript.Script;
 
+import jj.application.Application;
 import jj.http.server.LoadedResource;
 import jj.http.server.ServableResourceConfiguration;
 import jj.resource.AbstractFileResource;
-import jj.resource.PathResolver;
 import jj.script.RhinoContext;
 
 @ServableResourceConfiguration(routeContributor = ScriptResourceRouteContributor.class)
@@ -32,7 +32,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 		final Dependencies dependencies,
 		final Path path,
 		final Provider<RhinoContext> contextProvider,
-		final PathResolver pathResolver
+		final Application application
 	) throws IOException {
 		super(dependencies, path);
 		source = byteBuffer.toString(settings.charset());
@@ -41,7 +41,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 		}
 		
 		// Public! soon
-		safeToServe = base == Base && pathResolver.pathInBase(path);
+		safeToServe = base == Base && application.pathInBase(path);
 	}
 	
 	public Script script() {
