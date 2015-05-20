@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.application;
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -23,10 +23,10 @@ import static org.mockito.BDDMockito.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import jj.application.APIModules;
+import jj.application.Application;
+import jj.application.Assets;
 import jj.configuration.Arguments;
-import jj.configuration.resolution.APIModules;
-import jj.configuration.resolution.Application;
-import jj.configuration.resolution.Assets;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

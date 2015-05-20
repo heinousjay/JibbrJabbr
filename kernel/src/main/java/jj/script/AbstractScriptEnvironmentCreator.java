@@ -21,7 +21,7 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.resource.PathResolver;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.SimpleResourceCreator;

@@ -18,7 +18,7 @@ package jj.configuration;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
 import jj.event.MockPublisher;

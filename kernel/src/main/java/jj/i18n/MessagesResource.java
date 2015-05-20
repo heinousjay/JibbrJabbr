@@ -25,7 +25,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;

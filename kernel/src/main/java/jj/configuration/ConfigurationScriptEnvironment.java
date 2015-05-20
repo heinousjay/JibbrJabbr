@@ -15,7 +15,7 @@
  */
 package jj.configuration;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.Base;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
 
 import java.io.IOException;

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.application;
 
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Path;
 
 import jj.Base;
+import jj.application.AppLocation;
+import jj.application.Application;
 import jj.configuration.Arguments;
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Application;
 import jj.resource.Location;
 
 /**

@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.event.MockPublisher;
 import jj.event.Publisher;
 import jj.http.server.resource.StaticResource;

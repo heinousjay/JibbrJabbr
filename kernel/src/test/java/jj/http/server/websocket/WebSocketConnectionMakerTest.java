@@ -36,7 +36,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import jj.AnswerWithSelf;
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;

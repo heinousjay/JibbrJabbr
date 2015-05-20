@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.App;
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Assets;
+import jj.application.AppLocation;
+import jj.application.Assets;
 import jj.document.DocumentScriptEnvironment;
 import jj.event.Listener;
 import jj.event.Subscriber;

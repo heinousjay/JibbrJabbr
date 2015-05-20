@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 
 import org.junit.Test;
 

@@ -16,7 +16,7 @@
 package jj.resource;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.Base;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -25,6 +25,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import jj.util.SHA1Helper;
 
 import org.junit.After;

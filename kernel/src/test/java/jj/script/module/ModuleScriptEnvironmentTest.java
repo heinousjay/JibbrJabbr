@@ -16,7 +16,7 @@
 package jj.script.module;
 
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;

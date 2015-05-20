@@ -16,7 +16,7 @@
 package jj.jasmine;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;

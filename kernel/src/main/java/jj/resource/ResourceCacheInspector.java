@@ -25,7 +25,7 @@ import javax.inject.Provider;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.script.Global;
 import jj.script.RhinoContext;
 

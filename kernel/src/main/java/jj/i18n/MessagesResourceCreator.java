@@ -22,7 +22,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
 

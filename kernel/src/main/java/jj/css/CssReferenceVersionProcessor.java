@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.http.server.ServableResource;
 import jj.http.server.resource.StaticResource;
 import jj.http.server.uri.URIMatch;

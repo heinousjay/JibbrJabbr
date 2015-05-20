@@ -18,7 +18,7 @@ package jj.i18n;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 import jj.Base;
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.i18n.PropertiesResource;
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.MockAbstractResourceDependencies;

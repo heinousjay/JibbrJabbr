@@ -15,7 +15,7 @@
  */
 package jj.http.server;
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.HashMap;

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.application;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import jj.BootstrapClassPath;
-import jj.configuration.resolution.APIModules;
+import jj.application.APIModules;
 
 /**
  * @author jason

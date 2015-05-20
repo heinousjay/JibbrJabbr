@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.configuration.resolution.AppLocation.Assets;
+import static jj.application.AppLocation.Assets;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.io.IOException;

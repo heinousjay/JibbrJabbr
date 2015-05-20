@@ -24,8 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.MockApplication;
+import jj.application.AppLocation;
+import jj.application.MockApplication;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.script.MockRhinoContextProvider;
 

@@ -17,9 +17,8 @@ package jj.jasmine;
 
 import static org.mockito.BDDMockito.*;
 import static jj.jasmine.JasmineScriptEnvironment.*;
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.application.AppLocation.Virtual;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
-
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.script.module.ScriptResource;

@@ -19,13 +19,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.configuration.resolution.MockApplication;
+import jj.application.MockApplication;
 import jj.http.server.resource.StaticResource;
 import jj.http.server.resource.StaticResourceMaker;
 import jj.resource.MockAbstractResourceDependencies;

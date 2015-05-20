@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jj.BootstrapClassPath;
-import jj.configuration.resolution.InternalAssets;
+import jj.application.InternalAssets;
 
 /**
  * @author jason

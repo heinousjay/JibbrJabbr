@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.DocumentWebSocketMessageProcessors;

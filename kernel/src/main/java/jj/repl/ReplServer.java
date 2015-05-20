@@ -16,7 +16,7 @@
 package jj.repl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.application.AppLocation.Virtual;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ExecutorService;

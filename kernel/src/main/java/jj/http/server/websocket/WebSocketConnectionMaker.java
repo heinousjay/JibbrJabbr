@@ -35,7 +35,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;

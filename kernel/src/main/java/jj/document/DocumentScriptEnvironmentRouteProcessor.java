@@ -15,7 +15,7 @@
  */
 package jj.document;
 
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.application.AppLocation.Virtual;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Assets;
+import jj.application.AppLocation;
+import jj.application.Assets;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.execution.TaskRunner;
 import jj.http.server.HttpServerRequest;

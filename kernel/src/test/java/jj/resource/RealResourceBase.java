@@ -21,12 +21,14 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.resolution.MockApplication;
+import jj.application.MockApplication;
 import jj.event.Publisher;
+
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.runner.RunWith;

@@ -15,7 +15,7 @@
  */
 package jj.script.module;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.Base;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 

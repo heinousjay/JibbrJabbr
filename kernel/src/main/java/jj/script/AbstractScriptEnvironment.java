@@ -29,7 +29,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceName;

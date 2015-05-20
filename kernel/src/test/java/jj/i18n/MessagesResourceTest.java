@@ -22,7 +22,7 @@ import static org.mockito.BDDMockito.*;
 import java.util.Locale;
 
 import jj.Base;
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.i18n.MessagesResource;
 import jj.i18n.PropertiesResource;
 import jj.resource.MockAbstractResourceDependencies;

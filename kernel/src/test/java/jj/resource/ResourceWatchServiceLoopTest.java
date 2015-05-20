@@ -26,7 +26,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 

@@ -27,7 +27,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.execution.ExecutionInstance;

@@ -15,7 +15,7 @@
  */
 package jj.css;
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 

@@ -16,7 +16,7 @@
 package jj.resource;
 
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.Base;
 import jj.event.MockPublisher;
 import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;

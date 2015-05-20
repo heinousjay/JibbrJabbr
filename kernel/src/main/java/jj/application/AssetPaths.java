@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package jj.application;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
+
 /**
- * <p>
- * The system responsible for resolving paths and making resources concrete.
- * 
- * <p>
- * This is the in-code configuration for the resource system
- * 
  * @author jason
  *
  */
-package jj.configuration.resolution;
+@Qualifier
+@Documented
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AssetPaths {
+
+}

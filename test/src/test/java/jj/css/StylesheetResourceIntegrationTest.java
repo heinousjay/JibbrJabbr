@@ -17,7 +17,7 @@ package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.Base;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 

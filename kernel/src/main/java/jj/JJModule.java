@@ -24,9 +24,9 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
+import jj.application.APIPaths;
+import jj.application.AssetPaths;
 import jj.configuration.ConfigurationObjectBinder;
-import jj.configuration.resolution.APIPaths;
-import jj.configuration.resolution.AssetPaths;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;

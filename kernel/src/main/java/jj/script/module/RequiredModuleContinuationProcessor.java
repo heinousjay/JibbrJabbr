@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceEvent;

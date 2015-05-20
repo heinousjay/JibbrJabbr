@@ -1,6 +1,6 @@
 package jj.script.module;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.Base;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 

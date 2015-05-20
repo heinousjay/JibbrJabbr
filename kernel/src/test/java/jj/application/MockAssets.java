@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.application;
 
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.*;
-import static jj.configuration.resolution.AppLocation.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import java.util.List;
-
-import jj.resource.Location;
-
-import org.junit.Test;
+import jj.BootstrapClassPath;
+import jj.application.Assets;
 
 /**
  * @author jason
  *
  */
-public class AppLocationTest {
+public class MockAssets extends Assets {
+	
+	private static final Set<String> paths = new HashSet<>();
+	
+	static {
+		paths.add("/jj/assets");
+	}
 
-	@Test
-	public void test() {
-		List<Location> locations = Base.and(Private).and(Public).locations();
+	/**
+	 * @param resolver
+	 */
+	public MockAssets() {
 		
-		assertThat(locations, contains((Location)Base, Private, Public));
+		super(new BootstrapClassPath(), paths);
 	}
 
 }

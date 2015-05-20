@@ -1,11 +1,11 @@
 package jj.document.servable;
 
-import static jj.configuration.resolution.Assets.*;
+import static jj.application.Assets.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.resource.StaticResource;

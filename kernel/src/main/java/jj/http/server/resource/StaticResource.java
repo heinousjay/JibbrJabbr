@@ -22,7 +22,7 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.http.server.TransferableResource;
 import jj.resource.AbstractFileResource;
 import jj.resource.PathResolver;

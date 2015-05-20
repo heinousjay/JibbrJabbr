@@ -18,7 +18,7 @@ package jj.configuration;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
 import jj.MockServerStarting;
 import jj.ServerStarting;
