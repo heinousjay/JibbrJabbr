@@ -244,61 +244,57 @@ public class EventSystemTest {
 		final AtomicInteger countEventSub = new AtomicInteger();
 		
 		try {
-			for (int i = 0; i < threads; ++i) {
-				executor.submit(new Runnable() {
+			for (int t = 0; t < threads; ++t) {
+				executor.submit(() -> {
 					
-					@Override
-					public void run() {
-						
-						try {
-							int total = RandomHelper.nextInt(500, 1001);
-							for (int i = 0; i < total; ++i) {
-								
-								if (RandomHelper.nextInt(300) == 84) { 
-									// 84 was selected at random
-									// (that's the joke)
-									System.gc();
-								}
+					try {
+						int total = RandomHelper.nextInt(500, 1001);
+						for (int i = 0; i < total; ++i) {
 							
-								switch(RandomHelper.nextInt(10)) {
-								
-								case 0:
-								case 1:
-									injector.getInstance(Sub.class);
-									break;
-								case 2:
-									injector.getInstance(ConcurrentSub.class);
-									break;
-								case 3:
-								case 4:
-									injector.getInstance(ChildSub.class);
-								case 5:
-								case 6:
-									pub.publish(new EventSub());
-									countIEvent.getAndIncrement();
-									countEvent.getAndIncrement();
-									countEventSub.getAndIncrement();
-									break;
-								case 7:
-								case 8:
-									pub.publish(new Event());
-									countIEvent.getAndIncrement();
-									countEvent.getAndIncrement();
-									break;
-								case 9:
-									pub.publish(new UnrelatedIEvent());
-									countIEvent.getAndIncrement();
-									break;
-								default:
-									throw new AssertionError("you broke something");
-								}
+							if (RandomHelper.nextInt(300) == 84) { 
+								// 84 was selected at random
+								// (that's the joke)
+								System.gc();
 							}
+						
+							switch(RandomHelper.nextInt(10)) {
 							
-						} catch (Throwable e) {
-							throwables.add(e);
-						} finally {
-							latch.countDown();
+							case 0:
+							case 1:
+								injector.getInstance(Sub.class);
+								break;
+							case 2:
+								injector.getInstance(ConcurrentSub.class);
+								break;
+							case 3:
+							case 4:
+								injector.getInstance(ChildSub.class);
+							case 5:
+							case 6:
+								pub.publish(new EventSub());
+								countIEvent.getAndIncrement();
+								countEvent.getAndIncrement();
+								countEventSub.getAndIncrement();
+								break;
+							case 7:
+							case 8:
+								pub.publish(new Event());
+								countIEvent.getAndIncrement();
+								countEvent.getAndIncrement();
+								break;
+							case 9:
+								pub.publish(new UnrelatedIEvent());
+								countIEvent.getAndIncrement();
+								break;
+							default:
+								throw new AssertionError("you broke something");
+							}
 						}
+						
+					} catch (Throwable e) {
+						throwables.add(e);
+					} finally {
+						latch.countDown();
 					}
 				});
 			}
