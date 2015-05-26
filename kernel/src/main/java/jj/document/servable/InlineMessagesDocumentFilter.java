@@ -1,6 +1,6 @@
 package jj.document.servable;
 
-import static jj.application.AppLocation.Virtual;
+import static jj.system.ServerLocation.Virtual;
 
 import java.util.Locale;
 

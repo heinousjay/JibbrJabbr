@@ -16,7 +16,7 @@
 package jj.configuration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.application.AppLocation.Virtual;
+import static jj.system.ServerLocation.Virtual;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
 
 import java.util.concurrent.CountDownLatch;

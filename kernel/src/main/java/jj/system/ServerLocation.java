@@ -2,7 +2,7 @@ package jj.system;
 
 import jj.resource.Location;
 
-enum SystemLocation implements Location {
+public enum ServerLocation implements Location {
 	
 	Root,
 	Modules,

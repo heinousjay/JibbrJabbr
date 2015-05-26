@@ -2,7 +2,6 @@ package jj.application;
 
 import jj.JJModule;
 import jj.resource.LocationResolverBinder;
-import jj.resource.PathResolver;
 
 public class ApplicationModule extends JJModule {
 
@@ -13,7 +12,7 @@ public class ApplicationModule extends JJModule {
 		
 		bindAPIModulePath("/jj/configuration/api");
 		
-		bind(PathResolver.class).to(Application.class);
+		//bind(PathResolver.class).to(Application.class);
 		
 		new LocationResolverBinder(binder()).
 		// that ugly ugly line!

@@ -21,11 +21,11 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.application.AppLocation;
 import jj.resource.PathResolver;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
+import jj.system.ServerLocation;
 
 /**
  * @author jason
@@ -33,7 +33,7 @@ import jj.resource.Location;
  */
 public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptEnvironment> extends SimpleResourceCreator<T> {
 	
-	protected static final AppLocation Virtual = AppLocation.Virtual;
+	protected static final Location Virtual = ServerLocation.Virtual;
 	
 	@Singleton
 	public static class Dependencies extends SimpleResourceCreator.Dependencies {

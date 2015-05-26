@@ -1,6 +1,6 @@
 package jj.document.servable;
 
-import static jj.application.AppLocation.Virtual;
+import static jj.system.ServerLocation.Virtual;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;

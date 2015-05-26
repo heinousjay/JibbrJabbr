@@ -15,6 +15,7 @@
  */
 package jj.i18n;
 
+import static jj.system.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
@@ -45,7 +46,7 @@ public class MessagesResourceTest {
 	String name = "index";
 	
 	MockAbstractResourceDependencies dependencies = 
-		new MockAbstractResourceDependencies(AppLocation.Virtual, name);
+		new MockAbstractResourceDependencies(Virtual, name);
 	
 	@Test
 	public void test() throws Exception {

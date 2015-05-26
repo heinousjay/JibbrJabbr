@@ -16,7 +16,6 @@
 package jj.resource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public interface Location {
 	}
 	
 	default List<Location> locations() {
-		return Collections.unmodifiableList(Arrays.asList((Location)this));
+		return Collections.singletonList(this);
 	}
 	
 	default <T> T as(Class<T> type) {

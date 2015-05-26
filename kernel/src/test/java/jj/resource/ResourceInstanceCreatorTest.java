@@ -15,6 +15,7 @@
  */
 package jj.resource;
 
+import static jj.system.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.BDDMockito.*;
@@ -26,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import jj.application.AppLocation;
 import jj.application.Application;
 import jj.event.MockPublisher;
 import jj.event.Publisher;
@@ -146,7 +146,7 @@ public class ResourceInstanceCreatorTest  {
 	@Test
 	public void testVirtualCreationAndArgs() {
 		
-		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, date);
+		rimc.createResource(TestResource.class, cacheKey, Virtual, name, date);
 		
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		verify(injector).getInstance(TestResource.class);
@@ -163,13 +163,13 @@ public class ResourceInstanceCreatorTest  {
 	public void testCreationError() {
 		
 		given(injector.getInstance(TestResource.class)).willThrow(new RuntimeException());
-		rimc.createResource(TestResource.class, cacheKey, AppLocation.Virtual, name, one);
+		rimc.createResource(TestResource.class, cacheKey, Virtual, name, one);
 		
 		assertThat(publisher.events.size(), is(1));
 		ResourceError re = (ResourceError)publisher.events.get(0);
 		assertThat(re.resourceKey, is(nullValue()));
 		assertThat(re.resourceClass, equalTo(TestResource.class));
-		assertThat(re.base, is(AppLocation.Virtual));
+		assertThat(re.base, is(Virtual));
 		assertThat(re.name, is(name));
 		assertThat(re.arguments[0], is(one));
 	}

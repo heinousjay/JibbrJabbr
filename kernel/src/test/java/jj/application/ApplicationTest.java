@@ -46,10 +46,6 @@ public class ApplicationTest {
 	@Test
 	public void test() {
 		
-		// virtual resource have no application path
-		Path path = app.resolvePath(Virtual, "");
-		assertThat(path, is(nullValue()));
-		
 		// asset resources get delegated to Assets
 		app.resolvePath(Assets, "");
 		verify(assets).path("");

@@ -15,12 +15,12 @@
  */
 package jj.script.module;
 
+import static jj.system.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
-import jj.application.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoaded;
@@ -90,8 +90,8 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// we validate it happened because it's the only signal we get
-		verify(finder).findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule);
-		verify(loader).loadResource(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule);
+		verify(finder).findResource(ModuleScriptEnvironment.class, Virtual, module, requiredModule);
+		verify(loader).loadResource(ModuleScriptEnvironment.class, Virtual, module, requiredModule);
 	}
 	
 	@Test
@@ -115,7 +115,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceNotFound(new ResourceNotFound(ModuleScriptEnvironment.class, AppLocation.Virtual, module, requiredModule));
+		processor.resourceNotFound(new ResourceNotFound(ModuleScriptEnvironment.class, Virtual, module, requiredModule));
 		
 		// then
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
@@ -125,7 +125,7 @@ public class RequiredModuleContinuationProcessorTest {
 	}
 	
 	private void givenAScriptEnvironment() {
-		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(AppLocation.Virtual), eq(module), any(RequiredModule.class))).willReturn(moduleScriptEnvironment);
+		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(Virtual), eq(module), any(RequiredModule.class))).willReturn(moduleScriptEnvironment);
 	}
 	
 	@Test

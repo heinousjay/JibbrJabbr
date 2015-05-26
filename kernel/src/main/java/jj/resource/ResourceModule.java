@@ -17,6 +17,8 @@ public class ResourceModule extends JJModule {
 
 		bindExecutor(ResourceExecutor.class);
 		
+		bind(PathResolver.class).to(PathResolverImpl.class);
+		
 		bind(ResourceCache.class).to(ResourceCacheImpl.class);
 		
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);

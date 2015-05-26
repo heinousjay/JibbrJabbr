@@ -15,13 +15,14 @@
  */
 package jj.script.module;
 
+import static jj.system.ServerLocation.Virtual;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.application.AppLocation;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceEvent;
@@ -87,7 +88,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	}
 	
 	private void loadEnvironment(final RequiredModule requiredModule) {
-		resourceLoader.loadResource(ModuleScriptEnvironment.class, AppLocation.Virtual, requiredModule.identifier(), requiredModule);
+		resourceLoader.loadResource(ModuleScriptEnvironment.class, Virtual, requiredModule.identifier(), requiredModule);
 		Boolean result = waiters.putIfAbsent(requiredModule, Boolean.TRUE);
 		assert (result == null) : "something is crossed up in the " + getClass();
 	}
@@ -100,7 +101,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		ModuleScriptEnvironment scriptEnvironment = 
 			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
-				AppLocation.Virtual,
+				Virtual,
 				requiredModule.identifier(),
 				requiredModule
 			);

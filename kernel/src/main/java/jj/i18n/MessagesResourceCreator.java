@@ -15,6 +15,8 @@
  */
 package jj.i18n;
 
+import static jj.system.ServerLocation.Virtual;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Locale;
@@ -22,7 +24,6 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.application.AppLocation;
 import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
 
@@ -53,7 +54,7 @@ class MessagesResourceCreator extends SimpleResourceCreator<MessagesResource> {
 
 	private void assertArgs(Location base, Object... args) {
 		assert args.length == 1 && args[0] instanceof Locale : "messages require a Locale argument";
-		assert base == AppLocation.Virtual : "MessagesResource is only Virtual";
+		assert base == Virtual : "MessagesResource must be Virtual";
 	}
 
 }

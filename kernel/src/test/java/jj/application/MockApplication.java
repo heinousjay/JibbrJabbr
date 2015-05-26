@@ -15,6 +15,8 @@
  */
 package jj.application;
 
+import static jj.application.AppLocation.Assets;
+import static jj.system.ServerLocation.Virtual;
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Path;
@@ -37,12 +39,12 @@ public class MockApplication extends Application {
 	 * @param arguments
 	 */
 	public MockApplication() {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules());
+		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), null);
 		basePath = Base.path;
 	}
 	
 	public MockApplication(final Path basePath) {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules());
+		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), null);
 		this.basePath = basePath;
 	}
 	
@@ -53,7 +55,7 @@ public class MockApplication extends Application {
 
 	@Override
 	public Path resolvePath(Location base, String name) {
-		if (base != AppLocation.Assets && base != AppLocation.Virtual) {
+		if (base != Assets && base != Virtual) {
 			return basePath.resolve(((AppLocation)base).path()).resolve(name);
 		}
 		return super.resolvePath(base, name);

@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 import jj.configuration.Arguments;
 import jj.resource.Location;
 import jj.resource.LocationResolver;
-import jj.resource.PathResolver;
+import jj.system.Server;
 
 /**
  * component for determining app paths, based on the current application root.
@@ -33,7 +33,7 @@ import jj.resource.PathResolver;
  *
  */
 @Singleton
-public class Application implements PathResolver, LocationResolver {
+public class Application implements LocationResolver {
 	
 	private static final String APP_PATH_ARG_NAME = "app";
 	
@@ -47,7 +47,7 @@ public class Application implements PathResolver, LocationResolver {
 	private final APIModules apiModules;
 	
 	@Inject
-	public Application(final Arguments arguments, final Assets assets, final APIModules apiModules) {
+	public Application(final Arguments arguments, final Assets assets, final APIModules apiModules, final Server server) {
 		this.arguments = arguments;
 		this.assets = assets;
 		this.apiModules = apiModules;
@@ -76,8 +76,6 @@ public class Application implements PathResolver, LocationResolver {
 		AppLocation location = (AppLocation)base;
 		
 		switch (location) {
-		case Virtual:
-			return null;
 		case Assets:
 			return assets.path(name);
 		case APIModules:

@@ -1,0 +1,38 @@
+package jj.resource;
+
+import java.nio.file.Path;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+/**
+ * presents a consistent interface to the notion of resolution of resource
+ * names to a {@link Path} if one can be made.  The main motivation is to allow
+ * disparate parts of the system to contribute to how resource resolution occurs,
+ * but to do so in a fairly controlled manner, in a way that keeps the interface
+ * from caring too much about it.
+ * @author jason
+ *
+ */
+@Singleton
+class PathResolverImpl implements PathResolver {
+	
+	private final Map<Class<? extends Location>, LocationResolver> resolvers;
+
+	@Inject
+	PathResolverImpl(Map<Class<? extends Location>, LocationResolver> resolvers) {
+		this.resolvers = resolvers;
+	}
+	
+	@Override
+	public Path resolvePath(Location base, String name) {
+		
+		LocationResolver resolver = resolvers.get(base.getClass());
+		
+		assert resolver != null : base;
+		
+		return resolver.resolvePath(base, name);
+	}
+
+}

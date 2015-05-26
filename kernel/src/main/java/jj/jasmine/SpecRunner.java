@@ -15,7 +15,7 @@
  */
 package jj.jasmine;
 
-import static jj.application.AppLocation.Virtual;
+import static jj.system.ServerLocation.Virtual;
 import static jj.jasmine.JasmineScriptEnvironment.*;
 
 import java.util.Arrays;

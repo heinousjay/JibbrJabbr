@@ -16,6 +16,7 @@
 package jj.script;
 
 import static jj.script.ScriptExecutionState.*;
+import static jj.system.ServerLocation.Virtual;
 
 import java.util.HashMap;
 
@@ -29,7 +30,6 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.application.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceName;
@@ -93,7 +93,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			final ResourceKey cacheKey,
 			final @ResourceName String name
 		) {
-			super(abstractResourceDependencies, cacheKey, AppLocation.Virtual, name);
+			super(abstractResourceDependencies, cacheKey, Virtual, name);
 			this.scriptEnvironmentDependencies = abstractScriptEnvironmentDependencies;
 		}
 	}

@@ -15,7 +15,7 @@
  */
 package jj.document;
 
-import static jj.application.AppLocation.Virtual;
+import static jj.system.ServerLocation.Virtual;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

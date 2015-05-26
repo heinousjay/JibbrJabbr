@@ -16,7 +16,6 @@
 package jj.application;
 
 import jj.resource.Location;
-import jj.script.ScriptEnvironment;
 
 /**
  * <p>
@@ -46,17 +45,11 @@ import jj.script.ScriptEnvironment;
  */
 public enum AppLocation implements Location {
 	
-	/** 
-	 * denotes this resource is not from the application file system,
-	 * such as a {@link ScriptEnvironment} 
-	 */
-	Virtual("", null, false, false, false),
-	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", Virtual, false, true, true),
+	Assets("", null, false, true, true),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", Virtual, false, true, true),
+	APIModules("", null, false, true, true),
 	
 	/** the paths of the application pieces */
 	Base("", null, true, true, false),
@@ -85,11 +78,11 @@ public enum AppLocation implements Location {
 		this.internal = internal;
 	}
 	
-	public Location parent() {
+	public AppLocation parent() {
 		return parent;
 	}
 	
-	public Location root() {
+	public AppLocation root() {
 		return parent == null ? this : parent.root();
 	}
 	
