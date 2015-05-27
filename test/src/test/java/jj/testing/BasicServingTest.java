@@ -18,6 +18,7 @@ package jj.testing;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.system.Assets.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

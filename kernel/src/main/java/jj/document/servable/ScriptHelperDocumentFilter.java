@@ -1,7 +1,7 @@
 package jj.document.servable;
 
-import static jj.system.Assets.*;
 import static jj.system.ServerLocation.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

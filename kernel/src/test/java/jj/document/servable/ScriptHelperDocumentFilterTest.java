@@ -3,8 +3,8 @@ package jj.document.servable;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.system.Assets.*;
 import static jj.system.ServerLocation.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
 import java.util.List;
 import java.util.Arrays;

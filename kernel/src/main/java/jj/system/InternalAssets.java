@@ -33,7 +33,8 @@ import jj.ResourceResolver;
  */
 public abstract class InternalAssets {
 
-	protected static final Path NOT_FOUND = Paths.get("/jj/assets/not-found-sentinel/");
+	protected static final Path NOT_FOUND = Paths.get("/jj/not-found-sentinel/");
+	
 	private final ResourceResolver resolver;
 	private final Set<String> paths;
 

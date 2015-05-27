@@ -102,6 +102,7 @@ public abstract class JJModule extends AbstractModule {
 	}
 
 	protected void bindAssetPath(String path) {
+		assert path != null && path.startsWith("/") : "path must be present and start with /";
 		if (assetPaths == null) {
 			assetPaths = Multibinder.newSetBinder(binder(), String.class, AssetPaths.class);
 		}
@@ -109,6 +110,7 @@ public abstract class JJModule extends AbstractModule {
 	}
 	
 	protected void bindAPIModulePath(String path) {
+		assert path != null && path.startsWith("/") : "path must be present and start with /";
 		if (apiPaths == null) {
 			apiPaths = Multibinder.newSetBinder(binder(), String.class, APIPaths.class);
 		}

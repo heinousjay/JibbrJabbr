@@ -64,6 +64,7 @@ public class DocumentProcessingModule extends JJModule {
 		
 		bindConfiguration(DocumentConfiguration.class);
 		
+		bindAssetPath("/jj/document/assets");
 		bindAPIModulePath("/jj/document/api");
 
 		install(new DocumentServableModule());

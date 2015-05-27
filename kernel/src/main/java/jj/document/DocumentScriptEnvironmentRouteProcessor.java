@@ -16,7 +16,7 @@
 package jj.document;
 
 import static jj.system.ServerLocation.*;
-import static jj.system.Assets.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

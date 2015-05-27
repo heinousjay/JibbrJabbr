@@ -19,7 +19,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.system.ServerLocation.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static jj.system.Assets.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 
