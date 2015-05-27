@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.application;
+package jj.system;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import jj.BootstrapClassPath;
-import jj.application.Assets;
+import jj.system.Assets;
 
 /**
  * @author jason

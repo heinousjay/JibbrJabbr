@@ -1,11 +1,11 @@
 package jj.document.servable;
 
-import static jj.application.Assets.*;
+import static jj.system.Assets.*;
+import static jj.system.ServerLocation.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.application.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.resource.StaticResource;
@@ -58,7 +58,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			
 			// internal version of jquery
 			// it's versioned already, so no need for sha-ing
-			StaticResource jquery = resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JQUERY_JS);
+			StaticResource jquery = resourceFinder.findResource(StaticResource.class, Assets, JQUERY_JS);
 			jquery.addDependent(documentRequestProcessor.documentScriptEnvironment());
 			addScript(documentRequestProcessor.document(), "/" + jquery.name());
 			
@@ -69,7 +69,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				documentRequestProcessor.httpRequest().host() + 
 				scriptEnvironment.socketUri();
 			
-			StaticResource jj = resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS);
+			StaticResource jj = resourceFinder.findResource(StaticResource.class, Assets, JJ_JS);
 			jj.addDependent(documentRequestProcessor.documentScriptEnvironment());
 			Element jjScript = 
 				makeScriptTag(documentRequestProcessor.document(), jj.serverPath())

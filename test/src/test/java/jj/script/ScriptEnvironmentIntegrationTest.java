@@ -16,9 +16,11 @@
 package jj.script;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.system.ServerLocation.Virtual;
+import static jj.system.ServerLocation.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static jj.system.Assets.*;
+
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.concurrent.CountDownLatch;
@@ -28,8 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.App;
-import jj.application.AppLocation;
-import jj.application.Assets;
 import jj.document.DocumentScriptEnvironment;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -105,8 +105,8 @@ public class ScriptEnvironmentIntegrationTest {
 	
 	@Before
 	public void before() {
-		resourceLoader.loadResource(StaticResource.class, AppLocation.Assets, Assets.JJ_JS);
-		resourceLoader.loadResource(StaticResource.class, AppLocation.Assets, Assets.JQUERY_JS);
+		resourceLoader.loadResource(StaticResource.class, Assets, JJ_JS);
+		resourceLoader.loadResource(StaticResource.class, Assets, JQUERY_JS);
 	}
 	
 	// there should be a similar test in a resource system integration test

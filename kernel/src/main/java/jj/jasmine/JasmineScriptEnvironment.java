@@ -15,7 +15,7 @@
  */
 package jj.jasmine;
 
-import static jj.application.AppLocation.*;
+import static jj.system.ServerLocation.*;
 
 import java.io.IOException;
 

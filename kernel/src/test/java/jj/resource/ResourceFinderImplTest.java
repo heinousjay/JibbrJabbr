@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.application.AppLocation.*;
+import static jj.system.ServerLocation.*;
 import jj.application.AppLocation;
 import jj.event.Publisher;
 import jj.execution.CurrentTask;

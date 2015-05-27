@@ -6,7 +6,9 @@ public enum ServerLocation implements Location {
 	
 	Root,
 	Modules,
-	Virtual;
+	Virtual,
+	Assets,
+	APIModules;
 
 	@Override
 	public boolean parentInDirectory() {

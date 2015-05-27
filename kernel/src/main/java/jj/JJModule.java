@@ -24,8 +24,6 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
-import jj.application.APIPaths;
-import jj.application.AssetPaths;
 import jj.configuration.ConfigurationObjectBinder;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
@@ -42,6 +40,8 @@ import jj.resource.SimpleResourceCreator;
 import jj.script.Continuation;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationProcessorBinder;
+import jj.system.APIPaths;
+import jj.system.AssetPaths;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;

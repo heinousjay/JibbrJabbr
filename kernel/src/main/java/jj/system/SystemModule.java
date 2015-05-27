@@ -7,6 +7,9 @@ public class SystemModule extends JJModule {
 
 	@Override
 	protected void configure() {
+		
+		bindAssetPath("/jj/assets");
+		
 		new LocationResolverBinder(binder()).
 		
 		resolvePathsFor(ServerLocation.class).with(Server.class);

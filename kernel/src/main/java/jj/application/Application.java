@@ -36,16 +36,10 @@ public class Application implements LocationResolver {
 
 	private final Path basePath;
 	
-	private final Assets assets;
-	
-	private final APIModules apiModules;
-	
 	@Inject
-	public Application(final Arguments arguments, final Assets assets, final APIModules apiModules, final Server server) {
+	public Application(final Arguments arguments, final Server server) {
 		
 		basePath = arguments.get("app", Path.class, server.path().resolve("app"));
-		this.assets = assets;
-		this.apiModules = apiModules;
 	}
 
 	@Override
@@ -65,16 +59,8 @@ public class Application implements LocationResolver {
 
 	@Override
 	public Path resolvePath(Location base, String name) {
-		
+		assert base instanceof AppLocation;
 		AppLocation location = (AppLocation)base;
-		
-		switch (location) {
-		case Assets:
-			return assets.path(name);
-		case APIModules:
-			return apiModules.path(name);
-		default:
-			return basePath.resolve(location.path()).resolve(name).toAbsolutePath();
-		}
+		return basePath.resolve(location.path()).resolve(name).toAbsolutePath();
 	}
 }

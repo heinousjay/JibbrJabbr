@@ -15,8 +15,7 @@
  */
 package jj.application;
 
-import static jj.application.AppLocation.Assets;
-import static jj.system.ServerLocation.Virtual;
+import static jj.system.ServerLocation.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -48,12 +47,12 @@ public class MockApplication extends Application {
 	 * @param arguments
 	 */
 	public MockApplication() {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), mockServer());
+		super(mock(Arguments.class), mockServer());
 		basePath = Base.path;
 	}
 	
 	public MockApplication(final Path basePath) {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), mockServer());
+		super(mock(Arguments.class), mockServer());
 		this.basePath = basePath;
 	}
 	

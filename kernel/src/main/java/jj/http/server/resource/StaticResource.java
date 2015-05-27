@@ -15,6 +15,8 @@
  */
 package jj.http.server.resource;
 
+import static jj.system.ServerLocation.Assets;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
@@ -43,10 +45,10 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	StaticResource(
 		final Dependencies dependencies,
 		final Path path,
-		final Application pathResolver
+		final Application application
 	) throws IOException {
 		super(dependencies, path, false);
-		safeToServe = base.as(AppLocation.class).internal() || pathResolver.pathInBase(path);
+		safeToServe = base == Assets || (base instanceof AppLocation && application.pathInBase(path));
 	}
 	
 	@Override

@@ -45,18 +45,11 @@ import jj.resource.Location;
  */
 public enum AppLocation implements Location {
 	
-	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", null, false, true),
-	
-	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", null, false, true),
-	
 	/** the paths of the application pieces */
 	Base("", null, true, false),
 	Private("private/", Base, true, false),
-	PrivateSpecs("private-specs/", Base, true, false),
-	Public("public/", Base, true, false),
-	PublicSpecs("public-specs/", Base, true, false);
+	Specs("specs/", Base, true, false),
+	Public("public/", Base, true, false);
 	
 	private final String path;
 	private final AppLocation parent;

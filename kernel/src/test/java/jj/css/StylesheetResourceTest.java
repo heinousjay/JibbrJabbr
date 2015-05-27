@@ -17,6 +17,7 @@ package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static jj.application.AppLocation.*;
+import static jj.system.ServerLocation.*;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;

@@ -26,6 +26,8 @@ public class ConfigurationModule extends JJModule {
 	@Override
 	protected void configure() {
 		
+		bindAPIModulePath("/jj/configuration/api");
+		
 		bindStartupListener(ConfigurationScriptLoader.class);
 		
 		bindCreationOf(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);

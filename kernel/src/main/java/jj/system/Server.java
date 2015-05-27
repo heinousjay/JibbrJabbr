@@ -15,13 +15,20 @@ import jj.resource.LocationResolver;
 public class Server implements LocationResolver {
 	
 	private final Path rootPath;
+	
+	private final Assets assets;
+	
+	private final APIModules apiModules;
 
 	@Inject
-	Server(Arguments arguments) {
+	Server(Arguments arguments, Assets assets, APIModules apiModules) {
 		Path myJar = JJ.jarForClass(JJ.class); // need to account for capsule? probably
 		Path defaultPath = myJar == null ? Paths.get(System.getProperty("user.dir")) : myJar.getParent();
 		rootPath = arguments.get("server-root", Path.class, defaultPath);
 		assert rootPath != null;
+		
+		this.assets = assets;
+		this.apiModules = apiModules;
 	}
 	
 	@Override
@@ -43,6 +50,12 @@ public class Server implements LocationResolver {
 	public Path resolvePath(Location base, String name) {
 		assert base instanceof ServerLocation;
 		switch ((ServerLocation)base) {
+
+		case Assets:
+			return assets.path(name);
+		case APIModules:
+			return apiModules.path(name);
+			
 		case Root:
 		case Modules:
 		case Virtual:

@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.application;
+package jj.system;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Set;
 
-import javax.inject.Qualifier;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.ResourceResolver;
 
 /**
  * @author jason
  *
  */
-@Qualifier
-@Documented
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface APIPaths {
+@Singleton
+public class APIModules extends InternalAssets {
 
+	
+	@Inject
+	APIModules(final ResourceResolver resolver, final @APIPaths Set<String> paths) {
+		super(resolver, paths);
+	}
 }

@@ -17,6 +17,7 @@ package jj.script.module;
 
 
 import static jj.application.AppLocation.*;
+import static jj.system.ServerLocation.*;
 
 import java.io.IOException;
 

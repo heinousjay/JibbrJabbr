@@ -15,7 +15,8 @@
  */
 package jj.document;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.system.ServerLocation.*;
+import static jj.system.Assets.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,8 +24,6 @@ import javax.inject.Singleton;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
-import jj.application.AppLocation;
-import jj.application.Assets;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.execution.TaskRunner;
 import jj.http.server.HttpServerRequest;
@@ -91,8 +90,8 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 		// since we're in the IO thread already and we might need this stuff soon, as a small
 		// optimization to avoid jumping right back into the I/O thread after dispatching this
 		// into the script thread, we just "prime the pump"
-		resourceFinder.loadResource(StaticResource.class, AppLocation.Assets, Assets.JJ_JS);
-		resourceFinder.loadResource(StaticResource.class, AppLocation.Assets, Assets.JQUERY_JS);
+		resourceFinder.loadResource(StaticResource.class, Assets, JJ_JS);
+		resourceFinder.loadResource(StaticResource.class, Assets, JQUERY_JS);
 	}
 
 	private DocumentScriptEnvironment findDocumentScriptEnvironment(String name) {
