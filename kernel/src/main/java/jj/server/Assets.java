@@ -13,32 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.system;
+package jj.server;
 
-import java.util.HashSet;
 import java.util.Set;
 
-import jj.BootstrapClassPath;
-import jj.system.APIModules;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.ResourceResolver;
 
 /**
+ * registration point for asset directories? something like that
+ * 
  * @author jason
  *
  */
-public class MockAPIModules extends APIModules {
+@Singleton
+public class Assets extends InternalAssets {
 	
-	private static final Set<String> paths = new HashSet<>();
+	// always included!
+	public static final String FAVICON_ICO = "favicon.ico";
+	public static final String ERROR_404 = "errors/404.html";
 	
-	static {
-		paths.add("/jj/script/api");
+	@Inject
+	protected Assets(final ResourceResolver resolver, final @AssetPaths Set<String> paths) {
+		super(resolver, paths);
 	}
-
-	/**
-	 * @param resolver
-	 */
-	public MockAPIModules() {
-		
-		super(new BootstrapClassPath(), paths);
-	}
-
 }

@@ -10,4 +10,4 @@
  * @author jason
  *
  */
-package jj.system;
+package jj.server;

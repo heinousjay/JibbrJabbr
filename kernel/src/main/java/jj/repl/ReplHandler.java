@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

@@ -13,30 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.system;
+package jj.server;
 
-import java.util.Set;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import jj.ResourceResolver;
+import javax.inject.Qualifier;
 
 /**
- * registration point for asset directories? something like that
- * 
  * @author jason
  *
  */
-@Singleton
-public class Assets extends InternalAssets {
-	
-	// always included!
-	public static final String FAVICON_ICO = "favicon.ico";
-	public static final String ERROR_404 = "errors/404.html";
-	
-	@Inject
-	protected Assets(final ResourceResolver resolver, final @AssetPaths Set<String> paths) {
-		super(resolver, paths);
-	}
+@Qualifier
+@Documented
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AssetPaths {
+
 }

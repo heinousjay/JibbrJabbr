@@ -13,30 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.system;
+package jj.server;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import jj.BootstrapClassPath;
-import jj.system.InternalAssets;
+import jj.server.Assets;
 
 /**
  * @author jason
  *
  */
-public class TestableAssets extends InternalAssets {
+public class MockAssets extends Assets {
 	
-	private static final Set<String> paths;
+	private static final Set<String> paths = new HashSet<>();
 	
 	static {
-		
-		paths = new HashSet<>();
-		paths.add("/jj/assets/");
+		paths.add("/jj/assets");
 	}
 
-	
-	public TestableAssets() {
+	/**
+	 * @param resolver
+	 */
+	public MockAssets() {
+		
 		super(new BootstrapClassPath(), paths);
 	}
 

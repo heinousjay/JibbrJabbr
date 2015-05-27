@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.system.ServerLocation.*;
+import static jj.server.ServerLocation.*;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.io.IOException;

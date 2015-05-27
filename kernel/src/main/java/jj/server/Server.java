@@ -1,4 +1,4 @@
-package jj.system;
+package jj.server;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

@@ -26,7 +26,7 @@ import jj.event.MockPublisher;
 import jj.event.MockPublisher.OnPublish;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
-import jj.system.Server;
+import jj.server.Server;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

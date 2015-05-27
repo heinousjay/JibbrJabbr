@@ -40,8 +40,8 @@ import jj.resource.SimpleResourceCreator;
 import jj.script.Continuation;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationProcessorBinder;
-import jj.system.APIPaths;
-import jj.system.AssetPaths;
+import jj.server.APIPaths;
+import jj.server.AssetPaths;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;

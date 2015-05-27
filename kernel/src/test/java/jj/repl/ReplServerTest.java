@@ -16,7 +16,7 @@
 package jj.repl;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 

@@ -15,7 +15,7 @@
  */
 package jj.http.server.resource;
 
-import static jj.system.ServerLocation.Assets;
+import static jj.server.ServerLocation.Assets;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

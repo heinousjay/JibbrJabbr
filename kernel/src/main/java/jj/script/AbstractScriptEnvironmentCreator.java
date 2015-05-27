@@ -25,7 +25,7 @@ import jj.resource.PathResolver;
 import jj.resource.ResourceInstanceCreator;
 import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
-import jj.system.ServerLocation;
+import jj.server.ServerLocation;
 
 /**
  * @author jason

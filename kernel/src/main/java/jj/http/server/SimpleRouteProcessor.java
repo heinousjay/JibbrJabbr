@@ -16,7 +16,7 @@
 package jj.http.server;
 
 import static jj.application.AppLocation.*;
-import static jj.system.ServerLocation.*;
+import static jj.server.ServerLocation.*;
 
 import java.util.Map;
 

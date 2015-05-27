@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.http.server.PipelineStages.*;
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.HashSet;
 import java.util.Set;

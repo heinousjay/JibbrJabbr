@@ -15,7 +15,7 @@
  */
 package jj.document;
 
-import static jj.system.ServerLocation.*;
+import static jj.server.ServerLocation.*;
 import static jj.document.DocumentScriptEnvironment.*;
 
 import javax.inject.Inject;

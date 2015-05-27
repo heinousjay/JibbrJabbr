@@ -1,4 +1,4 @@
-package jj.system;
+package jj.server;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -8,6 +8,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.configuration.Arguments;
+import jj.server.APIModules;
+import jj.server.Assets;
+import jj.server.Server;
+import jj.server.ServerLocation;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

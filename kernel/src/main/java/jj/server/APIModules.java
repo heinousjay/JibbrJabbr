@@ -13,38 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.system;
+package jj.server;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
-
-import java.util.HashSet;
 import java.util.Set;
 
-import jj.BootstrapClassPath;
-import jj.system.Assets;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.junit.Test;
+import jj.ResourceResolver;
 
 /**
  * @author jason
  *
  */
-public class AssetsTest {
+@Singleton
+public class APIModules extends InternalAssets {
 
-	@Test
-	public void test() {
-		Set<String> paths = new HashSet<>();
-		paths.add("/jj/assets");
-		
-		Assets assets = new Assets(new BootstrapClassPath(), paths);
-		
-		assertThat(assets.path("jj.js"), is(notNullValue()));
-		
-		// NEEDS A BETTER TEST
-		assertThat(assets.path("jj1.js"), is(Assets.NOT_FOUND));
-		
-		
+	
+	@Inject
+	APIModules(final ResourceResolver resolver, final @APIPaths Set<String> paths) {
+		super(resolver, paths);
 	}
-
 }

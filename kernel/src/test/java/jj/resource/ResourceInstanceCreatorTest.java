@@ -15,7 +15,7 @@
  */
 package jj.resource;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.BDDMockito.*;

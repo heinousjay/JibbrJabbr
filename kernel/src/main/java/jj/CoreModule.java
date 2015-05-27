@@ -32,7 +32,7 @@ import jj.logging.LoggingModule;
 import jj.repl.ReplModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
-import jj.system.SystemModule;
+import jj.server.ServerModule;
 import jj.http.HttpModule;
 
 /**
@@ -72,7 +72,7 @@ public class CoreModule extends JJModule {
 		bindLoggedEventsAnnotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		
 		// first our key pieces
-		install(new SystemModule());
+		install(new ServerModule());
 		install(new ApplicationModule());
 		install(new ConfigurationModule());
 		install(new ConversionModule());

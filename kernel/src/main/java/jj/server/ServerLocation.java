@@ -1,4 +1,4 @@
-package jj.system;
+package jj.server;
 
 import jj.resource.Location;
 

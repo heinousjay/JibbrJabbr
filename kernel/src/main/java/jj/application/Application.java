@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 import jj.configuration.Arguments;
 import jj.resource.Location;
 import jj.resource.LocationResolver;
-import jj.system.Server;
+import jj.server.Server;
 
 /**
  * component for determining app paths, based on the current application root.

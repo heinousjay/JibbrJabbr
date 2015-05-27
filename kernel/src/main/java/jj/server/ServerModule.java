@@ -1,9 +1,9 @@
-package jj.system;
+package jj.server;
 
 import jj.JJModule;
 import jj.resource.LocationResolverBinder;
 
-public class SystemModule extends JJModule {
+public class ServerModule extends JJModule {
 
 	@Override
 	protected void configure() {

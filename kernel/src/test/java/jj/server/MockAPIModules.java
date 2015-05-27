@@ -13,25 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.system;
+package jj.server;
 
+import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import jj.ResourceResolver;
+import jj.BootstrapClassPath;
+import jj.server.APIModules;
 
 /**
  * @author jason
  *
  */
-@Singleton
-public class APIModules extends InternalAssets {
-
+public class MockAPIModules extends APIModules {
 	
-	@Inject
-	APIModules(final ResourceResolver resolver, final @APIPaths Set<String> paths) {
-		super(resolver, paths);
+	private static final Set<String> paths = new HashSet<>();
+	
+	static {
+		paths.add("/jj/script/api");
 	}
+
+	/**
+	 * @param resolver
+	 */
+	public MockAPIModules() {
+		
+		super(new BootstrapClassPath(), paths);
+	}
+
 }

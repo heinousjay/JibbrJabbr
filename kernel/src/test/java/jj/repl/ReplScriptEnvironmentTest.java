@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.system.ServerLocation.*;
+import static jj.server.ServerLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 

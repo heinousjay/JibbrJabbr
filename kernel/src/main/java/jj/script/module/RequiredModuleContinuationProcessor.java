@@ -15,7 +15,7 @@
  */
 package jj.script.module;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

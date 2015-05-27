@@ -15,7 +15,7 @@
  */
 package jj.i18n;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.*;

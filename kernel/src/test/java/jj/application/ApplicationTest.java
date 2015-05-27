@@ -24,7 +24,7 @@ import java.nio.file.Path;
 
 import jj.application.Application;
 import jj.configuration.Arguments;
-import jj.system.Server;
+import jj.server.Server;
 
 import org.junit.Before;
 import org.junit.Test;

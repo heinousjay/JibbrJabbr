@@ -15,7 +15,7 @@
  */
 package jj.application;
 
-import static jj.system.ServerLocation.*;
+import static jj.server.ServerLocation.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -27,7 +27,7 @@ import jj.application.AppLocation;
 import jj.application.Application;
 import jj.configuration.Arguments;
 import jj.resource.Location;
-import jj.system.Server;
+import jj.server.Server;
 
 /**
  * @author jason

@@ -12,7 +12,7 @@ import jj.event.Publisher;
 import jj.execution.JJTask;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
-import jj.system.Server;
+import jj.server.Server;
 
 @Singleton
 public class JJServerLifecycle {

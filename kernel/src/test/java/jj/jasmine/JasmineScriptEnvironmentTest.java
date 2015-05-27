@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.application.AppLocation.*;
-import static jj.system.ServerLocation.*;
+import static jj.server.ServerLocation.*;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
 import static jj.resource.DependentsHelper.verifyDependentSetup;
 import jj.resource.NoSuchResourceException;

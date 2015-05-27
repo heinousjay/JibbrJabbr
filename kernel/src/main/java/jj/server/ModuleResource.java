@@ -1,4 +1,4 @@
-package jj.system;
+package jj.server;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;

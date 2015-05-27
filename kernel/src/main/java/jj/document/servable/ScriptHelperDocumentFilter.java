@@ -1,6 +1,6 @@
 package jj.document.servable;
 
-import static jj.system.ServerLocation.*;
+import static jj.server.ServerLocation.*;
 import static jj.document.DocumentScriptEnvironment.*;
 
 import javax.inject.Inject;

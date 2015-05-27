@@ -16,7 +16,7 @@
 package jj.testing;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static jj.system.ServerLocation.APIModules;
+import static jj.server.ServerLocation.APIModules;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 

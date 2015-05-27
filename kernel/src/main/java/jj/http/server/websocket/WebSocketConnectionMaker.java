@@ -16,7 +16,7 @@
 package jj.http.server.websocket;
 
 import static jj.http.server.PipelineStages.*;
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.Set;
 

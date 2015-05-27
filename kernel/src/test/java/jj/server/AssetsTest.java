@@ -13,24 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.system;
+package jj.server;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-import javax.inject.Qualifier;
+import java.util.HashSet;
+import java.util.Set;
+
+import jj.BootstrapClassPath;
+import jj.server.Assets;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-@Qualifier
-@Documented
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface AssetPaths {
+public class AssetsTest {
+
+	@Test
+	public void test() {
+		Set<String> paths = new HashSet<>();
+		paths.add("/jj/assets");
+		
+		Assets assets = new Assets(new BootstrapClassPath(), paths);
+		
+		assertThat(assets.path("jj.js"), is(notNullValue()));
+		
+		// NEEDS A BETTER TEST
+		assertThat(assets.path("jj1.js"), is(Assets.NOT_FOUND));
+		
+		
+	}
 
 }

@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import jj.MockServerStarting;
 import jj.ServerStarting;
 import jj.ServerStarting.Priority;

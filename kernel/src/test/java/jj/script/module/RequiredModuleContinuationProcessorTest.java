@@ -15,7 +15,7 @@
  */
 package jj.script.module;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;

@@ -2,7 +2,7 @@ package jj.resource;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.application.AppLocation.*;
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 

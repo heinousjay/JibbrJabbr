@@ -15,7 +15,7 @@
  */
 package jj.script;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 
 import java.nio.file.Paths;
 

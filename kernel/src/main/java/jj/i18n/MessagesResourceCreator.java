@@ -15,7 +15,7 @@
  */
 package jj.i18n;
 
-import static jj.system.ServerLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 
 import java.io.IOException;
 import java.net.URI;
