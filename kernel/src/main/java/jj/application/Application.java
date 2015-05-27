@@ -16,7 +16,6 @@
 package jj.application;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,13 +33,8 @@ import jj.system.Server;
  */
 @Singleton
 public class Application implements LocationResolver {
-	
-	private static final String APP_PATH_ARG_NAME = "app";
-	
-	// TODO source this from the system
-	private static final String DEFAULT_APP_PATH = "app";
 
-	private final Arguments arguments;
+	private final Path basePath;
 	
 	private final Assets assets;
 	
@@ -48,7 +42,8 @@ public class Application implements LocationResolver {
 	
 	@Inject
 	public Application(final Arguments arguments, final Assets assets, final APIModules apiModules, final Server server) {
-		this.arguments = arguments;
+		
+		basePath = arguments.get("app", Path.class, server.path().resolve("app"));
 		this.assets = assets;
 		this.apiModules = apiModules;
 	}
@@ -60,14 +55,12 @@ public class Application implements LocationResolver {
 
 	@Override
 	public Path path() {
-		Path result = arguments.get(APP_PATH_ARG_NAME, Path.class);
-		if (result == null) result = Paths.get(DEFAULT_APP_PATH);
-		return result;
+		return basePath;
 	}
 	
 	@Override
 	public boolean pathInBase(final Path path) {
-		return path.startsWith(path());
+		return path.startsWith(basePath);
 	}
 
 	@Override
@@ -81,7 +74,7 @@ public class Application implements LocationResolver {
 		case APIModules:
 			return apiModules.path(name);
 		default:
-			return path().resolve(location.path()).resolve(name).toAbsolutePath();
+			return basePath.resolve(location.path()).resolve(name).toAbsolutePath();
 		}
 	}
 }

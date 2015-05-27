@@ -17,21 +17,30 @@ package jj.application;
 
 import static jj.application.AppLocation.Assets;
 import static jj.system.ServerLocation.Virtual;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import jj.Base;
 import jj.application.AppLocation;
 import jj.application.Application;
 import jj.configuration.Arguments;
 import jj.resource.Location;
+import jj.system.Server;
 
 /**
  * @author jason
  *
  */
 public class MockApplication extends Application {
+	
+	private static Server mockServer() {
+		Server result = mock(Server.class);
+		given(result.path()).willReturn(Paths.get(""));
+		return result;
+	}
 
 	private final Path basePath;
 	
@@ -39,18 +48,23 @@ public class MockApplication extends Application {
 	 * @param arguments
 	 */
 	public MockApplication() {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), null);
+		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), mockServer());
 		basePath = Base.path;
 	}
 	
 	public MockApplication(final Path basePath) {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), null);
+		super(mock(Arguments.class), new MockAssets(), new MockAPIModules(), mockServer());
 		this.basePath = basePath;
 	}
 	
 	@Override
 	public Path path() {
 		return basePath;
+	}
+	
+	@Override
+	public boolean pathInBase(Path path) {
+		return path.startsWith(basePath);
 	}
 
 	@Override

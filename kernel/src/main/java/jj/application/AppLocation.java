@@ -75,15 +75,15 @@ public enum AppLocation implements Location {
 		this.internal = internal;
 	}
 	
-	public AppLocation parent() {
+	AppLocation parent() {
 		return parent;
 	}
 	
-	public AppLocation root() {
+	AppLocation root() {
 		return parent == null ? this : parent.root();
 	}
 	
-	public String path() {
+	String path() {
 		return parent == null ? path : parent.path() + path;
 	}
 	

@@ -21,16 +21,16 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import jj.application.APIModules;
 import jj.application.Application;
 import jj.application.Assets;
 import jj.configuration.Arguments;
+import jj.system.Server;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -41,7 +41,16 @@ public class ApplicationTest {
 	@Mock private Arguments arguments;
 	@Mock private Assets assets;
 	@Mock private APIModules apiModules;
-	@InjectMocks Application app;
+	@Mock private Server server;
+	
+	Application app;
+	
+	@Before
+	public void before() {
+		given(server.path()).willReturn(jj.Base.path);
+		given(arguments.get("app", Path.class, jj.Base.path.resolve("app"))).willReturn(jj.Base.path);
+		app = new Application(arguments, assets, apiModules, server);
+	}
 	
 	@Test
 	public void test() {
@@ -57,7 +66,7 @@ public class ApplicationTest {
 		// otherwise we're doing something worth looking at
 		
 		// first, default config, no argument for app path
-		Path base = Paths.get("app").toAbsolutePath();
+		Path base = jj.Base.path;
 		
 		assertThat(app.resolvePath(Base, "config.js"), is(base.resolve("config.js")));
 		assertThat(app.resolvePath(Public, "index.html"), is(base.resolve("public/index.html")));
@@ -65,19 +74,6 @@ public class ApplicationTest {
 		assertThat(app.resolvePath(Public, "deep/and/deeper/index.html"), is(base.resolve("public/deep/and/deeper/index.html")));
 		assertThat(app.resolvePath(Private, "index.js"), is(base.resolve("private/index.js")));
 		assertThat(app.resolvePath(PublicSpecs, "index.js"), is(base.resolve("public-specs/index.js")));
-		assertThat(app.resolvePath(PrivateSpecs, "index.js"), is(base.resolve("private-specs/index.js")));
-		
-		
-		// and then with an argument
-		base = Paths.get("other").toAbsolutePath();
-		given(arguments.get("app", Path.class)).willReturn(base);
-		
-		assertThat(app.resolvePath(Base, "config.js"), is(base.resolve("config.js")));
-		assertThat(app.resolvePath(Public, "index.html"), is(base.resolve("public/index.html")));
-		assertThat(app.resolvePath(Private, "index.js"), is(base.resolve("private/index.js")));
-		assertThat(app.resolvePath(PublicSpecs, "index.js"), is(base.resolve("public-specs/index.js")));
-		assertThat(app.resolvePath(PublicSpecs, "deep/index.js"), is(base.resolve("public-specs/deep/index.js")));
-		assertThat(app.resolvePath(PublicSpecs, "deep/and/deeper/index.js"), is(base.resolve("public-specs/deep/and/deeper/index.js")));
 		assertThat(app.resolvePath(PrivateSpecs, "index.js"), is(base.resolve("private-specs/index.js")));
 	}
 
