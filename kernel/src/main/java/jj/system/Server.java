@@ -1,27 +1,27 @@
 package jj.system;
 
-import static jj.system.ServerLocation.Virtual;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.JJ;
 import jj.configuration.Arguments;
 import jj.resource.Location;
 import jj.resource.LocationResolver;
 
 @Singleton
 public class Server implements LocationResolver {
+	
+	private final Path rootPath;
 
 	@Inject
 	Server(Arguments arguments) {
-		// figure out the jar we're in? no. we'd want the capsule
-		String dir = arguments.get("server-root", String.class, System.getProperty("user.dir"));
-		Path path = Paths.get(dir);
-		
-		System.out.println(path);
+		Path myJar = JJ.jarForClass(JJ.class); // need to account for capsule? probably
+		Path defaultPath = myJar == null ? Paths.get(System.getProperty("user.dir")) : myJar.getParent();
+		rootPath = arguments.get("server-root", Path.class, defaultPath);
+		assert rootPath != null;
 	}
 	
 	@Override
@@ -31,20 +31,25 @@ public class Server implements LocationResolver {
 
 	@Override
 	public Path path() {
-		
-		return null;
+		return rootPath;
 	}
 
 	@Override
 	public boolean pathInBase(Path path) {
-		// TODO Auto-generated method stub
-		return false;
+		return path.startsWith(rootPath);
 	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {
-		assert base == Virtual;
-		return null;
+		assert base instanceof ServerLocation;
+		switch ((ServerLocation)base) {
+		case Root:
+		case Modules:
+		case Virtual:
+			return null;
+		}
+		
+		throw new AssertionError();
 	}
 
 }

@@ -32,7 +32,9 @@ class PathResolverImpl implements PathResolver {
 		
 		assert resolver != null : base;
 		
-		return resolver.resolvePath(base, name);
+		Path result = resolver.resolvePath(base, name);
+		
+		return result == null ? null : result.normalize().toAbsolutePath();
 	}
 
 }

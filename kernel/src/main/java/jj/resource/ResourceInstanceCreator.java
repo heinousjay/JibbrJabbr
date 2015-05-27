@@ -60,12 +60,9 @@ public class ResourceInstanceCreator {
 		final String name,
 		final Object...args
 	) {
-		// should just be
-		// pathResolver.resolve(base, name);
 		// ideally! base.resolve(name);
 		// but that requires tricks
-		
-		final Path path = base.representsFilesystem() ? pathResolver.resolvePath(base, name).normalize().toAbsolutePath() : null;
+		final Path path = pathResolver.resolvePath(base, name);
 		
 		try {
 			

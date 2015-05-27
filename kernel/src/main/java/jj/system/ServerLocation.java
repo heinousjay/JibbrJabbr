@@ -9,11 +9,6 @@ public enum ServerLocation implements Location {
 	Virtual;
 
 	@Override
-	public boolean representsFilesystem() {
-		return this != Virtual;
-	}
-
-	@Override
 	public boolean parentInDirectory() {
 		return this == Modules;
 	}

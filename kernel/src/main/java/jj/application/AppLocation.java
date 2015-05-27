@@ -46,35 +46,32 @@ import jj.resource.Location;
 public enum AppLocation implements Location {
 	
 	/** denotes this asset is a resource located on a path registered with {@link Assets} */
-	Assets("", null, false, true, true),
+	Assets("", null, false, true),
 	
 	/** denotes this asset is a resource located on a path registered with {@link APIModules} */
-	APIModules("", null, false, true, true),
+	APIModules("", null, false, true),
 	
 	/** the paths of the application pieces */
-	Base("", null, true, true, false),
-	Private("private/", Base, true, true, false),
-	PrivateSpecs("private-specs/", Base, true, true, false),
-	Public("public/", Base, true, true, false),
-	PublicSpecs("public-specs/", Base, true, true, false);
+	Base("", null, true, false),
+	Private("private/", Base, true, false),
+	PrivateSpecs("private-specs/", Base, true, false),
+	Public("public/", Base, true, false),
+	PublicSpecs("public-specs/", Base, true, false);
 	
 	private final String path;
 	private final AppLocation parent;
 	private final boolean ensureDirectory;
-	private final boolean representsFilesystem;
 	private final boolean internal;
 	
 	private AppLocation(
 		final String path,
 		final AppLocation parent,
 		final boolean ensureDirectory,
-		final boolean representsFilesystem,
 		final boolean internal
 	) {
 		this.path = path;
 		this.parent = parent;
 		this.ensureDirectory = ensureDirectory;
-		this.representsFilesystem = representsFilesystem;
 		this.internal = internal;
 	}
 	
@@ -97,10 +94,5 @@ public enum AppLocation implements Location {
 	@Override
 	public boolean parentInDirectory() {
 		return ensureDirectory;
-	}
-	
-	@Override
-	public boolean representsFilesystem() {
-		return representsFilesystem;
 	}
 }

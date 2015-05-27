@@ -71,7 +71,6 @@ public class ResourceInstanceCreatorTest  {
 		final String name = "name";
 		Path path = Paths.get("/");
 		
-		given(location.representsFilesystem()).willReturn(true);
 		given(app.resolvePath(location, name)).willReturn(path);
 		
 		rimc.createResource(StaticResource.class, cacheKey, location, name);

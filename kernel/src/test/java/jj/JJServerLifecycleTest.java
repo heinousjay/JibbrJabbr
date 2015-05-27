@@ -17,13 +17,16 @@ package jj;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import jj.ServerStarting.Priority;
 import jj.event.MockPublisher;
 import jj.event.MockPublisher.OnPublish;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
+import jj.system.Server;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +40,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JJServerLifecycleTest {
 	
+	@Mock Server server;
 	MockPublisher publisher;
 	MockTaskRunner taskRunner;
 	
@@ -109,7 +113,7 @@ public class JJServerLifecycleTest {
 		};
 		taskRunner = new MockTaskRunner();
 		
-		JJServerLifecycle jsl = new JJServerLifecycle(publisher, taskRunner, version);
+		JJServerLifecycle jsl = new JJServerLifecycle(server, publisher, taskRunner, version);
 		
 		// when
 		jsl.start();

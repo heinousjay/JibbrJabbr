@@ -56,13 +56,6 @@ public interface Location {
 			// never should even get called
 			throw new AssertionError("called parentInDirectory on a Location.Bundle. should never happen");
 		}
-		
-		@Override
-		public boolean representsFilesystem() {
-			// bundles cannot be used in this way
-			// never should even get called
-			throw new AssertionError("called representsFilesystem on a Location.Bundle. should never happen");
-		}
 	}
 	
 	default Location and(Location next) {
@@ -76,8 +69,6 @@ public interface Location {
 	default <T> T as(Class<T> type) {
 		return type.cast(this);
 	}
-	
-	boolean representsFilesystem();
 	
 	boolean parentInDirectory();
 }
