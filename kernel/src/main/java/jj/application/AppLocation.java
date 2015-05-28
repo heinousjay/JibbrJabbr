@@ -19,7 +19,7 @@ import jj.resource.Location;
 
 /**
  * <p>
- * Type safe way to represent the locations of resources, either in the application structure
+ * Type safe way to represent the locations of resources in the application structure
  * </p>
  * 
  * <pre>
@@ -31,61 +31,29 @@ import jj.resource.Location;
  *  |-public-specs
  * </pre>
  * 
- * <p>or internally with virtual
- * 
- * <p>
- * This needs a little more work.  The core system should define
- * Virtual and AppBase (and later some system for jars) and those
- * are considered the roots.  All filesystem resources are located
- * under AppBase and can be resolved by appending to that root
- * directly
- * 
  * @author jason
  *
  */
 public enum AppLocation implements Location {
 	
 	/** the paths of the application pieces */
-	Base("", null, true, false),
-	Private("private/", Base, true, false),
-	Specs("specs/", Base, true, false),
-	Public("public/", Base, true, false);
+	Base(""),
+	Private("private/"),
+	Specs("specs/"),
+	Public("public/");
 	
 	private final String path;
-	private final AppLocation parent;
-	private final boolean ensureDirectory;
-	private final boolean internal;
 	
-	private AppLocation(
-		final String path,
-		final AppLocation parent,
-		final boolean ensureDirectory,
-		final boolean internal
-	) {
+	private AppLocation(String path) {
 		this.path = path;
-		this.parent = parent;
-		this.ensureDirectory = ensureDirectory;
-		this.internal = internal;
-	}
-	
-	AppLocation parent() {
-		return parent;
-	}
-	
-	AppLocation root() {
-		return parent == null ? this : parent.root();
 	}
 	
 	String path() {
-		return parent == null ? path : parent.path() + path;
-	}
-	
-	public boolean internal() {
-		return internal;
+		return path;
 	}
 	
 	@Override
 	public boolean parentInDirectory() {
-		return ensureDirectory;
+		return true;
 	}
 }
