@@ -35,11 +35,13 @@ public interface Location {
 			locations.add(second);
 		}
 		
+		@Override
 		public Location and(Location next) {
 			locations.add(next);
 			return this;
 		}
 		
+		@Override
 		public List<Location> locations() {
 			return Collections.unmodifiableList(locations);
 		}
@@ -57,18 +59,41 @@ public interface Location {
 			throw new AssertionError("called parentInDirectory on a Location.Bundle. should never happen");
 		}
 	}
-	
+
+	/**
+	 * <p>
+	 * Used to chain locations for lookup. The locations are iterated in
+	 * the order they are added.
+	 * 
+	 * <p>
+	 * usage:{@code <pre>
+	 * FirstLocation.and(SecondLocation).and(ThirdLocation);
+	 * </pre>}
+	 * 
+	 * <p>
+	 * The default method is almost certainly what you need, overriding it should 
+	 * only be done when you know for sure it's the right thing.
+	 */
 	default Location and(Location next) {
 		return new Bundle(this, next);
 	}
 	
+	/**
+	 * <p>
+	 * Retrieve the full list of locations
+	 * 
+	 * <p>
+	 * The default method is almost certainly what you need, overriding it should 
+	 * only be done when you know for sure it's the right thing.
+	 */
 	default List<Location> locations() {
 		return Collections.singletonList(this);
 	}
 	
-	default <T> T as(Class<T> type) {
-		return type.cast(this);
-	}
-	
+	/**
+	 * <p>
+	 * flag to determine if a resource found in this location should
+	 * be parented in a {@link DirectoryResource}
+	 */
 	boolean parentInDirectory();
 }
