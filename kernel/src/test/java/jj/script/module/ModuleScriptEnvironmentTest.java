@@ -105,7 +105,7 @@ public class ModuleScriptEnvironmentTest {
 	@Test
 	public void testUserScriptModule() {
 		
-		constructScriptModule("module", "module", Base);
+		constructScriptModule("module", "module", AppBase);
 		
 		assertThat(mse.scope().get("inject", mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
@@ -121,7 +121,7 @@ public class ModuleScriptEnvironmentTest {
 	@Test
 	public void testUserJSONModule() {
 		
-		constructJSONModule("module", "module", Base);
+		constructJSONModule("module", "module", AppBase);
 		
 		assertThat(mse.exports(), is(contents));
 	}

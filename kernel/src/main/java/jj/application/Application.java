@@ -15,7 +15,7 @@
  */
 package jj.application;
 
-import static jj.application.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static jj.server.ServerLocation.*;
 
 import java.nio.file.Path;
@@ -60,7 +60,12 @@ public class Application implements LocationResolver {
 	}
 	
 	@Override
+	public Location resolveBase(Path path) {
+		return pathInBase(path) ? AppBase : null;
+	}
+	
+	@Override
 	public List<Location> watchedLocations() {
-		return Collections.singletonList(Base);
+		return Collections.singletonList(AppBase);
 	}
 }

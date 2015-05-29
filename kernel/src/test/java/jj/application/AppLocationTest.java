@@ -33,9 +33,9 @@ public class AppLocationTest {
 
 	@Test
 	public void test() {
-		List<Location> locations = Base.and(Private).and(Public).locations();
+		List<Location> locations = AppBase.and(Private).and(Public).locations();
 		
-		assertThat(locations, contains((Location)Base, Private, Public));
+		assertThat(locations, contains((Location)AppBase, Private, Public));
 	}
 
 }

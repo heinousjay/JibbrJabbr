@@ -70,8 +70,8 @@ public class JasmineIntegrationTest {
 		latch = new CountDownLatch(2);
 		
 		// loading a script resource triggers the jasmine run
-		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test.js");
-		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test-failures.js");
+		resourceLoader.loadResource(ScriptResource.class, AppBase, "jasmine-int-test.js");
+		resourceLoader.loadResource(ScriptResource.class, AppBase, "jasmine-int-test-failures.js");
 		
 		// takes about 1 second locally
 		// maybe externalize timeouts?  or produce a factor on travis?

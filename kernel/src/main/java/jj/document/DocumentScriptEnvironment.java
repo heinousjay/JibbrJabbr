@@ -110,15 +110,15 @@ public class DocumentScriptEnvironment
 	) {
 		super(dependencies);
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, resourceName(name));
+		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, resourceName(name));
 		
 		if (html == null) {
 			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(name));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(name));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(name));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(name));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(name));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(name));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),

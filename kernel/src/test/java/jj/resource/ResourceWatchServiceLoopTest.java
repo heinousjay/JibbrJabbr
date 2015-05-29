@@ -189,7 +189,7 @@ public class ResourceWatchServiceLoopTest {
 		verify(resource5).kill();
 		verify(publisher, times(5)).publish(isA(ResourceKilled.class));
 		
-		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.Base, resource5.name());
+		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.AppBase, resource5.name());
 	}
 
 }

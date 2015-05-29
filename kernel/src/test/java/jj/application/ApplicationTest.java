@@ -54,7 +54,7 @@ public class ApplicationTest {
 		// first, default config, no argument for app path
 		Path base = jj.Base.path;
 		
-		assertThat(app.resolvePath(Base, "config.js"), is(base.resolve("config.js")));
+		assertThat(app.resolvePath(AppBase, "config.js"), is(base.resolve("config.js")));
 		assertThat(app.resolvePath(Public, "index.html"), is(base.resolve("public/index.html")));
 		assertThat(app.resolvePath(Public, "deep/index.html"), is(base.resolve("public/deep/index.html")));
 		assertThat(app.resolvePath(Public, "deep/and/deeper/index.html"), is(base.resolve("public/deep/and/deeper/index.html")));

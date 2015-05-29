@@ -64,7 +64,7 @@ public class CssReferenceVersionProcessorTest {
 		basePath = Paths.get(getClass().getResource("/jj/css/test").toURI());
 		app = new MockApplication(basePath);
 		
-		dependencies = new MockAbstractResourceDependencies(Base, REPLACEMENT_CSS);
+		dependencies = new MockAbstractResourceDependencies(AppBase, REPLACEMENT_CSS);
 		
 		resourceFinder = dependencies.resourceFinder();
 	}
@@ -75,22 +75,22 @@ public class CssReferenceVersionProcessorTest {
 		CssReferenceVersionProcessor processor = new CssReferenceVersionProcessor(app, resourceFinder);
 		
 		// given
-		StaticResource replacement = spy(StaticResourceMaker.make(app, Base, REPLACEMENT_CSS));
-		given(resourceFinder.loadResource(StaticResource.class, Base, REPLACEMENT_CSS)).willReturn(replacement);
+		StaticResource replacement = spy(StaticResourceMaker.make(app, AppBase, REPLACEMENT_CSS));
+		given(resourceFinder.loadResource(StaticResource.class, AppBase, REPLACEMENT_CSS)).willReturn(replacement);
 		
 		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null, app);
 		
 		
 		given(testCss.serverPath()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");
 		given(testCss.path()).willReturn(basePath.resolve(TEST_CSS));
-		given(resourceFinder.loadResource(StylesheetResource.class, Base, TEST_CSS)).willReturn(testCss);
+		given(resourceFinder.loadResource(StylesheetResource.class, AppBase, TEST_CSS)).willReturn(testCss);
 		
-		StaticResource box = spy(StaticResourceMaker.make(app, Base, BOX_ICON));
-		StaticResource rox = spy(StaticResourceMaker.make(app, Base, ROX_ICON));
-		StaticResource sox = spy(StaticResourceMaker.make(app, Base, SOX_ICON));
-		given(resourceFinder.loadResource(StaticResource.class, Base, BOX_ICON)).willReturn(box);
-		given(resourceFinder.loadResource(StaticResource.class, Base, ROX_ICON)).willReturn(rox);
-		given(resourceFinder.loadResource(StaticResource.class, Base, SOX_ICON)).willReturn(sox);
+		StaticResource box = spy(StaticResourceMaker.make(app, AppBase, BOX_ICON));
+		StaticResource rox = spy(StaticResourceMaker.make(app, AppBase, ROX_ICON));
+		StaticResource sox = spy(StaticResourceMaker.make(app, AppBase, SOX_ICON));
+		given(resourceFinder.loadResource(StaticResource.class, AppBase, BOX_ICON)).willReturn(box);
+		given(resourceFinder.loadResource(StaticResource.class, AppBase, ROX_ICON)).willReturn(rox);
+		given(resourceFinder.loadResource(StaticResource.class, AppBase, SOX_ICON)).willReturn(sox);
 		
 		String inputString = new String(Files.readAllBytes(basePath.resolve(REPLACEMENT_CSS)), UTF_8);
 		

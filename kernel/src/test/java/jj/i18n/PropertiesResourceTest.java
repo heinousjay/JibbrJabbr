@@ -35,7 +35,7 @@ public class PropertiesResourceTest {
 
 	@Test
 	public void test() throws Exception {
-		Dependencies dependencies = new MockAbstractResourceDependencies(AppLocation.Base, NAME);
+		Dependencies dependencies = new MockAbstractResourceDependencies(AppLocation.AppBase, NAME);
 		
 		PropertiesResource resource = new PropertiesResource(dependencies, Base.appPath().resolve(NAME));
 		

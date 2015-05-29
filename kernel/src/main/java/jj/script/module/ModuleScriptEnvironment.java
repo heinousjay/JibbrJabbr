@@ -93,7 +93,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 
 		String moduleIdentifier = name;
 		
-		Location base = Base;
+		Location base = AppBase;
 		if (name.startsWith(API_PREFIX)) {
 			base = APIModules;
 			moduleIdentifier = name.substring(API_PREFIX.length());

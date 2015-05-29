@@ -17,7 +17,7 @@ package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.application.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
@@ -66,7 +66,7 @@ public class StylesheetResourceIntegrationTest {
 	// this test fails in eclipse. there's something funky about the classpath i need to figure out
 	@Test
 	public void testLess() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, Base, "less.css");
+		resourceLoader.loadResource(StylesheetResource.class, AppBase, "less.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		
@@ -79,7 +79,7 @@ public class StylesheetResourceIntegrationTest {
 	
 	@Test
 	public void testCss() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, Base, "test.css");
+		resourceLoader.loadResource(StylesheetResource.class, AppBase, "test.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		

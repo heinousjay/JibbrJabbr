@@ -41,6 +41,11 @@ public class Server implements LocationResolver {
 	public Path resolvePath(Location base) {
 		return resolvePath(base, "");
 	}
+	
+	@Override
+	public Location resolveBase(Path path) {
+		return pathInBase(path) && rootPath.relativize(path).startsWith("modules") ? ServerLocation.Modules : null;
+	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {

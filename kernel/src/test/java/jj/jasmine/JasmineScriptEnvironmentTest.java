@@ -86,13 +86,13 @@ public class JasmineScriptEnvironmentTest {
 		fakeResource(jasmineRun);
 		given(resourceFinder.loadResource(ScriptResource.class, Assets, "jasmine-run.js")).willReturn(jasmineRun);
 		
-		given(target.base()).willReturn(Base);
+		given(target.base()).willReturn(AppBase);
 		given(target.name()).willReturn(targetName);
 		
 		fakeResource(target);
-		given(resourceFinder.loadResource(ScriptResource.class, Base, targetName)).willReturn(target);
+		given(resourceFinder.loadResource(ScriptResource.class, AppBase, targetName)).willReturn(target);
 		
-		given(spec.base()).willReturn(Base);
+		given(spec.base()).willReturn(AppBase);
 		given(spec.name()).willReturn(specName);
 		
 	}
@@ -106,7 +106,7 @@ public class JasmineScriptEnvironmentTest {
 	public void testFound() {
 		
 		fakeResource(spec);
-		given(resourceFinder.loadResource(ScriptResource.class, Base, specName)).willReturn(spec);
+		given(resourceFinder.loadResource(ScriptResource.class, AppBase, specName)).willReturn(spec);
 		
 		JasmineScriptEnvironment jse = new JasmineScriptEnvironment(dependencies, global, resourceFinder, makeResourceLoaded(target));
 		

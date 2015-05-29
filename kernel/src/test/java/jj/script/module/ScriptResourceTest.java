@@ -55,7 +55,7 @@ public class ScriptResourceTest {
 	
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractResourceDependencies(AppLocation.Base, NAME);
+		dependencies = new MockAbstractResourceDependencies(AppLocation.AppBase, NAME);
 		contextProvider = new MockRhinoContextProvider();
 		rootPath = Paths.get(ScriptResourceTest.class.getResource("/jj/script/module/test.js").toURI()).getParent();
 		app = new MockApplication(rootPath);

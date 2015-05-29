@@ -102,7 +102,7 @@ public class SimpleRouteProcessorTest {
 	private void givenResourceRequest(String uri) {
 		URIMatch match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(resourceLoader.findResource(StaticResource.class, Base.and(Assets), match.path)).willReturn(resource);
+		given(resourceLoader.findResource(StaticResource.class, AppBase.and(Assets), match.path)).willReturn(resource);
 	}
 	
 	@Test

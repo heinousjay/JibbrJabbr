@@ -1,6 +1,6 @@
 package jj.server;
 
-import static jj.application.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static org.junit.Assert.*;
 
 import java.nio.file.Path;
@@ -22,7 +22,7 @@ public class ModuleResourceTest {
 		
 		Path path = Paths.get("");
 		
-		new ModuleResource(dependencies = new MockAbstractResourceDependencies(Base, "name"), path);
+		new ModuleResource(dependencies = new MockAbstractResourceDependencies(AppBase, "name"), path);
 	}
 
 }

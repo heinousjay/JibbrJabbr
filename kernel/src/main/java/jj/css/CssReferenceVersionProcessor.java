@@ -89,13 +89,13 @@ class CssReferenceVersionProcessor {
 				if (replacement.startsWith("/")) {
 					name = replacement.substring(1);
 				} else {
-					name = application.resolvePath(AppLocation.Base, "")
+					name = application.resolvePath(AppLocation.AppBase, "")
 						.relativize(resource.path().resolveSibling(replacement))
 						.normalize()
 						.toString();
 				
 				}
-				ServableResource dependency = resourceFinder.loadResource(type, AppLocation.Base, name);
+				ServableResource dependency = resourceFinder.loadResource(type, AppLocation.AppBase, name);
 				
 				if (dependency != null) {
 					dependency.addDependent(resource);

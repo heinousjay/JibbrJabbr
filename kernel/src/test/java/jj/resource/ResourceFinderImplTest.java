@@ -57,15 +57,15 @@ public class ResourceFinderImplTest {
 		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
 		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
 		
-		given(staticResourceCreator.resourceKey(Base, name1)).willReturn(staticResource1Key);
+		given(staticResourceCreator.resourceKey(AppBase, name1)).willReturn(staticResource1Key);
 		given(resourceCache.get(staticResource1Key)).willReturn(staticResource1);
-		given(sha1ResourceCreator.resourceKey(Base, name2)).willReturn(sha1Resource2Key);
+		given(sha1ResourceCreator.resourceKey(AppBase, name2)).willReturn(sha1Resource2Key);
 		given(resourceCache.get(sha1Resource2Key)).willReturn(sha1Resource2);
 		
-		assertThat(rfi.findResource(StaticResource.class, Base, name1), is(staticResource1));
-		assertThat(rfi.findResource(StaticResource.class, Base, name2), is(nullValue()));
-		assertThat(rfi.findResource(Sha1Resource.class, Base, name2), is(sha1Resource2));
-		assertThat(rfi.findResource(Sha1Resource.class, Base, name1), is(nullValue()));
+		assertThat(rfi.findResource(StaticResource.class, AppBase, name1), is(staticResource1));
+		assertThat(rfi.findResource(StaticResource.class, AppBase, name2), is(nullValue()));
+		assertThat(rfi.findResource(Sha1Resource.class, AppBase, name2), is(sha1Resource2));
+		assertThat(rfi.findResource(Sha1Resource.class, AppBase, name1), is(nullValue()));
 	}
 	
 	@Test
@@ -107,22 +107,22 @@ public class ResourceFinderImplTest {
 		
 		given(resourceCache.getCreator(StaticResource.class)).willReturn(staticResourceCreator);
 		given(staticResourceCreator.type()).willReturn(StaticResource.class);
-		given(staticResourceCreator.resourceKey(Base, name1)).willReturn(staticResource2Key);
-		given(staticResourceCreator.create(Base, name1)).willReturn(staticResource2);
+		given(staticResourceCreator.resourceKey(AppBase, name1)).willReturn(staticResource2Key);
+		given(staticResourceCreator.create(AppBase, name1)).willReturn(staticResource2);
 		
 		given(resourceCache.getCreator(Sha1Resource.class)).willReturn(sha1ResourceCreator);
 		given(sha1ResourceCreator.type()).willReturn(Sha1Resource.class);
-		given(sha1ResourceCreator.resourceKey(Base, name2)).willReturn(sha1Resource1Key);
-		given(sha1ResourceCreator.create(Base, name2)).willReturn(sha1Resource1);
+		given(sha1ResourceCreator.resourceKey(AppBase, name2)).willReturn(sha1Resource1Key);
+		given(sha1ResourceCreator.create(AppBase, name2)).willReturn(sha1Resource1);
 		
 		given(currentTask.currentIs(ResourceTask.class)).willReturn(true);
 		given(currentTask.currentAs(ResourceTask.class)).willReturn(task);
 		
-		assertThat(rfi.findResource(StaticResource.class, Base, name1), is(nullValue()));
-		assertThat(rfi.findResource(Sha1Resource.class, Base, name2), is(nullValue()));
+		assertThat(rfi.findResource(StaticResource.class, AppBase, name1), is(nullValue()));
+		assertThat(rfi.findResource(Sha1Resource.class, AppBase, name2), is(nullValue()));
 		
-		rfi.loadResource(StaticResource.class, Base, name1);
-		rfi.loadResource(Sha1Resource.class, Base, name2);
+		rfi.loadResource(StaticResource.class, AppBase, name1);
+		rfi.loadResource(Sha1Resource.class, AppBase, name2);
 		
 		verify(resourceCache).putIfAbsent(staticResource2Key, staticResource2);
 		verify(resourceCache).putIfAbsent(sha1Resource1Key, sha1Resource1);

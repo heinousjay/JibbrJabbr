@@ -101,7 +101,7 @@ public class MessagesResource extends AbstractResource {
 		ArrayList<PropertiesResource> result = new ArrayList<>(4);
 		for (String candidateName : candidateNames()) {
 			PropertiesResource resource =
-				resourceFinder.loadResource(PropertiesResource.class, AppLocation.Base, candidateName);
+				resourceFinder.loadResource(PropertiesResource.class, AppLocation.AppBase, candidateName);
 			if (resource != null) {
 				result.add(resource);
 				resource.addDependent(this);

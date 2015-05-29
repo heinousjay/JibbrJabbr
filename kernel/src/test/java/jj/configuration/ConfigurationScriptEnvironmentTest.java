@@ -67,7 +67,7 @@ public class ConfigurationScriptEnvironmentTest {
 
 	@Test
 	public void testInitialization() {
-		given(resourceFinder.loadResource(ScriptResource.class, Base, CONFIG_SCRIPT_NAME)).willReturn(configScript);
+		given(resourceFinder.loadResource(ScriptResource.class, AppBase, CONFIG_SCRIPT_NAME)).willReturn(configScript);
 		
 		cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
 		

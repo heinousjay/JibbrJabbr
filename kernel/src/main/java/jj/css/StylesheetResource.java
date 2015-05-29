@@ -87,7 +87,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		this.lessConfiguration = lessConfiguration;
 		
 		// is there a static css file?
-		StaticResource css = resourceFinder.loadResource(StaticResource.class, Base, name);
+		StaticResource css = resourceFinder.loadResource(StaticResource.class, AppBase, name);
 		String result;
 		
 		if (css == null) {
@@ -99,7 +99,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 
 			// this is just to check for existence of the resource, it will get loaded from
 			// the script execution and hooked into the dependency system then
-			LessResource lessSheet = resourceFinder.loadResource(LessResource.class, Base, lessName);
+			LessResource lessSheet = resourceFinder.loadResource(LessResource.class, AppBase, lessName);
 			if (lessSheet == null) {
 				throw new NoSuchResourceException(StylesheetResource.class, name());
 			}
@@ -235,7 +235,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			String resourceName = String.valueOf(args[0]);
 			publisher.publish(new LoadingLessResource(resourceName));
-			LessResource lr = resourceFinder.loadResource(LessResource.class, Base, resourceName);
+			LessResource lr = resourceFinder.loadResource(LessResource.class, AppBase, resourceName);
 			if (lr != null) {
 				lr.addDependent(StylesheetResource.this);
 				return lr.contents();

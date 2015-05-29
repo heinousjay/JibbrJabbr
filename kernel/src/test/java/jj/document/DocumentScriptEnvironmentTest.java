@@ -103,19 +103,19 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
-		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, baseName + ".html")).willReturn(html);
+		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, baseName + ".html")).willReturn(html);
 	}
 
 	private void givenAClientScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenASharedScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenAServerScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
 	}
 	
 	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {

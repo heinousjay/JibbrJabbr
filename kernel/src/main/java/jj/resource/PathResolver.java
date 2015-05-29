@@ -35,5 +35,7 @@ public interface PathResolver {
 	 */
 	Path resolvePath(Location base, String name);
 	
+	Location resolveLocation(Path path);
+	
 	List<Location> watchedLocations();
 }

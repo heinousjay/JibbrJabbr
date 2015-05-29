@@ -25,7 +25,7 @@ import jj.util.SHA1Helper;
 class MyResource extends AbstractResource {
 	
 	protected MyResource(String name, Publisher publisher) {
-		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.Base, name, publisher));
+		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.AppBase, name, publisher));
 	}
 
 	@Override

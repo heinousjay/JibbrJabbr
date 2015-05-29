@@ -16,7 +16,7 @@
 package jj.resource;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static jj.application.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -62,7 +62,7 @@ public class Sha1ResourceTest {
 	
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractResourceDependencies(resourceKey, Base, indexHtml);
+		dependencies = new MockAbstractResourceDependencies(resourceKey, AppBase, indexHtml);
 		
 		Path path = pathFor(indexSha1);
 		if (path != null && Files.exists(path)) {

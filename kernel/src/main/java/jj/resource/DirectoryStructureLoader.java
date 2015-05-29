@@ -15,8 +15,6 @@
  */
 package jj.resource;
 
-import static jj.application.AppLocation.Base;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -63,8 +61,9 @@ class DirectoryStructureLoader {
 	}
 	
 	void load(final Path path) {
-		// need reverse resolution of paths into locations! dangit
-		taskRunner.execute(new LoaderTask(Base, path));
+		Location base = pathResolver.resolveLocation(path);
+		assert base != null && base.parentInDirectory() : "asked to load a directory structure for a bad path"; 
+		taskRunner.execute(new LoaderTask(base, path));
 	}
 	
 	private class LoaderTask extends ResourceTask {

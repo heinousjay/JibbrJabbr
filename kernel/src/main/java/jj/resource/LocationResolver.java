@@ -35,6 +35,8 @@ public interface LocationResolver {
 	 */
 	Path resolvePath(Location base, String name);
 	
+	Location resolveBase(Path path);
+	
 	/**
 	 * enumerate the paths that this resolver wants watched for changes
 	 */

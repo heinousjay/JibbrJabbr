@@ -81,7 +81,6 @@ class Sha1Resource extends AbstractResource {
 		if (size != target.resource.size()) {
 			sha = SHA1Helper.keyFor(target.resource.path());
 			size = target.resource.size();
-			System.out.println("writing from sha1resource to " + path);
 			Files.write(path, (sha + size).getBytes(US_ASCII));
 		}
 		

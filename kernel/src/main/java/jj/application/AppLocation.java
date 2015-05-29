@@ -37,7 +37,7 @@ import jj.resource.Location;
 public enum AppLocation implements Location {
 	
 	/** the paths of the application pieces */
-	Base(""),
+	AppBase(""),
 	Private("private/"),
 	Specs("specs/"),
 	Public("public/");
