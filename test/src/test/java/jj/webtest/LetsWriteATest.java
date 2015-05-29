@@ -16,6 +16,7 @@
 package jj.webtest;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.testing.JibbrJabbrTestServer;
 import jj.webdriver.WebDriverRule;
 
@@ -29,7 +30,7 @@ import org.junit.Test;
 public class LetsWriteATest {
 	
 	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.two);
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(ServerRoot.one, App.two);
 	
 	
 	/** since we're running in the context of the embedded server, let that

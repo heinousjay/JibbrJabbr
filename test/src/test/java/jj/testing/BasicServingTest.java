@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
@@ -77,7 +78,7 @@ public class BasicServingTest {
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(App.one)
+		new JibbrJabbrTestServer(ServerRoot.one, App.one)
 		.verifying()
 		//.recording()
 		.injectInstance(this);

@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import jj.App;
 import jj.JJ;
 import jj.JJModule;
+import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.jasmine.JasmineTestError;
@@ -90,7 +91,7 @@ public class SystemScriptsTest {
 
 	@Rule
 	public JibbrJabbrTestServer server =
-		new JibbrJabbrTestServer(App.configuration) // we use the configuration because that loads all the core configuration scripts
+		new JibbrJabbrTestServer(ServerRoot.one, App.configuration) // we use the configuration because that loads all the core configuration scripts
 			.runAllSpecs()                          // this defaults to off.  that might not survive now!
 			.injectInstance(this)                   // well, sure
 			.withModule(new JJModule() {

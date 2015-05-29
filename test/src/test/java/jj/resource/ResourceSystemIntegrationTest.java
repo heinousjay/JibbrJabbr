@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.*;
 
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.TreeDeleter;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.HtmlResource;
@@ -72,12 +72,12 @@ public class ResourceSystemIntegrationTest {
 //		System.out.println("killedCount = " + killedCount);
 //		System.out.println("loadedCount = " + loadedCount);
 		try {
-			Files.walkFileTree(Paths.get(App.module).resolve("created"), new TreeDeleter());
+			Files.walkFileTree(App.module.resolve("created"), new TreeDeleter());
 		} catch (NoSuchFileException nsfe) {}
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.module)
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.module)
 		.withFileWatcher()
 		.injectInstance(this);
 
@@ -139,9 +139,9 @@ public class ResourceSystemIntegrationTest {
 					// touch a script and wait for a reload event.
 					touch(scriptResource2);
 					// and let's add some directories
-					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesOne));
-					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesTwo));
-					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesThree));
+					Files.createDirectories(App.module.resolve(createDirectoriesOne));
+					Files.createDirectories(App.module.resolve(createDirectoriesTwo));
+					Files.createDirectories(App.module.resolve(createDirectoriesThree));
 				} catch (Exception e) {
 					e.printStackTrace();
 					failed.set(true);

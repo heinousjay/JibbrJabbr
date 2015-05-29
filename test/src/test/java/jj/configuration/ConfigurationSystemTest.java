@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
 import jj.http.server.uri.Route;
@@ -65,7 +66,7 @@ public class ConfigurationSystemTest {
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.configuration).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.configuration).injectInstance(this);
 	
 	@Inject
 	private ConfigurationCollector collector;

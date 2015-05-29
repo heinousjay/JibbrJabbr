@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
@@ -46,7 +47,7 @@ import org.junit.Test;
 public class StylesheetResourceIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(App.css).injectInstance(this);
+	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(ServerRoot.one, App.css).injectInstance(this);
 	
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;

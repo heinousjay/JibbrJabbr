@@ -31,6 +31,7 @@ import javax.inject.Inject;
 
 import jj.App;
 import jj.JJModule;
+import jj.ServerRoot;
 import jj.http.client.api.RestOperation;
 import jj.testing.JibbrJabbrTestServer;
 
@@ -42,7 +43,7 @@ public class HttpClientIntegrationTest {
 
 	@Rule
 	public JibbrJabbrTestServer server =
-		new JibbrJabbrTestServer(App.httpClient)
+		new JibbrJabbrTestServer(ServerRoot.one, App.httpClient)
 			.withHttp()
 			.withModule(new JJModule() {
 				

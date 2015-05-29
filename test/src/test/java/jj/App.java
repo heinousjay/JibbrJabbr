@@ -16,6 +16,7 @@
 package jj;
 
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jj.webdriver.WebDriverProvider;
@@ -30,23 +31,23 @@ public class App {
 	// this could also be a helper class that inspects system properties or vm args or whatever
 	public static final Class<? extends WebDriverProvider> DRIVER_PROVIDER = PhantomJSWebDriverProvider.class; //FirefoxWebDriverProvider.class;
 	
-	public static final String one;
+	public static final Path one;
 	
-	public static final String two;
+	public static final Path two;
 	
-	public static final String minimal;
+	public static final Path minimal;
 	
-	public static final String configuration;
+	public static final Path configuration;
 	
-	public static final String css;
+	public static final Path css;
 	
-	public static final String httpClient;
+	public static final Path httpClient;
 
-	public static final String repl;
+	public static final Path repl;
 
-	public static final String module;
+	public static final Path module;
 
-	public static final String jasmine;
+	public static final Path jasmine;
 	
 	static {
 		try {
@@ -64,7 +65,7 @@ public class App {
 		}
 	}
 
-	private static String getPath(String p) throws URISyntaxException {
-		return Paths.get(App.class.getResource(p).toURI()).toAbsolutePath().toString();
+	private static Path getPath(String p) throws URISyntaxException {
+		return Paths.get(App.class.getResource(p).toURI()).toAbsolutePath();
 	}
 }

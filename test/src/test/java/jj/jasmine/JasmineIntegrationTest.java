@@ -24,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
@@ -42,7 +43,7 @@ import org.junit.Test;
 public class JasmineIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer jj = new JibbrJabbrTestServer(App.jasmine).injectInstance(this);
+	public JibbrJabbrTestServer jj = new JibbrJabbrTestServer(ServerRoot.one, App.jasmine).injectInstance(this);
 	
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;

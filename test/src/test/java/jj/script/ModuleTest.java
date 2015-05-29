@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.*;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
@@ -39,7 +40,7 @@ import org.junit.Test;
 public class ModuleTest {
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.module).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.module).injectInstance(this);
 	
 	@Inject EmbeddedHttpServer server;
 	

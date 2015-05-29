@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.document.DocumentScriptEnvironment;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -67,7 +68,7 @@ public class ScriptEnvironmentIntegrationTest {
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(App.module)
+		new JibbrJabbrTestServer(ServerRoot.one, App.module)
 			.injectInstance(this);
 	
 	CountDownLatch latch;
