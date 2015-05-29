@@ -140,14 +140,14 @@ public abstract class AbstractResource implements Resource {
 			dependencies.abstractResourceDependencies.demuxer.awaitInitialization(this);
 		}
 		
-		ResourceSettings base = resourceConfiguration.fileTypeSettings().get(extension());
-		if (base == null) {
-			base = resourceConfiguration.defaultSettings();
+		ResourceSettings baseSettings = resourceConfiguration.fileTypeSettings().get(extension());
+		if (baseSettings == null) {
+			baseSettings = resourceConfiguration.defaultSettings();
 		}
 		
 		// and specific based on the type/base/name?  need to figure out how to represent that tuple.  maybe just name?
 		
-		settings = base;
+		settings = baseSettings;
 	}
 	
 	void resourceLoaded() {

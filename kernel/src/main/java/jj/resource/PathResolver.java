@@ -16,12 +16,24 @@
 package jj.resource;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
+ * <p>
+ * Resolves a {@link Location}/name tuple into a {@link Path},
+ * if possible.
  * @author jason
  *
  */
 public interface PathResolver {
 
+	Path resolvePath(Location base);
+	
+	/**
+	 * If possible, construct a {@link Path} for the given
+	 * {@link Location}/name pair.
+	 */
 	Path resolvePath(Location base, String name);
+	
+	List<Location> watchedLocations();
 }

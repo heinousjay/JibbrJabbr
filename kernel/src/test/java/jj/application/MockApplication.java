@@ -16,11 +16,9 @@
 package jj.application;
 
 import static jj.server.ServerLocation.*;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import jj.Base;
 import jj.application.AppLocation;
@@ -34,12 +32,6 @@ import jj.server.Server;
  *
  */
 public class MockApplication extends Application {
-	
-	private static Server mockServer() {
-		Server result = mock(Server.class);
-		given(result.path()).willReturn(Paths.get(""));
-		return result;
-	}
 
 	private final Path basePath;
 	
@@ -47,18 +39,12 @@ public class MockApplication extends Application {
 	 * @param arguments
 	 */
 	public MockApplication() {
-		super(mock(Arguments.class), mockServer());
-		basePath = Base.path;
+		this(Base.path);
 	}
 	
 	public MockApplication(final Path basePath) {
-		super(mock(Arguments.class), mockServer());
+		super(mock(Arguments.class), mock(Server.class));
 		this.basePath = basePath;
-	}
-	
-	@Override
-	public Path path() {
-		return basePath;
 	}
 	
 	@Override

@@ -16,6 +16,7 @@
 package jj.application;
 
 import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -43,8 +44,8 @@ public class ApplicationTest {
 	
 	@Before
 	public void before() {
-		given(server.path()).willReturn(jj.Base.path);
-		given(arguments.get("app", Path.class, jj.Base.path.resolve("app"))).willReturn(jj.Base.path);
+		given(server.resolvePath(Root, "app")).willReturn(jj.Base.path);
+		given(arguments.get("app", Path.class, jj.Base.path)).willReturn(jj.Base.path);
 		app = new Application(arguments, server);
 	}
 	

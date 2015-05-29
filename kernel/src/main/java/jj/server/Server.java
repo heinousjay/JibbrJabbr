@@ -2,6 +2,8 @@ package jj.server;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,20 +32,14 @@ public class Server implements LocationResolver {
 		this.assets = assets;
 		this.apiModules = apiModules;
 	}
-	
-	@Override
-	public Location base() {
-		return ServerLocation.Root;
-	}
-
-	@Override
-	public Path path() {
-		return rootPath;
-	}
 
 	@Override
 	public boolean pathInBase(Path path) {
 		return path.startsWith(rootPath);
+	}
+	
+	public Path resolvePath(Location base) {
+		return resolvePath(base, "");
 	}
 
 	@Override
@@ -53,11 +49,16 @@ public class Server implements LocationResolver {
 
 		case Assets:
 			return assets.path(name);
+			
 		case APIModules:
 			return apiModules.path(name);
 			
 		case Root:
+			return rootPath.resolve(name);
+			
 		case Modules:
+			return rootPath.resolve("modules").resolve(name);
+			
 		case Virtual:
 			return null;
 		}
@@ -65,4 +66,8 @@ public class Server implements LocationResolver {
 		throw new AssertionError();
 	}
 
+	@Override
+	public List<Location> watchedLocations() {
+		return Collections.singletonList(ServerLocation.Modules);
+	}
 }

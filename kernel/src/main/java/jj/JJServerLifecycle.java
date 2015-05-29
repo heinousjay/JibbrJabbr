@@ -1,6 +1,7 @@
 package jj;
 
 import static java.util.concurrent.TimeUnit.*;
+import static jj.server.ServerLocation.Root;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -37,7 +38,7 @@ public class JJServerLifecycle {
 	
 	public void start() throws Exception {
 
-		ServerStarting startupEvent = new ServerStarting(server.path(), version);
+		ServerStarting startupEvent = new ServerStarting(server.resolvePath(Root), version);
 		publisher.publish(startupEvent);
 
 		for (ServerStarting.Priority priority : ServerStarting.Priority.values()) {

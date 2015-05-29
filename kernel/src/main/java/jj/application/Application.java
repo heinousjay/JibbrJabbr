@@ -15,7 +15,12 @@
  */
 package jj.application;
 
+import static jj.application.AppLocation.Base;
+import static jj.server.ServerLocation.*;
+
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -39,17 +44,7 @@ public class Application implements LocationResolver {
 	@Inject
 	public Application(final Arguments arguments, final Server server) {
 		
-		basePath = arguments.get("app", Path.class, server.path().resolve("app"));
-	}
-
-	@Override
-	public Location base() {
-		return AppLocation.Base;
-	}
-
-	@Override
-	public Path path() {
-		return basePath;
+		basePath = arguments.get("app", Path.class, server.resolvePath(Root, "app"));
 	}
 	
 	@Override
@@ -62,5 +57,10 @@ public class Application implements LocationResolver {
 		assert base instanceof AppLocation;
 		AppLocation location = (AppLocation)base;
 		return basePath.resolve(location.path()).resolve(name).toAbsolutePath();
+	}
+	
+	@Override
+	public List<Location> watchedLocations() {
+		return Collections.singletonList(Base);
 	}
 }

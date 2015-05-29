@@ -15,6 +15,8 @@
  */
 package jj.resource;
 
+import static jj.application.AppLocation.Base;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -27,7 +29,6 @@ import javax.inject.Singleton;
 
 import jj.ServerStarting;
 import jj.ServerStarting.Priority;
-import jj.application.Application;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
@@ -43,32 +44,37 @@ import jj.execution.TaskRunner;
 @Subscriber
 class DirectoryStructureLoader {
 	
-	private final Application application;
+	private final PathResolver pathResolver;
 	private final ResourceFinder resourceFinder;
 	private final TaskRunner taskRunner;
 	
 	@Inject
-	DirectoryStructureLoader(final Application application, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
-		this.application = application;
+	DirectoryStructureLoader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
+		this.pathResolver = pathResolver;
 		this.resourceFinder = resourceFinder;
 		this.taskRunner = taskRunner;
 	}
 
 	@Listener
 	void start(ServerStarting event) {
-		event.registerStartupTask(Priority.NearHighest, new LoaderTask(application.path()));
+		for (Location location : pathResolver.watchedLocations()) {
+			event.registerStartupTask(Priority.NearHighest, new LoaderTask(location, pathResolver.resolvePath(location)));
+		}
 	}
 	
 	void load(final Path path) {
-		taskRunner.execute(new LoaderTask(path));
+		// need reverse resolution of paths into locations! dangit
+		taskRunner.execute(new LoaderTask(Base, path));
 	}
 	
 	private class LoaderTask extends ResourceTask {
 		
+		private final Location location;
 		private final Path path;
 		
-		LoaderTask(final Path path) {
+		LoaderTask(final Location location, final Path path) {
 			super("loading directory structure rooted at " + path);
+			this.location = location;
 			this.path = path;
 		}
 		
@@ -80,8 +86,8 @@ class DirectoryStructureLoader {
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 					resourceFinder.loadResource(
 						DirectoryResource.class,
-						application.base(),
-						application.path().relativize(path.resolve(dir)).toString()
+						location,
+						pathResolver.resolvePath(location).relativize(path.resolve(dir)).toString()
 					);
 					return FileVisitResult.CONTINUE;
 				}

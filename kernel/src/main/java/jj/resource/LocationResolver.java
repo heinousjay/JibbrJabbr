@@ -16,22 +16,13 @@
 package jj.resource;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author jason
  *
  */
 public interface LocationResolver {
-	
-	/**
-	 * The base location of the path resolver
-	 */
-	Location base();
-	
-	/**
-	 * The base path of the path resolver
-	 */
-	Path path();
 	
 	/**
 	 * True if the given path is in the base
@@ -43,5 +34,10 @@ public interface LocationResolver {
 	 * the base path
 	 */
 	Path resolvePath(Location base, String name);
+	
+	/**
+	 * enumerate the paths that this resolver wants watched for changes
+	 */
+	List<Location> watchedLocations();
 
 }

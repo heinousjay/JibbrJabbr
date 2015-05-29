@@ -89,7 +89,7 @@ class CssReferenceVersionProcessor {
 				if (replacement.startsWith("/")) {
 					name = replacement.substring(1);
 				} else {
-					name = application.path()
+					name = application.resolvePath(AppLocation.Base, "")
 						.relativize(resource.path().resolveSibling(replacement))
 						.normalize()
 						.toString();

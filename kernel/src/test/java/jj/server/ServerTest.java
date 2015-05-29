@@ -1,7 +1,5 @@
 package jj.server;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
 
 import java.nio.file.Path;
@@ -33,8 +31,6 @@ public class ServerTest {
 		given(arguments.get(eq("server-root"), eq(Path.class), any(Path.class))).willReturn(path);
 		
 		server = new Server(arguments, assets, apiModules);
-		
-		assertThat(server.path(), is(path));
 		
 		// asset resources get delegated to Assets
 		server.resolvePath(ServerLocation.Assets, "a");

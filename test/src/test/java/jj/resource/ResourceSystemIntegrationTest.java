@@ -67,10 +67,10 @@ public class ResourceSystemIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
-//		System.out.println(resourceCache);
-//		System.out.println(reloadedCount);
-//		System.out.println(killedCount);
-//		System.out.println(loadedCount);
+		System.out.println("resourceCache = " + resourceCache);
+		System.out.println("reloadedCount = " + reloadedCount);
+		System.out.println("killedCount = " + killedCount);
+		System.out.println("loadedCount = " + loadedCount);
 		try {
 			Files.walkFileTree(Paths.get(App.module).resolve("created"), new TreeDeleter());
 		} catch (NoSuchFileException nsfe) {}
@@ -255,6 +255,6 @@ public class ResourceSystemIntegrationTest {
 	private boolean waitForCount(int count) throws Exception {
 		latch = new CountDownLatch(count);
 		countEvents = true;
-		return latch.await(11, SECONDS);
+		return latch.await(4, SECONDS);
 	}
 }

@@ -1,6 +1,9 @@
 package jj.resource;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -19,10 +22,21 @@ import javax.inject.Singleton;
 class PathResolverImpl implements PathResolver {
 	
 	private final Map<Class<? extends Location>, LocationResolver> resolvers;
+	private final List<Location> watchedLocations;
 
 	@Inject
 	PathResolverImpl(Map<Class<? extends Location>, LocationResolver> resolvers) {
 		this.resolvers = resolvers;
+		List<Location> builder = new ArrayList<>();
+		for (LocationResolver resolver : resolvers.values()) {
+			builder.addAll(resolver.watchedLocations());
+		}
+		watchedLocations = Collections.unmodifiableList(builder);
+	}
+	
+	@Override
+	public Path resolvePath(Location base) {
+		return resolvePath(base, "");
 	}
 	
 	@Override
@@ -35,6 +49,11 @@ class PathResolverImpl implements PathResolver {
 		Path result = resolver.resolvePath(base, name);
 		
 		return result == null ? null : result.normalize().toAbsolutePath();
+	}
+	
+	@Override
+	public List<Location> watchedLocations() {
+		return watchedLocations;
 	}
 
 }
