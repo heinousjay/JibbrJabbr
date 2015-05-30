@@ -20,6 +20,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +37,8 @@ import jj.util.SHA1Helper;
  */
 class Sha1Resource extends AbstractResource {
 	
+	static final String EXTENSION = "sha1";
+	
 	// empirical magic numbers - the sha1 hash is 40 hex digits, and the max long value as a decimal is 19 digits
 	private static final Pattern FORMAT = Pattern.compile("^([a-f\\d]{40})(\\d{1,19})$");
 
@@ -50,10 +53,11 @@ class Sha1Resource extends AbstractResource {
 	@Inject
 	Sha1Resource(
 		final Dependencies dependencies,
-		final Path path,
 		final Sha1ResourceTarget target
 	) throws IOException {
 		super(dependencies);
+		
+		Path path = Paths.get(target.resource.path().toString() + "." + EXTENSION);
 		
 		// 3 possibilities
 		// either there is no file at path, so we read in our target bytes to make one
@@ -77,7 +81,6 @@ class Sha1Resource extends AbstractResource {
 		if (size != target.resource.size()) {
 			sha = SHA1Helper.keyFor(target.resource.path());
 			size = target.resource.size();
-			
 			Files.write(path, (sha + size).getBytes(US_ASCII));
 		}
 		
@@ -91,7 +94,7 @@ class Sha1Resource extends AbstractResource {
 	
 	@Override
 	protected String extension() {
-		return Sha1ResourceCreator.EXTENSION;
+		return EXTENSION;
 	}
 	
 	public String representedSha() {

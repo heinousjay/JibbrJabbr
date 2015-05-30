@@ -25,8 +25,6 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 import jj.configuration.ConfigurationObjectBinder;
-import jj.configuration.resolution.APIPaths;
-import jj.configuration.resolution.AssetPaths;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
 import jj.execution.ExecutorBinder;
@@ -42,6 +40,8 @@ import jj.resource.SimpleResourceCreator;
 import jj.script.Continuation;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationProcessorBinder;
+import jj.server.APIPaths;
+import jj.server.AssetPaths;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
@@ -102,6 +102,7 @@ public abstract class JJModule extends AbstractModule {
 	}
 
 	protected void bindAssetPath(String path) {
+		assert path != null && path.startsWith("/") : "path must be present and start with /";
 		if (assetPaths == null) {
 			assetPaths = Multibinder.newSetBinder(binder(), String.class, AssetPaths.class);
 		}
@@ -109,6 +110,7 @@ public abstract class JJModule extends AbstractModule {
 	}
 	
 	protected void bindAPIModulePath(String path) {
+		assert path != null && path.startsWith("/") : "path must be present and start with /";
 		if (apiPaths == null) {
 			apiPaths = Multibinder.newSetBinder(binder(), String.class, APIPaths.class);
 		}

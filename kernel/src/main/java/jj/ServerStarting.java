@@ -15,6 +15,7 @@
  */
 package jj;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,11 +41,13 @@ public class ServerStarting extends LoggedEvent {
 		Lowest;
 	}
 	
+	private final Path rootPath;
 	private final Version version;
 	
 	private final HashMap<Priority, List<JJTask>> startupTasks = new HashMap<>();
 	
-	ServerStarting(Version version) {
+	ServerStarting(Path rootPath, Version version) {
+		this.rootPath = rootPath;
 		this.version = version;
 	}
 
@@ -59,6 +62,7 @@ public class ServerStarting extends LoggedEvent {
 	@Override
 	public void describeTo(Logger logger) {
 		logger.info("Welcome to {} version {} commit {}", version.name(), version.version(), version.commitId());
+		logger.info("Server root is {}", rootPath);
 		logger.info("Starting up!");
 	}
 

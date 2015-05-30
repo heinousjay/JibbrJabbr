@@ -16,8 +16,6 @@
 package jj.configuration;
 
 import jj.JJModule;
-import jj.configuration.resolution.Application;
-import jj.resource.PathResolver;
 
 /**
  * @author jason
@@ -28,13 +26,9 @@ public class ConfigurationModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		bindAssetPath("/jj/assets");
-		
 		bindAPIModulePath("/jj/configuration/api");
 		
 		bindStartupListener(ConfigurationScriptLoader.class);
-		
-		bind(PathResolver.class).to(Application.class);
 		
 		bindCreationOf(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);
 	}

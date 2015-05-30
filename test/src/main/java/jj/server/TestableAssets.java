@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.server;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.inject.Qualifier;
+import jj.BootstrapClassPath;
+import jj.server.InternalAssets;
 
 /**
  * @author jason
  *
  */
-@Qualifier
-@Documented
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface AssetPaths {
+public class TestableAssets extends InternalAssets {
+	
+	private static final Set<String> paths;
+	
+	static {
+		
+		paths = new HashSet<>();
+		paths.add("/jj/assets/");
+	}
+
+	
+	public TestableAssets() {
+		super(new BootstrapClassPath(), paths);
+	}
 
 }

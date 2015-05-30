@@ -27,11 +27,10 @@ import jj.execution.TaskRunner;
  */
 public class EventModule extends JJModule {
 	
-	@SuppressWarnings("rawtypes")
-	private static class SubscriberMatcher extends AbstractMatcher<TypeLiteral> {
+	private static class SubscriberMatcher extends AbstractMatcher<TypeLiteral<?>> {
 
 		@Override
-		public boolean matches(TypeLiteral t) {
+		public boolean matches(TypeLiteral<?> t) {
 			Class<?> c = t.getRawType();
 			boolean result = c.isAnnotationPresent(Subscriber.class) ||
 				TaskRunner.class.isAssignableFrom(c) ||

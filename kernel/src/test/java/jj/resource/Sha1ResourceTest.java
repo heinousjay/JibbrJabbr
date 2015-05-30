@@ -16,7 +16,7 @@
 package jj.resource;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
@@ -25,6 +25,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import jj.util.SHA1Helper;
 
 import org.junit.After;
@@ -61,7 +62,7 @@ public class Sha1ResourceTest {
 	
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractResourceDependencies(resourceKey, Base, indexHtml);
+		dependencies = new MockAbstractResourceDependencies(resourceKey, AppBase, indexHtml);
 		
 		Path path = pathFor(indexSha1);
 		if (path != null && Files.exists(path)) {
@@ -90,7 +91,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + size).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));
@@ -103,7 +104,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + (size - 1L)).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));
@@ -114,7 +115,7 @@ public class Sha1ResourceTest {
 	@Test
 	public void testNonExistent() throws Exception {
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, iSha1, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));

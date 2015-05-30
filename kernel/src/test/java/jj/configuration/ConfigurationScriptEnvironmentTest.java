@@ -18,7 +18,7 @@ package jj.configuration;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
 import jj.event.MockPublisher;
@@ -67,7 +67,7 @@ public class ConfigurationScriptEnvironmentTest {
 
 	@Test
 	public void testInitialization() {
-		given(resourceFinder.loadResource(ScriptResource.class, Base, CONFIG_SCRIPT_NAME)).willReturn(configScript);
+		given(resourceFinder.loadResource(ScriptResource.class, AppBase, CONFIG_SCRIPT_NAME)).willReturn(configScript);
 		
 		cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
 		

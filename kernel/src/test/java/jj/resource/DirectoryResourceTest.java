@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import jj.Base;
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class DirectoryResourceTest {
 	@Test
 	public void test() throws IOException {
 		
-		Location base = AppLocation.Base;
+		Location base = AppLocation.AppBase;
 		String name = "helpers";
 		Path path = Base.appPath().resolve(name);
 		

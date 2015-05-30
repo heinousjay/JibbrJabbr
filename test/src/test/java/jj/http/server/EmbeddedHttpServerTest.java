@@ -26,6 +26,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpServer.ResponseReady;
 import jj.testing.JibbrJabbrTestServer;
 
@@ -45,7 +46,7 @@ public class EmbeddedHttpServerTest {
 	EmbeddedHttpServer server;
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.one).injectInstance(this);
 
 	@Test
 	public void test() throws Throwable {

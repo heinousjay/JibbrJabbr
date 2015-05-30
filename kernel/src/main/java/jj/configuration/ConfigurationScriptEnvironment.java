@@ -15,7 +15,7 @@
  */
 package jj.configuration;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
 
 import java.io.IOException;
@@ -74,7 +74,7 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 		
 		publisher.publish(new ConfigurationLoading());
 		
-		config = resourceFinder.loadResource(ScriptResource.class, Base, CONFIG_SCRIPT_NAME);
+		config = resourceFinder.loadResource(ScriptResource.class, AppBase, CONFIG_SCRIPT_NAME);
 		
 		if (config != null) {
 			publisher.publish(new ConfigurationFound(config.path()));

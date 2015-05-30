@@ -18,14 +18,14 @@ package jj.resource;
 import java.io.IOException;
 import java.net.URI;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.event.Publisher;
 import jj.util.SHA1Helper;
 
 class MyResource extends AbstractResource {
 	
 	protected MyResource(String name, Publisher publisher) {
-		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.Base, name, publisher));
+		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.AppBase, name, publisher));
 	}
 
 	@Override

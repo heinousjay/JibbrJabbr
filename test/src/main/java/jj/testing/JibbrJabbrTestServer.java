@@ -21,8 +21,9 @@ import io.netty.util.ResourceLeakDetector.Level;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -64,7 +65,9 @@ public class JibbrJabbrTestServer implements TestRule {
 	
 	private HttpTraceMode mode = Nothing;
 	
-	private final String appPath;
+	private final Path rootPath;
+	
+	private final Path appPath;
 	
 	private boolean fileWatcher = false;
 	
@@ -85,16 +88,9 @@ public class JibbrJabbrTestServer implements TestRule {
 	 * the app parameter.
 	 * @param appPath
 	 */
-	public JibbrJabbrTestServer(final String appPath) {
+	public JibbrJabbrTestServer(final Path rootPath, final Path appPath) {
+		this.rootPath = rootPath;
 		this.appPath = appPath;
-	}
-	
-	/**
-	 * 
-	 */
-	public JibbrJabbrTestServer(final URI appURI) {
-		assert "file".equals(appURI.getScheme()) : "";
-		this.appPath = appURI.getPath();
 	}
 	
 	public JibbrJabbrTestServer verifying() {
@@ -259,6 +255,7 @@ public class JibbrJabbrTestServer implements TestRule {
 	public Statement apply(final Statement base, final Description description) {
 		
 		ArrayList<String> argBuilder = new ArrayList<>();
+		argBuilder.add("server-root=" + rootPath);
 		argBuilder.add("app=" + appPath);
 		argBuilder.add("fileWatcher=" + fileWatcher);
 		argBuilder.add("httpServer=" + httpServer);

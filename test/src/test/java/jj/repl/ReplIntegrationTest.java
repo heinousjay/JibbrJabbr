@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.testing.JibbrJabbrTestServer;
@@ -51,7 +52,7 @@ import org.junit.Test;
 public class ReplIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(App.repl).injectInstance(this);
+	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(ServerRoot.one, App.repl).injectInstance(this);
 	
 	@Inject ReplConfiguration config;
 

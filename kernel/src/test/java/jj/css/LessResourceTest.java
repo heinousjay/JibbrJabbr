@@ -15,7 +15,7 @@
  */
 package jj.css;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -37,7 +37,7 @@ public class LessResourceTest {
 	MockAbstractResourceDependencies dependencies;
 
 	private LessResource lessResource(String name) throws Exception {
-		dependencies = new MockAbstractResourceDependencies(Base, name);
+		dependencies = new MockAbstractResourceDependencies(AppBase, name);
 		
 		Path path = Paths.get(LessResourceTest.class.getResource("/" + name).toURI());
 		

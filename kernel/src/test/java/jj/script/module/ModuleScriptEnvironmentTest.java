@@ -16,7 +16,8 @@
 package jj.script.module;
 
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
@@ -104,7 +105,7 @@ public class ModuleScriptEnvironmentTest {
 	@Test
 	public void testUserScriptModule() {
 		
-		constructScriptModule("module", "module", Base);
+		constructScriptModule("module", "module", AppBase);
 		
 		assertThat(mse.scope().get("inject", mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
@@ -120,7 +121,7 @@ public class ModuleScriptEnvironmentTest {
 	@Test
 	public void testUserJSONModule() {
 		
-		constructJSONModule("module", "module", Base);
+		constructJSONModule("module", "module", AppBase);
 		
 		assertThat(mse.exports(), is(contents));
 	}

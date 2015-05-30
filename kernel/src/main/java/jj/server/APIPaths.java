@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.server;
 
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.*;
-import static jj.configuration.resolution.AppLocation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.List;
-
-import jj.resource.Location;
-
-import org.junit.Test;
+import javax.inject.Qualifier;
 
 /**
  * @author jason
  *
  */
-public class AppLocationTest {
-
-	@Test
-	public void test() {
-		List<Location> locations = Base.and(Private).and(Public).locations();
-		
-		assertThat(locations, contains((Location)Base, Private, Public));
-	}
+@Qualifier
+@Documented
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface APIPaths {
 
 }

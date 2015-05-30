@@ -17,7 +17,7 @@ package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
@@ -46,7 +47,7 @@ import org.junit.Test;
 public class StylesheetResourceIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(App.css).injectInstance(this);
+	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(ServerRoot.one, App.css).injectInstance(this);
 	
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
@@ -66,7 +67,7 @@ public class StylesheetResourceIntegrationTest {
 	// this test fails in eclipse. there's something funky about the classpath i need to figure out
 	@Test
 	public void testLess() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, Base, "less.css");
+		resourceLoader.loadResource(StylesheetResource.class, AppBase, "less.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		
@@ -79,7 +80,7 @@ public class StylesheetResourceIntegrationTest {
 	
 	@Test
 	public void testCss() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, Base, "test.css");
+		resourceLoader.loadResource(StylesheetResource.class, AppBase, "test.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		

@@ -15,7 +15,8 @@
  */
 package jj.http.server;
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 
 import java.util.Map;
 
@@ -58,13 +59,13 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	}
 	
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
-		return resourceLoader.findResource(resourceClass, Base.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
+		return resourceLoader.findResource(resourceClass, AppBase.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
 	}
 	
 	@ResourceThread
 	@Override
 	public <T extends ServableResource> T loadResource(final Class<T> resourceClass, final URIMatch uriMatch, final Route route) {
-		return resourceFinder.loadResource(resourceClass, Base.and(Assets), uriMatch.path); // should be Public.and(Assets)
+		return resourceFinder.loadResource(resourceClass, AppBase.and(Assets), uriMatch.path); // should be Public.and(Assets)
 	}
 
 	@Override
@@ -78,7 +79,7 @@ public class SimpleRouteProcessor implements RouteProcessor {
 
 		if (resource == null) {
 			// TODO - just use the task runner
-			resourceLoader.loadResource(resourceClass, Base.and(Assets), request.uriMatch().path).then(
+			resourceLoader.loadResource(resourceClass, AppBase.and(Assets), request.uriMatch().path).then(
 				new HttpServerTask("post-load, serving " + routeMatch.route()) {
 
 					@Override
@@ -95,7 +96,6 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	
 	private void serve(final ServableResource resource, final HttpServerRequest request, final HttpServerResponse response) {
 		URIMatch match = request.uriMatch();
-		System.out.println(match);
 		try {
 			
 			// if we get nothing, they get nothing

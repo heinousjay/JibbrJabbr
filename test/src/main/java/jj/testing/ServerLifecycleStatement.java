@@ -15,19 +15,29 @@
  */
 package jj.testing;
 
+import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.JJServerLifecycle;
+import jj.configuration.ConfigurationLoaded;
+import jj.event.Listener;
+import jj.event.Subscriber;
 
 import org.junit.runner.Description;
 
 @Singleton
+@Subscriber
 public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 	
 	private final JJServerLifecycle lifecycle;
 	private final TestLog testLog;
 	private final Description description;
+	private final CountDownLatch configured = new CountDownLatch(1);
 	
 	@Inject
 	ServerLifecycleStatement(
@@ -39,6 +49,11 @@ public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 		this.testLog = testLog;
 		this.description = description;
 	}
+	
+	@Listener
+	void on(ConfigurationLoaded event) {
+		configured.countDown();
+	}
 
 	@Override
 	public void evaluate() throws Throwable {
@@ -48,6 +63,7 @@ public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 			testLog.info("{} - test start", description);
 			testLog.info(" Starting the server.");
 			lifecycle.start();
+			assertTrue("configuration load timed out", configured.await(500, TimeUnit.MILLISECONDS));
 			evaluateInner();
 		} finally {
 			lifecycle.stop();

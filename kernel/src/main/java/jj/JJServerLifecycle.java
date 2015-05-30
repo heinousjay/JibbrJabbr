@@ -1,6 +1,7 @@
 package jj;
 
 import static java.util.concurrent.TimeUnit.*;
+import static jj.server.ServerLocation.Root;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -12,20 +13,24 @@ import jj.event.Publisher;
 import jj.execution.JJTask;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
+import jj.server.Server;
 
 @Singleton
 public class JJServerLifecycle {
 
+	private final Server server;
 	private final Publisher publisher;
 	private final TaskRunner taskRunner;
 	private final Version version;
 
 	@Inject
 	JJServerLifecycle(
+		final Server server,
 		final Publisher publisher,
 		final TaskRunner taskRunner,
 		final Version version
 	) {
+		this.server = server;
 		this.publisher = publisher;
 		this.taskRunner = taskRunner;
 		this.version = version;
@@ -33,7 +38,7 @@ public class JJServerLifecycle {
 	
 	public void start() throws Exception {
 
-		ServerStarting startupEvent = new ServerStarting(version);
+		ServerStarting startupEvent = new ServerStarting(server.resolvePath(Root), version);
 		publisher.publish(startupEvent);
 
 		for (ServerStarting.Priority priority : ServerStarting.Priority.values()) {

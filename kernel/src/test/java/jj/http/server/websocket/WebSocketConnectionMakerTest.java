@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.http.server.PipelineStages.*;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import jj.AnswerWithSelf;
-import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
@@ -116,7 +116,7 @@ public class WebSocketConnectionMakerTest {
 		String uri = "/" + sha + "/somethign.socket";
 		given(scriptEnvironment.sha1()).willReturn(sha);
 		given(request.uri()).willReturn(uri);
-		given(resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, new URIMatch(uri).name)).willReturn(scriptEnvironment);
+		given(resourceFinder.findResource(DocumentScriptEnvironment.class, Virtual, new URIMatch(uri).name)).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when
@@ -159,7 +159,7 @@ public class WebSocketConnectionMakerTest {
 		String uri = "/1234567890123456789012345678901234567890/uri.socket";
 		given(request.uri()).willReturn(uri);
 		given(scriptEnvironment.sha1()).willReturn("ABCDEF");
-		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), eq(AppLocation.Virtual), anyString())).willReturn(scriptEnvironment);
+		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), eq(Virtual), anyString())).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when

@@ -6,7 +6,7 @@ import jj.execution.JJTask;
 public class MockServerStarting extends ServerStarting {
 
 	public MockServerStarting() {
-		super(mock(Version.class));
+		super(null, mock(Version.class));
 	}
 	
 	public Priority priority;

@@ -3,13 +3,13 @@ package jj.document.servable;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.resolution.Assets.*;
+import static jj.server.ServerLocation.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.ScriptResourceType;
@@ -75,9 +75,9 @@ public class ScriptHelperDocumentFilterTest {
 		given(documentRequestProcessor.document()).willReturn(document);
 		given(documentRequestProcessor.httpRequest()).willReturn(httpRequest);
 		
-		given(resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JQUERY_JS))
+		given(resourceFinder.findResource(StaticResource.class, Assets, JQUERY_JS))
 			.willReturn(jqueryJs);
-		given(resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS))
+		given(resourceFinder.findResource(StaticResource.class, Assets, JJ_JS))
 			.willReturn(jjJs);
 		
 		given(jqueryJs.serverPath()).willReturn(JQUERY_URI);

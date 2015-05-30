@@ -16,7 +16,7 @@
 package jj.resource;
 
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import jj.event.MockPublisher;
 import jj.event.Publisher;
 import jj.resource.AbstractResource.Dependencies;
@@ -108,7 +108,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	}
 	
 	{
-		given(abstractResourceDependencies.resourceFinder.findResource(DirectoryResource.class, Base, "")).willReturn(rootDirectory);
+		given(abstractResourceDependencies.resourceFinder.findResource(DirectoryResource.class, AppBase, "")).willReturn(rootDirectory);
 		given(abstractResourceDependencies.resourceConfiguration.maxFileSizeToLoad()).willReturn(1024 * 1024 * 10L);
 		FileTypeSettingsDefaultProvider provider = new FileTypeSettingsDefaultProvider();
 		given(abstractResourceDependencies.resourceConfiguration.fileTypeSettings()).willReturn(provider.get());

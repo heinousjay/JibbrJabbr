@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.application;
 
+import static jj.server.ServerLocation.*;
 import static org.mockito.Mockito.mock;
 
 import java.nio.file.Path;
 
 import jj.Base;
+import jj.application.AppLocation;
+import jj.application.Application;
 import jj.configuration.Arguments;
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.Application;
 import jj.resource.Location;
+import jj.server.Server;
 
 /**
  * @author jason
@@ -37,23 +39,22 @@ public class MockApplication extends Application {
 	 * @param arguments
 	 */
 	public MockApplication() {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules());
-		basePath = Base.path;
+		this(Base.path);
 	}
 	
 	public MockApplication(final Path basePath) {
-		super(mock(Arguments.class), new MockAssets(), new MockAPIModules());
+		super(mock(Arguments.class), mock(Server.class));
 		this.basePath = basePath;
 	}
 	
 	@Override
-	public Path path() {
-		return basePath;
+	public boolean pathInBase(Path path) {
+		return path.startsWith(basePath);
 	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {
-		if (base != AppLocation.Assets && base != AppLocation.Virtual) {
+		if (base != Assets && base != Virtual) {
 			return basePath.resolve(((AppLocation)base).path()).resolve(name);
 		}
 		return super.resolvePath(base, name);

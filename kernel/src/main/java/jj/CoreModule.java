@@ -16,6 +16,7 @@
 package jj;
 
 
+import jj.application.ApplicationModule;
 import jj.configuration.CommandLine;
 import jj.configuration.ConfigurationModule;
 import jj.conversion.ConversionModule;
@@ -31,6 +32,7 @@ import jj.logging.LoggingModule;
 import jj.repl.ReplModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
+import jj.server.ServerModule;
 import jj.http.HttpModule;
 
 /**
@@ -70,6 +72,8 @@ public class CoreModule extends JJModule {
 		bindLoggedEventsAnnotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		
 		// first our key pieces
+		install(new ServerModule());
+		install(new ApplicationModule());
 		install(new ConfigurationModule());
 		install(new ConversionModule());
 		install(new EventModule());
@@ -90,6 +94,7 @@ public class CoreModule extends JJModule {
 		// of the script feature, so the require function should come
 		// from there.  broadcast is provided by the websocket system,
 		// so it should come from there.
+		// hey, i did those!
 		install(new HostApiModule());
 		
 		// this is part of the Document system, and should probably be renamed

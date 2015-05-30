@@ -16,7 +16,7 @@
 package jj.jasmine;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
@@ -24,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceFinder;
@@ -42,7 +43,7 @@ import org.junit.Test;
 public class JasmineIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer jj = new JibbrJabbrTestServer(App.jasmine).injectInstance(this);
+	public JibbrJabbrTestServer jj = new JibbrJabbrTestServer(ServerRoot.one, App.jasmine).injectInstance(this);
 	
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
@@ -70,8 +71,8 @@ public class JasmineIntegrationTest {
 		latch = new CountDownLatch(2);
 		
 		// loading a script resource triggers the jasmine run
-		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test.js");
-		resourceLoader.loadResource(ScriptResource.class, Base, "jasmine-int-test-failures.js");
+		resourceLoader.loadResource(ScriptResource.class, AppBase, "jasmine-int-test.js");
+		resourceLoader.loadResource(ScriptResource.class, AppBase, "jasmine-int-test-failures.js");
 		
 		// takes about 1 second locally
 		// maybe externalize timeouts?  or produce a factor on travis?

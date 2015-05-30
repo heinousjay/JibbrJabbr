@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;

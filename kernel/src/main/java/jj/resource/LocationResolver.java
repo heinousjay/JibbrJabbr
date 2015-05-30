@@ -13,25 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.resource;
 
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import jj.ResourceResolver;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author jason
  *
  */
-@Singleton
-public class APIModules extends InternalAssets {
-
+public interface LocationResolver {
 	
-	@Inject
-	APIModules(final ResourceResolver resolver, final @APIPaths Set<String> paths) {
-		super(resolver, paths);
-	}
+	/**
+	 * True if the given path is in the base
+	 */
+	boolean pathInBase(Path path);
+
+	/**
+	 * resolve the given location and name against
+	 * the base path
+	 */
+	Path resolvePath(Location base, String name);
+	
+	Location resolveBase(Path path);
+	
+	/**
+	 * enumerate the paths that this resolver wants watched for changes
+	 */
+	List<Location> watchedLocations();
+
 }

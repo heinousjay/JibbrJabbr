@@ -15,7 +15,7 @@
  */
 package jj.i18n;
 
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.Locale;
 

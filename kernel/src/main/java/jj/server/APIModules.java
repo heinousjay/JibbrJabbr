@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.server;
 
 import java.util.Set;
 
@@ -23,24 +23,15 @@ import javax.inject.Singleton;
 import jj.ResourceResolver;
 
 /**
- * registration point for asset directories? something like that
- * 
  * @author jason
  *
  */
 @Singleton
-public class Assets extends InternalAssets {
-	
-	// these are kinda goofy?
-	public static final String JJ_JS = "jj.js";
-	public static final String JQUERY_JS_DEV = "jquery-2.0.3.js";
-	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
-	public static final String JQUERY_JS_MAP = "jquery-2.0.3.min.map";
-	public static final String FAVICON_ICO = "favicon.ico";
-	public static final String ERROR_404 = "errors/404.html";
+public class APIModules extends InternalAssets {
+
 	
 	@Inject
-	protected Assets(final ResourceResolver resolver, final @AssetPaths Set<String> paths) {
+	APIModules(final ResourceResolver resolver, final @APIPaths Set<String> paths) {
 		super(resolver, paths);
 	}
 }

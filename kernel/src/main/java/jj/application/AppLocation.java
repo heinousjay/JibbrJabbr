@@ -13,31 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration;
+package jj.application;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jj.BootstrapClassPath;
-import jj.configuration.resolution.InternalAssets;
+import jj.resource.Location;
 
 /**
+ * <p>
+ * Type safe way to represent the locations of resources in the application structure
+ * </p>
+ * 
+ * <pre>
+ * (root location)
+ * |-config.js
+ * \--private
+ *  |-private-specs
+ *  |-public
+ *  |-public-specs
+ * </pre>
+ * 
  * @author jason
  *
  */
-public class TestableAssets extends InternalAssets {
+public enum AppLocation implements Location {
 	
-	private static final Set<String> paths;
+	/** the paths of the application pieces */
+	AppBase(""),
+	Private("private/"),
+	Specs("specs/"),
+	Public("public/");
 	
-	static {
-		
-		paths = new HashSet<>();
-		paths.add("/jj/assets/");
+	private final String path;
+	
+	private AppLocation(String path) {
+		this.path = path;
 	}
-
 	
-	public TestableAssets() {
-		super(new BootstrapClassPath(), paths);
+	String path() {
+		return path;
 	}
-
+	
+	@Override
+	public boolean parentInDirectory() {
+		return true;
+	}
 }

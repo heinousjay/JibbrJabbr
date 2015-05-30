@@ -16,6 +16,7 @@
 package jj.http.server.websocket;
 
 import static jj.http.server.PipelineStages.*;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.Set;
 
@@ -35,7 +36,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
@@ -113,7 +113,7 @@ public class WebSocketConnectionMaker {
 					WebSocketConnectionHost host = null;
 					
 					for (Class<? extends WebSocketConnectionHost> hostClass : webSocketConnectionHostClasses) {
-						host = resourceFinder.findResource(hostClass, AppLocation.Virtual, uriMatch.name);
+						host = resourceFinder.findResource(hostClass, Virtual, uriMatch.name);
 						if (host != null) break;
 					}
 					

@@ -27,7 +27,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.execution.ExecutionInstance;
@@ -63,6 +63,11 @@ import jj.util.SHA1Helper;
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
 	implements ExecutionLifecycleAware, RootScriptEnvironment, ServableResource {
+	
+	public static final String JJ_JS = "jj.js";
+	public static final String JQUERY_JS_DEV = "jquery-2.0.3.js";
+	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
+	public static final String JQUERY_JS_MAP = "jquery-2.0.3.min.map";
 	
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	
@@ -105,15 +110,15 @@ public class DocumentScriptEnvironment
 	) {
 		super(dependencies);
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, resourceName(name));
+		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, resourceName(name));
 		
 		if (html == null) {
 			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(name));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(name));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(name));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(name));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(name));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(name));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),

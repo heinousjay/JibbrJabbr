@@ -13,32 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.configuration.resolution;
+package jj.server;
+
+import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import jj.BootstrapClassPath;
-import jj.configuration.resolution.APIModules;
+import jj.server.Assets;
+
+import org.junit.Test;
 
 /**
  * @author jason
  *
  */
-public class MockAPIModules extends APIModules {
-	
-	private static final Set<String> paths = new HashSet<>();
-	
-	static {
-		paths.add("/jj/script/api");
-	}
+public class AssetsTest {
 
-	/**
-	 * @param resolver
-	 */
-	public MockAPIModules() {
+	@Test
+	public void test() {
+		Set<String> paths = new HashSet<>();
+		paths.add("/jj/assets");
 		
-		super(new BootstrapClassPath(), paths);
+		Assets assets = new Assets(new BootstrapClassPath(), paths);
+		
+		assertThat(assets.path("jj.js"), is(notNullValue()));
+		
+		// NEEDS A BETTER TEST
+		assertThat(assets.path("jj1.js"), is(Assets.NOT_FOUND));
+		
+		
 	}
 
 }

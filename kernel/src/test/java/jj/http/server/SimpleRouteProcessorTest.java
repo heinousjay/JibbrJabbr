@@ -15,7 +15,8 @@
  */
 package jj.http.server;
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.HashMap;
@@ -101,7 +102,7 @@ public class SimpleRouteProcessorTest {
 	private void givenResourceRequest(String uri) {
 		URIMatch match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(resourceLoader.findResource(StaticResource.class, Base.and(Assets), match.path)).willReturn(resource);
+		given(resourceLoader.findResource(StaticResource.class, AppBase.and(Assets), match.path)).willReturn(resource);
 	}
 	
 	@Test

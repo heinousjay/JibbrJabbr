@@ -24,8 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.configuration.resolution.AppLocation;
-import jj.configuration.resolution.MockApplication;
+import jj.application.AppLocation;
+import jj.application.MockApplication;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.script.MockRhinoContextProvider;
 
@@ -55,7 +55,7 @@ public class ScriptResourceTest {
 	
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractResourceDependencies(AppLocation.Base, NAME);
+		dependencies = new MockAbstractResourceDependencies(AppLocation.AppBase, NAME);
 		contextProvider = new MockRhinoContextProvider();
 		rootPath = Paths.get(ScriptResourceTest.class.getResource("/jj/script/module/test.js").toURI()).getParent();
 		app = new MockApplication(rootPath);

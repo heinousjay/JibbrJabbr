@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.configuration.resolution.AppLocation.Assets;
+import static jj.server.ServerLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 

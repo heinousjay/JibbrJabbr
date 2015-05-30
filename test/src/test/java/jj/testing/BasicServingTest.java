@@ -17,7 +17,9 @@ package jj.testing;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.Assets.*;
+import static jj.server.Assets.*;
+import static jj.document.DocumentScriptEnvironment.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,9 +27,11 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
@@ -74,7 +78,7 @@ public class BasicServingTest {
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(App.one)
+		new JibbrJabbrTestServer(ServerRoot.one, App.one)
 		.verifying()
 		//.recording()
 		.injectInstance(this);
