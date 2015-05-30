@@ -107,20 +107,40 @@ public abstract class AbstractResource implements Resource {
 
 	protected static final Object[] EMPTY_ARGS = {};
 	
+	/**
+	 * The key that identifies this resource in the cache
+	 */
 	protected final ResourceKey cacheKey;
 	
+	/**
+	 * The configured location that housed this resource,
+	 * as specified by the load request
+	 */
 	protected final Location base;
 	
+	/**
+	 * The name of this resource, as specified by the load
+	 * request
+	 */
 	protected final String name;
 	
+	/**
+	 * When this resource was created according to the system {@link Clock}
+	 */
 	protected final long creationTime;
 	
 	protected final Publisher publisher;
 	
 	protected final ResourceFinder resourceFinder;
 	
+	/**
+	 * The configuration of the resource system
+	 */
 	protected final ResourceConfiguration resourceConfiguration;
 
+	/**
+	 * The resolved settings for this resource
+	 */
 	protected final ResourceSettings settings;
 	
 	private final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
