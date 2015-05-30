@@ -1,0 +1,1 @@
+require('jj/uri-routing-configuration').route.GET("/").to.document('index');
