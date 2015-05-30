@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 import jj.http.server.uri.URIMatch;
 import jj.util.Sequence;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.AsciiString;
+import io.netty.util.AsciiString;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;

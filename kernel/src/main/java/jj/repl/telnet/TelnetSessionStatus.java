@@ -17,7 +17,7 @@ package jj.repl.telnet;
 
 import static jj.repl.telnet.TelnetProtocol.*;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufProcessor;
+import io.netty.util.ByteProcessor;
 import io.netty.buffer.Unpooled;
 
 /**
@@ -33,7 +33,7 @@ class TelnetSessionStatus {
 	
 	
 	TelnetSessionStatus parseResponse(final ByteBuf byteBuf) {
-		int index = Unpooled.wrappedBuffer(byteBuf).forEachByte(new ByteBufProcessor() {
+		int index = Unpooled.wrappedBuffer(byteBuf).forEachByte(new ByteProcessor() {
 			
 			@Override
 			public boolean process(byte value) throws Exception {

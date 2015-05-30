@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufProcessor;
+import io.netty.util.ByteProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -155,7 +155,7 @@ class TelnetConnectionHandler extends SimpleChannelInboundHandler<ByteBuf> {
 	
 	private void dumpBuffer(String message, ByteBuf buffer) {
 		System.out.println(message);
-		buffer.forEachByte(new ByteBufProcessor() {
+		buffer.forEachByte(new ByteProcessor() {
 			
 			@Override
 			public boolean process(byte value) throws Exception {
