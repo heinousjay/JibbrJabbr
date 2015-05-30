@@ -298,7 +298,7 @@ public abstract class AbstractResource implements Resource {
 	 * make something of the information. the base implementation does nothing
 	 */
 	protected void died() {
-		// mainly to allow AbstractScriptEnvironment to publish its own death event
+		// mainly to allow descendants to publish their own death event
 	}
 	
 	@Override
