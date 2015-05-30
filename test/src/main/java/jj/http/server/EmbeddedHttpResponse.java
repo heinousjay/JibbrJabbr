@@ -20,6 +20,7 @@ import io.netty.buffer.CompositeByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.ReferenceCountUtil;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,7 @@ public class EmbeddedHttpResponse {
 	
 	volatile HttpResponse response;
 	
-	final CompositeByteBuf buffer = ByteBufAllocator.DEFAULT.compositeBuffer();
+	final CompositeByteBuf buffer = ReferenceCountUtil.releaseLater(ByteBufAllocator.DEFAULT.compositeBuffer());
 
 	EmbeddedHttpResponse() {
 		this(null);
@@ -65,7 +66,7 @@ public class EmbeddedHttpResponse {
 		return this;
 	}
 	
-	void responseReady() {
+	void responseReady() throws Exception {
 		responded.countDown();
 		if (responseReady != null) {
 			responseReady.ready(this);
@@ -79,7 +80,7 @@ public class EmbeddedHttpResponse {
 	
 	public HttpResponseStatus status() throws Throwable {
 		checkError();
-		return (responded.getCount() == 0) ? response.getStatus() : null;
+		return (responded.getCount() == 0) ? response.status() : null;
 	}
 	
 	public String bodyContentAsString() throws Throwable {

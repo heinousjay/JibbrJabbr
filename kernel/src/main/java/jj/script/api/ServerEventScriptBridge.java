@@ -39,7 +39,6 @@ import com.google.inject.Injector;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.TaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
 import jj.script.ScriptEnvironmentDied;
@@ -90,9 +89,8 @@ public class ServerEventScriptBridge {
 		superClass = classPool.get(ServerEventCallableInvoker.class.getName());
 		
 		CtClass taskRunner = classPool.get(TaskRunner.class.getName());
-		CtClass continuationCoordinator = classPool.get(ContinuationCoordinator.class.getName());
 		
-		superConstructor = superClass.getDeclaredConstructor(new CtClass[] {taskRunner, continuationCoordinator});
+		superConstructor = superClass.getDeclaredConstructor(new CtClass[] {taskRunner});
 	}
 	
 	private String generateInvokerClassName(String eventClassName) {

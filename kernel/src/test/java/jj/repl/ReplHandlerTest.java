@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -23,7 +23,6 @@ import static org.mockito.BDDMockito.*;
 import io.netty.channel.ChannelHandlerContext;
 import jj.execution.MockTaskRunner;
 import jj.resource.ResourceFinder;
-import jj.script.ContinuationCoordinator;
 import jj.script.MockRhinoContextProvider;
 
 import org.junit.Before;
@@ -42,7 +41,6 @@ public class ReplHandlerTest {
 	
 	@Mock ResourceFinder resourceFinder;
 	MockTaskRunner taskRunner;
-	@Mock ContinuationCoordinator continuationCoordinator;
 	MockRhinoContextProvider contextProvider;
 	
 	ReplHandler rh;
@@ -61,7 +59,6 @@ public class ReplHandlerTest {
 		rh = new ReplHandler(
 			resourceFinder,
 			taskRunner,
-			continuationCoordinator,
 			new CurrentReplChannelHandlerContext(),
 			contextProvider
 		);
@@ -80,7 +77,7 @@ public class ReplHandlerTest {
 	@Test
 	public void testEmptyMessage() throws Exception {
 		
-		rh.channelRead0(ctx, "   \n\r\n\r\n   ");
+		rh.messageReceived(ctx, "   \n\r\n\r\n   ");
 
 		verify(ctx).writeAndFlush(">");
 		
@@ -91,11 +88,11 @@ public class ReplHandlerTest {
 	public void testMessageSuccess() throws Exception {
 		
 		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl-console")).willReturn(script);
-		rh.channelRead0(ctx, "something");
+		rh.messageReceived(ctx, "something");
 		
 		taskRunner.runFirstTask();
 		
-		verify(continuationCoordinator).execute(rse, script);
+		verify(rse).execute(script);
 	}
 	
 	@Test
@@ -104,7 +101,7 @@ public class ReplHandlerTest {
 		RuntimeException e = new RuntimeException("this is an exception");
 
 		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl-console")).willThrow(e);
-		rh.channelRead0(ctx, "something");
+		rh.messageReceived(ctx, "something");
 		
 		verify(ctx).writeAndFlush(e.getMessage() + "\n>");
 		

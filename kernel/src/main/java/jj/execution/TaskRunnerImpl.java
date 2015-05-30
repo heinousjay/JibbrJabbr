@@ -96,6 +96,10 @@ class TaskRunnerImpl implements TaskRunner {
 				} catch (InterruptedException ie) {
 					Thread.interrupted(); // clear the status in case the thread can get reused
 					interrupted = true;
+				} catch (AssertionError ae) {
+					System.err.println("ASSERTION TRIPPED");
+					ae.printStackTrace();
+					System.exit(1);
 				} catch (OutOfMemoryError e) {
 					throw e; // just in case
 				} catch (Throwable t) {

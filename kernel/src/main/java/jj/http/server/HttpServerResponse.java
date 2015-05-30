@@ -16,7 +16,8 @@
 package jj.http.server;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.util.AsciiString;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
@@ -34,7 +35,7 @@ import jj.resource.Resource;
  */
 public interface HttpServerResponse {
 	
-	public static final String MAX_AGE_ONE_YEAR = HttpHeaders.Values.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
+	public static final String MAX_AGE_ONE_YEAR = HttpHeaderValues.MAX_AGE + "=" + String.valueOf(60 * 60 * 24 * 365);
 
 	/**
 	 * Retrieve the status of the outgoing response.  Defaults to
@@ -57,7 +58,7 @@ public interface HttpServerResponse {
 	 * @param value
 	 * @return
 	 */
-	HttpServerResponse header(String name, String value);
+	HttpServerResponse header(AsciiString name, CharSequence value);
 	
 	/**
 	 * Set the header by name and value, if no header by this
@@ -66,7 +67,7 @@ public interface HttpServerResponse {
 	 * @param value
 	 * @return
 	 */
-	HttpServerResponse headerIfNotSet(String name, String value);
+	HttpServerResponse headerIfNotSet(AsciiString name, CharSequence value);
 
 	/**
 	 * Set the header by name and value, if no header by this
@@ -75,22 +76,24 @@ public interface HttpServerResponse {
 	 * @param value
 	 * @return
 	 */
-	HttpServerResponse headerIfNotSet(String name, long value);
+	HttpServerResponse headerIfNotSet(AsciiString name, long value);
 
 	/**
 	 * @param name
 	 * @return
 	 */
-	boolean containsHeader(String name);
+	boolean containsHeader(AsciiString name);
 
-	HttpServerResponse header(String name, Date date);
+	HttpServerResponse header(AsciiString name, Date date);
 
-	HttpServerResponse header(String name, long value);
+	HttpServerResponse header(AsciiString name, long value);
+
+	CharSequence header(AsciiString name);
 
 	/**
 	 * @return
 	 */
-	List<Entry<String, String>> allHeaders();
+	List<Entry<CharSequence, CharSequence>> allHeaders();
 
 	HttpVersion version();
 
@@ -130,8 +133,6 @@ public interface HttpServerResponse {
 	 * @return
 	 */
 	Charset charset();
-
-	String header(String name);
 
 	/**
 	 * @return

@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 
 /**
  * <p>
- * represent a resource in the resource system
+ * represents a resource in the resource system
  * 
  * <p>
  * do not implement this directly, extend {@link AbstractResource} instead
@@ -43,8 +43,10 @@ public interface Resource {
 	Charset charset();
 
 	/**
-	 * Adds a dependent resource to this resource, which will propagate
-	 * reloads to the dependent
+	 * add a resource as a dependent to this resource. if this resource is killed, that will
+	 * be propagated to all dependents in turn. there is no such idea as removing dependents,
+	 * outside of resource death, so semantically it is important to arrange that a permanent
+	 * relationship makes sense
 	 */
 	void addDependent(Resource dependent);
 	

@@ -36,6 +36,16 @@ $(function() {
 	});
 	//powerTipIt($('#users>div, #chatbox>div'));
 });
+// localStorage is a pain in phantomJS at the moment, so we're not using it
+var storage = {};
+
+function fStore(key, value){
+	storage[key] = value;
+}
+
+function fRetrieve(key) {
+	return storage[key];
+}
 
 function showUserNameModal() {
 	$('#user-name-modal').modal({

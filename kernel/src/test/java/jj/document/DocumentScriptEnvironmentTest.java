@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.document.CurrentDocumentRequestProcessor;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.DocumentWebSocketMessageProcessors;
@@ -34,15 +34,15 @@ import jj.document.ScriptCompiler;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.http.server.websocket.CurrentWebSocketConnection;
+import jj.http.server.websocket.MockAbstractWebSocketConnectionHostDependencies;
 import jj.http.server.websocket.MockCurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
-import jj.script.ContinuationPendingKey;
-import jj.script.ExecutionEvent;
-import jj.script.MockAbstractScriptEnvironmentDependencies;
+import jj.script.PendingKey;
+import jj.script.ScriptSystemEvent;
 import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
 import jj.util.Closer;
@@ -73,7 +73,7 @@ public class DocumentScriptEnvironmentTest {
 	
 	ResourceKey cacheKey;
 	MockRhinoContextProvider contextMaker;
-	MockAbstractScriptEnvironmentDependencies dependencies;
+	MockAbstractWebSocketConnectionHostDependencies dependencies;
 	
 	@Mock WebSocketConnection connection;
 	
@@ -81,7 +81,7 @@ public class DocumentScriptEnvironmentTest {
 	
 	CurrentWebSocketConnection currentConnection;
 	
-	@Captor ArgumentCaptor<ExecutionEvent> eventCaptor;
+	@Captor ArgumentCaptor<ScriptSystemEvent> eventCaptor;
 
 	@Before
 	public void before() throws Exception {
@@ -94,28 +94,28 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void makeResourceDependencies(String name) {
-		dependencies = new MockAbstractScriptEnvironmentDependencies(name, resourceFinder);
+		dependencies = new MockAbstractWebSocketConnectionHostDependencies(name, resourceFinder);
 		
-		cacheKey = dependencies.resourceCacheKey();
-		contextMaker = dependencies.rhinoContextProvider();
+		cacheKey = dependencies.cacheKey();
+		contextMaker = dependencies.mockRhinoContextProvider();
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
 		given(contextMaker.context.newChainedScope(any(Scriptable.class))).willReturn(local);
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
-		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, baseName + ".html")).willReturn(html);
+		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, baseName + ".html")).willReturn(html);
 	}
 
 	private void givenAClientScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenASharedScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenAServerScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
 	}
 	
 	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {
@@ -134,7 +134,7 @@ public class DocumentScriptEnvironmentTest {
 	@Test
 	public void testManagesContext() throws Exception {
 		
-		ContinuationPendingKey key = new ContinuationPendingKey();
+		PendingKey key = new PendingKey();
 		String name = "index";
 		
 		givenAnHtmlResource(name);
@@ -325,10 +325,10 @@ public class DocumentScriptEnvironmentTest {
 		assertThat(result.nextConnection(), is(true));
 		assertThat(iterated1.remove(result.currentConnection()), is(true));
 		
-		ContinuationPendingKey key = new ContinuationPendingKey();
+		PendingKey key = new PendingKey();
 		
 		result.captureContextForKey(key);
-		result.exitedCurrentScope();
+		result.exitedScope();
 		
 		assertThat(result.currentConnection(), is(nullValue()));
 		

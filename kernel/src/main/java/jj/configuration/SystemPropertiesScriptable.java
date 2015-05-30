@@ -26,7 +26,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 /**
  * <p>
- * Exposes the environment variables of the process to the script API
+ * Exposes the system properties of the process to the script API
  * 
  * <p>
  * may make this a per-request instance? in which case allow the prototype

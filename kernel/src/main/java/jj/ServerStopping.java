@@ -30,7 +30,7 @@ public class ServerStopping extends LoggedEvent {
 
 	@Override
 	public void describeTo(Logger logger) {
-		logger.info("Stopping the server");
+		logger.info("Shutting down");
 	}
 
 }

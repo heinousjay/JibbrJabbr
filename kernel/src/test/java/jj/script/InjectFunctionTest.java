@@ -36,12 +36,10 @@ import com.google.inject.Injector;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class InjectFunctionTest {
-	
-	public static final String NAME = InjectFunction.NAME;
 
 	@Mock Injector injector;
 	
-	@InjectMocks InjectFunction ibf;
+	@InjectMocks InjectFunction inject;
 	
 	@Mock ScriptEnvironment se;
 	
@@ -53,11 +51,11 @@ public class InjectFunctionTest {
 		given(injector.getInstance(ScriptEnvironment.class)).willReturn(se);
 		given(injector.getInstance(CurrentScriptEnvironment.class)).willReturn(cse);
 		
-		Object result = ibf.call(null, null, null, new Object[] {ScriptEnvironment.class.getName()});
+		Object result = inject.call(null, null, null, new Object[] {ScriptEnvironment.class.getName()});
 		
 		assertThat(result, is((Object)se));
 		
-		result = ibf.call(null, null, null, new Object[] {CurrentScriptEnvironment.class.getName()});
+		result = inject.call(null, null, null, new Object[] {CurrentScriptEnvironment.class.getName()});
 		
 		assertThat(result, is((Object)cse));
 	}

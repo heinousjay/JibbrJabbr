@@ -16,6 +16,7 @@
 package jj;
 
 
+import jj.application.ApplicationModule;
 import jj.configuration.CommandLine;
 import jj.configuration.ConfigurationModule;
 import jj.conversion.ConversionModule;
@@ -31,6 +32,7 @@ import jj.logging.LoggingModule;
 import jj.repl.ReplModule;
 import jj.resource.ResourceModule;
 import jj.script.ScriptModule;
+import jj.server.ServerModule;
 import jj.http.HttpModule;
 
 /**
@@ -40,7 +42,6 @@ import jj.http.HttpModule;
 public class CoreModule extends JJModule {
 	
 	private final String [] args;
-	private final boolean isTest;
 	private final ResourceResolver resourceResolver;
 	
 	public CoreModule(final String[] args) {
@@ -49,7 +50,6 @@ public class CoreModule extends JJModule {
 	
 	public CoreModule(final String [] args, final ResourceResolver resourceResolver) {
 		this.args = args;
-		this.isTest = resourceResolver == null;
 		this.resourceResolver = resourceResolver == null ? new BootstrapClassPath() : resourceResolver;
 	}
 
@@ -60,18 +60,20 @@ public class CoreModule extends JJModule {
 		bindScope(CreationScoped.class, creationScope);
 		bind(CreationScope.class).toInstance(creationScope);
 		
+		// we need the logging module to configure our async logger before we do anything that might log
+		// this is no longer true! but who cares!
+		install(new LoggingModule());
+		
 		// bind up the command line args
 		bind(String[].class).annotatedWith(CommandLine.class).toInstance(args);
 		bind(ResourceResolver.class).toInstance(resourceResolver);
 		bind(Version.class).to(VersionImpl.class);
 		
-		bindLoggedEvents().annotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
-		
-		// we need the logging module to configure our async logger before we do anything that might log
-		// this is no longer true! but who cares!
-		install(new LoggingModule(isTest));
+		bindLoggedEventsAnnotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		
 		// first our key pieces
+		install(new ServerModule());
+		install(new ApplicationModule());
 		install(new ConfigurationModule());
 		install(new ConversionModule());
 		install(new EventModule());
@@ -92,6 +94,7 @@ public class CoreModule extends JJModule {
 		// of the script feature, so the require function should come
 		// from there.  broadcast is provided by the websocket system,
 		// so it should come from there.
+		// hey, i did those!
 		install(new HostApiModule());
 		
 		// this is part of the Document system, and should probably be renamed

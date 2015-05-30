@@ -15,7 +15,7 @@
  */
 package jj.script.module;
 
-import static jj.configuration.resolution.AppLocation.Base;
+import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -56,15 +56,15 @@ public class JSONResourceTest {
 	@Test
 	public void test() throws Exception {
 		
-		JSONResource r = new JSONResource(new MockAbstractResourceDependencies(Base, "test.json"), rootPath.resolve("test1.json"), global, contextProvider);
+		JSONResource r = new JSONResource(new MockAbstractResourceDependencies(AppBase, "test.json"), rootPath.resolve("test1.json"), global, contextProvider);
 		
 		assertThat(r.contents(), is("this is a string"));
 		
-		r = new JSONResource(new MockAbstractResourceDependencies(Base, "test.json"), rootPath.resolve("test2.json"), global, contextProvider);
+		r = new JSONResource(new MockAbstractResourceDependencies(AppBase, "test.json"), rootPath.resolve("test2.json"), global, contextProvider);
 		
 		assertThat(r.contents(), is(23123));
 		
-		r = new JSONResource(new MockAbstractResourceDependencies(Base, "test.json"), rootPath.resolve("test3.json"), global, contextProvider);
+		r = new JSONResource(new MockAbstractResourceDependencies(AppBase, "test.json"), rootPath.resolve("test3.json"), global, contextProvider);
 		
 		assertThat(r.contents(), is(instanceOf(Scriptable.class)));
 		Scriptable c = (Scriptable)r.contents();

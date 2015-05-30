@@ -26,7 +26,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 
@@ -189,7 +189,7 @@ public class ResourceWatchServiceLoopTest {
 		verify(resource5).kill();
 		verify(publisher, times(5)).publish(isA(ResourceKilled.class));
 		
-		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.Base, resource5.name());
+		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.AppBase, resource5.name());
 	}
 
 }

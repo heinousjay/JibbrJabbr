@@ -29,10 +29,8 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	
 	protected final T scriptEnvironment;
 	
-	protected final ContinuationCoordinator continuationCoordinator;
-	
 	/** assign the result of any operation against the ContinuationCoordinator to this field */
-	protected ContinuationPendingKey pendingKey;
+	protected PendingKey pendingKey;
 	
 	/** 
 	 * if this field is populated when the task is run, call the resume on the ContinuationCoordinator
@@ -45,10 +43,9 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 */
 	protected Object result;
 	
-	protected ScriptTask(final String name, final T scriptEnvironment, final ContinuationCoordinator continuationCoordinator) {
+	protected ScriptTask(final String name, final T scriptEnvironment) {
 		super(name);
 		this.scriptEnvironment = scriptEnvironment;
-		this.continuationCoordinator = continuationCoordinator;
 	}
 	
 	@Override
@@ -65,7 +62,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 		if (pendingKey == null) {
 			complete();
 		} else {
-			continuationCoordinator.awaitContinuation(this);
+			((AbstractScriptEnvironment)scriptEnvironment).awaitContinuation(this);
 		}
 	}
 	
@@ -76,14 +73,11 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	protected abstract void begin() throws Exception;
 	
 	/**
-	 * Implement this method to have control over resumption.  If all you do is pass the result
-	 * to the ContinuationCoordinator, don't worry about it, you're covered
-	 * @throws Exception
+	 * Resumes executing the task
 	 */
-	protected void resume() throws Exception {
-		pendingKey = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, result);
+	void resume() {
+		pendingKey = ((AbstractScriptEnvironment)scriptEnvironment).resumeContinuation(pendingKey, result);
 	}
-	
 	/**
 	 * Implement this method to run after completion of either the begin or resume methods, when no
 	 * continuation is pending. this will only be called if the begin/resume methods complete 
@@ -105,7 +99,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 * be sure to store the key for resumption
 	 * @return
 	 */
-	final ContinuationPendingKey pendingKey() {
+	final PendingKey pendingKey() {
 		return pendingKey;
 	}
 	

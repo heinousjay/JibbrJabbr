@@ -15,30 +15,15 @@
  */
 package jj.script;
 
-import org.slf4j.Logger;
-
-import jj.logging.EmergencyLogger;
-import jj.logging.LoggedEvent;
+import jj.logging.Emergency;
 
 /**
  * @author jason
  *
  */
-@EmergencyLogger
-public class ScriptExecutionError extends LoggedEvent {
-	
-	private final ScriptEnvironment scriptEnvironment;
-	private final Throwable t;
+public class ScriptExecutionError extends Emergency {
 	
 	ScriptExecutionError(final ScriptEnvironment scriptEnvironment, final Throwable t) {
-		this.scriptEnvironment = scriptEnvironment;
-		this.t = t;
+		super("unexpected problem during script execution " + scriptEnvironment, t);
 	}
-
-	@Override
-	public void describeTo(Logger logger) {
-		logger.error("unexpected problem during script execution {}", scriptEnvironment);
-		logger.error("", t);
-	}
-
 }

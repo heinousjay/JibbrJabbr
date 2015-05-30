@@ -24,5 +24,5 @@ import java.util.Map;
 public enum ContinuationPendingKeyResultExtractor {
 	;
 	
-	public static Map<ContinuationPendingKey, Object> RESULT_MAP = ContinuationPendingKeyResultExtractorHelper.RESULT_MAP;
+	public static Map<PendingKey, Object> RESULT_MAP = ContinuationPendingKeyResultExtractorHelper.RESULT_MAP;
 }

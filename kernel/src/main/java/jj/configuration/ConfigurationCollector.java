@@ -18,6 +18,7 @@ package jj.configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.conversion.Converters;
+import jj.script.CurrentScriptEnvironment;
 
 /**
  * server component used to implement the configuration API. it's
@@ -39,42 +41,63 @@ import jj.conversion.Converters;
 public class ConfigurationCollector {
 	
 	private final AtomicReference<Map<String, Object>> current = new AtomicReference<>();
+	private LinkedHashMap<String, List<String>> errors = new LinkedHashMap<>(0);
 	private HashMap<String, Object> inProgress = new HashMap<>();
 	private final Converters converters;
+	private final CurrentScriptEnvironment env;
 	
 	@Inject
-	ConfigurationCollector(final Converters converters) {
+	ConfigurationCollector(final Converters converters, final CurrentScriptEnvironment env) {
 		this.converters = converters;
+		this.env = env;
+	}
+	
+	private void assertConfig() {
+		assert isConfig() : "only available from a config script";
+	}
+	
+	public boolean isConfig() {
+		return env.currentRootScriptEnvironment() instanceof ConfigurationScriptEnvironment;
 	}
 	
 	/**
 	 * This is the interface for the API modules
-	 * @param key
+	 * @param name
 	 * @param value
 	 */
-	public void addConfigurationElement(String key, Object value) {
-		inProgress.put(key, value);
+	public void addConfigurationElement(String name, Object value) {
+		assertConfig();
+		inProgress.put(name, value);
 	}
 	
-	public void addConfigurationMultiElement(String key, Object value) {
-		if (!inProgress.containsKey(key)) {
-			inProgress.put(key, new ArrayList<Object>());
+	public void addConfigurationMultiElement(String name, Object value) {
+		assertConfig();
+		if (!inProgress.containsKey(name)) {
+			inProgress.put(name, new ArrayList<Object>());
 		}
 		@SuppressWarnings("unchecked")
-		ArrayList<Object> list = ((ArrayList<Object>)inProgress.get(key));
+		ArrayList<Object> list = ((ArrayList<Object>)inProgress.get(name));
 		list.add(value);
 	}
 	
-	public void addConfigurationMappedElement(String key, Object valueKey, Object valueValue) {
-		if (!inProgress.containsKey(key)) {
-			inProgress.put(key, new HashMap<Object, Object>());
+	public void addConfigurationMappedElement(String name, Object key, Object value) {
+		assertConfig();
+		if (!inProgress.containsKey(name)) {
+			inProgress.put(name, new HashMap<Object, Object>());
 		}
 		@SuppressWarnings("unchecked")
-		HashMap<Object, Object> map = ((HashMap<Object, Object>)inProgress.get(key));
-		map.put(valueKey, valueValue);
+		HashMap<Object, Object> map = ((HashMap<Object, Object>)inProgress.get(name));
+		map.put(key, value);
 	}
 	
-	<T> T get(String key, Class<T> type, Object defaultValue) {
+	public void accumulateError(String name, String error) {
+		assertConfig();
+		errors.computeIfAbsent(name, k -> {
+			return new ArrayList<>(1);
+		}).add(error);
+	}
+	
+	<T> T get(String name, Class<T> type, Object defaultValue) {
 		Map<String, Object> map = current.get();
 		if (List.class.isAssignableFrom(type) && defaultValue == null) {
 			defaultValue = Collections.EMPTY_LIST;
@@ -82,24 +105,32 @@ public class ConfigurationCollector {
 		if (Map.class.isAssignableFrom(type) && defaultValue == null) {
 			defaultValue = Collections.EMPTY_MAP;
 		}
-		return converters.convert(map != null && map.containsKey(key) ? map.get(key) : defaultValue, type);
+		return converters.convert(map != null && map.containsKey(name) ? map.get(name) : defaultValue, type);
 	}
 	
-	void configurationComplete() {
+	ConfigurationErrored configurationComplete() {
 		
-		for (String key : inProgress.keySet()) {
-			if (inProgress.get(key) instanceof List) {
-				List<?> list = Collections.unmodifiableList((List<?>)inProgress.get(key));
-				inProgress.put(key, list);
+		if (!errors.isEmpty()) {
+			LinkedHashMap<String, List<String>> e = errors;
+			errors = new LinkedHashMap<>();
+			return new ConfigurationErrored(e);
+		}
+		
+		for (String name : inProgress.keySet()) {
+			if (inProgress.get(name) instanceof List) {
+				List<?> list = Collections.unmodifiableList((List<?>)inProgress.get(name));
+				inProgress.put(name, list);
 			}
-			if (inProgress.get(key) instanceof Map) {
-				Map<?, ?> map = Collections.unmodifiableMap((Map<?, ?>)inProgress.get(key));
-				inProgress.put(key, map);
+			if (inProgress.get(name) instanceof Map) {
+				Map<?, ?> map = Collections.unmodifiableMap((Map<?, ?>)inProgress.get(name));
+				inProgress.put(name, map);
 			}
 		}
 		
 		current.set(Collections.unmodifiableMap(inProgress));
 		inProgress = new HashMap<>();
+		
+		return null;
 	}
 	
 	@Override

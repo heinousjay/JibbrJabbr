@@ -21,7 +21,7 @@ package jj.script;
  */
 public interface Continuation {
 
-	void pendingKey(ContinuationPendingKey pendingKey);
+	void pendingKey(PendingKey pendingKey);
 	
-	ContinuationPendingKey pendingKey();
+	PendingKey pendingKey();
 }

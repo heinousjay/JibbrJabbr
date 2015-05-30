@@ -15,8 +15,7 @@
  */
 package jj.http.server;
 
-import io.netty.handler.codec.http.HttpHeaders;
-
+import io.netty.handler.codec.http.HttpHeaderNames;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map.Entry;
@@ -47,7 +46,7 @@ class RequestResponded extends LoggedEvent {
 	public void describeTo(Logger logger) {
 		logger.info(
 			"request for [{}] completed in {} milliseconds (wall time) (stats events!)",
-			request.uri(),
+			request.uriMatch().uri,
 			request.wallTime()
 		);
 		
@@ -56,8 +55,8 @@ class RequestResponded extends LoggedEvent {
 				extractIP(request.remoteAddress()),
 				DateFormatHelper.nowInAccessLogFormat(),
 				request.method(),
-				request.request().getUri(),
-				request.request().getProtocolVersion(),
+				request.request().uri(),
+				request.request().protocolVersion(),
 				response.status().code(),
 				extractContentLength(),
 				extractReferer(request),
@@ -66,15 +65,18 @@ class RequestResponded extends LoggedEvent {
 		}
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace("Request Headers");
-			for (Entry<String, String> header : request.allHeaders()) {
-				logger.trace(header.getKey() + " : " + header.getValue());
+			StringBuilder output = new StringBuilder("Request Headers:");
+			for (Entry<CharSequence, CharSequence> header : request.allHeaders()) {
+				output.append("\n").append(header.getKey()).append(" : ").append(header.getValue());
 			}
 			
-			logger.trace("Response Headers");
-			for (Entry<String, String> header : response.allHeaders()) {
-				logger.trace(header.getKey() + " : " + header.getValue());
+			logger.trace("{}\n", output);
+			
+			output = new StringBuilder("Response Headers:");
+			for (Entry<CharSequence, CharSequence> header : response.allHeaders()) {
+				output.append("\n").append(header.getKey()).append(" : ").append(header.getValue());
 			}
+			logger.trace("{}\n", output);
 		}
 	}
 	
@@ -88,20 +90,20 @@ class RequestResponded extends LoggedEvent {
 	}
 	
 	private String extractReferer(final HttpServerRequest request) {
-		return request.hasHeader(HttpHeaders.Names.REFERER) ?
-			"\"" + request.header(HttpHeaders.Names.REFERER) + "\"" :
+		return request.hasHeader(HttpHeaderNames.REFERER) ?
+			"\"" + request.header(HttpHeaderNames.REFERER) + "\"" :
 			"-";
 	}
 	
 	private String extractUserAgent(final HttpServerRequest request) {
-		return request.hasHeader(HttpHeaders.Names.USER_AGENT) ?
-			"\"" + request.header(HttpHeaders.Names.USER_AGENT) + "\"" :
+		return request.hasHeader(HttpHeaderNames.USER_AGENT) ?
+			"\"" + request.header(HttpHeaderNames.USER_AGENT) + "\"" :
 			"-";
 	}
 	
-	private String extractContentLength() {
-		if (response.containsHeader(HttpHeaders.Names.CONTENT_LENGTH)) {
-			return response.header(HttpHeaders.Names.CONTENT_LENGTH);
+	private CharSequence extractContentLength() {
+		if (response.containsHeader(HttpHeaderNames.CONTENT_LENGTH)) {
+			return response.header(HttpHeaderNames.CONTENT_LENGTH);
 		}
 		return "0";
 	}

@@ -15,12 +15,8 @@
  */
 package jj.http.client;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.AsyncHttpClientConfig;
-import org.asynchttpclient.AsyncHttpProvider;
-import org.asynchttpclient.providers.netty.NettyAsyncHttpProvider;
-
 import jj.JJModule;
+import jj.http.client.api.RestOperation;
 
 /**
  * @author jason
@@ -31,34 +27,15 @@ public class HttpClientModule extends JJModule {
 	@Override
 	protected void configure() {
 
-		addAPIModulePath("/jj/http/client/api");
+		bindAPIModulePath("/jj/http/client/api");
 		
-		dispatch().continuationOf(HttpClientRequest.class).to(HttpClientRequestContinuationProcessor.class);
+		bindStartupListener(HttpClient.class);
+		
+		bindContinuationProcessingOf(RestOperation.class).to(HttpClientRequestContinuationProcessor.class);
 		
 		bindExecutor(HttpClientNioEventLoopGroup.class);
 		
-		// configuring the async-http-client to work from guice. not too hard, really,
-		// and now the various levels of the API are available for injection.
-		// the AsyncHttpClientConfigProvider handles bridging the configuration in
-		// there are no singletons here so that new instances are configured on every
-		// use, to ensure that configuration is live.  this means only Providers should
-		// be injected
-		bind(AsyncHttpClientConfig.class).toProvider(AsyncHttpClientConfigProvider.class);
-		bind(AsyncHttpProvider.class).to(NettyAsyncHttpProvider.class);
-		
-		bindConfiguration().to(HttpClientConfiguration.class);
-		
-		try {
-			
-			bind(NettyAsyncHttpProvider.class)
-				.toConstructor(NettyAsyncHttpProvider.class.getConstructor(AsyncHttpClientConfig.class));
-			
-			bind(AsyncHttpClient.class)
-				.toConstructor(AsyncHttpClient.class.getConstructor(AsyncHttpProvider.class, AsyncHttpClientConfig.class));
-			
-		} catch (Exception e) {
-			throw new AssertionError("broken build", e);
-		}
+		bindConfiguration(HttpClientConfiguration.class);
 	}
 
 }

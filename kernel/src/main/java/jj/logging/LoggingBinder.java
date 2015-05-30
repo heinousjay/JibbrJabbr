@@ -33,6 +33,8 @@ import com.google.inject.multibindings.MapBinder;
  */
 public class LoggingBinder {
 	
+	private final MapBinder<String, String> loggerNameBinder;
+	
 	private final MapBinder<Class<? extends Annotation>, Logger> loggerBinder;
 	
 	public interface BindingBuilder {
@@ -40,11 +42,17 @@ public class LoggingBinder {
 	}
 	
 	public LoggingBinder(Binder binder) {
+		loggerNameBinder = MapBinder.newMapBinder(binder, String.class, String.class, LoggerNames.class);
+		
 		loggerBinder = MapBinder.newMapBinder(
 			binder,
 			new TypeLiteral<Class<? extends Annotation>>() {},
 			new TypeLiteral<Logger>() {}
 		);
+	}
+	
+	static void registerBuiltins(Binder binder) {
+		new LoggingBinder(binder).loggerNameBinder.addBinding("netty").toInstance("io.netty");
 	}
 
 	public BindingBuilder annotatedWith(final Class<? extends Annotation> annotation) {
@@ -53,8 +61,33 @@ public class LoggingBinder {
 			
 			@Override
 			public void toLogger(String loggerName) {
+				
+				if (EmergencyLogger.NAME != loggerName) {
+					loggerNameBinder.addBinding(camelCaseName(loggerName)).toInstance(loggerName);
+				}
 				loggerBinder.addBinding(annotation).toInstance(LoggerFactory.getLogger(loggerName));
 			}
 		};
+	}
+	
+	static String camelCaseName(String loggerName) {
+		
+		final StringBuilder output = new StringBuilder(loggerName.length());
+		boolean isFirst = true;
+		boolean lastWasSpace = false;
+		for (char c : loggerName.toCharArray()) {
+			if (!Character.isWhitespace(c)) {
+				if (lastWasSpace) {
+					c = Character.toUpperCase(c);
+				}
+				assert (!isFirst || Character.isJavaIdentifierStart(c)) && Character.isJavaIdentifierPart(c) :
+					"logger names must be composed of characters that are valid in java identifiers and whitespace";
+				output.append(c);
+			}
+			isFirst = false;
+			lastWasSpace = Character.isWhitespace(c);
+		}
+		
+		return output.toString();
 	}
 }

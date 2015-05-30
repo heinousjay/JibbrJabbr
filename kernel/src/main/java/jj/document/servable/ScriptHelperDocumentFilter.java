@@ -1,16 +1,15 @@
 package jj.document.servable;
 
-import static jj.configuration.resolution.Assets.*;
+import static jj.server.ServerLocation.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentConfiguration;
 import jj.document.DocumentScriptEnvironment;
-import jj.document.ScriptResourceType;
+import jj.http.server.resource.StaticResource;
 import jj.resource.ResourceFinder;
-import jj.resource.stat.ic.StaticResource;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -59,7 +58,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			
 			// internal version of jquery
 			// it's versioned already, so no need for sha-ing
-			StaticResource jquery = resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JQUERY_JS);
+			StaticResource jquery = resourceFinder.findResource(StaticResource.class, Assets, JQUERY_JS);
 			jquery.addDependent(documentRequestProcessor.documentScriptEnvironment());
 			addScript(documentRequestProcessor.document(), "/" + jquery.name());
 			
@@ -70,7 +69,7 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 				documentRequestProcessor.httpRequest().host() + 
 				scriptEnvironment.socketUri();
 			
-			StaticResource jj = resourceFinder.findResource(StaticResource.class, AppLocation.Assets, JJ_JS);
+			StaticResource jj = resourceFinder.findResource(StaticResource.class, Assets, JJ_JS);
 			jj.addDependent(documentRequestProcessor.documentScriptEnvironment());
 			Element jjScript = 
 				makeScriptTag(documentRequestProcessor.document(), jj.serverPath())
@@ -89,10 +88,10 @@ class ScriptHelperDocumentFilter implements DocumentFilter {
 			
 			// associated scripts
 			if (scriptEnvironment.sharedScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Shared.suffix(scriptEnvironment.serverPath()));
+				addScript(documentRequestProcessor.document(), scriptEnvironment.sharedScriptResource().serverPath());
 			}
 			if (scriptEnvironment.clientScriptResource() != null) {
-				addScript(documentRequestProcessor.document(), ScriptResourceType.Client.suffix(scriptEnvironment.serverPath()));
+				addScript(documentRequestProcessor.document(), scriptEnvironment.clientScriptResource().serverPath());
 			}
 		}
 	}

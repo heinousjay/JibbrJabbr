@@ -149,10 +149,10 @@ class ResourceFinderImpl implements ResourceFinder {
 				// let the world know
 				publisher.publish(new ResourceLoaded((AbstractResource)resource));
 				
-				if (resource instanceof ParentedResource) {
+				if (resource instanceof FileSystemResource) {
 					// if this was the first time we put this in the cache,
 					// we set up a file watch on it for background reloads
-					resourceWatchService.watch((ParentedResource)resource);
+					resourceWatchService.watch((FileSystemResource)resource);
 				}
 			}
 		}

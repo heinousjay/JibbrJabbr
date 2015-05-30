@@ -15,6 +15,13 @@
  */
 package jj;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import jj.execution.JJTask;
 import jj.logging.LoggedEvent;
 
 import org.slf4j.Logger;
@@ -26,16 +33,37 @@ import org.slf4j.Logger;
 @ServerLogger
 public class ServerStarting extends LoggedEvent {
 	
+	public enum Priority {
+		Highest,
+		NearHighest,
+		Middle,
+		NearLowest,
+		Lowest;
+	}
+	
+	private final Path rootPath;
 	private final Version version;
 	
-	ServerStarting(Version version) {
+	private final HashMap<Priority, List<JJTask>> startupTasks = new HashMap<>();
+	
+	ServerStarting(Path rootPath, Version version) {
+		this.rootPath = rootPath;
 		this.version = version;
+	}
+
+	public void registerStartupTask(final Priority priority, final JJTask task) {
+		startupTasks.computeIfAbsent(priority, (p) -> { return new ArrayList<>(1); }).add(task);
+	}
+
+	Map<Priority, List<JJTask>> startupTasks() {
+		return startupTasks;
 	}
 
 	@Override
 	public void describeTo(Logger logger) {
 		logger.info("Welcome to {} version {} commit {}", version.name(), version.version(), version.commitId());
-		logger.info("Starting the server");
+		logger.info("Server root is {}", rootPath);
+		logger.info("Starting up!");
 	}
 
 }

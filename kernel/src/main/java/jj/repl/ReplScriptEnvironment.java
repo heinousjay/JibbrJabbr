@@ -15,7 +15,7 @@
  */
 package jj.repl;
 
-import static jj.configuration.resolution.AppLocation.Assets;
+import static jj.server.ServerLocation.*;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.script.AbstractScriptEnvironment;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.Global;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
@@ -52,7 +52,7 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 	private final ScriptableObject local;
 	private final ScriptResource system;
 	
-	private final HashMap<ContinuationPendingKey, ChannelHandlerContext> pendingContexts = new HashMap<>();
+	private final HashMap<PendingKey, ChannelHandlerContext> pendingContexts = new HashMap<>();
 	
 	@Inject
 	ReplScriptEnvironment(
@@ -80,12 +80,12 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 	}
 
 	@Override
-	protected void captureContextForKey(ContinuationPendingKey key) {
+	protected void captureContextForKey(PendingKey key) {
 		pendingContexts.put(key, currentCtx.current());
 	}
 	
 	@Override
-	protected Closer restoreContextForKey(ContinuationPendingKey key) {
+	protected Closer restoreContextForKey(PendingKey key) {
 		ChannelHandlerContext ctx = pendingContexts.remove(key);
 		assert ctx != null : "no ctx found to restore";
 		

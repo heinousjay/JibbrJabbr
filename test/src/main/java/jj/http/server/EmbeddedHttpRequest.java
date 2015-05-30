@@ -18,6 +18,7 @@ package jj.http.server;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
@@ -46,7 +47,7 @@ public class EmbeddedHttpRequest {
 	
 	public EmbeddedHttpRequest(final HttpVersion httpVersion, final HttpMethod method, final String uri) {
 		request = new DefaultHttpRequest(httpVersion, method, uri);
-		request.headers().add(HttpHeaders.Names.HOST, "localhost");
+		request.headers().add(HttpHeaderNames.HOST, "localhost");
 	}
 	
 	public HttpHeaders headers() {
@@ -55,7 +56,7 @@ public class EmbeddedHttpRequest {
 	
 	FullHttpRequest fullHttpRequest() {
 		DefaultFullHttpRequest result = 
-			new DefaultFullHttpRequest(request.getProtocolVersion(), request.getMethod(), request.getUri());
+			new DefaultFullHttpRequest(request.protocolVersion(), request.method(), request.uri());
 		result.headers().add(request.headers());
 		return result;
 	}

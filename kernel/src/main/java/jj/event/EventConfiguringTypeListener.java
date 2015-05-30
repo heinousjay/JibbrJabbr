@@ -104,12 +104,14 @@ class EventConfiguringTypeListener implements TypeListener {
 	private final ClassPool classPool = CodeGenHelper.classPool();
 	private final CtClass invokerClass;
 	private final CtMethod invokeMethod;
+	private final CtMethod targetMethod;
 	private final CtClass weakReferenceClass;
 	
 	EventConfiguringTypeListener() {
 		try {
 			invokerClass = classPool.get(Invoker.class.getName());
 			invokeMethod = invokerClass.getDeclaredMethod("invoke");
+			targetMethod = invokerClass.getDeclaredMethod("target");
 			weakReferenceClass = classPool.get(WeakReference.class.getName());
 		} catch (NotFoundException e) {
 			// this can't happen
@@ -249,15 +251,28 @@ class EventConfiguringTypeListener implements TypeListener {
 				newClass
 			)
 		);
-		CtMethod newMethod = CtNewMethod.copy(invokeMethod, newClass, null);
-		newMethod.setBody(
+		
+		final String invokedClassName = invoked.getDeclaringClass().getName();
+		final String invokedMethodName = invoked.getName();
+		final String eventClassName = invoked.getParameterTypes()[0].getName();
+		
+		CtMethod target = CtNewMethod.copy(targetMethod, newClass, null);
+		target.setBody(
 			"{" +
-				invoked.getDeclaringClass().getName() + " invokee = (" + invoked.getDeclaringClass().getName() + ")instance.get();" +
-			// if the invokee goes out of scope, we can stop sending events to it
-			"if (invokee != null) invokee." + invoked.getName() + "((" + invoked.getParameterTypes()[0].getName() + ")$1);" +
+				"return \"" + invokedClassName + "." + invokedMethodName + "(" + eventClassName + ")\";" +
 			"}"
 		);
-		newClass.addMethod(newMethod);
+		newClass.addMethod(target);
+		
+		CtMethod invoke = CtNewMethod.copy(invokeMethod, newClass, null);
+		invoke.setBody(
+			"{" +
+				invokedClassName + " invokee = (" + invokedClassName + ")instance.get();" +
+				// if the invokee goes out of scope, we can stop sending events to it
+				"if (invokee != null) invokee." + invokedMethodName + "((" + eventClassName + ")$1);" +
+			"}"
+		);
+		newClass.addMethod(invoke);
 		
 		Class<? extends Invoker> invokerClass = classPool.toClass(
 			newClass, 

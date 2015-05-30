@@ -15,7 +15,7 @@
  */
 package jj.i18n;
 
-import static jj.configuration.resolution.AppLocation.Virtual;
+import static jj.server.ServerLocation.Virtual;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.*;
@@ -26,7 +26,7 @@ import java.util.Locale;
 import jj.execution.MockTaskRunner;
 import jj.i18n.ScriptMessages.ScriptMessagesLoaderBundle;
 import jj.resource.ResourceFinder;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.ContinuationState;
 import jj.script.CurrentScriptEnvironment;
 import jj.script.ScriptEnvironment;
@@ -63,7 +63,7 @@ public class ScriptMessagesTest {
 	@Mock MessagesResource mr;
 	
 	@Captor ArgumentCaptor<ScriptMessagesLoaderBundle> bundleCaptor;
-	@Mock ContinuationPendingKey pendingKey;
+	@Mock PendingKey pendingKey;
 	@Mock ContinuationState continuationState;
 	@Captor ArgumentCaptor<Scriptable> scriptableCaptor;
 	@Captor ArgumentCaptor<Undefined> undefinedCaptor;

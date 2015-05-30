@@ -15,7 +15,8 @@
  */
 package jj.css;
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -34,12 +35,13 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
+import jj.application.Application;
+import jj.http.server.LoadedResource;
+import jj.http.server.ServableResourceConfiguration;
+import jj.http.server.resource.StaticResource;
 import jj.resource.AbstractResource;
-import jj.resource.LoadedResource;
 import jj.resource.NoSuchResourceException;
-import jj.resource.PathResolver;
 import jj.resource.ResourceNotViableException;
-import jj.resource.stat.ic.StaticResource;
 import jj.script.Global;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;
@@ -51,9 +53,15 @@ import jj.util.SHA1Helper;
  * stylesheet, or a stylesheet that has run through less
  * processing.
  * 
+ * <p>
+ * The stylesheet represented by this resource will be processed to have
+ * all internal URIs replaced with long-term cacheable URIs.  This might
+ * get put into configuration to disable it.
+ * 
  * @author jason
  *
  */
+@ServableResourceConfiguration(routeContributor = StylesheetResourceRouteContributor.class)
 public class StylesheetResource extends AbstractResource implements LoadedResource {
 
 	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";
@@ -72,14 +80,14 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		final @Global ScriptableObject global,
 		final CssReferenceVersionProcessor processor,
 		final LessConfiguration lessConfiguration,
-		final PathResolver pathResolver
+		final Application application
 	) {
 		super(dependencies);
 		
 		this.lessConfiguration = lessConfiguration;
 		
 		// is there a static css file?
-		StaticResource css = resourceFinder.loadResource(StaticResource.class, Base, name);
+		StaticResource css = resourceFinder.loadResource(StaticResource.class, AppBase, name);
 		String result;
 		
 		if (css == null) {
@@ -91,7 +99,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 
 			// this is just to check for existence of the resource, it will get loaded from
 			// the script execution and hooked into the dependency system then
-			LessResource lessSheet = resourceFinder.loadResource(LessResource.class, Base, lessName);
+			LessResource lessSheet = resourceFinder.loadResource(LessResource.class, AppBase, lessName);
 			if (lessSheet == null) {
 				throw new NoSuchResourceException(StylesheetResource.class, name());
 			}
@@ -112,7 +120,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 			}
 		}
 		
-		safeToServe = path.startsWith(pathResolver.path());
+		safeToServe = application.pathInBase(path);
 
 		result = processor.fixUris(result, this);
 		
@@ -227,7 +235,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			String resourceName = String.valueOf(args[0]);
 			publisher.publish(new LoadingLessResource(resourceName));
-			LessResource lr = resourceFinder.loadResource(LessResource.class, Base, resourceName);
+			LessResource lr = resourceFinder.loadResource(LessResource.class, AppBase, resourceName);
 			if (lr != null) {
 				lr.addDependent(StylesheetResource.this);
 				return lr.contents();

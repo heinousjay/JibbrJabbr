@@ -18,10 +18,10 @@ package jj.configuration;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
-import jj.event.Publisher;
+import jj.event.MockPublisher;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
@@ -44,8 +44,8 @@ import org.mozilla.javascript.ScriptableObject;
 public class ConfigurationScriptEnvironmentTest {
 	
 	MockAbstractScriptEnvironmentDependencies dependencies;
-	@Mock ResourceFinder resourceFinder;
-	@Mock Publisher publisher;
+	ResourceFinder resourceFinder;
+	MockPublisher publisher;
 	@Mock ScriptableObject global;
 	@Mock ConfigurationCollector collector;
 	
@@ -58,51 +58,53 @@ public class ConfigurationScriptEnvironmentTest {
 		
 		dependencies = new MockAbstractScriptEnvironmentDependencies();
 
-		given(dependencies.rhinoContextProvider().context.newObject(global)).willReturn(global);
-		given(dependencies.rhinoContextProvider().context.newChainedScope(global)).willReturn(global);
+		given(dependencies.mockRhinoContextProvider().context.newObject(global)).willReturn(global);
+		given(dependencies.mockRhinoContextProvider().context.newChainedScope(global)).willReturn(global);
+		
+		resourceFinder = dependencies.resourceFinder();
+		publisher = dependencies.publisher();
 	}
 
 	@Test
 	public void testInitialization() {
-		given(resourceFinder.loadResource(ScriptResource.class, Base, CONFIG_SCRIPT_NAME)).willReturn(configScript);
+		given(resourceFinder.loadResource(ScriptResource.class, AppBase, CONFIG_SCRIPT_NAME)).willReturn(configScript);
 		
-		cse = new ConfigurationScriptEnvironment(
-			dependencies,
-			resourceFinder, publisher, global, collector
-		);
+		cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
 		
-		verify(publisher).publish(isA(ConfigurationLoading.class));
 		verify(configScript).addDependent(cse);
-		verify(publisher).publish(isA(ConfigurationFound.class));
 		
 		// make sure it only triggers on its own initialization
 		cse.scriptInitialized(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
 
 		verify(collector, never()).configurationComplete();
-		verify(publisher, never()).publish(isA(ConfigurationLoaded.class));
+		
+		assertThat(publisher.events.size(), is(2));
+		assertTrue(publisher.events.get(0) instanceof ConfigurationLoading);
+		assertTrue(publisher.events.get(1) instanceof ConfigurationFound);
 		
 		cse.scriptInitialized(new ScriptEnvironmentInitialized(cse));
 		
 		verify(collector).configurationComplete();
-		verify(publisher).publish(isA(ConfigurationLoaded.class));
+		
+		assertThat(publisher.events.size(), is(3));
+		assertTrue(publisher.events.get(2) instanceof ConfigurationLoaded);
 	}
 	
 	@Test
 	public void testDefaultConfiguration() {
 		
 		try {
-			cse = new ConfigurationScriptEnvironment(
-				dependencies,
-				resourceFinder, publisher, global, collector
-			);
+			cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
 			fail("should have thrown");
 		} catch (NoSuchResourceException nsre) {
 			assertThat(nsre, is(notNullValue()));
 		}
 		
-		verify(publisher).publish(isA(UsingDefaultConfiguration.class));
 		verify(collector).configurationComplete();
-		verify(publisher).publish(isA(ConfigurationLoaded.class));
+		assertThat(publisher.events.size(), is(3));
+		assertTrue(publisher.events.get(0) instanceof ConfigurationLoading);
+		assertTrue(publisher.events.get(1) instanceof UsingDefaultConfiguration);
+		assertTrue(publisher.events.get(2) instanceof ConfigurationLoaded);
 	}
 
 }

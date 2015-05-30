@@ -16,6 +16,7 @@
 package jj.http.server.websocket;
 
 import static jj.http.server.PipelineStages.*;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.Set;
 
@@ -24,7 +25,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
@@ -35,9 +36,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
 import jj.http.server.HttpServerResponse;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 
 /**
@@ -84,7 +84,7 @@ public class WebSocketConnectionMaker {
 		final WebSocketServerHandshaker handshaker = handshakerFactory.newHandshaker(request);
 		if (handshaker == null) {
 			response
-				.header(Names.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue())
+				.header(HttpHeaderNames.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue())
 				.sendError(HttpResponseStatus.UPGRADE_REQUIRED);
 		} else {
 			doHandshake(ctx, request, handshaker);
@@ -107,13 +107,13 @@ public class WebSocketConnectionMaker {
 			public void operationComplete(ChannelFuture future) throws Exception {
 				if (future.isSuccess()) {
 					
-					URIMatch uriMatch = new URIMatch(request.getUri());
+					URIMatch uriMatch = new URIMatch(request.uri());
 					
 
 					WebSocketConnectionHost host = null;
 					
 					for (Class<? extends WebSocketConnectionHost> hostClass : webSocketConnectionHostClasses) {
-						host = resourceFinder.findResource(hostClass, AppLocation.Virtual, uriMatch.name);
+						host = resourceFinder.findResource(hostClass, Virtual, uriMatch.name);
 						if (host != null) break;
 					}
 					

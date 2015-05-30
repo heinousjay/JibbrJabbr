@@ -26,11 +26,11 @@ public class CssModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAssetPath("/jj/css/assets");
-		addAPIModulePath("/jj/css/api");
-		bindCreation().of(LessResource.class).to(LessResourceCreator.class);
-		bindCreation().of(StylesheetResource.class).to(StylesheetResourceCreator.class);
-		bindConfiguration().to(LessConfiguration.class);
+		bindAssetPath("/jj/css/assets");
+		bindAPIModulePath("/jj/css/api");
+		bindCreationOf(LessResource.class).to(LessResourceCreator.class);
+		bindCreationOf(StylesheetResource.class).to(StylesheetResourceCreator.class);
+		bindConfiguration(LessConfiguration.class);
 	}
 
 }

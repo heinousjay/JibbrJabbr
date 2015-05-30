@@ -16,6 +16,7 @@
 package jj.resource;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * value object to configure resources according
@@ -49,14 +50,23 @@ public class ResourceSettings {
 		throw new AssertionError("not yet");
 	}
 	
+	/**
+	 * @return the mime type of the resource
+	 */
 	public String mimeType() {
 		return mimeType;
 	}
 	
+	/**
+	 * @return the charset of the resource, null if this resource is not text
+	 */
 	public Charset charset() {
 		return charset;
 	}
 	
+	/**
+	 * @return true if this resource has compressible contents
+	 */
 	public boolean compressible() {
 		return compressible == null ? false : compressible;
 	}
@@ -70,9 +80,14 @@ public class ResourceSettings {
 			compressible
 		);
 	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(mimeType, charset, compressible);
+	}
 
 	/**
-	 * @return
+	 * @return the configured mime type, including the charset parameter if applicable
 	 */
 	public String contentType() {
 		return mimeType() + (charset == null ? "" : "; charset=" + charset.name());

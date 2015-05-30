@@ -15,8 +15,6 @@
  */
 package jj.event.help;
 
-import javax.inject.Inject;
-
 import jj.event.Listener;
 import jj.event.Subscriber;
 
@@ -27,18 +25,11 @@ import jj.event.Subscriber;
 @Subscriber
 public class BrokenListener {
 	
-	private final Exception toThrow;
-	
 	public int heard = 0;
-	
-	@Inject
-	BrokenListener(final Exception toThrow) {
-		this.toThrow = toThrow;
-	}
 	
 	@Listener
 	public void throwAnException(Event event) throws Exception {
 		++heard;
-		throw toThrow;
+		throw new Exception();
 	}
 }

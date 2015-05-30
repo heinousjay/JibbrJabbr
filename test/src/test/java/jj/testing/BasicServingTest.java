@@ -15,28 +15,23 @@
  */
 package jj.testing;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.Assets.*;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import static jj.server.Assets.*;
+import static jj.document.DocumentScriptEnvironment.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
 import jj.App;
-import jj.configuration.TestableAssets;
+import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
@@ -47,111 +42,64 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Started as a scratchpad for a testing API, survives as a basic integration/stress test
+ * Started as a scratchpad for a testing API, survives as a basic integration/stress test. If something is
+ * broken, this test usually quits
  * 
  * @author jason
  *
  */
 public class BasicServingTest {
-	
-	/**
-	 * 
-	 */
-	private static final String INDEX_HTML_RENDERED = "/app1/app/index.html.rendered";
-	private static final String ANIMAL_HTML_RENDERED = "/app1/app/animal.html.rendered";
 
-	private static final String INDEX = "/";
+	private static final String INDEX = "/index";
 
 	private static final String ANIMAL = "/animal";
 	
-	public static final VerifiableRequest[] statics;
-	public static final VerifiableRequest[] documents;
-	public static final VerifiableRequest[] stylesheets;
-	public static final VerifiableRequest[] assets;
-	
-	private static VerifiableRequest makeResourceRequest(String name) throws Exception {
-		return new VerifiableRequest("/" + name, Files.readAllBytes(Paths.get(App.one, name)));
-	}
+	public static final List<String> statics;
+	public static final List<String> documents;
+	public static final List<String> stylesheets;
+	public static final List<String> assets;
 	
 	static {
-		try {
-			List<VerifiableRequest> work = new ArrayList<>();
-			work.add(makeResourceRequest("0.txt"));
-			work.add(makeResourceRequest("1.txt"));
-			work.add(makeResourceRequest("2.txt"));
-			work.add(makeResourceRequest("3.txt"));
-			work.add(makeResourceRequest("4.txt"));
-			work.add(makeResourceRequest("5.txt"));
-			work.add(makeResourceRequest("6.txt"));
-			work.add(makeResourceRequest("7.txt"));
-			work.add(makeResourceRequest("8.txt"));
-			work.add(makeResourceRequest("9.txt"));
-			Collections.shuffle(work);
-			statics = work.toArray(new VerifiableRequest[work.size()]);
-			
-			ResourceReader reader = new ResourceReader();
-			
-			work = new ArrayList<>();
-			work.add(new VerifiableRequest(INDEX, reader.readResource(INDEX_HTML_RENDERED)));
-			work.add(new VerifiableRequest(ANIMAL, reader.readResource(ANIMAL_HTML_RENDERED)));
-			
-			documents = work.toArray(new VerifiableRequest[work.size()]);
-			
-			work = new ArrayList<>();
-			work.add(makeResourceRequest("test.css"));
-			work.add(makeResourceRequest("style.css"));
-			
-			stylesheets = work.toArray(new VerifiableRequest[work.size()]);
-			
-			TestableAssets testAssets = new TestableAssets();
-
-			work = new ArrayList<>();
-			work.add(new VerifiableRequest("/" + JQUERY_JS, Files.readAllBytes(testAssets.path(JQUERY_JS))));
-			work.add(new VerifiableRequest("/" + JJ_JS, Files.readAllBytes(testAssets.path(JJ_JS))));
-			work.add(new VerifiableRequest("/" + FAVICON_ICO, Files.readAllBytes(testAssets.path(FAVICON_ICO))));
-			
-			assets = work.toArray(new VerifiableRequest[work.size()]);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new AssertionError("failed!", e);
-		}
+		List<String> work = Arrays.asList(
+			"/0.txt", "/1.txt", "/2.txt",
+			"/3.txt", "/4.txt", "/5.txt",
+			"/6.txt", "/7.txt", "/8.txt",
+			"/9.txt"
+		);
+		Collections.shuffle(work);
+		statics = Collections.unmodifiableList(work);
+		
+		documents = Collections.unmodifiableList(Arrays.asList(INDEX, ANIMAL));
+		
+		stylesheets = Collections.unmodifiableList(Arrays.asList("/test.css", "/style.css"));
+		
+		assets = Collections.unmodifiableList(Arrays.asList("/" + JQUERY_JS, "/" + JJ_JS, "/" + FAVICON_ICO));
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one).injectInstance(this);
+	public JibbrJabbrTestServer app = 
+		new JibbrJabbrTestServer(ServerRoot.one, App.one)
+		.verifying()
+		//.recording()
+		.injectInstance(this);
 	
 	@Inject EmbeddedHttpServer server;
 	
-	static interface Namer {
-		String name(int i);
-		Path path(int i);
-	}
+	@Inject TraceModeSwitch trace;
 	
-	static interface RequestMaker {
-		VerifiableRequest make();
-	}
-	
-	private void runStressTestPattern(final int timeout, final int totalClients, final RequestMaker maker) throws Throwable {
+	private void runBasicStressTest(final int timeout, final int totalClients, final List<String> uris) throws Throwable {
 		final AssertionError error = new AssertionError("failure!");
 		final CountDownLatch latch = new CountDownLatch(totalClients);
 		for (int i = 0; i < totalClients; ++i) {
-			final VerifiableRequest request = maker.make();
-			server.request(new EmbeddedHttpRequest(request.uri), new ResponseReady() {
+			String uri = uris.get(i % uris.size());
+			server.request(new EmbeddedHttpRequest(uri), new ResponseReady() {
 				
 				@Override
-				public void ready(EmbeddedHttpResponse response) {
+				public void ready(EmbeddedHttpResponse response) throws Exception {
 					try {
-						assertThat(request.uri, response.status(), is(HttpResponseStatus.OK));
-						assertThat(request.uri, response.bodyContentAsBytes(), is(request.bytes));
+						trace.mode().traceEvent(uri, response.bodyContentAsBytes());
 					} catch (Throwable t) {
 						error.addSuppressed(t);
-//						try {
-//							System.out.println("got :");
-//							System.out.println(response.bodyContentAsString());
-//							System.out.println("expected: ");
-//							System.out.println(new String(request.bytes, UTF_8));
-//						} catch (Throwable eaten) {}
 					} finally {
 						latch.countDown();
 					}
@@ -167,18 +115,6 @@ public class BasicServingTest {
 		if (!succeeded) {
 			throw new AssertionError("timed out");
 		}
-	}
-	
-	private void runBasicStressTest(final int timeout, final int total , final VerifiableRequest[] toRun) throws Throwable {
-		runStressTestPattern(timeout, total, new RequestMaker() {
-			
-			private AtomicInteger count = new AtomicInteger(total);
-			
-			@Override
-			public VerifiableRequest make() {
-				return toRun[count.getAndIncrement() % toRun.length];
-			}
-		});
 	}
 	
 	//@Test
@@ -201,14 +137,14 @@ public class BasicServingTest {
 		runBasicStressTest(3, 400, assets);
 	}
 	
-	private VerifiableRequest[] makeAll() {
-		List<VerifiableRequest> requests = new ArrayList<>();
-		Collections.addAll(requests, documents);
-		Collections.addAll(requests, statics);
-		Collections.addAll(requests, stylesheets);
-		Collections.addAll(requests, assets);
+	private List<String> makeAll() {
+		List<String> requests = new ArrayList<>();
+		requests.addAll(documents);
+		requests.addAll(statics);
+		requests.addAll(stylesheets);
+		requests.addAll(assets);
 		Collections.shuffle(requests);
-		return requests.toArray(new VerifiableRequest[requests.size()]);
+		return requests;
 	}
 	
 	@Test
@@ -233,7 +169,7 @@ public class BasicServingTest {
 	}
 	
 	private void poundIt(final int threadCount, final int perClientTimeout, final int perClientRequestCount) throws Exception {
-		final VerifiableRequest[] requests = makeAll();
+		final List<String> requests = makeAll();
 		final CountDownLatch latch = new CountDownLatch(threadCount);
 		final ExecutorService service = Executors.newFixedThreadPool(threadCount);
 	

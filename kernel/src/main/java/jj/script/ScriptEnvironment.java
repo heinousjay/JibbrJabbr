@@ -17,11 +17,19 @@ package jj.script;
 
 import jj.resource.Resource;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
+ * <p>
+ * an execution environment for continuable rhino scripts.  specific implementations define
+ * the semantics of that environment.
+ * 
+ * <p>
+ * do not implement this directly, extend {@link AbstractScriptEnvironment} instead
+ * 
  * @author jason
  *
  */
@@ -29,38 +37,39 @@ public interface ScriptEnvironment extends Resource {
 
 	/**
 	 * The execution scope for the script
-	 * @return
 	 */
 	Scriptable scope();
 
 	/**
-	 * The script
-	 * @return
+	 * The compiled script instance. Could be null if the environment is purely virtual,
+	 * such as a module based on a deserialized JSON object
 	 */
 	Script script();
 	
 	/**
-	 * 
-	 * @return
+	 * The name of the script
 	 */
 	String scriptName();
 	
-	// this crap needs a wash
-
+	/**
+	 * true when this environment is fully initialized, false prior
+	 */
 	boolean initialized();
 	
-	void initialized(boolean initialized);
-	
+	/**
+	 * true when this environment has begun initializing but before initialization is complete.
+	 * false prior
+	 */
 	boolean initializing();
-	
-	void initializing(boolean initializing);
 
 	/**
-	 * @param initializationError
+	 * the error that occurred during initialization, if any
 	 */
-	void initializationError(Throwable cause);
 	Throwable initializationError();
-		
+	
+	/**
+	 * true if there is an initialization error.
+	 */
 	boolean initializationDidError();
 
 	/**
@@ -69,8 +78,18 @@ public interface ScriptEnvironment extends Resource {
 	ScriptableObject newObject();
 
 	/**
-	 * @return
+	 * The exports of this environment. may be null, may be literally anything the script decides to export
 	 */
 	Object exports();
+	
+	/**
+	 * Execute the given script inside the environment
+	 */
+	PendingKey execute(Script script);
+	
+	/**
+	 * Execute the given {@link Callable} inside the environment
+	 */
+	PendingKey execute(Callable callable, Object...args);
 
 }

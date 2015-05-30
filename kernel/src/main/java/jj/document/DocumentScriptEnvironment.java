@@ -27,9 +27,13 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
+import jj.execution.ExecutionInstance;
+import jj.execution.ExecutionLifecycleAware;
+import jj.http.server.ServableResourceConfiguration;
+import jj.http.server.ServableResource;
 import jj.http.server.websocket.AbstractWebSocketConnectionHost;
 import jj.http.server.websocket.ConnectionBroadcastStack;
 import jj.http.server.websocket.CurrentWebSocketConnection;
@@ -38,15 +42,11 @@ import jj.http.server.websocket.WebSocketMessageProcessor;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceNotViableException;
-import jj.resource.ServableConfiguration;
-import jj.resource.ServableResource;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.ScriptThread;
 import jj.script.module.RootScriptEnvironment;
 import jj.script.module.ScriptResource;
 import jj.util.Closer;
-import jj.util.CurrentResource;
-import jj.util.CurrentResourceAware;
 import jj.util.SHA1Helper;
 
 /**
@@ -56,10 +56,18 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@ServableConfiguration(name = "document")
+@ServableResourceConfiguration(
+	name = "document",
+	processor = DocumentScriptEnvironmentRouteProcessor.class
+)
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
-	implements CurrentResourceAware, RootScriptEnvironment, ServableResource {
+	implements ExecutionLifecycleAware, RootScriptEnvironment, ServableResource {
+	
+	public static final String JJ_JS = "jj.js";
+	public static final String JQUERY_JS_DEV = "jquery-2.0.3.js";
+	public static final String JQUERY_JS = "jquery-2.0.3.min.js";
+	public static final String JQUERY_JS_MAP = "jquery-2.0.3.min.map";
 	
 	public static final String READY_FUNCTION_KEY = "Document.ready";
 	
@@ -89,11 +97,8 @@ public class DocumentScriptEnvironment
 	
 	private final CurrentWebSocketConnection currentConnection;
 	
-	private final HashMap<ContinuationPendingKey, Context<?>> contexts = new HashMap<>(10);
+	private final HashMap<PendingKey, Context<?>> contexts = new HashMap<>(10);
 	
-	/**
-	 * @param cacheKey
-	 */
 	@Inject
 	DocumentScriptEnvironment(
 		final Dependencies dependencies,
@@ -105,15 +110,15 @@ public class DocumentScriptEnvironment
 	) {
 		super(dependencies);
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.Base, resourceName(name));
+		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, resourceName(name));
 		
 		if (html == null) {
 			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Client.suffix(name));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Shared.suffix(name));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.Base, ScriptResourceType.Server.suffix(name));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(name));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(name));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(name));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -253,12 +258,12 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	public void enteredCurrentScope() {
+	public void enteredScope() {
 		// nothing to do
 	}
 	
 	@Override
-	public void exitedCurrentScope() {
+	public void exitedScope() {
 		// presumably, if there is still broadcasting to be done, then it's saved
 		// away with continuation state
 		broadcastStack = null;
@@ -272,7 +277,7 @@ public class DocumentScriptEnvironment
 	
 	private static class Context<T> {
 		
-		final CurrentResource<T> source;
+		final ExecutionInstance<T> source;
 		final T current;
 		final ConnectionBroadcastStack broadcastStack;
 		
@@ -282,7 +287,7 @@ public class DocumentScriptEnvironment
 			this.broadcastStack = broadcastStack;
 		}
 		
-		Context(final CurrentResource<T> source, T resource, final ConnectionBroadcastStack broadcastStack) {
+		Context(final ExecutionInstance<T> source, T resource, final ConnectionBroadcastStack broadcastStack) {
 			this.source = source;
 			this.current = resource;
 			this.broadcastStack = broadcastStack;
@@ -294,7 +299,7 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	protected void captureContextForKey(ContinuationPendingKey key) {
+	protected void captureContextForKey(PendingKey key) {
 		assert !contexts.containsKey(key) : "cannot capture multiple times with the same key";
 		// we can't have both a document and a connection, so this works out neatly...
 		if (currentDocument.current() != null) {
@@ -307,7 +312,7 @@ public class DocumentScriptEnvironment
 	}
 	
 	@Override
-	protected Closer restoreContextForKey(ContinuationPendingKey key) {
+	protected Closer restoreContextForKey(PendingKey key) {
 		assert broadcastStack == null : "restoring into a DocumentScriptEnvironment with a standing broadcastStack";
 		Context<?> context = contexts.remove(key);
 		broadcastStack = context.broadcastStack;

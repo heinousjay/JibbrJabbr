@@ -19,14 +19,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.execution.TaskRunner;
-import jj.script.ContinuationCoordinator;
 import jj.script.ScriptTask;
 import jj.util.Closer;
 
 import org.mozilla.javascript.Callable;
 
 /**
- * 
+ * Executes a function registered as an event in the context of a connection.
  * 
  * @author jason
  *
@@ -36,30 +35,28 @@ public class ConnectionEventExecutor {
 
 	private final TaskRunner taskRunner;
 	
-	private final ContinuationCoordinator continuationCoordinator;
-	
 	private final CurrentWebSocketConnection currentConnection;
 
 	@Inject
 	ConnectionEventExecutor(
 		final TaskRunner taskRunner,
-		final ContinuationCoordinator continuationCoordinator,
 		final CurrentWebSocketConnection currentConnection
 	) {
 		this.taskRunner = taskRunner;
-		this.continuationCoordinator = continuationCoordinator;
 		this.currentConnection = currentConnection;
 	}
 	
 	public void submit(final WebSocketConnection connection, final String event, final Object...args) {
-		taskRunner.execute(new ConnectionEventTask("host event " + event + " on WebSocket connection", connection.webSocketConnectionHost(), continuationCoordinator, args, connection, event));	
+		taskRunner.execute(
+			new ConnectionEventTask(
+				"host event " + event + " on WebSocket connection",
+				connection,
+				args,
+				event
+			)
+		);	
 	}
 	
-
-	/**
-	 * @author jason
-	 *
-	 */
 	private final class ConnectionEventTask extends ScriptTask<WebSocketConnectionHost> {
 
 		private final Object[] args;
@@ -70,13 +67,11 @@ public class ConnectionEventExecutor {
 
 		private ConnectionEventTask(
 			String name,
-			WebSocketConnectionHost scriptEnvironment,
-			ContinuationCoordinator continuationCoordinator,
-			Object[] args,
 			WebSocketConnection connection,
+			Object[] args,
 			String event
 		) {
-			super(name, scriptEnvironment, continuationCoordinator);
+			super(name, connection.webSocketConnectionHost());
 			this.args = args;
 			this.connection = connection;
 			this.event = event;
@@ -91,7 +86,7 @@ public class ConnectionEventExecutor {
 			
 			if (function != null) {
 				try (Closer closer = currentConnection.enterScope(connection)) {
-					pendingKey = continuationCoordinator.execute(scriptEnvironment, function, args);
+					pendingKey = scriptEnvironment.execute(function, args);
 				}
 			}
 		}

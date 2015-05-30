@@ -18,9 +18,10 @@ package jj.http.server.websocket;
 import javax.inject.Singleton;
 
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
-import jj.http.uri.URIMatch;
+import jj.http.server.uri.URIMatch;
 
 /**
  * @author jason
@@ -32,20 +33,20 @@ public class WebSocketRequestChecker {
 	private static final String SOCKET = "socket";
 
 	private boolean isWebSocketURI(final FullHttpRequest request) {
-		URIMatch uriMatch = new URIMatch(request.getUri());
+		URIMatch uriMatch = new URIMatch(request.uri());
 		return SOCKET.equals(uriMatch.extension) && uriMatch.sha1 != null;
 	}
 	
 	private boolean isUpgradeRequest(final FullHttpRequest request) {
-		return request.headers().contains(HttpHeaders.Names.CONNECTION) &&
-			request.headers().get(HttpHeaders.Names.CONNECTION).toLowerCase().contains(HttpHeaders.Values.UPGRADE.toLowerCase());
+		return request.headers().contains(HttpHeaderNames.CONNECTION) &&
+			request.headers().get(HttpHeaderNames.CONNECTION).toString().toLowerCase().contains(HttpHeaderValues.UPGRADE.toLowerCase());
 	}
 	
 	public boolean isWebSocketRequest(final FullHttpRequest request) {
 		
-		return HttpMethod.GET.equals(request.getMethod()) &&
+		return HttpMethod.GET.equals(request.method()) &&
 			isUpgradeRequest(request) &&
-			HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(request.headers().get(HttpHeaders.Names.UPGRADE)) &&
+			HttpHeaderValues.WEBSOCKET.equalsIgnoreCase(request.headers().get(HttpHeaderNames.UPGRADE)) &&
 			isWebSocketURI(request);
 	}
 	

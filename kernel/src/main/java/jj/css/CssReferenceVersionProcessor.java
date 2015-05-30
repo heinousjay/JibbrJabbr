@@ -21,12 +21,12 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
-import jj.http.uri.URIMatch;
-import jj.resource.PathResolver;
+import jj.application.AppLocation;
+import jj.application.Application;
+import jj.http.server.ServableResource;
+import jj.http.server.resource.StaticResource;
+import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
-import jj.resource.ServableResource;
-import jj.resource.stat.ic.StaticResource;
 
 /**
  * <p>
@@ -43,15 +43,15 @@ class CssReferenceVersionProcessor {
 	private static final Pattern URL = Pattern.compile("url\\((['\"])?(.+?)\\1?\\)");
 	private static final Pattern ABSOLUTE = Pattern.compile("^(?:https?:)?//");
 
-	private final PathResolver pathResolver;
+	private final Application application;
 	private final ResourceFinder resourceFinder;
 	
 	@Inject
 	CssReferenceVersionProcessor(
-		final PathResolver pathResolver,
+		final Application application,
 		final ResourceFinder resourceFinder
 	) {
-		this.pathResolver = pathResolver;
+		this.application = application;
 		this.resourceFinder = resourceFinder;
 	}
 
@@ -89,13 +89,13 @@ class CssReferenceVersionProcessor {
 				if (replacement.startsWith("/")) {
 					name = replacement.substring(1);
 				} else {
-					name = pathResolver.path()
+					name = application.resolvePath(AppLocation.AppBase, "")
 						.relativize(resource.path().resolveSibling(replacement))
 						.normalize()
 						.toString();
 				
 				}
-				ServableResource dependency = resourceFinder.loadResource(type, AppLocation.Base, name);
+				ServableResource dependency = resourceFinder.loadResource(type, AppLocation.AppBase, name);
 				
 				if (dependency != null) {
 					dependency.addDependent(resource);

@@ -15,6 +15,8 @@
  */
 package jj.http.server;
 
+import jj.util.StringUtils;
+
 /**
  * @author jason
  *
@@ -47,5 +49,19 @@ public class Binding {
 			(host == null ? "" : "'" + host + "', ") +
 			port +
 			");";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Binding && equals((Binding)obj);
+	}
+	
+	public boolean equals(Binding other) {
+		return StringUtils.equals(host, other.host) && port == other.port;
+	}
+	
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
 	}
 }

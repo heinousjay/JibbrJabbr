@@ -25,7 +25,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import jj.configuration.resolution.AppLocation;
+import jj.application.AppLocation;
 import jj.resource.AbstractResource;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
@@ -101,7 +101,7 @@ public class MessagesResource extends AbstractResource {
 		ArrayList<PropertiesResource> result = new ArrayList<>(4);
 		for (String candidateName : candidateNames()) {
 			PropertiesResource resource =
-				resourceFinder.loadResource(PropertiesResource.class, AppLocation.Base, candidateName);
+				resourceFinder.loadResource(PropertiesResource.class, AppLocation.AppBase, candidateName);
 			if (resource != null) {
 				result.add(resource);
 				resource.addDependent(this);
@@ -127,6 +127,11 @@ public class MessagesResource extends AbstractResource {
 	@Override
 	public String sha1() {
 		return sha;
+	}
+	
+	@Override
+	protected Object[] creationArgs() {
+		return new Object[] { locale };
 	}
 	
 	public boolean containsKey(String key) {

@@ -15,9 +15,8 @@
  */
 package jj.resource;
 
-import jj.http.server.ResourceServer;
-import jj.http.server.SimpleResourceServer;
-import jj.util.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
@@ -29,12 +28,10 @@ import com.google.inject.multibindings.MapBinder;
  *
  */
 public class ResourceBinder {
+	
+	private final Map<Class<? extends Resource>, ResourceBindingProcessor<? extends Resource>> bindingProcessors = new HashMap<>();
 
 	private final MapBinder<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
-	
-	private final MapBinder<String, Class<? extends ServableResource>> servableResourceBinder;
-	
-	private final MapBinder<Class<? extends ServableResource>, ResourceServer> resourceServerBinder;
 	
 	public ResourceBinder(final Binder binder) {
 		resourceCreatorBinder = MapBinder.newMapBinder(
@@ -42,46 +39,21 @@ public class ResourceBinder {
 			new TypeLiteral<Class<? extends AbstractResource>>() {},
 			new TypeLiteral<SimpleResourceCreator<? extends AbstractResource>>() {}
 		);
-		
-		servableResourceBinder = MapBinder.newMapBinder(
-			binder,
-			new TypeLiteral<String>() {},
-			new TypeLiteral<Class<? extends ServableResource>>() {}
-		);
-		
-		resourceServerBinder = MapBinder.newMapBinder(
-			binder,
-			new TypeLiteral<Class<? extends ServableResource>>() {},
-			new TypeLiteral<ResourceServer>() {}
-		);
+	}
+	
+	public <T extends Resource> ResourceBinder addResourceBindingProcessor(Class<T> resourceClass, ResourceBindingProcessor<T> bindingProcessor) {
+		bindingProcessors.put(resourceClass, bindingProcessor);
+		return this;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractResource, U extends SimpleResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
 		
-		if (ServableResource.class.isAssignableFrom(key)) {
-			
-			String name = null;
-			Class<? extends ResourceServer> resourceServerClass = SimpleResourceServer.class;
-			
-			ServableConfiguration config = key.getAnnotation(ServableConfiguration.class);
-			if (config != null) {
-				name = config.name();
-				resourceServerClass = config.processor();
+		for (Class<? extends Resource> resourceInterface : bindingProcessors.keySet()) {
+			if (resourceInterface.isAssignableFrom(key)) {
+				ResourceBindingProcessor<T> processor = (ResourceBindingProcessor<T>)bindingProcessors.get(resourceInterface);
+				processor.process(key);
 			}
-			
-			if (StringUtils.isEmpty(name)) {
-				// figure it out! this is close but not bulletproof
-				name = key.getSimpleName();
-				int end = name.lastIndexOf("Resource");
-				if (end > 1) {
-					name = name.substring(0, end);
-				}
-				name = name.substring(0, 1).toLowerCase() + name.substring(1);
-			}
-			
-			servableResourceBinder.addBinding(name).toInstance((Class<? extends ServableResource>)key);
-			resourceServerBinder.addBinding((Class<? extends ServableResource>)key).to(resourceServerClass);
 		}
 		
 		return (LinkedBindingBuilder<U>)resourceCreatorBinder.addBinding(key);

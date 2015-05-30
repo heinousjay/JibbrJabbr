@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.ResourceTask;
-import jj.script.ContinuationCoordinator;
 import jj.script.DependsOnScriptEnvironmentInitialization;
 import jj.script.ScriptTask;
 import jj.script.ScriptThread;
@@ -19,10 +18,9 @@ import jj.document.DocumentScriptEnvironment;
 import jj.execution.TaskRunner;
 import jj.http.server.HttpServerRequest;
 import jj.http.server.HttpServerResponse;
-import jj.http.server.servable.RequestProcessor;
 import jj.jjmessage.JJMessage;
-import io.netty.handler.codec.http.HttpHeaders;
-
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import org.jsoup.nodes.Document;
 import org.mozilla.javascript.Callable;
 
@@ -34,7 +32,7 @@ import org.mozilla.javascript.Callable;
  *
  */
 @Singleton
-public class DocumentRequestProcessor implements RequestProcessor {
+public class DocumentRequestProcessor {
 	
 	@SuppressWarnings("serial")
 	private static class FilterList extends ArrayList<DocumentFilter> {}
@@ -42,8 +40,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	private final TaskRunner taskRunner;
 	
 	private final DependsOnScriptEnvironmentInitialization initializer;
-	
-	private final ContinuationCoordinator continuationCoordinator;
 	
 	private final CurrentDocumentRequestProcessor currentDocument;
 	
@@ -63,7 +59,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	DocumentRequestProcessor(
 		final TaskRunner taskRunner,
 		final DependsOnScriptEnvironmentInitialization initializer,
-		final ContinuationCoordinator continuationCoordinator,
 		final CurrentDocumentRequestProcessor currentDocument,
 		final DocumentScriptEnvironment dse,
 		final HttpServerRequest httpRequest,
@@ -73,7 +68,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	) {
 		this.taskRunner = taskRunner;
 		this.initializer = initializer;
-		this.continuationCoordinator = continuationCoordinator;
 		this.currentDocument = currentDocument;
 		this.documentScriptEnvironment = dse;
 		this.document = dse.document();
@@ -105,17 +99,16 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		return documentScriptEnvironment.name();
 	}
 	
-	@Override
 	public void process() {
-		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment, continuationCoordinator));
+		taskRunner.execute(new DocumentRequestProcessTask(documentScriptEnvironment));
 	}
 	
 	private final class DocumentRequestProcessTask extends ScriptTask<DocumentScriptEnvironment> {
 		
 		private boolean run = false;
 		
-		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment, ContinuationCoordinator continuationCoordinator) {
-			super("processing document request at " + scriptEnvironment.name(), scriptEnvironment, continuationCoordinator);
+		protected DocumentRequestProcessTask(DocumentScriptEnvironment scriptEnvironment) {
+			super("processing document request at " + scriptEnvironment.name(), scriptEnvironment);
 		}
 
 		@Override
@@ -132,7 +125,7 @@ public class DocumentRequestProcessor implements RequestProcessor {
 				if (readyFunction != null) {
 					try (Closer closer = currentDocument.enterScope(DocumentRequestProcessor.this)) {
 						// should make a request object wrapper of some sort.  and perhaps response too?
-						pendingKey = continuationCoordinator.execute(scriptEnvironment, readyFunction);
+						pendingKey = scriptEnvironment.execute(readyFunction);
 					}
 				}
 			}
@@ -201,17 +194,17 @@ public class DocumentRequestProcessor implements RequestProcessor {
 		document.outputSettings().prettyPrint(false).indentAmount(0);
 		byte[] bytes = document.toString().getBytes(documentScriptEnvironment.charset());
 		httpResponse
-			.header(HttpHeaders.Names.CONTENT_LENGTH, bytes.length)
+			.header(HttpHeaderNames.CONTENT_LENGTH, bytes.length)
 			// clients shouldn't cache these responses at all
-			.header(HttpHeaders.Names.CACHE_CONTROL, HttpHeaders.Values.NO_STORE)
-			.header(HttpHeaders.Names.CONTENT_TYPE, documentScriptEnvironment.contentType())
+			.header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE)
+			.header(HttpHeaderNames.CONTENT_TYPE, documentScriptEnvironment.contentType())
 			.content(bytes)
 			.end();
 	}
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ": " + httpRequest.uri();
+		return getClass().getSimpleName() + ": " + documentScriptEnvironment;
 	}
 	
 	/**
@@ -245,6 +238,6 @@ public class DocumentRequestProcessor implements RequestProcessor {
 	}
 	
 	String uri() {
-		return httpRequest.uri();
+		return httpRequest.uriMatch().uri;
 	}
 }

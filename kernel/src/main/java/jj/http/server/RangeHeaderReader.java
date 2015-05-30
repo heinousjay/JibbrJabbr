@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jj.util.StringUtils;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 
 /**
@@ -94,7 +95,7 @@ class RangeHeaderReader {
 		this.responseSize = responseSize;
 		this.overlapDistance = overlapDistance;
 		this.maxRanges = maxRanges;
-		parseRanges(requestHeaders.get(HttpHeaders.Names.RANGE));
+		parseRanges(requestHeaders.get(HttpHeaderNames.RANGE).toString());
 	}
 	
 	private void parseRanges(String headerValue) {

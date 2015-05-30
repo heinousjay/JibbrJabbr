@@ -17,13 +17,13 @@ package jj.document;
 
 import org.slf4j.Logger;
 
-import jj.script.ExecutionEvent;
+import jj.script.ScriptSystemEvent;
 
 /**
  * @author jason
  *
  */
-class EvaluatingSharedScript extends ExecutionEvent {
+class EvaluatingSharedScript extends ScriptSystemEvent {
 	
 	private final String path;
 	

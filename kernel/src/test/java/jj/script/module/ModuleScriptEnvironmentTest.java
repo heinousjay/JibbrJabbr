@@ -16,12 +16,13 @@
 package jj.script.module;
 
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
 import jj.resource.Location;
-import jj.script.ContinuationPendingKey;
+import jj.script.PendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
 import jj.script.AbstractScriptEnvironment;
@@ -69,7 +70,7 @@ public class ModuleScriptEnvironmentTest {
 		given(((RootScriptEnvironment)parent).global()).willReturn(global);
 		
 		requiredModule = new RequiredModule((RootScriptEnvironment)parent, name);
-		requiredModule.pendingKey(new ContinuationPendingKey());
+		requiredModule.pendingKey(new PendingKey());
 		
 		given(parent.alive()).willReturn(true);
 		return dependencies;
@@ -104,7 +105,7 @@ public class ModuleScriptEnvironmentTest {
 	@Test
 	public void testUserScriptModule() {
 		
-		constructScriptModule("module", "module", Base);
+		constructScriptModule("module", "module", AppBase);
 		
 		assertThat(mse.scope().get("inject", mse.scope()), is(ScriptableObject.NOT_FOUND));
 	}
@@ -120,7 +121,7 @@ public class ModuleScriptEnvironmentTest {
 	@Test
 	public void testUserJSONModule() {
 		
-		constructJSONModule("module", "module", Base);
+		constructJSONModule("module", "module", AppBase);
 		
 		assertThat(mse.exports(), is(contents));
 	}

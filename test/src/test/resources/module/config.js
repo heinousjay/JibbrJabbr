@@ -6,3 +6,9 @@ require('jj/resource-system-configuration')
 	.maxFileSizeToLoad(10240);
 
 require('jj/default-resource-properties');
+
+
+var route = require('jj/uri-routing-configuration').route;
+
+route.GET('/').to.document("index");
+route.GET('/deep/nested').to.document("deep/nested");

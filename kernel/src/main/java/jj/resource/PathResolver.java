@@ -16,29 +16,26 @@
 package jj.resource;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
+ * <p>
+ * Resolves a {@link Location}/name tuple into a {@link Path},
+ * if possible.
  * @author jason
  *
  */
 public interface PathResolver {
-	
-	/**
-	 * The base location of the application
-	 */
-	Location base();
-	
-	/**
-	 * The base path of the application
-	 */
-	Path path();
-	
-	boolean pathInBase(Path path);
 
+	Path resolvePath(Location base);
+	
 	/**
-	 * resolve the given location and name against
-	 * the application base
+	 * If possible, construct a {@link Path} for the given
+	 * {@link Location}/name pair.
 	 */
 	Path resolvePath(Location base, String name);
-
+	
+	Location resolveLocation(Path path);
+	
+	List<Location> watchedLocations();
 }

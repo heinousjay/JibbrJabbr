@@ -11,13 +11,13 @@ public class ScriptModule extends JJModule {
 	@Override
 	protected void configure() {
 		
-		addAPIModulePath("/jj/script/api");
+		bindAPIModulePath("/jj/script/api");
 		
-		bindConfiguration().to(ScriptExecutionConfiguration.class);
+		bindConfiguration(ScriptExecutionConfiguration.class);
 		
 		bind(DependsOnScriptEnvironmentInitialization.class).to(ScriptEnvironmentInitializer.class);
 		
-		bind(ContinuationCoordinator.class).to(ContinuationCoordinatorImpl.class);
+		bind(ContinuationResumer.class).to(ContinuationCoordinator.class);
 		
 		bindExecutor(ScriptExecutorFactory.class);
 		
@@ -25,6 +25,6 @@ public class ScriptModule extends JJModule {
 		
 		bind(ScriptableObject.class).annotatedWith(Global.class).toProvider(GlobalStandardObjects.class);
 		
-		bindLoggedEvents().annotatedWith(ExecutionTraceLogger.class).toLogger(ExecutionTraceLogger.NAME);
+		bindLoggedEventsAnnotatedWith(ScriptSystemLogger.class).toLogger(ScriptSystemLogger.NAME);
 	}
 }

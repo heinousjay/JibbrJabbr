@@ -21,13 +21,13 @@ import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import jj.execution.TaskRunner;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -53,18 +53,14 @@ public class ContinuationPendingCacheTest {
 
 		/** it will never run so nulls are cool!
 		 */
-		protected HelperTask() {
-			super("", null, null);
+		protected HelperTask(PendingKey pendingKey) {
+			super("", null);
+			this.pendingKey = pendingKey;
 		}
 
 		@Override
 		protected void begin() throws Exception {
 			// never gonna run
-		}
-		
-		
-		protected void pendingKey(ContinuationPendingKey pendingKey) {
-			this.pendingKey = pendingKey;
 		}
 		
 		protected Object result() {
@@ -74,28 +70,40 @@ public class ContinuationPendingCacheTest {
 
 	private @Mock TaskRunner taskRunner;
 	private @InjectMocks ContinuationPendingCache cache;
-
-	private HelperTask[] tasks;
 	
-	private ContinuationPendingKey[] pendingKeys;
-	
-	@Before
-	public void before() {
-		//System.out.println(KEY_COUNT + " keys on " + STRESS_LEVEL + " threads");
-		assertThat(KEY_COUNT % STRESS_LEVEL, is(0));
+	@Test
+	public void testRemoval() throws Throwable {
 		
-		tasks = new HelperTask[KEY_COUNT];
-		pendingKeys = new ContinuationPendingKey[KEY_COUNT];
+		// given
+		PendingKey key = new PendingKey(cache);
 		
-		for (int i = 0; i < KEY_COUNT; ++i) {
-			tasks[i] = new HelperTask();
-			pendingKeys[i] = new ContinuationPendingKey(cache);
-			tasks[i].pendingKey(pendingKeys[i]);
+		// when
+		cache.storeForContinuation(new HelperTask(key));
+		cache.removePendingTasks(Collections.singletonList(key));
+		
+		// then
+		boolean failed = false;
+		try {
+			cache.resume(key, "");
+		} catch (AssertionError ae) {
+			failed = true;
 		}
+		
+		assertTrue(failed);
 	}
 	
 	@Test
 	public void testStoreAndResume() throws Throwable {
+		//System.out.println(KEY_COUNT + " keys on " + STRESS_LEVEL + " threads");
+		assertThat(KEY_COUNT % STRESS_LEVEL, is(0));
+		
+		HelperTask[] tasks = new HelperTask[KEY_COUNT];
+		PendingKey[] pendingKeys = new PendingKey[KEY_COUNT];
+		
+		for (int i = 0; i < KEY_COUNT; ++i) {
+			pendingKeys[i] = new PendingKey(cache);
+			tasks[i] = new HelperTask(pendingKeys[i]);
+		}
 		
 		final ArrayBlockingQueue<Throwable> throwables = new ArrayBlockingQueue<>(STRESS_LEVEL);
 		final CountDownLatch latch = new CountDownLatch(STRESS_LEVEL);
@@ -103,19 +111,15 @@ public class ContinuationPendingCacheTest {
 		
 		for (int i = 0; i < STRESS_LEVEL; ++i) {
 			final int start = i * stride; // 0 * 20 = 0, 1 * 20 = 20;
-			new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						for (int i = start; i < start + stride; ++i) {
-							cache.storeForContinuation(tasks[i]);
-							Thread.yield(); // get em all good and mixed up
-						}
-						latch.countDown();
-					} catch (Throwable t) {
-						throwables.add(t);
+			new Thread(() -> {
+				try {
+					for (int j = start; j < start + stride; ++j) {
+						cache.storeForContinuation(tasks[j]);
+						Thread.yield(); // get em all good and mixed up
 					}
+					latch.countDown();
+				} catch (Throwable t) {
+					throwables.add(t);
 				}
 			}).start();
 		}
@@ -127,26 +131,20 @@ public class ContinuationPendingCacheTest {
 		}
 		
 		final CountDownLatch latch2 = new CountDownLatch(STRESS_LEVEL);
-		final Object result = new Object();
 		
 		for (int i = 0; i < STRESS_LEVEL; ++i) {
 			final int start = i * stride; // 0 * 20 = 0, 1 * 20 = 20;
-			new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					int i = start;
-					try {
-						for (; i < start + stride; ++i) {
-							
-							cache.resume(pendingKeys[i], result);
-							assertThat(tasks[i].result(), is(sameInstance(result)));
-							verify(taskRunner).execute(tasks[i]);
-						}
-						latch2.countDown();
-					} catch (Throwable t) {
-						throwables.add(t);
+			new Thread(() -> {
+				try {
+					for (int j = start; j < start + stride; ++j) {
+						final Object result = new Object();
+						cache.resume(pendingKeys[j], result);
+						assertThat(tasks[j].result(), is(sameInstance(result)));
+						verify(taskRunner).execute(tasks[j]);
 					}
+					latch2.countDown();
+				} catch (Throwable t) {
+					throwables.add(t);
 				}
 			}).start();
 		}
@@ -161,18 +159,14 @@ public class ContinuationPendingCacheTest {
 		
 		for (int i = 0; i < STRESS_LEVEL; ++i) {
 			final int start = i * stride; // 0 * 20 = 0, 1 * 20 = 20;
-			new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						for (int i = start; i < start + stride; ++i) {
-							assertResume(i);
-						}
-						latch3.countDown();
-					} catch (Throwable t) {
-						t.printStackTrace();
+			new Thread(() -> {
+				try {
+					for (int j = start; j < start + stride; ++j) {
+						assertResume(pendingKeys[j]);
 					}
+					latch3.countDown();
+				} catch (Throwable t) {
+					t.printStackTrace();
 				}
 			}).start();
 		}
@@ -185,11 +179,11 @@ public class ContinuationPendingCacheTest {
 		
 	}
 	
-	private void assertResume(int index) {
+	private void assertResume(PendingKey pendingKey) {
 
 		boolean asserted = false;
 		try {
-			cache.resume(pendingKeys[index], ""); // should throw!
+			cache.resume(pendingKey, ""); // should throw!
 		} catch (AssertionError ae) {
 			asserted = true;
 		}

@@ -15,13 +15,13 @@
  */
 package jj.resource;
 
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.resource.stat.ic.StaticResource;
+import jj.http.server.resource.StaticResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,10 +48,11 @@ public class ResourceCreatorsTest {
 		
 		ResourceCreators rc = new ResourceCreators(resourceCreators);
 		
+		// contains here, because order matters
 		assertThat(rc.knownResourceTypeNames(), contains(
+			"jj.http.server.resource.StaticResource",
 			"jj.resource.AbstractResource",
-			"jj.resource.Sha1Resource",
-			"jj.resource.stat.ic.StaticResource"
+			"jj.resource.Sha1Resource"
 		));
 	}
 

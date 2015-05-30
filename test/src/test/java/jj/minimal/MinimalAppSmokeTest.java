@@ -18,8 +18,10 @@ package jj.minimal;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import jj.App;
+import jj.ServerRoot;
 import jj.testing.JibbrJabbrTestServer;
 import jj.webdriver.WebDriverRule;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -32,7 +34,7 @@ import org.junit.Test;
 public class MinimalAppSmokeTest {
 	
 	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(App.minimal);
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(ServerRoot.one, App.minimal);
 	
 	// asking for a WebDriverRule from the server rule automatically configures the
 	// server to start listening on 8080, and configures the rules to a base url of

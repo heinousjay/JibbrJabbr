@@ -53,7 +53,7 @@ public class ContinuationCoordinatorTest {
 	
 	final String sha1 = "scriptsha1";
 	
-	ContinuationPendingKey pendingKey;
+	PendingKey pendingKey;
 	
 	@Mock(extraInterfaces = {ConstProperties.class}) Scriptable scope;
 	
@@ -75,7 +75,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Script executedScript;
 
-	ContinuationCoordinatorImpl continuationCoordinator;
+	ContinuationCoordinator continuationCoordinator;
 	
 	final Object[] args = { new Object(), new Object() };
 	
@@ -89,12 +89,14 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock ContinuationPendingCache cache;
 	
+	@Mock IsThread is;
+	
 	@Mock Closer closer;
 	
 	@Before
 	public void before() {
 		
-		pendingKey = new ContinuationPendingKey();
+		pendingKey = new PendingKey();
 		
 		MockRhinoContextProvider contextProvider = new MockRhinoContextProvider();
 		
@@ -110,50 +112,15 @@ public class ContinuationCoordinatorTest {
 		continuationProcessors.put(JJMessage.class, continuationProcessor2);
 		continuationProcessors.put(RequiredModule.class, continuationProcessor3);
 		context = contextProvider.get();
-		continuationCoordinator = new ContinuationCoordinatorImpl(contextProvider, env, publisher, continuationProcessors, cache);
-	}
-	
-	@Test
-	public void testInitialExecutionNoContinuation() {
+		continuationCoordinator = new ContinuationCoordinator(contextProvider, env, publisher, continuationProcessors, cache, is);
 		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
-		
-		assertThat(result, is(nullValue()));
-	}
-	
-	@Test
-	public void testInitialExecutionWithContinuation() {
-		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(continuation);
-		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
-		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment);
-
-		assertThat(result, is(pendingKey));
-		verify(continuationProcessor2).process(continuationState);
-	}
-	
-	@Test
-	public void testInitialExecutionWithUnexpectedException() {
-		
-		final RuntimeException e = new RuntimeException();
-		
-		given(context.executeScriptWithContinuations(script, scope)).willThrow(e);
-		
-		try {
-			continuationCoordinator.execute(scriptEnvironment);
-			fail();
-		} catch (RuntimeException re) {
-			assertThat(re, is(sameInstance(e)));
-		}
-		
-		verify(publisher).publish(isA(ScriptExecutionError.class));
+		given(is.forScriptEnvironment(any(ScriptEnvironment.class))).willReturn(true);
 	}
 	
 	@Test
 	public void testFunctionExecutionNoContinuation() {
 		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, function, args[0], args[1]);
+		PendingKey result = continuationCoordinator.execute(scriptEnvironment, function, args[0], args[1]);
 		
 		assertThat(result, is(nullValue()));
 	}
@@ -164,7 +131,7 @@ public class ContinuationCoordinatorTest {
 		given(context.callFunctionWithContinuations(eq(function), eq(scope), any(Object[].class))).willThrow(continuation);
 		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
 		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, function, args);
+		PendingKey result = continuationCoordinator.execute(scriptEnvironment, function, args);
 		
 		assertThat(result, is(notNullValue()));
 		verify(continuationProcessor2).process(continuationState);
@@ -190,7 +157,7 @@ public class ContinuationCoordinatorTest {
 	@Test
 	public void testScriptExecutionNoContinuation() {
 		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, executedScript);
+		PendingKey result = continuationCoordinator.execute(scriptEnvironment, executedScript);
 		
 		assertThat(result, is(nullValue()));
 	}
@@ -201,7 +168,7 @@ public class ContinuationCoordinatorTest {
 		given(context.executeScriptWithContinuations(executedScript, scope)).willThrow(continuation);
 		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
 		
-		ContinuationPendingKey result = continuationCoordinator.execute(scriptEnvironment, executedScript);
+		PendingKey result = continuationCoordinator.execute(scriptEnvironment, executedScript);
 		
 		assertThat(result, is(notNullValue()));
 		verify(continuationProcessor2).process(continuationState);
@@ -230,7 +197,7 @@ public class ContinuationCoordinatorTest {
 		given(scriptEnvironment.continuationPending(pendingKey)).willReturn(continuation);
 		given(scriptEnvironment.restoreContextForKey(pendingKey)).willReturn(closer);
 		
-		ContinuationPendingKey result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
+		PendingKey result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
 		assertThat(result, is(nullValue()));
 	}
@@ -243,7 +210,7 @@ public class ContinuationCoordinatorTest {
 		given(context.resumeContinuation(any(), eq(scope), eq(args))).willThrow(continuation);
 		continuationState.continuationAs(JJMessage.class).pendingKey(pendingKey);
 		
-		ContinuationPendingKey result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
+		PendingKey result = continuationCoordinator.resumeContinuation(scriptEnvironment, pendingKey, args);
 		
 		assertThat(result, is(notNullValue()));
 		verify(continuationProcessor2).process(continuationState);

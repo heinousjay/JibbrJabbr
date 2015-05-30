@@ -15,7 +15,7 @@
  */
 package jj.jasmine;
 
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.server.ServerLocation.*;
 
 import java.io.IOException;
 
@@ -87,12 +87,12 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		spec    = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, name);
 		
 		// target is unlikely to be null, but maybe it got deleted while we were getting created
+		// if spec is null, we have nothing to do
 		if (target == null || spec == null) {
 			throw new NoSuchResourceException(JasmineScriptEnvironment.class, name);
 		}
 		
 		// if we have a reason to load stuff, load stuff!
-		
 		jasmine = resourceFinder.loadResource(ScriptResource.class, Assets, JASMINE_JS);
 		boot    = resourceFinder.loadResource(ScriptResource.class, Assets, JASMINE_BOOT_JS);
 		runner  = resourceFinder.loadResource(ScriptResource.class, Assets, JASMINE_RUN_JS);
@@ -102,10 +102,16 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		assert runner != null  : "can't find the jasmine-run script";
 		
 		// okay, we have all the things we need, now we can bother finishing up
-		// need to configure different require.  also need different inject.
-		// to allow things to be mocked correctly
-		scope = configureModuleObjects(JASMINE, createChainedScope(global), "$$realRequire");
+		sha1 = SHA1Helper.keyFor(target.sha1(), spec.sha1(), jasmine.sha1(), boot.sha1(), runner.sha1());
+		scope = scope(global);
+		dependencies();
+	}
+	
+	private ScriptableObject scope(ScriptableObject global) {
+		// need to configure different require to allow it to be mocked.
+		ScriptableObject scope = configureModuleObjects(JASMINE, createChainedScope(global), "$$realRequire");
 		
+		// also need different inject.
 		configureInjectFunction(configureTimers(scope), "$$realInject");
 		
 		// and we need to pre-execute the jasmine script into our scope, because requiring it
@@ -114,14 +120,15 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 			context.executeScript(jasmine.script(), scope);
 		}
 		
-		// do the dependency dance! gotta hook up to all our business
+		return scope;
+	}
+	
+	private void dependencies() {
 		target.addDependent(this);
 		spec.addDependent(this);
 		jasmine.addDependent(this);
 		boot.addDependent(this);
 		runner.addDependent(this);
-		
-		sha1 = SHA1Helper.keyFor(target.sha1(), spec.sha1(), jasmine.sha1(), boot.sha1(), runner.sha1());
 	}
 	
 	@Override

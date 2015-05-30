@@ -15,12 +15,14 @@
  */
 package jj.script;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.execution.CurrentTask;
 import jj.execution.TaskRunner;
 import jj.util.SecureRandomHelper;
 
@@ -31,56 +33,72 @@ import jj.util.SecureRandomHelper;
 @Singleton
 class ContinuationPendingCache {
 	
-	// does this require an inner task to clean up the the map?
-	// on the presumption that spots can be reserved and abandoned
-	// due to errors or malice
-	
-	// that would mean changing the value to be a tuple
-	// not convinced its necessary yet.  maybe once i've declared
-	// a ServerTask + executor it will be time
-
 	private final TaskRunner taskRunner;
 	
+	private final CurrentTask currentTask;
+	
 	@Inject
-	ContinuationPendingCache(final TaskRunner taskRunner) {
+	ContinuationPendingCache(final TaskRunner taskRunner, final CurrentTask currentTask) {
 		this.taskRunner = taskRunner;
+		this.currentTask = currentTask;
 	}
 	
-	private final ScriptTask<ScriptEnvironment> sentinel = 
-		new ScriptTask<ScriptEnvironment>("", null, null) {
+	private final ScriptTask<ScriptEnvironment> reserved = 
+		new ScriptTask<ScriptEnvironment>("", null) {
 		
 			@Override
 			protected void begin() throws Exception {
-				// will never be run
+				throw new AssertionError("reserved sentinel was run!");
+			}
+		};
+		
+	private final ScriptTask<ScriptEnvironment> alreadyResumed =
+		new ScriptTask<ScriptEnvironment>("", null) {
+			
+			@Override
+			protected void begin() throws Exception {
+				throw new AssertionError("already resumed sentinel was run!");
 			}
 		};
 	
 	/**
-	 * tasks awaiting resumption. can this be stored per executor somehow?
+	 * tasks awaiting resumption.
 	 */
 	private final ConcurrentMap<String, ScriptTask<?>> resumableTasks = new ConcurrentHashMap<>();
+	
+	/**
+	 * bulk removable of pending tasks
+	 * @param keys A collection of {@link PendingKey}s to remove
+	 */
+	void removePendingTasks(Collection<PendingKey> keys) {
+		keys.forEach(key -> {
+			resumableTasks.remove(key.id());
+		});
+	}
 	
 	String uniqueID() {
 		// wow.  a do...while!
 		String result;
 		do {
 			result = Integer.toHexString(SecureRandomHelper.nextInt());
-		} while (resumableTasks.putIfAbsent(result, sentinel) != null);
+		} while (resumableTasks.putIfAbsent(result, reserved) != null);
 		
 		return result;
 	}
 	
 	void storeForContinuation(final ScriptTask<?> task) {
-		ContinuationPendingKey pendingKey = task.pendingKey();
+		PendingKey pendingKey = task.pendingKey();
 		
 		if (pendingKey != null) {
-			if (!resumableTasks.replace(pendingKey.id(), sentinel, task)) {
+			if (!resumableTasks.replace(pendingKey.id(), reserved, task) &&
+				!resumableTasks.remove(pendingKey.id(), alreadyResumed)
+			) {
 				throw new AssertionError("pending key being stored was not reserved or is already in use!");
 			}
 		}
 	}
 	
-	void resume(final ContinuationPendingKey pendingKey, final Object result) {
+	void resume(final PendingKey pendingKey, final Object result) {
 		assert pendingKey != null : "attempting to resume without a pendingKey";
 		
 		ScriptTask<?> task = resumableTasks.remove(pendingKey.id());
@@ -88,8 +106,15 @@ class ContinuationPendingCache {
 		// we will just ignore them.  but that will be when one can do things like run with kernel assertions off :D
 		// so NOT YET
 		assert task != null : "asked to resume a nonexistent task";
-		assert task != sentinel : "key reserved was never stored";
-		task.resumeWith(result);
+		if (task != reserved) {
+			task.resumeWith(result);
+		} else if (currentTask.currentIs(ScriptTask.class)) { // it resumed immediately, via some stroke of luck
+			resumableTasks.putIfAbsent(pendingKey.id(), alreadyResumed);
+			task = currentTask.currentAs(ScriptTask.class);   // so reschedule the current task to run again
+			task.resumeWith(result);
+		} else {
+			throw new AssertionError("asked to resume an unstored key from a non-ScriptTask. weird error, weird message!");
+		}
 		
 		taskRunner.execute(task);
 	}

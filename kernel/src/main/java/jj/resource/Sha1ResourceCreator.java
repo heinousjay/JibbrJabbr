@@ -16,8 +16,6 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,8 +26,6 @@ import javax.inject.Singleton;
  */
 @Singleton
 class Sha1ResourceCreator extends SimpleResourceCreator<Sha1Resource> {
-	
-	static final String EXTENSION = "sha1";
 	
 	// a wrapper to keep guice happy
 	static class Sha1ResourceTarget {
@@ -51,8 +47,7 @@ class Sha1ResourceCreator extends SimpleResourceCreator<Sha1Resource> {
 		assert args.length == 1 && args[0] instanceof AbstractFileResource : "Sha1Resources can only be created in relation to an AbstractFileResource";
 		
 		AbstractFileResource resource = (AbstractFileResource)args[0];
-		Path path = Paths.get(resource.path.toString() + "." + EXTENSION);
 		
-		return creator.createResource(type(), resourceKey(base, name), base, name, path, new Sha1ResourceTarget(resource));
+		return creator.createResource(type(), resourceKey(base, name), base, name, new Sha1ResourceTarget(resource));
 	}
 }

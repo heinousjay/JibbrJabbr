@@ -1,13 +1,13 @@
 package jj.resource;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.configuration.resolution.AppLocation.*;
+import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.Virtual;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.TreeDeleter;
 import jj.document.DocumentScriptEnvironment;
 import jj.document.HtmlResource;
@@ -66,17 +67,17 @@ public class ResourceSystemIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
-//		System.out.println(resourceCache);
-//		System.out.println(reloadedCount);
-//		System.out.println(killedCount);
-//		System.out.println(loadedCount);
+//		System.out.println("resourceCache = " + resourceCache);
+//		System.out.println("reloadedCount = " + reloadedCount);
+//		System.out.println("killedCount = " + killedCount);
+//		System.out.println("loadedCount = " + loadedCount);
 		try {
-			Files.walkFileTree(Paths.get(App.module).resolve("created"), new TreeDeleter());
+			Files.walkFileTree(App.module.resolve("created"), new TreeDeleter());
 		} catch (NoSuchFileException nsfe) {}
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.module)
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.module)
 		.withFileWatcher()
 		.injectInstance(this);
 
@@ -86,9 +87,9 @@ public class ResourceSystemIntegrationTest {
 	public void testResourceSystem() throws Throwable {
 		
 		// validates that directory structures are created as expected
-		DirectoryResource root = finder.findResource(DirectoryResource.class, Base, "");
-		DirectoryResource deep = finder.findResource(DirectoryResource.class, Base, "deep");
-		DirectoryResource nesting = finder.findResource(DirectoryResource.class, Base, "deep/nesting");
+		DirectoryResource root = finder.findResource(DirectoryResource.class, AppBase, "");
+		DirectoryResource deep = finder.findResource(DirectoryResource.class, AppBase, "deep");
+		DirectoryResource nesting = finder.findResource(DirectoryResource.class, AppBase, "deep/nesting");
 		assertThat(root, is(notNullValue()));
 		assertThat(deep, is(notNullValue()));
 		assertThat(nesting, is(notNullValue()));
@@ -98,21 +99,21 @@ public class ResourceSystemIntegrationTest {
 		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
 		
 		dse = finder.findResource(DocumentScriptEnvironment.class, Virtual, "deep/nested");
-		htmlResource = finder.findResource(HtmlResource.class, Base, "deep/nested.html");
+		htmlResource = finder.findResource(HtmlResource.class, AppBase, "deep/nested.html");
 		assertTrue(deep.dependents().contains(htmlResource));
 		
 		mse1 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module"));
-		scriptResource1 = finder.findResource(ScriptResource.class, Base, "deep/module.js");
+		scriptResource1 = finder.findResource(ScriptResource.class, AppBase, "deep/module.js");
 		assertTrue(deep.dependents().contains(scriptResource1));
 		assertTrue(((AbstractResource)dse).dependents().contains(mse1));
 		
 		mse2 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"));
-		scriptResource2 = finder.findResource(ScriptResource.class, Base, "deep/nesting/module.js");
+		scriptResource2 = finder.findResource(ScriptResource.class, AppBase, "deep/nesting/module.js");
 		assertTrue(nesting.dependents().contains(scriptResource2));
 		assertTrue(((AbstractResource)dse).dependents().contains(mse2));
 		
 		mse3 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/values", new RequiredModule(dse, "deep/nesting/values"));
-		jsonResource1 = finder.findResource(JSONResource.class, Base, "deep/nesting/values.json");
+		jsonResource1 = finder.findResource(JSONResource.class, AppBase, "deep/nesting/values.json");
 		assertTrue(nesting.dependents().contains(jsonResource1));
 		assertTrue(((AbstractResource)dse).dependents().contains(mse3));
 		
@@ -125,9 +126,9 @@ public class ResourceSystemIntegrationTest {
 		assertTrue(mse3.alive());
 		assertTrue(jsonResource1.alive());
 		
-		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesOne), is(nullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesTwo), is(nullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesThree), is(nullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, AppBase, createDirectoriesOne), is(nullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, AppBase, createDirectoriesTwo), is(nullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, AppBase, createDirectoriesThree), is(nullValue()));
 		
 		final AtomicBoolean failed = new AtomicBoolean();
 		
@@ -138,9 +139,9 @@ public class ResourceSystemIntegrationTest {
 					// touch a script and wait for a reload event.
 					touch(scriptResource2);
 					// and let's add some directories
-					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesOne));
-					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesTwo));
-					Files.createDirectories(Paths.get(App.module).resolve(createDirectoriesThree));
+					Files.createDirectories(App.module.resolve(createDirectoriesOne));
+					Files.createDirectories(App.module.resolve(createDirectoriesTwo));
+					Files.createDirectories(App.module.resolve(createDirectoriesThree));
 				} catch (Exception e) {
 					e.printStackTrace();
 					failed.set(true);
@@ -195,9 +196,9 @@ public class ResourceSystemIntegrationTest {
 			is(nullValue())
 		);
 		
-		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesOne), is(notNullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesTwo), is(notNullValue()));
-		assertThat(finder.findResource(DirectoryResource.class, Base, createDirectoriesThree), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, AppBase, createDirectoriesOne), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, AppBase, createDirectoriesTwo), is(notNullValue()));
+		assertThat(finder.findResource(DirectoryResource.class, AppBase, createDirectoriesThree), is(notNullValue()));
 	}
 	
 	// also need a delete test!
@@ -254,6 +255,6 @@ public class ResourceSystemIntegrationTest {
 	private boolean waitForCount(int count) throws Exception {
 		latch = new CountDownLatch(count);
 		countEvents = true;
-		return latch.await(11, SECONDS);
+		return latch.await(4, SECONDS);
 	}
 }

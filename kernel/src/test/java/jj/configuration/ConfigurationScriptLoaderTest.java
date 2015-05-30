@@ -15,10 +15,15 @@
  */
 package jj.configuration;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import static jj.configuration.resolution.AppLocation.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
-
+import static jj.server.ServerLocation.Virtual;
+import jj.MockServerStarting;
+import jj.ServerStarting;
+import jj.ServerStarting.Priority;
+import jj.execution.TaskHelper;
 import jj.resource.ResourceLoader;
 
 import org.junit.Test;
@@ -38,10 +43,19 @@ public class ConfigurationScriptLoaderTest {
 	
 	@InjectMocks ConfigurationScriptLoader csp;
 	
+	@Mock ServerStarting serverStarting;
+	
 	@Test
 	public void test() throws Exception {
+		// trips the latch
 		csp.configurationLoaded(null);
-		csp.start();
+		MockServerStarting event = new MockServerStarting();
+		
+		csp.start(event);
+		
+		assertThat(event.priority, is(Priority.Middle));
+		
+		TaskHelper.invoke(event.task);
 		
 		verify(resourceLoader).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
 	}

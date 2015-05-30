@@ -13,13 +13,13 @@ public class HostApiModule extends JJModule {
 		
 		bind(EngineAPI.class).to(EngineAPIImpl.class);
 		
-		addHostObjectBinding().to(ClientStorage.class);
-		addHostObjectBinding().to(DollarFunction.class);
-		addHostObjectBinding().to(DoCallFunction.class);
-		addHostObjectBinding().to(DoInvokeFunction.class);
-		addHostObjectBinding().to(ClientConnectedFunction.class);
-		addHostObjectBinding().to(ClientDisconnectedFunction.class);
-		addHostObjectBinding().to(TerminatingFunction.class);
+		bindHostObject(ClientStorage.class);
+		bindHostObject(DollarFunction.class);
+		bindHostObject(DoCallFunction.class);
+		bindHostObject(DoInvokeFunction.class);
+		bindHostObject(ClientConnectedFunction.class);
+		bindHostObject(ClientDisconnectedFunction.class);
+		bindHostObject(TerminatingFunction.class);
 	}
 
 }

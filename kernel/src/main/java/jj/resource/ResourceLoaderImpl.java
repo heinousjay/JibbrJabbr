@@ -40,6 +40,11 @@ class ResourceLoaderImpl implements ResourceLoader {
 	}
 	
 	@Override
+	public <T extends Resource> T findResource(Class<T> resourceClass, Location base, String name, Object... args) {
+		return resourceFinder.findResource(resourceClass, base, name, args);
+	}
+	
+	@Override
 	public Promise loadResource(final Class<? extends Resource> resourceClass, final Location base, final String name,  final Object...arguments) {
 		return taskRunner.execute(new ResourceLoaderTask(resourceClass, base, name, arguments));
 	}

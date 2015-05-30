@@ -17,10 +17,12 @@ package jj.http.server;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+
 import java.util.List;
 
 import jj.http.server.RangeHeaderReader.Range;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 
 import org.junit.Test;
@@ -35,7 +37,7 @@ public class RangeHeaderReaderTest {
 	
 	RangeHeaderReader rangeHeaderReader(String headerValue, long responseSize, long overlapDistance) {
 		requestHeaders = new DefaultHttpHeaders();
-		requestHeaders.set(HttpHeaders.Names.RANGE, headerValue);
+		requestHeaders.set(HttpHeaderNames.RANGE, headerValue);
 		return new RangeHeaderReader(requestHeaders, responseSize, overlapDistance);
 	}
 
@@ -91,7 +93,7 @@ public class RangeHeaderReaderTest {
 	@Test
 	public void test5() {
 		requestHeaders = new DefaultHttpHeaders();
-		requestHeaders.set(HttpHeaders.Names.RANGE, "bytes=-100,-200,1-199,2-198,-198,500-");
+		requestHeaders.set(HttpHeaderNames.RANGE, "bytes=-100,-200,1-199,2-198,-198,500-");
 		List<Range> ranges = new RangeHeaderReader(requestHeaders, 2001L, 80, 6).ranges();
 		
 		assertThat(ranges.size(), is(2));

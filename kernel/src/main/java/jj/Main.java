@@ -1,7 +1,10 @@
 package jj;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.CountDownLatch;
 
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
@@ -21,11 +24,7 @@ public class Main {
 		
 		main.start();
 		
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				main.stop();
-			}
-		});
+		Runtime.getRuntime().addShutdownHook(new Thread(main::stop));
 	}
 	
 	private final String[] args;
@@ -35,6 +34,8 @@ public class Main {
 	private JJServerLifecycle lifecycle;
 	
 	private ResourceResolver systemResources;
+	
+	private volatile Exception initFailure;
 	
 	public Main(final String[] args) {
 		this.args = args;
@@ -74,20 +75,36 @@ public class Main {
 			displayMessages(pe.getErrorMessages());
 			throw failStartup();
 		}
-		
-		// this is a bit hacky! but it clears the line from the startup .....
-		System.out.println();
 	}
 	
 	public void start() throws Exception {
 		init();
 		
-		try {
-			lifecycle.start();
-		} catch (ProvisionException pe) {
-			displayMessages(pe.getErrorMessages());
-			throw failStartup();
+		CountDownLatch latch = new CountDownLatch(1);
+		
+		new Thread(() -> {
+			try {
+				latch.countDown();
+				lifecycle.start();
+				Thread.currentThread().join();
+			} catch (ProvisionException pe) {
+				displayMessages(pe.getErrorMessages());
+				initFailure = pe;
+			} catch (InterruptedException ie) {
+				// do nothing and like it
+			} catch (Exception e) {
+				initFailure = e;
+			}
+		}, "Server Init").start();
+		
+		boolean result = latch.await(1, SECONDS);
+		
+		if (initFailure != null) {
+			throw initFailure;
 		}
+		
+		assert result : "timed out waiting for init";
+		
 	}
 	
 	public void stop() {

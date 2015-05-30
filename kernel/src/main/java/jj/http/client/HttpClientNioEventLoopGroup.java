@@ -16,12 +16,17 @@
 package jj.http.client;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.ServerStopping;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import io.netty.channel.nio.NioEventLoopGroup;
 
 /**
@@ -29,13 +34,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
  *
  */
 @Singleton
+@Subscriber
 class HttpClientNioEventLoopGroup extends NioEventLoopGroup {
-
-	@Inject
-	HttpClientNioEventLoopGroup(
-		final UncaughtExceptionHandler uncaughtExceptionHandler
-	) {
-		super(Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+	
+	private static ExecutorService executorService(final int threads, final UncaughtExceptionHandler uncaughtExceptionHandler) {
+	
+	return Executors.newFixedThreadPool(threads, new ThreadFactory() {
 			
 			private final AtomicInteger id = new AtomicInteger();
 			
@@ -48,6 +52,16 @@ class HttpClientNioEventLoopGroup extends NioEventLoopGroup {
 			}
 		});
 	}
+
+	@Inject
+	HttpClientNioEventLoopGroup(
+		final UncaughtExceptionHandler uncaughtExceptionHandler
+	) {
+		super(1, executorService(1, uncaughtExceptionHandler));
+	}
 	
-	
+	@Listener
+	void serverStopping(ServerStopping event) {
+		shutdownGracefully();
+	}
 }

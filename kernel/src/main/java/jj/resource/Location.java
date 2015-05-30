@@ -30,16 +30,18 @@ public interface Location {
 		
 		private final List<Location> locations = new ArrayList<>();
 		
-		public Bundle(Location first, Location second) {
+		Bundle(Location first, Location second) {
 			locations.add(first);
 			locations.add(second);
 		}
 		
+		@Override
 		public Location and(Location next) {
 			locations.add(next);
 			return this;
 		}
 		
+		@Override
 		public List<Location> locations() {
 			return Collections.unmodifiableList(locations);
 		}
@@ -56,29 +58,42 @@ public interface Location {
 			// never should even get called
 			throw new AssertionError("called parentInDirectory on a Location.Bundle. should never happen");
 		}
-		
-		@Override
-		public boolean representsFilesystem() {
-			// bundles cannot be used in this way
-			// never should even get called
-			throw new AssertionError("called representsFilesystem on a Location.Bundle. should never happen");
-		}
-		
-		@Override
-		public boolean internal() {
-			// bundles cannot be used in this way
-			// never should even get called
-			throw new AssertionError("called internal on a Location.Bundle. should never happen");
-		}
+	}
+
+	/**
+	 * <p>
+	 * Used to chain locations for lookup. The locations are iterated in
+	 * the order they are added.
+	 * 
+	 * <p>
+	 * usage:{@code <pre>
+	 * FirstLocation.and(SecondLocation).and(ThirdLocation);
+	 * </pre>}
+	 * 
+	 * <p>
+	 * The default method is almost certainly what you need, overriding it should 
+	 * only be done when you know for sure it's the right thing.
+	 */
+	default Location and(Location next) {
+		return new Bundle(this, next);
 	}
 	
-	Location and(Location location);
+	/**
+	 * <p>
+	 * Retrieve the full list of locations
+	 * 
+	 * <p>
+	 * The default method is almost certainly what you need, overriding it should 
+	 * only be done when you know for sure it's the right thing.
+	 */
+	default List<Location> locations() {
+		return Collections.singletonList(this);
+	}
 	
-	List<Location> locations();
-	
-	boolean representsFilesystem();
-	
+	/**
+	 * <p>
+	 * flag to determine if a resource found in this location should
+	 * be parented in a {@link DirectoryResource}
+	 */
 	boolean parentInDirectory();
-	
-	boolean internal();
 }

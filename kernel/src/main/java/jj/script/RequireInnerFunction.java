@@ -15,12 +15,13 @@
  */
 package jj.script;
 
+import static jj.server.ServerLocation.Virtual;
+
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.configuration.resolution.AppLocation;
 import jj.resource.ResourceFinder;
 import jj.script.module.ModuleScriptEnvironment;
 import jj.script.module.RequiredModule;
@@ -74,7 +75,7 @@ class RequireInnerFunction extends BaseFunction {
 		ModuleScriptEnvironment scriptEnvironment =
 			resourceFinder.findResource(
 				ModuleScriptEnvironment.class,
-				AppLocation.Virtual,
+				Virtual,
 				moduleIdentifier,
 				requiredModule
 			);

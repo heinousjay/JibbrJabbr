@@ -21,8 +21,8 @@ import jj.engine.EventSelection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.jjmessage.JJMessage;
 import jj.jjmessage.MessageMaker;
-import jj.script.ContinuationCoordinator;
-import jj.script.ContinuationPendingKey;
+import jj.script.ContinuationResumer;
+import jj.script.PendingKey;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ElementMessageProcessorTest {
 	
-	@Mock ContinuationCoordinator continuationCoordinator;
+	@Mock ContinuationResumer continuationResumer;
 
 	@Mock WebSocketConnection connection;
 	
@@ -48,13 +48,13 @@ public class ElementMessageProcessorTest {
 		
 		//given
 		JJMessage jqm = MessageMaker.makeElement("id", "selector");
-		jqm.pendingKey(new ContinuationPendingKey());
+		jqm.pendingKey(new PendingKey());
 		
 		//when
 		emp.handle(connection, jqm);
 		
 		//then
-		verify(continuationCoordinator).resume(eq(jqm.pendingKey()), isA(EventSelection.class));
+		verify(continuationResumer).resume(eq(jqm.pendingKey()), isA(EventSelection.class));
 	}
 
 }

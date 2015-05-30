@@ -15,6 +15,7 @@
  */
 package jj.http.server;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
@@ -33,16 +34,17 @@ import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 
 import jj.event.Publisher;
-import jj.execution.MockTaskRunner;
 import jj.http.server.EngineHttpHandler;
 import jj.http.server.HttpServerRequestImpl;
-import jj.http.server.servable.RequestProcessor;
+import jj.http.server.uri.Route;
+import jj.http.server.uri.RouteMatch;
+import jj.http.server.uri.Router;
+import jj.http.server.uri.URIMatch;
 import jj.http.server.websocket.WebSocketConnectionMaker;
 import jj.http.server.websocket.WebSocketRequestChecker;
 import jj.logging.Emergency;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -75,8 +77,6 @@ public class EngineHttpHandlerTest {
 	@Mock WebSocketRequestChecker webSocketRequestChecker;
 	@Mock WebSocketConnectionMaker webSocketConnectionMaker;
 
-	MockTaskRunner taskRunner;
-
 	@Mock HttpServerRequestImpl httpRequest1;
 	@Mock HttpServerRequestImpl httpRequest2;
 	@Mock HttpServerRequestImpl httpRequest3;
@@ -85,32 +85,23 @@ public class EngineHttpHandlerTest {
 	
 	@Mock HttpServerResponse httpResponse;
 	
-	@Mock RequestProcessor requestProcessor1;
-	@Mock RequestProcessor requestProcessor2;
-	@Mock RequestProcessor requestProcessor3;
-	
 	EngineHttpHandler handler;
 	
-	@Rule
-	public MockServablesRule servables = new MockServablesRule();
+	@Mock ServableResources servableResources;
+	
+	@Mock Router router;
+	
+	@Mock RouteMatch routeMatch;
+	@Mock Route route;
+	String resourceName = "resource";
+	
+	@Mock RouteProcessor routeProcessor;
 	
 	//given
 	@Before
 	public void before() throws Exception {
-		taskRunner = new MockTaskRunner();
 		
-		given(httpRequest1.uriMatch()).willReturn(servables.staticUri);
-		given(httpRequest2.uriMatch()).willReturn(servables.assetUri);
-		given(httpRequest3.uriMatch()).willReturn(servables.cssUri);
-		given(httpRequest4.uriMatch()).willReturn(servables.uri4);
-		given(httpRequest5.uriMatch()).willReturn(servables.uri5);
-		
-		given(servables.staticServable.makeRequestProcessor(httpRequest1, httpResponse)).willReturn(requestProcessor1);
-		given(servables.staticServable.makeRequestProcessor(httpRequest2, httpResponse)).willReturn(requestProcessor2);
-		given(servables.cssServable.makeRequestProcessor(httpRequest3, httpResponse)).willReturn(requestProcessor3);
-		given(servables.cssServable.makeRequestProcessor(httpRequest4, httpResponse)).willReturn(requestProcessor3);
-		
-		handler = new EngineHttpHandler(taskRunner, servables.servables, injector, webSocketRequestChecker, publisher);
+		handler = new EngineHttpHandler(servableResources, router, injector, webSocketRequestChecker, publisher);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -125,39 +116,49 @@ public class EngineHttpHandlerTest {
 	}
 	
 	@Test
-	public void testChannelRead0BadRequest() throws Exception {
+	public void testReceivedBadRequest() throws Exception {
 		FullHttpRequest fullHttpRequest = mock(FullHttpRequest.class, RETURNS_DEEP_STUBS);
-		given(fullHttpRequest.getDecoderResult().isSuccess()).willReturn(false);
+		given(fullHttpRequest.decoderResult().isSuccess()).willReturn(false);
 		
 		prepareInjectorStubbing();
 		
-		handler.channelRead0(ctx, fullHttpRequest);
+		handler.messageReceived(ctx, fullHttpRequest);
 		
 		verify(httpResponse).sendError(HttpResponseStatus.BAD_REQUEST);
 	}
 	
 	@Test
-	public void testChannelRead0WebSocketRequest() throws Exception {
+	public void testReceivedWebSocketRequest() throws Exception {
 		
 		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
 		given(webSocketRequestChecker.isWebSocketRequest(fullHttpRequest)).willReturn(true);
 		
 		prepareInjectorStubbing();
 		
-		handler.channelRead0(ctx, fullHttpRequest);
+		handler.messageReceived(ctx, fullHttpRequest);
 		
 		verify(webSocketConnectionMaker).handshakeWebsocket();
 	}
 	
+	private void givenRouting() {
+		given(routeMatch.route()).willReturn(route);
+		given(routeMatch.resourceName()).willReturn(resourceName);
+		given(router.routeRequest(any(HttpMethod.class), any(URIMatch.class))).willReturn(routeMatch);
+	}
+	
 	@Test
-	public void testChannelRead0HttpRequest() throws Exception {
+	public void testReceivedHttpRequest() throws Exception {
 		
-		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		
+		// given
+		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, GET, "/");
 		prepareInjectorStubbing();
+		givenRouting();
+		given(servableResources.routeProcessor(resourceName)).willReturn(routeProcessor);
 		
-		handler.channelRead0(ctx, fullHttpRequest);
+		// when
+		handler.messageReceived(ctx, fullHttpRequest);
 		
+		// then
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		
 		Module module = moduleCaptor.getValue();
@@ -175,6 +176,22 @@ public class EngineHttpHandlerTest {
 		verify(abb).to(HttpServerResponseImpl.class);
 		
 		verifyNoMoreInteractions(binder, abb);
+		
+		verify(routeProcessor).process(routeMatch, httpRequest1, httpResponse);
+	}
+	
+	@Test
+	public void testNotFound() throws Exception {
+		// given
+		FullHttpRequest fullHttpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, GET, "/");
+		prepareInjectorStubbing();
+		givenRouting();
+		
+		// when
+		handler.messageReceived(ctx, fullHttpRequest);
+		
+		// then
+		verify(httpResponse).sendNotFound();
 	}
 	
 	@Test
@@ -204,7 +221,7 @@ public class EngineHttpHandlerTest {
 		
 		FullHttpResponse response = responseCaptor.getValue();
 		
-		assertThat(response.getStatus(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
+		assertThat(response.status(), is(HttpResponseStatus.INTERNAL_SERVER_ERROR));
 		
 		verify(channelFuture).addListener(futureListenerCaptor.capture());
 		
@@ -224,88 +241,5 @@ public class EngineHttpHandlerTest {
 		
 		//then
 		verify(publisher, times(2)).publish(isA(Emergency.class));
-	}
-	
-	@Test
-	public void testBasicOperation() throws Exception { 
-		
-		//when
-		handler.handleHttpRequest(httpRequest1, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(requestProcessor1).process();
-		
-		//when
-		handler.handleHttpRequest(httpRequest2, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(requestProcessor2).process();
-		
-		//when
-		handler.handleHttpRequest(httpRequest3, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(requestProcessor3).process();
-		
-		//when
-		handler.handleHttpRequest(httpRequest1, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(requestProcessor1, times(2)).process();
-		
-		//when
-		handler.handleHttpRequest(httpRequest2, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(requestProcessor2, times(2)).process();
-		
-		//when
-		handler.handleHttpRequest(httpRequest3, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(requestProcessor3, times(2)).process();
-	}
-	
-	@Test
-	public void testHandover() throws Exception {
-		
-		//when
-		handler.handleHttpRequest(httpRequest4, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(requestProcessor3).process();
-	}
-	
-	@Test
-	public void testNotFound() throws Exception {
-		
-		//when
-		handler.handleHttpRequest(httpRequest5, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		// then
-		verify(httpResponse).sendNotFound();
-	}
-	
-	@Test
-	public void testErrorDuringProcessing() throws Exception {
-		
-		//given
-		IOException ioe = new IOException();
-		doThrow(ioe).when(requestProcessor1).process();
-		
-		//when
-		handler.handleHttpRequest(httpRequest1, httpResponse);
-		taskRunner.runUntilIdle();
-		
-		//then
-		verify(httpResponse).error(ioe);
 	}
 }

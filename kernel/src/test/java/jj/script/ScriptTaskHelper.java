@@ -23,7 +23,7 @@ public enum ScriptTaskHelper {
 
 	;
 	
-	public static ContinuationPendingKey pendingKey(final ScriptTask<?> task) {
+	public static PendingKey pendingKey(final ScriptTask<?> task) {
 		return task.pendingKey();
 	}
 	

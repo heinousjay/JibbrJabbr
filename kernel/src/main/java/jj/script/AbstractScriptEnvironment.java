@@ -16,6 +16,7 @@
 package jj.script;
 
 import static jj.script.ScriptExecutionState.*;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.HashMap;
 
@@ -23,60 +24,77 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.configuration.resolution.AppLocation;
-import jj.event.Publisher;
 import jj.resource.AbstractResource;
-import jj.resource.AbstractResourceInitializationListener;
-import jj.resource.ResourceConfiguration;
-import jj.resource.ResourceFinder;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceName;
-import jj.util.Clock;
 import jj.util.Closer;
 
 /**
+ * <p>
+ * Provides basic services for {@link ScriptEnvironment}s.  In particular, integrations
+ * into the continuation system are the main point, allowing resumable execution.
+ * 
+ * <p>
+ * also provides methods for building rhino scopes, setting up the module loading system,
+ * and other small basic niceties for hooking into the system
+ * 
  * @author jason
  *
  */
 public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
 	
-	// bundles up the dependencies for this object, so that descendents don't need to
-	// to be updated when this changes, cause it just might change more!
-	// package-private access on the fields for testing
 	@Singleton
-	public static class Dependencies extends AbstractResource.Dependencies {
-		
-		final Provider<RhinoContext> contextProvider;
-		final Provider<ContinuationPendingKey> pendingKeyProvider;
-		final RequireInnerFunction requireInnerFunction;
-		final InjectFunction injectFunction;
-		final Timers timers;
+	protected static class AbstractScriptEnvironmentDependencies {
+		protected final ContinuationCoordinator continuationCoordinator;
+		protected final ContinuationPendingCache continuationPendingCache;
+		protected final Provider<PendingKey> pendingKeyProvider;
+		protected final RequireInnerFunction requireInnerFunction;
+		protected final InjectFunction injectFunction;
+		protected final Timers timers;
+		protected final Provider<RhinoContext> contextProvider;
 		
 		@Inject
-		Dependencies(
-			final Clock clock,
-			final ResourceConfiguration resourceConfiguration,
-			final AbstractResourceInitializationListener aril,
-			final ResourceKey cacheKey,
-			final @ResourceName String name,
-			final Provider<RhinoContext> contextProvider,
-			final Provider<ContinuationPendingKey> pendingKeyProvider,
+		AbstractScriptEnvironmentDependencies(
+			final ContinuationCoordinator continuationCoordinator,
+			final ContinuationPendingCache continuationPendingCache,
+			final Provider<PendingKey> pendingKeyProvider,
 			final RequireInnerFunction requireInnerFunction,
 			final InjectFunction injectFunction,
 			final Timers timers,
-			final Publisher publisher,
-			final ResourceFinder resourceFinder
+			final Provider<RhinoContext> contextProvider
 		) {
-			super(clock, resourceConfiguration, aril, cacheKey, AppLocation.Virtual, name, publisher, resourceFinder);
-			this.contextProvider = contextProvider;
+			this.continuationCoordinator = continuationCoordinator;
+			this.continuationPendingCache = continuationPendingCache;
 			this.pendingKeyProvider = pendingKeyProvider;
 			this.requireInnerFunction = requireInnerFunction;
 			this.injectFunction = injectFunction;
 			this.timers = timers;
+			this.contextProvider = contextProvider;
+		}
+	}
+	
+	// bundles up the dependencies for this object, so that descendents don't need to
+	// to be updated when this changes, cause it just might change more!
+	// package-private access on the fields for testing
+	public static class Dependencies extends AbstractResource.Dependencies {
+		
+		protected final AbstractScriptEnvironmentDependencies scriptEnvironmentDependencies;
+		
+		@Inject
+		protected Dependencies(
+			final AbstractResourceDependencies abstractResourceDependencies,
+			final AbstractScriptEnvironmentDependencies abstractScriptEnvironmentDependencies,
+			final ResourceKey cacheKey,
+			final @ResourceName String name
+		) {
+			super(abstractResourceDependencies, cacheKey, Virtual, name);
+			this.scriptEnvironmentDependencies = abstractScriptEnvironmentDependencies;
 		}
 	}
 	
@@ -85,26 +103,25 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 */
 	protected final Provider<RhinoContext> contextProvider;
 	
-	private final HashMap<ContinuationPendingKey, ContinuationPending> continuationPendings = new HashMap<>();
+	private final HashMap<PendingKey, ContinuationPending> continuationPendings = new HashMap<>();
+	
+	private final ContinuationCoordinator continuationCoordinator;
+	
+	private final ContinuationPendingCache continuationPendingCache;
 	
 	private final Dependencies dependencies;
 	
-	private ScriptExecutionState state = Unitialized;
+	private volatile ScriptExecutionState state = Unitialized;
 	
-	private Throwable initializationError;
+	private volatile Throwable initializationError;
 	
-	/**
-	 * @param cacheKey
-	 */
-	protected AbstractScriptEnvironment(
-		Dependencies dependencies
-	) {
+	protected AbstractScriptEnvironment(Dependencies dependencies) {
 		super(dependencies);
-		this.contextProvider = dependencies.contextProvider;
+		this.contextProvider = dependencies.scriptEnvironmentDependencies.contextProvider;
+		this.continuationPendingCache = dependencies.scriptEnvironmentDependencies.continuationPendingCache;
+		this.continuationCoordinator = dependencies.scriptEnvironmentDependencies.continuationCoordinator;
 		this.dependencies = dependencies;
 	}
-	
-	//protected abstract void initializeScopes();
 	
 	@Override
 	public ScriptableObject newObject() {
@@ -113,36 +130,14 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		}
 	}
 	
-	// this is a nasty mess and really needs a wash
-
 	@Override
 	public boolean initialized() {
 		return state == Initialized;
 	}
 
 	@Override
-	public void initialized(boolean initialized) {
-		if (initialized) {
-			state = Initialized;
-		}
-	}
-
-	@Override
 	public boolean initializing() {
 		return state == Initializing;
-	}
-
-	@Override
-	public void initializing(boolean initializing) {
-		if (initializing && state == Unitialized) {
-			state = Initializing;
-		}
-	}
-	
-	@Override
-	public void initializationError(Throwable cause) {
-		state = Errored;
-		this.initializationError = cause;
 	}
 	
 	@Override
@@ -155,42 +150,111 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return state == Errored;
 	}
 	
+	@Override
+	public PendingKey execute(Script script) {
+		return continuationCoordinator.execute(this, script);
+	}
+	
+	@Override
+	public PendingKey execute(Callable callable, Object...args) {
+		return continuationCoordinator.execute(this, callable, args);
+	}
+	
+	/**
+	 * Resume a continuation in this environment
+	 * @param pendingKey
+	 * @param result
+	 * @return
+	 */
+	PendingKey resumeContinuation(PendingKey pendingKey, Object result) {
+		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
+	}
+	
+	/**
+	 * Await a continuation in this environment
+	 * @param task
+	 */
+	<T extends ScriptEnvironment> void awaitContinuation(ScriptTask<T> task) {
+		continuationPendingCache.storeForContinuation(task);
+	}
+
+	PendingKey beginInitializing() {
+		assert state == Unitialized : "wrong state to initialize";
+		state = Initializing;
+		return doInitialize();
+	}
+
+	/**
+	 * mark this environment as being initialized
+	 */
+	void initialized(boolean initialized) {
+		if (initialized) {
+			state = Initialized;
+		}
+	}
+	
+	/**
+	 * mark this environment as having experienced an initialization error
+	 */
+	void initializationError(Throwable cause) {
+		state = Errored;
+		this.initializationError = cause;
+	}
+	
+	/**
+	 * Override this function for custom initialization functionality
+	 * @return
+	 */
+	protected PendingKey doInitialize() {
+		return script() == null ? null : execute(script());
+	}
+	
+	@Override
 	protected void died() {
+		// mark dead
 		state = Dead;
+		// when a script environment dies, we can dump any pending tasks on the floor
+		dependencies.scriptEnvironmentDependencies.continuationPendingCache.removePendingTasks(continuationPendings.keySet());
+		// and publish it to the world
 		publisher.publish(new ScriptEnvironmentDied(this));
 	}
 	
-	ContinuationPendingKey createContinuationContext(final ContinuationPending continuationPending) {
-		ContinuationPendingKey key = dependencies.pendingKeyProvider.get();
+	/**
+	 * prepare this environment for a continuation
+	 * @return the key to resume the continuation, with a fully saved context
+	 */
+	PendingKey createContinuationContext(final ContinuationPending continuationPending) {
+		PendingKey key = dependencies.scriptEnvironmentDependencies.pendingKeyProvider.get();
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;
 	}
 	
-	ContinuationPending continuationPending(final ContinuationPendingKey key) {
+	/**
+	 * @return the captured execution state for a given key
+	 */
+	ContinuationPending continuationPending(final PendingKey key) {
 		assert continuationPendings.containsKey(key) : "trying to retrieve a nonexistent continuation for " + key;
 		return continuationPendings.remove(key);
 	}
 	
-	protected void captureContextForKey(ContinuationPendingKey key) {
+	/**
+	 * Implement to perform environment-specific context capture for a continuation, associated to the given key
+	 */
+	protected void captureContextForKey(PendingKey key) {
 		// nothing to do in the abstract, but specific type will have things
 		// DocumentScriptEnvironment needs to save connections and documents, for example
 	}
 	
-	protected Closer restoreContextForKey(ContinuationPendingKey key) {
-		return new Closer() {
-			
-			@Override
-			public void close() {
-				// nothing to do in the abstract
-			}
-		};
+	/**
+	 * restore an environment-specific context for the continuation associated to the given key.
+	 * @return a {@link Closer} to clean up any restored context when the 
+	 */
+	protected Closer restoreContextForKey(PendingKey key) {
+		return () -> { /* nothing to do */ };
 	}
 
-	/**
-	 * @return the exports property of the module object in the script's scope.  This could be
-	 * anything at all, scripts are able to export whatever they want.
-	 */
+	@Override
 	public Object exports() {
 		try (RhinoContext context = contextProvider.get()) {
 			return scope() == null ? Undefined.instance : context.evaluateString(scope(), "module.exports", "evaluating exports");
@@ -199,43 +263,76 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	/**
 	 * @return a pendingKey if the completion of the initialization task should resume something
-	 * or null if nothing
-	 * <p>
-	 * maybe more things will be on this list later or the mechanism may expand
+	 * or null if nothing. the abstract returns null
 	 */
-	protected ContinuationPendingKey pendingKey() {
+	protected PendingKey initializationContinuationPendingKey() {
 		return null;
 	}
-
-	public String toString() {
-		return super.toString() + " {state=" + state + "}";
-	}
 	
+	/**
+	 * <p>
+	 * creates a child scope for the given parent.  lookups will delegate to the parent if a given
+	 * reference is not found in the child, but all creation will occur in the child. the parent is typically
+	 * sealed and cannot be impacted in any case
+	 * 
+	 * <p>
+	 * Generally, you want to inject the {@link Global} scope, and use that as a parent.  it has all the
+	 * standard javascript objects initialized, but it is sealed and intended to be shared server-wide
+	 * 
+	 * @return the new child scope
+	 */
 	protected ScriptableObject createChainedScope(final ScriptableObject parent) {
 		try (RhinoContext context = contextProvider.get()) {
 			return context.newChainedScope(parent);
 		}
 	}
 	
+	/**
+	 * <p>
+	 * creates the usual timer functions in the supplied scope. 
+	 * 
+	 * <p>
+	 * functions are setInterval, setTimeout, clearInterval, and clearTimeout.  they behave much like
+	 * their browser progenitors
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureTimers(final ScriptableObject localScope) {
 		assert !localScope.isSealed() : "cannot configure timers on a sealed scope";
-		localScope.defineProperty("setInterval", dependencies.timers.setInterval, ScriptableObject.EMPTY);
-		localScope.defineProperty("setTimeout", dependencies.timers.setTimeout, ScriptableObject.EMPTY);
-		localScope.defineProperty("clearInterval", dependencies.timers.clearInterval, ScriptableObject.EMPTY);
-		localScope.defineProperty("clearTimeout", dependencies.timers.clearTimeout, ScriptableObject.EMPTY);
+		localScope.defineProperty("setInterval", dependencies.scriptEnvironmentDependencies.timers.setInterval, ScriptableObject.EMPTY);
+		localScope.defineProperty("setTimeout", dependencies.scriptEnvironmentDependencies.timers.setTimeout, ScriptableObject.EMPTY);
+		localScope.defineProperty("clearInterval", dependencies.scriptEnvironmentDependencies.timers.clearInterval, ScriptableObject.EMPTY);
+		localScope.defineProperty("clearTimeout", dependencies.scriptEnvironmentDependencies.timers.clearTimeout, ScriptableObject.EMPTY);
 		return localScope;
 	}
 	
+	/**
+	 * Installs the {@link InjectFunction} under the standard name defined in {@link InjectFunction#NAME}
+	 * into the supplied scope.
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureInjectFunction(final ScriptableObject localScope) {
 		return configureInjectFunction(localScope, InjectFunction.NAME);
 	}
 	
+	/**
+	 * Installs the {@link InjectFunction} under the supplied name into the supplied scope.
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureInjectFunction(final ScriptableObject localScope, final String name) {
 		assert !localScope.isSealed() : "cannot configure inject function on a sealed scope";
-		localScope.defineProperty(name, dependencies.injectFunction, ScriptableObject.CONST);
+		localScope.defineProperty(name, dependencies.scriptEnvironmentDependencies.injectFunction, ScriptableObject.CONST);
 		return localScope;
 	}
 	
+	/**
+	 * Creates the CommonJS module set-up in the supplied scope, and adds a require function under the name
+	 * "require"
+	 * 
+	 * @return the supplied scope
+	 */
 	protected ScriptableObject configureModuleObjects(
 		final String moduleIdentifier,
 		final ScriptableObject localScope
@@ -245,10 +342,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 
 	/**
 	 * Configures top-level module objects in a given scope, including a require function and assignable exports
-	 * that are made available via {@link #exports()}
-	 * @param moduleIdentifier must be fully qualified or further module resolution will fail
-	 * @param localScope must not be sealed
-	 * @return localScope, post configuration, for chaining
+	 * that are made available via {@link #exports()}. the require function is installed under the supplied name
 	 */
 	protected ScriptableObject configureModuleObjects(
 		final String moduleIdentifier,
@@ -267,7 +361,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 			ScriptableObject exports = context.newObject(localScope);
 			module.defineProperty("id", moduleIdentifier, ScriptableObject.CONST);
 			module.defineProperty("exports", exports, ScriptableObject.EMPTY);
-			module.defineProperty("requireInner", dependencies.requireInnerFunction, ScriptableObject.EMPTY);
+			module.defineProperty("requireInner", dependencies.scriptEnvironmentDependencies.requireInnerFunction, ScriptableObject.EMPTY);
 			
 			localScope.defineProperty("module", module, ScriptableObject.CONST);
 			localScope.defineProperty("exports", exports, ScriptableObject.CONST);
@@ -305,4 +399,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		return localScope;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " {state=" + state + "}";
+	}
 }

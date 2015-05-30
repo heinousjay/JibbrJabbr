@@ -18,7 +18,7 @@ package jj.http;
 import jj.JJModule;
 import jj.http.client.HttpClientModule;
 import jj.http.server.HttpServerModule;
-import jj.http.uri.URIModule;
+import jj.http.server.uri.URIModule;
 
 /**
  * @author jason

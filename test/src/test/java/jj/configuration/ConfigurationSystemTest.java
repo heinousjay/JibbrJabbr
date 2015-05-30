@@ -24,17 +24,21 @@ import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.http.server.Binding;
 import jj.http.server.HttpServerSocketConfiguration;
-import jj.http.uri.Route;
-import jj.http.uri.RouterConfiguration;
+import jj.http.server.uri.Route;
+import jj.http.server.uri.RouterConfiguration;
 import jj.i18n.I18NConfiguration;
+import jj.logging.Level;
+import jj.logging.LoggingConfiguration;
 import jj.css.LessConfiguration;
 import jj.document.DocumentConfiguration;
 import jj.event.Listener;
@@ -62,7 +66,7 @@ public class ConfigurationSystemTest {
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.configuration).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.configuration).injectInstance(this);
 	
 	@Inject
 	private ConfigurationCollector collector;
@@ -81,6 +85,9 @@ public class ConfigurationSystemTest {
 	
 	@Inject
 	private I18NConfiguration i18nConfiguration;
+	
+	@Inject
+	private LoggingConfiguration loggingConfiguration;
 	
 	volatile boolean loaded;
 	final CountDownLatch loadedLatch = new CountDownLatch(1);
@@ -125,7 +132,7 @@ public class ConfigurationSystemTest {
 		assertThat(routerConfiguration.welcomeFile(), is("root"));
 		List<Route> routes = routerConfiguration.routes();
 		assertThat(routes.size(), is(4));
-		assertRoute(routes.get(0), GET, "/chat/", "/chat/list");
+		assertRoute(routes.get(0), GET, "/chat/", "document", "/chat/list");
 //		route.GET('/chat/').to('/chat/list');
 //		route.POST('/chat/:room').to('/chat/room');
 //		route.PUT('/chat/:room/*secret').to('/chat/room');
@@ -164,11 +171,23 @@ public class ConfigurationSystemTest {
 		
 		assertThat(i18nConfiguration.allowNonISO(), is(true));
 		assertThat(i18nConfiguration.defaultLocale(), is(Locale.UK));
+		
+		Map<String, Level> loggingLevels = loggingConfiguration.loggingLevels();
+		assertThat(loggingLevels.get("access"), is(Level.Off));
+		assertThat(loggingLevels.get("io.netty"), is(Level.Off));
+		assertThat(loggingLevels.get("script system"), is(Level.Off));
+		assertThat(loggingLevels.get("resource system"), is(Level.Off));
+		assertThat(loggingLevels.get("server"), is(Level.Debug));
+		assertThat(loggingLevels.get("test runner"), is(Level.Debug));
+		assertThat(loggingLevels.get("script@index"), is(Level.Trace));
+		assertThat(loggingLevels.get("script@d3/index"), is(Level.Trace));
+		assertThat(loggingLevels.get("script@chat/index"), is(Level.Off));
 	}
 	
-	private void assertRoute(Route route, HttpMethod method, String uri, String destination) {
+	private void assertRoute(Route route, HttpMethod method, String uri, String resourceName, String mappedName) {
 		assertThat(route.method(), is(method));
 		assertThat(route.uri(), is(uri));
-		assertThat(route.destination(), is(destination));
+		assertThat(route.resourceName(), is(resourceName));
+		assertThat(route.mapping(), is(mappedName));
 	}
 }

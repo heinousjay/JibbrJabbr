@@ -17,7 +17,6 @@ var inject = function(id) {
 	return mocks[id];
 }
 
-var print = $$realRequire('jj/print');
 describe('local-storage', function() {
 	
 	var contextError = new Error('local storage operations are not valid from this context, there is no connected client');

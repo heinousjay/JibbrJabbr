@@ -20,6 +20,7 @@ import static java.util.concurrent.TimeUnit.HOURS;
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
@@ -34,7 +35,7 @@ import org.junit.Test;
 public class RunAPage {
 
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(App.one).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.one).injectInstance(this);
 	
 	@Inject EmbeddedHttpServer server;
 	

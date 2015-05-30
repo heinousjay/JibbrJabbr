@@ -5,13 +5,17 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.JJServerStartupListener;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
+import jj.http.server.HttpServerStarted;
+import jj.http.server.HttpServerStopped;
 
 /**
  * 
@@ -19,7 +23,8 @@ import jj.execution.TaskRunner;
  *
  */
 @Singleton
-public class WebSocketConnectionTracker implements JJServerStartupListener {
+@Subscriber
+public class WebSocketConnectionTracker {
 	
 	private final class ActivityChecker extends ServerTask {
 
@@ -32,13 +37,13 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 
 		@Override
 		public void run() {
-			for (WebSocketConnection connection : allConnections.keySet()) {
-				if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
-					connection.close();
-				}
-			}
-			
+			// do nothing if we've been interrupted
 			if (!Thread.currentThread().isInterrupted()) {
+				for (WebSocketConnection connection : allConnections.keySet()) {
+					if (System.currentTimeMillis() - connection.lastActivity() > 35000) {
+						connection.close();
+					}
+				}
 				repeat();
 			}
 		}
@@ -53,19 +58,26 @@ public class WebSocketConnectionTracker implements JJServerStartupListener {
 		
 	private final TaskRunner taskRunner;
 	
+	private final AtomicReference<ActivityChecker> currentActivityChecker = new AtomicReference<>();
+	
 	@Inject
 	public WebSocketConnectionTracker(final TaskRunner taskRunner) {
 		this.taskRunner = taskRunner;
 	}
 	
-	@Override
-	public void start() {
-		taskRunner.execute(new ActivityChecker());
+	@Listener
+	void start(HttpServerStarted event) {
+		if (currentActivityChecker.get() == null) {
+			currentActivityChecker.set(new ActivityChecker());
+			taskRunner.execute(currentActivityChecker.get());
+		}
 	}
 	
-	@Override
-	public Priority startPriority() {
-		return Priority.Lowest;
+	@Listener
+	void stop(HttpServerStopped event) {
+		ActivityChecker current = currentActivityChecker.getAndSet(null);
+		assert current != null : "server was running with no web socket activity checker!";
+		current.cancelKey().cancel();
 	}
 	
 	void addConnection(WebSocketConnection connection) {

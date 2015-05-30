@@ -20,6 +20,8 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.event.Publisher;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Injector;
@@ -38,13 +40,17 @@ public class ResourceInstanceCreator {
 
 	private final Injector parentInjector;
 	
+	private final Publisher publisher;
+	
 	@Inject
 	ResourceInstanceCreator(
 		final PathResolver pathResolver,
-		final Injector parentInjector
+		final Injector parentInjector,
+		final Publisher publisher
 	) {
 		this.pathResolver = pathResolver;
 		this.parentInjector = parentInjector;
+		this.publisher = publisher;
 	}
 	
 	public <T extends Resource> T createResource(
@@ -54,19 +60,9 @@ public class ResourceInstanceCreator {
 		final String name,
 		final Object...args
 	) {
-		final Path path = base.representsFilesystem() ? pathResolver.resolvePath(base, name).normalize().toAbsolutePath() : null;
-		
-		return createResource(resourceClass, resourceKey, base, name, path, args);
-	}
-		
-	public <T extends Resource> T createResource(
-		final Class<T> resourceClass,
-		final ResourceKey resourceKey,
-		final Location base,
-		final String name,
-		final Path path,
-		final Object...args
-	) {
+		// ideally! base.resolve(name);
+		// but that requires tricks
+		final Path path = pathResolver.resolvePath(base, name);
 		
 		try {
 			
@@ -108,14 +104,11 @@ public class ResourceInstanceCreator {
 			}
 			
 		} catch (NoSuchResourceException nsre) {
-			
-			// don't bother logging this, it's just a "not found"
-			return null;
-			
+			// don't bother logging this, it's just a "not found" and will be handled in the ResourceLoaderImpl
 		} catch (Exception e) {
-			
-			throw new AssertionError("unexpected exception creating a resource", e);
-			
+			publisher.publish(new ResourceError(resourceClass, base, name, args, e));
 		}
+		
+		return null;
 	}
 }

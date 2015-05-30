@@ -18,24 +18,24 @@ package jj.repl;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.concurrent.TimeUnit.*;
 import static org.junit.Assert.*;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
+import java.net.InetAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
 import jj.App;
+import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.testing.JibbrJabbrTestServer;
@@ -52,7 +52,7 @@ import org.junit.Test;
 public class ReplIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(App.repl).injectInstance(this);
+	public JibbrJabbrTestServer testServer = new JibbrJabbrTestServer(ServerRoot.one, App.repl).injectInstance(this);
 	
 	@Inject ReplConfiguration config;
 
@@ -92,28 +92,36 @@ public class ReplIntegrationTest {
 		bootstrap = new Bootstrap()
 			.group(new NioEventLoopGroup(1))
 			.channel(NioSocketChannel.class)
-			.handler(new ChannelInitializer<SocketChannel>() {
+			.handler(new ChannelInitializer<NioSocketChannel>() {
 
 				@Override
-				protected void initChannel(SocketChannel ch) throws Exception {
+				protected void initChannel(NioSocketChannel ch) throws Exception {
 					ch.pipeline()
 						.addLast(new StringEncoder(US_ASCII))
 						.addLast(new StringDecoder(US_ASCII))
 						.addLast(new SimpleChannelInboundHandler<String>() {
+							
+							@Override
+							public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+								failure.set(cause);
+								ctx.close();
+								latch.countDown();
+							}
 
 							@Override
-							protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+							protected void messageReceived(ChannelHandlerContext ctx, String msg) throws Exception {
 								if (msg.equals(response.substring(0, msg.length()))) {
 									response.delete(0, msg.length());
 								}
 								if (response.length() == 0) {
+									ctx.close();
 									latch.countDown();
 								}
 							}
 						});
 				}
 			});
-		bootstrap.connect("localhost", config.port()).addListener((ChannelFuture future) -> {
+		bootstrap.connect(InetAddress.getLoopbackAddress(), config.port()).addListener((ChannelFuture future) -> {
 			if (future.isSuccess()) {
 				future.channel().writeAndFlush("whatever\n");
 			} else {

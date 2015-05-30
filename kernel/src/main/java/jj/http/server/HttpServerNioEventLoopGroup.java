@@ -16,6 +16,8 @@
 package jj.http.server;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,12 +32,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
  */
 @Singleton
 class HttpServerNioEventLoopGroup extends NioEventLoopGroup {
-
-	@Inject
-	HttpServerNioEventLoopGroup(
-		final UncaughtExceptionHandler uncaughtExceptionHandler
-	) {
-		super(Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+	
+	private static ExecutorService executorService(final int threads, final UncaughtExceptionHandler uncaughtExceptionHandler) {
+		
+		return Executors.newFixedThreadPool(threads, new ThreadFactory() {
 			
 			private final AtomicInteger id = new AtomicInteger();
 			
@@ -47,6 +47,15 @@ class HttpServerNioEventLoopGroup extends NioEventLoopGroup {
 				return thread;
 			}
 		});
+	}
+	
+	private static final int THREAD_COUNT = Runtime.getRuntime().availableProcessors();
+
+	@Inject
+	HttpServerNioEventLoopGroup(
+		final UncaughtExceptionHandler uncaughtExceptionHandler
+	) {
+		super(THREAD_COUNT, executorService(THREAD_COUNT, uncaughtExceptionHandler));
 	}
 	
 	

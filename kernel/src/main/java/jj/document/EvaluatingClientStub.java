@@ -17,13 +17,13 @@ package jj.document;
 
 import org.slf4j.Logger;
 
-import jj.script.ExecutionEvent;
+import jj.script.ScriptSystemEvent;
 
 /**
  * @author jason
  *
  */
-class EvaluatingClientStub extends ExecutionEvent {
+class EvaluatingClientStub extends ScriptSystemEvent {
 	
 	private final String path;
 	private final String stub;

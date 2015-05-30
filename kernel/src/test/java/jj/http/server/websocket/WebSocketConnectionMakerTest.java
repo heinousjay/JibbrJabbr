@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.http.server.PipelineStages.*;
+import static jj.server.ServerLocation.Virtual;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +29,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -36,14 +37,13 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import jj.AnswerWithSelf;
-import jj.configuration.resolution.AppLocation;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.HttpServerResponse;
+import jj.http.server.uri.URIMatch;
 import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.http.server.websocket.WebSocketConnectionMaker;
 import jj.http.server.websocket.WebSocketFrameHandler;
 import jj.http.server.websocket.WebSocketFrameHandlerCreator;
-import jj.http.uri.URIMatch;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;
@@ -115,8 +115,8 @@ public class WebSocketConnectionMakerTest {
 		String sha = "1234567890123456789012345678901234567890";
 		String uri = "/" + sha + "/somethign.socket";
 		given(scriptEnvironment.sha1()).willReturn(sha);
-		given(request.getUri()).willReturn(uri);
-		given(resourceFinder.findResource(DocumentScriptEnvironment.class, AppLocation.Virtual, new URIMatch(uri).name)).willReturn(scriptEnvironment);
+		given(request.uri()).willReturn(uri);
+		given(resourceFinder.findResource(DocumentScriptEnvironment.class, Virtual, new URIMatch(uri).name)).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when
@@ -137,7 +137,7 @@ public class WebSocketConnectionMakerTest {
 		wscm.handshakeWebsocket();
 		
 		// then
-		verify(response).header(HttpHeaders.Names.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue());
+		verify(response).header(HttpHeaderNames.SEC_WEBSOCKET_VERSION, WebSocketVersion.V13.toHttpHeaderValue());
 		verify(response).sendError(HttpResponseStatus.UPGRADE_REQUIRED);
 	}
 	
@@ -157,9 +157,9 @@ public class WebSocketConnectionMakerTest {
 		
 		// given
 		String uri = "/1234567890123456789012345678901234567890/uri.socket";
-		given(request.getUri()).willReturn(uri);
+		given(request.uri()).willReturn(uri);
 		given(scriptEnvironment.sha1()).willReturn("ABCDEF");
-		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), eq(AppLocation.Virtual), anyString())).willReturn(scriptEnvironment);
+		given(resourceFinder.findResource(eq(DocumentScriptEnvironment.class), eq(Virtual), anyString())).willReturn(scriptEnvironment);
 		given(channelFuture.isSuccess()).willReturn(true);
 		
 		// when

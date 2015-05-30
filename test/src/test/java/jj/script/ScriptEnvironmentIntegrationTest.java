@@ -16,8 +16,10 @@
 package jj.script;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.server.ServerLocation.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static jj.document.DocumentScriptEnvironment.*;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.concurrent.CountDownLatch;
@@ -27,19 +29,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 import jj.App;
-import jj.configuration.resolution.AppLocation;
+import jj.ServerRoot;
 import jj.document.DocumentScriptEnvironment;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.http.server.EmbeddedHttpRequest;
 import jj.http.server.EmbeddedHttpServer;
+import jj.http.server.resource.StaticResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
 import jj.script.module.ModuleScriptEnvironment;
 import jj.script.module.RequiredModule;
 import jj.testing.JibbrJabbrTestServer;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -64,7 +68,7 @@ public class ScriptEnvironmentIntegrationTest {
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(App.module)
+		new JibbrJabbrTestServer(ServerRoot.one, App.module)
 			.injectInstance(this);
 	
 	CountDownLatch latch;
@@ -99,6 +103,12 @@ public class ScriptEnvironmentIntegrationTest {
 		};
 	}
 	
+	@Before
+	public void before() {
+		resourceLoader.loadResource(StaticResource.class, Assets, JJ_JS);
+		resourceLoader.loadResource(StaticResource.class, Assets, JQUERY_JS);
+	}
+	
 	// there should be a similar test in a resource system integration test
 	@Test
 	public void testingDuplicateInitializationRequestsJoin() throws Exception {
@@ -113,19 +123,19 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		String name1 = DOCUMENT_ONE;
 		String name2 = DOCUMENT_TWO;
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name1).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name1).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name1).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name1).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name1).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name1).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name1).then(countDown);
 		
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name2).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name2).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name2).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name2).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name2).then(countDown);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name2).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
 		
 		assertTrue(latch1.await(1, SECONDS));
 		assertTrue(latch.await(1, SECONDS));
@@ -146,14 +156,14 @@ public class ScriptEnvironmentIntegrationTest {
 		assertThat(server.request(new EmbeddedHttpRequest(DOCUMENT_TWO)).await(1, SECONDS).status(), is(HttpResponseStatus.OK));
 		
 		ModuleScriptEnvironment mse =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, MODULE_ONE, new RequiredModule(scriptEnvironment, MODULE_ONE));
+			resourceFinder.findResource(ModuleScriptEnvironment.class, Virtual, MODULE_ONE, new RequiredModule(scriptEnvironment, MODULE_ONE));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
 		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
 		
 		mse =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, MODULE_TWO, new RequiredModule(scriptEnvironment, MODULE_TWO));
+			resourceFinder.findResource(ModuleScriptEnvironment.class, Virtual, MODULE_TWO, new RequiredModule(scriptEnvironment, MODULE_TWO));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
@@ -182,7 +192,7 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		
 		ModuleScriptEnvironment mse =
-			resourceFinder.findResource(ModuleScriptEnvironment.class, AppLocation.Virtual, MODULE_ONE, new RequiredModule(scriptEnvironment, MODULE_ONE));
+			resourceFinder.findResource(ModuleScriptEnvironment.class, Virtual, MODULE_ONE, new RequiredModule(scriptEnvironment, MODULE_ONE));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
@@ -195,7 +205,7 @@ public class ScriptEnvironmentIntegrationTest {
 	 */
 	private void loadScriptEnvironment(final String name) throws InterruptedException {
 		latch = new CountDownLatch(1);
-		resourceLoader.loadResource(DocumentScriptEnvironment.class, AppLocation.Virtual, name);
+		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name);
 		assertTrue(latch.await(1, TimeUnit.SECONDS));
 	}
 

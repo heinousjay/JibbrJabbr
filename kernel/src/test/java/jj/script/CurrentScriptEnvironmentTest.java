@@ -39,19 +39,19 @@ import org.mozilla.javascript.ContinuationPending;
 @RunWith(MockitoJUnitRunner.class)
 public class CurrentScriptEnvironmentTest {
 	
-	ContinuationPendingKey pendingKey;
+	PendingKey pendingKey;
 	
 	Continuation continuation = new Continuation() {
 		
-		ContinuationPendingKey pendingKey;
+		PendingKey pendingKey;
 		
 		@Override
-		public ContinuationPendingKey pendingKey() {
+		public PendingKey pendingKey() {
 			return pendingKey;
 		}
 		
 		@Override
-		public void pendingKey(ContinuationPendingKey pendingKey) {
+		public void pendingKey(PendingKey pendingKey) {
 			this.pendingKey = pendingKey;
 		}
 	};
@@ -75,7 +75,7 @@ public class CurrentScriptEnvironmentTest {
 	@Before
 	public void before() {
 		
-		pendingKey = new ContinuationPendingKey();
+		pendingKey = new PendingKey();
 		
 		MockRhinoContextProvider rcp = new MockRhinoContextProvider();
 		rhinoContext = rcp.context;

@@ -27,16 +27,14 @@ import jj.Version;
 import jj.event.Publisher;
 import jj.http.server.HttpServerRequestImpl;
 import jj.http.server.HttpServerResponseImpl;
-import jj.http.uri.RouteFinder;
 import jj.logging.LoggedEvent;
-import jj.resource.LoadedResource;
 import jj.resource.Resource;
-import jj.resource.TransferableResource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
@@ -49,7 +47,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
 
 /**
  * @author jason
@@ -76,8 +73,8 @@ public class HttpServerResponseImplTest {
 	@Before
 	public void before() {
 		nettyRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
-		nettyRequest.headers().add(HttpHeaders.Names.HOST, host);
-		request = new HttpServerRequestImpl(nettyRequest, new RouteFinder(), ctx);
+		nettyRequest.headers().add(HttpHeaderNames.HOST, host);
+		request = new HttpServerRequestImpl(nettyRequest, ctx);
 		
 		response = new HttpServerResponseImpl(version, request, ctx, publisher);
 		assertThat(response.charset(), is(UTF_8));
@@ -87,28 +84,28 @@ public class HttpServerResponseImplTest {
 		response.sendCachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_LENGTH), is(String.valueOf(size)));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaderNames.CONTENT_TYPE), is(mime));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.header(HttpHeaderNames.CONTENT_LENGTH), is(String.valueOf(size)));
+		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
 	}
 
 	private void testUncachedResource(Resource resource) throws IOException {
 		response.sendUncachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_TYPE), is(mime));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CONTENT_LENGTH), is(String.valueOf(size)));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpHeaders.Values.NO_CACHE));
+		assertThat(response.header(HttpHeaderNames.CONTENT_TYPE), is(mime));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.header(HttpHeaderNames.CONTENT_LENGTH), is(String.valueOf(size)));
+		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpHeaderValues.NO_CACHE));
 	}
 
 	private void testCachedNotModifiedResource(Resource resource) throws IOException {
 		response.sendNotModified(resource, true);
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.header(HttpHeaders.Names.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
 		assertThat(response.hasNoBody(), is(true));
 	}
 
@@ -116,8 +113,8 @@ public class HttpServerResponseImplTest {
 		response.sendNotModified(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));
-		assertThat(response.header(HttpHeaders.Names.ETAG), is(sha1));
-		assertThat(response.containsHeader(HttpHeaders.Names.CACHE_CONTROL), is(false));
+		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
+		assertThat(response.containsHeader(HttpHeaderNames.CACHE_CONTROL), is(false));
 		assertThat(response.hasNoBody(), is(true));
 	}
 	
@@ -258,45 +255,4 @@ public class HttpServerResponseImplTest {
 		testUncachedNotModifiedResource(givenATransferableResource());
 		verifyInlineResponse();
 	}
-	
-	/*
-	 * move this to a test of the logging class
-	@Test
-	public void testAccessLog() throws IOException {
-		
-		// given
-		given(logger.isInfoEnabled()).willReturn(true);
-		given(logger.isTraceEnabled()).willReturn(true);
-		String location = "home";
-		byte[] bytes = "this is the contents".getBytes(UTF_8);
-		long length = 100L;
-		
-		
-		response.status(HttpResponseStatus.FOUND)
-			.header(HttpHeaders.Names.ACCEPT_RANGES, HttpHeaders.Values.BYTES)
-			.header(HttpHeaders.Names.LOCATION, location)
-			.header(HttpHeaders.Names.CONTENT_LENGTH, length)
-			.content(bytes)
-			.end();
-		
-		verifyRequestRespondedIsPublished();
-		
-		// have to do this outside the verification or mockito gets all jacked up inside
-		String remoteAddress = ctx.channel().remoteAddress().toString();
-		
-		verify(logger).info(
-			eq("{} - - {} \"{} {} {}\" {} {} {} {}"),
-			eq(remoteAddress),
-			anyString(), // the date, not going to try to make this work
-			eq(request.method()),
-			eq(request.request().getUri()),
-			eq(request.request().getProtocolVersion()),
-			eq(response.status().code()),
-			eq("100"),
-			eq("-"),
-			eq("-")
-		);
-	}
-	*/
-
 }

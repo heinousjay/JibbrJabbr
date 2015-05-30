@@ -30,7 +30,6 @@ import jj.util.RandomHelper;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -57,7 +56,7 @@ public class SystemLoggerTest {
 		
 		sl = new SystemLogger(taskRunner, loggers);
 		
-		sl.start();
+		sl.start(null); // it ignores the event
 		
 		publishLoop = taskRunner.runFirstTaskInDaemon();
 	}
@@ -98,8 +97,9 @@ public class SystemLoggerTest {
 		}
 	}
 
-	@Ignore
-	@Test
+	//@Test
+	// this doesn't run well as part of the build, i suspect it
+	// gets shut down too early
 	public void testUnderLoad() throws Exception {
 		// warm up runs
 		loadTest(4, 7000, 7001, 3, 15);
