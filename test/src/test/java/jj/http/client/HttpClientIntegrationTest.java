@@ -35,10 +35,11 @@ import jj.ServerRoot;
 import jj.http.client.api.RestOperation;
 import jj.testing.JibbrJabbrTestServer;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-
+@Ignore // this test is currently pointless
 public class HttpClientIntegrationTest {
 
 	@Rule
