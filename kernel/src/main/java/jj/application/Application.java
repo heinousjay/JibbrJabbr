@@ -43,7 +43,6 @@ public class Application implements LocationResolver {
 	
 	@Inject
 	public Application(final Arguments arguments, final Server server) {
-		
 		basePath = arguments.get("app", Path.class, server.resolvePath(Root, "app"));
 	}
 	
@@ -67,5 +66,10 @@ public class Application implements LocationResolver {
 	@Override
 	public List<Location> watchedLocations() {
 		return Collections.singletonList(AppBase);
+	}
+	
+	@Override
+	public Location specLocationFor(Location base) {
+		return base == AppBase ? AppBase : null;
 	}
 }

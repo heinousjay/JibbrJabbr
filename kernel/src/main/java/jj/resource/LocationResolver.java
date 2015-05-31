@@ -41,5 +41,12 @@ public interface LocationResolver {
 	 * enumerate the paths that this resolver wants watched for changes
 	 */
 	List<Location> watchedLocations();
+	
+	/**
+	 * if there is an appropriate location for specs for a given
+	 * location, return it, otherwise return null
+	 * 
+	 */
+	Location specLocationFor(Location base);
 
 }

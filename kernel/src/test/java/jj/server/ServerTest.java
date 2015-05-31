@@ -22,6 +22,7 @@ public class ServerTest {
 	@Mock Arguments arguments;
 	@Mock Assets assets;
 	@Mock APIModules apiModules;
+	@Mock APISpecs apiSpecs;
 	
 	Server server;
 
@@ -30,7 +31,7 @@ public class ServerTest {
 		Path path = Paths.get("server-root-path");
 		given(arguments.get(eq("server-root"), eq(Path.class), any(Path.class))).willReturn(path);
 		
-		server = new Server(arguments, assets, apiModules);
+		server = new Server(arguments, assets, apiModules, apiSpecs);
 		
 		// asset resources get delegated to Assets
 		server.resolvePath(ServerLocation.Assets, "a");
@@ -39,6 +40,10 @@ public class ServerTest {
 		// api module resources get delegated to APIModules
 		server.resolvePath(ServerLocation.APIModules, "b");
 		verify(apiModules).path("b");
+		
+		// api spec resources are delegated to APISpecs
+		server.resolvePath(ServerLocation.APISpecs, "c");
+		verify(apiSpecs).path("c");
 	}
 
 
