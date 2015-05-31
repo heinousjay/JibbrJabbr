@@ -54,7 +54,7 @@ class SpecCoordinator {
 	}
 	
 	@Listener
-	void scriptInitialized(final ScriptEnvironmentInitialized event) {
+	void on(final ScriptEnvironmentInitialized event) {
 		// right now, checking this way for testing purposes, to let mocks in
 		if (JasmineScriptEnvironment.class.isAssignableFrom(event.scriptEnvironment().getClass())) {
 			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment()));

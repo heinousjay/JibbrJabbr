@@ -43,11 +43,13 @@ class SpecRunner {
 	
 	private static final String JS_ENDING = ".js";
 	private static final String SPEC_JS_ENDING = "-spec.js";
+	private static final String JASMINE_SPEC_JS_ENDING = "-jasmine" + SPEC_JS_ENDING;
 	
 	private final JasmineConfiguration configuration;
 	private final JasmineSwitch jasmineSwitch;
 	private final ResourceLoader resourceLoader;
 	
+	// make this contributable
 	private final Set<String> ignoredNames = new HashSet<>(Arrays.asList(JASMINE_JS, JASMINE_BOOT_JS, JASMINE_RUN_JS));
 	
 	@Inject
@@ -66,13 +68,15 @@ class SpecRunner {
 	}
 
 	@Listener
-	void resourceLoaded(ResourceLoaded rl) {
+	void on(ResourceLoaded rl) {
 		if (shouldRun() &&                                               // are we even on?
 			ScriptResource.class.isAssignableFrom(rl.resourceClass) &&   // was it a script that got loaded?
 			!ignoredNames.contains(rl.name) &&                           // are we not recursively trying to test our runner scripts?
-			!rl.name.endsWith(SPEC_JS_ENDING)                            // and of course, specs don't get specs.  stay out of rabbit holes
+			//rl.base != AppLocation.Specs &&                              // not from the specs location. this is getting adjusted
+			!rl.name.endsWith(SPEC_JS_ENDING)                            // kill this when spec locations make sense
 		) {
-			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name.replace(JS_ENDING, SPEC_JS_ENDING), rl);
+			// kick off a resource thread to look for a spec resource, and determine if it's jasmine or mocha or whatevs
+			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name.replace(JS_ENDING, JASMINE_SPEC_JS_ENDING), rl);
 		}
 	}
 }

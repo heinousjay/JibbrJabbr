@@ -47,7 +47,7 @@ public class SpecRunnerTest {
 	@Test
 	public void testNoAutorun() {
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
 		verify(resourceLoader, never()).loadResource(eq(JasmineScriptEnvironment.class), eq(Virtual), anyString(), anyVararg());
 	}
@@ -59,9 +59,9 @@ public class SpecRunnerTest {
 		given(sr.name()).willReturn("name.js");
 
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
-		verify(resourceLoader).loadResource(JasmineScriptEnvironment.class, Virtual, "name-spec.js", rl);
+		verify(resourceLoader).loadResource(JasmineScriptEnvironment.class, Virtual, "name-jasmine-spec.js", rl);
 	}
 	
 	@Test
@@ -71,19 +71,19 @@ public class SpecRunnerTest {
 		
 		given(sr.name()).willReturn(JASMINE_JS);
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
 		given(sr.name()).willReturn(JASMINE_BOOT_JS);
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
 		given(sr.name()).willReturn(JASMINE_RUN_JS);
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
 		given(sr.name()).willReturn("name-spec.js");
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
 		verifyZeroInteractions(resourceLoader);
 	}

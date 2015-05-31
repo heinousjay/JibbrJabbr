@@ -78,7 +78,7 @@ public class SpecCoordinatorTest {
 	public void testHappyPath() throws Exception {
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 
 		// then
 		
@@ -117,7 +117,7 @@ public class SpecCoordinatorTest {
 		given(jse.execute(specScript)).willThrow(exception);
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 		
 		// then
 		taskRunner.runFirstTask();
@@ -135,7 +135,7 @@ public class SpecCoordinatorTest {
 		given(jse.execute(targetScript)).willThrow(exception);
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 		
 		// then
 		taskRunner.runFirstTask();
@@ -156,7 +156,7 @@ public class SpecCoordinatorTest {
 		given(jse.execute(runnerScript)).willThrow(exception);
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 		
 		// then
 		taskRunner.runFirstTask();
