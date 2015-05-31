@@ -15,23 +15,22 @@
  */
 package jj.server;
 
-import java.util.Set;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import jj.ResourceResolver;
+import javax.inject.Qualifier;
 
 /**
  * @author jason
  *
  */
-@Singleton
-public class APIModules extends InternalAssets {
+@Qualifier
+@Documented
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface APISpecPaths {
 
-	
-	@Inject
-	APIModules(final ResourceResolver resolver, final @APIModulePaths Set<String> paths) {
-		super(resolver, paths);
-	}
 }

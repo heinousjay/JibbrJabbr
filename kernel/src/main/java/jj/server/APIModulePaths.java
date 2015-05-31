@@ -31,6 +31,6 @@ import javax.inject.Qualifier;
 @Documented
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface APIPaths {
+public @interface APIModulePaths {
 
 }
