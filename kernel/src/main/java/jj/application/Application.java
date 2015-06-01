@@ -15,7 +15,7 @@
  */
 package jj.application;
 
-import static jj.application.AppLocation.AppBase;
+import static jj.application.AppLocation.*;
 import static jj.server.ServerLocation.*;
 
 import java.nio.file.Path;
@@ -50,6 +50,12 @@ public class Application implements LocationResolver {
 	public boolean pathInBase(final Path path) {
 		return path.startsWith(basePath);
 	}
+	
+	public Path resolvePath(Location base) {
+		assert base instanceof AppLocation;
+		AppLocation location = (AppLocation)base;
+		return basePath.resolve(location.path()).toAbsolutePath();
+	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {
@@ -60,7 +66,19 @@ public class Application implements LocationResolver {
 	
 	@Override
 	public Location resolveBase(Path path) {
-		return pathInBase(path) ? AppBase : null;
+		Location result = null;
+		if (pathInBase(path)) {
+			result = AppBase;
+			if (path.startsWith(resolvePath(Private))) {
+				result = Private;
+			} else if (path.startsWith(resolvePath(Public))) {
+				result = Public;
+			} else if (path.startsWith(resolvePath(Specs))) {
+				result = Specs;
+			}
+		}
+		
+		return result;
 	}
 	
 	@Override
@@ -70,6 +88,6 @@ public class Application implements LocationResolver {
 	
 	@Override
 	public Location specLocationFor(Location base) {
-		return base == AppBase ? AppBase : null;
+		return base == Private ? Specs : null;
 	}
 }
