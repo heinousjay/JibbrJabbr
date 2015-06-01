@@ -54,10 +54,10 @@ public class App {
 			one = getPath("/app1/app/");
 			two = getPath("/app2/app/");
 			minimal = getPath("/minimal/app/");
-			configuration = getPath("/configuration/");
+			configuration = getPath("/test-apps/configuration/");
 			css = getPath("/css/");
-			httpClient = getPath("/http/client/");
-			repl = getPath("/repl/");
+			httpClient = getPath("/test-apps/http-client/");
+			repl = getPath("/test-apps/repl/");
 			module = getPath("/module/");
 			jasmine = getPath("/test-apps/jasmine/");
 		} catch (Exception e) {
