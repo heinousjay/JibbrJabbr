@@ -15,6 +15,8 @@
  */
 package jj.configuration;
 
+import java.nio.file.Path;
+
 import org.slf4j.Logger;
 
 import jj.ServerLogger;
@@ -33,9 +35,16 @@ import jj.logging.LoggedEvent;
  */
 @ServerLogger
 public class UsingDefaultConfiguration extends LoggedEvent {
+	
+	private final Path appRoot;
+	
+	UsingDefaultConfiguration(Path appRoot) {
+		this.appRoot = appRoot;
+	}
 
 	@Override
 	public void describeTo(Logger logger) {
+		logger.info("Application root is {}", appRoot);
 		logger.info("No configuration found, using defaults");
 	}
 

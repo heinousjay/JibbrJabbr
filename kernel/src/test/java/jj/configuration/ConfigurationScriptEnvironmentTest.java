@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import static jj.application.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
+import jj.application.Application;
 import jj.event.MockPublisher;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
@@ -48,6 +49,7 @@ public class ConfigurationScriptEnvironmentTest {
 	MockPublisher publisher;
 	@Mock ScriptableObject global;
 	@Mock ConfigurationCollector collector;
+	@Mock Application application;
 	
 	ConfigurationScriptEnvironment cse;
 	
@@ -69,7 +71,7 @@ public class ConfigurationScriptEnvironmentTest {
 	public void testInitialization() {
 		given(resourceFinder.loadResource(ScriptResource.class, AppBase, CONFIG_SCRIPT_NAME)).willReturn(configScript);
 		
-		cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
+		cse = new ConfigurationScriptEnvironment(dependencies, global, collector, application);
 		
 		verify(configScript).addDependent(cse);
 		
@@ -94,7 +96,7 @@ public class ConfigurationScriptEnvironmentTest {
 	public void testDefaultConfiguration() {
 		
 		try {
-			cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
+			cse = new ConfigurationScriptEnvironment(dependencies, global, collector, application);
 			fail("should have thrown");
 		} catch (NoSuchResourceException nsre) {
 			assertThat(nsre, is(notNullValue()));

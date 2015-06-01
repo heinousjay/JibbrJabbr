@@ -29,14 +29,17 @@ import jj.logging.LoggedEvent;
 @ServerLogger
 class ConfigurationFound extends LoggedEvent {
 	
+	private final Path appRoot;
 	private final Path configurationPath;
 	
-	ConfigurationFound(final Path configurationPath) {
+	ConfigurationFound(final Path appRoot, final Path configurationPath) {
+		this.appRoot = appRoot;
 		this.configurationPath = configurationPath;
 	}
 
 	@Override
 	public void describeTo(Logger logger) {
+		logger.info("Application root is {}", appRoot);
 		logger.info("Found configuration at {}", configurationPath);
 	}
 
