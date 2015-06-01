@@ -78,7 +78,7 @@ public class BasicServingTest {
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(ServerRoot.one, App.one)
+		new JibbrJabbrTestServer(ServerRoot.one, App.app1)
 		.verifying()
 		//.recording()
 		.injectInstance(this);

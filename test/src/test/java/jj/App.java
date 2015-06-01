@@ -31,11 +31,9 @@ public class App {
 	// this could also be a helper class that inspects system properties or vm args or whatever
 	public static final Class<? extends WebDriverProvider> DRIVER_PROVIDER = PhantomJSWebDriverProvider.class; //FirefoxWebDriverProvider.class;
 	
-	public static final Path one;
+	public static final Path app1;
 	
-	public static final Path two;
-	
-	public static final Path minimal;
+	public static final Path app2;
 	
 	public static final Path configuration;
 	
@@ -43,23 +41,25 @@ public class App {
 	
 	public static final Path httpClient;
 
-	public static final Path repl;
+	public static final Path jasmine;
+	
+	public static final Path minimal;
 
 	public static final Path module;
 
-	public static final Path jasmine;
+	public static final Path repl;
 	
 	static {
 		try {
-			one = getPath("/app1/app/");
-			two = getPath("/app2/app/");
-			minimal = getPath("/minimal/app/");
+			app1 = getPath("/app1/app/");
+			app2 = getPath("/app2/app/");
 			configuration = getPath("/test-apps/configuration/");
 			css = getPath("/css/");
 			httpClient = getPath("/test-apps/http-client/");
-			repl = getPath("/test-apps/repl/");
-			module = getPath("/module/");
 			jasmine = getPath("/test-apps/jasmine/");
+			minimal = getPath("/minimal/app/");
+			module = getPath("/module/");
+			repl = getPath("/test-apps/repl/");
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

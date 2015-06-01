@@ -46,7 +46,7 @@ public class EmbeddedHttpServerTest {
 	EmbeddedHttpServer server;
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.one).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.app1).injectInstance(this);
 
 	@Test
 	public void test() throws Throwable {
