@@ -1,1 +1,0 @@
-// this file only exists to allow the jasmine system to find jasmine-int-test-failures-spec.js and run it
