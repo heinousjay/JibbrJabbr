@@ -59,7 +59,7 @@ public class App {
 			httpClient = getPath("/http/client/");
 			repl = getPath("/repl/");
 			module = getPath("/module/");
-			jasmine = getPath("/jasmine/");
+			jasmine = getPath("/test-apps/jasmine/");
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

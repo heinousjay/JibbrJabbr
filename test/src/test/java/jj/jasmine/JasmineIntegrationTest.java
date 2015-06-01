@@ -19,6 +19,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static jj.application.AppLocation.*;
 import static org.junit.Assert.*;
 
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
@@ -27,6 +29,7 @@ import jj.App;
 import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.resource.FileResource;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
 import jj.script.module.ScriptResource;
@@ -43,7 +46,10 @@ import org.junit.Test;
 public class JasmineIntegrationTest {
 	
 	@Rule
-	public JibbrJabbrTestServer jj = new JibbrJabbrTestServer(ServerRoot.one, App.jasmine).injectInstance(this);
+	public JibbrJabbrTestServer jj = 
+		new JibbrJabbrTestServer(ServerRoot.one, App.jasmine)
+			.withFileWatcher()
+			.injectInstance(this);
 	
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
@@ -71,8 +77,8 @@ public class JasmineIntegrationTest {
 		latch = new CountDownLatch(2);
 		
 		// loading a script resource triggers the jasmine run
-		resourceLoader.loadResource(ScriptResource.class, AppBase, "jasmine-int-test.js");
-		resourceLoader.loadResource(ScriptResource.class, AppBase, "jasmine-int-test-failures.js");
+		resourceLoader.loadResource(ScriptResource.class, Private, "jasmine-int-test.js");
+		resourceLoader.loadResource(ScriptResource.class, Private, "jasmine-int-test-failures.js");
 		
 		// takes about 1 second locally
 		// maybe externalize timeouts?  or produce a factor on travis?
@@ -84,6 +90,28 @@ public class JasmineIntegrationTest {
 		
 		// contents of test results are verified in the unit tests
 		// TODO touch a script/spec and ensure it runs again?
+		success = null;
+		failure = null;
+		latch = new CountDownLatch(2);
+		
+		touch(resourceFinder.findResource(ScriptResource.class, Private, "jasmine-int-test.js"));
+		touch(resourceFinder.findResource(ScriptResource.class, Private, "jasmine-int-test-failures.js"));
+		
+		assertTrue("timed out", latch.await(3, SECONDS));
+		
+		// make sure they ran again
+		assertNotNull(success);
+		assertNotNull(failure);
 	}
-
+	
+	// also need a delete test!
+	private void touch(FileResource resource) throws Exception {
+		FileTime originalFileTime = Files.getLastModifiedTime(resource.path());
+		FileTime newFileTime;
+		do {
+			newFileTime = FileTime.fromMillis(System.currentTimeMillis());
+		} while (newFileTime.compareTo(originalFileTime) < 1);
+		
+		Files.setLastModifiedTime(resource.path(), newFileTime);
+	}
 }
