@@ -19,6 +19,8 @@ import static org.mockito.BDDMockito.*;
 import static jj.jasmine.JasmineScriptEnvironment.*;
 import static jj.server.ServerLocation.Virtual;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
+import jj.resource.Location;
+import jj.resource.PathResolver;
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.script.module.ScriptResource;
@@ -39,10 +41,12 @@ public class SpecRunnerTest {
 	@Mock JasmineConfiguration configuration;
 	@Mock JasmineSwitch jasmineSwitch;
 	@Mock ResourceLoader resourceLoader;
+	@Mock PathResolver pathResolver;
 	
 	@InjectMocks SpecRunner specRunner;
 	
 	@Mock ScriptResource sr;
+	@Mock Location location;
 
 	@Test
 	public void testNoAutorun() {
@@ -57,6 +61,8 @@ public class SpecRunnerTest {
 		
 		given(configuration.autorunSpecs()).willReturn(true);
 		given(sr.name()).willReturn("name.js");
+		given(sr.base()).willReturn(location);
+		given(pathResolver.specLocationFor(location)).willReturn(location);
 
 		ResourceLoaded rl = makeResourceLoaded(sr);
 		specRunner.on(rl);
@@ -68,6 +74,8 @@ public class SpecRunnerTest {
 	public void testIgnored() {
 
 		given(configuration.autorunSpecs()).willReturn(true);
+		given(sr.base()).willReturn(location);
+		given(pathResolver.specLocationFor(location)).willReturn(location);
 		
 		given(sr.name()).willReturn(JASMINE_JS);
 		ResourceLoaded rl = makeResourceLoaded(sr);

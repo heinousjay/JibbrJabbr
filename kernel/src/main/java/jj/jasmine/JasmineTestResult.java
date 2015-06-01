@@ -23,8 +23,12 @@ import jj.logging.LoggedEvent;
  *
  */
 @ServerLogger
-public abstract class JasmineTestResult extends LoggedEvent {
+abstract class JasmineTestResult extends LoggedEvent {
 	
+	protected final JasmineScriptEnvironment jse;
 	
+	JasmineTestResult(JasmineScriptEnvironment jse) {
+		this.jse = jse;
+	}
 
 }

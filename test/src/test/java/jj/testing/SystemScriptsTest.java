@@ -33,7 +33,6 @@ import javax.inject.Inject;
 
 import jj.App;
 import jj.JJ;
-import jj.JJModule;
 import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -92,13 +91,9 @@ public class SystemScriptsTest {
 	@Rule
 	public JibbrJabbrTestServer server =
 		new JibbrJabbrTestServer(ServerRoot.one, App.configuration) // we use the configuration because that loads all the core configuration scripts
-			.runAllSpecs()                          // this defaults to off.  that might not survive now!
-			.injectInstance(this)                   // well, sure
-			.withModule(new JJModule() {
-				protected void configure() {
-					bindAPIModulePath(SPEC_PATH);    // and put the specs on the path
-				}
-			});
+			.runAllSpecs()                          // this way, it runs specs regardless
+			.injectInstance(this);                  // well, sure
+
 	
 	@Inject
 	ResourceLoader resourceLoader;

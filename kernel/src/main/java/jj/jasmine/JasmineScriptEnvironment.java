@@ -25,7 +25,9 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.resource.Location;
 import jj.resource.NoSuchResourceException;
+import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoaded;
 import jj.script.AbstractScriptEnvironment;
@@ -74,6 +76,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		final Dependencies dependencies,
 		final @Global ScriptableObject global,
 		final ResourceFinder resourceFinder,
+		final PathResolver pathResolver,
 		final ResourceLoaded resourceLoaded // the original event that caused us to get loaded
 	) {
 		super(dependencies);
@@ -82,9 +85,11 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		
 		this.global = global;
 		
+		Location specLocation = pathResolver.specLocationFor(resourceLoaded.base);
+		
 		// we need some scripts to be happy
 		target  = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, resourceLoaded.name);
-		spec    = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, name);
+		spec    = resourceFinder.loadResource(ScriptResource.class, specLocation, name);
 		
 		// target is unlikely to be null, but maybe it got deleted while we were getting created
 		// if spec is null, we have nothing to do

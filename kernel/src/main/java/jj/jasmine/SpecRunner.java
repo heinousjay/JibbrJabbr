@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.resource.PathResolver;
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.script.module.ScriptResource;
@@ -48,19 +49,21 @@ class SpecRunner {
 	private final JasmineConfiguration configuration;
 	private final JasmineSwitch jasmineSwitch;
 	private final ResourceLoader resourceLoader;
-	
+	private final PathResolver pathResolver;
 	// make this contributable
 	private final Set<String> ignoredNames = new HashSet<>(Arrays.asList(JASMINE_JS, JASMINE_BOOT_JS, JASMINE_RUN_JS));
 	
 	@Inject
 	SpecRunner(
-		final JasmineConfiguration configuration,
-		final JasmineSwitch jasmineSwitch,
-		final ResourceLoader resourceLoader
+		JasmineConfiguration configuration,
+		JasmineSwitch jasmineSwitch,
+		ResourceLoader resourceLoader,
+		PathResolver pathResolver
 	) {
 		this.configuration = configuration;
 		this.jasmineSwitch = jasmineSwitch;
 		this.resourceLoader = resourceLoader;
+		this.pathResolver = pathResolver;
 	}
 	
 	private boolean shouldRun() {
@@ -72,7 +75,7 @@ class SpecRunner {
 		if (shouldRun() &&                                               // are we even on?
 			ScriptResource.class.isAssignableFrom(rl.resourceClass) &&   // was it a script that got loaded?
 			!ignoredNames.contains(rl.name) &&                           // are we not recursively trying to test our runner scripts?
-			//rl.base != AppLocation.Specs &&                              // not from the specs location. this is getting adjusted
+			pathResolver.specLocationFor(rl.base) != null &&             // a spec location exists for this resource
 			!rl.name.endsWith(SPEC_JS_ENDING)                            // kill this when spec locations make sense
 		) {
 			// kick off a resource thread to look for a spec resource, and determine if it's jasmine or mocha or whatevs

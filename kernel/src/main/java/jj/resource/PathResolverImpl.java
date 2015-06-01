@@ -67,5 +67,16 @@ class PathResolverImpl implements PathResolver {
 	public List<Location> watchedLocations() {
 		return watchedLocations;
 	}
+	
+	@Override
+	public Location specLocationFor(Location base) {
+
+		
+		LocationResolver resolver = resolvers.get(base.getClass());
+		
+		assert resolver != null : base;
+		
+		return resolver.specLocationFor(base);
+	}
 
 }

@@ -26,12 +26,11 @@ public class JasmineTestError extends JasmineTestResult {
 	static final String MESSAGE_1 = "Jasmine spec error!\nrunning {} errored\nwhile evaluating {}\ntargeting {}";
 	static final String MESSAGE_2 = "";
 	
-	private final JasmineScriptEnvironment jse;
 	private final String context;
 	private final Throwable cause;
 	
 	JasmineTestError(final JasmineScriptEnvironment jse, final String context, final Throwable cause) {
-		this.jse = jse;
+		super(jse);
 		this.context = context;
 		this.cause = cause;
 	}
