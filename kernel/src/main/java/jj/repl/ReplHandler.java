@@ -66,7 +66,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 	}
 	
 	@Listener
-	void resourceReloaded(ResourceReloaded resourceReloaded) {
+	void on(ResourceReloaded resourceReloaded) {
 		if (resourceReloaded.resourceClass == ReplScriptEnvironment.class) {
 			ctx.writeAndFlush("\nreloading! your definitions are gone\n>");
 		}

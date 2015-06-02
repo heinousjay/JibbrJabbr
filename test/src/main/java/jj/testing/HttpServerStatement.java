@@ -19,12 +19,12 @@ class HttpServerStatement extends JibbrJabbrTestStatement {
 	private final CountDownLatch stopLatch = new CountDownLatch(1);
 	
 	@Listener
-	void httpServerStarted(HttpServerStarted event) {
+	void on(HttpServerStarted event) {
 		startLatch.countDown();
 	}
 	
 	@Listener
-	void httpServerStopped(HttpServerStopped event) {
+	void on(HttpServerStopped event) {
 		stopLatch.countDown();
 	}
 	

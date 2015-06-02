@@ -25,8 +25,8 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 	
 	@Inject
 	ResourceWatchServiceImpl(
-		final ResourceWatchSwitch resourceWatchSwitch,
-		final ResourceWatchServiceLoop loop
+		ResourceWatchSwitch resourceWatchSwitch,
+		ResourceWatchServiceLoop loop
 	) {
 		this.resourceWatchSwitch = resourceWatchSwitch;
 		this.loop = loop;
@@ -40,7 +40,7 @@ class ResourceWatchServiceImpl implements ResourceWatchService {
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded event) {
+	void on(ConfigurationLoaded event) {
 		if (resourceWatchSwitch.runFileWatcher()) {
 			loop.start();
 		} else {

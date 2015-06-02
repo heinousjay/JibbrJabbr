@@ -60,11 +60,11 @@ public abstract class AbstractResource implements Resource {
 		
 		@Inject
 		protected AbstractResourceDependencies(
-			final Clock clock,
-			final ResourceConfiguration resourceConfiguration,
-			final AbstractResourceEventDemuxer demuxer,
-			final Publisher publisher,
-			final ResourceFinder resourceFinder
+			Clock clock,
+			ResourceConfiguration resourceConfiguration,
+			AbstractResourceEventDemuxer demuxer,
+			Publisher publisher,
+			ResourceFinder resourceFinder
 		) {
 			this.clock = clock;
 			this.resourceConfiguration = resourceConfiguration;
@@ -93,10 +93,10 @@ public abstract class AbstractResource implements Resource {
 		
 		@Inject
 		protected Dependencies(
-			final AbstractResourceDependencies abstractResourceDependencies,
-			final ResourceKey resourceKey,
-			final Location base,
-			final @ResourceName String name
+			AbstractResourceDependencies abstractResourceDependencies,
+			ResourceKey resourceKey,
+			Location base,
+			@ResourceName String name
 		) {
 			this.abstractResourceDependencies = abstractResourceDependencies;
 			this.resourceKey = resourceKey;
@@ -147,7 +147,7 @@ public abstract class AbstractResource implements Resource {
 	
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	
-	protected AbstractResource(final Dependencies dependencies) {
+	protected AbstractResource(Dependencies dependencies) {
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
 		this.name = dependencies.name;
@@ -194,7 +194,7 @@ public abstract class AbstractResource implements Resource {
 	 * @param event the event
 	 */
 	@Listener
-	void resourceKilled(ResourceKilled event) {
+	void on(ResourceKilled event) {
 		dependents.remove(event.resourceKey);
 	}
 	

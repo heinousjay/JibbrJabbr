@@ -82,7 +82,7 @@ public class ServerEventScriptBridge {
 	private final CtConstructor superConstructor;
 	
 	@Inject
-	ServerEventScriptBridge(final CurrentScriptEnvironment env, final Injector injector) throws Exception {
+	ServerEventScriptBridge(CurrentScriptEnvironment env, Injector injector) throws Exception {
 		this.env = env;
 		this.injector = injector;
 		
@@ -162,7 +162,7 @@ public class ServerEventScriptBridge {
 	}
 	
 	@Listener
-	void scriptEnvironmentDied(ScriptEnvironmentDied sed) {
+	void on(ScriptEnvironmentDied sed) {
 		Map<String, Map<Callable, ServerEventCallableInvoker>> map = invokers.remove(sed.scriptEnvironment());
 		// make sure the various invokers don't get invoked before cleanup
 		if (map != null) {

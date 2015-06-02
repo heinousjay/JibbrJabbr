@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Provider;
 
+import jj.configuration.ConfigurationLoaded;
 import jj.event.MockPublisher;
 import jj.execution.MockTaskRunner;
 
@@ -194,7 +195,7 @@ public class HttpServerTest {
 	public void testServerOff() throws Exception {
 		
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		
 		// then
 		assertTrue(publisher.events.isEmpty());
@@ -217,7 +218,7 @@ public class HttpServerTest {
 		givenStartupConditions();
 
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		taskRunner.runFirstTask();
 		
 		// check more - the value of the bindings maybe?
@@ -248,7 +249,7 @@ public class HttpServerTest {
 		givenStartupConditions();
 
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		taskRunner.runFirstTask();
 		
 		assertThat(publisher.events.size(), is(3));
@@ -277,7 +278,7 @@ public class HttpServerTest {
 		given(groupFuture.isSuccess()).willReturn(true);
 
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		taskRunner.runFirstTask();
 		
 		// then

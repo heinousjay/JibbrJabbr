@@ -94,13 +94,13 @@ public class ConfigurationSystemTest {
 	volatile boolean failed;
 	
 	@Listener 
-	void ConfigurationLoaded(ConfigurationLoaded configurationLoaded) {
+	void on(ConfigurationLoaded configurationLoaded) {
 		loaded = true;
 		loadedLatch.countDown();
 	}
 	
 	@Listener
-	void scriptError(ScriptError scriptError) {
+	void on(ScriptError scriptError) {
 		failed = true;
 	}
 

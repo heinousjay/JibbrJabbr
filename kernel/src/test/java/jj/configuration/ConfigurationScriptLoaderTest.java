@@ -48,10 +48,10 @@ public class ConfigurationScriptLoaderTest {
 	@Test
 	public void test() throws Exception {
 		// trips the latch
-		csp.configurationLoaded(null);
+		csp.on((ConfigurationLoaded)null);
 		MockServerStarting event = new MockServerStarting();
 		
-		csp.start(event);
+		csp.on(event);
 		
 		assertThat(event.priority, is(Priority.Middle));
 		

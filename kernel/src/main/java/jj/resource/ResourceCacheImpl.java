@@ -59,7 +59,7 @@ class ResourceCacheImpl implements ResourceCache {
 	}
 	
 	@Listener
-	public void serverStopping(ServerStopping event) {
+	void on(ServerStopping event) {
 		resourceCache.clear();
 	}
 	

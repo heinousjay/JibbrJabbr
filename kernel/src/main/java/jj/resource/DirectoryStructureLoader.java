@@ -47,14 +47,14 @@ class DirectoryStructureLoader {
 	private final TaskRunner taskRunner;
 	
 	@Inject
-	DirectoryStructureLoader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
+	DirectoryStructureLoader(PathResolver pathResolver, ResourceFinder resourceFinder, TaskRunner taskRunner) {
 		this.pathResolver = pathResolver;
 		this.resourceFinder = resourceFinder;
 		this.taskRunner = taskRunner;
 	}
 
 	@Listener
-	void start(ServerStarting event) {
+	void on(ServerStarting event) {
 		for (Location location : pathResolver.watchedLocations()) {
 			event.registerStartupTask(Priority.NearHighest, new LoaderTask(pathResolver.resolvePath(location)));
 		}

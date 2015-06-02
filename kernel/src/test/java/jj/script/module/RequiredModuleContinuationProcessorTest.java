@@ -101,7 +101,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceLoaded(new ResourceLoaded(moduleScriptEnvironment));
+		processor.on(new ResourceLoaded(moduleScriptEnvironment));
 		
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);
 		
@@ -115,7 +115,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.resourceNotFound(new ResourceNotFound(ModuleScriptEnvironment.class, Virtual, module, requiredModule));
+		processor.on(new ResourceNotFound(ModuleScriptEnvironment.class, Virtual, module, requiredModule));
 		
 		// then
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);

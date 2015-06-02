@@ -229,7 +229,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	@Listener
-	void resourceReloaded(ResourceReloaded event) {
+	void on(ResourceReloaded event) {
 		reloadedCount.incrementAndGet();
 		if (countEvents) {
 			latch.countDown();
@@ -237,7 +237,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	@Listener
-	void resourceKilled(ResourceKilled event) {
+	void on(ResourceKilled event) {
 		killedCount.incrementAndGet();
 		if (countEvents) {
 			latch.countDown();
@@ -245,7 +245,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	@Listener
-	void resourceLoaded(ResourceLoaded event) {
+	void on(ResourceLoaded event) {
 		if (loadedCount != null) loadedCount.incrementAndGet();
 		if (countEvents) {
 			latch.countDown();

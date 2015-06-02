@@ -42,9 +42,9 @@ class ScriptExecutor extends DelayedExecutor {
 
 	@Inject
 	ScriptExecutor(
-		final Clock clock,
-		final JJThreadFactory threadFactory,
-		final JJRejectedExecutionHandler handler
+		Clock clock,
+		JJThreadFactory threadFactory,
+		JJRejectedExecutionHandler handler
 	) {
 		super(
 			clock,
@@ -63,7 +63,7 @@ class ScriptExecutor extends DelayedExecutor {
 	}
 
 	@Listener
-	void stop(ServerStopping event) {
+	void on(ServerStopping event) {
 		shutdown();
 	}
 	

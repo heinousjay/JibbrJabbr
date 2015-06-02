@@ -99,7 +99,7 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 	
 	@Listener
-	void scriptInitialized(final ScriptEnvironmentInitialized event) {
+	void on(ScriptEnvironmentInitialized event) {
 		if (event.scriptEnvironment() == this) {
 			configurationComplete();
 		}

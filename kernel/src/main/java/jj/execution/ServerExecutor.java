@@ -37,9 +37,9 @@ class ServerExecutor extends DelayedExecutor {
 
 	@Inject
 	ServerExecutor(
-		final Clock clock,
-		final JJThreadFactory threadFactory,
-		final JJRejectedExecutionHandler handler
+		Clock clock,
+		JJThreadFactory threadFactory,
+		JJRejectedExecutionHandler handler
 	) {
 		super(
 			clock,
@@ -58,7 +58,7 @@ class ServerExecutor extends DelayedExecutor {
 	}
 
 	@Listener
-	public void stop(ServerStopping event) {
+	public void on(ServerStopping event) {
 		shutdownNow();
 	}
 	

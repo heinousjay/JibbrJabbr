@@ -15,7 +15,7 @@ class ScriptExecutorFactory {
 	private final ScriptExecutor executor;
 		
 	@Inject
-	ScriptExecutorFactory(final Provider<ScriptExecutor> executors) {
+	ScriptExecutorFactory(Provider<ScriptExecutor> executors) {
 		this.executor = executors.get();
 	}
 	
@@ -32,7 +32,7 @@ class ScriptExecutorFactory {
 	}
 
 	@Listener
-	public void stop(ServerStopping event) {
+	void on(ServerStopping event) {
 		executor.shutdownNow();
 	}
 

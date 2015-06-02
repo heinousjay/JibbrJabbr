@@ -54,7 +54,7 @@ class ResourceWatcher {
 	private final DirectoryStructureLoader directoryStructureLoader;
 	
 	@Inject
-	ResourceWatcher(final DirectoryStructureLoader directoryStructureLoader) throws IOException {
+	ResourceWatcher(DirectoryStructureLoader directoryStructureLoader) throws IOException {
 		watcher = FileSystems.getDefault().newWatchService();
 		this.directoryStructureLoader = directoryStructureLoader;
 	}
@@ -75,7 +75,7 @@ class ResourceWatcher {
 	}
 	
 	@Listener
-	public void stop(ServerStopping event) {
+	void on(ServerStopping event) {
 		try {
 			watcher.close();
 		} catch (IOException e) {}

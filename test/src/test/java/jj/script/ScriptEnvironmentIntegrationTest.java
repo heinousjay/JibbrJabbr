@@ -79,7 +79,7 @@ public class ScriptEnvironmentIntegrationTest {
 	AtomicInteger documentTwoCount = new AtomicInteger(0);
 	
 	@Listener
-	void scriptEnvironmentInitialized(ScriptEnvironmentInitialized sei) {
+	void on(ScriptEnvironmentInitialized sei) {
 		
 		if (sei.scriptEnvironment() instanceof DocumentScriptEnvironment) {
 			scriptEnvironment = (DocumentScriptEnvironment)sei.scriptEnvironment();

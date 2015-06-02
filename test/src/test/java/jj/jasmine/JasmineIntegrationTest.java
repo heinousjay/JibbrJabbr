@@ -60,14 +60,19 @@ public class JasmineIntegrationTest {
 	JasmineTestFailure failure;
 	
 	@Listener
-	void jasmineSpecExecutionSuccess(JasmineTestSuccess success) {
+	void on(JasmineTestSuccess success) {
 		this.success = success;
 		latch.countDown();
 	}
 
 	@Listener
-	void jasmineSpecExecutionFailure(JasmineTestFailure failure) {
+	void on(JasmineTestFailure failure) {
 		this.failure = failure;
+		latch.countDown();
+	}
+
+	@Listener
+	void on(JasmineTestError error) {
 		latch.countDown();
 	}
 

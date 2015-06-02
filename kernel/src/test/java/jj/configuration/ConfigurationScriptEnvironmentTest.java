@@ -76,7 +76,7 @@ public class ConfigurationScriptEnvironmentTest {
 		verify(configScript).addDependent(cse);
 		
 		// make sure it only triggers on its own initialization
-		cse.scriptInitialized(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
+		cse.on(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
 
 		verify(collector, never()).configurationComplete();
 		
@@ -84,7 +84,7 @@ public class ConfigurationScriptEnvironmentTest {
 		assertTrue(publisher.events.get(0) instanceof ConfigurationLoading);
 		assertTrue(publisher.events.get(1) instanceof ConfigurationFound);
 		
-		cse.scriptInitialized(new ScriptEnvironmentInitialized(cse));
+		cse.on(new ScriptEnvironmentInitialized(cse));
 		
 		verify(collector).configurationComplete();
 		

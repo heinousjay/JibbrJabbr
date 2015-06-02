@@ -58,7 +58,7 @@ public class StylesheetResourceIntegrationTest {
 	CountDownLatch latch;
 	
 	@Listener
-	void resourceLoaded(ResourceLoaded event) {
+	void on(ResourceLoaded event) {
 		if (event.resourceClass == StylesheetResource.class) {
 			stylesheet = resourceFinder.findResource(StylesheetResource.class, event.base, event.name);
 			latch.countDown();

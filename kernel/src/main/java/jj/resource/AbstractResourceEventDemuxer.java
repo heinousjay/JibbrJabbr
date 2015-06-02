@@ -40,7 +40,7 @@ class AbstractResourceEventDemuxer {
 	private final ConcurrentHashMap<ResourceKey, AbstractResource> waitingResources = new ConcurrentHashMap<>();
 
 	@Listener
-	void resourceLoaded(ResourceLoaded event) {
+	void on(ResourceLoaded event) {
 		
 		AbstractResource resource = waitingResources.remove(event.resourceKey);
 		if (resource != null) {

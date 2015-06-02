@@ -78,7 +78,7 @@ public class ResourceCacheTest {
 		
 		rc.putIfAbsent(sKey, hr);
 		assertThat(rc.get(sKey), is((Resource)hr));
-		rc.serverStopping(null);
+		rc.on(null);
 		assertThat(rc.get(sKey), is(nullValue()));
 		
 	}

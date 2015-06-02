@@ -22,6 +22,8 @@ import jj.document.DocumentScriptEnvironment;
 import jj.execution.DelayedExecutor.CancelKey;
 import jj.execution.MockTaskRunner;
 import jj.execution.ServerTask;
+import jj.http.server.HttpServerStarted;
+import jj.http.server.HttpServerStopped;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketConnectionTracker;
 
@@ -69,7 +71,7 @@ public class WebSocketConnectionTrackerTest {
 		given(connection2.lastActivity()).willReturn(System.currentTimeMillis());
 		
 		// when
-		wsct.start(null);
+		wsct.on((HttpServerStarted)null);
 		ServerTask task = (ServerTask)taskRunner.runFirstTask();
 		
 		// then
@@ -89,14 +91,14 @@ public class WebSocketConnectionTrackerTest {
 		taskRunner.cancelKey = cancelKey;
 		
 		// when
-		wsct.start(null);
+		wsct.on((HttpServerStarted)null);
 		ServerTask task = (ServerTask)taskRunner.runFirstTask();
 		
 		// then
 		assertTrue(taskRunner.taskWillRepeat(task));
 		
 		// when
-		wsct.stop(null);
+		wsct.on((HttpServerStopped)null);
 		
 		// then
 		verify(cancelKey).cancel();

@@ -51,7 +51,7 @@ class ConfigurationScriptLoader {
 	}
 	
 	@Listener
-	void start(ServerStarting event) {
+	void on(ServerStarting event) {
 		event.registerStartupTask(Priority.Middle, new ServerTask("initial load of configuration script") {
 			
 			@Override
@@ -64,12 +64,12 @@ class ConfigurationScriptLoader {
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded configurationLoaded) {
+	void on(ConfigurationLoaded configurationLoaded) {
 		latch.countDown();
 	}
 	
 	@Listener
-	void configurationErrored(ConfigurationErrored event) {
+	void on(ConfigurationErrored event) {
 		latch.countDown();
 	}
 	

@@ -99,7 +99,7 @@ public class LoggingConfigurator {
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded event) {
+	void on(ConfigurationLoaded event) {
 		setLevels();
 	}
 	

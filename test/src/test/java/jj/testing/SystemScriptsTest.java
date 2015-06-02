@@ -103,19 +103,19 @@ public class SystemScriptsTest {
 	final AtomicInteger failureCount = new AtomicInteger();
 	
 	@Listener
-	void testPassed(JasmineTestSuccess success) {
+	void on(JasmineTestSuccess success) {
 		successCount.incrementAndGet();
 		testCountLatch.countDown();
 	}
 	
 	@Listener
-	void testFailed(JasmineTestFailure failure) {
+	void on(JasmineTestFailure failure) {
 		failureCount.incrementAndGet();
 		testCountLatch.countDown();
 	}
 	
 	@Listener
-	void testErrored(JasmineTestError error) {
+	void on(JasmineTestError error) {
 		failureCount.incrementAndGet();
 		testCountLatch.countDown();
 	}

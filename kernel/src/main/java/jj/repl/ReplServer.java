@@ -89,19 +89,19 @@ class ReplServer {
 	}
 	
 	@Listener
-	void serverStarting(ServerStarting serverStarting) {
+	void on(ServerStarting serverStarting) {
 		resourceLoader.loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.NAME);
 	}
 	
 	@Listener
-	void serverStopping(ServerStopping serverStopping) {
+	void on(ServerStopping serverStopping) {
 		if (server != null) {
 			shutdown();
 		}
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded configurationLoaded) {
+	void on(ConfigurationLoaded configurationLoaded) {
 		if (configuration.activate()) {
 			
 			if (server != null && port != configuration.port()) {
