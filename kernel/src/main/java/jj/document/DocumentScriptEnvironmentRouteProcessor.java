@@ -82,7 +82,7 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 	@ResourceThread
 	@Override
 	public <T extends ServableResource> T loadResource(final Class<T> resourceClass, final URIMatch uriMatch, final Route route) {
-		assert resourceClass == DocumentScriptEnvironment.class : "somehow got called for " + resourceClass;
+		assert resourceClass == DocumentScriptEnvironment.class;
 		return resourceFinder.loadResource(resourceClass, Virtual, route.mapping());
 	}
 	
