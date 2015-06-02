@@ -17,9 +17,9 @@ package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import static jj.server.ServerLocation.Virtual;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -73,7 +73,7 @@ public class StylesheetResourceIntegrationTest {
 
 	@Test
 	public void testLess() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, AppBase, "less.css");
+		resourceLoader.loadResource(StylesheetResource.class, Virtual, "less.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		
@@ -86,7 +86,7 @@ public class StylesheetResourceIntegrationTest {
 	
 	@Test
 	public void testCss() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, AppBase, "test.css");
+		resourceLoader.loadResource(StylesheetResource.class, Virtual, "test.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		
@@ -99,7 +99,7 @@ public class StylesheetResourceIntegrationTest {
 	@Test
 	public void testReplacements() throws Exception {
 		latch = new CountDownLatch(2); // we want two!
-		resourceLoader.loadResource(StylesheetResource.class, AppBase, "replacement.css");
+		resourceLoader.loadResource(StylesheetResource.class, Virtual, "replacement.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		

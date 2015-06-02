@@ -28,8 +28,9 @@ import java.nio.file.Paths;
 import jj.application.MockApplication;
 import jj.http.server.resource.StaticResource;
 import jj.http.server.resource.StaticResourceMaker;
+import jj.http.server.uri.URIMatch;
 import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.ResourceFinder;
+import jj.resource.ServableLoader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class CssReferenceVersionProcessorTest {
 	
 	Path basePath;
 
-	ResourceFinder resourceFinder;
+	@Mock ServableLoader servableLoader;
 	MockApplication app;
 	
 	@Mock StylesheetResource testCss;
@@ -65,32 +66,31 @@ public class CssReferenceVersionProcessorTest {
 		app = new MockApplication(basePath);
 		
 		dependencies = new MockAbstractResourceDependencies(AppBase, REPLACEMENT_CSS);
-		
-		resourceFinder = dependencies.resourceFinder();
 	}
 
 	@Test
 	public void testProcessUrls() throws Exception {
 		
-		CssReferenceVersionProcessor processor = new CssReferenceVersionProcessor(app, resourceFinder);
+		CssReferenceVersionProcessor processor = new CssReferenceVersionProcessor(app, servableLoader);
 		
 		// given
 		StaticResource replacement = spy(StaticResourceMaker.make(app, AppBase, REPLACEMENT_CSS));
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, REPLACEMENT_CSS)).willReturn(replacement);
+		given(dependencies.resourceFinder().loadResource(StaticResource.class, AppBase, REPLACEMENT_CSS)).willReturn(replacement);
+		given(servableLoader.loadResource(new URIMatch(REPLACEMENT_CSS))).willReturn(replacement);
 		
 		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null, app);
 		
 		
 		given(testCss.serverPath()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");
 		given(testCss.path()).willReturn(basePath.resolve(TEST_CSS));
-		given(resourceFinder.loadResource(StylesheetResource.class, AppBase, TEST_CSS)).willReturn(testCss);
+		given(servableLoader.loadResource(new URIMatch(TEST_CSS))).willReturn(testCss);
 		
 		StaticResource box = spy(StaticResourceMaker.make(app, AppBase, BOX_ICON));
 		StaticResource rox = spy(StaticResourceMaker.make(app, AppBase, ROX_ICON));
 		StaticResource sox = spy(StaticResourceMaker.make(app, AppBase, SOX_ICON));
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, BOX_ICON)).willReturn(box);
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, ROX_ICON)).willReturn(rox);
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, SOX_ICON)).willReturn(sox);
+		given(servableLoader.loadResource(new URIMatch(BOX_ICON))).willReturn(box);
+		given(servableLoader.loadResource(new URIMatch(ROX_ICON))).willReturn(rox);
+		given(servableLoader.loadResource(new URIMatch(SOX_ICON))).willReturn(sox);
 		
 		String inputString = new String(Files.readAllBytes(basePath.resolve(REPLACEMENT_CSS)), UTF_8);
 		

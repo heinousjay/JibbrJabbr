@@ -15,15 +15,13 @@
  */
 package jj.document.servable;
 
-import static io.netty.handler.codec.http.HttpMethod.GET;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.http.server.ServableResource;
-import jj.http.server.ServableResources;
-import jj.http.server.uri.RouteMatch;
-import jj.http.server.uri.Router;
 import jj.http.server.uri.URIMatch;
+import jj.resource.ServableLoader;
+
 import org.jsoup.nodes.Element;
 
 /**
@@ -39,16 +37,11 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 	private static final String SRC = "src";
 	private static final String SELECTOR = "[" + HREF + "],[" + SRC + "]";
 	
-	private final ServableResources servables;
-	private final Router router;
+	private final ServableLoader servableLoader;
 	
 	@Inject
-	ResourceUrlDocumentFilter(
-		final ServableResources servables,
-		final Router router
-	) {
-		this.servables = servables;
-		this.router = router;
+	ResourceUrlDocumentFilter(ServableLoader servableLoader) {
+		this.servableLoader = servableLoader;
 	}
 
 	@Override
@@ -60,17 +53,9 @@ class ResourceUrlDocumentFilter implements DocumentFilter {
 		if (url.startsWith(URI_PREPEND)) {
 			String path = url.substring(URI_PREPEND.length());
 			URIMatch uriMatch = new URIMatch(path);
-			if (!uriMatch.versioned && uriMatch.path != null) {
-				
-				RouteMatch match = router.routeRequest(GET, uriMatch);
-				if (match.matched()) {
-					Class<? extends ServableResource> resourceClass = servables.classFor(match.resourceName());
-					ServableResource resource = 
-						servables.routeProcessor(match.resourceName()).loadResource(resourceClass, uriMatch, match.route());
-					if (resource != null && uriMatch.sha1 == null) {
-						return resource.serverPath();
-					}
-				}
+			ServableResource resource = uriMatch.versioned ? null : servableLoader.loadResource(uriMatch);
+			if (resource != null) {
+				return resource.serverPath();
 			}
 			return path;
 		}
