@@ -15,9 +15,6 @@
  */
 package jj.http.server;
 
-import static jj.application.AppLocation.*;
-import static jj.server.ServerLocation.*;
-
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -33,9 +30,7 @@ import jj.resource.ResourceThread;
 
 /**
  * <p>
- * Handles basic serving of resources that don't require dealing with
- * route mappings. This only reads the path from the URI match to determine
- * which resource to use.  The Route mapping is ignored
+ * Serves resources that have simple lifecycle needs
  * 
  * @author jason
  *
@@ -46,26 +41,29 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	private final ResourceFinder resourceFinder;
 	private final ResourceLoader resourceLoader;
 	private final Map<String, Class<? extends ServableResource>> servableResources;
+	private final Map<Class<? extends ServableResource>, RouteProcessorConfiguration> configurationMap;
 	
 	@Inject
 	SimpleRouteProcessor(
 		final ResourceFinder resourceFinder,
 		final ResourceLoader resourceLoader,
-		final Map<String, Class<? extends ServableResource>> servableResources
+		final Map<String, Class<? extends ServableResource>> servableResources,
+		final Map<Class<? extends ServableResource>, RouteProcessorConfiguration> configurationMap
 	) {
 		this.resourceFinder = resourceFinder;
 		this.resourceLoader = resourceLoader;
 		this.servableResources = servableResources;
+		this.configurationMap = configurationMap;
 	}
 	
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
-		return resourceLoader.findResource(resourceClass, AppBase.and(Assets), request.uriMatch().path); // should be Public.and(Assets)
+		return resourceLoader.findResource(resourceClass, configurationMap.get(resourceClass).location(), request.uriMatch().path);
 	}
 	
 	@ResourceThread
 	@Override
 	public <T extends ServableResource> T loadResource(final Class<T> resourceClass, final URIMatch uriMatch, final Route route) {
-		return resourceFinder.loadResource(resourceClass, AppBase.and(Assets), uriMatch.path); // should be Public.and(Assets)
+		return resourceFinder.loadResource(resourceClass, configurationMap.get(resourceClass).location(), uriMatch.path);
 	}
 
 	@Override
@@ -79,7 +77,11 @@ public class SimpleRouteProcessor implements RouteProcessor {
 
 		if (resource == null) {
 			// TODO - just use the task runner
-			resourceLoader.loadResource(resourceClass, AppBase.and(Assets), request.uriMatch().path).then(
+			resourceLoader.loadResource(
+				resourceClass,
+				configurationMap.get(resourceClass).location(),
+				request.uriMatch().path
+			).then(
 				new HttpServerTask("post-load, serving " + routeMatch.route()) {
 
 					@Override

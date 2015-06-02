@@ -34,17 +34,23 @@ public @interface ServableResourceConfiguration {
 	 * The name by which this resource is exposed for routing. By default, will use
 	 * the simple class name, with the word "Resource" removed from the end,
 	 * and the initial letter lowercase - for example
-	 * "jj.resource.stat.ic.StaticResource" will become "static"
+	 * "jj.http.server.resource.StaticResource" will become "static"
 	 * @return
 	 */
 	String name() default "";
 	
 	/**
-	 * The {@link ResourceServer} implementation that will process matching request.
-	 * Defaults to {@link SimpleResourceServer} 
+	 * The {@link RouteProcessor} implementation that will process matching request.
+	 * Defaults to {@link SimpleResourceServer}, which is configurable with {@link #processorConfig()}
 	 * @return
 	 */
 	Class<? extends RouteProcessor> processor() default SimpleRouteProcessor.class;
+	
+	/**
+	 * The {@link RouteProcessorConfiguration} implementation that configures the
+	 * {@link RouteProcessor} supplied in {@link #processor()}, if needed and welcome
+	 */
+	Class<? extends RouteProcessorConfiguration> processorConfig() default DefaultRouteProcessorConfiguration.class;
 	
 	/**
 	 * The {@link RouteContributor} implementation that will add {@link Route}s to the
