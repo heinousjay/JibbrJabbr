@@ -15,6 +15,7 @@
  */
 package jj.repl;
 
+import static jj.application.AppLocation.AppBase;
 import static jj.server.ServerLocation.*;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -27,6 +28,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.resource.Location;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.PendingKey;
 import jj.script.Global;
@@ -125,5 +127,10 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 	@Override
 	public ScriptableObject global() {
 		return global;
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		return AppBase;
 	}
 }

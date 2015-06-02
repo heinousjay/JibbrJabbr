@@ -15,6 +15,7 @@
  */
 package jj.script.module;
 
+import jj.resource.Location;
 import jj.script.ScriptEnvironment;
 
 import org.mozilla.javascript.ScriptableObject;
@@ -28,4 +29,10 @@ import org.mozilla.javascript.ScriptableObject;
 public interface RootScriptEnvironment extends ScriptEnvironment {
 
 	ScriptableObject global();
+	
+	/**
+	 * Indicates where module scripts can be found for this environment
+	 * @return
+	 */
+	Location moduleLocation();
 }

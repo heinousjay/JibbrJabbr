@@ -15,6 +15,8 @@
  */
 package jj.document;
 
+import static jj.application.AppLocation.*;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -27,7 +29,6 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.application.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.execution.ExecutionInstance;
@@ -39,6 +40,7 @@ import jj.http.server.websocket.ConnectionBroadcastStack;
 import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketMessageProcessor;
+import jj.resource.Location;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceNotViableException;
@@ -110,15 +112,15 @@ public class DocumentScriptEnvironment
 	) {
 		super(dependencies);
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, resourceName(name));
+		html = resourceFinder.loadResource(HtmlResource.class, AppBase, resourceName(name));
 		
 		if (html == null) {
 			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(name));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(name));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(name));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, AppBase, ScriptResourceType.Client.suffix(name));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppBase, ScriptResourceType.Shared.suffix(name));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, AppBase, ScriptResourceType.Server.suffix(name));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -208,6 +210,11 @@ public class DocumentScriptEnvironment
 	@Override
 	public ScriptableObject global() {
 		return global;
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		return AppBase;
 	}
 
 	@Override

@@ -29,6 +29,7 @@ import org.mozilla.javascript.ScriptableObject;
 import jj.application.Application;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.resource.Location;
 import jj.resource.NoSuchResourceException;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.Global;
@@ -133,6 +134,11 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	@Override
 	public ScriptableObject global() {
 		return global;
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		return AppBase;
 	}
 
 	@Override

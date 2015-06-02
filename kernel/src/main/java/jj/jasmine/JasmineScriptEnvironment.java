@@ -15,6 +15,7 @@
  */
 package jj.jasmine;
 
+import static jj.application.AppLocation.AppBase;
 import static jj.server.ServerLocation.*;
 
 import java.io.IOException;
@@ -71,6 +72,8 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	
 	private final ResourceLoaded resourceLoaded;
 	
+	private final Location specLocation;
+	
 	@Inject
 	JasmineScriptEnvironment(
 		final Dependencies dependencies,
@@ -85,7 +88,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 		
 		this.global = global;
 		
-		Location specLocation = pathResolver.specLocationFor(resourceLoaded.base);
+		this.specLocation = pathResolver.specLocationFor(resourceLoaded.base);
 		
 		// we need some scripts to be happy
 		target  = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, resourceLoaded.name);
@@ -154,6 +157,11 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	@Override
 	public Script script() {
 		return boot.script();
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		return AppBase.and(specLocation);
 	}
 	
 	ScriptResource spec() {
