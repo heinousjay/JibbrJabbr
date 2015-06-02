@@ -28,7 +28,7 @@ public abstract class AbstractListener {
 	public int iEventCount;
 
 	@Listener
-	void iEvent(IEvent ievent) {
+	void on(IEvent ievent) {
 		++iEventCount;
 	}
 }
