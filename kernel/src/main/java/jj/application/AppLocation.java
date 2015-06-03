@@ -56,4 +56,9 @@ public enum AppLocation implements Location {
 	public boolean parentInDirectory() {
 		return true;
 	}
+	
+	@Override
+	public boolean servable() {
+		return this == Public;
+	}
 }

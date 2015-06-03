@@ -47,6 +47,15 @@ public interface Location {
 		}
 		
 		@Override
+		public boolean servable() {
+			boolean result = true;
+			for (Location l : locations) {
+				result = result && l.servable();
+			}
+			return result;
+		}
+		
+		@Override
 		public boolean equals(Object obj) {
 			return obj instanceof Bundle &&
 				((Bundle)obj).locations.equals(locations);
@@ -89,6 +98,12 @@ public interface Location {
 	default List<Location> locations() {
 		return Collections.singletonList(this);
 	}
+	
+	/**
+	 * True if this location can be served to the world, false otherwise
+	 * @return
+	 */
+	boolean servable();
 	
 	/**
 	 * <p>

@@ -55,4 +55,9 @@ public enum ServerLocation implements Location {
 	public boolean parentInDirectory() {
 		return this == Modules;
 	}
+	
+	@Override
+	public boolean servable() {
+		return this == Assets;
+	}
 }

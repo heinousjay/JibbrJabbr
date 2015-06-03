@@ -131,6 +131,8 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 	
 	@Override
 	public Location moduleLocation() {
+		// maybe define a REPL base location where repl-only modules can live!
+		// but only after modularity and the REPL lives alone
 		return AppBase;
 	}
 }

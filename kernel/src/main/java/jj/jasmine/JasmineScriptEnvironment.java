@@ -15,7 +15,6 @@
  */
 package jj.jasmine;
 
-import static jj.application.AppLocation.AppBase;
 import static jj.server.ServerLocation.*;
 
 import java.io.IOException;
@@ -161,7 +160,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	
 	@Override
 	public Location moduleLocation() {
-		return AppBase.and(specLocation);
+		return resourceLoaded.base.and(specLocation);
 	}
 	
 	ScriptResource spec() {

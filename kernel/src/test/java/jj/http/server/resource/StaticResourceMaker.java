@@ -16,10 +16,12 @@
 package jj.http.server.resource;
 
 import static org.mockito.BDDMockito.*;
-import jj.application.AppLocation;
-import jj.application.Application;
+
+import java.nio.file.Path;
+
 import jj.event.Publisher;
 import jj.http.server.resource.StaticResource;
+import jj.resource.Location;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceKey;
 
@@ -28,11 +30,11 @@ import jj.resource.ResourceKey;
  *
  */
 public class StaticResourceMaker {
-	public static StaticResource make(Application app, AppLocation base, String name) throws Exception {
+	public static StaticResource make(Location base, String name, Path path) throws Exception {
 		
 		ResourceKey resourceKey = mock(ResourceKey.class);
 		Publisher publisher = mock(Publisher.class);
 		
-		return new StaticResource(new MockAbstractResourceDependencies(resourceKey, base, name, publisher), app.resolvePath(base, name), app);
+		return new StaticResource(new MockAbstractResourceDependencies(resourceKey, base, name, publisher), path);
 	}
 }

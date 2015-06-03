@@ -46,11 +46,6 @@ public class MockApplication extends Application {
 		super(mock(Arguments.class), mock(Server.class));
 		this.basePath = basePath;
 	}
-	
-	@Override
-	public boolean pathInBase(Path path) {
-		return path.startsWith(basePath);
-	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {

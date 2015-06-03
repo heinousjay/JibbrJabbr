@@ -38,18 +38,15 @@ public class Server implements LocationResolver {
 		this.apiSpecs = apiSpecs;
 	}
 
-	@Override
-	public boolean pathInBase(Path path) {
-		return path.startsWith(rootPath);
-	}
-	
 	public Path resolvePath(Location base) {
 		return resolvePath(base, "");
 	}
 	
 	@Override
 	public Location resolveBase(Path path) {
-		return pathInBase(path) && rootPath.relativize(path).startsWith("modules") ? ServerLocation.Modules : null;
+		assert path != null;
+		path = path.normalize().toAbsolutePath();
+		return path.startsWith(rootPath) && rootPath.relativize(path).startsWith("modules") ? ServerLocation.Modules : null;
 	}
 
 	@Override

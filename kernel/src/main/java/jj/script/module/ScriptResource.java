@@ -1,6 +1,5 @@
 package jj.script.module;
 
-import static jj.application.AppLocation.AppBase;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -41,7 +40,7 @@ public class ScriptResource extends AbstractFileResource implements LoadedResour
 		}
 		
 		// Public! soon
-		safeToServe = base == AppBase && application.pathInBase(path);
+		safeToServe = base.servable();
 	}
 	
 	public Script script() {

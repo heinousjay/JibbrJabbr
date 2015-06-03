@@ -23,11 +23,6 @@ import java.util.List;
  *
  */
 public interface LocationResolver {
-	
-	/**
-	 * True if the given path is in the base
-	 */
-	boolean pathInBase(Path path);
 
 	/**
 	 * resolve the given location and name against

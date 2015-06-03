@@ -123,7 +123,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 			}
 		}
 		
-		safeToServe = application.pathInBase(path);
+		safeToServe = base.servable();
 
 		result = processor.fixUris(result, this);
 		

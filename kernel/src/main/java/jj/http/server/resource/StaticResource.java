@@ -15,8 +15,6 @@
  */
 package jj.http.server.resource;
 
-import static jj.server.ServerLocation.Assets;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
@@ -24,8 +22,6 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 
-import jj.application.AppLocation;
-import jj.application.Application;
 import jj.http.server.TransferableResource;
 import jj.resource.AbstractFileResource;
 import jj.resource.ResourceThread;
@@ -39,16 +35,12 @@ import jj.resource.ResourceThread;
  */
 public class StaticResource extends AbstractFileResource implements TransferableResource {
 	
-	private final boolean safeToServe;
-	
 	@Inject
 	StaticResource(
 		final Dependencies dependencies,
-		final Path path,
-		final Application application
+		final Path path
 	) throws IOException {
 		super(dependencies, path, false);
-		safeToServe = base == Assets || (base instanceof AppLocation && application.pathInBase(path));
 	}
 	
 	@Override
@@ -80,6 +72,6 @@ public class StaticResource extends AbstractFileResource implements Transferable
 	
 	@Override
 	public boolean safeToServe() {
-		return safeToServe;
+		return base.servable();
 	}
 }

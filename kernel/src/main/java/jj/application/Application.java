@@ -46,11 +46,6 @@ public class Application implements LocationResolver {
 		basePath = arguments.get("app", Path.class, server.resolvePath(Root, "app"));
 	}
 	
-	@Override
-	public boolean pathInBase(final Path path) {
-		return path.startsWith(basePath);
-	}
-	
 	public Path resolvePath(Location base) {
 		assert base instanceof AppLocation;
 		AppLocation location = (AppLocation)base;
@@ -66,8 +61,10 @@ public class Application implements LocationResolver {
 	
 	@Override
 	public Location resolveBase(Path path) {
+		assert path != null;
+		path = path.normalize().toAbsolutePath();
 		Location result = null;
-		if (pathInBase(path)) {
+		if (path.startsWith(basePath)) {
 			result = AppBase;
 			if (path.startsWith(resolvePath(Private))) {
 				result = Private;
