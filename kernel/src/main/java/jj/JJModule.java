@@ -40,7 +40,8 @@ import jj.resource.SimpleResourceCreator;
 import jj.script.Continuation;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationProcessorBinder;
-import jj.server.APIPaths;
+import jj.server.APIModulePaths;
+import jj.server.APISpecPaths;
 import jj.server.AssetPaths;
 
 import com.google.inject.AbstractModule;
@@ -78,7 +79,8 @@ public abstract class JJModule extends AbstractModule {
 	private Multibinder<Converter<?, ?>> converters;
 	private Multibinder<HostObject> hostObjects;
 	private Multibinder<String> assetPaths;
-	private Multibinder<String> apiPaths;
+	private Multibinder<String> apiModulePaths;
+	private Multibinder<String> apiSpecPaths;
 
 	protected void bindStartupListener(Class<?> startupListenerClass) {
 		if (startupListeners == null) {
@@ -111,10 +113,18 @@ public abstract class JJModule extends AbstractModule {
 	
 	protected void bindAPIModulePath(String path) {
 		assert path != null && path.startsWith("/") : "path must be present and start with /";
-		if (apiPaths == null) {
-			apiPaths = Multibinder.newSetBinder(binder(), String.class, APIPaths.class);
+		if (apiModulePaths == null) {
+			apiModulePaths = Multibinder.newSetBinder(binder(), String.class, APIModulePaths.class);
 		}
-		apiPaths.addBinding().toInstance(path);
+		apiModulePaths.addBinding().toInstance(path);
+	}
+	
+	protected void bindAPISpecPath(String path) {
+		assert path != null && path.startsWith("/") : "path must be present and start with /";
+		if (apiSpecPaths == null) {
+			apiSpecPaths = Multibinder.newSetBinder(binder(), String.class, APISpecPaths.class);
+		}
+		apiSpecPaths.addBinding().toInstance(path);
 	}
 
 	protected <T extends AbstractResource> LinkedBindingBuilder<SimpleResourceCreator<T>> bindCreationOf(Class<T> resourceClass) {

@@ -66,7 +66,7 @@ public class WebSocketConnectionTracker {
 	}
 	
 	@Listener
-	void start(HttpServerStarted event) {
+	void on(HttpServerStarted event) {
 		if (currentActivityChecker.get() == null) {
 			currentActivityChecker.set(new ActivityChecker());
 			taskRunner.execute(currentActivityChecker.get());
@@ -74,7 +74,7 @@ public class WebSocketConnectionTracker {
 	}
 	
 	@Listener
-	void stop(HttpServerStopped event) {
+	void on(HttpServerStopped event) {
 		ActivityChecker current = currentActivityChecker.getAndSet(null);
 		assert current != null : "server was running with no web socket activity checker!";
 		current.cancelKey().cancel();

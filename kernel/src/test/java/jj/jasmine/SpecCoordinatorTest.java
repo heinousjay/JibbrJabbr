@@ -44,7 +44,7 @@ public class SpecCoordinatorTest {
 	MockTaskRunner taskRunner;
 	MockPublisher publisher;
 	
-	SpecCoordinator sc;
+	JasmineSpecCoordinator sc;
 	
 	@Mock JasmineScriptEnvironment jse;
 	
@@ -71,14 +71,14 @@ public class SpecCoordinatorTest {
 		given(jse.targetScript()).willReturn(targetScript);
 		given(jse.runnerScript()).willReturn(runnerScript);
 		
-		sc = new SpecCoordinator(taskRunner, publisher);
+		sc = new JasmineSpecCoordinator(taskRunner, publisher);
 	}
 	
 	@Test
 	public void testHappyPath() throws Exception {
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 
 		// then
 		
@@ -117,7 +117,7 @@ public class SpecCoordinatorTest {
 		given(jse.execute(specScript)).willThrow(exception);
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 		
 		// then
 		taskRunner.runFirstTask();
@@ -125,7 +125,7 @@ public class SpecCoordinatorTest {
 		
 		verify(jse).execute(specScript);
 		
-		verifyErrorEvent(SpecCoordinator.CONTEXT_SPEC);
+		verifyErrorEvent(JasmineSpecCoordinator.CONTEXT_SPEC);
 	}
 	
 	@Test
@@ -135,7 +135,7 @@ public class SpecCoordinatorTest {
 		given(jse.execute(targetScript)).willThrow(exception);
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 		
 		// then
 		taskRunner.runFirstTask();
@@ -146,7 +146,7 @@ public class SpecCoordinatorTest {
 		io.verify(jse).execute(specScript);
 		io.verify(jse).execute(targetScript);
 		
-		verifyErrorEvent(SpecCoordinator.CONTEXT_TARGET);
+		verifyErrorEvent(JasmineSpecCoordinator.CONTEXT_TARGET);
 	}
 	
 	@Test
@@ -156,7 +156,7 @@ public class SpecCoordinatorTest {
 		given(jse.execute(runnerScript)).willThrow(exception);
 		
 		// when
-		sc.scriptInitialized(new ScriptEnvironmentInitialized(jse));
+		sc.on(new ScriptEnvironmentInitialized(jse));
 		
 		// then
 		taskRunner.runFirstTask();
@@ -169,7 +169,7 @@ public class SpecCoordinatorTest {
 		io.verify(jse).execute(targetScript);
 		io.verify(jse).execute(runnerScript);
 		
-		verifyErrorEvent(SpecCoordinator.CONTEXT_RUNNER);
+		verifyErrorEvent(JasmineSpecCoordinator.CONTEXT_RUNNER);
 	}
 
 }

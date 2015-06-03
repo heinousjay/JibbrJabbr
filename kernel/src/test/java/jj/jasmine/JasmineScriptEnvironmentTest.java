@@ -23,6 +23,7 @@ import static jj.server.ServerLocation.*;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
 import static jj.resource.DependentsHelper.verifyDependentSetup;
 import jj.resource.NoSuchResourceException;
+import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.module.ScriptResource;
@@ -42,6 +43,7 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class JasmineScriptEnvironmentTest {
 
+	@Mock PathResolver pathResolver;
 	@Mock ResourceFinder resourceFinder;
 	@Mock ScriptableObject global;
 	
@@ -99,7 +101,7 @@ public class JasmineScriptEnvironmentTest {
 	
 	@Test(expected = NoSuchResourceException.class)
 	public void testNotFound() {
-		new JasmineScriptEnvironment(dependencies, global, resourceFinder, makeResourceLoaded(target));
+		new JasmineScriptEnvironment(dependencies, global, resourceFinder, pathResolver, makeResourceLoaded(target));
 	}
 
 	@Test
@@ -107,8 +109,9 @@ public class JasmineScriptEnvironmentTest {
 		
 		fakeResource(spec);
 		given(resourceFinder.loadResource(ScriptResource.class, AppBase, specName)).willReturn(spec);
+		given(pathResolver.specLocationFor(AppBase)).willReturn(AppBase);
 		
-		JasmineScriptEnvironment jse = new JasmineScriptEnvironment(dependencies, global, resourceFinder, makeResourceLoaded(target));
+		JasmineScriptEnvironment jse = new JasmineScriptEnvironment(dependencies, global, resourceFinder, pathResolver, makeResourceLoaded(target));
 		
 		assertThat(jse.name(), is(specName));
 		assertThat(jse.script(), is(jasmineBootScript));

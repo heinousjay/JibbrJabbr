@@ -75,30 +75,36 @@ public class ModuleScriptEnvironmentTest {
 		given(parent.alive()).willReturn(true);
 		return dependencies;
 	}
+	
+	private void givenModuleLocation(Location location) {
+		given(((RootScriptEnvironment)parent).moduleLocation()).willReturn(location);
+	}
 
-	public void constructScriptModule(String name, String moduleIdentifier, Location scriptBase) {
+	private void constructScriptModule(String name, String moduleIdentifier, Location scriptLocation) {
 		
 		MockAbstractScriptEnvironmentDependencies dependencies = construct(name);
 		
-		given(dependencies.resourceFinder().loadResource(ScriptResource.class, scriptBase, moduleIdentifier + ".js")).willReturn(scriptResource);
+		given(dependencies.resourceFinder().loadResource(ScriptResource.class, scriptLocation, moduleIdentifier + ".js")).willReturn(scriptResource);
 		
-		given(scriptResource.base()).willReturn(scriptBase);
+		given(scriptResource.base()).willReturn(scriptLocation);
 		given(scriptResource.name()).willReturn(moduleIdentifier);
 		given(scriptResource.source()).willReturn("");
 		
+		givenModuleLocation(scriptLocation);
 		mse = new ModuleScriptEnvironment(dependencies, requiredModule);
 	}
 
-	public void constructJSONModule(String name, String moduleIdentifier, Location jsonBase) {
+	private void constructJSONModule(String name, String moduleIdentifier, Location jsonLocation) {
 		
 		MockAbstractScriptEnvironmentDependencies dependencies = construct(name);
 		
-		given(dependencies.resourceFinder().loadResource(JSONResource.class, jsonBase, moduleIdentifier + ".json")).willReturn(jsonResource);
+		given(dependencies.resourceFinder().loadResource(JSONResource.class, jsonLocation, moduleIdentifier + ".json")).willReturn(jsonResource);
 		
-		given(jsonResource.base()).willReturn(jsonBase);
+		given(jsonResource.base()).willReturn(jsonLocation);
 		given(jsonResource.name()).willReturn(moduleIdentifier);
 		given(jsonResource.contents()).willReturn(contents);
 		
+		givenModuleLocation(jsonLocation);
 		mse = new ModuleScriptEnvironment(dependencies, requiredModule);
 	}
 	

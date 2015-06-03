@@ -54,14 +54,12 @@ class HttpClientNioEventLoopGroup extends NioEventLoopGroup {
 	}
 
 	@Inject
-	HttpClientNioEventLoopGroup(
-		final UncaughtExceptionHandler uncaughtExceptionHandler
-	) {
+	HttpClientNioEventLoopGroup(UncaughtExceptionHandler uncaughtExceptionHandler) {
 		super(1, executorService(1, uncaughtExceptionHandler));
 	}
 	
 	@Listener
-	void serverStopping(ServerStopping event) {
+	void on(ServerStopping event) {
 		shutdownGracefully();
 	}
 }

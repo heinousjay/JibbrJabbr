@@ -25,6 +25,9 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Provider;
 
+import jj.ServerStarting;
+import jj.ServerStopping;
+import jj.configuration.ConfigurationLoaded;
 import jj.event.Publisher;
 import jj.resource.ResourceLoader;
 
@@ -84,12 +87,12 @@ public class ReplServerTest {
 	
 	@After
 	public void after() {
-		server.serverStopping(null);
+		server.on((ServerStopping)null);
 	}
 	
 	@Test
 	public void testInitialization() {
-		server.serverStarting(null);
+		server.on((ServerStarting)null);
 		
 		verify(resourceLoader).loadResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.NAME);
 	}
@@ -108,7 +111,7 @@ public class ReplServerTest {
 			}
 		}).given(publisher).publish(isA(ReplListening.class));
 		
-		server.configurationLoaded(null);
+		server.on((ConfigurationLoaded)null);
 		
 		assertTrue(latch.await(1, SECONDS)); 
 		

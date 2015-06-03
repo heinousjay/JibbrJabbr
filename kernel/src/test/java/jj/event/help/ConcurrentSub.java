@@ -32,17 +32,17 @@ public class ConcurrentSub {
 	public final AtomicInteger countEventSub = new AtomicInteger();
 	
 	@Listener
-	void iEvent(IEvent ievent) {
+	void on(IEvent ievent) {
 		countIEvent.getAndIncrement();
 	}
 
 	@Listener
-	void event(Event event) {
+	void on(Event event) {
 		countEvent.getAndIncrement();
 	}
 	
 	@Listener
-	void eventSub(EventSub eventSub) {
+	void on(EventSub eventSub) {
 		countEventSub.getAndIncrement();
 	}
 }

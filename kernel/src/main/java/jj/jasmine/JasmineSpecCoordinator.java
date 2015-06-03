@@ -35,7 +35,7 @@ import jj.script.ScriptTask;
  */
 @Singleton
 @Subscriber
-class SpecCoordinator {
+class JasmineSpecCoordinator {
 	
 	static final String CONTEXT_SPEC = "spec";
 	static final String CONTEXT_TARGET = "target";
@@ -45,7 +45,7 @@ class SpecCoordinator {
 	private final Publisher publisher;
 	
 	@Inject
-	SpecCoordinator(
+	JasmineSpecCoordinator(
 		final TaskRunner taskRunner,
 		final Publisher publisher
 	) {
@@ -54,8 +54,8 @@ class SpecCoordinator {
 	}
 	
 	@Listener
-	void scriptInitialized(final ScriptEnvironmentInitialized event) {
-		// right now, checking this way for testing purposes, to let mocks in
+	void on(final ScriptEnvironmentInitialized event) {
+		// always check this way for testing purposes, to let mocks in
 		if (JasmineScriptEnvironment.class.isAssignableFrom(event.scriptEnvironment().getClass())) {
 			taskRunner.execute(new SpecEvaluationTask((JasmineScriptEnvironment)event.scriptEnvironment()));
 		}

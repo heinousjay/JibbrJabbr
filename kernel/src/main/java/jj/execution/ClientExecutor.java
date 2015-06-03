@@ -51,9 +51,7 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor {
 	public static final int WORKER_COUNT = 1 + Math.max(2, (int)(Runtime.getRuntime().availableProcessors() * 0.5));
 		
 	@Inject
-	ClientExecutor(
-		final UncaughtExceptionHandler uncaughtExceptionHandler
-	) {
+	ClientExecutor(UncaughtExceptionHandler uncaughtExceptionHandler) {
 		super(
 			1, 
 			new ThreadFactory() {
@@ -91,7 +89,7 @@ public class ClientExecutor extends ScheduledThreadPoolExecutor {
 	}
 
 	@Listener
-	public void stop(ServerStopping event) {
+	void on(ServerStopping event) {
 		shutdownNow();
 	}
 }

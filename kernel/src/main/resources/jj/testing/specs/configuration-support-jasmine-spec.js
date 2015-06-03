@@ -8,6 +8,8 @@ var collectorMock = {
 	accumulateError: function() {}
 }
 
+var scriptBase = "configuration-support-jasmine-spec.js:";
+
 // replacing inject('jj.configuration.ConfigurationCollector')
 function inject(obj) {
 	return collectorMock;
@@ -40,7 +42,7 @@ describe("configuration-support.js", function() {
 	describe("function makeBooleanProperty", function() {
 		
 		var testFunc;
-		var mustBeABoolean = 'must be a boolean: at configuration-support-spec.js:';
+		var mustBeABoolean = 'must be a boolean: at ' + scriptBase;
 		
 		beforeEach(function() {
 			testFunc = s.makeBooleanProperty(name);
@@ -48,33 +50,33 @@ describe("configuration-support.js", function() {
 		
 		it("rejects string values", function() {
 			testFunc("not a boolean");
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '50');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '52');
 		});
 		
 		it("rejects number values", function() {
 			testFunc(1);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '55');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '57');
 		});
 		
 		it("rejects object values", function() {
 			testFunc({});
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '60');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '62');
 		});
 		
 		it("rejects array values", function() {
 			testFunc([]);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '65');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '67');
 		});
 		
 		it("rejects null values", function() {
 			testFunc(null);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '70');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeABoolean + '72');
 		});
 		
 		it("accumulates validator failures", function() {
 			s.makeBooleanProperty(name, failingValidator)(true);
 			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
-			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at configuration-support-spec.js:75');
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at ' + scriptBase + '77');
 		});
 		
 		it("calls a passing validator function", function() {
@@ -97,8 +99,8 @@ describe("configuration-support.js", function() {
 	describe("function makeIntProperty", function() {
 		
 		var testFunc;
-		var mustBeAnInteger = 'must be an integer: at configuration-support-spec.js:';
-		var isOutOfIntegerRange = 'is out of integer range: at configuration-support-spec.js:';
+		var mustBeAnInteger = 'must be an integer: at ' + scriptBase;
+		var isOutOfIntegerRange = 'is out of integer range: at ' + scriptBase;
 		
 		beforeEach(function() {
 			testFunc = s.makeIntProperty(name);
@@ -106,43 +108,43 @@ describe("configuration-support.js", function() {
 		
 		it("rejects string values", function() {
 			testFunc("not an int");
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '108');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '110');
 		});
 		
 		it("rejects boolean values", function() {
 			testFunc(true);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '113');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '115');
 		});
 		
 		it("rejects object values", function() {
 			testFunc({});
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '118');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '120');
 		});
 		
 		it("rejects array values", function() {
 			testFunc([]);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '123');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '125');
 		});
 		
 		it("rejects null values", function() {
 			testFunc(null);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '128');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAnInteger + '130');
 		});
 		
 		it("rejects too large values", function() {
 			testFunc(java.lang.Integer.MAX_VALUE + 1);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, isOutOfIntegerRange + '133');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, isOutOfIntegerRange + '135');
 		});
 		
 		it("rejects too small values", function() {
 			testFunc(java.lang.Integer.MIN_VALUE - 1)
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, isOutOfIntegerRange + '138');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, isOutOfIntegerRange + '140');
 		});
 		
 		it("accumulates validator failures", function() {
 			s.makeIntProperty(name, failingValidator)(1);
 			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
-			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at configuration-support-spec.js:143');
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at ' + scriptBase + '145');
 		});
 		
 		it("calls a passing validator function", function() {
@@ -174,7 +176,7 @@ describe("configuration-support.js", function() {
 	describe("function makeLongProperty", function() {
 		
 		var testFunc;
-		var mustBeALong = 'must be a long: at configuration-support-spec.js:';
+		var mustBeALong = 'must be a long: at ' + scriptBase;
 		
 		beforeEach(function() {
 			testFunc = s.makeLongProperty(name);
@@ -182,33 +184,33 @@ describe("configuration-support.js", function() {
 		
 		it("rejects string values", function() {
 			testFunc("not an int");
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '184');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '186');
 		});
 		
 		it("rejects boolean values", function() {
 			testFunc(true);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '189');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '191');
 		});
 		
 		it("rejects object values", function() {
 			testFunc({});
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '194');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '196');
 		});
 		
 		it("rejects array values", function() {
 			testFunc([]);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '199');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '201');
 		});
 		
 		it("rejects null values", function() {
 			testFunc(null);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '204');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeALong + '206');
 		});
 		
 		it("accumulates validator failures", function() {
 			s.makeLongProperty(name, failingValidator)(1);
 			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
-			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at configuration-support-spec.js:209');
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at ' + scriptBase + '211');
 		});
 		
 		it("calls a passing validator function", function() {
@@ -241,7 +243,7 @@ describe("configuration-support.js", function() {
 	describe("function makeStringProperty", function() {
 
 		var testFunc;
-		var mustBeAString = 'must be a string: at configuration-support-spec.js:';
+		var mustBeAString = 'must be a string: at ' + scriptBase;
 		
 		beforeEach(function() {
 			testFunc = s.makeStringProperty(name);
@@ -249,33 +251,33 @@ describe("configuration-support.js", function() {
 		
 		it("rejects numeric values", function() {
 			testFunc(1);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '251');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '253');
 		});
 		
 		it("rejects boolean values", function() {
 			testFunc(true);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '256');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '258');
 		});
 		
 		it("rejects object values", function() {
 			testFunc({});
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '261');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '263');
 		});
 		
 		it("rejects array values", function() {
 			testFunc([]);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '266');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '268');
 		});
 		
 		it("rejects null values", function() {
 			testFunc(null);
-			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '271');
+			expect(collectorMock.accumulateError).toHaveBeenCalledWith(name, mustBeAString + '273');
 		});
 		
 		it("accumulates validator failures", function() {
 			s.makeStringProperty(name, failingValidator)("1");
 			expect(collector.addConfigurationElement).not.toHaveBeenCalled();
-			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at configuration-support-spec.js:276');
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at ' + scriptBase + '278');
 		});
 		
 		it("calls a passing validator function", function() {
@@ -309,7 +311,7 @@ describe("configuration-support.js", function() {
 		it("accumulates validator failures", function() {
 			s.makeAddToList(name, failingValidator)("1");
 			expect(collector.addConfigurationMultiElement).not.toHaveBeenCalled();
-			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at configuration-support-spec.js:310');
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at ' + scriptBase + '312');
 		});
 		
 		it("calls a passing validator function", function() {
@@ -343,7 +345,7 @@ describe("configuration-support.js", function() {
 		it("accumulates validator failures", function() {
 			s.makeAddToMap(name, failingValidator)("1", "2");
 			expect(collector.addConfigurationMappedElement).not.toHaveBeenCalled();
-			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at configuration-support-spec.js:344');
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'failingValidator: at ' + scriptBase + '346');
 		});
 		
 		it("calls a passing validator function", function() {
@@ -382,7 +384,7 @@ describe("configuration-support.js", function() {
 		it('adds the correct stack line', function() {
 			// pass in the depth explicitly
 			s.accumulateError('name', 'error', 1);
-			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'error: at configuration-support-spec.js:384');
+			expect(collector.accumulateError).toHaveBeenCalledWith(name, 'error: at ' + scriptBase + '386');
 		});
 	});
 });

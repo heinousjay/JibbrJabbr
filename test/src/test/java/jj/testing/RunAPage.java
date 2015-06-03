@@ -35,7 +35,7 @@ import org.junit.Test;
 public class RunAPage {
 
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.one).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.app1).injectInstance(this);
 	
 	@Inject EmbeddedHttpServer server;
 	

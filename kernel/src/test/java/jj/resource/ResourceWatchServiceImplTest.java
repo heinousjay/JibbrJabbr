@@ -37,7 +37,7 @@ public class ResourceWatchServiceImplTest {
 		
 		// when
 		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(resourceWatchSwitch, loop);
-		service.configurationLoaded(null);
+		service.on(null);
 		service.watch(resource);
 		
 		// then
@@ -52,7 +52,7 @@ public class ResourceWatchServiceImplTest {
 
 		
 		ResourceWatchServiceImpl service = new ResourceWatchServiceImpl(resourceWatchSwitch, loop);
-		service.configurationLoaded(null);
+		service.on(null);
 		service.watch(resource);
 		
 		verify(loop).start();

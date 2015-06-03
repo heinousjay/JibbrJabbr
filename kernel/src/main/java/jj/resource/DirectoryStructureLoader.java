@@ -47,33 +47,31 @@ class DirectoryStructureLoader {
 	private final TaskRunner taskRunner;
 	
 	@Inject
-	DirectoryStructureLoader(final PathResolver pathResolver, final ResourceFinder resourceFinder, final TaskRunner taskRunner) {
+	DirectoryStructureLoader(PathResolver pathResolver, ResourceFinder resourceFinder, TaskRunner taskRunner) {
 		this.pathResolver = pathResolver;
 		this.resourceFinder = resourceFinder;
 		this.taskRunner = taskRunner;
 	}
 
 	@Listener
-	void start(ServerStarting event) {
+	void on(ServerStarting event) {
 		for (Location location : pathResolver.watchedLocations()) {
-			event.registerStartupTask(Priority.NearHighest, new LoaderTask(location, pathResolver.resolvePath(location)));
+			event.registerStartupTask(Priority.NearHighest, new LoaderTask(pathResolver.resolvePath(location)));
 		}
 	}
 	
 	void load(final Path path) {
 		Location base = pathResolver.resolveLocation(path);
 		assert base != null && base.parentInDirectory() : "asked to load a directory structure for a bad path"; 
-		taskRunner.execute(new LoaderTask(base, path));
+		taskRunner.execute(new LoaderTask(path));
 	}
 	
 	private class LoaderTask extends ResourceTask {
 		
-		private final Location location;
 		private final Path path;
 		
-		LoaderTask(final Location location, final Path path) {
+		LoaderTask(final Path path) {
 			super("loading directory structure rooted at " + path);
-			this.location = location;
 			this.path = path;
 		}
 		
@@ -83,6 +81,7 @@ class DirectoryStructureLoader {
 
 				@Override
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+					Location location = pathResolver.resolveLocation(dir);
 					resourceFinder.loadResource(
 						DirectoryResource.class,
 						location,

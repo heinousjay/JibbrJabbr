@@ -62,7 +62,7 @@ class SystemLogger {
 	}
 
 	@Listener
-	void start(ServerStarting event) {
+	void on(ServerStarting event) {
 		// just start immediately! we need to work quickly
 		// block startup!
 		final CountDownLatch startupLatch = new CountDownLatch(1);
@@ -126,7 +126,7 @@ class SystemLogger {
 	 * LoggedEvent instead.
 	 */
 	@Listener
-	void log(LoggedEvent event) {
+	void on(LoggedEvent event) {
 		if (useQueue) {
 			events.add(event);
 		} else {

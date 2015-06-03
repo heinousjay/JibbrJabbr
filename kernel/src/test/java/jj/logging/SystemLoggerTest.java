@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jj.ServerStarting;
 import jj.execution.MockTaskRunner;
 import jj.util.RandomHelper;
 
@@ -56,7 +57,7 @@ public class SystemLoggerTest {
 		
 		sl = new SystemLogger(taskRunner, loggers);
 		
-		sl.start(null); // it ignores the event
+		sl.on((ServerStarting)null); // it ignores the event
 		
 		publishLoop = taskRunner.runFirstTaskInDaemon();
 	}
@@ -84,7 +85,7 @@ public class SystemLoggerTest {
 		latch = new CountDownLatch(1);
 		String name = "name 1";
 		Thread.currentThread().setName(name);
-		sl.log(new HelperEvent1());
+		sl.on(new HelperEvent1());
 		assertTrue(latch.await(400, MILLISECONDS));
 		assertThat(threadName, is(name));
 	}
@@ -183,7 +184,7 @@ run 5
 						int runs = RandomHelper.nextInt(lowerBound, upperBound);
 						expected.getAndAdd(runs);
 						for (int i = 0; i < runs; ++i) {
-							sl.log(helperEvent);
+							sl.on(helperEvent);
 						}
 						latch.countDown();
 					}

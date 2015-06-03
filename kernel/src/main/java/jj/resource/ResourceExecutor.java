@@ -30,10 +30,10 @@ class ResourceExecutor extends ThreadPoolExecutor {
 	private final JJThreadFactory threadFactory;
 	
 	@Inject
-	public ResourceExecutor(
-		final ResourceConfiguration configuration,
-		final JJThreadFactory threadFactory,
-		final JJRejectedExecutionHandler handler
+	ResourceExecutor(
+		ResourceConfiguration configuration,
+		JJThreadFactory threadFactory,
+		JJRejectedExecutionHandler handler
 	) {
 		super(
 			configuration.ioThreads(),
@@ -53,7 +53,7 @@ class ResourceExecutor extends ThreadPoolExecutor {
 	// is the maximum number of worker threads, which is also the core, which we allow to die off
 
 	@Listener
-	public void stop(ServerStopping event) {
+	void on(ServerStopping event) {
 		shutdown();
 	}
 	

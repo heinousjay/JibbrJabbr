@@ -15,7 +15,6 @@
  */
 package jj.http.server;
 
-import static jj.application.AppLocation.*;
 import static jj.server.ServerLocation.*;
 import static org.mockito.BDDMockito.*;
 
@@ -31,6 +30,7 @@ import jj.http.server.uri.RouteMatch;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
+import jj.server.ServerLocation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +58,7 @@ public class SimpleRouteProcessorTest {
 	@Mock ResourceFinder resourceFinder;
 	@Mock ResourceLoader resourceLoader;
 	Map<String, Class<? extends ServableResource>> servableResources;
+	Map<Class<? extends ServableResource>, RouteProcessorConfiguration> processorConfigurations;
 	
 	SimpleRouteProcessor srs;
 	
@@ -70,11 +71,16 @@ public class SimpleRouteProcessorTest {
 	
 	@Captor ArgumentCaptor<JJTask> taskCaptor;
 	
+	ServerLocation location = Root; // YEAH RIGHT!
+	
 	@Before
 	public void before() {
 		
 		servableResources = new HashMap<>();
 		servableResources.put(STATIC, StaticResource.class);
+		
+		processorConfigurations = new HashMap<>();
+		processorConfigurations.put(StaticResource.class, () -> { return location; });
 		
 		given(routeMatch.resourceName()).willReturn(STATIC);
 		
@@ -84,7 +90,7 @@ public class SimpleRouteProcessorTest {
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
-		srs = new SimpleRouteProcessor(resourceFinder, resourceLoader, servableResources);
+		srs = new SimpleRouteProcessor(resourceFinder, resourceLoader, servableResources, processorConfigurations);
 	}
 	
 	@Test
@@ -102,7 +108,7 @@ public class SimpleRouteProcessorTest {
 	private void givenResourceRequest(String uri) {
 		URIMatch match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(resourceLoader.findResource(StaticResource.class, AppBase.and(Assets), match.path)).willReturn(resource);
+		given(resourceLoader.findResource(StaticResource.class, location, match.path)).willReturn(resource);
 	}
 	
 	@Test

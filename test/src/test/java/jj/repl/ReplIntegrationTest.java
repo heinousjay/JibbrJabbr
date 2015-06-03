@@ -60,7 +60,7 @@ public class ReplIntegrationTest {
 	CountDownLatch latch = new CountDownLatch(1);
 	
 	@Listener
-	void replListening(ReplListening replListening) {
+	void on(ReplListening replListening) {
 		latch.countDown();
 	}
 	

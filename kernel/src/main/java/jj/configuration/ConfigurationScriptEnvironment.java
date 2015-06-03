@@ -26,8 +26,10 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.application.Application;
 import jj.event.Listener;
 import jj.event.Subscriber;
+import jj.resource.Location;
 import jj.resource.NoSuchResourceException;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.Global;
@@ -61,7 +63,8 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	ConfigurationScriptEnvironment(
 		final Dependencies dependencies,
 		final @Global ScriptableObject global,
-		final ConfigurationCollector collector
+		final ConfigurationCollector collector,
+		final Application application
 	) {
 		super(dependencies);
 		
@@ -77,10 +80,10 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 		config = resourceFinder.loadResource(ScriptResource.class, AppBase, CONFIG_SCRIPT_NAME);
 		
 		if (config != null) {
-			publisher.publish(new ConfigurationFound(config.path()));
+			publisher.publish(new ConfigurationFound(application.resolvePath(AppBase), config.path()));
 			config.addDependent(this);
 		} else {
-			publisher.publish(new UsingDefaultConfiguration());
+			publisher.publish(new UsingDefaultConfiguration(application.resolvePath(AppBase)));
 			configurationComplete();
 			throw new NoSuchResourceException(getClass(), CONFIG_SCRIPT_NAME);
 		}
@@ -96,7 +99,7 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 	
 	@Listener
-	void scriptInitialized(final ScriptEnvironmentInitialized event) {
+	void on(ScriptEnvironmentInitialized event) {
 		if (event.scriptEnvironment() == this) {
 			configurationComplete();
 		}
@@ -131,6 +134,11 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implement
 	@Override
 	public ScriptableObject global() {
 		return global;
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		return AppBase;
 	}
 
 	@Override

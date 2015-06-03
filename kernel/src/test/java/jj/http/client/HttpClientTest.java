@@ -30,6 +30,8 @@ import io.netty.resolver.dns.DnsNameResolverGroup;
 
 import javax.inject.Provider;
 
+import jj.configuration.ConfigurationLoading;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,7 +80,7 @@ public class HttpClientTest {
 		given(configuration.localNameserverAddress()).willReturn(localNameserverAddress);
 		given(configuration.nameservers()).willReturn(Arrays.asList(nameserverAddress1, nameserverAddress2));
 		
-		client.configurationLoading(null);
+		client.on((ConfigurationLoading)null);
 		
 		verify(bootstrap).group(group);
 		verify(bootstrap).handler(initializer);

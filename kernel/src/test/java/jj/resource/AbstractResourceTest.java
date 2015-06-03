@@ -69,10 +69,10 @@ public class AbstractResourceTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				ResourceKilled event = (ResourceKilled)invocation.getArguments()[0];
-				base.resourceKilled(event);
-				one.resourceKilled(event);
-				two.resourceKilled(event);
-				one_two.resourceKilled(event);
+				base.on(event);
+				one.on(event);
+				two.on(event);
+				one_two.on(event);
 				return null;
 			}
 		}).given(publisher).publish(isA(ResourceKilled.class));

@@ -54,16 +54,16 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	@Inject
 	RequiredModuleContinuationProcessor(
-		final ResourceLoader resourceLoader,
-		final ResourceFinder resourceFinder,
-		final DependsOnScriptEnvironmentInitialization initializer
+		ResourceLoader resourceLoader,
+		ResourceFinder resourceFinder,
+		DependsOnScriptEnvironmentInitialization initializer
 	) {
 		this.resourceLoader = resourceLoader;
 		this.resourceFinder = resourceFinder;
 		this.initializer = initializer;
 	}
 	
-	private RequiredModule extractRequiredModule(final ResourceEvent event) {
+	private RequiredModule extractRequiredModule(ResourceEvent event) {
 		RequiredModule result = null;
 		if (event.arguments.length == 1 && event.arguments[0] instanceof RequiredModule) {
 			result = (RequiredModule)event.arguments[0];
@@ -72,7 +72,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	}
 	
 	@Listener
-	void resourceNotFound(final ResourceNotFound event) {
+	void on(ResourceNotFound event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null && waiters.remove(requiredModule) != null) {
 			requiredModule.pendingKey().resume(false);
@@ -80,21 +80,21 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	}
 	
 	@Listener
-	void resourceLoaded(final ResourceLoaded event) {
+	void on(ResourceLoaded event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null) {
 			waiters.remove(requiredModule);
 		}
 	}
 	
-	private void loadEnvironment(final RequiredModule requiredModule) {
+	private void loadEnvironment(RequiredModule requiredModule) {
 		resourceLoader.loadResource(ModuleScriptEnvironment.class, Virtual, requiredModule.identifier(), requiredModule);
 		Boolean result = waiters.putIfAbsent(requiredModule, Boolean.TRUE);
 		assert (result == null) : "something is crossed up in the " + getClass();
 	}
 
 	@Override
-	public void process(final ContinuationState continuationState) {
+	public void process(ContinuationState continuationState) {
 		
 		final RequiredModule requiredModule = continuationState.continuationAs(RequiredModule.class);
 		

@@ -25,12 +25,11 @@ import org.slf4j.Logger;
  */
 public class JasmineTestFailure extends JasmineTestResult {
 
-	private final JasmineScriptEnvironment jse;
 	private final long executionTime;
 	private final Collection<Suite> suites;
 	
 	JasmineTestFailure(final JasmineScriptEnvironment jse, final long executionTime, final Collection<Suite> suites) {
-		this.jse = jse;
+		super(jse);
 		this.executionTime = executionTime;
 		this.suites = suites;
 	}

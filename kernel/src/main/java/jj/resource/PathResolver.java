@@ -38,4 +38,6 @@ public interface PathResolver {
 	Location resolveLocation(Path path);
 	
 	List<Location> watchedLocations();
+	
+	Location specLocationFor(Location base);
 }

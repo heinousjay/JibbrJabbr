@@ -133,7 +133,7 @@ public class EventSystemTest {
 			pub.publish(new Event());
 			worked = true;
 		} catch (AssertionError ae) {
-			assertThat(ae.getMessage(), is("broken event listener! jj.event.help.BrokenListener.throwAnException(jj.event.help.Event)"));
+			assertThat(ae.getMessage(), is("broken event listener! jj.event.help.BrokenListener.on(jj.event.help.Event)"));
 		}
 		
 		assertFalse(worked);
@@ -199,7 +199,7 @@ public class EventSystemTest {
 		// when
 		pub.publish(new EventSub());
 		pub.publish(new UnrelatedIEvent());
-		
+		System.out.println(pub.listenerMap);
 		// then
 		assertThat(childSub.heard, is(2));
 		assertThat(childSub.heard2, is(1));
@@ -217,7 +217,7 @@ public class EventSystemTest {
 		assertThat(pub.listenerMap.get(UnrelatedIEvent.class).size(), is(1));
 		
 		// and one little validation of the target method
-		assertThat(pub.listenerMap.get(IEvent.class).peek().target(), is("jj.event.help.Sub.listen(jj.event.help.IEvent)"));
+		assertThat(pub.listenerMap.get(IEvent.class).peek().target(), is("jj.event.help.Sub.on(jj.event.help.IEvent)"));
 		
 		return pub;
 	}

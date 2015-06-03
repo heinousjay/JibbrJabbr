@@ -52,9 +52,10 @@ public class FileTypeSettingsDefaultProvider implements Provider<Map<String, Res
 			
 			HashMap<String, ResourceSettings> result = new HashMap<>(configuration.size() * 2);
 			
-			for (String ext : configuration.keySet()) {
-				result.put(ext, makeSettings(configuration.get(ext)));
-			}
+			configuration.forEach((ext, input) -> {
+				result.put(ext, makeSettings(input));
+			});
+			
 			settings = Collections.unmodifiableMap(result);
 			
 		} catch (Exception e) {

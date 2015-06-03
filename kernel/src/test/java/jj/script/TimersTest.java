@@ -73,7 +73,7 @@ public class TimersTest {
 		}
 		
 		ScriptEnvironmentDied event = new ScriptEnvironmentDied(root);
-		timers.scriptEnvironmentDied(event);
+		timers.on(event);
 		
 		verify(cancelKey).cancel();
 	}

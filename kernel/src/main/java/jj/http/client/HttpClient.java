@@ -73,12 +73,12 @@ class HttpClient {
 	}
 	
 	@Listener
-	void configurationLoading(ConfigurationLoading event) {
+	void on(ConfigurationLoading event) {
 		makeBootstrap();
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded event) {
+	void on(ConfigurationLoaded event) {
 		makeBootstrap();
 	}
 	

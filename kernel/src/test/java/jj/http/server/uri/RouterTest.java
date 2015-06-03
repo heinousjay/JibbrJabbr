@@ -103,7 +103,7 @@ public class RouterTest {
 		routeContributors.add(routeContributor2);
 		
 		router = new Router(config, routeContributors, mockTaskRunner);
-		router.configurationLoaded(null);
+		router.on(null);
 		mockTaskRunner.runFirstTask();
 	}
 	

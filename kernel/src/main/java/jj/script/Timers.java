@@ -66,15 +66,15 @@ class Timers {
 
 	@Inject
 	Timers(
-		final TaskRunner taskRunner,
-		final CurrentScriptEnvironment env
+		TaskRunner taskRunner,
+		CurrentScriptEnvironment env
 	) {
 		this.taskRunner = taskRunner;
 		this.env = env;
 	}
 	
 	@Listener
-	void scriptEnvironmentDied(ScriptEnvironmentDied event) {
+	void on(ScriptEnvironmentDied event) {
 		
 		Map<String, CancelKey> cancelKeys = runningTimers.remove(event.scriptEnvironment());
 		if (cancelKeys != null) {
@@ -171,11 +171,11 @@ class Timers {
 		}
 	}
 	
-	public final BaseFunction setInterval = new TimerFunction(true);
+	final BaseFunction setInterval = new TimerFunction(true);
 	
-	public final BaseFunction setTimeout = new TimerFunction(false);
+	final BaseFunction setTimeout = new TimerFunction(false);
 	
-	public final BaseFunction clearInterval = new BaseFunction() {
+	final BaseFunction clearInterval = new BaseFunction() {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -188,5 +188,5 @@ class Timers {
 		}
 	};
 	
-	public final BaseFunction clearTimeout = clearInterval;
+	final BaseFunction clearTimeout = clearInterval;
 }

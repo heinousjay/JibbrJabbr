@@ -19,6 +19,8 @@ import static org.mockito.BDDMockito.*;
 import static jj.jasmine.JasmineScriptEnvironment.*;
 import static jj.server.ServerLocation.Virtual;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
+import jj.resource.Location;
+import jj.resource.PathResolver;
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.script.module.ScriptResource;
@@ -39,15 +41,17 @@ public class SpecRunnerTest {
 	@Mock JasmineConfiguration configuration;
 	@Mock JasmineSwitch jasmineSwitch;
 	@Mock ResourceLoader resourceLoader;
+	@Mock PathResolver pathResolver;
 	
 	@InjectMocks SpecRunner specRunner;
 	
 	@Mock ScriptResource sr;
+	@Mock Location location;
 
 	@Test
 	public void testNoAutorun() {
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
 		verify(resourceLoader, never()).loadResource(eq(JasmineScriptEnvironment.class), eq(Virtual), anyString(), anyVararg());
 	}
@@ -57,33 +61,37 @@ public class SpecRunnerTest {
 		
 		given(configuration.autorunSpecs()).willReturn(true);
 		given(sr.name()).willReturn("name.js");
+		given(sr.base()).willReturn(location);
+		given(pathResolver.specLocationFor(location)).willReturn(location);
 
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
-		verify(resourceLoader).loadResource(JasmineScriptEnvironment.class, Virtual, "name-spec.js", rl);
+		verify(resourceLoader).loadResource(JasmineScriptEnvironment.class, Virtual, "name-jasmine-spec.js", rl);
 	}
 	
 	@Test
 	public void testIgnored() {
 
 		given(configuration.autorunSpecs()).willReturn(true);
+		given(sr.base()).willReturn(location);
+		given(pathResolver.specLocationFor(location)).willReturn(location);
 		
 		given(sr.name()).willReturn(JASMINE_JS);
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
 		given(sr.name()).willReturn(JASMINE_BOOT_JS);
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
 		given(sr.name()).willReturn(JASMINE_RUN_JS);
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
 		given(sr.name()).willReturn("name-spec.js");
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
 		verifyZeroInteractions(resourceLoader);
 	}

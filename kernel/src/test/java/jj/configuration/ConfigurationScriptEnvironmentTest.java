@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import static jj.application.AppLocation.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.*;
+import jj.application.Application;
 import jj.event.MockPublisher;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceFinder;
@@ -48,6 +49,7 @@ public class ConfigurationScriptEnvironmentTest {
 	MockPublisher publisher;
 	@Mock ScriptableObject global;
 	@Mock ConfigurationCollector collector;
+	@Mock Application application;
 	
 	ConfigurationScriptEnvironment cse;
 	
@@ -69,12 +71,12 @@ public class ConfigurationScriptEnvironmentTest {
 	public void testInitialization() {
 		given(resourceFinder.loadResource(ScriptResource.class, AppBase, CONFIG_SCRIPT_NAME)).willReturn(configScript);
 		
-		cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
+		cse = new ConfigurationScriptEnvironment(dependencies, global, collector, application);
 		
 		verify(configScript).addDependent(cse);
 		
 		// make sure it only triggers on its own initialization
-		cse.scriptInitialized(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
+		cse.on(new ScriptEnvironmentInitialized(mock(ScriptEnvironment.class)));
 
 		verify(collector, never()).configurationComplete();
 		
@@ -82,7 +84,7 @@ public class ConfigurationScriptEnvironmentTest {
 		assertTrue(publisher.events.get(0) instanceof ConfigurationLoading);
 		assertTrue(publisher.events.get(1) instanceof ConfigurationFound);
 		
-		cse.scriptInitialized(new ScriptEnvironmentInitialized(cse));
+		cse.on(new ScriptEnvironmentInitialized(cse));
 		
 		verify(collector).configurationComplete();
 		
@@ -94,7 +96,7 @@ public class ConfigurationScriptEnvironmentTest {
 	public void testDefaultConfiguration() {
 		
 		try {
-			cse = new ConfigurationScriptEnvironment(dependencies, global, collector);
+			cse = new ConfigurationScriptEnvironment(dependencies, global, collector, application);
 			fail("should have thrown");
 		} catch (NoSuchResourceException nsre) {
 			assertThat(nsre, is(notNullValue()));

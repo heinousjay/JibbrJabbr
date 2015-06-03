@@ -35,6 +35,6 @@ public class JasmineModule extends JJModule {
 		
 		// we basically just initialize some event listeners and wait for things to happen
 		bindStartupListener(SpecRunner.class);
-		bindStartupListener(SpecCoordinator.class);
+		bindStartupListener(JasmineSpecCoordinator.class);
 	}
 }

@@ -60,11 +60,11 @@ public abstract class AbstractResource implements Resource {
 		
 		@Inject
 		protected AbstractResourceDependencies(
-			final Clock clock,
-			final ResourceConfiguration resourceConfiguration,
-			final AbstractResourceEventDemuxer demuxer,
-			final Publisher publisher,
-			final ResourceFinder resourceFinder
+			Clock clock,
+			ResourceConfiguration resourceConfiguration,
+			AbstractResourceEventDemuxer demuxer,
+			Publisher publisher,
+			ResourceFinder resourceFinder
 		) {
 			this.clock = clock;
 			this.resourceConfiguration = resourceConfiguration;
@@ -93,10 +93,10 @@ public abstract class AbstractResource implements Resource {
 		
 		@Inject
 		protected Dependencies(
-			final AbstractResourceDependencies abstractResourceDependencies,
-			final ResourceKey resourceKey,
-			final Location base,
-			final @ResourceName String name
+			AbstractResourceDependencies abstractResourceDependencies,
+			ResourceKey resourceKey,
+			Location base,
+			@ResourceName String name
 		) {
 			this.abstractResourceDependencies = abstractResourceDependencies;
 			this.resourceKey = resourceKey;
@@ -107,27 +107,47 @@ public abstract class AbstractResource implements Resource {
 
 	protected static final Object[] EMPTY_ARGS = {};
 	
+	/**
+	 * The key that identifies this resource in the cache
+	 */
 	protected final ResourceKey cacheKey;
 	
+	/**
+	 * The configured location that housed this resource,
+	 * as specified by the load request
+	 */
 	protected final Location base;
 	
+	/**
+	 * The name of this resource, as specified by the load
+	 * request
+	 */
 	protected final String name;
 	
+	/**
+	 * When this resource was created according to the system {@link Clock}
+	 */
 	protected final long creationTime;
 	
 	protected final Publisher publisher;
 	
 	protected final ResourceFinder resourceFinder;
 	
+	/**
+	 * The configuration of the resource system
+	 */
 	protected final ResourceConfiguration resourceConfiguration;
 
+	/**
+	 * The resolved settings for this resource
+	 */
 	protected final ResourceSettings settings;
 	
 	private final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
 	
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	
-	protected AbstractResource(final Dependencies dependencies) {
+	protected AbstractResource(Dependencies dependencies) {
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
 		this.name = dependencies.name;
@@ -174,7 +194,7 @@ public abstract class AbstractResource implements Resource {
 	 * @param event the event
 	 */
 	@Listener
-	void resourceKilled(ResourceKilled event) {
+	void on(ResourceKilled event) {
 		dependents.remove(event.resourceKey);
 	}
 	
@@ -278,7 +298,7 @@ public abstract class AbstractResource implements Resource {
 	 * make something of the information. the base implementation does nothing
 	 */
 	protected void died() {
-		// mainly to allow AbstractScriptEnvironment to publish its own death event
+		// mainly to allow descendants to publish their own death event
 	}
 	
 	@Override

@@ -30,7 +30,7 @@ import org.junit.Test;
 public class LetsWriteATest {
 	
 	@Rule
-	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(ServerRoot.one, App.two);
+	public JibbrJabbrTestServer server = new JibbrJabbrTestServer(ServerRoot.one, App.app2);
 	
 	
 	/** since we're running in the context of the embedded server, let that
