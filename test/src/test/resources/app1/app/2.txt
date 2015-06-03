@@ -1,6 +1,0 @@
-this is the text!
-
-dfa f
-aef
-sdf 
-f
