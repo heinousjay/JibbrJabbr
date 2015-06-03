@@ -11,7 +11,7 @@ class DefaultRouteProcessorConfiguration implements RouteProcessorConfiguration 
 
 	@Override
 	public Location location() {
-		return AppLocation.AppBase.and(ServerLocation.Assets);
+		return AppLocation.Public.and(ServerLocation.Assets);
 	}
 
 }

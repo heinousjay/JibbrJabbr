@@ -87,7 +87,7 @@ public class StylesheetResourceTest {
 
 	@Test
 	public void testNotFound() {
-		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(AppBase, NAME);
+		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(Virtual, NAME);
 		try {
 			newStylesheet(dependencies);
 			fail();
@@ -95,15 +95,15 @@ public class StylesheetResourceTest {
 			// yay
 		}
 		
-		verify(dependencies.resourceFinder()).loadResource(StaticResource.class, AppBase, NAME);
-		verify(dependencies.resourceFinder()).loadResource(LessResource.class, AppBase, "test.less");
+		verify(dependencies.resourceFinder()).loadResource(StaticResource.class, Public, NAME);
+		verify(dependencies.resourceFinder()).loadResource(LessResource.class, Private, "test.less");
 	}
 	
 	@Test
 	public void testCssFound() {
-		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(AppBase, NAME);
+		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(Virtual, NAME);
 		
-		given(dependencies.resourceFinder().loadResource(StaticResource.class, AppBase, NAME)).willReturn(cssResource);
+		given(dependencies.resourceFinder().loadResource(StaticResource.class, Public, NAME)).willReturn(cssResource);
 		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willReturn("");
 		
 		StylesheetResource sr = newStylesheet(dependencies);
@@ -118,11 +118,12 @@ public class StylesheetResourceTest {
 		
 		given(resourceFinder.loadResource(ScriptResource.class, Assets, StylesheetResource.LESS_SCRIPT)).willReturn(lessScriptResource);
 		
-		LessResource less1 = new LessResource(new MockAbstractResourceDependencies(AppBase, "test.less", resourceFinder), cssPath.resolveSibling("test.less"));
-		given(resourceFinder.loadResource(LessResource.class, AppBase, "test.less")).willReturn(less1);
+		LessResource less1 = new LessResource(new MockAbstractResourceDependencies(Private, "test.less", resourceFinder), cssPath.resolveSibling("test.less"));
+		given(resourceFinder.loadResource(LessResource.class, Private, "test.less")).willReturn(less1);
+		given(resourceFinder.loadResource(LessResource.class, Public.and(Private), "test.less")).willReturn(less1);
 		
-		LessResource less2 = new LessResource(new MockAbstractResourceDependencies(AppBase, "test2.less", resourceFinder), cssPath.resolveSibling("test2.less"));
-		given(resourceFinder.loadResource(LessResource.class, AppBase, "test2.less")).willReturn(less2);
+		LessResource less2 = new LessResource(new MockAbstractResourceDependencies(Private, "test2.less", resourceFinder), cssPath.resolveSibling("test2.less"));
+		given(resourceFinder.loadResource(LessResource.class, Public.and(Private), "test2.less")).willReturn(less2);
 		
 		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willAnswer(new Answer<String>() {
 
@@ -132,7 +133,7 @@ public class StylesheetResourceTest {
 			}
 		});
 		
-		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(AppBase, NAME, resourceFinder);
+		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(Virtual, NAME, resourceFinder);
 		
 		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			global = context.initStandardObjects();
@@ -146,6 +147,8 @@ public class StylesheetResourceTest {
 			
 		// then
 			verify(lessScriptResource).addDependent(sr);
+			System.out.println(dependents(less1));
+			System.out.println(dependents(less2));
 			assertTrue(dependents(less1).contains(sr));
 			assertTrue(dependents(less2).contains(sr));
 			

@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,7 +66,7 @@ public class CssReferenceVersionProcessorTest {
 		basePath = Paths.get(getClass().getResource("/jj/css/test").toURI());
 		app = new MockApplication(basePath);
 		
-		dependencies = new MockAbstractResourceDependencies(AppBase, REPLACEMENT_CSS);
+		dependencies = new MockAbstractResourceDependencies(Virtual, REPLACEMENT_CSS);
 	}
 
 	@Test
@@ -75,7 +76,7 @@ public class CssReferenceVersionProcessorTest {
 		
 		// given
 		StaticResource replacement = spy(StaticResourceMaker.make(app, AppBase, REPLACEMENT_CSS));
-		given(dependencies.resourceFinder().loadResource(StaticResource.class, AppBase, REPLACEMENT_CSS)).willReturn(replacement);
+		given(dependencies.resourceFinder().loadResource(StaticResource.class, Public, REPLACEMENT_CSS)).willReturn(replacement);
 		given(servableLoader.loadResource(new URIMatch(REPLACEMENT_CSS))).willReturn(replacement);
 		
 		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null, app);

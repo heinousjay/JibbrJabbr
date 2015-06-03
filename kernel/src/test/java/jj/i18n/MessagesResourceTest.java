@@ -52,13 +52,13 @@ public class MessagesResourceTest {
 	public void test() throws Exception {
 		
 		PropertiesResource index_base = new PropertiesResource(dependencies, Base.appPath().resolve("index.properties"));
-		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.AppBase, "index.properties")).willReturn(index_base);
+		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.Private, "index.properties")).willReturn(index_base);
 		
 		PropertiesResource index_en = new PropertiesResource(dependencies, Base.appPath().resolve("index_en.properties"));
-		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.AppBase, "index_en.properties")).willReturn(index_en);
+		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.Private, "index_en.properties")).willReturn(index_en);
 		
 		PropertiesResource index_us = new PropertiesResource(dependencies, Base.appPath().resolve("index_en_US.properties"));
-		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.AppBase, "index_en_US.properties")).willReturn(index_us);
+		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.Private, "index_en_US.properties")).willReturn(index_us);
 		
 		MessagesResource resource = new MessagesResource(dependencies, Locale.US, resourceFinder);
 		

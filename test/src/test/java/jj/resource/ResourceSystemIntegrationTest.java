@@ -88,32 +88,41 @@ public class ResourceSystemIntegrationTest {
 		
 		// validates that directory structures are created as expected
 		DirectoryResource root = finder.findResource(DirectoryResource.class, AppBase, "");
-		DirectoryResource deep = finder.findResource(DirectoryResource.class, AppBase, "deep");
-		DirectoryResource nesting = finder.findResource(DirectoryResource.class, AppBase, "deep/nesting");
+		DirectoryResource pub = finder.findResource(DirectoryResource.class, AppBase, "public");
+		DirectoryResource pubDeep = finder.findResource(DirectoryResource.class, Public, "deep");
+		DirectoryResource priv = finder.findResource(DirectoryResource.class, AppBase, "private");
+		DirectoryResource privDeep = finder.findResource(DirectoryResource.class, Private, "deep");
+		DirectoryResource nesting = finder.findResource(DirectoryResource.class, Private, "deep/nesting");
 		assertThat(root, is(notNullValue()));
-		assertThat(deep, is(notNullValue()));
+		assertThat(pub, is(notNullValue()));
+		//assertTrue(root.dependents().contains(pub));
+		assertThat(pubDeep, is(notNullValue()));
+		assertTrue(pub.dependents().contains(pubDeep));
+		assertThat(priv, is(notNullValue()));
+		//assertTrue(root.dependents().contains(priv));
+		assertThat(privDeep, is(notNullValue()));
 		assertThat(nesting, is(notNullValue()));
-		assertTrue(root.dependents().contains(deep));
-		assertTrue(deep.dependents().contains(nesting));
+		assertTrue(priv.dependents().contains(privDeep));
+		assertTrue(privDeep.dependents().contains(nesting));
 		
 		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
 		
 		dse = finder.findResource(DocumentScriptEnvironment.class, Virtual, "deep/nested");
-		htmlResource = finder.findResource(HtmlResource.class, AppBase, "deep/nested.html");
-		assertTrue(deep.dependents().contains(htmlResource));
+		htmlResource = finder.findResource(HtmlResource.class, Public, "deep/nested.html");
+		assertTrue(pubDeep.dependents().contains(htmlResource));
 		
 		mse1 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module"));
-		scriptResource1 = finder.findResource(ScriptResource.class, AppBase, "deep/module.js");
-		assertTrue(deep.dependents().contains(scriptResource1));
+		scriptResource1 = finder.findResource(ScriptResource.class, Private, "deep/module.js");
+		assertTrue(privDeep.dependents().contains(scriptResource1));
 		assertTrue(((AbstractResource)dse).dependents().contains(mse1));
 		
 		mse2 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"));
-		scriptResource2 = finder.findResource(ScriptResource.class, AppBase, "deep/nesting/module.js");
+		scriptResource2 = finder.findResource(ScriptResource.class, Private, "deep/nesting/module.js");
 		assertTrue(nesting.dependents().contains(scriptResource2));
 		assertTrue(((AbstractResource)dse).dependents().contains(mse2));
 		
 		mse3 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/values", new RequiredModule(dse, "deep/nesting/values"));
-		jsonResource1 = finder.findResource(JSONResource.class, AppBase, "deep/nesting/values.json");
+		jsonResource1 = finder.findResource(JSONResource.class, Private, "deep/nesting/values.json");
 		assertTrue(nesting.dependents().contains(jsonResource1));
 		assertTrue(((AbstractResource)dse).dependents().contains(mse3));
 		

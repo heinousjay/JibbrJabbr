@@ -112,15 +112,15 @@ public class DocumentScriptEnvironment
 	) {
 		super(dependencies);
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppBase, resourceName(name));
+		html = resourceFinder.loadResource(HtmlResource.class, Public, resourceName(name));
 		
 		if (html == null) {
 			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, AppBase, ScriptResourceType.Client.suffix(name));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppBase, ScriptResourceType.Shared.suffix(name));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, AppBase, ScriptResourceType.Server.suffix(name));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Client.suffix(name));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Shared.suffix(name));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, Private, ScriptResourceType.Client.suffix(name));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -214,7 +214,7 @@ public class DocumentScriptEnvironment
 	
 	@Override
 	public Location moduleLocation() {
-		return AppBase;
+		return Private.and(Public);
 	}
 
 	@Override

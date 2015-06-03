@@ -46,10 +46,7 @@ class CssReferenceVersionProcessor {
 	private final ServableLoader servableLoader;
 	
 	@Inject
-	CssReferenceVersionProcessor(
-		final Application application,
-		final ServableLoader servableLoader
-	) {
+	CssReferenceVersionProcessor(Application application, ServableLoader servableLoader) {
 		this.application = application;
 		this.servableLoader = servableLoader;
 	}
@@ -69,11 +66,11 @@ class CssReferenceVersionProcessor {
 	}
 	
 	private String doReplacement(
-		final String css,
-		final StylesheetResource resource,
-		final Pattern pattern,
-		final String prefix,
-		final String suffix
+		String css,
+		StylesheetResource resource,
+		Pattern pattern,
+		String prefix,
+		String suffix
 	) {
 		// yuck.  the API was never updated
 		StringBuffer sb = new StringBuffer();
@@ -87,7 +84,7 @@ class CssReferenceVersionProcessor {
 				if (replacement.startsWith("/")) {
 					name = replacement.substring(1);
 				} else {
-					name = application.resolvePath(AppLocation.AppBase, "") // Public!
+					name = application.resolvePath(AppLocation.Public, "") // Public!
 						.relativize(resource.path().resolveSibling(replacement))
 						.normalize()
 						.toString();

@@ -78,7 +78,7 @@ public class StylesheetResourceIntegrationTest {
 		assertTrue("timed out", latch.await(2, SECONDS));
 		
 		String lessOutput = stylesheet.bytes().toString(UTF_8);
-		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css")), UTF_8);
+		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css.output")), UTF_8);
 		
 		assertThat(lessOutput, is(expectedOutput));
 	}
@@ -91,7 +91,7 @@ public class StylesheetResourceIntegrationTest {
 		assertTrue("timed out", latch.await(2, SECONDS));
 		
 		String cssOutput = stylesheet.bytes().toString(UTF_8);
-		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css")), UTF_8);
+		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css.output")), UTF_8);
 		
 		assertThat(cssOutput, is(expectedOutput));
 	}

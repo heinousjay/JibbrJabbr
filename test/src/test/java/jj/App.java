@@ -51,14 +51,14 @@ public class App {
 	
 	static {
 		try {
-			app1 = getPath("/app1/app/");
-			app2 = getPath("/app2/app/");
+			app1 = getPath("/test-apps/app1/");
+			app2 = getPath("/test-apps/app2/");
 			configuration = getPath("/test-apps/configuration/");
-			css = getPath("/css/");
+			css = getPath("/test-apps/css/");
 			httpClient = getPath("/test-apps/http-client/");
 			jasmine = getPath("/test-apps/jasmine/");
-			minimal = getPath("/minimal/app/");
-			module = getPath("/module/");
+			minimal = getPath("/test-apps/minimal/");
+			module = getPath("/test-apps/module/");
 			repl = getPath("/test-apps/repl/");
 		} catch (Exception e) {
 			throw new AssertionError(e);
