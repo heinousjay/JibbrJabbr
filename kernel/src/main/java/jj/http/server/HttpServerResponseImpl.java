@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -157,9 +156,9 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	@Override
-	public List<Entry<CharSequence, CharSequence>> allHeaders() {
+	public Iterable<Entry<CharSequence, CharSequence>> allHeaders() {
 		// TODO make unmodifiable if committed
-		return response.headers().entries();
+		return response.headers();
 	}
 
 	@Override

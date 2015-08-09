@@ -139,8 +139,8 @@ class HttpServerRequestImpl implements HttpServerRequest {
 	 * @return
 	 */
 	@Override
-	public List<Entry<CharSequence, CharSequence>> allHeaders() {
-		return request.headers().entries();
+	public Iterable<Entry<CharSequence, CharSequence>> allHeaders() {
+		return request.headers();
 	}
 	
 	@Override
