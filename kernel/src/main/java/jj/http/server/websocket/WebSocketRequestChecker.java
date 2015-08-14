@@ -46,7 +46,7 @@ public class WebSocketRequestChecker {
 		
 		return HttpMethod.GET.equals(request.method()) &&
 			isUpgradeRequest(request) &&
-			HttpHeaderValues.WEBSOCKET.equalsIgnoreCase(request.headers().get(HttpHeaderNames.UPGRADE)) &&
+			HttpHeaderValues.WEBSOCKET.contentEqualsIgnoreCase(request.headers().get(HttpHeaderNames.UPGRADE)) &&
 			isWebSocketURI(request);
 	}
 	
