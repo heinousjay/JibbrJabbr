@@ -16,6 +16,8 @@
 package jj;
 
 
+import javax.inject.Singleton;
+
 import jj.application.ApplicationModule;
 import jj.configuration.CommandLine;
 import jj.configuration.ConfigurationModule;
@@ -64,10 +66,14 @@ public class CoreModule extends JJModule {
 		// this is no longer true! but who cares!
 		install(new LoggingModule());
 		
-		// bind up the command line args
+		// bind the command line args
 		bind(String[].class).annotatedWith(CommandLine.class).toInstance(args);
+		
+		// bind the given resource resolver
 		bind(ResourceResolver.class).toInstance(resourceResolver);
-		bind(Version.class).to(VersionImpl.class);
+		
+		// make sure the version is a singleton
+		bind(Version.class).in(Singleton.class);
 		
 		bindLoggedEventsAnnotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		

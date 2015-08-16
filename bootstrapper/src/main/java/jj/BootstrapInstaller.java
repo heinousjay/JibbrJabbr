@@ -40,7 +40,7 @@ final class BootstrapInstaller {
 	}
 	
 	private void install() throws Exception {
-		
+		Version version = new Version();
 		try (FileSystem myJarFS = FileSystems.newFileSystem(jarPath, null)) {
 			
 			// basic self installation
@@ -66,7 +66,7 @@ final class BootstrapInstaller {
 					
 					Path installedPath = systemPath.resolve(fileName);
 					
-					if (fileName.startsWith(Version.name) && Version.snapshot) {
+					if (fileName.startsWith(version.name()) && version.snapshot()) {
 						Files.copy(storedPath, installedPath, COPY_ATTRIBUTES, REPLACE_EXISTING);
 					} else if (!Files.exists(installedPath)){
 						Files.copy(storedPath, installedPath, COPY_ATTRIBUTES);

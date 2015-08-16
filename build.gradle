@@ -80,33 +80,6 @@ allprojects {
 		serverCore 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
 		serverCore 'org.jsoup:jsoup:1.8.1'
 	}
-	
-	eclipseClasspath.doFirst {
-				
-		Map<String, String> sourceMap = new HashMap<String, String>()
-		project.sourceSets.each { sourceSet ->
-			def classesOut = project.relativePath(sourceSet.output.classesDir)
-			def resourcesOut = project.relativePath(sourceSet.output.resourcesDir)
-			
-			sourceSet.java.srcDirs.each { dir ->
-				sourceMap[project.relativePath(dir)] = classesOut
-			}
-			
-			sourceSet.resources.srcDirs.each { dir ->
-				sourceMap[project.relativePath(dir)] = resourcesOut
-			}
-		}
-	
-		eclipse.classpath.file {
-			whenMerged { classpath ->
-				classpath.entries.findAll { entry -> 
-					entry.kind == 'src' && sourceMap.containsKey(entry.path) 
-				}.each { entry -> 
-					entry.output = sourceMap[entry.path];
-				}
-			}
-		}
-	}
 }
 
 subprojects {
