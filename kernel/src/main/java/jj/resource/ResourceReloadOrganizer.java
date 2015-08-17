@@ -25,20 +25,20 @@ import java.util.HashSet;
  */
 class ResourceReloadOrganizer {
 	
-	final HashSet<AbstractResource> deletions = new HashSet<>();
-	final HashSet<AbstractResource> reloads = new HashSet<>();
+	final HashSet<AbstractResource<?>> deletions = new HashSet<>();
+	final HashSet<AbstractResource<?>> reloads = new HashSet<>();
 	
-	ResourceReloadOrganizer(AbstractResource base, boolean delete) {
+	ResourceReloadOrganizer(AbstractResource<?> base, boolean delete) {
 		
 		placeResource(base, delete);
 		
 	}
 	
-	private void placeResource(AbstractResource resource, boolean delete) {
+	private void placeResource(AbstractResource<?> resource, boolean delete) {
 		// sorry for the javascripty java but the test passes!
 		if ((delete || resource.removeOnReload() ? deletions : reloads).add(resource)) {
 			// if we haven't seen this one before, traverse it
-			for (AbstractResource dependent : resource.dependents()) {
+			for (AbstractResource<?> dependent : resource.dependents()) {
 				placeResource(dependent, false);
 			}
 		}

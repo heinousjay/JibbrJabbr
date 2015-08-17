@@ -134,7 +134,7 @@ public class ResourceWatchServiceLoopTest {
 		assertThat(resourceCache.get(resource2.cacheKey()), is(nullValue()));
 		assertThat(resourceCache.get(resource3.cacheKey()), is(nullValue()));
 		assertThat(resourceCache.get(resource4.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource5.cacheKey()), is((Resource)resource5));
+		assertThat((Resource<?>)resourceCache.get(resource5.cacheKey()), is(resource5));
 		
 		assertThat(taskRunner.tasks, is(empty()));
 		verifyZeroInteractions(resourceFinder);
@@ -176,7 +176,7 @@ public class ResourceWatchServiceLoopTest {
 		assertThat(resourceCache.get(resource2.cacheKey()), is(nullValue()));
 		assertThat(resourceCache.get(resource3.cacheKey()), is(nullValue()));
 		assertThat(resourceCache.get(resource4.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource5.cacheKey()), is((Resource)resource5));
+		assertThat((Resource<?>)resourceCache.get(resource5.cacheKey()), is(resource5));
 		
 		assertThat(taskRunner.tasks, is(not(empty())));
 		
@@ -189,7 +189,7 @@ public class ResourceWatchServiceLoopTest {
 		verify(resource5).kill();
 		verify(publisher, times(5)).publish(isA(ResourceKilled.class));
 		
-		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.AppBase, resource5.name());
+		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.AppBase, resource5.name(), null);
 	}
 
 }

@@ -20,8 +20,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptExecutorFactoryTest {
 	
-	@Mock ScriptEnvironment scriptEnvironment1;
-	@Mock ScriptEnvironment scriptEnvironment2;
+	@Mock ScriptEnvironment<?> scriptEnvironment1;
+	@Mock ScriptEnvironment<?> scriptEnvironment2;
 	
 	@Mock Provider<ScriptExecutor> provider;
 	

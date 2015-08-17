@@ -49,7 +49,7 @@ public class ModuleScriptEnvironmentTest {
 	
 	RequiredModule requiredModule;
 	
-	@Mock(extraInterfaces = { RootScriptEnvironment.class }) AbstractScriptEnvironment parent;
+	@Mock(extraInterfaces = { RootScriptEnvironment.class }) AbstractScriptEnvironment<?> parent;
 	
 	@Mock ScriptResource scriptResource;
 	
@@ -67,9 +67,9 @@ public class ModuleScriptEnvironmentTest {
 		MockAbstractScriptEnvironmentDependencies dependencies =
 			new MockAbstractScriptEnvironmentDependencies(contextProvider, name);
 		
-		given(((RootScriptEnvironment)parent).global()).willReturn(global);
+		given(((RootScriptEnvironment<?>)parent).global()).willReturn(global);
 		
-		requiredModule = new RequiredModule((RootScriptEnvironment)parent, name);
+		requiredModule = new RequiredModule((RootScriptEnvironment<?>)parent, name);
 		requiredModule.pendingKey(new PendingKey());
 		
 		given(parent.alive()).willReturn(true);
@@ -77,7 +77,7 @@ public class ModuleScriptEnvironmentTest {
 	}
 	
 	private void givenModuleLocation(Location location) {
-		given(((RootScriptEnvironment)parent).moduleLocation()).willReturn(location);
+		given(((RootScriptEnvironment<?>)parent).moduleLocation()).willReturn(location);
 	}
 
 	private void constructScriptModule(String name, String moduleIdentifier, Location scriptLocation) {

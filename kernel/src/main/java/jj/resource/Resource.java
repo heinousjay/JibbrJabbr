@@ -12,10 +12,12 @@ import java.nio.charset.Charset;
  * <p>
  * do not implement this directly, extend {@link AbstractResource} instead
  * 
+ * @param <T> the type of creation argument. Void if none
+ * 
  * @author jason
  *
  */
-public interface Resource {
+public interface Resource<T> {
 	
 	/**
 	 * The base location of this resource
@@ -48,7 +50,7 @@ public interface Resource {
 	 * outside of resource death, so semantically it is important to arrange that a permanent
 	 * relationship makes sense
 	 */
-	void addDependent(Resource dependent);
+	void addDependent(Resource<?> dependent);
 	
 	/**
 	 * The key in the cache where this resource is stored
@@ -60,4 +62,9 @@ public interface Resource {
 	 * between the time of its creation and the time it is removed from the resource cache.
 	 */
 	boolean alive();
+	
+	/**
+	 * the argument, if any, used to parameterize creation
+	 */
+	T creationArg();
 }

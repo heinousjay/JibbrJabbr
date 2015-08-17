@@ -24,7 +24,7 @@ import org.jsoup.select.NodeVisitor;
  * @author jason
  *
  */
-public class HtmlResource extends AbstractFileResource {
+public class HtmlResource extends AbstractFileResource<Void> {
 
 	private final Document document;
 	

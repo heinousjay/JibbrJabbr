@@ -29,34 +29,27 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ModuleScriptEnvironment> {
-	
-	private static final String ARG_ERROR = "ModuleScriptEnvironmentCreator requires a RequiredModule argument";
+class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<RequiredModule, ModuleScriptEnvironment> {
 	
 	@Inject
 	ModuleScriptEnvironmentCreator(final Dependencies dependencies) {
 		super(dependencies);
 	}
-	
-	private RequiredModule requiredModule(Object[] args) {
-		assert args.length == 1 && args[0] instanceof RequiredModule : ARG_ERROR;
-		return (RequiredModule)args[0];
-	}
 
 	@Override
-	protected ModuleScriptEnvironment createScriptEnvironment(String moduleIdentifier, Object... args) throws IOException {
+	protected ModuleScriptEnvironment createScriptEnvironment(String moduleIdentifier, RequiredModule argument) throws IOException {
 		return creator.createResource(
 			ModuleScriptEnvironment.class,
-			resourceKey(Virtual, moduleIdentifier, args),
+			resourceKey(Virtual, moduleIdentifier, argument),
 			Virtual,
 			moduleIdentifier,
-			requiredModule(args)
+			argument
 		);
 	}
 	
 	@Override
-	protected URI uri(Location base, String moduleIdentifier, Object... args) {
-		return requiredModule(args).uri();
+	protected URI uri(Location base, String moduleIdentifier, RequiredModule argument) {
+		return argument.uri();
 	}
 
 }

@@ -23,13 +23,13 @@ import org.slf4j.Logger;
  */
 public class ScriptEnvironmentInitialized extends ScriptSystemEvent {
 	
-	private final ScriptEnvironment scriptEnvironment;
+	private final ScriptEnvironment<?> scriptEnvironment;
 
-	public ScriptEnvironmentInitialized(final ScriptEnvironment scriptEnvironment) {
+	public ScriptEnvironmentInitialized(final ScriptEnvironment<?> scriptEnvironment) {
 		this.scriptEnvironment = scriptEnvironment;
 	}
 	
-	public ScriptEnvironment scriptEnvironment() {
+	public ScriptEnvironment<?> scriptEnvironment() {
 		return scriptEnvironment;
 	}
 

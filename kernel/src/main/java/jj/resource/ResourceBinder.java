@@ -29,27 +29,27 @@ import com.google.inject.multibindings.MapBinder;
  */
 public class ResourceBinder {
 	
-	private final Map<Class<? extends Resource>, ResourceBindingProcessor<? extends Resource>> bindingProcessors = new HashMap<>();
+	private final Map<Class<? extends Resource<?>>, ResourceBindingProcessor<? extends Resource<?>>> bindingProcessors = new HashMap<>();
 
-	private final MapBinder<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreatorBinder;
+	private final MapBinder<Class<? extends AbstractResource<?>>, SimpleResourceCreator<?, ? extends AbstractResource<?>>> resourceCreatorBinder;
 	
 	public ResourceBinder(final Binder binder) {
 		resourceCreatorBinder = MapBinder.newMapBinder(
 			binder,
-			new TypeLiteral<Class<? extends AbstractResource>>() {},
-			new TypeLiteral<SimpleResourceCreator<? extends AbstractResource>>() {}
+			new TypeLiteral<Class<? extends AbstractResource<?>>>() {},
+			new TypeLiteral<SimpleResourceCreator<?, ? extends AbstractResource<?>>>() {}
 		);
 	}
 	
-	public <T extends Resource> ResourceBinder addResourceBindingProcessor(Class<T> resourceClass, ResourceBindingProcessor<T> bindingProcessor) {
+	public <A, T extends Resource<A>> ResourceBinder addResourceBindingProcessor(Class<T> resourceClass, ResourceBindingProcessor<?> bindingProcessor) {
 		bindingProcessors.put(resourceClass, bindingProcessor);
 		return this;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends AbstractResource, U extends SimpleResourceCreator<T>> LinkedBindingBuilder<U> of(Class<T> key) {
+	public <A, T extends AbstractResource<A>, U extends SimpleResourceCreator<A, T>> LinkedBindingBuilder<U> of(Class<T> key) {
 		
-		for (Class<? extends Resource> resourceInterface : bindingProcessors.keySet()) {
+		for (Class<? extends Resource<?>> resourceInterface : bindingProcessors.keySet()) {
 			if (resourceInterface.isAssignableFrom(key)) {
 				ResourceBindingProcessor<T> processor = (ResourceBindingProcessor<T>)bindingProcessors.get(resourceInterface);
 				processor.process(key);

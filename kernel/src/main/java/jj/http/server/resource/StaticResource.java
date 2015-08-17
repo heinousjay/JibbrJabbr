@@ -33,7 +33,7 @@ import jj.resource.ResourceThread;
  * @author jason
  *
  */
-public class StaticResource extends AbstractFileResource implements TransferableResource {
+public class StaticResource extends AbstractFileResource<Void> implements TransferableResource {
 	
 	@Inject
 	StaticResource(

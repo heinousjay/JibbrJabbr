@@ -21,7 +21,7 @@ package jj.resource;
  */
 public class ResourceLoaded extends ResourceEvent implements ResourceCacheUpdated {
 
-	public ResourceLoaded(AbstractResource resource) {
+	public ResourceLoaded(AbstractResource<?> resource) {
 		super(resource);
 	}
 

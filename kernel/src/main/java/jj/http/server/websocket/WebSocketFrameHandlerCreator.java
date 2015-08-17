@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 

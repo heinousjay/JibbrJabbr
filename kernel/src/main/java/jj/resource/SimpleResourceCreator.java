@@ -42,7 +42,7 @@ import jj.util.GenericUtils;
  *
  */
 @Singleton
-public class SimpleResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
+public class SimpleResourceCreator<A, T extends AbstractResource<A>> implements ResourceCreator<A, T> {
 	
 	@Singleton
 	public static class Dependencies {
@@ -58,17 +58,23 @@ public class SimpleResourceCreator<T extends AbstractResource> implements Resour
 	protected final PathResolver pathResolver;
 	protected final ResourceInstanceCreator creator;
 	private final Class<T> type;
+	private final Class<A> argType;
 	
 	@SuppressWarnings("unchecked")
 	@Inject
 	protected SimpleResourceCreator(final Dependencies dependencies) {
 		pathResolver = dependencies.pathResolver;
 		creator = dependencies.creator;
-		type = (Class<T>)GenericUtils.extractGenericParameter(getClass());
+		type = (Class<T>)GenericUtils.extractGenericParameter(getClass(), 1);
+		argType = (Class<A>)GenericUtils.extractGenericParameter(getClass());
 	}
 
-	protected URI uri(final Location base, final String name, final Object...args) {
+	protected URI uri(final Location base, final String name, final A argument) {
 		return pathResolver.resolvePath(base, name).toUri();
+	}
+	
+	public Class<A> argType() {
+		return argType;
 	}
 	
 	@Override
@@ -77,17 +83,17 @@ public class SimpleResourceCreator<T extends AbstractResource> implements Resour
 	}
 	
 	@Override
-	public ResourceKey resourceKey(final Location base, final String name, final Object...args) {
-		return new ResourceKey(type, uri(base, name, args));
+	public ResourceKey resourceKey(final Location base, final String name, final A argument) {
+		return new ResourceKey(type, uri(base, name, argument));
 	}
 	
-	protected boolean arguments(Location base, String name) {
+	protected boolean arguments(Location base, String name, A argument) {
 		return true;
 	}
 
 	@Override
-	public T create(Location base, String name, Object... args) throws IOException {
-		assert arguments(base, name);
-		return creator.createResource(type, resourceKey(base, name), base, name);
+	public T create(Location base, String name, A argument) throws IOException {
+		assert arguments(base, name, argument);
+		return creator.createResource(type, resourceKey(base, name, argument), base, name, argument);
 	}
 }

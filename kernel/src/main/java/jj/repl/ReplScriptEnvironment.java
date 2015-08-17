@@ -44,7 +44,7 @@ import jj.util.Closer;
  * @author jason
  *
  */
-class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
+class ReplScriptEnvironment extends AbstractScriptEnvironment<Void> implements RootScriptEnvironment<Void> {
 
 	static final String NAME = "repl";
 	static final String BASE_REPL_SYSTEM = "base-repl-system.js";

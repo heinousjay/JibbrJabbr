@@ -61,7 +61,7 @@ public class ContinuationCoordinatorTest {
 	
 	@Mock Script script;
 	
-	@Mock AbstractScriptEnvironment scriptEnvironment;
+	@Mock AbstractScriptEnvironment<?> scriptEnvironment;
 	
 	CurrentScriptEnvironment env = new CurrentScriptEnvironment(new MockRhinoContextProvider());
 	

@@ -43,7 +43,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class Sha1ResourceTest {
 	
-	@Mock AbstractFileResource afs;
+	@Mock AbstractFileResource<?> afs;
 	@Mock ResourceKey resourceKey;
 	MockAbstractResourceDependencies dependencies;
 	
@@ -91,7 +91,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + size).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));
@@ -104,7 +104,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + (size - 1L)).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));
@@ -115,7 +115,7 @@ public class Sha1ResourceTest {
 	@Test
 	public void testNonExistent() throws Exception {
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceCreator.Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceTarget(afs));
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));

@@ -25,7 +25,7 @@ import jj.execution.TaskRunner;
  * @author jason
  *
  */
-public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTask<ScriptExecutor> {
+public abstract class ScriptTask<T extends ScriptEnvironment<?>> extends DelayedTask<ScriptExecutor> {
 	
 	protected final T scriptEnvironment;
 	
@@ -62,7 +62,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 		if (pendingKey == null) {
 			complete();
 		} else {
-			((AbstractScriptEnvironment)scriptEnvironment).awaitContinuation(this);
+			((AbstractScriptEnvironment<?>)scriptEnvironment).awaitContinuation(this);
 		}
 	}
 	
@@ -76,7 +76,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 * Resumes executing the task
 	 */
 	void resume() {
-		pendingKey = ((AbstractScriptEnvironment)scriptEnvironment).resumeContinuation(pendingKey, result);
+		pendingKey = ((AbstractScriptEnvironment<?>)scriptEnvironment).resumeContinuation(pendingKey, result);
 	}
 	/**
 	 * Implement this method to run after completion of either the begin or resume methods, when no

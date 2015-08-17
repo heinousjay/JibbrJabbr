@@ -30,7 +30,7 @@ import jj.script.ScriptThread;
  * @author jason
  *
  */
-public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvironment implements WebSocketConnectionHost {
+public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvironment<Void> implements WebSocketConnectionHost {
 	
 	@Singleton
 	public static class AbstractWebSocketConnectionHostDependencies {

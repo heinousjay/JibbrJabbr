@@ -46,7 +46,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-public class JasmineScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
+public class JasmineScriptEnvironment extends AbstractScriptEnvironment<ResourceLoaded> implements RootScriptEnvironment<ResourceLoaded> {
 
 	private static final String JASMINE         = "jasmine";
 	static final String JASMINE_JS      = JASMINE + ".js";
@@ -139,8 +139,8 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	}
 	
 	@Override
-	protected Object[] creationArgs() {
-		return new Object[] { resourceLoaded };
+	public ResourceLoaded creationArg() {
+		return resourceLoaded;
 	}
 
 	@Override

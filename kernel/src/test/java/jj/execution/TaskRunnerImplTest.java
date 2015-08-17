@@ -56,7 +56,7 @@ public class TaskRunnerImplTest {
 	
 	@Mock CancelKey cancelKey;
 	
-	private @Mock ScriptEnvironment scriptEnvironment;
+	private @Mock ScriptEnvironment<?> scriptEnvironment;
 
 	private ExecutorBundle bundle;
 	

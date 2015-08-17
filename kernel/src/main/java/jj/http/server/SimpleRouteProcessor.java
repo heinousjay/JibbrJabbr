@@ -57,13 +57,13 @@ public class SimpleRouteProcessor implements RouteProcessor {
 	}
 	
 	private ServableResource findResource(final Class<? extends ServableResource> resourceClass, final HttpServerRequest request) {
-		return resourceLoader.findResource(resourceClass, configurationMap.get(resourceClass).location(), request.uriMatch().path);
+		return resourceLoader.findResource(resourceClass, configurationMap.get(resourceClass).location(), request.uriMatch().path, null);
 	}
 	
 	@ResourceThread
 	@Override
 	public <T extends ServableResource> T loadResource(final Class<T> resourceClass, final URIMatch uriMatch, final Route route) {
-		return resourceFinder.loadResource(resourceClass, configurationMap.get(resourceClass).location(), uriMatch.path);
+		return resourceFinder.loadResource(resourceClass, configurationMap.get(resourceClass).location(), uriMatch.path, null);
 	}
 
 	@Override
@@ -80,7 +80,8 @@ public class SimpleRouteProcessor implements RouteProcessor {
 			resourceLoader.loadResource(
 				resourceClass,
 				configurationMap.get(resourceClass).location(),
-				request.uriMatch().path
+				request.uriMatch().path,
+				null
 			).then(
 				new HttpServerTask("post-load, serving " + routeMatch.route()) {
 

@@ -84,6 +84,8 @@ public class WebSocketConnectionMakerTest {
 	Set<Class<? extends WebSocketConnectionHost>> webSocketConnectionHosts;
 	
 	WebSocketConnectionMaker wscm;
+	
+	public interface TestWebSocketConnectionHost extends WebSocketConnectionHost {}
 
 	@Before
 	public void before() {
@@ -91,7 +93,7 @@ public class WebSocketConnectionMakerTest {
 		response = mock(HttpServerResponse.class, AnswerWithSelf.ANSWER_WITH_SELF);
 		
 		webSocketConnectionHosts = new HashSet<>();
-		webSocketConnectionHosts.add(WebSocketConnectionHost.class);
+		webSocketConnectionHosts.add(TestWebSocketConnectionHost.class);
 		webSocketConnectionHosts.add(DocumentScriptEnvironment.class);
 		
 		wscm = new WebSocketConnectionMaker(handlerCreator, resourceFinder, ctx, request, response, handshakerFactory, webSocketConnectionHosts);

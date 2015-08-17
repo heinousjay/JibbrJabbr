@@ -45,8 +45,8 @@ public class TimersTest {
 	
 	@Mock Callable callable;
 	@Mock ScriptableObject scope;
-	@Mock(extraInterfaces = {ChildScriptEnvironment.class}) AbstractScriptEnvironment module;
-	@Mock(extraInterfaces = {RootScriptEnvironment.class}) AbstractScriptEnvironment root;
+	@Mock(extraInterfaces = {ChildScriptEnvironment.class}) AbstractScriptEnvironment<?> module;
+	@Mock(extraInterfaces = {RootScriptEnvironment.class}) AbstractScriptEnvironment<?> root;
 	@Mock ResourceKey rk;
 	CurrentScriptEnvironment env;
 	
@@ -57,7 +57,7 @@ public class TimersTest {
 	public void before() {
 		taskRunner = new MockTaskRunner();
 		taskRunner.cancelKey = cancelKey;
-		given(((ChildScriptEnvironment)module).parent()).willReturn(root);
+		willReturn(root).given(((ChildScriptEnvironment<?>)module)).parent();
 		env = new CurrentScriptEnvironment(contextProvider);
 		given(root.cacheKey()).willReturn(rk);
 		

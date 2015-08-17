@@ -18,7 +18,6 @@ package jj.http.server.websocket;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
-import jj.document.DocumentScriptEnvironment;
 import jj.execution.DelayedExecutor.CancelKey;
 import jj.execution.MockTaskRunner;
 import jj.execution.ServerTask;
@@ -48,8 +47,8 @@ public class WebSocketConnectionTrackerTest {
 	@Mock WebSocketConnection connection1;
 	@Mock WebSocketConnection connection2;
 	
-	@Mock DocumentScriptEnvironment documentScriptEnvironment1;
-	@Mock DocumentScriptEnvironment documentScriptEnvironment2;
+	@Mock WebSocketConnectionHost documentScriptEnvironment1;
+	@Mock WebSocketConnectionHost documentScriptEnvironment2;
 	
 	@Captor ArgumentCaptor<ServerTask> activityTrackerCaptor;
 	
@@ -57,8 +56,8 @@ public class WebSocketConnectionTrackerTest {
 	public void before() {
 		wsct = new WebSocketConnectionTracker((taskRunner = new MockTaskRunner()));
 		
-		given(connection1.webSocketConnectionHost()).willReturn(documentScriptEnvironment1);
-		given(connection2.webSocketConnectionHost()).willReturn(documentScriptEnvironment1);
+		willReturn(documentScriptEnvironment1).given(connection1).webSocketConnectionHost();
+		willReturn(documentScriptEnvironment1).given(connection2).webSocketConnectionHost();
 	}
 	
 	@Test

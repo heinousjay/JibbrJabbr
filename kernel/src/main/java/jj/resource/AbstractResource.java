@@ -47,7 +47,7 @@ import jj.util.Clock;
  *
  */
 @Subscriber
-public abstract class AbstractResource implements Resource {
+public abstract class AbstractResource<T> implements Resource<T> {
 	
 	@Singleton
 	public static class AbstractResourceDependencies {
@@ -105,7 +105,7 @@ public abstract class AbstractResource implements Resource {
 		}
 	}
 
-	protected static final Object[] EMPTY_ARGS = {};
+	protected static final Object EMPTY_ARGS = null;
 	
 	/**
 	 * The key that identifies this resource in the cache
@@ -143,7 +143,7 @@ public abstract class AbstractResource implements Resource {
 	 */
 	protected final ResourceSettings settings;
 	
-	private final ConcurrentHashMap<ResourceKey, AbstractResource> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
+	private final ConcurrentHashMap<ResourceKey, AbstractResource<?>> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
 	
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	
@@ -238,11 +238,11 @@ public abstract class AbstractResource implements Resource {
 	}
 	
 	@Override
-	public void addDependent(Resource dependent) {
+	public void addDependent(Resource<?> dependent) {
 		assert alive.get() : "cannot accept dependents, i am dead " + toString();
 		assert dependent != null : "can not depend on null";
 		assert dependent != this : "can not depend on myself";
-		AbstractResource r = (AbstractResource)dependent;
+		AbstractResource<?> r = (AbstractResource<?>)dependent;
 		dependents.put(r.cacheKey(), r);
 	}
 	
@@ -250,7 +250,7 @@ public abstract class AbstractResource implements Resource {
 	 * retrieve an unmodifiable collection of this resource's dependents
 	 * @return
 	 */
-	Collection<AbstractResource> dependents() {
+	Collection<AbstractResource<?>> dependents() {
 		return Collections.unmodifiableCollection(dependents.values());
 	}
 	
@@ -331,8 +331,9 @@ public abstract class AbstractResource implements Resource {
 	 * from being kept package private but don't call it
 	 * @return
 	 */
-	protected Object[] creationArgs() {
-		return EMPTY_ARGS;
+	@Override
+	public T creationArg() {
+		return null;
 	}
 	
 	public String toString() {

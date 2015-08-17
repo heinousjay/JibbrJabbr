@@ -27,16 +27,16 @@ public class NoSuchResourceException extends ResourceNotViableException {
 	 * 
 	 */
 	private static final long serialVersionUID = 6215686822327315451L;
-
+	
 	/**
 	 * @param resourcePath
 	 * @param cause
 	 */
-	public NoSuchResourceException(Class<? extends Resource> type, Path resourcePath) {
+	public NoSuchResourceException(Class<? extends Resource<?>> type, Path resourcePath) {
 		super(type.getName() + "@" + resourcePath);
 	}
 	
-	public NoSuchResourceException(Class<? extends Resource> type, String uri) {
+	public NoSuchResourceException(Class<? extends Resource<?>> type, String uri) {
 		super(type.getName() + "@" + uri);
 	}
 }

@@ -56,11 +56,11 @@ class ContinuationCoordinator implements ContinuationResumer {
 		this.is = is;
 	}
 	
-	private void log(final Throwable t, final ScriptEnvironment scriptEnvironment) {
+	private void log(final Throwable t, final ScriptEnvironment<?> scriptEnvironment) {
 		publisher.publish(new ScriptExecutionError(scriptEnvironment, t));
 	} 
 	
-	private PendingKey execute(final ScriptEnvironment scriptEnvironment, final ContinuationExecution execution) {
+	private PendingKey execute(final ScriptEnvironment<?> scriptEnvironment, final ContinuationExecution execution) {
 		try (RhinoContext context = contextProvider.get()) {
 			execution.run(context);
 		} catch (ContinuationPending continuation) {
@@ -81,7 +81,7 @@ class ContinuationCoordinator implements ContinuationResumer {
 	 * @param script The script to evaluate.
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
-	PendingKey execute(final ScriptEnvironment scriptEnvironment, final Script script) {
+	PendingKey execute(final ScriptEnvironment<?> scriptEnvironment, final Script script) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -101,7 +101,7 @@ class ContinuationCoordinator implements ContinuationResumer {
 	 * @param args The arguments to the function, if any
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
-	PendingKey execute(final ScriptEnvironment scriptEnvironment, final Callable callable, final Object...args) {
+	PendingKey execute(final ScriptEnvironment<?> scriptEnvironment, final Callable callable, final Object...args) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -127,7 +127,7 @@ class ContinuationCoordinator implements ContinuationResumer {
 	 * @param result The result of the resumption
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
-	PendingKey resumeContinuation(ScriptEnvironment scriptEnvironment, final PendingKey pendingKey, final Object result) {
+	PendingKey resumeContinuation(ScriptEnvironment<?> scriptEnvironment, final PendingKey pendingKey, final Object result) {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
@@ -137,9 +137,9 @@ class ContinuationCoordinator implements ContinuationResumer {
 		
 		assert pendingKey != null : "cannot resume without a pending key";
 		
-		final AbstractScriptEnvironment environment = (AbstractScriptEnvironment)scriptEnvironment;
+		final AbstractScriptEnvironment<?> environment = (AbstractScriptEnvironment<?>)scriptEnvironment;
 		
-		final ContinuationPending continuation = ((AbstractScriptEnvironment)scriptEnvironment).continuationPending(pendingKey);
+		final ContinuationPending continuation = ((AbstractScriptEnvironment<?>)scriptEnvironment).continuationPending(pendingKey);
 		if (continuation != null) {
 
 			return execute(scriptEnvironment, context -> {

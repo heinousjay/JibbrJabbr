@@ -25,29 +25,16 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class Sha1ResourceCreator extends SimpleResourceCreator<Sha1Resource> {
+class Sha1ResourceCreator extends SimpleResourceCreator<Sha1ResourceTarget, Sha1Resource> {
 	
-	// a wrapper to keep guice happy
-	static class Sha1ResourceTarget {
-		
-		final AbstractFileResource resource;
-		
-		Sha1ResourceTarget(final AbstractFileResource resource) {
-			this.resource = resource;
-		}
-	}
-
 	@Inject
 	Sha1ResourceCreator(final Dependencies dependencies) {
 		super(dependencies);
 	}
 	
 	@Override
-	public Sha1Resource create(Location base, String name, Object... args) throws IOException {
-		assert args.length == 1 && args[0] instanceof AbstractFileResource : "Sha1Resources can only be created in relation to an AbstractFileResource";
+	public Sha1Resource create(Location base, String name, Sha1ResourceTarget argument) throws IOException {
 		
-		AbstractFileResource resource = (AbstractFileResource)args[0];
-		
-		return creator.createResource(type(), resourceKey(base, name), base, name, new Sha1ResourceTarget(resource));
+		return creator.createResource(type(), resourceKey(base, name, argument), base, name, argument);
 	}
 }

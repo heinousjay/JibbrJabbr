@@ -33,6 +33,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceLoaderTest {
+	
+	public interface TestResource extends Resource<Integer> {}
 
 	MockTaskRunner taskRunner;
 	@Mock ResourceFinder resourceFinder;
@@ -51,11 +53,11 @@ public class ResourceLoaderTest {
 		// kinda simple, we just make sure it's going to make its task and schedule it
 		// and that the task does the right thing
 		
-		rl.loadResource(Resource.class, AppLocation.AppBase, "name", "a thing", new Integer(1));
+		rl.loadResource(TestResource.class, AppLocation.AppBase, "name", new Integer(1));
 		
 		taskRunner.runFirstTask();
 		
-		verify(resourceFinder).loadResource(Resource.class, AppLocation.AppBase, "name", "a thing", new Integer(1));
+		verify(resourceFinder).loadResource(TestResource.class, AppLocation.AppBase, "name", new Integer(1));
 	}
 
 }

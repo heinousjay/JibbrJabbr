@@ -38,7 +38,7 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractScriptEnvironmentTest {
 	
-	private class MyScriptEnvironment extends AbstractScriptEnvironment {
+	private class MyScriptEnvironment extends AbstractScriptEnvironment<Void> {
 		
 		protected MyScriptEnvironment(Dependencies dependencies) {
 			super(dependencies);

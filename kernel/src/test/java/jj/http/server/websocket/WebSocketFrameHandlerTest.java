@@ -75,7 +75,7 @@ public class WebSocketFrameHandlerTest {
 	public void before() {
 		byteBuf = Unpooled.buffer(0);
 		
-		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
+		willReturn(webSocketConnectionHost).given(connection).webSocketConnectionHost();
 	}
 	
 	@Test

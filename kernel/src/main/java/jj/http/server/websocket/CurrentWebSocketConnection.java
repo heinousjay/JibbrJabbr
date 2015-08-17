@@ -50,7 +50,7 @@ public class CurrentWebSocketConnection extends ExecutionInstance<WebSocketConne
 		// be broadcasting, and so in that case, we want to use its connection.
 		
 		WebSocketConnection current = trueCurrent();
-		ScriptEnvironment se = env.current();
+		ScriptEnvironment<?> se = env.current();
 		if (se != null && 
 			se instanceof WebSocketConnectionHost && 
 			((WebSocketConnectionHost)se).broadcasting()

@@ -23,7 +23,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class DirectoryResourceCreator extends SimpleResourceCreator<DirectoryResource> {
+class DirectoryResourceCreator extends SimpleResourceCreator<Void, DirectoryResource> {
 	
 	@Inject
 	DirectoryResourceCreator(Dependencies dependencies) {
@@ -31,7 +31,7 @@ class DirectoryResourceCreator extends SimpleResourceCreator<DirectoryResource> 
 	}
 
 	@Override
-	protected boolean arguments(Location base, String name) {
+	protected boolean arguments(Location base, String name, Void argument) {
 		return base.parentInDirectory();
 	}
 

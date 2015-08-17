@@ -22,16 +22,16 @@ import jj.logging.Emergency;
  */
 public class ScriptEnvironmentInitializationError extends Emergency {
 	
-	private final ScriptEnvironment scriptEnvironment;
+	private final ScriptEnvironment<?> scriptEnvironment;
 	private final Throwable cause;
 
-	ScriptEnvironmentInitializationError(final ScriptEnvironment scriptEnvironment, final Throwable cause) {
+	ScriptEnvironmentInitializationError(final ScriptEnvironment<?> scriptEnvironment, final Throwable cause) {
 		super("script environment errored during initialization: " + scriptEnvironment, cause);
 		this.scriptEnvironment = scriptEnvironment;
 		this.cause = cause;
 	}
 	
-	public ScriptEnvironment scriptEnvironment() {
+	public ScriptEnvironment<?> scriptEnvironment() {
 		return scriptEnvironment;
 	}
 	

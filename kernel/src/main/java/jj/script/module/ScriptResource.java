@@ -18,7 +18,7 @@ import jj.resource.AbstractFileResource;
 import jj.script.RhinoContext;
 
 @ServableResourceConfiguration(routeContributor = ScriptResourceRouteContributor.class)
-public class ScriptResource extends AbstractFileResource implements LoadedResource {
+public class ScriptResource extends AbstractFileResource<Void> implements LoadedResource {
 	
 	private final String source;
 	

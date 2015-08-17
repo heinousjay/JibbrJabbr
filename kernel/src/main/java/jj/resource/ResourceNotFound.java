@@ -23,8 +23,8 @@ import org.slf4j.Logger;
  */
 public class ResourceNotFound extends ResourceEvent {
 	
-	public ResourceNotFound(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
-		super(resourceClass, base, name, arguments);
+	public <A, T extends Resource<A>> ResourceNotFound(final Class<T> resourceClass, final Location base, final String name, final A argument) {
+		super(resourceClass, base, name, argument);
 	}
 	
 	@Override

@@ -27,7 +27,7 @@ class ResourceCacheImpl implements ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	private final ConcurrentMap<ResourceKey, AbstractResource> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
+	private final ConcurrentMap<ResourceKey, Resource<?>> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
 
 	@Inject
 	ResourceCacheImpl(final ResourceCreators resourceCreators) {
@@ -38,12 +38,13 @@ class ResourceCacheImpl implements ResourceCache {
 	 * @param uri
 	 * @return
 	 */
-	public List<AbstractResource> findAllByUri(URI uri) {
+	@Override
+	public List<Resource<?>> findAllByUri(URI uri) {
 		
-		List<AbstractResource> result = new ArrayList<>();
+		List<Resource<?>> result = new ArrayList<>();
 		
-		for (SimpleResourceCreator<? extends Resource> resourceCreator : resourceCreators) {
-			AbstractResource it = get(new ResourceKey(resourceCreator.type(), uri));
+		for (SimpleResourceCreator<?, ? extends Resource<?>> resourceCreator : resourceCreators) {
+			Resource<?> it = get(new ResourceKey(resourceCreator.type(), uri));
 			if (it != null) result.add(it);
 		}
 		return Collections.unmodifiableList(result);
@@ -54,7 +55,7 @@ class ResourceCacheImpl implements ResourceCache {
 	 * immediately out of date, cannot be manipulated, and is in no particular order.
 	 * @return
 	 */
-	List<AbstractResource> allResources() {
+	List<Resource<?>> allResources() {
 		return Collections.unmodifiableList(new ArrayList<>(resourceCache.values()));
 	}
 	
@@ -63,28 +64,31 @@ class ResourceCacheImpl implements ResourceCache {
 		resourceCache.clear();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Resource> ResourceCreator<T> getCreator(Class<T> type) {
-		return resourceCreators.get(type);
+	public <A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type) {
+		return (ResourceCreator<A, T>) resourceCreators.get(type);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public AbstractResource get(ResourceKey key) {
-		return resourceCache.get(key);
+	public <A, T extends Resource<A>> T get(ResourceKey key) {
+		return (T)resourceCache.get(key);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <A, T extends Resource<A>> T putIfAbsent(ResourceKey key, T value) {
+		return (T)resourceCache.putIfAbsent(key, value);
 	}
 
 	@Override
-	public AbstractResource putIfAbsent(ResourceKey key, AbstractResource value) {
-		return resourceCache.putIfAbsent(key, value);
-	}
-
-	@Override
-	public boolean replace(ResourceKey key, AbstractResource oldValue, AbstractResource newValue) {
+	public <A, T extends Resource<A>> boolean replace(ResourceKey key, T oldValue, T newValue) {
 		return resourceCache.replace(key, oldValue, newValue);
 	}
 
 	@Override
-	public boolean remove(ResourceKey cacheKey, AbstractResource resource) {
+	public <A, T extends Resource<A>> boolean remove(ResourceKey cacheKey, T resource) {
 		return resourceCache.remove(cacheKey, resource);
 	}
 	
@@ -95,7 +99,7 @@ class ResourceCacheImpl implements ResourceCache {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
-		for (Entry<ResourceKey, AbstractResource> entry : resourceCache.entrySet()) {
+		for (Entry<ResourceKey, Resource<?>> entry : resourceCache.entrySet()) {
 			sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
 		}
  		return sb.append("}").toString();

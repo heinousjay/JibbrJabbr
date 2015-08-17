@@ -108,7 +108,6 @@ public class WebSocketConnectionMaker {
 				if (future.isSuccess()) {
 					
 					URIMatch uriMatch = new URIMatch(request.uri());
-					
 
 					WebSocketConnectionHost host = null;
 					

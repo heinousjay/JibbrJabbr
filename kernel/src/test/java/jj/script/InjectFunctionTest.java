@@ -41,7 +41,7 @@ public class InjectFunctionTest {
 	
 	@InjectMocks InjectFunction inject;
 	
-	@Mock ScriptEnvironment se;
+	@Mock ScriptEnvironment<?> se;
 	
 	@Mock CurrentScriptEnvironment cse;
 	

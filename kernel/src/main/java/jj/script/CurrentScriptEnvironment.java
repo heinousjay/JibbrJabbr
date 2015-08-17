@@ -32,7 +32,7 @@ import jj.util.Closer;
  *
  */
 @Singleton
-public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironment> {
+public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironment<?>> {
 	
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -45,7 +45,7 @@ public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironmen
 	 * internal method, to allow continuation resumption to also involve environment-dependent
 	 * context restoration
 	 */
-	Closer enterScope(final AbstractScriptEnvironment scriptEnvironment, final PendingKey pendingKey) {
+	Closer enterScope(final AbstractScriptEnvironment<?> scriptEnvironment, final PendingKey pendingKey) {
 		
 		final Closer environmentCloser = enterScope(scriptEnvironment);
 		final Closer contextCloser = scriptEnvironment.restoreContextForKey(pendingKey);
@@ -60,11 +60,11 @@ public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironmen
 		};
 	}
 	
-	protected AbstractScriptEnvironment innerCurrent() {
-		return (AbstractScriptEnvironment)current();
+	protected AbstractScriptEnvironment<?> innerCurrent() {
+		return (AbstractScriptEnvironment<?>)current();
 	}
 	
-	public <T extends ScriptEnvironment> T currentAs(Class<T> environmentClass) {
+	public <T extends ScriptEnvironment<?>> T currentAs(Class<T> environmentClass) {
 		return environmentClass.cast(current());
 	}
 	
@@ -110,13 +110,13 @@ public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironmen
 	/**
 	 * @return
 	 */
-	public RootScriptEnvironment currentRootScriptEnvironment() {
-		ScriptEnvironment current = current();
+	public RootScriptEnvironment<?> currentRootScriptEnvironment() {
+		ScriptEnvironment<?> current = current();
 		while (current instanceof ChildScriptEnvironment) {
-			current = ((ChildScriptEnvironment)current).parent();
+			current = ((ChildScriptEnvironment<?>)current).parent();
 		}
 		assert current instanceof RootScriptEnvironment : "declare your root!";
 		
-		return (RootScriptEnvironment)current;
+		return (RootScriptEnvironment<?>)current;
 	}
 }

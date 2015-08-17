@@ -36,7 +36,7 @@ import jj.script.RhinoContext;
  * @author jason
  *
  */
-public class JSONResource extends AbstractFileResource {
+public class JSONResource extends AbstractFileResource<Void> {
 	
 	private final String source;
 	

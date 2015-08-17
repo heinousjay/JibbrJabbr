@@ -32,7 +32,7 @@ import jj.resource.Location;
  *
  */
 @Singleton
-class MessagesResourceCreator extends SimpleResourceCreator<MessagesResource> {
+class MessagesResourceCreator extends SimpleResourceCreator<Locale, MessagesResource> {
 
 	@Inject
 	MessagesResourceCreator(final Dependencies dependencies) {
@@ -40,20 +40,18 @@ class MessagesResourceCreator extends SimpleResourceCreator<MessagesResource> {
 	}
 
 	@Override
-	public MessagesResource create(Location base, String name, Object... args) throws IOException {
-		assertArgs(base, args);
-		return creator.createResource(MessagesResource.class, resourceKey(base, name, args), base, name, args);
+	public MessagesResource create(Location base, String name, Locale locale) throws IOException {
+		assertArgs(base);
+		return creator.createResource(MessagesResource.class, resourceKey(base, name, locale), base, name, locale);
 	}
 
 	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		assertArgs(base, args);
-		Locale locale = (Locale)args[0];
+	protected URI uri(Location base, String name, Locale locale) {
+		assertArgs(base);
 		return URI.create(name + "_" + locale.toLanguageTag());
 	}
 
-	private void assertArgs(Location base, Object... args) {
-		assert args.length == 1 && args[0] instanceof Locale : "messages require a Locale argument";
+	private void assertArgs(Location base) {
 		assert base == Virtual : "MessagesResource must be Virtual";
 	}
 

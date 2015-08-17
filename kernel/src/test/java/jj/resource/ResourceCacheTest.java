@@ -46,11 +46,11 @@ public class ResourceCacheTest {
 	
 	@Mock StaticResource sr;
 	
-	@Mock SimpleResourceCreator<StaticResource> src;
+	@Mock SimpleResourceCreator<Void, StaticResource> src;
 	
 	@Mock HtmlResource hr;
 	
-	@Mock SimpleResourceCreator<HtmlResource> hrc;
+	@Mock SimpleResourceCreator<Void, HtmlResource> hrc;
 	
 	ResourceKey sKey;
 	
@@ -61,7 +61,7 @@ public class ResourceCacheTest {
 	@Before
 	public void before() {
 		
-		HashMap<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> map = new HashMap<>();
+		HashMap<Class<? extends AbstractResource<?>>, SimpleResourceCreator<?, ? extends AbstractResource<?>>> map = new HashMap<>();
 		map.put(StaticResource.class, src);
 		map.put(HtmlResource.class, hrc);
 		rc = new ResourceCacheImpl(new ResourceCreators(map));
@@ -76,13 +76,14 @@ public class ResourceCacheTest {
 	@Test
 	public void testShutdownBehavior() throws Exception {
 		
-		rc.putIfAbsent(sKey, hr);
-		assertThat(rc.get(sKey), is((Resource)hr));
+		rc.putIfAbsent(sKey, sr);
+		assertThat((Resource<?>)rc.get(sKey), is(sr));
 		rc.on(null);
 		assertThat(rc.get(sKey), is(nullValue()));
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testOperationsByUri() throws IOException {
 		
@@ -90,11 +91,11 @@ public class ResourceCacheTest {
 		rc.putIfAbsent(sKey, sr);
 		rc.putIfAbsent(hKey, hr);
 		// when
-		List<AbstractResource> resources = rc.findAllByUri(uri);
+		List<Resource<?>> resources = rc.findAllByUri(uri);
 		
 		// then
 		assertThat(resources.size(), is(2));
-		assertThat(resources, containsInAnyOrder((Resource)sr, (Resource)hr));
+		assertThat(resources, containsInAnyOrder((Resource<?>)sr, (Resource<?>)hr));
 	}
 
 }

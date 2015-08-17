@@ -31,7 +31,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ConfigurationScriptEnvironment> {
+class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Void, ConfigurationScriptEnvironment> {
 	
 	static final String CONFIG_NAME = "config";
 	static final String CONFIG_SCRIPT_NAME = CONFIG_NAME + ".js";
@@ -44,15 +44,15 @@ class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCre
 	}
 
 	@Override
-	protected ConfigurationScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
+	protected ConfigurationScriptEnvironment createScriptEnvironment(String name, Void argument) throws IOException {
 		assert name == CONFIG_NAME : "can only create " + CONFIG_NAME;
-		return creator.createResource(ConfigurationScriptEnvironment.class, resourceKey(Virtual, name, args), Virtual, name, args);
+		return creator.createResource(ConfigurationScriptEnvironment.class, resourceKey(Virtual, name, argument), Virtual, name, argument);
 	}
 	
 	@Override
-	protected URI uri(Location base, String name, Object... args) {
+	protected URI uri(Location base, String name, Void argument) {
 		assert name == CONFIG_NAME : "can only load " + CONFIG_NAME;
-		return super.uri(base, name, args);
+		return super.uri(base, name, argument);
 	}
 
 }

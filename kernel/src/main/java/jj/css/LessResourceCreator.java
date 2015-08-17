@@ -26,7 +26,7 @@ import jj.resource.SimpleResourceCreator;
  * @author jason
  */
 @Singleton
-class LessResourceCreator extends SimpleResourceCreator<LessResource> {
+class LessResourceCreator extends SimpleResourceCreator<Void, LessResource> {
 	@Inject
 	LessResourceCreator(Dependencies dependencies) {
 		super(dependencies);

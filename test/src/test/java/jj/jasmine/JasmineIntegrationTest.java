@@ -110,7 +110,7 @@ public class JasmineIntegrationTest {
 	}
 	
 	// also need a delete test!
-	private void touch(FileResource resource) throws Exception {
+	private void touch(FileResource<?> resource) throws Exception {
 		FileTime originalFileTime = Files.getLastModifiedTime(resource.path());
 		FileTime newFileTime;
 		do {

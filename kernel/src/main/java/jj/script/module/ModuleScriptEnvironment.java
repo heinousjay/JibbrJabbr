@@ -68,7 +68,7 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-public class ModuleScriptEnvironment extends AbstractScriptEnvironment implements ChildScriptEnvironment {
+public class ModuleScriptEnvironment extends AbstractScriptEnvironment<RequiredModule> implements ChildScriptEnvironment<RequiredModule> {
 	
 	public static final String API_PREFIX = "jj/";
 	
@@ -165,12 +165,12 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	}
 	
 	@Override
-	protected Object[] creationArgs() {
-		return new Object[] { requiredModule };
+	public RequiredModule creationArg() {
+		return requiredModule;
 	}
 	
 	@Override
-	public ScriptEnvironment parent() {
+	public ScriptEnvironment<?> parent() {
 		return requiredModule.parent();
 	}
 

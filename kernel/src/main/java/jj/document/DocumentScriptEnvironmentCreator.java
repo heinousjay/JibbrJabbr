@@ -26,7 +26,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<DocumentScriptEnvironment> {
+public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Void, DocumentScriptEnvironment> {
 	
 	@Inject
 	DocumentScriptEnvironmentCreator(final Dependencies dependencies) {
@@ -34,13 +34,13 @@ public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentC
 	}
 
 	@Override
-	protected DocumentScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
+	protected DocumentScriptEnvironment createScriptEnvironment(String name, Void argument) throws IOException {
 		DocumentScriptEnvironment dse = creator.createResource(
 			DocumentScriptEnvironment.class,
-			resourceKey(Virtual, name),
+			resourceKey(Virtual, name, null),
 			Virtual,
 			name,
-			args
+			null
 		);
 		
 		return dse;

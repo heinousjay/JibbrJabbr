@@ -86,7 +86,7 @@ public class SimpleRouteProcessorTest {
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/hi/there"));
 		
-		given(resourceLoader.loadResource(any(), any(), anyString())).willReturn(promise);
+		given(resourceLoader.loadResource(any(), any(), anyString(), any())).willReturn(promise);
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
@@ -108,7 +108,7 @@ public class SimpleRouteProcessorTest {
 	private void givenResourceRequest(String uri) {
 		URIMatch match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(resourceLoader.findResource(StaticResource.class, location, match.path)).willReturn(resource);
+		given(resourceLoader.findResource(StaticResource.class, location, match.path, null)).willReturn(resource);
 	}
 	
 	@Test

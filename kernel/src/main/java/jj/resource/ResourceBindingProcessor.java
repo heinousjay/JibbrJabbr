@@ -21,7 +21,7 @@ package jj.resource;
  * @author jason
  *
  */
-public interface ResourceBindingProcessor<T extends Resource> {
+public interface ResourceBindingProcessor<T extends Resource<?>> {
 
 	void process(Class<? extends T> resourceClassBinding);
 }

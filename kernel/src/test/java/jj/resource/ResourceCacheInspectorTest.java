@@ -50,15 +50,15 @@ public class ResourceCacheInspectorTest {
 	// few different types (we don't get many in the core)
 	// to validate that class information is passed through
 	// correctly
-	@Mock AbstractResource resource1;
-	@Mock AbstractResource resource2;
-	@Mock AbstractResource resource3;
-	@Mock AbstractResource resource4;
-	@Mock AbstractResource resource5;
-	@Mock AbstractResource resource6;
-	@Mock AbstractResource resource7;
+	@Mock AbstractResource<?> resource1;
+	@Mock AbstractResource<?> resource2;
+	@Mock AbstractResource<?> resource3;
+	@Mock AbstractResource<?> resource4;
+	@Mock AbstractResource<?> resource5;
+	@Mock AbstractResource<?> resource6;
+	@Mock AbstractResource<?> resource7;
 	
-	List<AbstractResource> resources;
+	List<Resource<?>> resources;
 	
 	int total;
 	
@@ -73,7 +73,7 @@ public class ResourceCacheInspectorTest {
 		
 		resources = Arrays.asList(resource1, resource2, resource3, resource4, resource5, resource6, resource7);
 		total = resources.size();
-		given(resourceCacheImpl.allResources()).willReturn(resources);
+		given((List<Resource<?>>)resourceCacheImpl.allResources()).willReturn(resources);
 		
 		given(resourceCreators.knownResourceTypeNames()).willReturn(Arrays.asList("type1", "type2"));
 		
@@ -92,7 +92,7 @@ public class ResourceCacheInspectorTest {
 		for (int i = 0; i < total; ++i) {
 			Scriptable node = (Scriptable)nodesArray.get(i, nodesArray);
 			assertThat(node, is(notNullValue()));
-			verify(resources.get(i)).describe(node);
+			((AbstractResource<?>)verify(resources.get(i))).describe(node);
 		}
 		
 	}

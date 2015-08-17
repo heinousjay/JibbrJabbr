@@ -25,8 +25,8 @@ public class ResourceError extends ResourceEvent {
 
 	private final Throwable t;
 	
-	ResourceError(Class<? extends Resource> resourceClass, Location base, String name, Object[] arguments, Throwable t) {
-		super(resourceClass, base, name, arguments);
+	<A, T extends Resource<A>> ResourceError(Class<T> resourceClass, Location base, String name, A argument, Throwable t) {
+		super(resourceClass, base, name, argument);
 		this.t = t;
 	}
 

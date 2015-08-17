@@ -31,7 +31,7 @@ import jj.resource.Resource;
  * @author jason
  *
  */
-public interface ServableResource extends Resource {
+public interface ServableResource extends Resource<Void> {
 
 
 	String serverPath();

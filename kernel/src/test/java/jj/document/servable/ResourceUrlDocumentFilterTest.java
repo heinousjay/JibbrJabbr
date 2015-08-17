@@ -69,9 +69,9 @@ public class ResourceUrlDocumentFilterTest {
 	@Test
 	public void test() {
 		
-		given(servableLoader.loadResource(new URIMatch("/" + cssResourcePath))).willReturn(cssResource);
-		given(servableLoader.loadResource(new URIMatch("/" + baseStaticPath))).willReturn(staticResource1);
-		given(servableLoader.loadResource(new URIMatch("/" + assetStaticPath))).willReturn(staticResource2);
+		willReturn(cssResource).given(servableLoader).loadResource(new URIMatch("/" + cssResourcePath));
+		willReturn(staticResource1).given(servableLoader).loadResource(new URIMatch("/" + baseStaticPath));
+		willReturn(staticResource2).given(servableLoader).loadResource(new URIMatch("/" + assetStaticPath));
 		
 		given(cssResource.serverPath()).willReturn("/substitutesha/" + cssResourcePath);
 		given(staticResource1.serverPath()).willReturn("/substitutesha/" + baseStaticPath);

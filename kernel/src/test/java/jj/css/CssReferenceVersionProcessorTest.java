@@ -77,21 +77,21 @@ public class CssReferenceVersionProcessorTest {
 		// given
 		StaticResource replacement = spy(StaticResourceMaker.make(AppBase, REPLACEMENT_CSS, basePath.resolve(REPLACEMENT_CSS)));
 		given(dependencies.resourceFinder().loadResource(StaticResource.class, Public, REPLACEMENT_CSS)).willReturn(replacement);
-		given(servableLoader.loadResource(new URIMatch(REPLACEMENT_CSS))).willReturn(replacement);
+		willReturn(replacement).given(servableLoader).loadResource(new URIMatch(REPLACEMENT_CSS));
 		
 		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null, app);
 		
 		
 		given(testCss.serverPath()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");
 		given(testCss.path()).willReturn(basePath.resolve(TEST_CSS));
-		given(servableLoader.loadResource(new URIMatch(TEST_CSS))).willReturn(testCss);
+		willReturn(testCss).given(servableLoader).loadResource(new URIMatch(TEST_CSS));
 		
 		StaticResource box = spy(StaticResourceMaker.make(AppBase, BOX_ICON, basePath.resolve(BOX_ICON)));
 		StaticResource rox = spy(StaticResourceMaker.make(AppBase, ROX_ICON, basePath.resolve(ROX_ICON)));
 		StaticResource sox = spy(StaticResourceMaker.make(AppBase, SOX_ICON, basePath.resolve(SOX_ICON)));
-		given(servableLoader.loadResource(new URIMatch(BOX_ICON))).willReturn(box);
-		given(servableLoader.loadResource(new URIMatch(ROX_ICON))).willReturn(rox);
-		given(servableLoader.loadResource(new URIMatch(SOX_ICON))).willReturn(sox);
+		willReturn(box).given(servableLoader).loadResource(new URIMatch(BOX_ICON));
+		willReturn(rox).given(servableLoader).loadResource(new URIMatch(ROX_ICON));
+		willReturn(sox).given(servableLoader).loadResource(new URIMatch(SOX_ICON));
 		
 		String inputString = new String(Files.readAllBytes(basePath.resolve(REPLACEMENT_CSS)), UTF_8);
 		

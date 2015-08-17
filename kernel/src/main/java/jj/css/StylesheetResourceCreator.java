@@ -29,7 +29,7 @@ import jj.server.ServerLocation;
  *
  */
 @Singleton
-class StylesheetResourceCreator extends SimpleResourceCreator<StylesheetResource> {
+class StylesheetResourceCreator extends SimpleResourceCreator<Void, StylesheetResource> {
 	
 	@Inject
 	StylesheetResourceCreator(final Dependencies dependencies) {
@@ -37,7 +37,7 @@ class StylesheetResourceCreator extends SimpleResourceCreator<StylesheetResource
 	}
 	
 	@Override
-	protected URI uri(Location base, String name, Object... args) {
+	protected URI uri(Location base, String name, Void argument) {
 		assert base == ServerLocation.Virtual;
 		return URI.create(name);
 	}

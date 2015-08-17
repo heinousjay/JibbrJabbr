@@ -160,14 +160,14 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
-		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
+		assertThat(mse.parent(), is((ScriptEnvironment<?>)scriptEnvironment));
 		
 		mse =
 			resourceFinder.findResource(ModuleScriptEnvironment.class, Virtual, MODULE_TWO, new RequiredModule(scriptEnvironment, MODULE_TWO));
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
-		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
+		assertThat(mse.parent(), is((ScriptEnvironment<?>)scriptEnvironment));
 	}
 	
 	@Test
@@ -196,7 +196,7 @@ public class ScriptEnvironmentIntegrationTest {
 		
 		assertThat(mse, is(notNullValue()));
 		assertThat(mse.initialized(), is(true));
-		assertThat(mse.parent(), is((ScriptEnvironment)scriptEnvironment));
+		assertThat(mse.parent(), is((ScriptEnvironment<?>)scriptEnvironment));
 		
 	}
 

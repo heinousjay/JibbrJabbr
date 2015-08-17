@@ -20,7 +20,7 @@ import jj.resource.AbstractFileResource;
  * @author jason
  *
  */
-public class PropertiesResource extends AbstractFileResource {
+public class PropertiesResource extends AbstractFileResource<Void> {
 	
 	private final Map<String, String> properties;
 	

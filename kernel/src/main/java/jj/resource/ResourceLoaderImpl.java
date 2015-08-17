@@ -40,37 +40,44 @@ class ResourceLoaderImpl implements ResourceLoader {
 	}
 	
 	@Override
-	public <T extends Resource> T findResource(Class<T> resourceClass, Location base, String name, Object... args) {
-		return resourceFinder.findResource(resourceClass, base, name, args);
+	public <T extends Resource<Void>> T findResource(Class<T> resourceClass, Location base, String name) {
+		return findResource(resourceClass, base, name, null);
 	}
 	
 	@Override
-	public Promise loadResource(final Class<? extends Resource> resourceClass, final Location base, final String name,  final Object...arguments) {
-		return taskRunner.execute(new ResourceLoaderTask(resourceClass, base, name, arguments));
+	public <A, T extends Resource<A>> T findResource(Class<T> resourceClass, Location base, String name, A argument) {
+		return resourceFinder.findResource(resourceClass, base, name, argument);
 	}
 	
-	private final class ResourceLoaderTask extends ResourceTask {
+	@Override
+	public <T extends Resource<Void>> Promise loadResource(Class<T> resourceClass, Location base, String name) {
+		return loadResource(resourceClass, base, name, null);
+	}
+	
+	@Override
+	public <A, T extends Resource<A>> Promise loadResource(final Class<T> resourceClass, final Location base, final String name,  final A argument) {
+		return taskRunner.execute(new ResourceLoaderTask<>(resourceClass, base, name, argument));
+	}
+	
+	private final class ResourceLoaderTask<A, T extends Resource<A>> extends ResourceTask {
 		
-		private final Class<? extends Resource> resourceClass;
+		private final Class<T> resourceClass;
 		private final Location base;
 		private final String name;
-		private final Object[] arguments;
+		private final A argument;
 
-		/**
-		 * @param name
-		 */
-		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
+		private ResourceLoaderTask(final Class<T> resourceClass, final Location base, final String name, final A argument) {
 			super("Resource loader [" + resourceClass.getSimpleName() + "@" + base + "/" + name + "]");
 			this.resourceClass = resourceClass;
 			this.base = base;
 			this.name = name;
-			this.arguments = arguments;
+			this.argument = argument;
 			
 		}
 
 		@Override
 		protected void run() throws Exception {
-			resourceFinder.loadResource(resourceClass, base, name, arguments);
+			resourceFinder.loadResource(resourceClass, base, name, argument);
 		}
 	}
 }

@@ -48,7 +48,7 @@ public class ScriptEnvironmentInitializerTest {
 
 	ScriptEnvironmentInitializer sei;
 	
-	@Mock AbstractScriptEnvironment scriptEnvironment;
+	@Mock AbstractScriptEnvironment<?> scriptEnvironment;
 	
 	@Mock Script script;
 	
@@ -98,7 +98,7 @@ public class ScriptEnvironmentInitializerTest {
 		
 		verify(scriptEnvironment).initialized(true);
 		verify(publisher).publish(initEventCaptor.capture());
-		assertThat(initEventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));
+		assertThat(initEventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment<?>)scriptEnvironment));
 		assertThat(ScriptTaskHelper.pendingKey(resumable), is(nullValue()));
 	}
 	
@@ -111,7 +111,7 @@ public class ScriptEnvironmentInitializerTest {
 		
 		verify(scriptEnvironment).initializationError(re);
 		verify(publisher).publish(errorEventCaptor.capture());
-		assertThat(errorEventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment)scriptEnvironment));
+		assertThat(errorEventCaptor.getValue().scriptEnvironment(), is((ScriptEnvironment<?>)scriptEnvironment));
 		assertThat(errorEventCaptor.getValue().cause(), is((Throwable)re));
 	}
 

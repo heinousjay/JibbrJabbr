@@ -25,11 +25,15 @@ import jj.execution.Promise;
  *
  */
 public interface ResourceLoader {
+	
+	<T extends Resource<Void>> T findResource(Class<T> resourceClass, Location base, String name);
 
 	/**
 	 * @see ResourceFinder#findResource(Class, Location, String, Object...)
 	 */
-	<T extends Resource> T findResource(Class<T> resourceClass, Location base, String name, Object...args);
+	<A, T extends Resource<A>> T findResource(Class<T> resourceClass, Location base, String name, A argument);
+	
+	<T extends Resource<Void>> Promise loadResource(Class<T> resourceClass, Location base, String name);
 	
 	/**
 	 * <p>
@@ -41,6 +45,6 @@ public interface ResourceLoader {
 	 * @param arguments The creation arguments of the <code>Resource</code>
 	 * @return the <code>ResourceTask</code>'s {@link Promise}
 	 */
-	Promise loadResource(Class<? extends Resource> resourceClass, Location base, String name, Object... arguments);
+	<A, T extends Resource<A>> Promise loadResource(Class<T> resourceClass, Location base, String name, A argument);
 
 }

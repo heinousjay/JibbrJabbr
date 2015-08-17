@@ -23,7 +23,7 @@ import jj.logging.Emergency;
  */
 public class CannotFindContinuation extends Emergency {
 
-	CannotFindContinuation(final ScriptEnvironment scriptEnvironment, final PendingKey pendingKey) {
+	CannotFindContinuation(final ScriptEnvironment<?> scriptEnvironment, final PendingKey pendingKey) {
 		super("attempting to resume a non-existent continuation in " + scriptEnvironment + " keyed by " + pendingKey + "\nhelpful stacktrace:", new Exception());
 	}
 }

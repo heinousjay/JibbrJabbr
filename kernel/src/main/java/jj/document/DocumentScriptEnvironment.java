@@ -64,7 +64,7 @@ import jj.util.SHA1Helper;
 )
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
-	implements ExecutionLifecycleAware, RootScriptEnvironment, ServableResource {
+	implements ExecutionLifecycleAware, RootScriptEnvironment<Void>, ServableResource {
 	
 	public static final String JJ_JS = "jj.js";
 	public static final String JQUERY_JS_DEV = "jquery-2.0.3.js";

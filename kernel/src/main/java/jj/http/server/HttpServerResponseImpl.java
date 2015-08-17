@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 
 import jj.Version;
 import jj.event.Publisher;
-import jj.resource.Resource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -233,7 +232,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	@Override
-	public HttpServerResponse sendNotModified(final Resource resource) {
+	public HttpServerResponse sendNotModified(final ServableResource resource) {
 		return sendNotModified(resource, false);
 	}
 
@@ -245,7 +244,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	@Override
-	public HttpServerResponse sendNotModified(final Resource resource, boolean cache) {
+	public HttpServerResponse sendNotModified(final ServableResource resource, boolean cache) {
 		assertNotCommitted();
 		
 		if (cache) {
@@ -264,7 +263,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	@Override
-	public HttpServerResponse sendTemporaryRedirect(final Resource resource) {
+	public HttpServerResponse sendTemporaryRedirect(final ServableResource resource) {
 		assertNotCommitted();
 		return status(HttpResponseStatus.TEMPORARY_REDIRECT)
 			.header(HttpHeaderNames.LOCATION, makeAbsoluteURL(resource))
@@ -273,7 +272,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 
 	@Override
-	public HttpServerResponse sendUncachableResource(Resource resource) throws IOException {
+	public HttpServerResponse sendUncachableResource(ServableResource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_CACHE);
 		if (resource instanceof TransferableResource) {
@@ -286,7 +285,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 
 	@Override
-	public HttpServerResponse sendCachableResource(Resource resource) throws IOException {
+	public HttpServerResponse sendCachableResource(ServableResource resource) throws IOException {
 		assertNotCommitted();
 		header(HttpHeaderNames.CACHE_CONTROL, MAX_AGE_ONE_YEAR);
 		if (resource instanceof TransferableResource) {
@@ -357,7 +356,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 		return this;
 	}
 	
-	protected String makeAbsoluteURL(final Resource resource) {
+	protected String makeAbsoluteURL(final ServableResource resource) {
 		return new StringBuilder("http")
 			.append(request.secure() ? "s" : "")
 			.append("://")

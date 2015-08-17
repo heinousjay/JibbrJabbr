@@ -13,8 +13,6 @@ public class MockAbstractWebSocketConnectionHostDependencies extends AbstractWeb
 		extends AbstractWebSocketConnectionHost.AbstractWebSocketConnectionHostDependencies {
 		
 	}
-	
-	
 
 	public MockAbstractWebSocketConnectionHostDependencies(String name, ResourceFinder resourceFinder) {
 		super(

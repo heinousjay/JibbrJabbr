@@ -73,7 +73,7 @@ public class ResourceInstanceCreatorTest  {
 		
 		given(app.resolvePath(location, name)).willReturn(path);
 		
-		rimc.createResource(StaticResource.class, cacheKey, location, name);
+		rimc.createResource(StaticResource.class, cacheKey, location, name, null);
 		
 		verify(app).resolvePath(location, name);
 		verify(injector).createChildInjector(moduleCaptor.capture());
@@ -95,7 +95,7 @@ public class ResourceInstanceCreatorTest  {
 		assertThat(testInjector.getInstance(Path.class), is(path));
 	}
 	
-	public static class TestResource implements Resource {
+	public static class TestResource implements Resource<Date> {
 
 		@Override
 		public Location base() {
@@ -123,7 +123,7 @@ public class ResourceInstanceCreatorTest  {
 		}
 
 		@Override
-		public void addDependent(Resource dependent) {
+		public void addDependent(Resource<?> dependent) {
 		}
 
 		@Override
@@ -136,10 +136,13 @@ public class ResourceInstanceCreatorTest  {
 			return true;
 		}
 		
+		@Override
+		public Date creationArg() {
+			return null;
+		}
 	}
 	
 	final String name = "name";
-	final Integer one = Integer.valueOf(1);
 	final Date date = new Date();
 	
 	@Test
@@ -162,7 +165,7 @@ public class ResourceInstanceCreatorTest  {
 	public void testCreationError() {
 		
 		given(injector.getInstance(TestResource.class)).willThrow(new RuntimeException());
-		rimc.createResource(TestResource.class, cacheKey, Virtual, name, one);
+		rimc.createResource(TestResource.class, cacheKey, Virtual, name, date);
 		
 		assertThat(publisher.events.size(), is(1));
 		ResourceError re = (ResourceError)publisher.events.get(0);
@@ -170,6 +173,6 @@ public class ResourceInstanceCreatorTest  {
 		assertThat(re.resourceClass, equalTo(TestResource.class));
 		assertThat(re.base, is(Virtual));
 		assertThat(re.name, is(name));
-		assertThat(re.arguments[0], is(one));
+		assertThat(re.argument, is(date));
 	}
 }

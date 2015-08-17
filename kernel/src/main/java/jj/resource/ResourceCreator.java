@@ -9,7 +9,7 @@ import java.io.IOException;
  *
  * @param <T> The type of resource we create
  */
-interface ResourceCreator<T extends Resource> {
+interface ResourceCreator<A, T extends Resource<A>> {
 
 	/**
 	 * The type of resource we create
@@ -21,7 +21,7 @@ interface ResourceCreator<T extends Resource> {
 	 * Produce a resource key for given resource by its creation args
 	 * @return
 	 */
-	ResourceKey resourceKey(final Location base, final String name, final Object...args);
+	ResourceKey resourceKey(final Location base, final String name, final A argument);
 	
 	/**
 	 * create the given resource
@@ -30,5 +30,5 @@ interface ResourceCreator<T extends Resource> {
 	 * @return
 	 * @throws IOException
 	 */
-	T create(final Location base, final String name, final Object...args) throws IOException;
+	T create(final Location base, final String name, final A argument) throws IOException;
 }

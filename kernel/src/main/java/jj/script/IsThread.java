@@ -31,7 +31,7 @@ public class IsThread {
 		this.scriptExecutorFactory = scriptExecutorFactory;
 	}
 
-	public boolean forScriptEnvironment(final ScriptEnvironment scriptEnvironment) {
+	public boolean forScriptEnvironment(final ScriptEnvironment<?> scriptEnvironment) {
 		return scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
 	}
 }

@@ -69,7 +69,7 @@ public class DocumentScriptEnvironmentRouteProcessor implements RouteProcessor {
 				@Override
 				protected void run() throws Exception {
 					preloadResources();
-					DocumentScriptEnvironment dse = loadResource(DocumentScriptEnvironment.class, null, route);
+					DocumentScriptEnvironment dse = resourceFinder.loadResource(DocumentScriptEnvironment.class, Virtual, route.mapping());
 					serve(dse, request, response);
 				}
 				

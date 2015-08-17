@@ -64,11 +64,11 @@ import jj.script.RhinoContext;
  */
 public class ResourceCacheInspector {
 
-	private final List<AbstractResource> resources;
+	private final List<Resource<?>> resources;
 	private final Provider<RhinoContext> contextProvider;
 	private final ScriptableObject global;
 	
-	private final Map<Resource, Integer> reverseIndex = new HashMap<>();
+	private final Map<Resource<?>, Integer> reverseIndex = new HashMap<>();
 	
 	private final Scriptable nodes;
 	private final Scriptable links;
@@ -97,10 +97,10 @@ public class ResourceCacheInspector {
 		try (RhinoContext context = contextProvider.get()) {
 			Scriptable resultArray = context.newArray(global, resources.size());
 			int index = 0;
-			for (AbstractResource resource : resources) {
+			for (Resource<?> resource : resources) {
 				reverseIndex.put(resource, index);
 				Scriptable rObj = context.newObject(global);
-				resource.describe(rObj);
+				((AbstractResource<?>)resource).describe(rObj);
 				resultArray.put(index++, resultArray, rObj);
 			}
 			return resultArray;
@@ -112,8 +112,8 @@ public class ResourceCacheInspector {
 			// maybe no links! maybe a freakin million! WE DON'T KNOW!
 			Scriptable resultArray = context.newArray(global, 0);
 			int index = 0;
-			for (AbstractResource r1 : resources) {
-				for (AbstractResource r2 : r1.dependents()) {
+			for (Resource<?> r1 : resources) {
+				for (AbstractResource<?> r2 : ((AbstractResource<?>)r1).dependents()) {
 					Scriptable link = context.newObject(global);
 					link.put("source", link, reverseIndex.get(r1));
 					link.put("target", link, reverseIndex.get(r2));

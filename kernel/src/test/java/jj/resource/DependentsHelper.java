@@ -26,11 +26,11 @@ import java.util.Set;
  */
 public class DependentsHelper {
 
-	public static Set<Resource> dependents(Resource resource) {
-		return new HashSet<Resource>(((AbstractResource)resource).dependents());
+	public static Set<Resource<?>> dependents(Resource<?> resource) {
+		return new HashSet<Resource<?>>(((AbstractResource<?>)resource).dependents());
 	}
 	
-	public static void verifyDependentSetup(AbstractResource target, AbstractResource dependent) {
+	public static void verifyDependentSetup(AbstractResource<?> target, AbstractResource<?> dependent) {
 		verify(target).addDependent(dependent);
 	}
 }

@@ -55,7 +55,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-public class MessagesResource extends AbstractResource {
+public class MessagesResource extends AbstractResource<Locale> {
 	
 	// doubled because java8 is a pain
 	private static final String __ = "_";
@@ -130,8 +130,8 @@ public class MessagesResource extends AbstractResource {
 	}
 	
 	@Override
-	protected Object[] creationArgs() {
-		return new Object[] { locale };
+	public Locale creationArg() {
+		return locale;
 	}
 	
 	public boolean containsKey(String key) {

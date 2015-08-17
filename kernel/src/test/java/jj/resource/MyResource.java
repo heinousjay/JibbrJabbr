@@ -22,7 +22,7 @@ import jj.application.AppLocation;
 import jj.event.Publisher;
 import jj.util.SHA1Helper;
 
-class MyResource extends AbstractResource {
+class MyResource extends AbstractResource<Void> {
 	
 	protected MyResource(String name, Publisher publisher) {
 		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.AppBase, name, publisher));

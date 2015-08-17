@@ -27,7 +27,7 @@ import jj.util.StringUtils;
  */
 public class RequiredModule implements Continuation {
 	
-	private final RootScriptEnvironment parent;
+	private final RootScriptEnvironment<?> parent;
 	
 	private final String identifier;
 	
@@ -36,7 +36,7 @@ public class RequiredModule implements Continuation {
 	private PendingKey pendingKey;
 
 	public RequiredModule(
-		final RootScriptEnvironment parent,
+		final RootScriptEnvironment<?> parent,
 		final String identifier
 	) {
 		assert parent != null : "no required module without a parent!";
@@ -50,7 +50,7 @@ public class RequiredModule implements Continuation {
 		return identifier;
 	}
 	
-	RootScriptEnvironment parent() {
+	RootScriptEnvironment<?> parent() {
 		return parent;
 	}
 	

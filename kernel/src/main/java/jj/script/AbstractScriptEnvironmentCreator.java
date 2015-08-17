@@ -31,7 +31,7 @@ import jj.server.ServerLocation;
  * @author jason
  *
  */
-public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptEnvironment> extends SimpleResourceCreator<T> {
+public abstract class AbstractScriptEnvironmentCreator<A, T extends AbstractScriptEnvironment<A>> extends SimpleResourceCreator<A, T> {
 	
 	protected static final Location Virtual = ServerLocation.Virtual;
 	
@@ -60,11 +60,11 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 	}
 
 	@Override
-	public T create(Location base, String name, Object... args) throws IOException {
+	public T create(Location base, String name, A argument) throws IOException {
 		
 		assert base == Virtual : "all ScriptEnvironments are Virtual";
 		
-		T result = createScriptEnvironment(name, args);
+		T result = createScriptEnvironment(name, argument);
 		
 		if (result != null) {
 			initializer.initializeScript(result);
@@ -73,10 +73,10 @@ public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptE
 		return result;
 	}
 	
-	protected abstract T createScriptEnvironment(String name, Object... args) throws IOException;
+	protected abstract T createScriptEnvironment(String name, A argument) throws IOException;
 	
 	@Override
-	protected URI uri(Location base, String name, Object... args) {
+	protected URI uri(Location base, String name, A argument) {
 		assert base == Virtual : "all ScriptEnvironments are Virtual";
 		return URI.create(name);
 	}

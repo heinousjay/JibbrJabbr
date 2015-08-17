@@ -38,19 +38,19 @@ import java.net.URI;
  */
 public class ResourceKey {
 	
-	private final Class<? extends Resource> type;
+	private final Class<? extends Resource<?>> type;
 	private final URI uri;
 	private final String toString;
 	private final int hashCode;
 
-	ResourceKey(final Class<? extends Resource> type, final URI uri) {
+	ResourceKey(final Class<? extends Resource<?>> type, final URI uri) {
 		this.type = type;
 		this.uri = uri;
 		this.toString = type.getSimpleName().toString() + " at " + uri.toString();
 		this.hashCode = toString.hashCode();
 	}
 	
-	Class<? extends Resource> type() {
+	Class<? extends Resource<?>> type() {
 		return type;
 	}
 	

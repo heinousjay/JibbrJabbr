@@ -21,7 +21,9 @@ public interface ResourceFinder {
 	 * @param args The creation arguments of the <code>Resource</code>
 	 * @return the {@link Resource}, or null if not found
 	 */
-	<T extends Resource> T findResource(Class<T> resourceClass, Location base, String name, Object...args);
+	<A, T extends Resource<A>> T findResource(Class<T> resourceClass, Location base, String name, A argument);
+	
+	<T extends Resource<Void>> T findResource(Class<T> resourceClass, Location base, String name);
 	
 	/**
 	 * <p>
@@ -37,5 +39,8 @@ public interface ResourceFinder {
 	 * @return the {@link Resource}, or null if not found
 	 */
 	@ResourceThread
-	<T extends Resource> T loadResource(Class<T> resourceClass, Location base, String name, Object...args);
+	<A, T extends Resource<A>> T loadResource(Class<T> resourceClass, Location base, String name, A argument);
+	
+	@ResourceThread
+	<T extends Resource<Void>> T loadResource(Class<T> resourceClass, Location base, String name);
 }

@@ -114,17 +114,17 @@ public class ResourceSystemIntegrationTest {
 		mse1 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module"));
 		scriptResource1 = finder.findResource(ScriptResource.class, Private, "deep/module.js");
 		assertTrue(privDeep.dependents().contains(scriptResource1));
-		assertTrue(((AbstractResource)dse).dependents().contains(mse1));
+		assertTrue(((AbstractResource<?>)dse).dependents().contains(mse1));
 		
 		mse2 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"));
 		scriptResource2 = finder.findResource(ScriptResource.class, Private, "deep/nesting/module.js");
 		assertTrue(nesting.dependents().contains(scriptResource2));
-		assertTrue(((AbstractResource)dse).dependents().contains(mse2));
+		assertTrue(((AbstractResource<?>)dse).dependents().contains(mse2));
 		
 		mse3 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/values", new RequiredModule(dse, "deep/nesting/values"));
 		jsonResource1 = finder.findResource(JSONResource.class, Private, "deep/nesting/values.json");
 		assertTrue(nesting.dependents().contains(jsonResource1));
-		assertTrue(((AbstractResource)dse).dependents().contains(mse3));
+		assertTrue(((AbstractResource<?>)dse).dependents().contains(mse3));
 		
 		assertTrue(dse.alive());
 		assertTrue(htmlResource.alive());
@@ -211,7 +211,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	// also need a delete test!
-	private void touch(FileResource resource) throws Exception {
+	private void touch(FileResource<?> resource) throws Exception {
 		FileTime originalFileTime = Files.getLastModifiedTime(resource.path());
 		FileTime newFileTime;
 		do {

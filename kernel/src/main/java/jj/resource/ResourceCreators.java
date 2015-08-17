@@ -32,29 +32,29 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class ResourceCreators implements Iterable<SimpleResourceCreator<? extends AbstractResource>> {
+class ResourceCreators implements Iterable<SimpleResourceCreator<?, ? extends AbstractResource<?>>> {
 	
-	private final Map<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreators;
+	private final Map<Class<? extends AbstractResource<?>>, SimpleResourceCreator<?, ? extends AbstractResource<?>>> resourceCreators;
 
 	@Inject
-	ResourceCreators(final Map<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> resourceCreators) {
+	ResourceCreators(final Map<Class<? extends AbstractResource<?>>, SimpleResourceCreator<?, ? extends AbstractResource<?>>> resourceCreators) {
 		this.resourceCreators = Collections.unmodifiableMap(resourceCreators);
 	}
 	
-	<T extends Resource> ResourceCreator<T> get(final Class<T> type) {
+	<T extends Resource<?>> ResourceCreator<?, T> get(final Class<T> type) {
 
 		@SuppressWarnings("unchecked")
-		ResourceCreator<T> result = (ResourceCreator<T>)resourceCreators.get(type);
+		ResourceCreator<?, T> result = (ResourceCreator<?, T>)resourceCreators.get(type);
 		
 		assert(result != null) : "don't have a resource creator that can make " + type;
 		
-		assert(result.type() == type);
+		assert(result.type() == type) : result.type() + " " + type;
 		
 		return result;
 	}
 
 	@Override
-	public Iterator<SimpleResourceCreator<? extends AbstractResource>> iterator() {
+	public Iterator<SimpleResourceCreator<?, ? extends AbstractResource<?>>> iterator() {
 		return resourceCreators.values().iterator();
 	}
 

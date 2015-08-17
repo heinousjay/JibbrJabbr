@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.BDDMockito.isA;
-
 import jj.event.Publisher;
 
 import org.junit.Test;
@@ -39,13 +38,14 @@ public class AbstractResourceTest {
 
 	@Mock Publisher publisher;
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testDependencyAndLifetimeInteraction() {
 		
-		final AbstractResource base = new MyResource("", publisher);
-		final AbstractResource one = new MyResource("1", publisher);
-		final AbstractResource two = new MyResource("2", publisher);
-		final AbstractResource one_two = new MyResource("1/2", publisher);
+		final AbstractResource<Void> base = new MyResource("", publisher);
+		final AbstractResource<Void> one = new MyResource("1", publisher);
+		final AbstractResource<Void> two = new MyResource("2", publisher);
+		final AbstractResource<Void> one_two = new MyResource("1/2", publisher);
 		
 		base.addDependent(one);
 		base.addDependent(two);

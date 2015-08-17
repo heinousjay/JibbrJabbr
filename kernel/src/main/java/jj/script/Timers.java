@@ -61,7 +61,7 @@ class Timers {
 	// there is a bit of a dance around the cancel keys.  they must be stored according to the root environment, because
 	// it's conceivable that a module will pass a cancel key via exports or a callback or a function call to some other
 	// environment - but the timer itself should execute in the context of the original environment
-	private final ConcurrentHashMap<RootScriptEnvironment, Map<String, CancelKey>> runningTimers = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<RootScriptEnvironment<?>, Map<String, CancelKey>> runningTimers = new ConcurrentHashMap<>();
 	private final Sequence cancelIds = new Sequence();
 
 	@Inject
@@ -82,7 +82,7 @@ class Timers {
 		}
 	}
 	
-	private void killTimerCancelKey(final ScriptEnvironment se, final String timerKey) {
+	private void killTimerCancelKey(final ScriptEnvironment<?> se, final String timerKey) {
 		Map<String, CancelKey> keys = runningTimers.get(se);
 		if (keys != null) {
 			CancelKey key = keys.remove(timerKey);
@@ -95,10 +95,10 @@ class Timers {
 	private String setTimer(final Callable function, final int delay, final boolean repeat, final Object...args) {
 		
 		final String key = "jj-timer-" + cancelIds.next();
-		final ScriptEnvironment rootEnvironment = env.currentRootScriptEnvironment();
+		final ScriptEnvironment<?> rootEnvironment = env.currentRootScriptEnvironment();
 		
-		ScriptTask<ScriptEnvironment> task =
-			new ScriptTask<ScriptEnvironment>(repeat ? "setInterval" : "setTimeout", env.current()) {
+		ScriptTask<ScriptEnvironment<?>> task =
+			new ScriptTask<ScriptEnvironment<?>>(repeat ? "setInterval" : "setTimeout", env.current()) {
 				@Override
 				protected void begin() throws Exception {
 					// if this is setTimeout, kill the cancelation structure

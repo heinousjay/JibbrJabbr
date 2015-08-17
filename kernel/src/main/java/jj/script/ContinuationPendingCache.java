@@ -43,8 +43,8 @@ class ContinuationPendingCache {
 		this.currentTask = currentTask;
 	}
 	
-	private final ScriptTask<ScriptEnvironment> reserved = 
-		new ScriptTask<ScriptEnvironment>("", null) {
+	private final ScriptTask<ScriptEnvironment<?>> reserved = 
+		new ScriptTask<ScriptEnvironment<?>>("", null) {
 		
 			@Override
 			protected void begin() throws Exception {
@@ -52,8 +52,8 @@ class ContinuationPendingCache {
 			}
 		};
 		
-	private final ScriptTask<ScriptEnvironment> alreadyResumed =
-		new ScriptTask<ScriptEnvironment>("", null) {
+	private final ScriptTask<ScriptEnvironment<?>> alreadyResumed =
+		new ScriptTask<ScriptEnvironment<?>>("", null) {
 			
 			@Override
 			protected void begin() throws Exception {

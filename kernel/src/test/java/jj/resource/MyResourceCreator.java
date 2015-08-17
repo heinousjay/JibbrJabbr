@@ -20,7 +20,7 @@ import java.net.URI;
 
 import jj.event.Publisher;
 
-class MyResourceCreator extends SimpleResourceCreator<MyResource> {
+class MyResourceCreator extends SimpleResourceCreator<Void, MyResource> {
 	
 	private final Publisher publisher;
 	
@@ -30,12 +30,12 @@ class MyResourceCreator extends SimpleResourceCreator<MyResource> {
 	}
 
 	@Override
-	public MyResource create(Location base, String name, Object... args) throws IOException {
+	public MyResource create(Location base, String name, Void argument) throws IOException {
 		return new MyResource(name, publisher);
 	}
 
 	@Override
-	protected URI uri(Location base, String name, Object... args) {
+	protected URI uri(Location base, String name, Void argument) {
 		return URI.create(name);
 	}
 }

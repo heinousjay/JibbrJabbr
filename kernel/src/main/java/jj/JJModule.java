@@ -127,7 +127,7 @@ public abstract class JJModule extends AbstractModule {
 		apiSpecPaths.addBinding().toInstance(path);
 	}
 
-	protected <T extends AbstractResource> LinkedBindingBuilder<SimpleResourceCreator<T>> bindCreationOf(Class<T> resourceClass) {
+	protected <A, T extends AbstractResource<A>> LinkedBindingBuilder<SimpleResourceCreator<A, T>> bindCreationOf(Class<T> resourceClass) {
 		if (resources == null) {
 			resources = new ResourceBinder(binder())
 				.addResourceBindingProcessor(ServableResource.class, new ServableResourceBindingProcessor(binder()))

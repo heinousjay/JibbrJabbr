@@ -53,12 +53,12 @@ public class ResourceInstanceCreator {
 		this.publisher = publisher;
 	}
 	
-	public <T extends Resource> T createResource(
+	public <A, T extends Resource<A>> T createResource(
 		final Class<T> resourceClass,
 		final ResourceKey resourceKey,
 		final Location base,
 		final String name,
-		final Object...args
+		final A argument
 	) {
 		// ideally! base.resolve(name);
 		// but that requires tricks
@@ -80,8 +80,8 @@ public class ResourceInstanceCreator {
 								bind(Path.class).toInstance(path);
 							}
 							
-							for (Object arg : args) {
-								bindInstance(arg.getClass(), arg);
+							if (argument != null) {
+								bindInstance(argument.getClass(), argument);
 							}
 						}
 						
@@ -106,7 +106,7 @@ public class ResourceInstanceCreator {
 		} catch (NoSuchResourceException nsre) {
 			// don't bother logging this, it's just a "not found" and will be handled in the ResourceLoaderImpl
 		} catch (Exception e) {
-			publisher.publish(new ResourceError(resourceClass, base, name, args, e));
+			publisher.publish(new ResourceError(resourceClass, base, name, argument, e));
 		}
 		
 		return null;

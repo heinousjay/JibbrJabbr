@@ -26,7 +26,7 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-public interface RootScriptEnvironment extends ScriptEnvironment {
+public interface RootScriptEnvironment<T> extends ScriptEnvironment<T> {
 
 	ScriptableObject global();
 	

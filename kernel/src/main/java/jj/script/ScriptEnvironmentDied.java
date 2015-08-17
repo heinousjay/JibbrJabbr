@@ -23,13 +23,13 @@ import org.slf4j.Logger;
  */
 public class ScriptEnvironmentDied extends ScriptSystemEvent {
 	
-	private final ScriptEnvironment scriptEnvironment;
+	private final ScriptEnvironment<?> scriptEnvironment;
 
-	public ScriptEnvironmentDied(final ScriptEnvironment scriptEnvironment) {
+	public ScriptEnvironmentDied(final ScriptEnvironment<?> scriptEnvironment) {
 		this.scriptEnvironment = scriptEnvironment;
 	}
 	
-	public ScriptEnvironment scriptEnvironment() {
+	public ScriptEnvironment<?> scriptEnvironment() {
 		return scriptEnvironment;
 	}
 

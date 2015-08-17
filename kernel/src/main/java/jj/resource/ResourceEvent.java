@@ -15,8 +15,6 @@
  */
 package jj.resource;
 
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 
 import jj.logging.LoggedEvent;
@@ -31,36 +29,37 @@ public abstract class ResourceEvent extends LoggedEvent {
 	
 	/** this is not always available, in particular when the resource did not get created */
 	public final ResourceKey resourceKey;
-	public final Class<? extends Resource> resourceClass;
+	public final Class<?> resourceClass;
 	public final Location base;
 	public final String name;
-	public final Object[] arguments;
+	public final Object argument;
 	
-	protected ResourceEvent(final AbstractResource resource) {
+	protected ResourceEvent(final Resource<?> resource) {
 		this.resourceKey = resource.cacheKey();
 		this.resourceClass = resource.getClass();
 		this.base = resource.base();
 		this.name = resource.name();
-		this.arguments = resource.creationArgs();
+		this.argument = resource.creationArg();
 	}
 	
-	protected ResourceEvent(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
+	protected <A> ResourceEvent(final Class<? extends Resource<A>> resourceClass, final Location base, final String name, final A argument) {
 		this.resourceKey = null;
 		this.resourceClass = resourceClass;
 		this.base = base;
 		this.name = name;
-		this.arguments = arguments;
+		this.argument = argument;
 	}
 	
-	public boolean matches(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
+	public <A, T extends Resource<A>> boolean matches(final Class<T> resourceClass, final Location base, final String name, final A argument) {
 		return this.resourceClass == resourceClass &&
 			this.base == base &&
 			this.name.equals(name) &&
-			Arrays.equals(this.arguments, arguments);
+			this.argument == argument || (this.argument != null && this.argument.equals(argument));
 	}
 	
-	public boolean matches(final AbstractResource resource) {
-		return matches(resource.getClass(), resource.base(), resource.name(), resource.creationArgs());
+	@SuppressWarnings("unchecked")
+	public <A> boolean matches(final Resource<A> resource) {
+		return matches(resource.getClass(), resource.base(), resource.name(), resource.creationArg());
 	}
 	
 	protected abstract String description();
@@ -72,7 +71,7 @@ public abstract class ResourceEvent extends LoggedEvent {
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(type: " + resourceClass.getName() + ", base: " + base + ", name: " + name + ", args: " + arguments + ")";
+		return getClass().getSimpleName() + "(type: " + resourceClass.getName() + ", base: " + base + ", name: " + name + ", argument: " + argument + ")";
 	}
 
 }

@@ -49,7 +49,7 @@ import jj.script.module.ScriptResource;
  *
  */
 @Subscriber
-class ConfigurationScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
+class ConfigurationScriptEnvironment extends AbstractScriptEnvironment<Void> implements RootScriptEnvironment<Void> {
 	
 	private final ScriptableObject global;
 	

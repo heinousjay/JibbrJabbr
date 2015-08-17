@@ -33,7 +33,7 @@ import jj.resource.AbstractFileResource;
  * @author jason
  *
  */
-class LessResource extends AbstractFileResource {
+class LessResource extends AbstractFileResource<Void> {
 
 	@Inject
 	LessResource(Dependencies dependencies, Path path) {

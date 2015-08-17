@@ -65,7 +65,7 @@ import jj.util.SHA1Helper;
 	routeContributor = StylesheetResourceRouteContributor.class,
 	processorConfig = StylesheetResourceRouteProcessorConfiguration.class
 )
-public class StylesheetResource extends AbstractResource implements LoadedResource {
+public class StylesheetResource extends AbstractResource<Void> implements LoadedResource {
 
 	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";
 	private final ByteBuf bytes;

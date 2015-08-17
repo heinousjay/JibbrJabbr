@@ -55,25 +55,26 @@ class ResourceWatchServiceLoop extends ServerTask {
 	}
 
 	
-	private void remove(final AbstractResource resource) {
+	private void remove(final AbstractResource<?> resource) {
 		if (resourceCache.remove(resource.cacheKey(), resource)) {
 			resource.kill();
 		}
 	}
 	
-	private void reload(final AbstractResource resource) {
+	private  void reload(final AbstractResource<?> resource) {
 		resource.kill();
 		taskRunner.execute(
 			new ResourceTask(getClass().getSimpleName() + " reloader for " + resource.cacheKey()) {
 
 
+				@SuppressWarnings("unchecked") // because argument type checking gets effy
 				@Override
 				public void run() {
 					resourceFinder.loadResource(
 						resource.getClass(),
 						resource.base(),
 						resource.name(),
-						resource.creationArgs()
+						resource.creationArg()
 					);
 				}
 			}
@@ -103,13 +104,13 @@ class ResourceWatchServiceLoop extends ServerTask {
 		while (run) {
 			Map<URI, Boolean> uris = watcher.awaitChangedUris();
 			for (URI uri : uris.keySet()) {
-				for (final Resource resource : resourceCache.findAllByUri(uri)) {
+				for (final Resource<?> resource : resourceCache.findAllByUri(uri)) {
 					ResourceReloadOrganizer rro = 
-						new ResourceReloadOrganizer((AbstractResource)resource, uris.get(uri));
-					for (AbstractResource ar : rro.deletions) {
+						new ResourceReloadOrganizer((AbstractResource<?>)resource, uris.get(uri));
+					for (AbstractResource<?> ar : rro.deletions) {
 						remove(ar);
 					}
-					for (AbstractResource ar : rro.reloads) {
+					for (AbstractResource<?> ar : rro.reloads) {
 						reload(ar);
 					}
 				}

@@ -37,6 +37,7 @@ import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.MockAbstractWebSocketConnectionHostDependencies;
 import jj.http.server.websocket.MockCurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
@@ -140,7 +141,7 @@ public class DocumentScriptEnvironmentTest {
 		givenAnHtmlResource(name);
 		given(html.document()).willReturn(Jsoup.parse("<html><head><title>test</title></head></html>"));
 		DocumentScriptEnvironment dse = givenADocumentScriptEnvironment(name);
-		given(connection.webSocketConnectionHost()).willReturn(dse);
+		willReturn(dse).given(connection).webSocketConnectionHost();
 		// we expect documents to be cloned on first access, and that instance should be maintained
 		Document document = dse.document();
 		given(documentRequestProcessor.document()).willReturn(document);
@@ -259,7 +260,7 @@ public class DocumentScriptEnvironmentTest {
 		givenAClientScript(name);
 		givenAServerScript(name);
 		
-		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);
+		WebSocketConnectionHost result = givenADocumentScriptEnvironment(name);
 		
 		result.connected(connection1);
 		result.connected(connection2);
@@ -272,7 +273,7 @@ public class DocumentScriptEnvironmentTest {
 		given(connection4.webSocketConnectionHost()).willReturn(result);
 		given(connection5.webSocketConnectionHost()).willReturn(result);
 		
-		return result;
+		return (DocumentScriptEnvironment)result;
 	}
 	
 	@Test

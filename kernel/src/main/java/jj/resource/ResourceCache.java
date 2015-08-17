@@ -24,29 +24,16 @@ import java.util.List;
  */
 interface ResourceCache {
 
-	/**
-	 * @param uri
-	 * @return
-	 */
-	List<AbstractResource> findAllByUri(URI uri);
+	List<Resource<?>> findAllByUri(URI uri);
 
-	/**
-	 * @param cacheKey
-	 * @return
-	 */
-	AbstractResource get(ResourceKey cacheKey);
+	<A, T extends Resource<A>> T get(ResourceKey cacheKey);
 	
-	AbstractResource putIfAbsent(ResourceKey cacheKey, AbstractResource resource);
+	<A, T extends Resource<A>> T putIfAbsent(ResourceKey cacheKey, T resource);
 	
-	<T extends Resource> ResourceCreator<T> getCreator(final Class<T> type);
+	<A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type);
 
-	/**
-	 * @param cacheKey
-	 * @param resource
-	 * @return
-	 */
-	boolean remove(ResourceKey cacheKey, AbstractResource resource);
+	<A, T extends Resource<A>> boolean remove(ResourceKey cacheKey, T resource);
 	
-	boolean replace(ResourceKey key, AbstractResource oldValue, AbstractResource newValue);
+	<A, T extends Resource<A>> boolean replace(ResourceKey key, T oldValue, T newValue);
 
 }

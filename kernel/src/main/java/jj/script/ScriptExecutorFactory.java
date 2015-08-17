@@ -19,15 +19,15 @@ class ScriptExecutorFactory {
 		this.executor = executors.get();
 	}
 	
-	ScriptExecutor executorFor(ScriptEnvironment scriptEnvironment) {
+	ScriptExecutor executorFor(ScriptEnvironment<?> scriptEnvironment) {
 		while (scriptEnvironment instanceof ChildScriptEnvironment) {
-			scriptEnvironment = ((ChildScriptEnvironment)scriptEnvironment).parent();
+			scriptEnvironment = ((ChildScriptEnvironment<?>)scriptEnvironment).parent();
 		}
 		
 		return executor;
 	}
 	
-	boolean isScriptThreadFor(ScriptEnvironment scriptEnvironment) {
+	boolean isScriptThreadFor(ScriptEnvironment<?> scriptEnvironment) {
 		return executor.isScriptThread();
 	}
 

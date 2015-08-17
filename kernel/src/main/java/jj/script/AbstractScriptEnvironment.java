@@ -47,7 +47,7 @@ import jj.util.Closer;
  * @author jason
  *
  */
-public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
+public abstract class AbstractScriptEnvironment<T> extends AbstractResource<T> implements ScriptEnvironment<T> {
 	
 	@Singleton
 	protected static class AbstractScriptEnvironmentDependencies {
@@ -174,7 +174,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 * Await a continuation in this environment
 	 * @param task
 	 */
-	<T extends ScriptEnvironment> void awaitContinuation(ScriptTask<T> task) {
+	<S extends ScriptEnvironment<?>> void awaitContinuation(ScriptTask<S> task) {
 		continuationPendingCache.storeForContinuation(task);
 	}
 
