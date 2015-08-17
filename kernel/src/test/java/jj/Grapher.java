@@ -15,48 +15,30 @@
  */
 package jj;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintWriter;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.grapher.GrapherModule;
-import com.google.inject.grapher.InjectorGrapher;
+import com.google.inject.grapher.graphviz.GraphvizGrapher;
 import com.google.inject.grapher.graphviz.GraphvizModule;
-import com.google.inject.grapher.graphviz.GraphvizRenderer;
 
 public class Grapher {
 
 	public static void main(String[] args) throws Exception {
-
 		graph("build/main.dot", Guice.createInjector(new CoreModule(args, new BootstrapClassPath())));
 	}
+	
+	private static void graph(String filename, Injector appInjector) throws Exception {
+		File file = new File(filename);
+		PrintWriter out = new PrintWriter(file, "UTF-8");
 
-	public final static void graph(String filename, Injector inj) throws Exception {
-		File file = new File(filename).getAbsoluteFile();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		PrintWriter out = new PrintWriter(baos);
-
-		Injector injector =
-			Guice.createInjector(new GrapherModule(), new GraphvizModule());
-		GraphvizRenderer renderer =
-			injector.getInstance(GraphvizRenderer.class);
-		renderer.setOut(out).setRankdir("TB");
-
-		injector.getInstance(InjectorGrapher.class).of(inj).graph();
-
-		out = new PrintWriter(file, "UTF-8");
-		String s = baos.toString("UTF-8");
-		s = fixGrapherBugs(s);
-		out.write(s);
-		out.close();
+		Injector injector = Guice.createInjector(new GraphvizModule());
+		GraphvizGrapher grapher = injector.getInstance(GraphvizGrapher.class);
+		grapher.setOut(out);
+		grapher.setRankdir("TB");
+		grapher.graph(appInjector);
 
 		System.out.println("wrote to " + file);
-	}
-
-	public static String fixGrapherBugs(String s) {
-		s = s.replaceAll("style=invis", "style=solid");
-		s = s.replaceAll(" margin=(\\S+), ", " margin=\"$1\", ");
-		return s;
 	}
 }

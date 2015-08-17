@@ -6,7 +6,7 @@ dependencies {
 	compile project(':bootstrapper')
 	
 	testCompile configurations.testPack
-	testCompile 'com.google.inject.extensions:guice-grapher:3.0'
+	testCompile 'com.google.inject.extensions:guice-grapher:4.0'
 }
 
 test {

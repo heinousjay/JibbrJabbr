@@ -57,8 +57,8 @@ allprojects {
 		// shared with the test project.
 		// which might get made into a whole other thing
 		// it's looking interesting
-		core 'com.google.inject:guice:3.0'
-		core 'com.google.inject.extensions:guice-multibindings:3.0'
+		core 'com.google.inject:guice:4.0'
+		core 'com.google.inject.extensions:guice-multibindings:4.0'
 		core 'org.javassist:javassist:3.18.2-GA'
 		core 'org.slf4j:slf4j-api:1.7.6'
 		core('ch.qos.logback:logback-classic:1.0.7') {
