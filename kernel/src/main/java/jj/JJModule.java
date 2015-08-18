@@ -23,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
+import javax.inject.Singleton;
 
 import jj.configuration.ConfigurationObjectBinder;
 import jj.conversion.Converter;
@@ -58,6 +59,9 @@ import com.google.inject.multibindings.Multibinder;
  */
 public abstract class JJModule extends AbstractModule {
 	
+	// this annotation is used to ensure that no one can inject Set<Object> and
+	// get a weird variety of server components, because that's just not a
+	// sensible thing to do
 	@Qualifier
 	@Target(PARAMETER)
 	@Retention(RetentionPolicy.RUNTIME)
@@ -83,6 +87,7 @@ public abstract class JJModule extends AbstractModule {
 	private Multibinder<String> apiSpecPaths;
 
 	protected void bindStartupListener(Class<?> startupListenerClass) {
+		assert startupListenerClass.isAnnotationPresent(Singleton.class) : "startup listeners must be singletons!";
 		if (startupListeners == null) {
 			startupListeners =  Multibinder.newSetBinder(binder(), Object.class, StartupListeners.class);
 		}
