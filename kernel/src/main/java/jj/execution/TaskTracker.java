@@ -124,7 +124,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 	public void describeTo(Logger logger) {
 		if (logger.isTraceEnabled()) {
 			// i agree, this is ugly
-			JJTask task = this.task.get();
+			JJTask task = task();
 			boolean logged = false;
 			if (task instanceof DelayedTask) {
 				DelayedTask<?> dTask = (DelayedTask<?>)task;
