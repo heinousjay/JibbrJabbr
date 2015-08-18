@@ -77,56 +77,51 @@ class TaskRunnerImpl implements TaskRunner {
 		tracker.enqueue();
 		queuedTasks.add(tracker);
 		
-		task.addRunnableToExecutor(executors, new Runnable() {
+		task.addRunnableToExecutor(executors, () -> {
+				
+			String oldName = Thread.currentThread().getName();
+			String threadName = oldName + " - " + task.name();
+			Thread.currentThread().setName(threadName);
+
+			boolean interrupted = false;
+			queuedTasks.remove(tracker);
+			tracker.start();
 			
-			@Override
-			public void run() {
-				
-				String oldName = Thread.currentThread().getName();
-				String threadName = oldName + " - " + task.name();
-				Thread.currentThread().setName(threadName);
-
-				boolean interrupted = false;
-				queuedTasks.remove(tracker);
-				tracker.start();
-				
-				try (Closer closer = currentTask.enterScope(task)) {
-					task.runningThread = Thread.currentThread();
-					task.run();
-				} catch (InterruptedException ie) {
-					Thread.interrupted(); // clear the status in case the thread can get reused
-					interrupted = true;
-				} catch (AssertionError ae) {
-					System.err.println("ASSERTION TRIPPED");
-					ae.printStackTrace();
-					System.exit(1);
-				} catch (OutOfMemoryError e) {
-					throw e; // just in case
-				} catch (Throwable t) {
-					if (!task.errored(t)) {
-						publisher.publish(new Emergency("Task [" + task.name() + "] ended in exception", t));
-						tracker.endedInError();
-					}
-
-				} finally {
-					task.runningThread = null;
-					tracker.end();
-					
-					// interruption means don't bother keeping promises
-					if (!interrupted) {
-						List<JJTask> tasks = promise.done();
-						if (tasks != null) {
-							for (JJTask t : tasks) {
-								execute(t);
-							}
-						}
-					}
-					
-					publisher.publish(tracker);
-					Thread.currentThread().setName(oldName);
-					
+			try (Closer closer = currentTask.enterScope(task)) {
+				task.runningThread = Thread.currentThread();
+				task.run();
+			} catch (InterruptedException ie) {
+				Thread.interrupted(); // clear the status in case the thread can get reused
+				interrupted = true;
+			} catch (AssertionError ae) {
+				System.err.println("ASSERTION TRIPPED");
+				ae.printStackTrace();
+				System.exit(1);
+			} catch (OutOfMemoryError e) {
+				throw e; // just in case
+			} catch (Throwable t) {
+				if (!task.errored(t)) {
+					publisher.publish(new Emergency("Task [" + task.name() + "] ended in exception", t));
+					tracker.endedInError();
 				}
 
+			} finally {
+				task.runningThread = null;
+				tracker.end();
+				
+				// interruption means don't bother keeping promises
+				if (!interrupted) {
+					List<JJTask> tasks = promise.done();
+					if (tasks != null) {
+						for (JJTask t : tasks) {
+							execute(t);
+						}
+					}
+				}
+				
+				publisher.publish(tracker);
+				Thread.currentThread().setName(oldName);
+				
 			}
 		});
 		
