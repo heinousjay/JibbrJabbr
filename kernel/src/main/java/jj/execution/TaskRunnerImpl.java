@@ -69,7 +69,7 @@ class TaskRunnerImpl implements TaskRunner {
 	}
 	
 	@Override
-	public Promise execute(final JJTask<?> task) {
+	public <ExecutorType> Promise execute(final JJTask<ExecutorType> task) {
 
 		final Promise promise = task.promise().taskRunner(this);
 		final TaskTracker tracker = new TaskTracker(clock, task);
@@ -77,7 +77,7 @@ class TaskRunnerImpl implements TaskRunner {
 		tracker.enqueue();
 		queuedTasks.add(tracker);
 		
-		task.addRunnableToExecutor(executors, () -> {
+		executors.executeTask(task, () -> {
 				
 			String oldName = Thread.currentThread().getName();
 			String threadName = oldName + " - " + task.name();

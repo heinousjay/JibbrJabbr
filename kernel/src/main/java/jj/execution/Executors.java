@@ -15,32 +15,39 @@
  */
 package jj.execution;
 
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.google.inject.Injector;
+
+import jj.util.GenericUtils;
+
 /**
- * just a convenience for the moment
+ * bridges tasks to execution models
  * 
  * @author jason
  *
  */
 @Singleton
-class Executors implements JJTask.ExecutorFinder {
+class Executors {
 	
-	private final Map<Class<?>, Object> executors;
+	private final Injector injector;
+	
+	private final ConcurrentMap<Class<?>, Object> executorInstances = new ConcurrentHashMap<>();
 
 	@Inject
-	Executors(
-		final Map<Class<?>, Object> executors
-	) {
-		this.executors = executors;
+	Executors(Injector injector) {
+		this.injector = injector;
 	}
-
-	@Override
-	public <T> T ofType(Class<T> executorType) {
-		assert executors.containsKey(executorType);
-		return executorType.cast(executors.get(executorType));
+	
+	<ExecutorType> void executeTask(JJTask<ExecutorType> task, Runnable runnable) {
+		@SuppressWarnings("unchecked")
+		ExecutorType executor = (ExecutorType)executorInstances.computeIfAbsent(task.getClass(), (t) -> {
+			return injector.getInstance(GenericUtils.extractTypeParameterAsClass(t, JJTask.class, "ExecutorType"));
+		});
+		task.addRunnableToExecutor(executor, runnable);
 	}
 }

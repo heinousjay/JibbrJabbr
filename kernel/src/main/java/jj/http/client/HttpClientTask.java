@@ -31,8 +31,8 @@ public abstract class HttpClientTask extends JJTask<HttpClientNioEventLoopGroup>
 	}
 
 	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(HttpClientNioEventLoopGroup.class).execute(runnable);
+	protected final void addRunnableToExecutor(HttpClientNioEventLoopGroup executor, Runnable runnable) {
+		executor.execute(runnable);
 	}
 
 }

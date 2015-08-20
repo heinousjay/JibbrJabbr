@@ -40,7 +40,7 @@ class ContinuationPendingKeyResultExtractorHelper extends ContinuationPendingCac
 		super(new TaskRunner() { // cause really, it shouldn't happen
 			
 			@Override
-			public Promise execute(JJTask<?> task) {
+			public <ExecutorType> Promise execute(JJTask<ExecutorType> task) {
 				throw new AssertionError("how did this get called?");
 			}
 		}, new CurrentTask());

@@ -36,8 +36,8 @@ public abstract class ResourceTask extends JJTask<ResourceExecutor> {
 	}
 	
 	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, final Runnable runnable) {
-		executors.ofType(ResourceExecutor.class).submit(new Runnable() {
+	protected final void addRunnableToExecutor(ResourceExecutor executor, final Runnable runnable) {
+		executor.submit(new Runnable() {
 			
 			@Override
 			public void run() {

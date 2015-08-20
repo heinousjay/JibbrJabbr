@@ -23,16 +23,12 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.event.MockPublisher;
 import jj.event.MockPublisher.OnPublish;
-import jj.execution.DelayedExecutor.CancelKey;
 import jj.logging.Emergency;
 import jj.script.ScriptEnvironment;
 import jj.util.MockClock;
@@ -50,21 +46,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TaskRunnerImplTest {
 	
-	private @Mock ServerExecutor serverExecutor;
-	
 	private Runnable monitorTask;
-	
-	@Mock CancelKey cancelKey;
 	
 	private @Mock ScriptEnvironment<?> scriptEnvironment;
 
-	private Executors bundle;
+	private @Mock Executors executors;
 	
 	private CurrentTask currentTask;
 	
 	private MockPublisher publisher;
 	
 	private TaskRunnerImpl executor;
+	
+	private @Captor ArgumentCaptor<JJTask<?>> taskCaptor;
 	
 	private @Captor ArgumentCaptor<Runnable> runnableCaptor;
 	
@@ -77,25 +71,21 @@ public class TaskRunnerImplTest {
 		
 		currentTask = new CurrentTask();
 		
-		Map<Class<?>, Object> executors = new HashMap<>();
-		executors.put(ServerExecutor.class, serverExecutor);
-		bundle = new Executors(executors);
+		executor = new TaskRunnerImpl(executors, currentTask, publisher = new MockPublisher(), clock);
 		
-		executor = new TaskRunnerImpl(bundle, currentTask, publisher = new MockPublisher(), clock);
+		verify(executors).executeTask(taskCaptor.capture(), runnableCaptor.capture());
 		
-		verify(serverExecutor).submit(runnableCaptor.capture(), eq(0L), eq(MILLISECONDS));
 		monitorTask = runnableCaptor.getValue();
-		reset(serverExecutor);
-		given(serverExecutor.submit(any(Runnable.class), any(Long.class), any(TimeUnit.class))).willReturn(cancelKey);
+		reset(executors);
 		
 		given(scriptEnvironment.name()).willReturn(baseName);
 	}
 	
 	private Runnable getRunnable() {
-		verify(serverExecutor).submit(runnableCaptor.capture(), eq(0L), eq(MILLISECONDS));
+		verify(executors).executeTask(taskCaptor.capture(), runnableCaptor.capture());
 		// reset after pulling a runnable so that a test can control execution
 		// one task at a time
-		reset(serverExecutor);
+		reset(executors);
 		return runnableCaptor.getValue();
 	}
 	
@@ -217,7 +207,7 @@ public class TaskRunnerImplTest {
 		assertTrue(interrupted.get());
 		assertFalse(completed.get());
 		
-		verifyZeroInteractions(serverExecutor);
+		verifyZeroInteractions(executors);
 	}
 	
 	@Ignore // this refuses to work consistently
@@ -263,7 +253,7 @@ public class TaskRunnerImplTest {
 				// takes advantage of the implementation of DelayQueue, so not ideal, but i got nothing
 				// else!
 				executor.execute(task);
-				reset(serverExecutor);
+				reset(executors);
 			}
 		}); //.start();
 		

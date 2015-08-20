@@ -87,11 +87,6 @@ public abstract class ScriptTask<T extends ScriptEnvironment<?>> extends Delayed
 	protected void complete() throws Exception {
 		
 	}
-	
-	@Override
-	protected ScriptExecutor findExecutor(ExecutorFinder executors) {
-		return executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment);
-	}
 
 	/**
 	 * return null if the task is completed

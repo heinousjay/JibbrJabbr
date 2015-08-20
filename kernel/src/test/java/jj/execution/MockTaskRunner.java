@@ -91,7 +91,7 @@ public class MockTaskRunner implements TaskRunner {
 	public CancelKey cancelKey;
 	
 	@Override
-	public Promise execute(final JJTask<?> task) {
+	public <ExecutorType> Promise execute(final JJTask<ExecutorType> task) {
 		if (cancelKey != null && task instanceof DelayedTask<?>) {
 			DelayedTask<?> dTask = (DelayedTask<?>)task;
 			dTask.cancelKey = cancelKey;

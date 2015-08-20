@@ -36,11 +36,6 @@ import jj.script.ScriptTask;
  */
 public abstract class JJTask<ExecutorType> {
 	
-	protected interface ExecutorFinder {
-		
-		<T> T ofType(Class<T> executorType);
-	}
-	
 	private final String name;
 	
 	private final String spawnedBy = Thread.currentThread().getName();
@@ -72,7 +67,7 @@ public abstract class JJTask<ExecutorType> {
 		return false;
 	}
 	
-	protected abstract void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable);
+	protected abstract void addRunnableToExecutor(ExecutorType executor, Runnable runnable);
 	
 	final String name() {
 		return name;

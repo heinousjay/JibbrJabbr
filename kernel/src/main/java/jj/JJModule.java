@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 import jj.configuration.ConfigurationObjectBinder;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
-import jj.execution.ExecutorBinder;
 import jj.http.server.ServableResource;
 import jj.http.server.ServableResourceBindingProcessor;
 import jj.http.server.websocket.WebSocketConnectionHost;
@@ -70,8 +69,6 @@ public abstract class JJModule extends AbstractModule {
 	private ResourceBinder resources;
 
 	private ContinuationProcessorBinder continuationProcessors;
-
-	private ExecutorBinder executors;
 
 	private LoggingBinder loggers;
 
@@ -149,10 +146,8 @@ public abstract class JJModule extends AbstractModule {
 	}
 
 	protected void bindExecutor(Class<?> executor) {
-		if (executors == null) {
-			executors = new ExecutorBinder(binder());
-		}
-		executors.addExecutor(executor);
+		assert executor.isAnnotationPresent(Singleton.class);
+		binder().bind(executor).asEagerSingleton();
 	}
 
 	protected BindingBuilder bindLoggedEventsAnnotatedWith(Class<? extends Annotation> annotation) {

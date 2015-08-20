@@ -20,6 +20,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.ServerStopping;
 import jj.event.Listener;
@@ -35,6 +36,7 @@ import jj.util.Clock;
  * @author jason
  *
  */
+@Singleton
 @Subscriber
 class ScriptExecutor extends DelayedExecutor {
 	
