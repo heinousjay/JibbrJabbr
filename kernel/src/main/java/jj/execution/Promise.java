@@ -79,7 +79,7 @@ public class Promise {
 	
 	private List<JJTask<?>> next() {
 		if (next.get() == null) {
-			next.compareAndSet(null, new ArrayList<JJTask<?>>());
+			next.compareAndSet(null, new ArrayList<JJTask<?>>(0)); // probably never carrying any
 		}
 		return next.get();
 	}
