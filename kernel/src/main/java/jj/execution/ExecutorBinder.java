@@ -15,6 +15,8 @@
  */
 package jj.execution;
 
+import javax.inject.Singleton;
+
 import com.google.inject.Binder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.TypeLiteral;
@@ -32,6 +34,7 @@ public class ExecutorBinder {
 	}
 
 	public void addExecutor(Class<?> executor) {
+		assert executor.isAnnotationPresent(Singleton.class) : "executors must be singletons";
 		executorBinder.addBinding(executor).to(executor);
 	}
 }

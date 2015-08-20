@@ -10,10 +10,10 @@ public class MockServerStarting extends ServerStarting {
 	}
 	
 	public Priority priority;
-	public JJTask task;
+	public JJTask<?> task;
 
 	@Override
-	public void registerStartupTask(Priority priority, JJTask task) {
+	public void registerStartupTask(Priority priority, JJTask<?> task) {
 		this.priority = priority;
 		this.task = task;
 	}

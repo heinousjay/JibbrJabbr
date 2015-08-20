@@ -23,7 +23,7 @@ import jj.execution.JJTask;
  * @author jason
  *
  */
-public abstract class HttpServerTask extends JJTask {
+public abstract class HttpServerTask extends JJTask<HttpServerNioEventLoopGroup> {
 
 	public HttpServerTask(String name) {
 		super(name);

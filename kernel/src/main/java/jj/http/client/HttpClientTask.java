@@ -24,7 +24,7 @@ import jj.execution.JJTask;
  * @author jason
  *
  */
-public abstract class HttpClientTask extends JJTask {
+public abstract class HttpClientTask extends JJTask<HttpClientNioEventLoopGroup> {
 
 	public HttpClientTask(String name) {
 		super(name);

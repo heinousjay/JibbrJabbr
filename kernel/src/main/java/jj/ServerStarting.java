@@ -44,18 +44,18 @@ public class ServerStarting extends LoggedEvent {
 	private final Path rootPath;
 	private final Version version;
 	
-	private final HashMap<Priority, List<JJTask>> startupTasks = new HashMap<>();
+	private final HashMap<Priority, List<JJTask<?>>> startupTasks = new HashMap<>();
 	
 	ServerStarting(Path rootPath, Version version) {
 		this.rootPath = rootPath;
 		this.version = version;
 	}
 
-	public void registerStartupTask(final Priority priority, final JJTask task) {
+	public void registerStartupTask(final Priority priority, final JJTask<?> task) {
 		startupTasks.computeIfAbsent(priority, (p) -> { return new ArrayList<>(1); }).add(task);
 	}
 
-	Map<Priority, List<JJTask>> startupTasks() {
+	Map<Priority, List<JJTask<?>>> startupTasks() {
 		return startupTasks;
 	}
 

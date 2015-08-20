@@ -34,7 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class TaskTrackerTest {
 
 	MockClock clock = new MockClock();
-	@Mock JJTask task;
+	@Mock JJTask<?> task;
 
 	@Test
 	public void test() {

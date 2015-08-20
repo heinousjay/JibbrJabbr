@@ -69,7 +69,7 @@ public class SimpleRouteProcessorTest {
 	
 	@Mock Promise promise;
 	
-	@Captor ArgumentCaptor<JJTask> taskCaptor;
+	@Captor ArgumentCaptor<JJTask<?>> taskCaptor;
 	
 	ServerLocation location = Root; // YEAH RIGHT!
 	

@@ -58,7 +58,7 @@ public class TaskRunnerImplTest {
 	
 	private @Mock ScriptEnvironment<?> scriptEnvironment;
 
-	private ExecutorBundle bundle;
+	private Executors bundle;
 	
 	private CurrentTask currentTask;
 	
@@ -79,7 +79,7 @@ public class TaskRunnerImplTest {
 		
 		Map<Class<?>, Object> executors = new HashMap<>();
 		executors.put(ServerExecutor.class, serverExecutor);
-		bundle = new ExecutorBundle(executors);
+		bundle = new Executors(executors);
 		
 		executor = new TaskRunnerImpl(bundle, currentTask, publisher = new MockPublisher(), clock);
 		

@@ -23,7 +23,7 @@ import jj.util.Closer;
 @Singleton
 class TaskRunnerImpl implements TaskRunner {
 
-	private final ExecutorBundle executors;
+	private final Executors executors;
 	private final CurrentTask currentTask;
 	private final Publisher publisher;
 	private final Clock clock;
@@ -32,7 +32,7 @@ class TaskRunnerImpl implements TaskRunner {
 	
 	private final ServerTask monitor = new ServerTask(getClass().getSimpleName() + " execution monitor") {
 		
-		private void log(TaskTracker taskTracker, JJTask task) {
+		private void log(TaskTracker taskTracker, JJTask<?> task) {
 			publisher.publish(new Emergency(
 				"{} has been waiting {} milliseconds to execute.  something is broken", task, new Long(clock.time() + taskTracker.enqueuedTime()) 
 			));
@@ -42,7 +42,7 @@ class TaskRunnerImpl implements TaskRunner {
 		public void run() throws Exception {
 			while (true) {
 				final TaskTracker taskTracker = queuedTasks.take();
-				final JJTask task = taskTracker.task();
+				final JJTask<?> task = taskTracker.task();
 				if (taskTracker.startTime() == 0 
 					&& task != null
 					&& ((task instanceof DelayedTask<?>) ? !((DelayedTask<?>)task).cancelKey().canceled() : true)
@@ -55,7 +55,7 @@ class TaskRunnerImpl implements TaskRunner {
 	
 	@Inject
 	TaskRunnerImpl(
-		final ExecutorBundle bundle,
+		final Executors bundle,
 		final CurrentTask currentTask,
 		final Publisher publisher,
 		final Clock clock
@@ -69,7 +69,7 @@ class TaskRunnerImpl implements TaskRunner {
 	}
 	
 	@Override
-	public Promise execute(final JJTask task) {
+	public Promise execute(final JJTask<?> task) {
 
 		final Promise promise = task.promise().taskRunner(this);
 		final TaskTracker tracker = new TaskTracker(clock, task);
@@ -111,9 +111,9 @@ class TaskRunnerImpl implements TaskRunner {
 				
 				// interruption means don't bother keeping promises
 				if (!interrupted) {
-					List<JJTask> tasks = promise.done();
+					List<JJTask<?>> tasks = promise.done();
 					if (tasks != null) {
-						for (JJTask t : tasks) {
+						for (JJTask<?> t : tasks) {
 							execute(t);
 						}
 					}

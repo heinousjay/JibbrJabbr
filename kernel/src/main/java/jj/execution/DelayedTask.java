@@ -24,7 +24,7 @@ import jj.execution.DelayedExecutor.CancelKey;
  * @author jason
  *
  */
-public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask {
+public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask<T> {
 
 	protected DelayedTask(String name) {
 		super(name);

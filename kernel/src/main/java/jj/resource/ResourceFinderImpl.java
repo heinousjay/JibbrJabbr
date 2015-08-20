@@ -1,5 +1,7 @@
 package jj.resource;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -126,7 +128,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	private void acquire(ResourceKey slot) {
 		ResourceTask owner = resourcesInProgress.putIfAbsent(slot, currentTask.currentAs(ResourceTask.class));
 		if (owner != null) {
-			owner.await();
+			owner.await(2, SECONDS);
 		}
 	}
 	

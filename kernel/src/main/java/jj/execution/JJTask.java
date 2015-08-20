@@ -34,7 +34,7 @@ import jj.script.ScriptTask;
  * @author jason
  *
  */
-public abstract class JJTask {
+public abstract class JJTask<ExecutorType> {
 	
 	protected interface ExecutorFinder {
 		
@@ -78,7 +78,7 @@ public abstract class JJTask {
 		return name;
 	}
 	
-	final void next(JJTask next) {
+	final void next(JJTask<?> next) {
 		promise.then(next);
 	}
 	

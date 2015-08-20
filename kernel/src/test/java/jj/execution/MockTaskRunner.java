@@ -34,17 +34,17 @@ import jj.execution.DelayedExecutor.CancelKey;
 @Singleton
 public class MockTaskRunner implements TaskRunner {
 
-	public List<JJTask> tasks = new ArrayList<>();
+	public List<JJTask<?>> tasks = new ArrayList<>();
 	
 	public void runUntilIdle() throws Exception {
-		JJTask task = tasks.isEmpty() ? null : tasks.remove(0);
+		JJTask<?> task = tasks.isEmpty() ? null : tasks.remove(0);
 		while (task != null) {
 			task.run();
 			task = tasks.isEmpty() ? null : tasks.remove(0);
 		}
 	}
 
-	public JJTask firstTask() {
+	public JJTask<?> firstTask() {
 		return tasks.get(0);
 	}
 	
@@ -52,10 +52,10 @@ public class MockTaskRunner implements TaskRunner {
 		return (DelayedTask<?>)tasks.get(0);
 	}
 	
-	public JJTask runFirstTask() throws Exception {
+	public JJTask<?> runFirstTask() throws Exception {
 		assert(!tasks.isEmpty());
 		
-		JJTask task = tasks.remove(0);
+		JJTask<?> task = tasks.remove(0);
 		try {
 			task.run();
 		} catch (Exception cause) {
@@ -91,7 +91,7 @@ public class MockTaskRunner implements TaskRunner {
 	public CancelKey cancelKey;
 	
 	@Override
-	public Promise execute(final JJTask task) {
+	public Promise execute(final JJTask<?> task) {
 		if (cancelKey != null && task instanceof DelayedTask<?>) {
 			DelayedTask<?> dTask = (DelayedTask<?>)task;
 			dTask.cancelKey = cancelKey;
@@ -107,7 +107,7 @@ public class MockTaskRunner implements TaskRunner {
 
 				@Override
 				public Promise answer(InvocationOnMock invocation) throws Throwable {
-					((JJTask)invocation.getArguments()[0]).run();
+					((JJTask<?>)invocation.getArguments()[0]).run();
 					return result;
 				}
 				
@@ -125,13 +125,13 @@ public class MockTaskRunner implements TaskRunner {
 		return delay(tasks.get(0));
 	}
 	
-	public long delay(JJTask task) {
+	public long delay(JJTask<?> task) {
 		assert task instanceof DelayedTask : "not a DelayedTask";
 	
 		return ((DelayedTask<?>)task).delay();
 	}
 	
-	public boolean taskWillRepeat(JJTask task) {
+	public boolean taskWillRepeat(JJTask<?> task) {
 		assert task instanceof DelayedTask : "not a DelayedTask";
 		
 		return ((DelayedTask<?>)task).willRepeat();

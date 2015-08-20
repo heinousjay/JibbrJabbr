@@ -27,12 +27,12 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class ExecutorBundle implements JJTask.ExecutorFinder {
+class Executors implements JJTask.ExecutorFinder {
 	
 	private final Map<Class<?>, Object> executors;
 
 	@Inject
-	ExecutorBundle(
+	Executors(
 		final Map<Class<?>, Object> executors
 	) {
 		this.executors = executors;
