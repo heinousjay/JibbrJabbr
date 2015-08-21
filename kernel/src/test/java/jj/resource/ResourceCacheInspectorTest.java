@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import jj.script.RealRhinoContextProvider;
@@ -67,13 +68,13 @@ public class ResourceCacheInspectorTest {
 		
 		// holy crap dependency lists
 		// this literally might be better to do in the integration test.  it's getting ridiculous here
-		given(resource1.dependents()).willReturn(Arrays.asList(resource2));
-		given(resource2.dependents()).willReturn(Arrays.asList(resource1));
+		given(resource1.dependents()).willReturn(Collections.singletonList(resource2));
+		given(resource2.dependents()).willReturn(Collections.singletonList(resource1));
 		given(resource3.dependents()).willReturn(Arrays.asList(resource4, resource5, resource6, resource7));
 		
 		resources = Arrays.asList(resource1, resource2, resource3, resource4, resource5, resource6, resource7);
 		total = resources.size();
-		given((List<Resource<?>>)resourceCacheImpl.allResources()).willReturn(resources);
+		given(resourceCacheImpl.allResources()).willReturn(resources);
 		
 		given(resourceCreators.knownResourceTypeNames()).willReturn(Arrays.asList("type1", "type2"));
 		

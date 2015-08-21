@@ -33,9 +33,7 @@ import javax.inject.Inject;
 import jj.App;
 import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpRequest;
-import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
-import jj.http.server.EmbeddedHttpServer.ResponseReady;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -92,17 +90,13 @@ public class BasicServingTest {
 		final CountDownLatch latch = new CountDownLatch(totalClients);
 		for (int i = 0; i < totalClients; ++i) {
 			String uri = uris.get(i % uris.size());
-			server.request(new EmbeddedHttpRequest(uri), new ResponseReady() {
-				
-				@Override
-				public void ready(EmbeddedHttpResponse response) throws Exception {
-					try {
-						trace.mode().traceEvent(uri, response.bodyContentAsBytes());
-					} catch (Throwable t) {
-						error.addSuppressed(t);
-					} finally {
-						latch.countDown();
-					}
+			server.request(new EmbeddedHttpRequest(uri), response -> {
+				try {
+					trace.mode().traceEvent(uri, response.bodyContentAsBytes());
+				} catch (Throwable t) {
+					error.addSuppressed(t);
+				} finally {
+					latch.countDown();
 				}
 			});
 		}
@@ -177,17 +171,13 @@ public class BasicServingTest {
 		try {
 			for (int i = 0; i < threadCount; ++i) {
 				final int index = i;
-				service.submit(new Runnable() {
-					
-					@Override
-					public void run() {
-						try {
-							runBasicStressTest(perClientTimeout, perClientRequestCount, requests);
-						} catch (Throwable t) {
-							throwables[index] = t;
-						} finally {
-							latch.countDown();
-						}
+				service.submit(() -> {
+					try {
+						runBasicStressTest(perClientTimeout, perClientRequestCount, requests);
+					} catch (Throwable t) {
+						throwables[index] = t;
+					} finally {
+						latch.countDown();
 					}
 				});
 			}

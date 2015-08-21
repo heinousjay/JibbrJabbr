@@ -32,6 +32,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface ServerLogger {
 	
-	public static final String NAME = "server";
+	String NAME = "server";
 
 }

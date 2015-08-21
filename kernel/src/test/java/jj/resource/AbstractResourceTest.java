@@ -24,9 +24,7 @@ import jj.event.Publisher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * validates that dependencies are handled correctly
@@ -64,17 +62,13 @@ public class AbstractResourceTest {
 		
 		// okay this is a little weird, i admit it
 		
-		willAnswer(new Answer<Void>() {
-
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				ResourceKilled event = (ResourceKilled)invocation.getArguments()[0];
-				base.on(event);
-				one.on(event);
-				two.on(event);
-				one_two.on(event);
-				return null;
-			}
+		willAnswer((invocation) -> {
+			ResourceKilled event = (ResourceKilled)invocation.getArguments()[0];
+			base.on(event);
+			one.on(event);
+			two.on(event);
+			one_two.on(event);
+			return null;
 		}).given(publisher).publish(isA(ResourceKilled.class));
 		
 		one_two.kill();

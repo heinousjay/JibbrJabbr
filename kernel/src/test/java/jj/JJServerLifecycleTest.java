@@ -18,12 +18,8 @@ package jj;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jj.ServerStarting.Priority;
 import jj.event.MockPublisher;
-import jj.event.MockPublisher.OnPublish;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
 import jj.server.Server;
@@ -75,41 +71,35 @@ public class JJServerLifecycleTest {
 	@Mock JJTask<?> lowest_task2;
 	@Mock JJTask<?> lowest_task3;
 	@Mock JJTask<?> lowest_task4;
-	
-	
-	List<Integer> order = new ArrayList<>();
+
 
 	@Test
 	public void test() throws Exception {
 		
 		// given
 		publisher = new MockPublisher();
-		publisher.onPublish = new OnPublish() {
-			
-			@Override
-			public void published(Object event) {
-				ServerStarting starting = (ServerStarting)event;
-				starting.registerStartupTask(Priority.Highest, highest_task1);
-				starting.registerStartupTask(Priority.Highest, highest_task2);
-				starting.registerStartupTask(Priority.Highest, highest_task3);
-				starting.registerStartupTask(Priority.Highest, highest_task4);
-				starting.registerStartupTask(Priority.NearHighest, high_task1);
-				starting.registerStartupTask(Priority.NearHighest, high_task2);
-				starting.registerStartupTask(Priority.NearHighest, high_task3);
-				starting.registerStartupTask(Priority.NearHighest, high_task4);
-				starting.registerStartupTask(Priority.Middle, mid_task1);
-				starting.registerStartupTask(Priority.Middle, mid_task2);
-				starting.registerStartupTask(Priority.Middle, mid_task3);
-				starting.registerStartupTask(Priority.Middle, mid_task4);
-				starting.registerStartupTask(Priority.NearLowest, low_task1);
-				starting.registerStartupTask(Priority.NearLowest, low_task2);
-				starting.registerStartupTask(Priority.NearLowest, low_task3);
-				starting.registerStartupTask(Priority.NearLowest, low_task4);
-				starting.registerStartupTask(Priority.Lowest, lowest_task1);
-				starting.registerStartupTask(Priority.Lowest, lowest_task2);
-				starting.registerStartupTask(Priority.Lowest, lowest_task3);
-				starting.registerStartupTask(Priority.Lowest, lowest_task4);
-			}
+		publisher.onPublish = event -> {
+			ServerStarting starting = (ServerStarting)event;
+			starting.registerStartupTask(Priority.Highest, highest_task1);
+			starting.registerStartupTask(Priority.Highest, highest_task2);
+			starting.registerStartupTask(Priority.Highest, highest_task3);
+			starting.registerStartupTask(Priority.Highest, highest_task4);
+			starting.registerStartupTask(Priority.NearHighest, high_task1);
+			starting.registerStartupTask(Priority.NearHighest, high_task2);
+			starting.registerStartupTask(Priority.NearHighest, high_task3);
+			starting.registerStartupTask(Priority.NearHighest, high_task4);
+			starting.registerStartupTask(Priority.Middle, mid_task1);
+			starting.registerStartupTask(Priority.Middle, mid_task2);
+			starting.registerStartupTask(Priority.Middle, mid_task3);
+			starting.registerStartupTask(Priority.Middle, mid_task4);
+			starting.registerStartupTask(Priority.NearLowest, low_task1);
+			starting.registerStartupTask(Priority.NearLowest, low_task2);
+			starting.registerStartupTask(Priority.NearLowest, low_task3);
+			starting.registerStartupTask(Priority.NearLowest, low_task4);
+			starting.registerStartupTask(Priority.Lowest, lowest_task1);
+			starting.registerStartupTask(Priority.Lowest, lowest_task2);
+			starting.registerStartupTask(Priority.Lowest, lowest_task3);
+			starting.registerStartupTask(Priority.Lowest, lowest_task4);
 		};
 		taskRunner = new MockTaskRunner();
 		

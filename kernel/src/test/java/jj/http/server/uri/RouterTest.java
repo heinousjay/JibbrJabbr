@@ -74,23 +74,13 @@ public class RouterTest {
 	
 	Set<RouteContributor> routeContributors;
 	
-	RouteContributor routeContributor1 = new RouteContributor() {
-		
-		@Override
-		public List<Route> contributions() {
-			return Collections.singletonList(new Route(GET, "/*path.something", SOMETHING, ""));
-		}
-	};
+	RouteContributor routeContributor1 = () -> Collections.singletonList(new Route(GET, "/*path.something", SOMETHING, ""));
 	
-	RouteContributor routeContributor2 = new RouteContributor() {
-		
-		@Override
-		public List<Route> contributions() {
-			return Arrays.asList(
-				new Route(POST, "/*path.something", SOMETHING, ""),
-				new Route(DELETE, "/*path.something", SOMETHING, "")
-			);
-		}
+	RouteContributor routeContributor2 = () -> {
+		return Arrays.asList(
+			new Route(POST, "/*path.something", SOMETHING, ""),
+			new Route(DELETE, "/*path.something", SOMETHING, "")
+		);
 	};
 	
 	Router router;

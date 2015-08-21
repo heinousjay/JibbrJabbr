@@ -65,7 +65,7 @@ class SeparatorNode extends TrieNode {
 			if (nextNode == null) {
 				nextNode = new StaticNode();
 				nextNode.terminal = terminal;
-				stringNodeChildren.put(value, (StaticNode)nextNode);
+				stringNodeChildren.put(value, nextNode);
 			}
 			nextNode.addRoute(route.advanceIndex());
 		}

@@ -15,27 +15,15 @@
  */
 package jj.http.server;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-
-import jj.http.server.HttpServerNioEventLoopGroup;
-
 /**
  * @author jason
  *
  */
 class MockHttpServerNioEventLoopGroup extends HttpServerNioEventLoopGroup {
-
-	/**
-	 * @param uncaughtExceptionHandler
-	 */
 	MockHttpServerNioEventLoopGroup() {
-		super(new UncaughtExceptionHandler() {
-			
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				e.printStackTrace();
-				throw new AssertionError(e);
-			}
+		super((t, e) -> {
+			e.printStackTrace();
+			throw new AssertionError(e);
 		});
 	}
 

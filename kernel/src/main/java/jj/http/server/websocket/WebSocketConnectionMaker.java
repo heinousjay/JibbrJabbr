@@ -128,16 +128,12 @@ public class WebSocketConnectionMaker {
 					} else if (!uriMatch.sha1.equals(host.sha1())) {
 						
 						ctx.writeAndFlush(new TextWebSocketFrame("jj-reload"))
-							.addListener(new ChannelFutureListener() {
-								
-								@Override
-								public void operationComplete(ChannelFuture future) throws Exception {
-									// 1001 indicates that an endpoint is "going away", such as a server
-									// going down or a browser having navigated away from a page.
-									ctx.writeAndFlush(new CloseWebSocketFrame(1001, null)).addListener(CLOSE);
-									// TODO: is closing here the right thing? or do we count on the client closing the connection
-									// to avoid the time_wait state? 
-								}
+							.addListener(f -> {
+								// 1001 indicates that an endpoint is "going away", such as a server
+								// going down or a browser having navigated away from a page.
+								ctx.writeAndFlush(new CloseWebSocketFrame(1001, null)).addListener(CLOSE);
+								// TODO: is closing here the right thing? or do we count on the client closing the connection
+								// to avoid the time_wait state?
 							});
 						
 						

@@ -39,13 +39,7 @@ public class ConnectionBroadcastStack {
 	private final ConnectionBroadcastStack parent;
 	
 	public ConnectionBroadcastStack(final ConnectionBroadcastStack parent, final Iterator<WebSocketConnection> iterator) {
-		this(parent, iterator, new Predicate() {
-			
-			@Override
-			public boolean accept(WebSocketConnection connection) {
-				return true;
-			}
-		});
+		this(parent, iterator, connection -> true);
 	}
 
 	public ConnectionBroadcastStack(final ConnectionBroadcastStack parent, final Iterator<WebSocketConnection> iterator, final Predicate predicate) {

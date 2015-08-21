@@ -34,10 +34,7 @@ public class JJThreadFactory implements ThreadFactory {
 	private final AtomicInteger id = new AtomicInteger();
 	
 	private String namePattern;
-
-	/**
-	 * @param uncaughtExceptionHandler
-	 */
+	
 	@Inject
 	public JJThreadFactory(UncaughtExceptionHandler uncaughtExceptionHandler) {
 		this.uncaughtExceptionHandler = uncaughtExceptionHandler;
@@ -49,20 +46,17 @@ public class JJThreadFactory implements ThreadFactory {
 	}
 
 	@Override
-	public Thread newThread(final Runnable r) {
+	public Thread newThread(Runnable r) {
 		final String name = String.format(
 			namePattern, 
 			id.incrementAndGet()
 		);
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				flag.set(Boolean.TRUE);
-				try {
-					r.run();
-				} finally {
-					flag.set(null);
-				}
+		Thread thread = new Thread(() -> {
+			flag.set(Boolean.TRUE);
+			try {
+				r.run();
+			} finally {
+				flag.set(null);
 			}
 		}, name);
 		thread.setDaemon(true);

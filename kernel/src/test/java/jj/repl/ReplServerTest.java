@@ -36,9 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * @author jason
@@ -60,14 +58,8 @@ public class ReplServerTest {
 		}
 	};
 	
-	Provider<ReplHandler> replHandlerProvider = new Provider<ReplHandler>() {
+	Provider<ReplHandler> replHandlerProvider = () -> mock(ReplHandler.class);
 
-		@Override
-		public ReplHandler get() {
-			return mock(ReplHandler.class);
-		}
-	};
-	
 	@Mock Publisher publisher;
 	@Mock ResourceLoader resourceLoader;
 	@Mock UncaughtExceptionHandler uncaughtExceptionHandler;
@@ -102,13 +94,9 @@ public class ReplServerTest {
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 		
-		willAnswer(new Answer<Void>() {
-
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				latch.countDown();
-				return null;
-			}
+		willAnswer(invocation -> {
+			latch.countDown();
+			return null;
 		}).given(publisher).publish(isA(ReplListening.class));
 		
 		server.on((ConfigurationLoaded)null);

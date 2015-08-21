@@ -108,23 +108,19 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 	
 	private final DelayQueue<DelayedRunnable> delayedTasks = new DelayQueue<>();
 	
-	private final Runnable scheduler = new Runnable() {
-		
-		@Override
-		public void run() {
-			Thread.currentThread().setName(schedulerThreadName());
-			try {
-				while (true) {
-					DelayedRunnable runnable = delayedTasks.take();
-					if (asynchronousScheduling()) {
-						submit(runnable);
-					} else {
-						try { runnable.run(); } catch (Throwable t) {}
-					}
+	private final Runnable scheduler = () -> {
+		Thread.currentThread().setName(schedulerThreadName());
+		try {
+			while (true) {
+				DelayedRunnable runnable = delayedTasks.take();
+				if (asynchronousScheduling()) {
+					submit(runnable);
+				} else {
+					try { runnable.run(); } catch (Throwable t) {}
 				}
-			} catch (InterruptedException e) {
-				
 			}
+		} catch (InterruptedException e) {
+			// just die
 		}
 	};
 	

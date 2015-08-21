@@ -38,7 +38,7 @@ public class ServerStarting extends LoggedEvent {
 		NearHighest,
 		Middle,
 		NearLowest,
-		Lowest;
+		Lowest
 	}
 	
 	private final Path rootPath;
@@ -52,7 +52,7 @@ public class ServerStarting extends LoggedEvent {
 	}
 
 	public void registerStartupTask(final Priority priority, final JJTask<?> task) {
-		startupTasks.computeIfAbsent(priority, (p) -> { return new ArrayList<>(1); }).add(task);
+		startupTasks.computeIfAbsent(priority, p -> new ArrayList<>(1)).add(task);
 	}
 
 	Map<Priority, List<JJTask<?>>> startupTasks() {
