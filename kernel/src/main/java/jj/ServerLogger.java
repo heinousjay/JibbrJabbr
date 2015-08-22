@@ -23,6 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Annotates {@link jj.logging.LoggedEvent}s that go to the
+ * server log
+ *
  * @author jason
  *
  */
