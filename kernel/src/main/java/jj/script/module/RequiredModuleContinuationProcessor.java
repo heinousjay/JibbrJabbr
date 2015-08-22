@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceEvent;
-import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.resource.ResourceNotFound;
@@ -46,8 +45,6 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final ResourceLoader resourceLoader;
 	
-	private final ResourceFinder resourceFinder;
-	
 	private final DependsOnScriptEnvironmentInitialization initializer;
 	
 	private final ConcurrentMap<RequiredModule, Boolean> waiters = new ConcurrentHashMap<>(4);
@@ -55,11 +52,9 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	@Inject
 	RequiredModuleContinuationProcessor(
 		ResourceLoader resourceLoader,
-		ResourceFinder resourceFinder,
 		DependsOnScriptEnvironmentInitialization initializer
 	) {
 		this.resourceLoader = resourceLoader;
-		this.resourceFinder = resourceFinder;
 		this.initializer = initializer;
 	}
 	
@@ -90,7 +85,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	private void loadEnvironment(RequiredModule requiredModule) {
 		resourceLoader.loadResource(ModuleScriptEnvironment.class, Virtual, requiredModule.identifier(), requiredModule);
 		Boolean result = waiters.putIfAbsent(requiredModule, Boolean.TRUE);
-		assert (result == null) : "something is crossed up in the " + getClass();
+		assert (result == null);
 	}
 
 	@Override
@@ -99,7 +94,7 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 		final RequiredModule requiredModule = continuationState.continuationAs(RequiredModule.class);
 		
 		ModuleScriptEnvironment scriptEnvironment = 
-			resourceFinder.findResource(
+			resourceLoader.findResource(
 				ModuleScriptEnvironment.class,
 				Virtual,
 				requiredModule.identifier(),
