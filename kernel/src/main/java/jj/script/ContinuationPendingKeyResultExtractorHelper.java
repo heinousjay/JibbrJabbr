@@ -32,10 +32,7 @@ import jj.execution.TaskRunner;
 class ContinuationPendingKeyResultExtractorHelper extends ContinuationPendingCache {
 
 	static Map<PendingKey, Object> RESULT_MAP = new HashMap<>();
-	
-	/**
-	 * @param taskRunner
-	 */
+
 	ContinuationPendingKeyResultExtractorHelper() {
 		super(new TaskRunner() { // cause really, it shouldn't happen
 			

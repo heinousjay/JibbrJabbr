@@ -22,9 +22,6 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
 import jj.execution.DelayedExecutor.CancelKey;
 
 /**
@@ -70,16 +67,12 @@ public class MockTaskRunner implements TaskRunner {
 	public Thread runFirstTaskInDaemon() throws Exception {
 		assert(!tasks.isEmpty());
 		
-		Thread t = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					runFirstTask();
-				} catch (InterruptedException ie) { // eat this, we are shutting it down
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		Thread t = new Thread(() -> {
+			try {
+				runFirstTask();
+			} catch (InterruptedException ie) { // eat this, we are shutting it down
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 		t.setDaemon(true);
@@ -103,14 +96,9 @@ public class MockTaskRunner implements TaskRunner {
 		
 		if (mockingDetails(task).isMock()) {
 			result = mock(Promise.class);
-			when(result.then(any(JJTask.class))).then(new Answer<Promise>() {
-
-				@Override
-				public Promise answer(InvocationOnMock invocation) throws Throwable {
-					((JJTask<?>)invocation.getArguments()[0]).run();
-					return result;
-				}
-				
+			when(result.then(any(JJTask.class))).then(invocation -> {
+				((JJTask<?>)invocation.getArguments()[0]).run();
+				return result;
 			});
 		} else {
 			result = task.promise().taskRunner(this);
