@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jj.event.MockPublisher;
-import jj.event.MockPublisher.OnPublish;
 import jj.logging.Emergency;
 import jj.script.ScriptEnvironment;
 import jj.util.MockClock;
@@ -61,7 +60,7 @@ public class TaskRunnerImplTest {
 	private @Captor ArgumentCaptor<JJTask<?>> taskCaptor;
 	
 	private @Captor ArgumentCaptor<Runnable> runnableCaptor;
-	
+
 	private String baseName = "test";
 	
 	private MockClock clock = new MockClock();
@@ -154,7 +153,7 @@ public class TaskRunnerImplTest {
 		final Exception toThrow = new Exception();
 		
 		executor.execute(new ServerTask("test task") {
-			
+
 			@Override
 			protected void run() throws Exception {
 				throw toThrow;
@@ -233,32 +232,25 @@ public class TaskRunnerImplTest {
 		
 		// and we need to coordinate
 		final CountDownLatch latch = new CountDownLatch(1);
-		publisher.onPublish = new OnPublish() {
-			
-			@Override
-			public void published(Object event) {
-				System.out.println("totally got called " + event);
-				latch.countDown();
-			}
+		publisher.onPublish = event -> {
+			System.out.println("totally got called " + event);
+			latch.countDown();
 		};
 		
 		// now we need to trigger the monitor to wake up.  this requires yet another
 		// thread.  this one is not a daemon on purpose
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				System.out.println("well at least i got called");
-				// causes the queue to get polled and have the system realize something has expired
-				// takes advantage of the implementation of DelayQueue, so not ideal, but i got nothing
-				// else!
-				executor.execute(task);
-				reset(executors);
-			}
+		new Thread(() -> {
+			System.out.println("well at least i got called");
+			// causes the queue to get polled and have the system realize something has expired
+			// takes advantage of the implementation of DelayQueue, so not ideal, but i got nothing
+			// else!
+			executor.execute(task);
+			reset(executors);
 		}); //.start();
 		
 		assertTrue("timed out", latch.await(2, SECONDS));
 		
 		assertThat(publisher.events.get(0), is(instanceOf(Emergency.class)));
+
 	}
 }
