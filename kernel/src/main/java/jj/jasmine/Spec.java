@@ -41,7 +41,7 @@ class Spec {
 	}
 	
 	public boolean failed() {
-		return status == "failed";
+		return "failed".equals(status);
 	}
 	
 	protected StringBuilder makeToString(StringBuilder sb, int indentation) {
