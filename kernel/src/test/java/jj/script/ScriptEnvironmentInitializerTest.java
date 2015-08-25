@@ -118,7 +118,7 @@ public class ScriptEnvironmentInitializerTest {
 	private ScriptTask<?> startInitialization() {
 		// this just puts the task into our greedy little hands
 		sei.initializeScript(scriptEnvironment);
-		JJTask task = taskRunner.tasks.get(0);
+		JJTask<?> task = taskRunner.tasks.get(0);
 		ScriptTask<?> resumable = (ScriptTask<?>)task;
 		return resumable;
 	}

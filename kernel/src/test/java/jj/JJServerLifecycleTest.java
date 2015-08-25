@@ -18,12 +18,8 @@ package jj;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jj.ServerStarting.Priority;
 import jj.event.MockPublisher;
-import jj.event.MockPublisher.OnPublish;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
 import jj.server.Server;
@@ -47,69 +43,63 @@ public class JJServerLifecycleTest {
 	
 	@Mock Version version;
 	
-	@Mock JJTask p1;
-	@Mock JJTask p2;
-	@Mock JJTask p3;
+	@Mock JJTask<?> p1;
+	@Mock JJTask<?> p2;
+	@Mock JJTask<?> p3;
 	
-	@Mock JJTask highest_task1;
-	@Mock JJTask highest_task2;
-	@Mock JJTask highest_task3;
-	@Mock JJTask highest_task4;
+	@Mock JJTask<?> highest_task1;
+	@Mock JJTask<?> highest_task2;
+	@Mock JJTask<?> highest_task3;
+	@Mock JJTask<?> highest_task4;
 	
-	@Mock JJTask high_task1;
-	@Mock JJTask high_task2;
-	@Mock JJTask high_task3;
-	@Mock JJTask high_task4;
+	@Mock JJTask<?> high_task1;
+	@Mock JJTask<?> high_task2;
+	@Mock JJTask<?> high_task3;
+	@Mock JJTask<?> high_task4;
 	
-	@Mock JJTask mid_task1;
-	@Mock JJTask mid_task2;
-	@Mock JJTask mid_task3;
-	@Mock JJTask mid_task4;
+	@Mock JJTask<?> mid_task1;
+	@Mock JJTask<?> mid_task2;
+	@Mock JJTask<?> mid_task3;
+	@Mock JJTask<?> mid_task4;
 	
-	@Mock JJTask low_task1;
-	@Mock JJTask low_task2;
-	@Mock JJTask low_task3;
-	@Mock JJTask low_task4;
+	@Mock JJTask<?> low_task1;
+	@Mock JJTask<?> low_task2;
+	@Mock JJTask<?> low_task3;
+	@Mock JJTask<?> low_task4;
 	
-	@Mock JJTask lowest_task1;
-	@Mock JJTask lowest_task2;
-	@Mock JJTask lowest_task3;
-	@Mock JJTask lowest_task4;
-	
-	
-	List<Integer> order = new ArrayList<>();
+	@Mock JJTask<?> lowest_task1;
+	@Mock JJTask<?> lowest_task2;
+	@Mock JJTask<?> lowest_task3;
+	@Mock JJTask<?> lowest_task4;
+
 
 	@Test
 	public void test() throws Exception {
 		
 		// given
 		publisher = new MockPublisher();
-		publisher.onPublish = new OnPublish() {
-			
-			@Override
-			public void published(Object event) {
-				ServerStarting starting = (ServerStarting)event;
-				starting.registerStartupTask(Priority.Highest, highest_task1);
-				starting.registerStartupTask(Priority.Highest, highest_task2);
-				starting.registerStartupTask(Priority.Highest, highest_task3);
-				starting.registerStartupTask(Priority.Highest, highest_task4);
-				starting.registerStartupTask(Priority.NearHighest, high_task1);
-				starting.registerStartupTask(Priority.NearHighest, high_task2);
-				starting.registerStartupTask(Priority.NearHighest, high_task3);
-				starting.registerStartupTask(Priority.NearHighest, high_task4);
-				starting.registerStartupTask(Priority.Middle, mid_task1);
-				starting.registerStartupTask(Priority.Middle, mid_task2);
-				starting.registerStartupTask(Priority.Middle, mid_task3);
-				starting.registerStartupTask(Priority.Middle, mid_task4);
-				starting.registerStartupTask(Priority.NearLowest, low_task1);
-				starting.registerStartupTask(Priority.NearLowest, low_task2);
-				starting.registerStartupTask(Priority.NearLowest, low_task3);
-				starting.registerStartupTask(Priority.NearLowest, low_task4);
-				starting.registerStartupTask(Priority.Lowest, lowest_task1);
-				starting.registerStartupTask(Priority.Lowest, lowest_task2);
-				starting.registerStartupTask(Priority.Lowest, lowest_task3);
-				starting.registerStartupTask(Priority.Lowest, lowest_task4);
-			}
+		publisher.onPublish = event -> {
+			ServerStarting starting = (ServerStarting)event;
+			starting.registerStartupTask(Priority.Highest, highest_task1);
+			starting.registerStartupTask(Priority.Highest, highest_task2);
+			starting.registerStartupTask(Priority.Highest, highest_task3);
+			starting.registerStartupTask(Priority.Highest, highest_task4);
+			starting.registerStartupTask(Priority.NearHighest, high_task1);
+			starting.registerStartupTask(Priority.NearHighest, high_task2);
+			starting.registerStartupTask(Priority.NearHighest, high_task3);
+			starting.registerStartupTask(Priority.NearHighest, high_task4);
+			starting.registerStartupTask(Priority.Middle, mid_task1);
+			starting.registerStartupTask(Priority.Middle, mid_task2);
+			starting.registerStartupTask(Priority.Middle, mid_task3);
+			starting.registerStartupTask(Priority.Middle, mid_task4);
+			starting.registerStartupTask(Priority.NearLowest, low_task1);
+			starting.registerStartupTask(Priority.NearLowest, low_task2);
+			starting.registerStartupTask(Priority.NearLowest, low_task3);
+			starting.registerStartupTask(Priority.NearLowest, low_task4);
+			starting.registerStartupTask(Priority.Lowest, lowest_task1);
+			starting.registerStartupTask(Priority.Lowest, lowest_task2);
+			starting.registerStartupTask(Priority.Lowest, lowest_task3);
+			starting.registerStartupTask(Priority.Lowest, lowest_task4);
 		};
 		taskRunner = new MockTaskRunner();
 		
@@ -120,13 +110,7 @@ public class JJServerLifecycleTest {
 		
 		// then
 		
-		assertThat(taskRunner.tasks, hasItems(
-			highest_task1, highest_task2, highest_task3, highest_task4,
-			high_task1, high_task2, high_task3, high_task4,
-			mid_task1, mid_task2, mid_task3, mid_task4,
-			low_task1, low_task2, low_task3, low_task4,
-			lowest_task1, lowest_task2, lowest_task3, lowest_task4
-		));
+		assertTaskList();
 		
 		// given
 		publisher.events.clear();
@@ -137,6 +121,17 @@ public class JJServerLifecycleTest {
 		
 		// then
 		assertThat(publisher.events.get(0), is(instanceOf(ServerStopping.class)));
+	}
+
+	@SuppressWarnings("unchecked")
+	private void assertTaskList() {
+		assertThat(taskRunner.tasks, hasItems(
+			highest_task1, highest_task2, highest_task3, highest_task4,
+			high_task1, high_task2, high_task3, high_task4,
+			mid_task1, mid_task2, mid_task3, mid_task4,
+			low_task1, low_task2, low_task3, low_task4,
+			lowest_task1, lowest_task2, lowest_task3, lowest_task4
+		));
 	}
 
 }

@@ -41,14 +41,7 @@ public class ReplServerChannelInitializerTest {
 	
 	@Mock SocketChannel ch;
 	
-	Provider<ReplHandler> replHandlerProvider = new Provider<ReplHandler>() {
-
-		@Override
-		public ReplHandler get() {
-			return mock(ReplHandler.class);
-		}
-		
-	};
+	Provider<ReplHandler> replHandlerProvider = () ->  mock(ReplHandler.class);
 
 	@Test
 	public void test() throws Exception {

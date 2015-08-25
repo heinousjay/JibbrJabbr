@@ -45,48 +45,37 @@ public class CreationScope implements Scope {
 	}
 	
 	private static final Provider<Object> SEEDED_KEY_PROVIDER =
-		new Provider<Object>() {
-			public Object get() {
+			() -> {
 				throw new AssertionError(
 					"scoped object should have been " +
 					"explicitly seeded in this scope by calling " +
 					"#seed(), but was not."
 				);
-			}
-		};
+			};
 
 	CreationScope() {}
 	
-	private final ThreadLocal<Map<Key<?>, Object>> values = new ThreadLocal<Map<Key<?>, Object>>();
+	private final ThreadLocal<Map<Key<?>, Object>> values = new ThreadLocal<>();
 
 	@Override
 	public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
-		return new Provider<T>() {
-			public T get() {
-				Map<Key<?>, Object> scopedObjects = getScopedObjectMap(key);
+		return () -> {
+			Map<Key<?>, Object> scopedObjects = getScopedObjectMap(key);
 
-				@SuppressWarnings("unchecked")
-				T current = (T)scopedObjects.get(key);
-				if (current == null && !scopedObjects.containsKey(key)) {
-					current = unscoped.get();
-					scopedObjects.put(key, current);
-				}
-				return current;
+			@SuppressWarnings("unchecked")
+			T current = (T)scopedObjects.get(key);
+			if (current == null && !scopedObjects.containsKey(key)) {
+				current = unscoped.get();
+				scopedObjects.put(key, current);
 			}
+			return current;
 		};
 	}
 
 	public Closer enter() {
 		assert(values.get() == null) : "A scoping block is already in progress";
-		values.set(new HashMap<Key<?>, Object>());
-		return new Closer() {
-
-			@Override
-			public void close() {
-				values.remove();
-			}
-			
-		};
+		values.set(new HashMap<>());
+		return values::remove;
 	}
 
 	public <T> CreationScope seed(Key<T> key, T value) {

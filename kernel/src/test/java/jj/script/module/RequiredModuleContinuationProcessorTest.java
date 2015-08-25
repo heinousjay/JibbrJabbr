@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
 import jj.document.DocumentScriptEnvironment;
-import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.resource.ResourceNotFound;
@@ -30,9 +29,6 @@ import jj.script.PendingKey;
 import jj.script.ContinuationPendingKeyResultExtractor;
 import jj.script.ContinuationState;
 import jj.script.DependsOnScriptEnvironmentInitialization;
-import jj.script.module.ModuleScriptEnvironment;
-import jj.script.module.RequiredModule;
-import jj.script.module.RequiredModuleContinuationProcessor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,15 +47,11 @@ public class RequiredModuleContinuationProcessorTest {
 	
 	PendingKey pendingKey;
 	
-	String baseName = "index";
-	
 	String module = "module";
 	
 	@Mock DocumentScriptEnvironment documentScriptEnvironment;
 	
 	@Mock ResourceLoader loader;
-	
-	@Mock ResourceFinder finder;
 	
 	@Mock ContinuationState continuationState;
 	
@@ -90,7 +82,7 @@ public class RequiredModuleContinuationProcessorTest {
 		processor.process(continuationState);
 		
 		// we validate it happened because it's the only signal we get
-		verify(finder).findResource(ModuleScriptEnvironment.class, Virtual, module, requiredModule);
+		verify(loader).findResource(ModuleScriptEnvironment.class, Virtual, module, requiredModule);
 		verify(loader).loadResource(ModuleScriptEnvironment.class, Virtual, module, requiredModule);
 	}
 	
@@ -125,7 +117,7 @@ public class RequiredModuleContinuationProcessorTest {
 	}
 	
 	private void givenAScriptEnvironment() {
-		given(finder.findResource(eq(ModuleScriptEnvironment.class), eq(Virtual), eq(module), any(RequiredModule.class))).willReturn(moduleScriptEnvironment);
+		given(loader.findResource(eq(ModuleScriptEnvironment.class), eq(Virtual), eq(module), any(RequiredModule.class))).willReturn(moduleScriptEnvironment);
 	}
 	
 	@Test

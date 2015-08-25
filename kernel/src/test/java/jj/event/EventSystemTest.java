@@ -199,7 +199,7 @@ public class EventSystemTest {
 		// when
 		pub.publish(new EventSub());
 		pub.publish(new UnrelatedIEvent());
-		System.out.println(pub.listenerMap);
+
 		// then
 		assertThat(childSub.heard, is(2));
 		assertThat(childSub.heard2, is(1));

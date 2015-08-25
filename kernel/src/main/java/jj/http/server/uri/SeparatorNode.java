@@ -47,7 +47,7 @@ class SeparatorNode extends TrieNode {
 		assert current != PATH_SEPARATOR_CHAR : route + " has two separators in a row";
 		
 		if (PARAM_CHARS.indexOf(current) != -1) {
-			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<String, ParamNode>(4) : paramNodeChildren;
+			paramNodeChildren = paramNodeChildren == null ? new LinkedHashMap<>(4) : paramNodeChildren;
 			String paramValue = ParamNode.makeValue(route);
 			ParamNode nextNode = paramNodeChildren.get(paramValue);
 			if (nextNode == null) { 
@@ -59,13 +59,13 @@ class SeparatorNode extends TrieNode {
 			}
 			nextNode.addRoute(route.advanceIndex(paramValue.length()));
 		} else {
-			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<String, StaticNode>(4) : stringNodeChildren;
+			stringNodeChildren = stringNodeChildren == null ? new LinkedHashMap<>(4) : stringNodeChildren;
 			String value = String.valueOf(current);
 			StaticNode nextNode = stringNodeChildren.get(value);
 			if (nextNode == null) {
 				nextNode = new StaticNode();
 				nextNode.terminal = terminal;
-				stringNodeChildren.put(value, (StaticNode)nextNode);
+				stringNodeChildren.put(value, nextNode);
 			}
 			nextNode.addRoute(route.advanceIndex());
 		}
@@ -85,10 +85,8 @@ class SeparatorNode extends TrieNode {
 		
 		if (stringNodeChildren != null && uri.length() >= index + keyLength) {
 			String current = uri.substring(index, index + keyLength);
-			if (stringNodeChildren.containsKey(current)) {
-				boolean matched = stringNodeChildren.get(current).findGoal(context, uri, index + keyLength);
-				result = result || matched;
-			}
+			result = stringNodeChildren.containsKey(current) &&
+				stringNodeChildren.get(current).findGoal(context, uri, index + keyLength);
 		}
 		
 		if (paramNodeChildren != null) {
@@ -114,18 +112,14 @@ class SeparatorNode extends TrieNode {
 				newNode.compress();
 				stringNodeChildren = Collections.singletonMap(accumulator.toString(), newNode);
 			} else {
-				for (StaticNode node : stringNodeChildren.values()) {
-					node.compress();
-				}
+				stringNodeChildren.values().forEach(TrieNode::compress);
 				stringNodeChildren = Collections.unmodifiableMap(stringNodeChildren);
 			}
 		}
 		
 		if (paramNodeChildren != null) {
-			for (ParamNode node : paramNodeChildren.values()) {
-				node.compress();
-			}
-			// silly optimization
+			paramNodeChildren.values().forEach(TrieNode::compress);
+			// silly micro-optimization. might make it faster to route in common cases though
 			if (paramNodeChildren.size() == 1) {
 				Entry<String, ParamNode> entry = paramNodeChildren.entrySet().iterator().next();
 				paramNodeChildren = Collections.singletonMap(entry.getKey(), entry.getValue());

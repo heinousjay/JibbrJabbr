@@ -162,9 +162,6 @@ public abstract class AbstractScriptEnvironment<T> extends AbstractResource<T> i
 	
 	/**
 	 * Resume a continuation in this environment
-	 * @param pendingKey
-	 * @param result
-	 * @return
 	 */
 	PendingKey resumeContinuation(PendingKey pendingKey, Object result) {
 		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
@@ -172,7 +169,6 @@ public abstract class AbstractScriptEnvironment<T> extends AbstractResource<T> i
 	
 	/**
 	 * Await a continuation in this environment
-	 * @param task
 	 */
 	<S extends ScriptEnvironment<?>> void awaitContinuation(ScriptTask<S> task) {
 		continuationPendingCache.storeForContinuation(task);
@@ -203,7 +199,6 @@ public abstract class AbstractScriptEnvironment<T> extends AbstractResource<T> i
 	
 	/**
 	 * Override this function for custom initialization functionality
-	 * @return
 	 */
 	protected PendingKey doInitialize() {
 		return script() == null ? null : execute(script());
@@ -225,6 +220,7 @@ public abstract class AbstractScriptEnvironment<T> extends AbstractResource<T> i
 	 */
 	PendingKey createContinuationContext(final ContinuationPending continuationPending) {
 		PendingKey key = dependencies.scriptEnvironmentDependencies.pendingKeyProvider.get();
+		//noinspection ThrowableResultOfMethodCallIgnored
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;

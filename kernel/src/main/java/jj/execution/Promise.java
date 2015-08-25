@@ -32,7 +32,7 @@ public class Promise {
 	
 	private final AtomicBoolean done = new AtomicBoolean();
 	
-	private final AtomicReference<List<JJTask>> next = new AtomicReference<>();
+	private final AtomicReference<List<JJTask<?>>> next = new AtomicReference<>();
 	
 	Promise() {}
 	
@@ -54,10 +54,8 @@ public class Promise {
 	 * execute(task1).then(task2).then(task3);
 	 * </pre>
 	 * means that task2 starts when task1 finishes, and task3 starts when task2 is done
-	 * @param next
-	 * @return
 	 */
-	public Promise then(final JJTask task) {
+	public Promise then(final JJTask<?> task) {
 		
 		next().add(task);
 		
@@ -66,25 +64,23 @@ public class Promise {
 		// relationship that guarantees that if i then execute all tasks in the list, it won't
 		// double up
 		if (done.get()) {
-			List<JJTask> tasks = next.getAndSet(null);
+			List<JJTask<?>> tasks = next.getAndSet(null);
 			if (tasks != null) {
-				for (JJTask t : tasks) {
-					taskRunner.execute(t);
-				}
+				tasks.forEach(taskRunner::execute);
 			}
 		}
 		
 		return task.promise();
 	}
 	
-	private List<JJTask> next() {
+	private List<JJTask<?>> next() {
 		if (next.get() == null) {
-			next.compareAndSet(null, new ArrayList<JJTask>());
+			next.compareAndSet(null, new ArrayList<>(0)); // probably never carrying any
 		}
 		return next.get();
 	}
 	
-	List<JJTask> done() {
+	List<JJTask<?>> done() {
 		done.set(true);
 		return next.getAndSet(null);
 	}

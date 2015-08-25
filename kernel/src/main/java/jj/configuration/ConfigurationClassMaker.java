@@ -139,7 +139,7 @@ class ConfigurationClassMaker {
 	private void implement(final CtClass result, final CtClass resultInterface) throws Exception {
 		
 		// don't allow pathological values!
-		int baseInt = 0;
+		int baseInt;
 		do {
 			baseInt = RandomHelper.nextInt();
 		} while (baseInt == 0 || baseInt == -1 || baseInt == 1);

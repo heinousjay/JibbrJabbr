@@ -62,7 +62,7 @@ public class RouteUriValidator {
 		}
 	}
 	
-	private void validateStaticSegment(String segment, boolean last, StringBuilder errors) {
+	private void validateStaticSegment(String segment, StringBuilder errors) {
 		if (!STATIC_NODE_PATTERN.matcher(segment).matches()) {
 			append(errors, "segment ", segment, " contains invalid URL characters");
 		}
@@ -94,7 +94,7 @@ public class RouteUriValidator {
 		}
 	}
 	
-	private void validateParamSegment(String segment, boolean last, StringBuilder errors) {
+	private void validateParamSegment(String segment, StringBuilder errors) {
 		validateParameter(segment, errors);
 	}
 	
@@ -109,9 +109,9 @@ public class RouteUriValidator {
 		if (segment.startsWith("*")) {
 			validateSplatSegment(segment, last, errors);
 		} else if (segment.startsWith(":")) {
-			validateParamSegment(segment, last, errors);
+			validateParamSegment(segment, errors);
 		} else {
-			validateStaticSegment(segment, last, errors);
+			validateStaticSegment(segment, errors);
 		}
 	}
 	

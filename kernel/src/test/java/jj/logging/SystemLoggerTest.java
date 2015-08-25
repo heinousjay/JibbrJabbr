@@ -20,12 +20,12 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.text.DecimalFormat;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jj.ServerStarting;
 import jj.execution.MockTaskRunner;
 import jj.util.RandomHelper;
 
@@ -57,7 +57,7 @@ public class SystemLoggerTest {
 		
 		sl = new SystemLogger(taskRunner, loggers);
 		
-		sl.on((ServerStarting)null); // it ignores the event
+		sl.on(null); // it ignores the event
 		
 		publishLoop = taskRunner.runFirstTaskInDaemon();
 	}
@@ -164,10 +164,25 @@ run 5
 	int run = 0;
 	final AtomicInteger count = new AtomicInteger();
 	final AtomicInteger expected = new AtomicInteger();
+
+	@Test
+	public void testtesttest() {
+
+		int threadTotal = 12;
+		ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
+		ExecutorService executor = Executors.newFixedThreadPool(threadTotal);
+		for (int i = 0; i < threadTotal; ++i) {
+			executor.submit(() -> {
+				map.computeIfAbsent("key", s -> { System.out.println("Hi"); return new Object(); });
+			});
+		}
+
+		System.out.println(map);
+	}
 	
 	private void loadTest(final int threadTotal, final int lowerBound, final int upperBound, final int timeout, final int waitTime) throws Exception {
 		System.out.println("run " + ++run);
-		ExecutorService executor = null;
+		ExecutorService executor = Executors.newFixedThreadPool(threadTotal);
 		final HelperEvent2 helperEvent = new HelperEvent2();
 		long start = System.nanoTime();
 		long latchTime = 0;
@@ -175,19 +190,14 @@ run 5
 			count.set(0);
 			expected.set(0);
 			latch = new CountDownLatch(threadTotal);
-			executor = Executors.newFixedThreadPool(threadTotal);
 			for (int i = 0; i < threadTotal; ++i) {
-				executor.submit(new Runnable() {
-					
-					@Override
-					public void run() {
-						int runs = RandomHelper.nextInt(lowerBound, upperBound);
-						expected.getAndAdd(runs);
-						for (int i = 0; i < runs; ++i) {
-							sl.on(helperEvent);
-						}
-						latch.countDown();
+				executor.submit(() -> {
+					int runs = RandomHelper.nextInt(lowerBound, upperBound);
+					expected.getAndAdd(runs);
+					for (int i1 = 0; i1 < runs; ++i1) {
+						sl.on(helperEvent);
 					}
+					latch.countDown();
 				});
 			}
 			

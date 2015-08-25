@@ -23,7 +23,7 @@ import jj.util.Closer;
 @Singleton
 class TaskRunnerImpl implements TaskRunner {
 
-	private final ExecutorBundle executors;
+	private final Executors executors;
 	private final CurrentTask currentTask;
 	private final Publisher publisher;
 	private final Clock clock;
@@ -32,7 +32,7 @@ class TaskRunnerImpl implements TaskRunner {
 	
 	private final ServerTask monitor = new ServerTask(getClass().getSimpleName() + " execution monitor") {
 		
-		private void log(TaskTracker taskTracker, JJTask task) {
+		private void log(TaskTracker taskTracker, JJTask<?> task) {
 			publisher.publish(new Emergency(
 				"{} has been waiting {} milliseconds to execute.  something is broken", task, new Long(clock.time() + taskTracker.enqueuedTime()) 
 			));
@@ -42,7 +42,7 @@ class TaskRunnerImpl implements TaskRunner {
 		public void run() throws Exception {
 			while (true) {
 				final TaskTracker taskTracker = queuedTasks.take();
-				final JJTask task = taskTracker.task();
+				final JJTask<?> task = taskTracker.task();
 				if (taskTracker.startTime() == 0 
 					&& task != null
 					&& ((task instanceof DelayedTask<?>) ? !((DelayedTask<?>)task).cancelKey().canceled() : true)
@@ -55,7 +55,7 @@ class TaskRunnerImpl implements TaskRunner {
 	
 	@Inject
 	TaskRunnerImpl(
-		final ExecutorBundle bundle,
+		final Executors bundle,
 		final CurrentTask currentTask,
 		final Publisher publisher,
 		final Clock clock
@@ -69,7 +69,7 @@ class TaskRunnerImpl implements TaskRunner {
 	}
 	
 	@Override
-	public Promise execute(final JJTask task) {
+	public <ExecutorType> Promise execute(final JJTask<ExecutorType> task) {
 
 		final Promise promise = task.promise().taskRunner(this);
 		final TaskTracker tracker = new TaskTracker(clock, task);
@@ -77,56 +77,51 @@ class TaskRunnerImpl implements TaskRunner {
 		tracker.enqueue();
 		queuedTasks.add(tracker);
 		
-		task.addRunnableToExecutor(executors, new Runnable() {
+		executors.executeTask(task, () -> {
+				
+			String oldName = Thread.currentThread().getName();
+			String threadName = oldName + " - " + task.name();
+			Thread.currentThread().setName(threadName);
+
+			boolean interrupted = false;
+			queuedTasks.remove(tracker);
+			tracker.start();
 			
-			@Override
-			public void run() {
-				
-				String oldName = Thread.currentThread().getName();
-				String threadName = oldName + " - " + task.name();
-				Thread.currentThread().setName(threadName);
-
-				boolean interrupted = false;
-				queuedTasks.remove(tracker);
-				tracker.start();
-				
-				try (Closer closer = currentTask.enterScope(task)) {
-					task.runningThread = Thread.currentThread();
-					task.run();
-				} catch (InterruptedException ie) {
-					Thread.interrupted(); // clear the status in case the thread can get reused
-					interrupted = true;
-				} catch (AssertionError ae) {
-					System.err.println("ASSERTION TRIPPED");
-					ae.printStackTrace();
-					System.exit(1);
-				} catch (OutOfMemoryError e) {
-					throw e; // just in case
-				} catch (Throwable t) {
-					if (!task.errored(t)) {
-						publisher.publish(new Emergency("Task [" + task.name() + "] ended in exception", t));
-						tracker.endedInError();
-					}
-
-				} finally {
-					task.runningThread = null;
-					tracker.end();
-					
-					// interruption means don't bother keeping promises
-					if (!interrupted) {
-						List<JJTask> tasks = promise.done();
-						if (tasks != null) {
-							for (JJTask t : tasks) {
-								execute(t);
-							}
-						}
-					}
-					
-					publisher.publish(tracker);
-					Thread.currentThread().setName(oldName);
-					
+			try (Closer closer = currentTask.enterScope(task)) {
+				task.runningThread = Thread.currentThread();
+				task.run();
+			} catch (InterruptedException ie) {
+				Thread.interrupted(); // clear the status in case the thread can get reused
+				interrupted = true;
+			} catch (AssertionError ae) {
+				System.err.println("ASSERTION TRIPPED");
+				ae.printStackTrace();
+				System.exit(1);
+			} catch (OutOfMemoryError e) {
+				throw e; // just in case
+			} catch (Throwable t) {
+				if (!task.errored(t)) {
+					publisher.publish(new Emergency("Task [" + task.name() + "] ended in exception", t));
+					tracker.endedInError();
 				}
 
+			} finally {
+				task.runningThread = null;
+				tracker.end();
+				
+				// interruption means don't bother keeping promises
+				if (!interrupted) {
+					List<JJTask<?>> tasks = promise.done();
+					if (tasks != null) {
+						for (JJTask<?> t : tasks) {
+							execute(t);
+						}
+					}
+				}
+				
+				publisher.publish(tracker);
+				Thread.currentThread().setName(oldName);
+				
 			}
 		});
 		

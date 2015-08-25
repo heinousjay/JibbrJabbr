@@ -42,10 +42,10 @@ public class JJServerLifecycle {
 		publisher.publish(startupEvent);
 
 		for (ServerStarting.Priority priority : ServerStarting.Priority.values()) {
-			List<JJTask> tasks = startupEvent.startupTasks().get(priority);
+			List<JJTask<?>> tasks = startupEvent.startupTasks().get(priority);
 			if (tasks != null) {
 				CountDownLatch latch = new CountDownLatch(tasks.size());
-				for (JJTask task : tasks) {
+				for (JJTask<?> task : tasks) {
 					taskRunner.execute(task).then(new ServerTask("counting down " + priority + " priority startup tasks") {
 						@Override
 						protected void run() throws Exception {

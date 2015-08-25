@@ -25,7 +25,7 @@ class StaticNode extends TrieNode {
 	int keyLength = 1;
 	
 	void doAddChild(Route route) {
-		children = children == null ? new LinkedHashMap<String, TrieNode>(4, 0.75f) : children;
+		children = children == null ? new LinkedHashMap<>(4, 0.75f) : children;
 		TrieNode nextNode;
 		char cur = route.currentChar();
 		if (cur == PATH_SEPARATOR_CHAR ||
@@ -80,9 +80,7 @@ class StaticNode extends TrieNode {
 					children.get(key).compress();
 				}
 			} else {
-				for (TrieNode child : children.values()) {
-					child.compress();
-				}
+				children.values().forEach(TrieNode::compress);
 				children = Collections.unmodifiableMap(children);
 			}
 		}

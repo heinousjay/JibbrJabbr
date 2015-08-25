@@ -47,7 +47,7 @@ class SystemLogger {
 	
 	static final String THREAD_NAME = "thread";
 	
-	private final BlockingQueue<LoggedEvent> events = new LinkedBlockingQueue<>();
+	private final BlockingQueue<LoggedEvent> loggedEvents = new LinkedBlockingQueue<>();
 	
 	private final TaskRunner taskRunner;
 	
@@ -62,7 +62,7 @@ class SystemLogger {
 	}
 
 	@Listener
-	void on(ServerStarting event) {
+	void on(ServerStarting serverStarting) {
 		// just start immediately! we need to work quickly
 		// block startup!
 		final CountDownLatch startupLatch = new CountDownLatch(1);
@@ -73,22 +73,26 @@ class SystemLogger {
 				startupLatch.countDown();
 				try {
 					for (;;) {
-						
-						LoggedEvent event = events.take();
-						doLog(event);
+						LoggedEvent logged = loggedEvents.take();
+						doLog(logged);
 					}
 				} catch (InterruptedException ie) {
-					LoggedEvent event;
+					// this is a shutdown, empty the waiting logs
 					useQueue = false;
-					while ((event = events.poll()) != null) {
-						doLog(event);
-					}
+					loggedEvents.forEach(SystemLogger.this::doLog);
+					throw ie;
+				} catch (Exception e) {
+					throw new AssertionError("logging threw!", e);
 				}
 			}
 		});
 		
-		// hacky signal from the test
-		if (event != null) {
+		// hacky signal from the test,
+		// if the event is null then we don't really wait because it's not going
+		// to start running at all, but if there is an event (hence a real server
+		// of some sort) then we give it a quarter second to get running and bail
+		// on the init
+		if (serverStarting != null) {
 			try {
 				boolean started = startupLatch.await(250, MILLISECONDS);
 				assert started : 
@@ -101,23 +105,21 @@ class SystemLogger {
 		}
 	}
 
-	private void doLog(LoggedEvent event) {
-		Logger logger = loggers.findLogger(event);
-		try (Closer closer = threadName(event.threadName)) {
-			event.describeTo(logger);
+	private void doLog(LoggedEvent logged) {
+		Logger logger = loggers.findLogger(logged);
+		try (Closer closer = threadName(logged.threadName)) {
+			logged.describeTo(logger);
 		}
+	}
+	
+	private void cleanThreadName() {
+		MDC.remove(THREAD_NAME);
 	}
 	
 	// package private because it is exposed in a test class
 	Closer threadName(String threadName) {
 		MDC.put(THREAD_NAME, threadName);
-		return new Closer() {
-			
-			@Override
-			public void close() {
-				MDC.remove(THREAD_NAME);
-			}
-		};
+		return this::cleanThreadName;
 	}
 	
 	/**
@@ -126,11 +128,11 @@ class SystemLogger {
 	 * LoggedEvent instead.
 	 */
 	@Listener
-	void on(LoggedEvent event) {
+	void on(LoggedEvent logged) {
 		if (useQueue) {
-			events.add(event);
+			loggedEvents.add(logged);
 		} else {
-			doLog(event);
+			doLog(logged);
 		}
 	}
 

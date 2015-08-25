@@ -20,6 +20,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.ServerStopping;
 import jj.event.Listener;
@@ -35,6 +36,7 @@ import jj.util.Clock;
  * @author jason
  *
  */
+@Singleton
 @Subscriber
 class ScriptExecutor extends DelayedExecutor {
 	
@@ -50,7 +52,7 @@ class ScriptExecutor extends DelayedExecutor {
 			clock,
 			1, 1,
 			10, MILLISECONDS,
-			new LinkedBlockingQueue<Runnable>(),
+			new LinkedBlockingQueue<>(),
 			threadFactory.namePattern("JibbrJabbr Script Thread %s"),
 			handler
 		);
@@ -63,7 +65,7 @@ class ScriptExecutor extends DelayedExecutor {
 	}
 
 	@Listener
-	void on(ServerStopping event) {
+	void on(ServerStopping serverStopping) {
 		shutdown();
 	}
 	

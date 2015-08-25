@@ -65,19 +65,15 @@ public class EmbeddedHttpServerTest {
 		
 		final CountDownLatch myLatch = new CountDownLatch(3);
 		final AssertionError testFailures = new AssertionError("there were test failures");
-		ResponseReady responseReady = new ResponseReady() {
-			
-			@Override
-			public void ready(EmbeddedHttpResponse response) {
-				try {
-					String body = response.bodyContentAsString();
-					int contentLength = response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH, -1);
-					assertThat(body.length(), is(contentLength)); // this only works because it's ASCII haha
-				} catch (Throwable t) {
-					testFailures.addSuppressed(t);
-				} finally {
-					myLatch.countDown();
-				}
+		ResponseReady responseReady = response -> {
+			try {
+				String body = response.bodyContentAsString();
+				int contentLength = response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH, -1);
+				assertThat(body.length(), is(contentLength)); // this only works because it's ASCII haha
+			} catch (Throwable t) {
+				testFailures.addSuppressed(t);
+			} finally {
+				myLatch.countDown();
 			}
 		};
 		

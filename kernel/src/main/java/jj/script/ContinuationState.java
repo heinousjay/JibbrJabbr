@@ -30,10 +30,6 @@ public class ContinuationState implements Serializable {
 	}
 	
 	public String toString() {
-		return new StringBuilder("type: ")
-			.append(type)
-			.append(", message: ")
-			.append(continuation)
-			.toString();
+		return String.format("type: %s, message: %s", type, continuation);
 	}
 }

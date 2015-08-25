@@ -56,7 +56,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment<?>> extends Delayed
 		} else if (result != null) {
 			resume();
 		} else {
-			throw new AssertionError("did you mess with the pendingKey and/or result?\npendingKey = " + pendingKey + "\nresult = " + result);
+			throw new AssertionError("did you mess with the pendingKey and/or result?\npendingKey = " + pendingKey + "\nresult = null");
 		}
 		
 		if (pendingKey == null) {
@@ -87,17 +87,11 @@ public abstract class ScriptTask<T extends ScriptEnvironment<?>> extends Delayed
 	protected void complete() throws Exception {
 		
 	}
-	
-	@Override
-	protected ScriptExecutor findExecutor(ExecutorFinder executors) {
-		return executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment);
-	}
 
 	/**
 	 * return null if the task is completed
 	 * return the continuation pendingKey if the task needs to be resumed
 	 * be sure to store the key for resumption
-	 * @return
 	 */
 	final PendingKey pendingKey() {
 		return pendingKey;
@@ -106,7 +100,6 @@ public abstract class ScriptTask<T extends ScriptEnvironment<?>> extends Delayed
 	/**
 	 * The {@link TaskRunner} will call this with the result to be used to continue.
 	 * do not do any processing in this method! store the value and wait to be run
-	 * @param result
 	 */
 	final void resumeWith(Object result) {
 		this.result = result;

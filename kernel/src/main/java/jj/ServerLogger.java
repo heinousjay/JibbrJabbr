@@ -23,6 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Annotates {@link jj.logging.LoggedEvent}s that go to the
+ * server log
+ *
  * @author jason
  *
  */
@@ -32,6 +35,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface ServerLogger {
 	
-	public static final String NAME = "server";
+	String NAME = "server";
 
 }

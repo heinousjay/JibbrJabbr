@@ -19,8 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.engine.HostEvent;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
@@ -69,14 +67,10 @@ class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> 
 		connection.webSocketConnectionHost().connected(connection);
 		executor.submit(connection, HostEvent.clientConnected.toString(), connection);
 		
-		ctx.channel().closeFuture().addListener(new ChannelFutureListener() {
-			
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				connectionTracker.removeConnection(connection);
-				connection.webSocketConnectionHost().disconnected(connection);
-				executor.submit(connection, HostEvent.clientDisconnected.toString(), connection);
-			}
+		ctx.channel().closeFuture().addListener(future -> {
+			connectionTracker.removeConnection(connection);
+			connection.webSocketConnectionHost().disconnected(connection);
+			executor.submit(connection, HostEvent.clientDisconnected.toString(), connection);
 		});
 	}
 	

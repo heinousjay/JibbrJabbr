@@ -42,9 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -125,13 +123,7 @@ public class StylesheetResourceTest {
 		LessResource less2 = new LessResource(new MockAbstractResourceDependencies(Private, "test2.less", resourceFinder), cssPath.resolveSibling("test2.less"));
 		given(resourceFinder.loadResource(LessResource.class, Public.and(Private), "test2.less")).willReturn(less2);
 		
-		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willAnswer(new Answer<String>() {
-
-			@Override
-			public String answer(InvocationOnMock invocation) throws Throwable {
-				return (String)invocation.getArguments()[0];
-			}
-		});
+		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willAnswer(invocation -> invocation.getArguments()[0]);
 		
 		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(Virtual, NAME, resourceFinder);
 		

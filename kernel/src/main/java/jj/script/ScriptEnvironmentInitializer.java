@@ -59,11 +59,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 			return new HashMap<>();
 		}
 	};
-	
-	/**
-	 * @param targetName
-	 * @param moduleScriptEnvironment
-	 */
+
 	@Inject
 	ScriptEnvironmentInitializer(
 		final TaskRunner taskRunner,
@@ -97,7 +93,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	private List<TaskOrKey> getTaskOrKeyList(ScriptEnvironment<?> scriptEnvironment) {
 		List<TaskOrKey> taskOrKeys = pendingInitialization.get().get(scriptEnvironment);
 		if (taskOrKeys == null) {
-			pendingInitialization.get().put(scriptEnvironment, new ArrayList<TaskOrKey>());
+			pendingInitialization.get().put(scriptEnvironment, new ArrayList<>());
 			taskOrKeys = pendingInitialization.get().get(scriptEnvironment);
 		}
 		return taskOrKeys;
@@ -112,8 +108,6 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	/**
 	 * register here to have a pendingKey resumed when a scriptEnvironment has transitioned to initialized
-	 * @param scriptEnvironment
-	 * @param pendingKey
 	 */
 	@Override
 	public void resumeOnInitialization(final ScriptEnvironment<?> scriptEnvironment, final PendingKey pendingKey) {
@@ -123,12 +117,7 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	}
 	
 	private class InitializerTask extends ScriptTask<AbstractScriptEnvironment<?>> {
-		
 
-		/**
-		 * @param name
-		 * @param scriptEnvironment
-		 */
 		protected InitializerTask(String name, AbstractScriptEnvironment<?> scriptEnvironment) {
 			super(name, scriptEnvironment);
 		}

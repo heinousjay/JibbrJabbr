@@ -78,8 +78,10 @@ class ResourceWatcher {
 	void on(ServerStopping event) {
 		try {
 			watcher.close();
-		} catch (IOException e) {}
-	};
+		} catch (IOException e) {
+			// report this? or who cares? not us
+		}
+	}
 
 	Map<URI, Boolean> awaitChangedUris() throws InterruptedException {
 		Map<URI, Boolean> result = new HashMap<>();

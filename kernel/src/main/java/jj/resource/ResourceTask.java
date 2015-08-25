@@ -15,9 +15,8 @@
  */
 package jj.resource;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import jj.execution.JJTask;
 
@@ -28,7 +27,7 @@ import jj.execution.JJTask;
  * @author jason
  *
  */
-public abstract class ResourceTask extends JJTask {
+public abstract class ResourceTask extends JJTask<ResourceExecutor> {
 	
 	private final CountDownLatch completionLatch = new CountDownLatch(1);
 	
@@ -37,16 +36,12 @@ public abstract class ResourceTask extends JJTask {
 	}
 	
 	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, final Runnable runnable) {
-		executors.ofType(ResourceExecutor.class).submit(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					runnable.run();
-				} finally {
-					completionLatch.countDown();
-				}
+	protected final void addRunnableToExecutor(ResourceExecutor executor, final Runnable runnable) {
+		executor.submit(() -> {
+			try {
+				runnable.run();
+			} finally {
+				completionLatch.countDown();
 			}
 		});
 	}
@@ -54,9 +49,9 @@ public abstract class ResourceTask extends JJTask {
 	/**
 	 * used to synchronize resource creation across multiple requests
 	 */
-	void await() {
+	void await(long time, TimeUnit unit) {
 		try {
-			completionLatch.await(2, SECONDS);
+			completionLatch.await(time, unit);
 		} catch (Exception e) {
 			throw new AssertionError(e); // good enough for now
 		}

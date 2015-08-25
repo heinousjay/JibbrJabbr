@@ -52,8 +52,6 @@ public class SimpleRouteProcessorTest {
 	static final String ZERO_TXT = "0.txt";
 	static final String UNVERSIONED_URI = "/" + ZERO_TXT;
 	static final String VERSIONED_URI = "/" + SHA1 + "/" + ZERO_TXT;
-	static final String MIME = "mime";
-	static final long LENGTH = 100L;
 	
 	@Mock ResourceFinder resourceFinder;
 	@Mock ResourceLoader resourceLoader;
@@ -69,7 +67,7 @@ public class SimpleRouteProcessorTest {
 	
 	@Mock Promise promise;
 	
-	@Captor ArgumentCaptor<JJTask> taskCaptor;
+	@Captor ArgumentCaptor<JJTask<?>> taskCaptor;
 	
 	ServerLocation location = Root; // YEAH RIGHT!
 	
@@ -80,13 +78,13 @@ public class SimpleRouteProcessorTest {
 		servableResources.put(STATIC, StaticResource.class);
 		
 		processorConfigurations = new HashMap<>();
-		processorConfigurations.put(StaticResource.class, () -> { return location; });
+		processorConfigurations.put(StaticResource.class, () -> location);
 		
 		given(routeMatch.resourceName()).willReturn(STATIC);
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/hi/there"));
-		
-		given(resourceLoader.loadResource(any(), any(), anyString(), any())).willReturn(promise);
+
+		given(resourceLoader.loadResource(any(), any(), anyString())).willReturn(promise);
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
@@ -108,7 +106,7 @@ public class SimpleRouteProcessorTest {
 	private void givenResourceRequest(String uri) {
 		URIMatch match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(resourceLoader.findResource(StaticResource.class, location, match.path, null)).willReturn(resource);
+		given(resourceLoader.findResource(StaticResource.class, location, match.path)).willReturn(resource);
 	}
 	
 	@Test

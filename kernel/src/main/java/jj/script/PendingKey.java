@@ -88,9 +88,6 @@ public class PendingKey {
 		return toString;
 	}
 
-	/**
-	 * @param eventSelection
-	 */
 	public void resume(Object result) {
 		assert cache != null;
 		cache.resume(this, result);

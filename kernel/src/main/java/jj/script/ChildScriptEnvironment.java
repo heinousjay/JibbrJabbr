@@ -23,5 +23,5 @@ package jj.script;
  */
 public interface ChildScriptEnvironment<T> extends ScriptEnvironment<T> {
 
-	public ScriptEnvironment<?> parent();
+	ScriptEnvironment<?> parent();
 }

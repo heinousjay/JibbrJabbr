@@ -65,8 +65,8 @@ public class SimpleResourceCreator<A, T extends AbstractResource<A>> implements 
 	protected SimpleResourceCreator(final Dependencies dependencies) {
 		pathResolver = dependencies.pathResolver;
 		creator = dependencies.creator;
-		type = (Class<T>)GenericUtils.extractGenericParameter(getClass(), 1);
-		argType = (Class<A>)GenericUtils.extractGenericParameter(getClass());
+		type = (Class<T>)GenericUtils.extractTypeParameterAsClass(getClass(), SimpleResourceCreator.class, "T");
+		argType = (Class<A>)GenericUtils.extractTypeParameterAsClass(getClass(), SimpleResourceCreator.class, "A");
 	}
 
 	protected URI uri(final Location base, final String name, final A argument) {

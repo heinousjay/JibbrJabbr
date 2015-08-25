@@ -45,7 +45,6 @@ public interface ScriptExecutionConfiguration {
 	 *  
 	 *  <p>
 	 *  lower bound is 1
-	 * @return
 	 */
 	@Default("1")
 	int threadCount();

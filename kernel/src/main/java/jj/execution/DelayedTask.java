@@ -24,14 +24,11 @@ import jj.execution.DelayedExecutor.CancelKey;
  * @author jason
  *
  */
-public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask {
+public abstract class DelayedTask<ExecutionType extends DelayedExecutor> extends JJTask<ExecutionType> {
 
 	protected DelayedTask(String name) {
 		super(name);
 	}
-	
-	
-	protected abstract T findExecutor(ExecutorFinder executors);
 
 	protected long delay() {
 		return 0;
@@ -41,8 +38,8 @@ public abstract class DelayedTask<T extends DelayedExecutor> extends JJTask {
 	/** DON'T TOUCH THIS */
 	volatile CancelKey cancelKey;
 
-	protected void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		cancelKey = findExecutor(executors).submit(runnable, delay(), TimeUnit.MILLISECONDS);
+	protected void addRunnableToExecutor(ExecutionType executor, Runnable runnable) {
+		cancelKey = executor.submit(runnable, delay(), TimeUnit.MILLISECONDS);
 	}
 
 	public CancelKey cancelKey() {

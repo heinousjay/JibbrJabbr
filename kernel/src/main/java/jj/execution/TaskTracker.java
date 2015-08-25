@@ -44,9 +44,9 @@ class TaskTracker extends LoggedEvent implements Delayed {
 	
 	private final String name;
 	
-	private final WeakReference<JJTask> task;
+	private final WeakReference<JJTask<?>> task;
 	
-	TaskTracker(final Clock clock, final JJTask tracked) {
+	TaskTracker(final Clock clock, final JJTask<?> tracked) {
 		this.clock = clock;
 		task = new WeakReference<>(tracked);
 		name = tracked.name();
@@ -106,7 +106,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 		return executionTime;
 	}
 	
-	JJTask task() {
+	JJTask<?> task() {
 		return task.get();
 	}
 	
@@ -124,7 +124,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 	public void describeTo(Logger logger) {
 		if (logger.isTraceEnabled()) {
 			// i agree, this is ugly
-			JJTask task = this.task.get();
+			JJTask<?> task = task();
 			boolean logged = false;
 			if (task instanceof DelayedTask) {
 				DelayedTask<?> dTask = (DelayedTask<?>)task;

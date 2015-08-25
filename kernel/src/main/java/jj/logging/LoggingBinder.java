@@ -57,16 +57,12 @@ public class LoggingBinder {
 
 	public BindingBuilder annotatedWith(final Class<? extends Annotation> annotation) {
 		
-		return new BindingBuilder() {
-			
-			@Override
-			public void toLogger(String loggerName) {
-				
-				if (EmergencyLogger.NAME != loggerName) {
-					loggerNameBinder.addBinding(camelCaseName(loggerName)).toInstance(loggerName);
-				}
-				loggerBinder.addBinding(annotation).toInstance(LoggerFactory.getLogger(loggerName));
+		return loggerName -> {
+
+			if (!EmergencyLogger.NAME.equals(loggerName)) {
+				loggerNameBinder.addBinding(camelCaseName(loggerName)).toInstance(loggerName);
 			}
+			loggerBinder.addBinding(annotation).toInstance(LoggerFactory.getLogger(loggerName));
 		};
 	}
 	

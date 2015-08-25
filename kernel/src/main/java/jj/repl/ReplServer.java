@@ -30,7 +30,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -106,16 +105,11 @@ class ReplServer {
 			
 			if (server != null && port != configuration.port()) {
 			
-				server.group().terminationFuture().addListener(new GenericFutureListener<Future<Object>>() {
-					@Override
-					public void operationComplete(Future<Object> future) throws Exception {
-						// if this failed what do we do?
-						// just publish an emergency
-						if (future.isSuccess()) {
-							start();
-						} else {
-							publisher.publish(new Emergency("couldn't restart the REPL server.  The server may need to be restarted", future.cause()));
-						}
+				server.group().terminationFuture().addListener((Future<Object> future) -> {
+					if (future.isSuccess()) {
+						start();
+					} else {
+						publisher.publish(new Emergency("couldn't restart the REPL server.  The server may need to be restarted", future.cause()));
 					}
 				});
 				

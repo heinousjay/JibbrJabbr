@@ -25,16 +25,40 @@ import org.junit.Test;
  */
 public class GenericUtilsTest {
 	
-	public static class Target<T, U> {}
+	public static class Target<TargetTypeOne, TargetTypeTwo> {}
 	
 	public static class Impl extends Target<String, Integer> {}
 	
+	public static class Impl2 extends Impl {}
+	
+	public static class SomeImpl<PassthroughOne> extends Target<Double, PassthroughOne> {}
+	
+	public static class SomeImpl2<PassthroughTwo> extends SomeImpl<PassthroughTwo> {}
+	
+	public static class SomeImpl3 extends SomeImpl2<Long> {}
 
 	@Test
-	public void test() {
+	public void testNewSchool() {
+		assertEquals(String.class, GenericUtils.extractTypeParameter(Impl2.class, Target.class, "TargetTypeOne"));
+		assertEquals(Integer.class, GenericUtils.extractTypeParameter(Impl2.class, Target.class, "TargetTypeTwo"));
+		assertEquals(String.class, GenericUtils.extractTypeParameter(Impl.class, Target.class, "TargetTypeOne"));
+		assertEquals(Integer.class, GenericUtils.extractTypeParameter(Impl.class, Target.class, "TargetTypeTwo"));
 		
-		assertEquals(String.class, GenericUtils.extractGenericParameter(Impl.class));
-		assertEquals(Integer.class, GenericUtils.extractGenericParameter(Impl.class, 1));
+		assertEquals(String.class, GenericUtils.extractTypeParameterAsClass(Impl2.class, Target.class, "TargetTypeOne"));
+		assertEquals(Integer.class, GenericUtils.extractTypeParameterAsClass(Impl2.class, Target.class, "TargetTypeTwo"));
+		assertEquals(String.class, GenericUtils.extractTypeParameterAsClass(Impl.class, Target.class, "TargetTypeOne"));
+		assertEquals(Integer.class, GenericUtils.extractTypeParameterAsClass(Impl.class, Target.class, "TargetTypeTwo"));
 	}
+	
+	@Test
+	public void testNewNewSchool() {
 
+		assertEquals(Double.class, GenericUtils.extractTypeParameter(SomeImpl3.class, Target.class, "TargetTypeOne"));
+		assertEquals(Long.class, GenericUtils.extractTypeParameter(SomeImpl3.class, SomeImpl2.class, "PassthroughTwo"));
+		assertEquals(Long.class, GenericUtils.extractTypeParameter(SomeImpl3.class, Target.class, "TargetTypeTwo"));
+		
+		assertEquals(Double.class, GenericUtils.extractTypeParameterAsClass(SomeImpl3.class, Target.class, "TargetTypeOne"));
+		assertEquals(Long.class, GenericUtils.extractTypeParameterAsClass(SomeImpl3.class, SomeImpl2.class, "PassthroughTwo"));
+		assertEquals(Long.class, GenericUtils.extractTypeParameterAsClass(SomeImpl3.class, Target.class, "TargetTypeTwo"));
+	}
 }

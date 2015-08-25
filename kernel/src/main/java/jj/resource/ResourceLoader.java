@@ -29,7 +29,7 @@ public interface ResourceLoader {
 	<T extends Resource<Void>> T findResource(Class<T> resourceClass, Location base, String name);
 
 	/**
-	 * @see ResourceFinder#findResource(Class, Location, String, Object...)
+	 * find a resource
 	 */
 	<A, T extends Resource<A>> T findResource(Class<T> resourceClass, Location base, String name, A argument);
 	
@@ -42,7 +42,7 @@ public interface ResourceLoader {
 	 * @param resourceClass The type of <code>Resource</code>
 	 * @param base The {@link Location} of the <code>Resource</code>
 	 * @param name The name of the <code>Resource</code>
-	 * @param arguments The creation arguments of the <code>Resource</code>
+	 * @param argument The creation argument of the <code>Resource</code>
 	 * @return the <code>ResourceTask</code>'s {@link Promise}
 	 */
 	<A, T extends Resource<A>> Promise loadResource(Class<T> resourceClass, Location base, String name, A argument);

@@ -48,8 +48,6 @@ public class Route {
 	
 	private List<Parameter> parameters;
 	
-	private TrieNode parent;
-	
 	public Route(final HttpMethod method, final String uri, final String resourceName, final String mapping) {
 		
 		if (method == null) {
@@ -84,10 +82,6 @@ public class Route {
 	
 	public String mapping() {
 		return mapping;
-	}
-	
-	public Map<HttpMethod, Route> allMethods() {
-		return parent.goal;
 	}
 	
 	// move this to another class
@@ -136,19 +130,14 @@ public class Route {
 	}
 	
 	Route addParam(Parameter parameter) {
-		parameters = parameters == null ? new ArrayList<Parameter>() : parameters;
+		parameters = parameters == null ? new ArrayList<>() : parameters;
 		parameters.add(parameter);
 		return this;
 	}
 	
-	Route setParent(TrieNode parent) {
-		this.parent = parent;
+	Route added() {
 		this.parameters = this.parameters == null ? null : Collections.unmodifiableList(this.parameters);
 		return this;
-	}
-	
-	TrieNode parent() {
-		return parent;
 	}
 	
 	//---> basics
@@ -162,8 +151,8 @@ public class Route {
 		return route != null &&
 			method.equals(route.method) &&
 			uri.equals(route.uri) &&
-			resourceName.equals(resourceName) &&
-			mapping.equals(mapping);
+			resourceName.equals(route.resourceName) &&
+			mapping.equals(route.mapping);
 	}
 	
 	@Override

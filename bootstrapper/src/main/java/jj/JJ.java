@@ -135,21 +135,17 @@ public final class JJ {
 	public static void main(String[] args) 
 		throws Exception {
 		
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						if (System.in.read() == 3) {
-							break;
-						}
-					} catch (Exception e) {
+		new Thread(() -> {
+			while (true) {
+				try {
+					if (System.in.read() == 3) {
 						break;
 					}
+				} catch (Exception e) {
+					break;
 				}
-				System.exit(0);
 			}
+			System.exit(0);
 		}).start();
 		
 		try {

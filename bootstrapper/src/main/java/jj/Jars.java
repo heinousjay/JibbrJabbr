@@ -68,8 +68,6 @@ public class Jars implements ResourceResolver {
 	
 	/**
 	 * A path pointing to a directory, presumably full of jars
-	 * @param libPath
-	 * @throws IOException
 	 */
 	public Jars(final Path libPath) throws IOException {
 		assert Files.isDirectory(libPath) : "this component is to read and index a directory of jars";
@@ -145,14 +143,7 @@ public class Jars implements ResourceResolver {
 		return jars.get(key);
 	}
 	
-	private final DirectoryStream.Filter<Path> directoryFilter = new DirectoryStream.Filter<Path>() {
-
-		@Override
-		public boolean accept(Path entry) throws IOException {
-			return Files.isDirectory(entry) && !entry.startsWith(META_INF);
-		}
-		
-	};
+	private final DirectoryStream.Filter<Path> directoryFilter = entry -> Files.isDirectory(entry) && !entry.startsWith(META_INF);
 	
 	private boolean hasFiles(Path directory) throws IOException {
 		boolean result = false;
@@ -207,10 +198,11 @@ public class Jars implements ResourceResolver {
 				}
 				
 				for (Path path : paths) {
-					if (result.containsKey(path)) {
-						result.get(path.toString()).next = new FileSystemNode(jarPath, myJarFS);
+					String p = path.toString();
+					if (result.containsKey(p)) {
+						result.get(p).next = new FileSystemNode(jarPath, myJarFS);
 					} else {
-						result.put(path.toString(), new FileSystemNode(jarPath, myJarFS));
+						result.put(p, new FileSystemNode(jarPath, myJarFS));
 					}
 				}
 			}
