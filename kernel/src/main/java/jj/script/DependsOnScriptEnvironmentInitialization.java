@@ -27,8 +27,6 @@ public interface DependsOnScriptEnvironmentInitialization {
 
 	/**
 	 * register here to have a pendingKey resumed when a scriptEnvironment has transitioned to initialized
-	 * @param scriptEnvironment
-	 * @param pendingKey
 	 */
 	void resumeOnInitialization(ScriptEnvironment<?> scriptEnvironment, PendingKey pendingKey);
 	

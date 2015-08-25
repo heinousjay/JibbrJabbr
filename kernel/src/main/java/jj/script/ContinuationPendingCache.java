@@ -71,9 +71,7 @@ class ContinuationPendingCache {
 	 * @param keys A collection of {@link PendingKey}s to remove
 	 */
 	void removePendingTasks(Collection<PendingKey> keys) {
-		keys.forEach(key -> {
-			resumableTasks.remove(key.id());
-		});
+		keys.forEach(key -> resumableTasks.remove(key.id()));
 	}
 	
 	String uniqueID() {

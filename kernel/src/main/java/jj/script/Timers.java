@@ -75,7 +75,8 @@ class Timers {
 	
 	@Listener
 	void on(ScriptEnvironmentDied event) {
-		
+
+		//noinspection SuspiciousMethodCalls
 		Map<String, CancelKey> cancelKeys = runningTimers.remove(event.scriptEnvironment());
 		if (cancelKeys != null) {
 			cancelKeys.values().forEach(CancelKey::cancel);
@@ -83,6 +84,7 @@ class Timers {
 	}
 	
 	private void killTimerCancelKey(final ScriptEnvironment<?> se, final String timerKey) {
+		//noinspection SuspiciousMethodCalls
 		Map<String, CancelKey> keys = runningTimers.get(se);
 		if (keys != null) {
 			CancelKey key = keys.remove(timerKey);
@@ -155,7 +157,7 @@ class Timers {
 			if (args.length > 1) {
 				Integer timeAtt = Util.toJavaInt(args[1]);
 				if (timeAtt != null) {
-					time = timeAtt.intValue();
+					time = timeAtt;
 				}
 			}
 			
