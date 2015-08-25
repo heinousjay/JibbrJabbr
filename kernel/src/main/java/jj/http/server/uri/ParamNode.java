@@ -110,29 +110,29 @@ class ParamNode extends TrieNode {
 		// first, see if we match
 		String matchValue = "";
 		switch (parameter.type) {
-		case Param:
-			matchValue = matchParam(uri, index);
-			break;
-		case Splat:
-			int end = uri.length();
-			if (child != null) {
-				assert child.terminal : "splat followed by non-terminal child!";
-				end = uri.lastIndexOf('.');
-				// if we're expecting an extension an none exist, we don't match.
-				// is returning here correct?
-				if (end == -1) return false;
-			}
-			
-			matchValue = uri.substring(index, end);
-			break;
+			case Param:
+				matchValue = matchParam(uri, index);
+				break;
+			case Splat:
+				int end = uri.length();
+				if (child != null) {
+					assert child.terminal : "splat followed by non-terminal child!";
+					end = uri.lastIndexOf('.');
+					// if we're expecting an extension an none exist, we don't match.
+					// is returning here correct?
+					if (end == -1) return false;
+				}
+
+				matchValue = uri.substring(index, end);
+				break;
 		}
-		
-		
+
+
 		if (!matchValue.isEmpty()) {
-			
+
 			context.addParam(parameter.name, matchValue);
 		}
-		
+
 		if (index + matchValue.length() == uri.length()) {
 			if (goal != null) {
 				context.setGoal(goal);
@@ -140,12 +140,9 @@ class ParamNode extends TrieNode {
 			}
 			return false;
 		}
-		
-		if (child != null) {
-			return child.findGoal(context, uri, index + matchValue.length() + 1);
-		}
-		
-		return false;
+
+		return child != null && child.findGoal(context, uri, index + matchValue.length() + 1);
+
 	}
 	
 	@Override

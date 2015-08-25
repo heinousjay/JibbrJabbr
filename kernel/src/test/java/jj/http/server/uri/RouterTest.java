@@ -28,11 +28,6 @@ import java.util.Set;
 
 import jj.execution.MockTaskRunner;
 import jj.http.server.RouteContributor;
-import jj.http.server.uri.Route;
-import jj.http.server.uri.RouteMatch;
-import jj.http.server.uri.Router;
-import jj.http.server.uri.RouterConfiguration;
-import jj.http.server.uri.URIMatch;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,14 +69,13 @@ public class RouterTest {
 	
 	Set<RouteContributor> routeContributors;
 	
-	RouteContributor routeContributor1 = () -> Collections.singletonList(new Route(GET, "/*path.something", SOMETHING, ""));
+	RouteContributor routeContributor1 = () ->
+		Collections.singletonList(new Route(GET, "/*path.something", SOMETHING, ""));
 	
-	RouteContributor routeContributor2 = () -> {
-		return Arrays.asList(
-			new Route(POST, "/*path.something", SOMETHING, ""),
-			new Route(DELETE, "/*path.something", SOMETHING, "")
-		);
-	};
+	RouteContributor routeContributor2 = () -> Arrays.asList(
+		new Route(POST, "/*path.something", SOMETHING, ""),
+		new Route(DELETE, "/*path.something", SOMETHING, "")
+	);
 	
 	Router router;
 

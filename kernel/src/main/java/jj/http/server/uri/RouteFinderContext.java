@@ -41,11 +41,7 @@ class RouteFinderContext {
 		
 		@Override
 		public String toString() {
-			return new StringBuilder("Match(\n")
-				.append("  params=").append(params).append("\n")
-				.append("  goal=").append(goal).append("\n")
-				.append(")")
-				.toString();
+			return String.format("Match(%n  params=%s%n  goal=%s%n)", params, goal);
 		}
 	}
 	
