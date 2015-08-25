@@ -44,7 +44,7 @@ public enum AppLocation implements Location {
 	
 	private final String path;
 	
-	private AppLocation(String path) {
+	AppLocation(String path) {
 		this.path = path;
 	}
 	

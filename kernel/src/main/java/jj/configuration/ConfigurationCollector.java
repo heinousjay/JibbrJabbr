@@ -62,8 +62,6 @@ public class ConfigurationCollector {
 	
 	/**
 	 * This is the interface for the API modules
-	 * @param name
-	 * @param value
 	 */
 	public void addConfigurationElement(String name, Object value) {
 		assertConfig();
@@ -73,7 +71,7 @@ public class ConfigurationCollector {
 	public void addConfigurationMultiElement(String name, Object value) {
 		assertConfig();
 		if (!inProgress.containsKey(name)) {
-			inProgress.put(name, new ArrayList<Object>());
+			inProgress.put(name, new ArrayList<>());
 		}
 		@SuppressWarnings("unchecked")
 		ArrayList<Object> list = ((ArrayList<Object>)inProgress.get(name));
@@ -83,7 +81,7 @@ public class ConfigurationCollector {
 	public void addConfigurationMappedElement(String name, Object key, Object value) {
 		assertConfig();
 		if (!inProgress.containsKey(name)) {
-			inProgress.put(name, new HashMap<Object, Object>());
+			inProgress.put(name, new HashMap<>());
 		}
 		@SuppressWarnings("unchecked")
 		HashMap<Object, Object> map = ((HashMap<Object, Object>)inProgress.get(name));
@@ -92,9 +90,7 @@ public class ConfigurationCollector {
 	
 	public void accumulateError(String name, String error) {
 		assertConfig();
-		errors.computeIfAbsent(name, k -> {
-			return new ArrayList<>(1);
-		}).add(error);
+		errors.computeIfAbsent(name, k -> new ArrayList<>(1)).add(error);
 	}
 	
 	<T> T get(String name, Class<T> type, Object defaultValue) {

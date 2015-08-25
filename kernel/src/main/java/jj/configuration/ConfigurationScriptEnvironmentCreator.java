@@ -45,13 +45,13 @@ class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCre
 
 	@Override
 	protected ConfigurationScriptEnvironment createScriptEnvironment(String name, Void argument) throws IOException {
-		assert name == CONFIG_NAME : "can only create " + CONFIG_NAME;
+		assert CONFIG_NAME.equals(name) : "can only create " + CONFIG_NAME;
 		return creator.createResource(ConfigurationScriptEnvironment.class, resourceKey(Virtual, name, argument), Virtual, name, argument);
 	}
 	
 	@Override
 	protected URI uri(Location base, String name, Void argument) {
-		assert name == CONFIG_NAME : "can only load " + CONFIG_NAME;
+		assert CONFIG_NAME.equals(name) : "can only load " + CONFIG_NAME;
 		return super.uri(base, name, argument);
 	}
 
