@@ -17,6 +17,7 @@ package jj.script;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import java.time.Clock;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
@@ -28,7 +29,6 @@ import jj.event.Subscriber;
 import jj.execution.DelayedExecutor;
 import jj.execution.JJRejectedExecutionHandler;
 import jj.execution.JJThreadFactory;
-import jj.util.Clock;
 
 /**
  * provides a single-threaded {@link DelayedExecutor} suitable for running script tasks.

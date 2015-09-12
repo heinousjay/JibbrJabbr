@@ -64,8 +64,8 @@ public class HttpClientTest {
 	
 	@Mock InetSocketAddress localClientAddress;
 	@Mock InetSocketAddress localNameserverAddress;
-	@Mock InetSocketAddress nameserverAddress1;
-	@Mock InetSocketAddress nameserverAddress2;
+	InetSocketAddress nameserverAddress1 = new InetSocketAddress("localhost", 8080);
+	InetSocketAddress nameserverAddress2 = new InetSocketAddress("localhost", 8081);
 	
 	@Before
 	public void before() {

@@ -25,6 +25,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.util.Date;
 
 import jj.application.Application;
@@ -32,6 +33,7 @@ import jj.event.MockPublisher;
 import jj.event.Publisher;
 import jj.http.server.resource.StaticResource;
 
+import jj.util.MockClock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,6 +86,7 @@ public class ResourceInstanceCreatorTest  {
 			@Override
 			protected void configure() {
 				bind(Application.class).toInstance(mock(Application.class)); // ugly
+				bind(Clock.class).toInstance(new MockClock());
 				bind(Publisher.class).toInstance(mock(Publisher.class));
 				bind(ResourceFinder.class).toInstance(mock(ResourceFinder.class));
 				bind(ResourceConfiguration.class).toInstance(mock(ResourceConfiguration.class));

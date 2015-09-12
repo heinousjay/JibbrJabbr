@@ -16,14 +16,13 @@
 package jj.execution;
 
 import java.lang.ref.WeakReference;
+import java.time.Clock;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import jj.util.Clock;
 
 /**
  * <p>
@@ -73,7 +72,7 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 		
 		private final TimeUnit timeUnit;
 		
-		private final long start = clock.time();
+		private final long start = clock.millis();
 		
 		private final AtomicBoolean canceled = new AtomicBoolean();
 		
@@ -99,7 +98,7 @@ public abstract class DelayedExecutor extends ThreadPoolExecutor {
 
 		@Override
 		public long getDelay(TimeUnit unit) {
-			return unit.convert((start + delay) - clock.time(), timeUnit);
+			return unit.convert((start + delay) - clock.millis(), timeUnit);
 		}
 	}
 	

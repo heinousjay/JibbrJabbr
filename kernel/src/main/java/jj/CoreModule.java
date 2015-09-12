@@ -37,6 +37,8 @@ import jj.script.ScriptModule;
 import jj.server.ServerModule;
 import jj.http.HttpModule;
 
+import java.time.Clock;
+
 /**
  * @author jason
  *
@@ -74,6 +76,10 @@ public class CoreModule extends JJModule {
 		
 		// make sure the version is a singleton
 		bind(Version.class).in(Singleton.class);
+
+		// bind a time source
+		// TODO should take a time zone from the command line?
+		bind(Clock.class).toInstance(Clock.systemUTC());
 		
 		bindLoggedEventsAnnotatedWith(ServerLogger.class).toLogger(ServerLogger.NAME);
 		

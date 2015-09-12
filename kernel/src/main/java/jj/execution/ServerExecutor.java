@@ -15,6 +15,7 @@
  */
 package jj.execution;
 
+import java.time.Clock;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -23,7 +24,6 @@ import javax.inject.Singleton;
 import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
-import jj.util.Clock;
 
 /**
  * Special internal executor for the various tasks the server needs done.

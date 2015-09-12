@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import io.netty.resolver.dns.DnsServerAddresses;
 import jj.configuration.ConfigurationLoaded;
 import jj.configuration.ConfigurationLoading;
 import jj.event.Listener;
@@ -86,7 +87,7 @@ class HttpClient {
 		
 		if (configuration.hashCode() != configurationHashCode) {
 			configurationHashCode = configuration.hashCode();
-			
+
 			List<InetSocketAddress> nameservers = configuration.nameservers();
 			
 			if (nameservers.isEmpty()) {
@@ -99,7 +100,13 @@ class HttpClient {
 					.handler(initializer)
 					.channel(NioSocketChannel.class)
 					.localAddress(configuration.localClientAddress())
-					.resolver(new DnsNameResolverGroup(NioDatagramChannel.class, configuration.localNameserverAddress(), nameservers))
+					.resolver(
+						new DnsNameResolverGroup(
+							NioDatagramChannel.class,
+							configuration.localNameserverAddress(),
+							DnsServerAddresses.rotational(nameservers)
+						)
+					)
 					.option(ChannelOption.TCP_NODELAY, true)
 					.validate();
 				

@@ -16,12 +16,12 @@
 package jj.execution;
 
 import java.lang.ref.WeakReference;
+import java.time.Clock;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 import jj.ServerLogger;
 import jj.logging.LoggedEvent;
-import jj.util.Clock;
 
 import org.slf4j.Logger;
 
@@ -54,7 +54,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 	
 	@Override
 	public final long getDelay(TimeUnit unit) {
-		return unit.convert(maxTime - (clock.time() - enqueuedTime), TimeUnit.MILLISECONDS);
+		return unit.convert(maxTime - (clock.millis() - enqueuedTime), TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
@@ -77,17 +77,17 @@ class TaskTracker extends LoggedEvent implements Delayed {
 		executionTime = 0;
 		startTime = 0;
 		maxTime = timeoutMillis;
-		enqueuedTime = clock.time();
+		enqueuedTime = clock.millis();
 	}
 	
 	void start() {
 		assert (maxTime != 0 && startTime == 0);
-		startTime = clock.time();
+		startTime = clock.millis();
 	}
 	
 	void end() {
 		assert (startTime != 0 && executionTime == 0);
-		executionTime = clock.time() - startTime;
+		executionTime = clock.millis() - startTime;
 	}
 	
 	void endedInError() {

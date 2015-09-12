@@ -84,15 +84,15 @@ allprojects {
 
 subprojects {
 	
-	/*
+	//*
 	apply plugin: 'jacoco'
 	
 	jacoco {
-		toolVersion = '0.7.0.201403182114'
+//		toolVersion = '0.7.0.201403182114'
 	}
 	
 	check.dependsOn jacocoTestReport
-	*/
+	//*/
 	
 	jar {
 		manifest {

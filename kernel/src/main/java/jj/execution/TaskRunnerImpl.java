@@ -1,5 +1,6 @@
 package jj.execution;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.concurrent.DelayQueue;
 
@@ -8,7 +9,6 @@ import javax.inject.Singleton;
 
 import jj.event.Publisher;
 import jj.logging.Emergency;
-import jj.util.Clock;
 import jj.util.Closer;
 
 /**
@@ -34,7 +34,7 @@ class TaskRunnerImpl implements TaskRunner {
 		
 		private void log(TaskTracker taskTracker, JJTask<?> task) {
 			publisher.publish(new Emergency(
-				"{} has been waiting {} milliseconds to execute.  something is broken", task, new Long(clock.time() + taskTracker.enqueuedTime()) 
+				"{} has been waiting {} milliseconds to execute.  something is broken", task, clock.millis() + taskTracker.enqueuedTime()
 			));
 		}
 		
@@ -45,7 +45,7 @@ class TaskRunnerImpl implements TaskRunner {
 				final JJTask<?> task = taskTracker.task();
 				if (taskTracker.startTime() == 0 
 					&& task != null
-					&& ((task instanceof DelayedTask<?>) ? !((DelayedTask<?>)task).cancelKey().canceled() : true)
+					&& ((!(task instanceof DelayedTask<?>)) || !((DelayedTask<?>) task).cancelKey().canceled())
 				) {
 					log(taskTracker, task);
 				}
@@ -78,7 +78,7 @@ class TaskRunnerImpl implements TaskRunner {
 		queuedTasks.add(tracker);
 		
 		executors.executeTask(task, () -> {
-				
+
 			String oldName = Thread.currentThread().getName();
 			String threadName = oldName + " - " + task.name();
 			Thread.currentThread().setName(threadName);
@@ -86,7 +86,7 @@ class TaskRunnerImpl implements TaskRunner {
 			boolean interrupted = false;
 			queuedTasks.remove(tracker);
 			tracker.start();
-			
+
 			try (Closer closer = currentTask.enterScope(task)) {
 				task.runningThread = Thread.currentThread();
 				task.run();
@@ -108,20 +108,18 @@ class TaskRunnerImpl implements TaskRunner {
 			} finally {
 				task.runningThread = null;
 				tracker.end();
-				
+
 				// interruption means don't bother keeping promises
 				if (!interrupted) {
 					List<JJTask<?>> tasks = promise.done();
 					if (tasks != null) {
-						for (JJTask<?> t : tasks) {
-							execute(t);
-						}
+						tasks.forEach(this::execute);
 					}
 				}
-				
+
 				publisher.publish(tracker);
 				Thread.currentThread().setName(oldName);
-				
+
 			}
 		});
 		

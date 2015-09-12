@@ -18,6 +18,7 @@ package jj.resource;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.time.Clock;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +32,6 @@ import org.mozilla.javascript.Scriptable;
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
-import jj.util.Clock;
 
 /**
  * <p>
@@ -151,7 +151,7 @@ public abstract class AbstractResource<T> implements Resource<T> {
 		this.cacheKey = dependencies.resourceKey;
 		this.base = dependencies.base;
 		this.name = dependencies.name;
-		this.creationTime = dependencies.abstractResourceDependencies.clock.time();
+		this.creationTime = dependencies.abstractResourceDependencies.clock.millis();
 		this.publisher = dependencies.abstractResourceDependencies.publisher;
 		this.resourceFinder = dependencies.abstractResourceDependencies.resourceFinder;
 		this.resourceConfiguration = dependencies.abstractResourceDependencies.resourceConfiguration;

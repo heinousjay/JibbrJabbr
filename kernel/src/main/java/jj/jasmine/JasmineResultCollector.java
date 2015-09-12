@@ -15,13 +15,13 @@
  */
 package jj.jasmine;
 
+import java.time.Clock;
 import java.util.LinkedHashMap;
 
 import javax.inject.Inject;
 
 import jj.event.Publisher;
 import jj.script.CurrentScriptEnvironment;
-import jj.util.Clock;
 
 /**
  * collects results from a jasmine run, collates them into
@@ -95,7 +95,7 @@ public class JasmineResultCollector {
 	}
 	
 	public void jasmineStarted() {
-		startTime = clock.time();
+		startTime = clock.millis();
 	}
 	
 	public void jasmineDone() {
@@ -108,7 +108,7 @@ public class JasmineResultCollector {
 		for (Suite suite : suites.values()) {
 			failed = failed || suite.failed();
 		}
-		long executionTime = clock.time() - startTime;
+		long executionTime = clock.millis() - startTime;
 		publisher.publish(
 			failed ? 
 			new JasmineTestFailure(jse, executionTime, suites.values()) :
