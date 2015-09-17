@@ -19,15 +19,12 @@ public class ResourceModule extends JJModule {
 		
 		bind(PathResolver.class).to(PathResolverImpl.class);
 		
-		bind(ResourceCache.class).to(ResourceCacheImpl.class);
-		
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
 		
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
 		
-		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
-		
 		bindStartupListener(DirectoryStructureLoader.class);
+		bindStartupListener(ResourceWatchServiceLoop.class); // not really but this works
 		
 		bindCreationOf(DirectoryResource.class).to(DirectoryResourceCreator.class);
 		

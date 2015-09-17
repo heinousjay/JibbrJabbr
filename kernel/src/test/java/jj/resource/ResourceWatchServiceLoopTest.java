@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jj.application.AppLocation;
+import jj.configuration.ConfigurationLoaded;
 import jj.event.Publisher;
 import jj.execution.MockTaskRunner;
 
@@ -40,7 +41,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 // integrates a bit
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceWatchServiceLoopTest {
-	
+
+	@Mock ResourceWatchSwitch resourceWatchSwitch;
 	ResourceCache resourceCache;
 	@Mock ResourceFinder resourceFinder;
 	@Mock ResourceWatcher watcher;
@@ -77,10 +79,11 @@ public class ResourceWatchServiceLoopTest {
 	
 	@Before
 	public void before() throws Exception {
-		resourceCache = new ResourceCacheImpl(makeResourceCreators());
+
+		resourceCache = new ResourceCache(makeResourceCreators());
 		
 		taskRunner = new MockTaskRunner();
-		loop = new ResourceWatchServiceLoop(resourceCache, resourceFinder, watcher, taskRunner);
+		loop = new ResourceWatchServiceLoop(resourceWatchSwitch, resourceCache, resourceFinder, watcher, taskRunner);
 		
 		uri1 = URI.create("resource1");
 		resource1 = makeResource("resource1");
@@ -100,7 +103,8 @@ public class ResourceWatchServiceLoopTest {
 	
 	@Test
 	public void testStart() {
-		loop.start();
+		given(resourceWatchSwitch.runFileWatcher()).willReturn(true);
+		loop.on(new ConfigurationLoaded());
 		
 		assertThat(taskRunner.firstTask(), is(loop));
 	}

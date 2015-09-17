@@ -34,7 +34,9 @@ import javax.inject.Singleton;
 
 import jj.ServerStopping;
 import jj.event.Listener;
+import jj.event.Publisher;
 import jj.event.Subscriber;
+import jj.logging.Emergency;
 
 /**
  * Encapsulates the JDK watch service for mockability.  this is also
@@ -52,11 +54,13 @@ class ResourceWatcher {
 
 	private final WatchService watcher;
 	private final DirectoryStructureLoader directoryStructureLoader;
+	private final Publisher publisher;
 	
 	@Inject
-	ResourceWatcher(DirectoryStructureLoader directoryStructureLoader) throws IOException {
+	ResourceWatcher(DirectoryStructureLoader directoryStructureLoader, Publisher publisher) throws IOException {
 		watcher = FileSystems.getDefault().newWatchService();
 		this.directoryStructureLoader = directoryStructureLoader;
+		this.publisher = publisher;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -64,13 +68,17 @@ class ResourceWatcher {
 		return (WatchEvent<Path>)event;
 	}
 	
-	void watch(Path directory) throws IOException {
+	void watch(Path directory) {
 		// this is kind of cheating
-		if ("Mac OS X".equals(System.getProperty("os.name"))) {
-			// it still polls but this makes it much quicker
-			directory.register(watcher, new Kind[]{ ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE }, com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
-		} else {
-			directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE);
+		try {
+			if ("Mac OS X".equals(System.getProperty("os.name"))) {
+				// it still polls but this makes it much quicker
+				directory.register(watcher, new Kind[]{ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE}, com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
+			} else {
+				directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE);
+			}
+		} catch (IOException ioe) {
+			publisher.publish(new Emergency("could not watch a directory: " + directory, ioe));
 		}
 	}
 	

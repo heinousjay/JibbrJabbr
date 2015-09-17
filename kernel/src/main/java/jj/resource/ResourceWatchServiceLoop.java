@@ -24,11 +24,17 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.configuration.ConfigurationLoaded;
+import jj.event.Listener;
+import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
 
 @Singleton
+@Subscriber
 class ResourceWatchServiceLoop extends ServerTask {
+
+	private final ResourceWatchSwitch resourceWatchSwitch;
 	
 	private final ResourceWatcher watcher;
 	
@@ -42,12 +48,14 @@ class ResourceWatchServiceLoop extends ServerTask {
 	
 	@Inject
 	ResourceWatchServiceLoop(
+		ResourceWatchSwitch resourceWatchSwitch,
 		final ResourceCache resourceCache,
 		final ResourceFinder resourceFinder,
 		final ResourceWatcher watcher,
 		final TaskRunner taskRunner
 	) throws IOException {
 		super(ResourceWatchServiceLoop.class.getSimpleName());
+		this.resourceWatchSwitch = resourceWatchSwitch;
 		this.watcher = watcher;
 		this.resourceCache = resourceCache;
 		this.resourceFinder = resourceFinder;
@@ -61,7 +69,7 @@ class ResourceWatchServiceLoop extends ServerTask {
 		}
 	}
 	
-	private  void reload(final AbstractResource<?> resource) {
+	private void reload(final AbstractResource<?> resource) {
 		resource.kill();
 		taskRunner.execute(
 			new ResourceTask(getClass().getSimpleName() + " reloader for " + resource.cacheKey()) {
@@ -81,20 +89,38 @@ class ResourceWatchServiceLoop extends ServerTask {
 		);
 	}
 	
-	void watch(FileSystemResource resource) throws IOException {
-		Path path = resource.path();
-		
-		if (path.getFileSystem() == FileSystems.getDefault()) {
-			watcher.watch(resource.isDirectory() ? path : path.getParent());
+	private void watch(FileSystemResource resource) {
+		if (resource != null) {
+			Path path = resource.path();
+
+			if (path.getFileSystem() == FileSystems.getDefault()) {
+				watcher.watch(resource.isDirectory() ? path : path.getParent());
+			}
+		}
+	}
+
+	@Listener
+	void on(ResourceLoaded event) {
+		if (resourceWatchSwitch.runFileWatcher() && FileSystemResource.class.isAssignableFrom(event.resourceClass)) {
+			watch((FileSystemResource)event.resourceReference.get());
+		}
+	}
+
+	@Listener
+	void on(ConfigurationLoaded event) {
+		if (resourceWatchSwitch.runFileWatcher()) {
+			start();
+		} else {
+			stop();
 		}
 	}
 	
-	void start() {
+	private void start() {
 		run = true;
 		taskRunner.execute(this);
 	}
 	
-	void stop() {
+	private void stop() {
 		run = false;
 		interrupt();
 	}
@@ -102,19 +128,18 @@ class ResourceWatchServiceLoop extends ServerTask {
 	@Override
 	protected void run() throws Exception {
 		while (run) {
+			// there's probably a streamy way of doing this but
+			// i'm feeling happy enough
 			Map<URI, Boolean> uris = watcher.awaitChangedUris();
-			for (URI uri : uris.keySet()) {
-				for (final Resource<?> resource : resourceCache.findAllByUri(uri)) {
-					ResourceReloadOrganizer rro = 
-						new ResourceReloadOrganizer((AbstractResource<?>)resource, uris.get(uri));
-					for (AbstractResource<?> ar : rro.deletions) {
-						remove(ar);
+			uris.keySet().forEach(uri -> {
+				resourceCache.findAllByUri(uri).forEach(resource -> {
+						ResourceReloadOrganizer rro =
+							new ResourceReloadOrganizer((AbstractResource<?>) resource, uris.get(uri));
+						rro.deletions.forEach(this::remove);
+						rro.reloads.forEach(this::reload);
 					}
-					for (AbstractResource<?> ar : rro.reloads) {
-						reload(ar);
-					}
-				}
-			}
+				);
+			});
 		}
 	}
 }

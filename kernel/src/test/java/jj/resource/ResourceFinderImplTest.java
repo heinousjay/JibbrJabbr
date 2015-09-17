@@ -25,8 +25,8 @@ public class ResourceFinderImplTest {
 	private final String name1 = "index.html";
 	private final String name2 = "output.html";
 
-	private @Mock ResourceCache resourceCache;
-	private @Mock ResourceWatchService resourceWatchService;
+	private @Mock
+	ResourceCache resourceCache;
 	private @Mock Publisher publisher;
 	private @Mock CurrentTask currentTask;
 	
@@ -126,7 +126,6 @@ public class ResourceFinderImplTest {
 		
 		verify(resourceCache).putIfAbsent(staticResource2Key, staticResource2);
 		verify(resourceCache).putIfAbsent(sha1Resource1Key, sha1Resource1);
-		verify(resourceWatchService, times(1)).watch(any(FileSystemResource.class));
 		
 		verify(publisher, times(2)).publish(eventCaptor.capture());
 		// validate the events? probably
