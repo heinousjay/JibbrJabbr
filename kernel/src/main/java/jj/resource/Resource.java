@@ -62,7 +62,13 @@ public interface Resource<T> {
 	 * between the time of its creation and the time it is removed from the resource cache.
 	 */
 	boolean alive();
-	
+
+	/**
+	 * the type of resource, declared here so the compiler is happy with it being used to
+	 * load resources generically
+	 */
+	Class<? extends Resource<T>> type();
+
 	/**
 	 * the argument, if any, used to parameterize creation
 	 */

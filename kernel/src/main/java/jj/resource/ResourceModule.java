@@ -4,9 +4,6 @@ import jj.JJModule;
 
 
 public class ResourceModule extends JJModule {
-	
-	public ResourceModule() {
-	}
 
 	@Override
 	protected void configure() {
@@ -24,7 +21,7 @@ public class ResourceModule extends JJModule {
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
 		
 		bindStartupListener(DirectoryStructureLoader.class);
-		bindStartupListener(ResourceWatchServiceLoop.class); // not really but this works
+		bindStartupListener(ResourceWatchServiceLoop.class);
 		
 		bindCreationOf(DirectoryResource.class).to(DirectoryResourceCreator.class);
 		

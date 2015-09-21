@@ -138,7 +138,12 @@ public class ResourceInstanceCreatorTest  {
 		public boolean alive() {
 			return true;
 		}
-		
+
+		@Override
+		public Class<? extends Resource<Date>> type() {
+			return TestResource.class;
+		}
+
 		@Override
 		public Date creationArg() {
 			return null;

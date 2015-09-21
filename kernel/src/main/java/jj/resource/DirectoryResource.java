@@ -37,8 +37,6 @@ import jj.util.SHA1Helper;
  *
  */
 public class DirectoryResource extends AbstractResource<Void> implements FileSystemResource {
-	
-	public static final String ROOT_NAME = "";
 
 	private final Path path;
 	private final FileTime lastModified;

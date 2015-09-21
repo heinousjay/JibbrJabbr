@@ -18,7 +18,6 @@ package jj.resource;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,38 +27,54 @@ import java.nio.file.WatchService;
 import java.nio.file.WatchEvent.Kind;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.ServerStopping;
-import jj.event.Listener;
 import jj.event.Publisher;
-import jj.event.Subscriber;
 import jj.logging.Emergency;
+import jj.logging.Warning;
 
 /**
  * Encapsulates the JDK watch service for mockability.  this is also
  * why this class has pretty much zero test coverage.  specifically,
- * on the mac, file watching is implemented with 10 second polling,
+ * on the mac, file watching is implemented with 1 second polling,
  * so we only cover this class in an integration test to keep the
- * unit suite quick
+ * unit suite quick. as such, this class should do nothing but translate
+ * to the JDK and publish errors
  * 
  * @author jason
  *
  */
 @Singleton
-@Subscriber
-class ResourceWatcher {
+class FileWatcher {
 
-	private final WatchService watcher;
-	private final DirectoryStructureLoader directoryStructureLoader;
+	enum Action {
+		Unknown, Create, Modify, Delete;
+
+		static Action from(Kind<?> kind) {
+			if (kind == ENTRY_CREATE) {
+				return Create;
+			}
+			if (kind == ENTRY_MODIFY) {
+				return Modify;
+			}
+			if (kind == ENTRY_DELETE) {
+				return Delete;
+			}
+			return Unknown;
+		}
+	}
+
+	private static final boolean MAC_OS_X = "Mac OS X".equals(System.getProperty("os.name"));
+	private static final Kind<?>[] FILE_EVENTS = new Kind<?>[] { ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE };
+
+	private final AtomicReference<WatchService> watchServiceRef = new AtomicReference<>();
 	private final Publisher publisher;
 	
 	@Inject
-	ResourceWatcher(DirectoryStructureLoader directoryStructureLoader, Publisher publisher) throws IOException {
-		watcher = FileSystems.getDefault().newWatchService();
-		this.directoryStructureLoader = directoryStructureLoader;
+	FileWatcher(Publisher publisher) {
 		this.publisher = publisher;
 	}
 	
@@ -70,31 +85,54 @@ class ResourceWatcher {
 	
 	void watch(Path directory) {
 		// this is kind of cheating
+		WatchService watchService = watchServiceRef.get();
+		assert watchService != null : "asked to watch a file but we aren't even running";
 		try {
-			if ("Mac OS X".equals(System.getProperty("os.name"))) {
-				// it still polls but this makes it much quicker
-				directory.register(watcher, new Kind[]{ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE}, com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
+			if (MAC_OS_X) {
+				// this polls on MAC, but the high sensitivity makes it poll a lot
+				directory.register(watchService, FILE_EVENTS, com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
 			} else {
-				directory.register(watcher, ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE);
+				directory.register(watchService, FILE_EVENTS);
 			}
 		} catch (IOException ioe) {
 			publisher.publish(new Emergency("could not watch a directory: " + directory, ioe));
 		}
 	}
-	
-	@Listener
-	void on(ServerStopping event) {
+
+	boolean start() {
+
+		if (watchServiceRef.get() != null) {
+			return true; // already running? awesome
+		}
+
 		try {
-			watcher.close();
+			WatchService watchService = FileSystems.getDefault().newWatchService();
+			if (!watchServiceRef.compareAndSet(null, watchService)) {
+				publisher.publish(
+					new Warning("started a watch service when one was already running.  you need to fix some CAS ops")
+				);
+				try { watchService.close(); } catch (Exception ignored) {}
+			}
+			return true;
 		} catch (IOException e) {
-			// report this? or who cares? not us
+			publisher.publish(new Emergency("creating a watcher threw", e));
+		}
+
+		return false;
+	}
+
+	void stop() {
+		try {
+			watchServiceRef.getAndSet(null).close();
+		} catch (IOException e) {
+			publisher.publish(new Warning("closing a watcher threw", e));
 		}
 	}
 
-	Map<URI, Boolean> awaitChangedUris() throws InterruptedException {
-		Map<URI, Boolean> result = new HashMap<>();
+	Map<Path, Action> awaitChangedPaths() throws InterruptedException {
+		Map<Path, Action> result = new HashMap<>();
 		while (result.isEmpty()) {
-			WatchKey watchKey = watcher.take();
+			WatchKey watchKey = watchServiceRef.get().take();
 			if (watchKey.isValid()) {
 				final Path directory = (Path)watchKey.watchable();
 				for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
@@ -104,27 +142,21 @@ class ResourceWatcher {
 						// not sure what to do about this. probably need to
 						// flush the whole cache in this scenario and reload
 						// the directories from the base
-						System.err.println(getClass().getSimpleName() + " OVERFLOW - not even sure what this means!");
-						continue; // for now.
+						publisher.publish(new Warning("event overflow in the file watcher.  changes were missed"));
 						
 					} else {
 
 						final WatchEvent<Path> event = cast(watchEvent);
 						final Path context = event.context();
 						final Path path = directory.resolve(context);
-						
-						// if something was changed, get our reload on
-						if (kind == ENTRY_DELETE || kind == ENTRY_MODIFY) {
-							result.put(path.toUri(), kind == ENTRY_DELETE);
-						}
-						
-						// if this is a new directory, then walk it
-						else if (kind == ENTRY_CREATE && Files.isDirectory(path)) {
-							directoryStructureLoader.load(path);
-						}
+						result.put(path, Action.from(kind));
 					}
 					
 				}
+
+				// gotta clean up after ourselves?
+				// i'm not totally clear on if this is necessary but it seems to work
+				// cargo cult cancel!
 				if (!Files.exists(directory)) {
 					watchKey.cancel();
 				}

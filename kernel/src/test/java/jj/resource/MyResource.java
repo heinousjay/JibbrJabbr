@@ -17,6 +17,7 @@ package jj.resource;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Paths;
 
 import jj.application.AppLocation;
 import jj.event.Publisher;
@@ -25,7 +26,7 @@ import jj.util.SHA1Helper;
 class MyResource extends AbstractResource<Void> {
 	
 	protected MyResource(String name, Publisher publisher) {
-		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.AppBase, name, publisher));
+		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, Paths.get(name).toUri()), AppLocation.AppBase, name, publisher));
 	}
 
 	@Override
