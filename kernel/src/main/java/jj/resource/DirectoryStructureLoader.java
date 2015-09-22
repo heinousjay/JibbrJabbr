@@ -32,8 +32,7 @@ import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 
 /**
- * walks the application structure from the root, loading all of
- * the directories along the way
+ * walks the directory structure to load resources that represent it
  * 
  * @author jason
  *
@@ -59,8 +58,15 @@ class DirectoryStructureLoader {
 			event.registerStartupTask(Priority.NearHighest, new LoaderTask(pathResolver.resolvePath(location)));
 		}
 	}
+
+	@Listener
+	void on(PathCreation pathCreation) {
+		if (Files.isDirectory(pathCreation.path)) {
+			load(pathCreation.path);
+		}
+	}
 	
-	void load(final Path path) {
+	void load(Path path) {
 		Location base = pathResolver.resolveLocation(path);
 		assert base != null && base.parentInDirectory() : "asked to load a directory structure for a bad path"; 
 		taskRunner.execute(new LoaderTask(path));
@@ -70,7 +76,7 @@ class DirectoryStructureLoader {
 		
 		private final Path path;
 		
-		LoaderTask(final Path path) {
+		LoaderTask(Path path) {
 			super("loading directory structure rooted at " + path);
 			this.path = path;
 		}

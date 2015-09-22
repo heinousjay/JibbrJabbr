@@ -42,7 +42,8 @@ import org.mozilla.javascript.Scriptable;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceCacheInspectorTest {
 	
-	@Mock ResourceCacheImpl resourceCacheImpl;
+	@Mock
+	ResourceCache resourceCache;
 	@Mock ResourceCreators resourceCreators;
 	RealRhinoContextProvider rhinoContextProvider;
 
@@ -74,14 +75,14 @@ public class ResourceCacheInspectorTest {
 		
 		resources = Arrays.asList(resource1, resource2, resource3, resource4, resource5, resource6, resource7);
 		total = resources.size();
-		given(resourceCacheImpl.allResources()).willReturn(resources);
+		given(resourceCache.allResources()).willReturn(resources);
 		
 		given(resourceCreators.knownResourceTypeNames()).willReturn(Arrays.asList("type1", "type2"));
 		
 		rhinoContextProvider = new RealRhinoContextProvider();
 		
 		try (RhinoContext context = rhinoContextProvider.get()) {
-			rca = new ResourceCacheInspector(resourceCacheImpl, resourceCreators, rhinoContextProvider, context.initStandardObjects());
+			rca = new ResourceCacheInspector(resourceCache, resourceCreators, rhinoContextProvider, context.initStandardObjects());
 		}
 	}
 	

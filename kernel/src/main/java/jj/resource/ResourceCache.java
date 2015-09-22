@@ -1,39 +1,96 @@
-/*
- *    Copyright 2012 Jason Miller
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package jj.resource;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import jj.ServerStopping;
+import jj.event.Listener;
+import jj.event.Subscriber;
 
 /**
+ * central lookup for all resources, mapped from the URI
+ * representation of their path to the resource.
  * @author jason
  *
  */
-interface ResourceCache {
-
-	List<Resource<?>> findAllByUri(URI uri);
-
-	<A, T extends Resource<A>> T get(ResourceKey cacheKey);
+@Singleton
+@Subscriber
+class ResourceCache {
 	
-	<A, T extends Resource<A>> T putIfAbsent(ResourceKey cacheKey, T resource);
+	private final ResourceCreators resourceCreators;
 	
-	<A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type);
+	private final ConcurrentMap<ResourceKey, Resource<?>> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
 
-	<A, T extends Resource<A>> boolean remove(ResourceKey cacheKey, T resource);
+	@Inject
+	ResourceCache(final ResourceCreators resourceCreators) {
+		this.resourceCreators = resourceCreators;
+	}
+
+	public List<Resource<?>> findAllByUri(URI uri) {
+		
+		List<Resource<?>> result = new ArrayList<>();
+		
+		for (SimpleResourceCreator<?, ? extends Resource<?>> resourceCreator : resourceCreators) {
+			Resource<?> it = get(new ResourceKey(resourceCreator.type(), uri));
+			if (it != null) result.add(it);
+		}
+		return Collections.unmodifiableList(result);
+	}
 	
-	<A, T extends Resource<A>> boolean replace(ResourceKey key, T oldValue, T newValue);
+	/**
+	 * Returns an unmodifiable snapshot of the current Resource instances.  This information is
+	 * immediately out of date, cannot be manipulated, and is in no particular order.
+	 */
+	List<Resource<?>> allResources() {
+		return Collections.unmodifiableList(new ArrayList<>(resourceCache.values()));
+	}
+	
+	@Listener
+	void on(ServerStopping event) {
+		resourceCache.clear();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type) {
+		return (ResourceCreator<A, T>) resourceCreators.get(type);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <A, T extends Resource<A>> T get(ResourceKey key) {
+		return (T)resourceCache.get(key);
+	}
 
+	@SuppressWarnings("unchecked")
+	public <A, T extends Resource<A>> T putIfAbsent(ResourceKey key, T value) {
+		return (T)resourceCache.putIfAbsent(key, value);
+	}
+
+	public <A, T extends Resource<A>> boolean replace(ResourceKey key, T oldValue, T newValue) {
+		return resourceCache.replace(key, oldValue, newValue);
+	}
+
+	public <A, T extends Resource<A>> boolean remove(ResourceKey cacheKey, T resource) {
+		return resourceCache.remove(cacheKey, resource);
+	}
+	
+	int size() {
+		return resourceCache.size();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
+		for (Entry<ResourceKey, Resource<?>> entry : resourceCache.entrySet()) {
+			sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
+		}
+ 		return sb.append("}").toString();
+	}
 }

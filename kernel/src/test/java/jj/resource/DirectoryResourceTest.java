@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import jj.Base;
 import jj.application.AppLocation;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -56,7 +57,7 @@ public class DirectoryResourceTest {
 		try {
 			new DirectoryResource(new MockAbstractResourceDependencies(base, name), path);
 			fail();
-		} catch (NoSuchResourceException nsre) {}
+		} catch (NoSuchResourceException nsre) { /* empty */ }
 
 		name = "blank.gif";
 		path = Base.appPath().resolve(name);
@@ -64,7 +65,7 @@ public class DirectoryResourceTest {
 		try {
 			new DirectoryResource(new MockAbstractResourceDependencies(base, name), path);
 			fail();
-		} catch (NoSuchResourceException nsre) {}
+		} catch (NoSuchResourceException nsre) { /* empty */ }
 		
 	}
 

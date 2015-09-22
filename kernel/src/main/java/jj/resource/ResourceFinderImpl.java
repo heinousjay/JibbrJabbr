@@ -25,8 +25,6 @@ class ResourceFinderImpl implements ResourceFinder {
 
 	private final ResourceCache resourceCache;
 	
-	private final ResourceWatchService resourceWatchService;
-	
 	private final Publisher publisher;
 	
 	private final CurrentTask currentTask;
@@ -34,12 +32,10 @@ class ResourceFinderImpl implements ResourceFinder {
 	@Inject
 	ResourceFinderImpl(
 		final ResourceCache resourceCache,
-		final ResourceWatchService resourceWatchService,
 		final Publisher publisher,
 		final CurrentTask currentTask
 	) {
 		this.resourceCache = resourceCache;
-		this.resourceWatchService = resourceWatchService;
 		this.publisher = publisher;
 		this.currentTask = currentTask;
 	}
@@ -170,13 +166,7 @@ class ResourceFinderImpl implements ResourceFinder {
 		} else {
 			if (resourceCache.putIfAbsent(cacheKey, resource) == null) {
 				// let the world know
-				publisher.publish(new ResourceLoaded((AbstractResource<A>)resource));
-				
-				if (resource instanceof FileSystemResource) {
-					// if this was the first time we put this in the cache,
-					// we set up a file watch on it for background reloads
-					resourceWatchService.watch((FileSystemResource)resource);
-				}
+				publisher.publish(new ResourceLoaded(resource));
 			}
 		}
 	}

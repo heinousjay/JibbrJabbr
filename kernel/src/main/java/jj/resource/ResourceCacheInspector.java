@@ -54,7 +54,7 @@ import jj.script.RhinoContext;
  * </ol>
  * 
  * <p>
- * Why not just put all this in the ResourceCacheImpl, you might ask. I'll tell you!
+ * Why not just put all this in the ResourceCache, you might ask. I'll tell you!
  * because that shouldn't be public, but the script API requires public classes,
  * and because the transformation steps can be isolated, so they should be isolated.
  * no need to give one class two jobs.
@@ -77,7 +77,7 @@ public class ResourceCacheInspector {
 	
 	@Inject
 	ResourceCacheInspector(
-		final ResourceCacheImpl resourceCache,
+		final ResourceCache resourceCache,
 		final ResourceCreators resourceCreators,
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global

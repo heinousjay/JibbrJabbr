@@ -326,11 +326,12 @@ public abstract class AbstractResource<T> implements Resource<T> {
 		return name;
 	}
 
-	/**
-	 * the arguments used to create this resource. mocking needs prevent this
-	 * from being kept package private but don't call it
-	 * @return
-	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public Class<? extends Resource<T>> type() {
+		return (Class<? extends Resource<T>>)getClass();
+	}
+
 	@Override
 	public T creationArg() {
 		return null;

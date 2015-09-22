@@ -94,7 +94,6 @@ public class JasmineIntegrationTest {
 		assertNotNull(failure);
 		
 		// contents of test results are verified in the unit tests
-		// TODO touch a script/spec and ensure it runs again?
 		success = null;
 		failure = null;
 		latch = new CountDownLatch(2);

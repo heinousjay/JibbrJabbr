@@ -56,7 +56,7 @@ public class ResourceCacheTest {
 	
 	ResourceKey hKey;
 	
-	ResourceCacheImpl rc;
+	ResourceCache rc;
 	
 	@Before
 	public void before() {
@@ -64,7 +64,7 @@ public class ResourceCacheTest {
 		HashMap<Class<? extends AbstractResource<?>>, SimpleResourceCreator<?, ? extends AbstractResource<?>>> map = new HashMap<>();
 		map.put(StaticResource.class, src);
 		map.put(HtmlResource.class, hrc);
-		rc = new ResourceCacheImpl(new ResourceCreators(map));
+		rc = new ResourceCache(new ResourceCreators(map));
 		
 		given(src.type()).willReturn(StaticResource.class);
 		given(hrc.type()).willReturn(HtmlResource.class);

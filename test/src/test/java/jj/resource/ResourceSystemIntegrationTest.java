@@ -47,7 +47,8 @@ public class ResourceSystemIntegrationTest {
 	
 	@Inject EmbeddedHttpServer server;
 	
-	@Inject ResourceCache resourceCache;
+	@Inject
+	ResourceCache resourceCache;
 	
 	DocumentScriptEnvironment dse;
 	HtmlResource htmlResource;
