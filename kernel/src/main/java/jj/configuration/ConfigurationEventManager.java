@@ -16,9 +16,12 @@
 package jj.configuration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.application.AppLocation.AppBase;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
 import static jj.server.ServerLocation.Virtual;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
 
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
@@ -29,25 +32,29 @@ import jj.ServerStarting.Priority;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
+import jj.resource.PathCreation;
+import jj.resource.PathResolver;
 import jj.resource.ResourceLoader;
 
 /**
  * ensures that the configuration file for the application
- * is available to the system on startup
+ * is available to the system on startup and thereafter
  * 
  * @author jason
  *
  */
 @Singleton
 @Subscriber
-class ConfigurationScriptLoader {
+class ConfigurationEventManager {
 	
 	private final ResourceLoader resourceLoader;
+	private final Path configFilePath;
 	private final CountDownLatch latch = new CountDownLatch(1);
 	
 	@Inject
-	ConfigurationScriptLoader(final ResourceLoader resourceFinder) {
+	ConfigurationEventManager(ResourceLoader resourceFinder, PathResolver pathResolver) {
 		this.resourceLoader = resourceFinder;
+		configFilePath = pathResolver.resolvePath(AppBase, CONFIG_SCRIPT_NAME);
 	}
 	
 	@Listener
@@ -61,6 +68,13 @@ class ConfigurationScriptLoader {
 				assert success : "configuration didn't load in 3 seconds";
 			}
 		});
+	}
+
+	@Listener
+	void on(PathCreation pathCreation) {
+		if (configFilePath.equals(pathCreation.path)) {
+			load();
+		}
 	}
 	
 	@Listener
