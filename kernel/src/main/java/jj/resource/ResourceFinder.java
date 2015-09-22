@@ -32,7 +32,7 @@ public interface ResourceFinder {
 	 * loads a resource matching the given resource spec, if necessary, and populates
 	 * the cache.  can only be called via a {@link ResourceTask}.  if the resource spec does
 	 * not identify a valid resource, this returns null. if a resource is returned from this method,
-	 * then it will be watched for changes and automatically updated
+	 * then it will be watched for changes and automatically updated, unless the watcher is shut off
 	 * 
 	 * @param resourceClass The type of <code>Resource</code>
 	 * @param base The {@link Location} of the <code>Resource</code>
