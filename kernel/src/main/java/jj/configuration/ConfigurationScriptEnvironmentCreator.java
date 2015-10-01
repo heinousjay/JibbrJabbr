@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.Location;
+import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**
@@ -37,16 +38,14 @@ class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCre
 	static final String CONFIG_SCRIPT_NAME = CONFIG_NAME + ".js";
 	
 	@Inject
-	ConfigurationScriptEnvironmentCreator(
-		final Dependencies dependencies
-	) {
+	ConfigurationScriptEnvironmentCreator(Dependencies dependencies) {
 		super(dependencies);
 	}
 
 	@Override
 	protected ConfigurationScriptEnvironment createScriptEnvironment(String name, Void argument) throws IOException {
 		assert CONFIG_NAME.equals(name) : "can only create " + CONFIG_NAME;
-		return creator.createResource(ConfigurationScriptEnvironment.class, resourceKey(Virtual, name, argument), Virtual, name, argument);
+		return creator.createResource(resourceIdentifierMaker.make(type(), Virtual, name, null));
 	}
 	
 	@Override

@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static jj.server.ServerLocation.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +30,6 @@ import java.util.Map;
 import jj.Base;
 import jj.ServerStarting;
 import jj.ServerStopping;
-import jj.application.AppLocation;
 import jj.event.MockPublisher;
 import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
@@ -71,7 +71,7 @@ public class ResourceWatchServiceLoopTest {
 	
 	private MyResource makeResource(String name) {
 		MyResource result = spy(new MyResource(name, publisher));
-		resourceCache.putIfAbsent(result.cacheKey(), result);
+		resourceCache.putIfAbsent(result);
 		return result;
 	}
 	
@@ -102,15 +102,19 @@ public class ResourceWatchServiceLoopTest {
 		assertThat(startWatchLoop(), is(loop));
 	}
 
-	@Mock(extraInterfaces = {FileSystemResource.class}) Resource<?> resource;
+	public interface MyTestResource extends FileSystemResource, Resource<Void> {}
 
+	@Mock MyTestResource resource;
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testWatches() {
+		given((ResourceIdentifier<MyTestResource, Void>)resource.identifier()).willReturn(ResourceIdentifierHelper.make(MyTestResource.class, Virtual, "whatever"));
+
 		given(resourceWatchSwitch.runFileWatcher()).willReturn(true);
-		FileSystemResource fsResource = (FileSystemResource)resource;
 
 		Path path = Paths.get("whatever/makes/you/happy");
-		given(fsResource.path()).willReturn(path);
+		given(resource.path()).willReturn(path);
 
 		loop.on(new ResourceLoaded(resource));
 		verify(watcher, never()).watch(path.getParent());
@@ -120,7 +124,7 @@ public class ResourceWatchServiceLoopTest {
 		loop.on(new ResourceLoaded(resource));
 		verify(watcher).watch(path.getParent());
 
-		given(fsResource.isDirectory()).willReturn(true);
+		given(resource.isDirectory()).willReturn(true);
 		loop.on(new ResourceLoaded(resource));
 		verify(watcher).watch(path);
 
@@ -130,12 +134,22 @@ public class ResourceWatchServiceLoopTest {
 	public void testDirectoryCreation() throws Exception {
 		startWatchLoop();
 
-		// relatively simple, directory creation gets delegated to the loader
 		changes.put(Base.path, FileWatcher.Action.Create);
 		loopOverChangesAndDie();
 
-		PathCreation pc = (PathCreation)publisher.events.get(0);
-		assertThat(pc.path, is(Base.path));
+		DirectoryCreation dc = (DirectoryCreation)publisher.events.get(0);
+		assertThat(dc.path, is(Base.path));
+	}
+
+	@Test
+	public void testFileCreation() throws Exception {
+		startWatchLoop();
+		Path path = Base.path.resolve("blank.gif");
+		changes.put(path, FileWatcher.Action.Create);
+		loopOverChangesAndDie();
+
+		FileCreation fc = (FileCreation)publisher.events.get(0);
+		assertThat(fc.path, is(path));
 	}
 	
 	@Test
@@ -153,15 +167,15 @@ public class ResourceWatchServiceLoopTest {
 		resource3.addDependent(resource4);
 		resource5.addDependent(resource1);
 		
-		changes.put(Paths.get(resource1.uri()), FileWatcher.Action.Delete);
+		changes.put(resource1.path(), FileWatcher.Action.Delete);
 
 		loopOverChangesAndDie();
 		
-		assertThat(resourceCache.get(resource1.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource2.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource3.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource4.cacheKey()), is(nullValue()));
-		assertThat(MyResource.class.cast(resourceCache.get(resource5.cacheKey())), is(resource5));
+		assertThat(resourceCache.get(resource1.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource2.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource3.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource4.identifier()), is(nullValue()));
+		assertThat(MyResource.class.cast(resourceCache.get(resource5.identifier())), is(resource5));
 		
 		assertThat(taskRunner.tasks, is(empty()));
 		verifyZeroInteractions(resourceLoader);
@@ -171,15 +185,16 @@ public class ResourceWatchServiceLoopTest {
 		verify(resource3).kill();
 		verify(resource4).kill();
 		verify(resource5, never()).kill();
-		assertThat(publisher.events.size(), is(4));
-		check((ResourceKilled)publisher.events.get(0), resource1);
-		check((ResourceKilled)publisher.events.get(1), resource2);
-		check((ResourceKilled)publisher.events.get(2), resource3);
-		check((ResourceKilled)publisher.events.get(3), resource4);
+		assertThat(publisher.events.size(), is(9));
+		check((ResourceKilled)publisher.events.get(5), resource1);
+		check((ResourceKilled)publisher.events.get(6), resource2);
+		check((ResourceKilled)publisher.events.get(7), resource3);
+		check((ResourceKilled)publisher.events.get(8), resource4);
 	}
 
 	private void check(ResourceEvent event, MyResource resource) {
-		assertTrue(event.resourceClass == resource.getClass());
+		// because we're spying, the resource is a runtime subclass
+		assertTrue(event.type().isAssignableFrom(resource.getClass()));
 	}
 
 	@Test
@@ -198,33 +213,30 @@ public class ResourceWatchServiceLoopTest {
 		resource3.addDependent(resource4);
 		resource4.addDependent(resource5);
 		
-		changes.put(Paths.get(resource1.uri()), FileWatcher.Action.Modify);
+		changes.put(resource1.path(), FileWatcher.Action.Modify);
 		
 		loopOverChangesAndDie();
 		
-		assertThat(resourceCache.get(resource1.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource2.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource3.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource4.cacheKey()), is(nullValue()));
-		assertThat(MyResource.class.cast(resourceCache.get(resource5.cacheKey())), is(resource5));
-		
-		verify(resourceLoader).loadResource(resource5.getClass(), resource5.base(), resource5.name(), resource5.creationArg());
+		assertThat(resourceCache.get(resource1.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource2.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource3.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource4.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource5.identifier()), is(nullValue()));
 
 		verify(resource1).kill();
 		verify(resource2).kill();
 		verify(resource3).kill();
 		verify(resource4).kill();
 		verify(resource5).kill();
-		assertThat(publisher.events.size(), is(5));
-		check((ResourceKilled) publisher.events.get(0), resource1);
-		check((ResourceKilled) publisher.events.get(1), resource2);
-		check((ResourceKilled) publisher.events.get(2), resource3);
-		check((ResourceKilled) publisher.events.get(3), resource4);
-		check((ResourceKilled) publisher.events.get(4), resource5);
+		assertThat(publisher.events.size(), is(10));
+		check((ResourceKilled) publisher.events.get(5), resource1);
+		check((ResourceKilled) publisher.events.get(6), resource2);
+		check((ResourceKilled) publisher.events.get(7), resource3);
+		check((ResourceKilled) publisher.events.get(8), resource4);
+		check((ResourceKilled) publisher.events.get(9), resource5);
 
-		@SuppressWarnings("unchecked")
-		Class<MyResource> runtimeClass = (Class<MyResource>)resource5.getClass();
-		verify(resourceLoader).loadResource(runtimeClass, AppLocation.AppBase, resource5.name(), null);
+		verify(resourceLoader).loadResource(resource5.identifier());
+		verifyNoMoreInteractions(resourceLoader);
 	}
 
 	private JJTask<?> startWatchLoop() {

@@ -60,8 +60,8 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private RequiredModule extractRequiredModule(ResourceEvent event) {
 		RequiredModule result = null;
-		if (event.argument instanceof RequiredModule) {
-			result = (RequiredModule)event.argument;
+		if (event.argument() instanceof RequiredModule) {
+			result = (RequiredModule)event.argument();
 		}
 		return result;
 	}

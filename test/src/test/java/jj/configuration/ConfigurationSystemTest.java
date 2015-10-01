@@ -66,7 +66,9 @@ public class ConfigurationSystemTest {
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.configuration).injectInstance(this);
+	public JibbrJabbrTestServer app =
+		new JibbrJabbrTestServer(ServerRoot.one, App.configuration)
+			.injectInstance(this);
 	
 	@Inject
 	private ConfigurationCollector collector;

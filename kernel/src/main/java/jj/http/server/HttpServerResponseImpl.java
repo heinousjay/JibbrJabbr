@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.netty.handler.codec.http.*;
 import jj.Version;
 import jj.event.Publisher;
 import io.netty.buffer.ByteBuf;
@@ -33,13 +34,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AsciiString;
-import io.netty.handler.codec.http.DefaultHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderUtil;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.stream.ChunkedNioFile;
 
 /**
@@ -55,9 +49,6 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	
 	private final Publisher publisher;
 	
-	/**
-	 * @param response
-	 */
 	@Inject
 	HttpServerResponseImpl(
 		final Version version,
@@ -336,7 +327,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 	
 	private ChannelFuture maybeClose(final ChannelFuture f) {
-		if (!HttpHeaderUtil.isKeepAlive(request.request())) {
+		if (!HttpUtil.isKeepAlive(request.request())) {
 			f.addListener(ChannelFutureListener.CLOSE);
 		}
 		

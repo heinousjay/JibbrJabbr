@@ -10,4 +10,5 @@ build/
 .jar
 .README.md.html
 .idea/
+.idea-build/
 *.iml

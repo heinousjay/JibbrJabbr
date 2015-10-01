@@ -25,7 +25,7 @@ class MyResourceCreator extends SimpleResourceCreator<Void, MyResource> {
 	private final Publisher publisher;
 	
 	MyResourceCreator(Publisher publisher) {
-		super(new Dependencies(null, null));
+		super(new Dependencies(null, null, null));
 		this.publisher = publisher;
 	}
 

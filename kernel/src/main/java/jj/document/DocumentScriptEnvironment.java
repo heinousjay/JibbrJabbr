@@ -112,15 +112,16 @@ public class DocumentScriptEnvironment
 	) {
 		super(dependencies);
 		
-		html = resourceFinder.loadResource(HtmlResource.class, Public, resourceName(name));
-		
+		html = resourceFinder.loadResource(HtmlResource.class, Public, resourceName(name()));
+
+		// NO
 		if (html == null) {
-			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
+			throw new NoSuchResourceException(getClass(), name() + "-" + resourceName(name()));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Client.suffix(name));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Shared.suffix(name));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, Private, ScriptResourceType.Client.suffix(name));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Client.suffix(name()));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Shared.suffix(name()));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, Private, ScriptResourceType.Client.suffix(name()));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -129,7 +130,7 @@ public class DocumentScriptEnvironment
 			serverScript == null ? "none" : serverScript.sha1()
 		);
 
-		serverPath = "/" + sha1 + "/" + name;
+		serverPath = "/" + sha1 + "/" + name();
 		
 		if (serverScript == null)  {
 			socketUri = null;
@@ -138,12 +139,12 @@ public class DocumentScriptEnvironment
 		} else {
 			socketUri = serverPath + ".socket";
 			global = api.global();
-			scope = configureTimers(configureModuleObjects(name, createChainedScope(global)));
+			scope = configureTimers(configureModuleObjects(name(), createChainedScope(global)));
 			
 			try {
 				compiler.compile(scope, clientScript, sharedScript, serverScript.name());
 			} catch (Exception e) {
-				throw new ResourceNotViableException(name, e);
+				throw new ResourceNotViableException(name(), e);
 			}
 		}
 		
@@ -169,7 +170,7 @@ public class DocumentScriptEnvironment
 
 	@Override
 	public String scriptName() {
-		return ScriptResourceType.Client.suffix(name);
+		return ScriptResourceType.Client.suffix(name());
 	}
 
 	@Override
@@ -327,23 +328,14 @@ public class DocumentScriptEnvironment
 		return (closer != null) ? closer : super.restoreContextForKey(key);
 	}
 
-	/**
-	 * @return
-	 */
 	public String socketUri() {
 		return socketUri;
 	}
 
-	/**
-	 * @return
-	 */
 	public ScriptResource clientScriptResource() {
 		return clientScript;
 	}
 
-	/**
-	 * @return
-	 */
 	public ScriptResource sharedScriptResource() {
 		return sharedScript;
 	}

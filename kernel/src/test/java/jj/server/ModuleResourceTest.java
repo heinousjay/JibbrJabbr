@@ -22,7 +22,7 @@ public class ModuleResourceTest {
 		
 		Path path = Paths.get("");
 		
-		new ModuleResource(dependencies = new MockAbstractResourceDependencies(AppBase, "name"), path);
+		new ModuleResource(dependencies = new MockAbstractResourceDependencies(ModuleResource.class, AppBase, "name"), path);
 	}
 
 }

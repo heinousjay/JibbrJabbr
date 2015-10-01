@@ -66,7 +66,7 @@ public class CssReferenceVersionProcessorTest {
 		basePath = Paths.get(getClass().getResource("/jj/css/test").toURI());
 		app = new MockApplication(basePath);
 		
-		dependencies = new MockAbstractResourceDependencies(Virtual, REPLACEMENT_CSS);
+		dependencies = new MockAbstractResourceDependencies(StylesheetResource.class, Virtual, REPLACEMENT_CSS);
 	}
 
 	@Test

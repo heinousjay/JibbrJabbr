@@ -17,6 +17,10 @@ import jj.resource.LocationResolver;
 
 @Singleton
 public class Server implements LocationResolver {
+
+	private static final String MODULES = "modules";
+
+	private static final String MODULES_PATH = "modules/";
 	
 	private final Path rootPath;
 	
@@ -46,7 +50,10 @@ public class Server implements LocationResolver {
 	public Location resolveBase(Path path) {
 		assert path != null;
 		path = path.normalize().toAbsolutePath();
-		return path.startsWith(rootPath) && rootPath.relativize(path).startsWith("modules") ? ServerLocation.Modules : null;
+
+		return path.getFileSystem() == rootPath.getFileSystem() && path.startsWith(rootPath) ?
+			(rootPath.relativize(path).startsWith(MODULES) ? ServerLocation.Modules : ServerLocation.Root) :
+			null;
 	}
 
 	@Override
@@ -67,7 +74,7 @@ public class Server implements LocationResolver {
 			return rootPath.resolve(name);
 			
 		case Modules:
-			return rootPath.resolve("modules").resolve(name);
+			return rootPath.resolve(MODULES).resolve(name);
 			
 		case Virtual:
 			return null;
@@ -84,5 +91,15 @@ public class Server implements LocationResolver {
 	@Override
 	public Location specLocationFor(Location base) {
 		return base == APIModules ? APISpecs : null;
+	}
+
+	@Override
+	public String normalizedName(Location originalBase, Location normalizedBase, String name) {
+
+		// only one situation here, so very concretely:
+		if (originalBase == Root && normalizedBase == Modules && name.startsWith(MODULES_PATH)) {
+			return name.substring(MODULES_PATH.length());
+		}
+		return name;
 	}
 }

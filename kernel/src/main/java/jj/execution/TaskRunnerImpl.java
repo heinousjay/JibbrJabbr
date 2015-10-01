@@ -7,6 +7,7 @@ import java.util.concurrent.DelayQueue;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.JJServerLifecycle;
 import jj.event.Publisher;
 import jj.logging.Emergency;
 import jj.util.Closer;
@@ -27,6 +28,7 @@ class TaskRunnerImpl implements TaskRunner {
 	private final CurrentTask currentTask;
 	private final Publisher publisher;
 	private final Clock clock;
+	private final JJServerLifecycle lifecycle;
 	
 	private final DelayQueue<TaskTracker> queuedTasks = new DelayQueue<>();
 	
@@ -55,16 +57,18 @@ class TaskRunnerImpl implements TaskRunner {
 	
 	@Inject
 	TaskRunnerImpl(
-		final Executors bundle,
-		final CurrentTask currentTask,
-		final Publisher publisher,
-		final Clock clock
+		Executors bundle,
+		CurrentTask currentTask,
+		Publisher publisher,
+		Clock clock,
+		JJServerLifecycle lifecycle
 	) {
 		this.executors = bundle;
 		this.currentTask = currentTask;
 		this.publisher = publisher;
 		this.clock = clock;
-		
+		this.lifecycle = lifecycle;
+
 		execute(monitor);
 	}
 	
@@ -96,7 +100,7 @@ class TaskRunnerImpl implements TaskRunner {
 			} catch (AssertionError ae) {
 				System.err.println("ASSERTION TRIPPED");
 				ae.printStackTrace();
-				System.exit(1);
+				lifecycle.stop();
 			} catch (OutOfMemoryError e) {
 				throw e; // just in case
 			} catch (Throwable t) {

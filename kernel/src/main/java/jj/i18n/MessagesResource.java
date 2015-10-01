@@ -80,7 +80,7 @@ public class MessagesResource extends AbstractResource<Locale> {
 		ArrayList<PropertiesResource> propertiesResources = findResources(resourceFinder);
 		
 		if (propertiesResources.isEmpty()) {
-			throw new NoSuchResourceException(MessagesResource.class, name);
+			throw new NoSuchResourceException(MessagesResource.class, name());
 		}
 		
 		String[] shas = new String[propertiesResources.size()];
@@ -112,6 +112,7 @@ public class MessagesResource extends AbstractResource<Locale> {
 	}
 	
 	private String[] candidateNames() {
+		String name = name();
 		return new String[] {
 			name + EXT,
 			name + __ + locale.getLanguage() + EXT,

@@ -24,6 +24,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.resource.ResourceIdentifier;
 import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
 
@@ -42,7 +43,7 @@ class MessagesResourceCreator extends SimpleResourceCreator<Locale, MessagesReso
 	@Override
 	public MessagesResource create(Location base, String name, Locale locale) throws IOException {
 		assertArgs(base);
-		return creator.createResource(MessagesResource.class, resourceKey(base, name, locale), base, name, locale);
+		return creator.createResource(resourceIdentifierMaker.make(type(), base, name, locale));
 	}
 
 	@Override

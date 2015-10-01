@@ -15,6 +15,7 @@
  */
 package jj.script;
 
+import static jj.server.ServerLocation.Virtual;
 import static org.mockito.Mockito.mock;
 
 import javax.inject.Provider;
@@ -22,7 +23,8 @@ import javax.inject.Provider;
 import jj.event.MockPublisher;
 import jj.resource.MockAbstractResourceDependencies;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceKey;
+import jj.resource.ResourceIdentifier;
+import jj.resource.ResourceIdentifierHelper;
 import jj.script.AbstractScriptEnvironment.AbstractScriptEnvironmentDependencies;
 
 /**
@@ -56,30 +58,64 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 	}
 	
 	public interface MockPendingKeyProvider extends Provider<PendingKey> {}
-	
-	public MockAbstractScriptEnvironmentDependencies() {
-		this("unnamed");
-	}
 
-	public MockAbstractScriptEnvironmentDependencies(final String name) {
-		this(name, mock(ResourceFinder.class));
-	}
-
-	public MockAbstractScriptEnvironmentDependencies(final String name, final ResourceFinder resourceFinder) {
+	public <T extends ScriptEnvironment<Void>> MockAbstractScriptEnvironmentDependencies(
+		Class<T> environmentType,
+		String name
+	) {
 		super(
-			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(resourceFinder),
+			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
 			new MockInnerAbstractScriptEnvironmentDependencies(),
-			mock(ResourceKey.class),
-			name
+			ResourceIdentifierHelper.make(environmentType, Virtual, name, null)
 		);
 	}
 
-	public MockAbstractScriptEnvironmentDependencies(final RealRhinoContextProvider rhinoContextProvider, final String name) {
+	public <T extends ScriptEnvironment<Void>> MockAbstractScriptEnvironmentDependencies(
+		Class<T> environmentType,
+		String name,
+		ResourceFinder resourceFinder
+	) {
+		super(
+			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(resourceFinder),
+			new MockInnerAbstractScriptEnvironmentDependencies(),
+			ResourceIdentifierHelper.make(environmentType, Virtual, name, null)
+		);
+	}
+
+	public <T extends ScriptEnvironment<Void>> MockAbstractScriptEnvironmentDependencies(
+		Class<T> environmentType,
+		String name,
+		RealRhinoContextProvider rhinoContextProvider
+	) {
 		super(
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
 			new MockInnerAbstractScriptEnvironmentDependencies(rhinoContextProvider),
-			mock(ResourceKey.class),
-			name
+			ResourceIdentifierHelper.make(environmentType, Virtual, name, null)
+		);
+	}
+
+	public <A, T extends ScriptEnvironment<A>> MockAbstractScriptEnvironmentDependencies(
+		Class<T> environmentType,
+		String name,
+		A argument
+	) {
+		super(
+			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
+			new MockInnerAbstractScriptEnvironmentDependencies(),
+			ResourceIdentifierHelper.make(environmentType, Virtual, name, argument)
+		);
+	}
+
+	public <A, T extends ScriptEnvironment<A>> MockAbstractScriptEnvironmentDependencies(
+		Class<T> environmentType,
+		String name,
+		A argument,
+		RealRhinoContextProvider rhinoContextProvider
+	) {
+		super(
+			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
+			new MockInnerAbstractScriptEnvironmentDependencies(rhinoContextProvider),
+			ResourceIdentifierHelper.make(environmentType, Virtual, name, argument)
 		);
 	}
 	
@@ -89,10 +125,6 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 	
 	public MockPublisher publisher() {
 		return ((MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies)abstractResourceDependencies).publisher();
-	}
-
-	public ResourceKey cacheKey() {
-		return resourceKey;
 	}
 
 	public ResourceFinder resourceFinder() {

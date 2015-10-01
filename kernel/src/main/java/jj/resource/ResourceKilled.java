@@ -30,7 +30,7 @@ public class ResourceKilled extends ResourceEvent implements ResourceCacheUpdate
 	 * @param arguments
 	 */
 	ResourceKilled(AbstractResource<?> resource) {
-		super(resource);
+		super(resource.identifier());
 	}
 
 	@Override

@@ -17,9 +17,9 @@ package jj.i18n;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
+import static jj.application.AppLocation.AppBase;
 import jj.Base;
-import jj.application.AppLocation;
-import jj.i18n.PropertiesResource;
+
 import jj.resource.AbstractResource.Dependencies;
 import jj.resource.MockAbstractResourceDependencies;
 
@@ -35,7 +35,7 @@ public class PropertiesResourceTest {
 
 	@Test
 	public void test() throws Exception {
-		Dependencies dependencies = new MockAbstractResourceDependencies(AppLocation.AppBase, NAME);
+		Dependencies dependencies = new MockAbstractResourceDependencies(PropertiesResource.class, AppBase, NAME);
 		
 		PropertiesResource resource = new PropertiesResource(dependencies, Base.appPath().resolve(NAME));
 		

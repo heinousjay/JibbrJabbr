@@ -37,7 +37,7 @@ public class LessResourceTest {
 	MockAbstractResourceDependencies dependencies;
 
 	private LessResource lessResource(String name) throws Exception {
-		dependencies = new MockAbstractResourceDependencies(AppBase, name);
+		dependencies = new MockAbstractResourceDependencies(LessResource.class, AppBase, name);
 		
 		Path path = Paths.get(LessResourceTest.class.getResource("/" + name).toURI());
 		

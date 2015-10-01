@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import javax.inject.Inject;
 
 import jj.resource.Location;
+import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**
@@ -38,13 +39,7 @@ class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Re
 
 	@Override
 	protected ModuleScriptEnvironment createScriptEnvironment(String moduleIdentifier, RequiredModule argument) throws IOException {
-		return creator.createResource(
-			ModuleScriptEnvironment.class,
-			resourceKey(Virtual, moduleIdentifier, argument),
-			Virtual,
-			moduleIdentifier,
-			argument
-		);
+		return creator.createResource(resourceIdentifierMaker.make(type(), Virtual, moduleIdentifier, argument));
 	}
 	
 	@Override

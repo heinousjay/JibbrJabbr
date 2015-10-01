@@ -59,8 +59,8 @@ public class StylesheetResourceIntegrationTest {
 	
 	@Listener
 	void on(ResourceLoaded event) {
-		if (event.resourceClass == StylesheetResource.class) {
-			stylesheet = resourceFinder.findResource(StylesheetResource.class, event.base, event.name);
+		if (event.type() == StylesheetResource.class) {
+			stylesheet = resourceFinder.findResource(StylesheetResource.class, event.base(), event.name());
 			latch.countDown();
 		}
 	}

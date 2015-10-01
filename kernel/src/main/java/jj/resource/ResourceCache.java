@@ -1,12 +1,12 @@
 package jj.resource;
 
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,22 +27,20 @@ class ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	private final ConcurrentMap<ResourceKey, Resource<?>> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
+	private final ConcurrentMap<ResourceIdentifier, Resource<?>> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
 
 	@Inject
 	ResourceCache(final ResourceCreators resourceCreators) {
 		this.resourceCreators = resourceCreators;
 	}
 
-	public List<Resource<?>> findAllByUri(URI uri) {
-		
-		List<Resource<?>> result = new ArrayList<>();
-		
-		for (SimpleResourceCreator<?, ? extends Resource<?>> resourceCreator : resourceCreators) {
-			Resource<?> it = get(new ResourceKey(resourceCreator.type(), uri));
-			if (it != null) result.add(it);
-		}
-		return Collections.unmodifiableList(result);
+	List<Resource<?>> findAllByPath(Path path) {
+		return Collections.unmodifiableList(resourceCache.values().stream().filter(
+			resource ->
+				resource.alive() && // skip the deaders!
+				resource instanceof FileSystemResource && // and check for path equality
+				path.equals(((FileSystemResource)resource).path())
+		).collect(Collectors.toList()));
 	}
 	
 	/**
@@ -59,26 +57,32 @@ class ResourceCache {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type) {
+	<A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type) {
 		return (ResourceCreator<A, T>) resourceCreators.get(type);
 	}
-	
-	@SuppressWarnings("unchecked")
-	public <A, T extends Resource<A>> T get(ResourceKey key) {
-		return (T)resourceCache.get(key);
+
+	<T extends Resource<A>, A> T get(ResourceIdentifier<T, A> identifier) {
+		return identifier.resourceClass.cast(resourceCache.get(identifier));
 	}
 
-	@SuppressWarnings("unchecked")
-	public <A, T extends Resource<A>> T putIfAbsent(ResourceKey key, T value) {
-		return (T)resourceCache.putIfAbsent(key, value);
+	<T extends Resource<A>, A> T putIfAbsent(T resource) {
+		@SuppressWarnings("unchecked")
+		ResourceIdentifier<T, A> identifier = (ResourceIdentifier<T, A>) resource.identifier();
+		return identifier.resourceClass.cast(resourceCache.putIfAbsent(identifier, resource));
 	}
 
-	public <A, T extends Resource<A>> boolean replace(ResourceKey key, T oldValue, T newValue) {
-		return resourceCache.replace(key, oldValue, newValue);
+	<T extends Resource<?>> boolean replace(Resource<T> newResource) {
+		return resourceCache.replace(newResource.identifier(), newResource) != null;
 	}
 
-	public <A, T extends Resource<A>> boolean remove(ResourceKey cacheKey, T resource) {
-		return resourceCache.remove(cacheKey, resource);
+	<A, T extends Resource<A>> boolean replace(Resource<T> currentResource, Resource<T> newResource) {
+		ResourceIdentifier<? ,?> identifier = currentResource.identifier();
+		assert identifier.equals(newResource.identifier()) : "RESOURCE REPLACEMENT MUST BE EQUIVALENT";
+		return resourceCache.replace(identifier, currentResource, newResource);
+	}
+
+	<A, T extends Resource<A>> boolean remove(T resource) {
+		return resourceCache.remove(resource.identifier(), resource);
 	}
 	
 	int size() {
@@ -88,9 +92,9 @@ class ResourceCache {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
-		for (Entry<ResourceKey, Resource<?>> entry : resourceCache.entrySet()) {
-			sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
-		}
+		resourceCache.forEach((identifier, resource) -> {
+			sb.append("  ").append(identifier).append(" = ").append(resource).append("\n");
+		});
  		return sb.append("}").toString();
 	}
 }

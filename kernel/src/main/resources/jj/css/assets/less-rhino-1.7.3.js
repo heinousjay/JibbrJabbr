@@ -9492,7 +9492,7 @@ function runLess(filename, configuration) {
     };
     
     if (configuration.sourceMaps()) {
-        lessLog("source maps don't seem to work yet.  also logging is going to the sysout!");
+        lessLog("source maps don't seem to work yet.");
     }
     
     name(filename);

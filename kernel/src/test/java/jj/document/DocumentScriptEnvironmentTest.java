@@ -26,11 +26,6 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 
 import jj.application.AppLocation;
-import jj.document.CurrentDocumentRequestProcessor;
-import jj.document.DocumentScriptEnvironment;
-import jj.document.DocumentWebSocketMessageProcessors;
-import jj.document.HtmlResource;
-import jj.document.ScriptCompiler;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.http.server.websocket.CurrentWebSocketConnection;
@@ -39,7 +34,6 @@ import jj.http.server.websocket.MockCurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.PendingKey;
@@ -71,8 +65,7 @@ public class DocumentScriptEnvironmentTest {
 	@Mock ScriptCompiler scriptCompiler;
 	@Mock DocumentWebSocketMessageProcessors processors;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
-	
-	ResourceKey cacheKey;
+
 	MockRhinoContextProvider contextMaker;
 	MockAbstractWebSocketConnectionHostDependencies dependencies;
 	
@@ -95,9 +88,8 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void makeResourceDependencies(String name) {
-		dependencies = new MockAbstractWebSocketConnectionHostDependencies(name, resourceFinder);
-		
-		cacheKey = dependencies.cacheKey();
+		dependencies = new MockAbstractWebSocketConnectionHostDependencies(DocumentScriptEnvironment.class, name, resourceFinder);
+
 		contextMaker = dependencies.mockRhinoContextProvider();
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
 		given(contextMaker.context.newChainedScope(any(Scriptable.class))).willReturn(local);
@@ -146,25 +138,25 @@ public class DocumentScriptEnvironmentTest {
 		Document document = dse.document();
 		given(documentRequestProcessor.document()).willReturn(document);
 		
-		try (Closer closer = currentDocument.enterScope(documentRequestProcessor)) {
+		try (Closer ignored = currentDocument.enterScope(documentRequestProcessor)) {
 			dse.captureContextForKey(key);
 		}
 		
 		assertThat(currentDocument.current(), is(nullValue()));
 		
-		try (Closer closer = dse.restoreContextForKey(key)) {
+		try (Closer ignored = dse.restoreContextForKey(key)) {
 			assertThat(currentDocument.current(), is(sameInstance(documentRequestProcessor)));
 		}
 
 		assertThat(currentDocument.current(), is(nullValue()));
 		
-		try (Closer closer = currentConnection.enterScope(connection)) {
+		try (Closer ignored = currentConnection.enterScope(connection)) {
 			dse.captureContextForKey(key);
 		}
 		
 		assertThat(currentConnection.current(), is(nullValue()));
 		
-		try (Closer closer = dse.restoreContextForKey(key)) {
+		try (Closer ignored = dse.restoreContextForKey(key)) {
 			assertThat(currentConnection.current(), is(sameInstance(connection)));
 		}
 		

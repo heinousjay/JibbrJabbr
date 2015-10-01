@@ -20,10 +20,9 @@ import static org.mockito.BDDMockito.*;
 import java.nio.file.Path;
 
 import jj.event.Publisher;
-import jj.http.server.resource.StaticResource;
 import jj.resource.Location;
 import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.ResourceKey;
+import jj.resource.ResourceIdentifierHelper;
 
 /**
  * @author jason
@@ -31,10 +30,15 @@ import jj.resource.ResourceKey;
  */
 public class StaticResourceMaker {
 	public static StaticResource make(Location base, String name, Path path) throws Exception {
-		
-		ResourceKey resourceKey = mock(ResourceKey.class);
+
 		Publisher publisher = mock(Publisher.class);
 		
-		return new StaticResource(new MockAbstractResourceDependencies(resourceKey, base, name, publisher), path);
+		return new StaticResource(
+			new MockAbstractResourceDependencies(
+				ResourceIdentifierHelper.make(StaticResource.class, base, name),
+				publisher
+			),
+			path
+		);
 	}
 }

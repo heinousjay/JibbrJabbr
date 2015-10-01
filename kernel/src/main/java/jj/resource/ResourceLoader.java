@@ -19,32 +19,47 @@ import jj.execution.Promise;
 
 /**
  * <p>
- * Service component that asynchronously loads a resource 
+ * Provides an asynchronous interface to loading a resource
+ * if you need the fire-and-forget action. Also exposes the find
+ * methods to make your life somewhat easier
+ *
+ * <p>
+ * All methods on this service return immediately and perform no
+ * I/O, so they are all fine candidates to be called from any tasks
  * 
  * @author jason
  *
  */
 public interface ResourceLoader {
-	
+
+	/**
+	 * Find the identified resource in the cache, returning null if not loaded
+	 */
+	<T extends Resource<A>, A> T findResource(ResourceIdentifier<T, A> identifier);
+
+	/**
+	 * Find the identified resource in the cache, returning null if not loaded
+	 */
 	<T extends Resource<Void>> T findResource(Class<T> resourceClass, Location base, String name);
 
 	/**
-	 * find a resource
+	 * Find the identified resource in the cache, returning null if not loaded
 	 */
-	<A, T extends Resource<A>> T findResource(Class<T> resourceClass, Location base, String name, A argument);
-	
-	<T extends Resource<Void>> Promise loadResource(Class<T> resourceClass, Location base, String name);
-	
+	<T extends Resource<A>, A> T findResource(Class<T> resourceClass, Location base, String name, A argument);
+
 	/**
-	 * <p>
-	 * Asynchronously load the identified {@link Resource} using a {@link ResourceTask}
-	 * 
-	 * @param resourceClass The type of <code>Resource</code>
-	 * @param base The {@link Location} of the <code>Resource</code>
-	 * @param name The name of the <code>Resource</code>
-	 * @param argument The creation argument of the <code>Resource</code>
-	 * @return the <code>ResourceTask</code>'s {@link Promise}
+	 * Attempt to load the identified resource asynchronously, returning the task's {@link Promise}
 	 */
-	<A, T extends Resource<A>> Promise loadResource(Class<T> resourceClass, Location base, String name, A argument);
+	<T extends Resource<A>, A> Promise loadResource(ResourceIdentifier<T, A> identifier);
+
+	/**
+	 * Attempt to load the identified resource asynchronously, returning the task's {@link Promise}
+	 */
+	<T extends Resource<Void>> Promise loadResource(Class<T> resourceClass, Location base, String name);
+
+	/**
+	 * Attempt to load the identified resource asynchronously, returning the task's {@link Promise}
+	 */
+	<T extends Resource<A>, A> Promise loadResource(Class<T> resourceClass, Location base, String name, A argument);
 
 }

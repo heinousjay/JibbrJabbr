@@ -22,9 +22,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
 import jj.document.DocumentScriptEnvironment;
-import jj.resource.ResourceLoaded;
-import jj.resource.ResourceLoader;
-import jj.resource.ResourceNotFound;
+import jj.resource.*;
 import jj.script.PendingKey;
 import jj.script.ContinuationPendingKeyResultExtractor;
 import jj.script.ContinuationState;
@@ -62,7 +60,8 @@ public class RequiredModuleContinuationProcessorTest {
 	@InjectMocks RequiredModuleContinuationProcessor processor;
 	
 	@Mock ModuleScriptEnvironment moduleScriptEnvironment;
-	
+
+	@SuppressWarnings("unchecked")
 	@Before
 	public void before() {
 		
@@ -72,6 +71,9 @@ public class RequiredModuleContinuationProcessorTest {
 		requiredModule.pendingKey(pendingKey);
 		
 		given(moduleScriptEnvironment.creationArg()).willReturn(requiredModule);
+		given((ResourceIdentifier<ModuleScriptEnvironment, RequiredModule>)moduleScriptEnvironment.identifier()).willReturn(
+			ResourceIdentifierHelper.make(ModuleScriptEnvironment.class, Virtual, "module", requiredModule)
+		);
 		
 		given(continuationState.continuationAs(RequiredModule.class)).willReturn(requiredModule);
 	}
@@ -107,7 +109,7 @@ public class RequiredModuleContinuationProcessorTest {
 		performFirstRequireOfModule();
 		
 		// when
-		processor.on(new ResourceNotFound(ModuleScriptEnvironment.class, Virtual, module, requiredModule));
+		processor.on(new ResourceNotFound(ResourceIdentifierHelper.make(ModuleScriptEnvironment.class, Virtual, module, requiredModule)));
 		
 		// then
 		Object result = ContinuationPendingKeyResultExtractor.RESULT_MAP.remove(pendingKey);

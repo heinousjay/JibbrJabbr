@@ -82,21 +82,23 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment<Resource
 		final ResourceLoaded resourceLoaded // the original event that caused us to get loaded
 	) {
 		super(dependencies);
+
+		assert resourceLoaded.type() == ScriptResource.class : "cannot run ";
 		
 		this.resourceLoaded = resourceLoaded;
 		
 		this.global = global;
 		
-		this.specLocation = pathResolver.specLocationFor(resourceLoaded.base);
+		this.specLocation = pathResolver.specLocationFor(resourceLoaded.base());
 		
 		// we need some scripts to be happy
-		target  = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, resourceLoaded.name);
-		spec    = resourceFinder.loadResource(ScriptResource.class, specLocation, name);
+		target  = resourceFinder.loadResource(resourceLoaded.identifier());
+		spec    = resourceFinder.loadResource(ScriptResource.class, specLocation, name());
 		
 		// target is unlikely to be null, but maybe it got deleted while we were getting created
 		// if spec is null, we have nothing to do
 		if (target == null || spec == null) {
-			throw new NoSuchResourceException(JasmineScriptEnvironment.class, name);
+			throw new NoSuchResourceException(JasmineScriptEnvironment.class, name());
 		}
 		
 		// if we have a reason to load stuff, load stuff!
@@ -160,7 +162,7 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment<Resource
 	
 	@Override
 	public Location moduleLocation() {
-		return resourceLoaded.base.and(specLocation);
+		return resourceLoaded.base().and(specLocation);
 	}
 	
 	ScriptResource spec() {

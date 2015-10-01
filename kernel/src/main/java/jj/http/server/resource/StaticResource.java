@@ -72,6 +72,6 @@ public class StaticResource extends AbstractFileResource<Void> implements Transf
 	
 	@Override
 	public boolean safeToServe() {
-		return base.servable();
+		return base().servable();
 	}
 }

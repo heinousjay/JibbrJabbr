@@ -32,7 +32,12 @@ import jj.event.Subscriber;
 import jj.execution.TaskRunner;
 
 /**
- * walks the directory structure to load resources that represent it
+ * <p>
+ * Service that loads directory structures as {@link DirectoryResource}s
+ *
+ * <p>
+ * Responsible for the initial load of directory structures during system startup,
+ * and also listens for new directory creation
  * 
  * @author jason
  *
@@ -60,15 +65,13 @@ class DirectoryStructureLoader {
 	}
 
 	@Listener
-	void on(PathCreation pathCreation) {
-		if (Files.isDirectory(pathCreation.path)) {
-			load(pathCreation.path);
-		}
+	void on(DirectoryCreation creation) {
+		load(creation.path);
 	}
 	
-	void load(Path path) {
+	private void load(Path path) {
 		Location base = pathResolver.resolveLocation(path);
-		assert base != null && base.parentInDirectory() : "asked to load a directory structure for a bad path"; 
+		assert base != null && base.parentInDirectory() : "asked to load a directory structure for a bad path: " + path;
 		taskRunner.execute(new LoaderTask(path));
 	}
 	
@@ -83,16 +86,21 @@ class DirectoryStructureLoader {
 		
 		@Override
 		protected void run() throws Exception {
+			// we check if the path is a directory here in ResourceThread context,
+			// so that the external methods can be invoked without incurring I/O costs
+			assert Files.isDirectory(path) : "asked to load a file " + path;
 			Files.walkFileTree(path, new FileVisitor<Path>() {
 
 				@Override
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 					Location location = pathResolver.resolveLocation(dir);
-					resourceFinder.loadResource(
-						DirectoryResource.class,
-						location,
-						pathResolver.resolvePath(location).relativize(path.resolve(dir)).toString()
-					);
+					if (location.parentInDirectory()) {
+						resourceFinder.loadResource(
+								DirectoryResource.class,
+								location,
+								pathResolver.resolvePath(location).relativize(path.resolve(dir)).toString()
+						);
+					}
 					return FileVisitResult.CONTINUE;
 				}
 
@@ -112,5 +120,5 @@ class DirectoryStructureLoader {
 				}
 			});
 		}
-	};
+	}
 }

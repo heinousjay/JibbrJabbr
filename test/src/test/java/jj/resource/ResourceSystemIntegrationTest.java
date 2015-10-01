@@ -68,13 +68,13 @@ public class ResourceSystemIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
-//		System.out.println("resourceCache = " + resourceCache);
+		System.out.println("resourceCache = " + resourceCache);
 //		System.out.println("reloadedCount = " + reloadedCount);
 //		System.out.println("killedCount = " + killedCount);
 //		System.out.println("loadedCount = " + loadedCount);
 		try {
 			Files.walkFileTree(App.module.resolve("created"), new TreeDeleter());
-		} catch (NoSuchFileException nsfe) {}
+		} catch (NoSuchFileException nsfe) { /* empty */ }
 	}
 	
 	@Rule
@@ -89,9 +89,9 @@ public class ResourceSystemIntegrationTest {
 		
 		// validates that directory structures are created as expected
 		DirectoryResource root = finder.findResource(DirectoryResource.class, AppBase, "");
-		DirectoryResource pub = finder.findResource(DirectoryResource.class, AppBase, "public");
+		DirectoryResource pub = finder.findResource(DirectoryResource.class, Public, "");
 		DirectoryResource pubDeep = finder.findResource(DirectoryResource.class, Public, "deep");
-		DirectoryResource priv = finder.findResource(DirectoryResource.class, AppBase, "private");
+		DirectoryResource priv = finder.findResource(DirectoryResource.class, Private, "");
 		DirectoryResource privDeep = finder.findResource(DirectoryResource.class, Private, "deep");
 		DirectoryResource nesting = finder.findResource(DirectoryResource.class, Private, "deep/nesting");
 		assertThat(root, is(notNullValue()));

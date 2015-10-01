@@ -44,4 +44,6 @@ public interface LocationResolver {
 	 */
 	Location specLocationFor(Location base);
 
+	String normalizedName(Location originalBase, Location normalizedBase, String name);
+
 }

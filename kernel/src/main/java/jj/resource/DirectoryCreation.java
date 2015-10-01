@@ -1,5 +1,5 @@
 /*
- *    Copyright 2012 Jason Miller
+ *    Copyright 2016 Jason Miller
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,17 @@
  */
 package jj.resource;
 
-import java.lang.ref.WeakReference;
+import java.nio.file.Path;
 
 /**
- * @author jason
- *
+ * Event published when a new directory has been created in a watched filesystem
+ * @author Jason Miller
  */
-public class ResourceLoaded extends ResourceEvent implements ResourceCacheUpdated {
+public class DirectoryCreation {
 
-	final WeakReference<Resource<?>> resourceReference;
+	public final Path path;
 
-	public ResourceLoaded(Resource<?> resource) {
-		super(resource.identifier());
-		resourceReference = new WeakReference<>(resource);
-	}
-
-	@Override
-	public String description() {
-		return "resource loaded";
+	DirectoryCreation(Path path) {
+		this.path = path;
 	}
 }

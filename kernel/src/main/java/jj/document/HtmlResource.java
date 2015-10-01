@@ -69,7 +69,7 @@ public class HtmlResource extends AbstractFileResource<Void> {
 		
 		Parser parser = Parser.htmlParser().setTrackErrors(configuration.showParsingErrors() ? Integer.MAX_VALUE : 0);
 		
-		this.document = parser.parseInput(html, name);
+		this.document = parser.parseInput(html, name());
 		
 		List<ParseError> errors = parser.getErrors();
 		if (!errors.isEmpty()) {

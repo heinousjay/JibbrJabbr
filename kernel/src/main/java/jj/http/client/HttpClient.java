@@ -25,7 +25,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.resolver.dns.DnsNameResolverGroup;
+import io.netty.resolver.dns.DnsAddressResolverGroup;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -101,7 +101,7 @@ class HttpClient {
 					.channel(NioSocketChannel.class)
 					.localAddress(configuration.localClientAddress())
 					.resolver(
-						new DnsNameResolverGroup(
+						new DnsAddressResolverGroup(
 							NioDatagramChannel.class,
 							configuration.localNameserverAddress(),
 							DnsServerAddresses.rotational(nameservers)

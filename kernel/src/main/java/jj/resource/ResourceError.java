@@ -25,8 +25,8 @@ public class ResourceError extends ResourceEvent {
 
 	private final Throwable t;
 	
-	<A, T extends Resource<A>> ResourceError(Class<T> resourceClass, Location base, String name, A argument, Throwable t) {
-		super(resourceClass, base, name, argument);
+	<T extends Resource<A>, A> ResourceError(ResourceIdentifier<T, A> resourceIdentifier, Throwable t) {
+		super(resourceIdentifier);
 		this.t = t;
 	}
 
@@ -37,8 +37,7 @@ public class ResourceError extends ResourceEvent {
 	
 	@Override
 	public void describeTo(Logger logger) {
-		logger.error("{} - {} at {}/{}", description(), resourceClass, base, name);
-		logger.error("", t);
+		logger.error("{} - {}", description(), identifier, t);
 	}
 
 }

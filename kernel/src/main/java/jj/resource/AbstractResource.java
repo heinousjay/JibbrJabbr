@@ -27,11 +27,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.logging.LoggedEvent;
 import org.mozilla.javascript.Scriptable;
 
 import jj.event.Listener;
 import jj.event.Publisher;
 import jj.event.Subscriber;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -87,42 +89,22 @@ public abstract class AbstractResource<T> implements Resource<T> {
 	public static class Dependencies {
 		
 		protected final AbstractResourceDependencies abstractResourceDependencies;
-		protected final ResourceKey resourceKey;
-		protected final Location base;
-		protected final String name;
+		protected final ResourceIdentifier<?, ?> identifier;
 		
 		@Inject
 		protected Dependencies(
 			AbstractResourceDependencies abstractResourceDependencies,
-			ResourceKey resourceKey,
-			Location base,
-			@ResourceName String name
+			ResourceIdentifier<?, ?> identifier
 		) {
 			this.abstractResourceDependencies = abstractResourceDependencies;
-			this.resourceKey = resourceKey;
-			this.base = base;
-			this.name = name;
+			this.identifier = identifier;
 		}
 	}
-
-	protected static final Object EMPTY_ARGS = null;
 	
 	/**
 	 * The key that identifies this resource in the cache
 	 */
-	protected final ResourceKey cacheKey;
-	
-	/**
-	 * The configured location that housed this resource,
-	 * as specified by the load request
-	 */
-	protected final Location base;
-	
-	/**
-	 * The name of this resource, as specified by the load
-	 * request
-	 */
-	protected final String name;
+	protected final ResourceIdentifier<? extends Resource<T>, T> identifier;
 	
 	/**
 	 * When this resource was created according to the system {@link Clock}
@@ -143,19 +125,23 @@ public abstract class AbstractResource<T> implements Resource<T> {
 	 */
 	protected final ResourceSettings settings;
 	
-	private final ConcurrentHashMap<ResourceKey, AbstractResource<?>> dependents = new ConcurrentHashMap<>(2, 0.75f, 2);
+	private final ConcurrentHashMap<ResourceIdentifier<?, ?>, AbstractResource<?>> dependents =
+		new ConcurrentHashMap<>(2, 0.75f, 2);
 	
 	private final AtomicBoolean alive = new AtomicBoolean(true);
+
+	@SuppressWarnings("unchecked")
+	private ResourceIdentifier<? extends Resource<T>, T> cast(ResourceIdentifier<?, ?> identifier) {
+		return (ResourceIdentifier<? extends Resource<T>, T>)identifier;
+	}
 	
 	protected AbstractResource(Dependencies dependencies) {
-		this.cacheKey = dependencies.resourceKey;
-		this.base = dependencies.base;
-		this.name = dependencies.name;
+		this.identifier = cast(dependencies.identifier);
 		this.creationTime = dependencies.abstractResourceDependencies.clock.millis();
 		this.publisher = dependencies.abstractResourceDependencies.publisher;
 		this.resourceFinder = dependencies.abstractResourceDependencies.resourceFinder;
 		this.resourceConfiguration = dependencies.abstractResourceDependencies.resourceConfiguration;
-		
+
 		if ((this instanceof FileSystemResource) && this.base().parentInDirectory()) {
 			dependencies.abstractResourceDependencies.demuxer.awaitInitialization(this);
 		}
@@ -169,17 +155,27 @@ public abstract class AbstractResource<T> implements Resource<T> {
 		
 		settings = baseSettings;
 	}
-	
+
 	void resourceLoaded() {
 		// little bit of internal magic here - post initialization of either a
 		// FileResource or a DirectoryResource rooted in Base should be added to
 		// the directory structure.
-		String parentName = name().substring(0, name().lastIndexOf('/') + 1);
-		if (!parentName.equals(name())) {
+		int index = name().lastIndexOf('/');
+		String parentName = index == -1 ?
+			(name().equals("") ? null : "") :
+			name().substring(0, index);
+
+		if (parentName != null) {
 			DirectoryResource parent = resourceFinder.findResource(DirectoryResource.class, base(), parentName);
 			// possibly the best bet in this case is to make the missing directory,
 			// which really oughta go into another thread? cause this could get all deadlocky
-			assert parent != null : "no parent directory for " + this;
+			if (parent == null) {
+				throw new AssertionError(
+					"no parent directory " + parentName +
+					" for " + this +
+					", looked in " + base() + " for " + parentName
+				);
+			}
 			parent.addDependent(this);
 		}
 	}
@@ -189,13 +185,13 @@ public abstract class AbstractResource<T> implements Resource<T> {
 	 * and only happens when there are modifications to resources, which are both rare events in a sense (and things
 	 * that should never matter in a production setting) then having this listener live in every resource in the system
 	 * seems like a reasonable thing.  Note that the loaded event is demuxed in a separate component because that event
-	 * is going to be thrown around like crazy and will cause resource creation to slow as more resource are created.
+	 * is going to be thrown around like crazy and will cause resource creation to slow as more resources are created.
 	 * 
 	 * @param event the event
 	 */
 	@Listener
 	void on(ResourceKilled event) {
-		dependents.remove(event.resourceKey);
+		dependents.remove(event.identifier());
 	}
 	
 	/**
@@ -216,18 +212,6 @@ public abstract class AbstractResource<T> implements Resource<T> {
 	 */
 	@ResourceThread
 	public abstract boolean needsReplacing() throws IOException;
-
-	/**
-	 * indicates if the resource is obselete - either it is no longer alive, or {@link #needsReplacing()}
-	 * has returned true
-	 * 
-	 * @return obsolescence status
-	 * @throws IOException if something happens.
-	 */
-	@ResourceThread
-	boolean isObselete() throws IOException {
-		return !alive.get() || needsReplacing();
-	}
 	
 	/**
 	 * return true from this method to be removed instead of reloaded on watch notifications,
@@ -242,13 +226,30 @@ public abstract class AbstractResource<T> implements Resource<T> {
 		assert alive.get() : "cannot accept dependents, i am dead " + toString();
 		assert dependent != null : "can not depend on null";
 		assert dependent != this : "can not depend on myself";
-		AbstractResource<?> r = (AbstractResource<?>)dependent;
-		dependents.put(r.cacheKey(), r);
+		assert dependent.alive() : "can not depend on dead resources";
+		publisher.publish(new DependentAdded(toString(), dependent.toString()));
+		dependents.put(dependent.identifier(), (AbstractResource<?>)dependent);
+	}
+
+	@ResourceLogger
+	private static class DependentAdded extends LoggedEvent {
+
+		private final String parentString;
+		private final String dependentString;
+
+		DependentAdded(String parentString, String dependentString) {
+			this.parentString = parentString;
+			this.dependentString = dependentString;
+		}
+
+		@Override
+		public void describeTo(Logger logger) {
+			logger.debug("{} is depending on {}", dependentString, parentString);
+		}
 	}
 	
 	/**
 	 * retrieve an unmodifiable collection of this resource's dependents
-	 * @return
 	 */
 	Collection<AbstractResource<?>> dependents() {
 		return Collections.unmodifiableCollection(dependents.values());
@@ -266,7 +267,7 @@ public abstract class AbstractResource<T> implements Resource<T> {
 		
 		// don't forget to convert to strings if needed
 		// need an id! use the resource key?
-		to.put("id",           to, cacheKey.toString());
+		to.put("id",           to, identifier.toString());
 		to.put("type",         to, getClass().getName());
 		to.put("name",         to, name());
 		to.put("base",         to, base().toString());
@@ -305,25 +306,10 @@ public abstract class AbstractResource<T> implements Resource<T> {
 	public Charset charset() {
 		return null; // by default, resources don't have one at all.  might not be text!
 	}
-	
-	@Override
-	public ResourceKey cacheKey() {
-		return cacheKey;
-	}
 
 	@Override
-	public final URI uri() {
-		return cacheKey.uri();
-	}
-	
-	@Override
-	public Location base() {
-		return base;
-	}
-	
-	@Override
-	public String name() {
-		return name;
+	public ResourceIdentifier<? extends Resource<T>, T> identifier() {
+		return identifier;
 	}
 
 	@Override
@@ -331,13 +317,30 @@ public abstract class AbstractResource<T> implements Resource<T> {
 	public Class<? extends Resource<T>> type() {
 		return (Class<? extends Resource<T>>)getClass();
 	}
+	
+	@Override
+	public Location base() {
+		return identifier.base;
+	}
+	
+	@Override
+	public String name() {
+		return identifier.name;
+	}
 
 	@Override
 	public T creationArg() {
+		return identifier.argument;
+	}
+
+	@Override
+	public final URI uri() {
 		return null;
 	}
-	
+
 	public String toString() {
-		return getClass().getName() + "@" + base() + "/" + name();
+		return identifier.toString();
 	}
+
+	// equals and hashCode are left as Object impls deliberately
 }

@@ -1,5 +1,5 @@
 /*
- *    Copyright 2012 Jason Miller
+ *    Copyright 2016 Jason Miller
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jj.resource;
+package jj.css;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import javax.inject.Qualifier;
+import java.lang.annotation.*;
 
 /**
- * Annotates the resource name String argument.
- * @author jason
- *
+ * @author Jason Miller
  */
-@Qualifier
 @Documented
-@Target({ElementType.PARAMETER})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ResourceName {
-
+@Inherited
+@interface LessLogger {
+	String NAME = "less";
 }

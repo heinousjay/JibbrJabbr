@@ -22,9 +22,8 @@ import static jj.application.AppLocation.*;
 import static jj.server.ServerLocation.*;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
 import static jj.resource.DependentsHelper.verifyDependentSetup;
-import jj.resource.NoSuchResourceException;
-import jj.resource.PathResolver;
-import jj.resource.ResourceFinder;
+
+import jj.resource.*;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.module.ScriptResource;
 
@@ -64,15 +63,22 @@ public class JasmineScriptEnvironmentTest {
 	MockAbstractScriptEnvironmentDependencies dependencies;
 	
 	int count = 0;
+	@SuppressWarnings("unchecked")
 	private ScriptResource fakeResource(ScriptResource sr) {
-		given(sr.sha1()).willReturn("da39a3ee5e6b4b0d3255bfef95601890afd8070" + (++count));		
+		given(sr.sha1()).willReturn("da39a3ee5e6b4b0d3255bfef95601890afd8070" + (++count));
+		given((ResourceIdentifier<ScriptResource, Void>)sr.identifier()).willReturn(ResourceIdentifierHelper.make(ScriptResource.class, AppBase, "script" + count));
 		return sr;
 	}
 	
 	@Before
 	public void before() {
+		given(target.base()).willReturn(AppBase);
+		given(target.name()).willReturn(targetName);
+
+		fakeResource(target);
+
 		count = 0;
-		dependencies = new MockAbstractScriptEnvironmentDependencies(specName);
+		dependencies = new MockAbstractScriptEnvironmentDependencies(JasmineScriptEnvironment.class, specName, makeResourceLoaded(target));
 		given(dependencies.mockRhinoContextProvider().context.newObject(global)).willReturn(global);
 		given(dependencies.mockRhinoContextProvider().context.newChainedScope(global)).willReturn(global);
 		
@@ -87,11 +93,7 @@ public class JasmineScriptEnvironmentTest {
 		
 		fakeResource(jasmineRun);
 		given(resourceFinder.loadResource(ScriptResource.class, Assets, "jasmine-run.js")).willReturn(jasmineRun);
-		
-		given(target.base()).willReturn(AppBase);
-		given(target.name()).willReturn(targetName);
-		
-		fakeResource(target);
+
 		given(resourceFinder.loadResource(ScriptResource.class, AppBase, targetName)).willReturn(target);
 		
 		given(spec.base()).willReturn(AppBase);
@@ -104,8 +106,15 @@ public class JasmineScriptEnvironmentTest {
 		new JasmineScriptEnvironment(dependencies, global, resourceFinder, pathResolver, makeResourceLoaded(target));
 	}
 
+	@SuppressWarnings("unchecked")
+	private void makeTargetFindable() {
+		given(resourceFinder.loadResource((ResourceIdentifier<ScriptResource, Void>) target.identifier())).willReturn(target);
+	}
+
 	@Test
 	public void testFound() {
+
+		makeTargetFindable();
 		
 		fakeResource(spec);
 		given(resourceFinder.loadResource(ScriptResource.class, AppBase, specName)).willReturn(spec);
@@ -134,7 +143,7 @@ public class JasmineScriptEnvironmentTest {
 		// verify the sha is build from all our script buddies.  kind of goofy but correct
 		// this is sort of future-prep but this might become a target for socket connections at
 		// some point, to deliver test run results to the browser.  maybe
-		assertThat(jse.sha1(), is("2aa82b3b93e7e4ed4cb7b8aa7c350e84016a0014"));
+		assertThat(jse.sha1(), is("4a117d7e27db77e337750a4e380ef4587be12f40"));
 	}
 	
 }
