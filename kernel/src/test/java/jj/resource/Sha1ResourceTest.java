@@ -44,7 +44,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class Sha1ResourceTest {
 	
 	@Mock AbstractFileResource<?> afs;
-	@Mock ResourceKey resourceKey;
+	Sha1ResourceTarget sha1ResourceTarget;
 	MockAbstractResourceDependencies dependencies;
 	
 	final String indexHtml = "index.html";
@@ -62,7 +62,8 @@ public class Sha1ResourceTest {
 	
 	@Before
 	public void before() throws Exception {
-		dependencies = new MockAbstractResourceDependencies(resourceKey, AppBase, indexHtml);
+		sha1ResourceTarget = new Sha1ResourceTarget(afs);
+		dependencies = new MockAbstractResourceDependencies(Sha1Resource.class, AppBase, indexHtml, sha1ResourceTarget);
 		
 		Path path = pathFor(indexSha1);
 		if (path != null && Files.exists(path)) {
@@ -91,7 +92,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + size).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, sha1ResourceTarget);
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));
@@ -104,7 +105,7 @@ public class Sha1ResourceTest {
 		
 		Files.write(iSha1, (shaKey + (size - 1L)).getBytes(US_ASCII));
 		
-		Sha1Resource resource = new Sha1Resource(dependencies, new Sha1ResourceTarget(afs));
+		Sha1Resource resource = new Sha1Resource(dependencies, sha1ResourceTarget);
 		
 		assertThat(resource.representedSha(), is(shaKey));
 		assertThat(resource.representedFileSize(), is(size));

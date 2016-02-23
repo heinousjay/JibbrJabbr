@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import jj.resource.ResourceIdentifier;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
@@ -31,8 +32,6 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import jj.resource.AbstractResource;
-import jj.resource.ResourceKey;
-import jj.resource.ResourceName;
 import jj.util.Closer;
 
 /**
@@ -90,10 +89,9 @@ public abstract class AbstractScriptEnvironment<T> extends AbstractResource<T> i
 		protected Dependencies(
 			final AbstractResourceDependencies abstractResourceDependencies,
 			final AbstractScriptEnvironmentDependencies abstractScriptEnvironmentDependencies,
-			final ResourceKey cacheKey,
-			final @ResourceName String name
+			final ResourceIdentifier<?, ?> identifier
 		) {
-			super(abstractResourceDependencies, cacheKey, Virtual, name);
+			super(abstractResourceDependencies, identifier);
 			this.scriptEnvironmentDependencies = abstractScriptEnvironmentDependencies;
 		}
 	}

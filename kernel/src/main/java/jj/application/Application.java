@@ -49,14 +49,14 @@ public class Application implements LocationResolver {
 	public Path resolvePath(Location base) {
 		assert base instanceof AppLocation;
 		AppLocation location = (AppLocation)base;
-		return basePath.resolve(location.path()).toAbsolutePath();
+		return basePath.resolve(location.path()).normalize().toAbsolutePath();
 	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {
 		assert base instanceof AppLocation;
 		AppLocation location = (AppLocation)base;
-		return basePath.resolve(location.path()).resolve(name).toAbsolutePath();
+		return basePath.resolve(location.path()).resolve(name).normalize().toAbsolutePath();
 	}
 	
 	@Override
@@ -86,5 +86,16 @@ public class Application implements LocationResolver {
 	@Override
 	public Location specLocationFor(Location base) {
 		return base == Private ? Specs : null;
+	}
+
+	public String normalizedName(Location originalBase, Location normalizedBase, String name) {
+		assert originalBase == AppBase :
+				"originalBase is not AppBase, originalBase: " + originalBase + ", normalizedBase: " + normalizedBase + ", name: " + name;
+		assert normalizedBase instanceof AppLocation :
+				"normalizedBase is not AppLocation, originalBase: " + originalBase + ", normalizedBase: " + normalizedBase + ", name: " + name;
+		AppLocation location = (AppLocation)normalizedBase;
+		assert name.startsWith(location.path()) :
+				"did not normalize correctly? originalBase: " + originalBase + ", normalizedBase: " + normalizedBase + ", name: " + name;
+		return name.substring(location.path().length());
 	}
 }

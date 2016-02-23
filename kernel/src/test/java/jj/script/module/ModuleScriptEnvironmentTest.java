@@ -26,10 +26,6 @@ import jj.script.PendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
 import jj.script.AbstractScriptEnvironment;
-import jj.script.module.ModuleScriptEnvironment;
-import jj.script.module.RequiredModule;
-import jj.script.module.RootScriptEnvironment;
-import jj.script.module.ScriptResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,16 +60,19 @@ public class ModuleScriptEnvironmentTest {
 	private MockAbstractScriptEnvironmentDependencies construct(String name) {
 		contextProvider = new RealRhinoContextProvider();
 		
-		MockAbstractScriptEnvironmentDependencies dependencies =
-			new MockAbstractScriptEnvironmentDependencies(contextProvider, name);
-		
 		given(((RootScriptEnvironment<?>)parent).global()).willReturn(global);
 		
 		requiredModule = new RequiredModule((RootScriptEnvironment<?>)parent, name);
 		requiredModule.pendingKey(new PendingKey());
 		
 		given(parent.alive()).willReturn(true);
-		return dependencies;
+
+		return new MockAbstractScriptEnvironmentDependencies(
+			ModuleScriptEnvironment.class,
+			name,
+			requiredModule,
+			contextProvider
+		);
 	}
 	
 	private void givenModuleLocation(Location location) {

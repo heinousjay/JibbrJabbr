@@ -1,12 +1,12 @@
 package jj.resource;
 
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,8 +16,11 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 
 /**
- * central lookup for all resources, mapped from the URI
- * representation of their path to the resource.
+ * <p>
+ * Cache of {@link Resource}s, keyed by their associated
+ * {@link ResourceIdentifier}s. Main purpose is to provide
+ * a type-safe heterogeneous collection, and to provide a
+ * way to get all known resources associated to a path
  * @author jason
  *
  */
@@ -27,22 +30,27 @@ class ResourceCache {
 	
 	private final ResourceCreators resourceCreators;
 	
-	private final ConcurrentMap<ResourceKey, Resource<?>> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
+	private final ConcurrentMap<ResourceIdentifier, Resource<?>> resourceCache = new ConcurrentHashMap<>(128, 0.75F, 4);
 
 	@Inject
 	ResourceCache(final ResourceCreators resourceCreators) {
 		this.resourceCreators = resourceCreators;
 	}
 
-	public List<Resource<?>> findAllByUri(URI uri) {
-		
-		List<Resource<?>> result = new ArrayList<>();
-		
-		for (SimpleResourceCreator<?, ? extends Resource<?>> resourceCreator : resourceCreators) {
-			Resource<?> it = get(new ResourceKey(resourceCreator.type(), uri));
-			if (it != null) result.add(it);
-		}
-		return Collections.unmodifiableList(result);
+	List<Resource<?>> findAllByPath(Path path) {
+		return Collections.unmodifiableList(
+			resourceCache.values().stream()
+				.filter(
+					resource ->
+						// only living resources
+						resource.alive() &&
+						// that are from the file system
+						resource instanceof FileSystemResource &&
+						// and have the same path
+						path.equals(((FileSystemResource)resource).path())
+				)
+				.collect(Collectors.toList())
+		);
 	}
 	
 	/**
@@ -54,31 +62,37 @@ class ResourceCache {
 	}
 	
 	@Listener
-	void on(ServerStopping event) {
+	void on(ServerStopping ignored) {
 		resourceCache.clear();
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type) {
-		return (ResourceCreator<A, T>) resourceCreators.get(type);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <A, T extends Resource<A>> T get(ResourceKey key) {
-		return (T)resourceCache.get(key);
+	<T extends Resource<A>, A> ResourceCreator<T, A> getCreator(final Class<T> type) {
+		return (ResourceCreator<T, A>) resourceCreators.get(type);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <A, T extends Resource<A>> T putIfAbsent(ResourceKey key, T value) {
-		return (T)resourceCache.putIfAbsent(key, value);
+	<T extends Resource<A>, A> T get(ResourceIdentifier<T, A> identifier) {
+		return identifier.resourceClass.cast(resourceCache.get(identifier));
 	}
 
-	public <A, T extends Resource<A>> boolean replace(ResourceKey key, T oldValue, T newValue) {
-		return resourceCache.replace(key, oldValue, newValue);
+	<T extends Resource<A>, A> T putIfAbsent(T resource) {
+		@SuppressWarnings("unchecked")
+		ResourceIdentifier<T, A> identifier = (ResourceIdentifier<T, A>) resource.identifier();
+		return identifier.resourceClass.cast(resourceCache.putIfAbsent(identifier, resource));
 	}
 
-	public <A, T extends Resource<A>> boolean remove(ResourceKey cacheKey, T resource) {
-		return resourceCache.remove(cacheKey, resource);
+	<T extends Resource<A>, A> boolean replace(Resource<T> newResource) {
+		return resourceCache.replace(newResource.identifier(), newResource) != null;
+	}
+
+	<T extends Resource<A>, A> boolean replace(Resource<T> currentResource, Resource<T> newResource) {
+		ResourceIdentifier<? ,?> identifier = currentResource.identifier();
+		assert identifier.equals(newResource.identifier()) : "RESOURCE REPLACEMENT MUST BE EQUIVALENT";
+		return resourceCache.replace(identifier, currentResource, newResource);
+	}
+
+	<T extends Resource<A>, A> boolean remove(T resource) {
+		return resourceCache.remove(resource.identifier(), resource);
 	}
 	
 	int size() {
@@ -88,9 +102,9 @@ class ResourceCache {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
-		for (Entry<ResourceKey, Resource<?>> entry : resourceCache.entrySet()) {
-			sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
-		}
+		resourceCache.forEach((identifier, resource) ->
+			sb.append("  ").append(identifier).append(" = ").append(resource).append("\n")
+		);
  		return sb.append("}").toString();
 	}
 }

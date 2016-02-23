@@ -17,6 +17,7 @@ package jj.resource;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,6 +33,7 @@ import jj.event.Publisher;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
+import jj.logging.Emergency;
 
 @Singleton
 @Subscriber
@@ -81,7 +83,7 @@ class ResourceWatchServiceLoop extends ServerTask {
 
 	@Listener
 	void on(ResourceLoaded event) {
-		if (run.get() && FileSystemResource.class.isAssignableFrom(event.resourceClass)) {
+		if (run.get() && FileSystemResource.class.isAssignableFrom(event.type())) {
 			watch((FileSystemResource)event.resourceReference.get());
 		}
 	}
@@ -121,18 +123,20 @@ class ResourceWatchServiceLoop extends ServerTask {
 	@Override
 	protected void run() throws Exception {
 		while (run.get()) {
-			// there's probably a streamy way of doing this but
-			// i'm feeling happy enough
 			watcher.awaitChangedPaths().forEach((path, action) -> {
 				switch (action) {
 
 					case Create:
-						publisher.publish(new PathCreation(path));
+						publisher.publish(
+							Files.isDirectory(path) ?
+								new DirectoryCreation(path) :
+								new FileCreation(path)
+						);
 						break;
 
 					case Delete:
 					case Modify:
-						resourceCache.findAllByUri(path.toUri()).forEach(resource -> {
+						resourceCache.findAllByPath(path).forEach(resource -> {
 							ResourceReloadOrganizer rro = new ResourceReloadOrganizer(resource, action);
 							rro.deletions.forEach(this::remove);
 							rro.reloads.forEach(this::reload);
@@ -142,21 +146,21 @@ class ResourceWatchServiceLoop extends ServerTask {
 					// the error case!
 					case Unknown:
 					default:
-						throw new AssertionError("unknown file operation on " + path);
+						publisher.publish(new Emergency("unknown file operation on {}", path));
 				}
 			});
 		}
 	}
 
-	private void remove(final AbstractResource<?> resource) {
-		if (resourceCache.remove(resource.cacheKey(), resource)) {
+	private void remove(AbstractResource<?> resource) {
+		if (resourceCache.remove(resource)) {
 			resource.kill();
 		}
 	}
 
 	private <T> void reload(final AbstractResource<T> resource) {
-		resource.kill();
-		resourceLoader.loadResource(resource.type(), resource.base(), resource.name(), resource.creationArg());
+		remove(resource);
+		resourceLoader.loadResource(resource.identifier());
 	}
 
 	/**

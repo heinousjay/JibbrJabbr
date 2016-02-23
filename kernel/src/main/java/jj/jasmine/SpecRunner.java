@@ -72,14 +72,14 @@ class SpecRunner {
 
 	@Listener
 	void on(ResourceLoaded rl) {
-		if (shouldRun() &&                                               // are we even on?
-			ScriptResource.class.isAssignableFrom(rl.resourceClass) &&   // was it a script that got loaded?
-			!ignoredNames.contains(rl.name) &&                           // are we not recursively trying to test our runner scripts?
-			pathResolver.specLocationFor(rl.base) != null &&             // a spec location exists for this resource
-			!rl.name.endsWith(SPEC_JS_ENDING)                            // kill this when spec locations make sense
+		if (shouldRun() &&                                        // are we even on?
+			ScriptResource.class.isAssignableFrom(rl.type()) &&   // was it a script that got loaded?
+			!ignoredNames.contains(rl.name()) &&                  // are we not recursively trying to test our runner scripts?
+			pathResolver.specLocationFor(rl.base()) != null &&    // a spec location exists for this resource
+			!rl.name().endsWith(SPEC_JS_ENDING)                   // kill this when spec locations make sense
 		) {
 			// kick off a resource thread to look for a spec resource, and determine if it's jasmine or mocha or whatevs
-			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name.replace(JS_ENDING, JASMINE_SPEC_JS_ENDING), rl);
+			resourceLoader.loadResource(JasmineScriptEnvironment.class, Virtual, rl.name().replace(JS_ENDING, JASMINE_SPEC_JS_ENDING), rl);
 		}
 	}
 }

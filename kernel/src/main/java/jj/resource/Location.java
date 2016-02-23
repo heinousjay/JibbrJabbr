@@ -67,6 +67,11 @@ public interface Location {
 			// never should even get called
 			throw new AssertionError("called parentInDirectory on a Location.Bundle. should never happen");
 		}
+
+		@Override
+		public String toString() {
+			return locations.toString();
+		}
 	}
 
 	/**

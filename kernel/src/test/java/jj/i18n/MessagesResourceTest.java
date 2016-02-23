@@ -44,23 +44,26 @@ public class MessagesResourceTest {
 	@Mock ResourceFinder resourceFinder;
 	
 	String name = "index";
+
+	MockAbstractResourceDependencies propertiesDependencies =
+		new MockAbstractResourceDependencies(PropertiesResource.class, AppLocation.Private, "index.properties");
 	
-	MockAbstractResourceDependencies dependencies = 
-		new MockAbstractResourceDependencies(Virtual, name);
+	MockAbstractResourceDependencies messageDependencies =
+		new MockAbstractResourceDependencies(MessagesResource.class, Virtual, name, Locale.US);
 	
 	@Test
 	public void test() throws Exception {
 		
-		PropertiesResource index_base = new PropertiesResource(dependencies, Base.appPath().resolve("index.properties"));
+		PropertiesResource index_base = new PropertiesResource(propertiesDependencies, Base.appPath().resolve("index.properties"));
 		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.Private, "index.properties")).willReturn(index_base);
 		
-		PropertiesResource index_en = new PropertiesResource(dependencies, Base.appPath().resolve("index_en.properties"));
+		PropertiesResource index_en = new PropertiesResource(propertiesDependencies, Base.appPath().resolve("index_en.properties"));
 		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.Private, "index_en.properties")).willReturn(index_en);
 		
-		PropertiesResource index_us = new PropertiesResource(dependencies, Base.appPath().resolve("index_en_US.properties"));
+		PropertiesResource index_us = new PropertiesResource(propertiesDependencies, Base.appPath().resolve("index_en_US.properties"));
 		given(resourceFinder.loadResource(PropertiesResource.class, AppLocation.Private, "index_en_US.properties")).willReturn(index_us);
 		
-		MessagesResource resource = new MessagesResource(dependencies, Locale.US, resourceFinder);
+		MessagesResource resource = new MessagesResource(messageDependencies, Locale.US, resourceFinder);
 		
 		assertThat(resource.message("title"), is("JAYCHAT!"));
 		assertThat(resource.message("topic"), is("US TOPIC"));

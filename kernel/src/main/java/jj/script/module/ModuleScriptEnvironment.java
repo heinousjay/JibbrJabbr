@@ -92,12 +92,12 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment<RequiredM
 	) {
 		super(dependencies);
 
-		String moduleIdentifier = name;
+		String moduleIdentifier = name();
 		
 		Location base = requiredModule.parent().moduleLocation();
-		if (name.startsWith(API_PREFIX)) {
+		if (name().startsWith(API_PREFIX)) {
 			base = APIModules;
-			moduleIdentifier = name.substring(API_PREFIX.length());
+			moduleIdentifier = name().substring(API_PREFIX.length());
 		}
 		
 		this.requiredModule = requiredModule;
@@ -161,12 +161,7 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment<RequiredM
 
 	@Override
 	public String scriptName() {
-		return name + ".js";
-	}
-	
-	@Override
-	public RequiredModule creationArg() {
-		return requiredModule;
+		return name() + ".js";
 	}
 	
 	@Override

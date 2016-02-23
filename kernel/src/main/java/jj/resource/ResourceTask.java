@@ -49,11 +49,7 @@ public abstract class ResourceTask extends JJTask<ResourceExecutor> {
 	/**
 	 * used to synchronize resource creation across multiple requests
 	 */
-	void await(long time, TimeUnit unit) {
-		try {
-			completionLatch.await(time, unit);
-		} catch (Exception e) {
-			throw new AssertionError(e); // good enough for now
-		}
+	boolean await(long time, TimeUnit unit) throws InterruptedException {
+		return completionLatch.await(time, unit);
 	}
 }

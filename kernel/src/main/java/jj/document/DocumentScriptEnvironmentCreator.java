@@ -19,6 +19,7 @@ import java.io.IOException;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
+import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**
@@ -26,7 +27,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Void, DocumentScriptEnvironment> {
+public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<DocumentScriptEnvironment, Void> {
 	
 	@Inject
 	DocumentScriptEnvironmentCreator(final Dependencies dependencies) {
@@ -35,14 +36,6 @@ public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentC
 
 	@Override
 	protected DocumentScriptEnvironment createScriptEnvironment(String name, Void argument) throws IOException {
-		DocumentScriptEnvironment dse = creator.createResource(
-			DocumentScriptEnvironment.class,
-			resourceKey(Virtual, name, null),
-			Virtual,
-			name,
-			null
-		);
-		
-		return dse;
+		return creator.createResource(resourceIdentifierMaker.make(type(), Virtual, name, null));
 	}
 }

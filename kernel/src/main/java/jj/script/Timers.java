@@ -65,10 +65,7 @@ class Timers {
 	private final Sequence cancelIds = new Sequence();
 
 	@Inject
-	Timers(
-		TaskRunner taskRunner,
-		CurrentScriptEnvironment env
-	) {
+	Timers(TaskRunner taskRunner, CurrentScriptEnvironment env) {
 		this.taskRunner = taskRunner;
 		this.env = env;
 	}

@@ -69,6 +69,27 @@ class FileWatcher {
 
 	private static final boolean MAC_OS_X = "Mac OS X".equals(System.getProperty("os.name"));
 	private static final Kind<?>[] FILE_EVENTS = new Kind<?>[] { ENTRY_DELETE, ENTRY_MODIFY, ENTRY_CREATE };
+	private static final WatchEvent.Modifier FAST_POLLING_MODIFIER;
+
+	static {
+		// if we can find the modifier, we can speed up our polling quite a bit on OS X
+		// but this neatly avoids relying on the class
+		WatchEvent.Modifier candidate = null;
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends Enum<?>> modifierClass =
+					(Class<? extends Enum<?>>)Class.forName("com.sun.nio.file.SensitivityWatchEventModifier");
+
+			for (Enum<?> value : modifierClass.getEnumConstants()) {
+				if (value.name().equals("HIGH")) {
+					candidate = (WatchEvent.Modifier)value;
+					break;
+				}
+			}
+
+		} catch (Exception ignored) {}
+		FAST_POLLING_MODIFIER = candidate;
+	}
 
 	private final AtomicReference<WatchService> watchServiceRef = new AtomicReference<>();
 	private final Publisher publisher;
@@ -88,9 +109,10 @@ class FileWatcher {
 		WatchService watchService = watchServiceRef.get();
 		assert watchService != null : "asked to watch a file but we aren't even running";
 		try {
-			if (MAC_OS_X) {
-				// this polls on MAC, but the high sensitivity makes it poll a lot
-				directory.register(watchService, FILE_EVENTS, com.sun.nio.file.SensitivityWatchEventModifier.HIGH);
+			if (MAC_OS_X && FAST_POLLING_MODIFIER != null) {
+				// this polls on MAC, but the high sensitivity makes it poll a lot, which seems fine
+				// for development purposes
+				directory.register(watchService, FILE_EVENTS, FAST_POLLING_MODIFIER);
 			} else {
 				directory.register(watchService, FILE_EVENTS);
 			}
@@ -109,27 +131,31 @@ class FileWatcher {
 			WatchService watchService = FileSystems.getDefault().newWatchService();
 			if (!watchServiceRef.compareAndSet(null, watchService)) {
 				publisher.publish(
-					new Warning("started a watch service when one was already running.  you need to fix some CAS ops")
+					new Warning("started a watch service when one was already running! ignored", new Exception("Caller stacktrace"))
 				);
 				try { watchService.close(); } catch (Exception ignored) {}
 			}
 			return true;
 		} catch (IOException e) {
-			publisher.publish(new Emergency("creating a watcher threw", e));
+			publisher.publish(new Emergency("creating a watcher failed", e));
 		}
 
 		return false;
 	}
 
 	void stop() {
-		try {
-			watchServiceRef.getAndSet(null).close();
-		} catch (IOException e) {
-			publisher.publish(new Warning("closing a watcher threw", e));
+		WatchService watchService = watchServiceRef.getAndSet(null);
+		if (watchService != null) {
+			try {
+				watchService.close();
+			} catch (IOException e) {
+				publisher.publish(new Warning("closing a watcher threw", e));
+			}
 		}
 	}
 
 	Map<Path, Action> awaitChangedPaths() throws InterruptedException {
+		assert watchServiceRef.get() != null : "awaiting changes but never started!";
 		Map<Path, Action> result = new HashMap<>();
 		while (result.isEmpty()) {
 			WatchKey watchKey = watchServiceRef.get().take();
@@ -142,7 +168,7 @@ class FileWatcher {
 						// not sure what to do about this. probably need to
 						// flush the whole cache in this scenario and reload
 						// the directories from the base
-						publisher.publish(new Warning("event overflow in the file watcher.  changes were missed"));
+						publisher.publish(new Warning("event overflow in the file watcher.  changes were missed!"));
 						
 					} else {
 

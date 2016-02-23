@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import jj.logging.LoggedEvent;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -46,6 +47,7 @@ import jj.script.Global;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;
 import jj.util.SHA1Helper;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -90,14 +92,14 @@ public class StylesheetResource extends AbstractResource<Void> implements Loaded
 		this.lessConfiguration = lessConfiguration;
 		
 		// is there a static css file?
-		StaticResource css = resourceFinder.loadResource(StaticResource.class, Public, name);
+		StaticResource css = resourceFinder.loadResource(StaticResource.class, Public, name());
 		String result;
 		
 		if (css == null) {
 			// for whatever reason, i'm getting obsessed with optimal string processing
-			String lessName = new StringBuilder(name.length() + 1)
-				.append(name)
-				.replace(name.length() - 3, name.length() - 2, "le")
+			String lessName = new StringBuilder(name().length() + 1)
+				.append(name())
+				.replace(name().length() - 3, name().length() - 2, "le")
 				.toString();
 
 			// this is just to check for existence of the resource, it will get loaded from
@@ -123,14 +125,14 @@ public class StylesheetResource extends AbstractResource<Void> implements Loaded
 			}
 		}
 		
-		safeToServe = base.servable();
+		safeToServe = base().servable();
 
 		result = processor.fixUris(result, this);
 		
 		sha1 = SHA1Helper.keyFor(result);
 		bytes = Unpooled.copiedBuffer(result, charset());
 		size = bytes.readableBytes();
-		serverPath = "/" + sha1 + "/" + name;
+		serverPath = "/" + sha1 + "/" + name();
 	}
 	
 	private String processLessScript(final Provider<RhinoContext> contextProvider, final ScriptableObject global, String lessName) {
@@ -269,8 +271,23 @@ public class StylesheetResource extends AbstractResource<Void> implements Loaded
 		
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			
-			System.out.println(args[0]);
+			if (args.length == 1) { publisher.publish(new LessLog(args[0])); }
 			return Undefined.instance;
+		}
+	}
+
+	@LessLogger
+	private static class LessLog extends LoggedEvent {
+
+		private final Object arg;
+
+		LessLog(Object arg) {
+			this.arg = arg;
+		}
+
+		@Override
+		public void describeTo(Logger logger) {
+			logger.debug("{}", arg);
 		}
 	}
 }

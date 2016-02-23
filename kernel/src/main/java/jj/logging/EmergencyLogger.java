@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface EmergencyLogger {
 
-	public static final String NAME = "emergency";
+	String NAME = "emergency";
 
 }

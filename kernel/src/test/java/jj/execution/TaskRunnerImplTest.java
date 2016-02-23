@@ -27,6 +27,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jj.JJServerLifecycle;
 import jj.event.MockPublisher;
 import jj.logging.Emergency;
 import jj.script.ScriptEnvironment;
@@ -64,13 +65,15 @@ public class TaskRunnerImplTest {
 	private String baseName = "test";
 	
 	private MockClock clock = new MockClock();
+
+	private @Mock JJServerLifecycle lifecycle;
 	
 	@Before
 	public void before() {
 		
 		currentTask = new CurrentTask();
 		
-		executor = new TaskRunnerImpl(executors, currentTask, publisher = new MockPublisher(), clock);
+		executor = new TaskRunnerImpl(executors, currentTask, publisher = new MockPublisher(), clock, lifecycle);
 		
 		verify(executors).executeTask(taskCaptor.capture(), runnableCaptor.capture());
 		

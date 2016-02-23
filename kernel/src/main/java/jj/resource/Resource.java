@@ -51,11 +51,13 @@ public interface Resource<T> {
 	 * relationship makes sense
 	 */
 	void addDependent(Resource<?> dependent);
-	
+
+
 	/**
-	 * The key in the cache where this resource is stored
+	 * The identifier of the resource. Java won't let me self-reference the right types, so
+	 * for now it's a wild-card
 	 */
-	ResourceKey cacheKey();
+	ResourceIdentifier<? extends Resource<T>, T> identifier();
 	
 	/**
 	 * flag indicating this live status of this resource.  a resource is considered alive

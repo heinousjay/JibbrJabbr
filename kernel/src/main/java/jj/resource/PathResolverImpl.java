@@ -79,4 +79,29 @@ class PathResolverImpl implements PathResolver {
 		return resolver.specLocationFor(base);
 	}
 
+	@Override
+	public Location normalizedLocation(Location base, String name) {
+
+		LocationResolver resolver = resolvers.get(base.getClass());
+
+		assert resolver != null : base;
+
+		Path path = resolver.resolvePath(base, name);
+
+		return path == null ? base : resolver.resolveBase(path);
+	}
+
+	@Override
+	public String normalizedName(Location originalBase, Location normalizedBase, String name) {
+
+		assert originalBase.getClass() == normalizedBase.getClass() : "bases need to be the same!";
+
+		LocationResolver resolver = resolvers.get(originalBase.getClass());
+
+		assert resolver != null : originalBase;
+
+		return originalBase == normalizedBase ?
+			name :
+			resolver.normalizedName(originalBase, normalizedBase, name);
+	}
 }

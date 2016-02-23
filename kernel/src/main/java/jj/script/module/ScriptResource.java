@@ -11,7 +11,6 @@ import javax.inject.Provider;
 
 import org.mozilla.javascript.Script;
 
-import jj.application.Application;
 import jj.http.server.LoadedResource;
 import jj.http.server.ServableResourceConfiguration;
 import jj.resource.AbstractFileResource;
@@ -30,17 +29,15 @@ public class ScriptResource extends AbstractFileResource<Void> implements Loaded
 	ScriptResource(
 		final Dependencies dependencies,
 		final Path path,
-		final Provider<RhinoContext> contextProvider,
-		final Application application
+		final Provider<RhinoContext> contextProvider
 	) throws IOException {
 		super(dependencies, path);
 		source = byteBuffer.toString(settings.charset());
 		try (RhinoContext context = contextProvider.get()) {
-			script = context.compileString(source, name);
+			script = context.compileString(source, name());
 		}
-		
-		// Public! soon
-		safeToServe = base.servable();
+
+		safeToServe = base().servable();
 	}
 	
 	public Script script() {

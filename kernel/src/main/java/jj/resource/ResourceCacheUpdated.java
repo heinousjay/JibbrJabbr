@@ -21,8 +21,10 @@ package jj.resource;
  *
  */
 public interface ResourceCacheUpdated {
-	
-	<A, T extends Resource<A>> boolean matches(final Class<T> resourceClass, final Location base, final String name, final A argument);
 
-	<A> boolean matches(final Resource<A> resource);
+	<T extends Resource<A>, A> boolean matches(Class<T> resourceClass, Location base, String name, A argument);
+	
+	boolean matches(ResourceIdentifier<? ,?> identifier);
+
+	boolean matches(final Resource<?> resource);
 }

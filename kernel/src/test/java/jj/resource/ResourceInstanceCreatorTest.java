@@ -21,13 +21,12 @@ import static org.mockito.Mockito.any;
 import static org.mockito.BDDMockito.*;
 import static org.hamcrest.Matchers.*;
 
-import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
 import java.util.Date;
 
+import com.google.inject.*;
 import jj.application.Application;
 import jj.event.MockPublisher;
 import jj.event.Publisher;
@@ -42,15 +41,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceInstanceCreatorTest  {
+
+	private static final Key<ResourceIdentifier<?, ?>> RESOURCE_IDENTIFIER =
+		Key.get(new TypeLiteral<ResourceIdentifier<?, ?>>() {});
 	
-	@Mock PathResolver app;
+	@Mock PathResolver pathResolver;
 	@Mock Location location;
 	@Mock Injector injector;
 	MockPublisher publisher;
@@ -59,11 +56,9 @@ public class ResourceInstanceCreatorTest  {
 	
 	ResourceInstanceCreator rimc;
 	
-	@Mock ResourceKey cacheKey;
-	
 	@Before
 	public void before() {
-		rimc = new ResourceInstanceCreator(app, injector, publisher = new MockPublisher());
+		rimc = new ResourceInstanceCreator(pathResolver, injector, publisher = new MockPublisher());
 		given(injector.createChildInjector(any(AbstractModule.class))).willReturn(injector);
 	}
 	
@@ -73,11 +68,13 @@ public class ResourceInstanceCreatorTest  {
 		final String name = "name";
 		Path path = Paths.get("/");
 		
-		given(app.resolvePath(location, name)).willReturn(path);
+		given(pathResolver.resolvePath(location, name)).willReturn(path);
+
+		ResourceIdentifier<StaticResource, Void> identifier =
+			new MockResourceIdentifierMaker().make(StaticResource.class, location, name);
+		rimc.createResource(identifier);
 		
-		rimc.createResource(StaticResource.class, cacheKey, location, name, null);
-		
-		verify(app).resolvePath(location, name);
+		verify(pathResolver).resolvePath(location, name);
 		verify(injector).createChildInjector(moduleCaptor.capture());
 		verify(injector).getInstance(StaticResource.class);
 		
@@ -86,85 +83,34 @@ public class ResourceInstanceCreatorTest  {
 			@Override
 			protected void configure() {
 				bind(Application.class).toInstance(mock(Application.class)); // ugly
+				bind(PathResolver.class).toInstance(pathResolver);
 				bind(Clock.class).toInstance(new MockClock());
 				bind(Publisher.class).toInstance(mock(Publisher.class));
 				bind(ResourceFinder.class).toInstance(mock(ResourceFinder.class));
 				bind(ResourceConfiguration.class).toInstance(mock(ResourceConfiguration.class));
 			}
 		}, moduleCaptor.getValue());
-		
-		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
-		assertThat(testInjector.getInstance(Key.get(String.class, ResourceName.class)), is(name));
+
+		assertThat(testInjector.getInstance(RESOURCE_IDENTIFIER), is(identifier));
 		assertThat(testInjector.getInstance(Path.class), is(path));
 	}
-	
-	public static class TestResource implements Resource<Date> {
 
-		@Override
-		public Location base() {
-			return null;
-		}
-		
-		@Override
-		public String name() {
-			return null;
-		}
-
-		@Override
-		public URI uri() {
-			return URI.create("");
-		}
-
-		@Override
-		public String sha1() {
-			return null;
-		}
-		
-		@Override
-		public ResourceKey cacheKey() {
-			return null;
-		}
-
-		@Override
-		public void addDependent(Resource<?> dependent) {
-		}
-
-		@Override
-		public Charset charset() {
-			return null;
-		}
-		
-		@Override
-		public boolean alive() {
-			return true;
-		}
-
-		@Override
-		public Class<? extends Resource<Date>> type() {
-			return TestResource.class;
-		}
-
-		@Override
-		public Date creationArg() {
-			return null;
-		}
-	}
-	
 	final String name = "name";
 	final Date date = new Date();
 	
 	@Test
 	public void testVirtualCreationAndArgs() {
-		
-		rimc.createResource(TestResource.class, cacheKey, Virtual, name, date);
+
+		ResourceIdentifier<TestDateResource, Date> identifier =
+			new MockResourceIdentifierMaker().make(TestDateResource.class, Virtual, name, date);
+		rimc.createResource(identifier);
 		
 		verify(injector).createChildInjector(moduleCaptor.capture());
-		verify(injector).getInstance(TestResource.class);
+		verify(injector).getInstance(TestDateResource.class);
 		
 		Injector testInjector = Guice.createInjector(moduleCaptor.getValue());
 		
-		assertThat(testInjector.getInstance(ResourceKey.class), is(cacheKey));
-		assertThat(testInjector.getInstance(Key.get(String.class, ResourceName.class)), is(name));
+		assertThat(testInjector.getInstance(RESOURCE_IDENTIFIER), is(identifier));
 		assertThat(testInjector.getExistingBinding(Key.get(Path.class)), is(nullValue()));
 		assertThat(testInjector.getInstance(Date.class), is(date));
 	}
@@ -172,15 +118,13 @@ public class ResourceInstanceCreatorTest  {
 	@Test
 	public void testCreationError() {
 		
-		given(injector.getInstance(TestResource.class)).willThrow(new RuntimeException());
-		rimc.createResource(TestResource.class, cacheKey, Virtual, name, date);
+		given(injector.getInstance(TestDateResource.class)).willThrow(new RuntimeException());
+		ResourceIdentifier<TestDateResource, Date> identifier =
+			new MockResourceIdentifierMaker().make(TestDateResource.class, Virtual, name, date);
+		rimc.createResource(identifier);
 		
 		assertThat(publisher.events.size(), is(1));
 		ResourceError re = (ResourceError)publisher.events.get(0);
-		assertThat(re.resourceKey, is(nullValue()));
-		assertThat(re.resourceClass, equalTo(TestResource.class));
-		assertThat(re.base, is(Virtual));
-		assertThat(re.name, is(name));
-		assertThat(re.argument, is(date));
+		assertThat(re.identifier, is((Object)identifier));
 	}
 }

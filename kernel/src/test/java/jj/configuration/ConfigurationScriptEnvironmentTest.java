@@ -58,7 +58,7 @@ public class ConfigurationScriptEnvironmentTest {
 	@Before
 	public void before() {
 		
-		dependencies = new MockAbstractScriptEnvironmentDependencies();
+		dependencies = new MockAbstractScriptEnvironmentDependencies(ConfigurationScriptEnvironment.class, ConfigurationScriptEnvironmentCreator.CONFIG_NAME);
 
 		given(dependencies.mockRhinoContextProvider().context.newObject(global)).willReturn(global);
 		given(dependencies.mockRhinoContextProvider().context.newChainedScope(global)).willReturn(global);

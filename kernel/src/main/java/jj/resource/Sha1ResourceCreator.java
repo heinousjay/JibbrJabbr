@@ -25,7 +25,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class Sha1ResourceCreator extends SimpleResourceCreator<Sha1ResourceTarget, Sha1Resource> {
+class Sha1ResourceCreator extends SimpleResourceCreator<Sha1Resource, Sha1ResourceTarget> {
 	
 	@Inject
 	Sha1ResourceCreator(final Dependencies dependencies) {
@@ -35,6 +35,6 @@ class Sha1ResourceCreator extends SimpleResourceCreator<Sha1ResourceTarget, Sha1
 	@Override
 	public Sha1Resource create(Location base, String name, Sha1ResourceTarget argument) throws IOException {
 		
-		return creator.createResource(type(), resourceKey(base, name, argument), base, name, argument);
+		return creator.createResource(resourceIdentifierMaker.make(type(), base, name, argument));
 	}
 }

@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.resolver.dns.DnsNameResolverGroup;
+import io.netty.resolver.dns.DnsAddressResolverGroup;
 
 import javax.inject.Provider;
 
@@ -60,7 +60,7 @@ public class HttpClientTest {
 	HttpClient client;
 	
 	@Captor ArgumentCaptor<SocketAddress> localAddressCaptor;
-	@Captor ArgumentCaptor<DnsNameResolverGroup> resolverCaptor;
+	@Captor ArgumentCaptor<DnsAddressResolverGroup> resolverCaptor;
 	
 	@Mock InetSocketAddress localClientAddress;
 	@Mock InetSocketAddress localNameserverAddress;

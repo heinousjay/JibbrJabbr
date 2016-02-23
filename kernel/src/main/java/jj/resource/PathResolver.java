@@ -40,4 +40,13 @@ public interface PathResolver {
 	List<Location> watchedLocations();
 	
 	Location specLocationFor(Location base);
+
+	/**
+	 * Returns a normalized location, if needed. if the same location is returned, all is well!
+	 * if not, then normalize the name with the new location.
+	 * if java had destructuring this wouldn't suck
+	 */
+	Location normalizedLocation(Location base, String name);
+
+	String normalizedName(Location originalBase, Location normalizedBase, String name);
 }

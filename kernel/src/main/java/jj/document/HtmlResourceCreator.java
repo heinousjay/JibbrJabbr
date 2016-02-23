@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 import jj.resource.SimpleResourceCreator;
 
 @Singleton
-public class HtmlResourceCreator extends SimpleResourceCreator<Void, HtmlResource> {
+public class HtmlResourceCreator extends SimpleResourceCreator<HtmlResource, Void> {
 	
 	@Inject
 	HtmlResourceCreator(final Dependencies dependencies) {

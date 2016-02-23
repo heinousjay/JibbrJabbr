@@ -20,12 +20,8 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.google.inject.*;
 import jj.event.Publisher;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.CreationException;
-import com.google.inject.Injector;
-import com.google.inject.ProvisionException;
 
 /**
  * Handles instantiating Resource instances with full injection and common error handling.
@@ -53,16 +49,10 @@ public class ResourceInstanceCreator {
 		this.publisher = publisher;
 	}
 	
-	public <A, T extends Resource<A>> T createResource(
-		final Class<T> resourceClass,
-		final ResourceKey resourceKey,
-		final Location base,
-		final String name,
-		final A argument
-	) {
+	public <T extends Resource<A>, A> T createResource(ResourceIdentifier<T, A> identifier) {
 		// ideally! base.resolve(name);
 		// but that requires tricks
-		final Path path = pathResolver.resolvePath(base, name);
+		final Path path = pathResolver.resolvePath(identifier.base, identifier.name);
 		
 		try {
 			
@@ -72,16 +62,16 @@ public class ResourceInstanceCreator {
 					new AbstractModule() {
 						@Override
 						protected void configure() {
-							bind(resourceClass);
-							bind(ResourceKey.class).toInstance(resourceKey);
-							bind(Location.class).toInstance(base);
-							bind(String.class).annotatedWith(ResourceName.class).toInstance(name);
 							if (path != null) {
 								bind(Path.class).toInstance(path);
 							}
-							
-							if (argument != null) {
-								bindInstance(argument.getClass(), argument);
+
+							bind(identifier.resourceClass);
+							bind(new TypeLiteral<ResourceIdentifier<?, ?>>() {}).toInstance(identifier);
+
+							// bind this specifically to get a convenient param in the constructor
+							if (identifier.argument != null) {
+								bindInstance(identifier.argument.getClass(), identifier.argument);
 							}
 						}
 						
@@ -92,7 +82,7 @@ public class ResourceInstanceCreator {
 					}
 				);
 				
-				return inj.getInstance(resourceClass);
+				return inj.getInstance(identifier.resourceClass);
 				
 			} catch (ProvisionException | CreationException ce) {
 				
@@ -106,7 +96,7 @@ public class ResourceInstanceCreator {
 		} catch (NoSuchResourceException nsre) {
 			// don't bother logging this, it's just a "not found" and will be handled in the ResourceLoaderImpl
 		} catch (Exception e) {
-			publisher.publish(new ResourceError(resourceClass, base, name, argument, e));
+			publisher.publish(new ResourceError(identifier, e));
 		}
 		
 		return null;

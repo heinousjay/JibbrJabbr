@@ -57,7 +57,6 @@ public class DoInvokeFunction extends BaseFunction implements HostObject {
 		assert connection.current() != null : "cannot invoke remote functions without a connected client in context";
 		JJMessage message = JJMessage.makeInvoke(String.valueOf(args[0]), String.valueOf(args[1]));
 		connection.current().send(message);
-		System.out.println("what is up hot stuff " + message);
 		throw env.preparedContinuation(message);
 	}
 	

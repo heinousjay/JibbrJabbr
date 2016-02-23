@@ -15,6 +15,7 @@
  */
 package jj.server;
 
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,7 +69,6 @@ public abstract class InternalAssets {
 			result = NOT_FOUND;
 		}
 		
-		return result.toAbsolutePath();
+		return result.normalize().toAbsolutePath();
 	}
-
 }

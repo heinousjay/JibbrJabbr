@@ -23,7 +23,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class DirectoryResourceCreator extends SimpleResourceCreator<Void, DirectoryResource> {
+class DirectoryResourceCreator extends SimpleResourceCreator<DirectoryResource, Void> {
 	
 	@Inject
 	DirectoryResourceCreator(Dependencies dependencies) {

@@ -38,9 +38,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 			this(mock(ResourceFinder.class));
 		}
 		
-		public MockInnerAbstractResourceDependencies(
-			ResourceFinder resourceFinder
-		) {
+		public MockInnerAbstractResourceDependencies(ResourceFinder resourceFinder) {
 			super(
 				new MockClock(),
 				mock(ResourceConfiguration.class),
@@ -51,9 +49,7 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		}
 
 		
-		public MockInnerAbstractResourceDependencies(
-			Publisher publisher
-		) {
+		public MockInnerAbstractResourceDependencies(Publisher publisher) {
 			super(
 				new MockClock(),
 				mock(ResourceConfiguration.class),
@@ -72,39 +68,24 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		}
 	}
 
-	public MockAbstractResourceDependencies(Location base, String name) {
-		this(
-			base,
-			name,
-			mock(ResourceFinder.class)
-		);
+	public <T extends Resource<Void>> MockAbstractResourceDependencies(Class<T> resourceClass, Location base, String name) {
+		super(new MockInnerAbstractResourceDependencies(), new MockResourceIdentifierMaker().make(resourceClass, base, name, null));
 	}
 
-	public MockAbstractResourceDependencies(Location base, String name, ResourceFinder resourceFinder) {
-		super(
-			new MockInnerAbstractResourceDependencies(resourceFinder),
-			mock(ResourceKey.class),
-			base,
-			name
-		);
+	public <T extends Resource<A>, A> MockAbstractResourceDependencies(Class<T> resourceClass, Location base, String name, A argument) {
+		super(new MockInnerAbstractResourceDependencies(), new MockResourceIdentifierMaker().make(resourceClass, base, name, argument));
+	}
+
+	public <T extends Resource<A>, A> MockAbstractResourceDependencies(ResourceIdentifier<T, A> identifier) {
+		super(new MockInnerAbstractResourceDependencies(), identifier);
 	}
 	
-	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name) {
-		super(
-			new MockInnerAbstractResourceDependencies(),
-			resourceKey,
-			base,
-			name
-		);
+	public <T extends Resource<A>, A> MockAbstractResourceDependencies(ResourceIdentifier<T, A> identifier, Publisher publisher) {
+		super(new MockInnerAbstractResourceDependencies(publisher), identifier);
 	}
-	
-	public MockAbstractResourceDependencies(ResourceKey resourceKey, Location base, String name, Publisher publisher) {
-		super(
-			new MockInnerAbstractResourceDependencies(publisher),
-			resourceKey,
-			base,
-			name
-		);
+
+	public <T extends Resource<A>, A> MockAbstractResourceDependencies(ResourceIdentifier<T, A> identifier, ResourceFinder resourceFinder) {
+		super(new MockInnerAbstractResourceDependencies(resourceFinder), identifier);
 	}
 	
 	{
@@ -136,15 +117,11 @@ public class MockAbstractResourceDependencies extends Dependencies {
 		return (MockPublisher)abstractResourceDependencies.publisher;
 	}
 	
-	public ResourceKey resourceKey() {
-		return resourceKey;
-	}
-	
 	public Location base() {
-		return base;
+		return identifier.base;
 	}
 	
 	public String name() {
-		return name;
+		return identifier.name;
 	}
 }

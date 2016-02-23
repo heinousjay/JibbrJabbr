@@ -20,6 +20,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**
@@ -27,7 +28,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-class ReplScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Void, ReplScriptEnvironment> {
+class ReplScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ReplScriptEnvironment, Void> {
 
 	@Inject
 	ReplScriptEnvironmentCreator(Dependencies dependencies) {
@@ -37,7 +38,7 @@ class ReplScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Void
 	@Override
 	protected ReplScriptEnvironment createScriptEnvironment(String name, Void argument) throws IOException {
 		assert ReplScriptEnvironment.NAME.equals(name) : "repl must be named " + ReplScriptEnvironment.NAME;
-		return creator.createResource(ReplScriptEnvironment.class, resourceKey(Virtual, name, null), Virtual, name, null);
+		return creator.createResource(resourceIdentifierMaker.make(type(), Virtual, name, null));
 	}
 
 }

@@ -57,7 +57,7 @@ class Sha1Resource extends AbstractResource<Sha1ResourceTarget> {
 		final Sha1ResourceTarget target
 	) throws IOException {
 		super(dependencies);
-		
+
 		Path path = Paths.get(target.resource.path().toString() + "." + EXTENSION);
 		
 		// 3 possibilities

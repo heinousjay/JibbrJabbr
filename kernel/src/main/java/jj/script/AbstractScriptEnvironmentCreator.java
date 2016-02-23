@@ -21,17 +21,14 @@ import java.net.URI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.PathResolver;
-import jj.resource.ResourceInstanceCreator;
-import jj.resource.SimpleResourceCreator;
-import jj.resource.Location;
+import jj.resource.*;
 import jj.server.ServerLocation;
 
 /**
  * @author jason
  *
  */
-public abstract class AbstractScriptEnvironmentCreator<A, T extends AbstractScriptEnvironment<A>> extends SimpleResourceCreator<A, T> {
+public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptEnvironment<A>, A> extends SimpleResourceCreator<T, A> {
 	
 	protected static final Location Virtual = ServerLocation.Virtual;
 	
@@ -44,9 +41,10 @@ public abstract class AbstractScriptEnvironmentCreator<A, T extends AbstractScri
 		protected Dependencies(
 			final PathResolver pathResolver,
 			final ResourceInstanceCreator creator,
+			final ResourceIdentifierMaker resourceIdentifierMaker,
 			final ScriptEnvironmentInitializer initializer
 		) {
-			super(pathResolver, creator);
+			super(pathResolver, creator, resourceIdentifierMaker);
 			this.initializer = initializer;
 		}
 		

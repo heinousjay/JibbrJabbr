@@ -87,7 +87,7 @@ public class AbstractScriptEnvironmentTest {
 
 	@Before
 	public void before() throws Exception {
-		ase = new MyScriptEnvironment(dependencies = new MockAbstractScriptEnvironmentDependencies());
+		ase = new MyScriptEnvironment(dependencies = new MockAbstractScriptEnvironmentDependencies(MyScriptEnvironment.class, "test environment"));
 	}
 	
 	@Test
