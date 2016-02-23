@@ -26,7 +26,6 @@ import java.util.List;
 
 import jj.event.MockPublisher;
 
-import jj.server.ServerLocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,8 +47,8 @@ public class ResourceCacheTest {
 	MyResource resource2;
 	TestDateResource testDateResource1;
 	
-	@Mock SimpleResourceCreator<Void, MyResource> creator1;
-	@Mock SimpleResourceCreator<Date, TestDateResource> creator2;
+	@Mock SimpleResourceCreator<MyResource, Void> creator1;
+	@Mock SimpleResourceCreator<TestDateResource, Date> creator2;
 
 	ResourceCache rc;
 
@@ -60,14 +59,14 @@ public class ResourceCacheTest {
 
 		publisher = new MockPublisher();
 		
-		HashMap<Class<? extends AbstractResource<?>>, SimpleResourceCreator<?, ? extends AbstractResource<?>>> map = new HashMap<>();
+		HashMap<Class<? extends AbstractResource<?>>, SimpleResourceCreator<? extends AbstractResource<?>, ?>> map = new HashMap<>();
 		map.put(MyResource.class, creator1);
 		map.put(TestDateResource.class, creator2);
 		rc = new ResourceCache(new ResourceCreators(map));
 
 		resource1 = new MyResource("resource1", publisher);
 		resource2 = new MyResource("resource2", publisher);
-		ResourceIdentifier<TestDateResource, Date> identifier = ResourceIdentifierHelper.make(
+		ResourceIdentifier<TestDateResource, Date> identifier = new MockResourceIdentifierMaker().make(
 			TestDateResource.class,
 			Virtual,
 			"resource1",

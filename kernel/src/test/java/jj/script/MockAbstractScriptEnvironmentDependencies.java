@@ -22,9 +22,8 @@ import javax.inject.Provider;
 
 import jj.event.MockPublisher;
 import jj.resource.MockAbstractResourceDependencies;
+import jj.resource.MockResourceIdentifierMaker;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceIdentifier;
-import jj.resource.ResourceIdentifierHelper;
 import jj.script.AbstractScriptEnvironment.AbstractScriptEnvironmentDependencies;
 
 /**
@@ -66,7 +65,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 		super(
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
 			new MockInnerAbstractScriptEnvironmentDependencies(),
-			ResourceIdentifierHelper.make(environmentType, Virtual, name, null)
+			new MockResourceIdentifierMaker().make(environmentType, Virtual, name, null)
 		);
 	}
 
@@ -78,7 +77,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 		super(
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(resourceFinder),
 			new MockInnerAbstractScriptEnvironmentDependencies(),
-			ResourceIdentifierHelper.make(environmentType, Virtual, name, null)
+			new MockResourceIdentifierMaker().make(environmentType, Virtual, name, null)
 		);
 	}
 
@@ -90,7 +89,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 		super(
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
 			new MockInnerAbstractScriptEnvironmentDependencies(rhinoContextProvider),
-			ResourceIdentifierHelper.make(environmentType, Virtual, name, null)
+			new MockResourceIdentifierMaker().make(environmentType, Virtual, name, null)
 		);
 	}
 
@@ -102,7 +101,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 		super(
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
 			new MockInnerAbstractScriptEnvironmentDependencies(),
-			ResourceIdentifierHelper.make(environmentType, Virtual, name, argument)
+			new MockResourceIdentifierMaker().make(environmentType, Virtual, name, argument)
 		);
 	}
 
@@ -115,7 +114,7 @@ public class MockAbstractScriptEnvironmentDependencies extends AbstractScriptEnv
 		super(
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(),
 			new MockInnerAbstractScriptEnvironmentDependencies(rhinoContextProvider),
-			ResourceIdentifierHelper.make(environmentType, Virtual, name, argument)
+			new MockResourceIdentifierMaker().make(environmentType, Virtual, name, argument)
 		);
 	}
 	

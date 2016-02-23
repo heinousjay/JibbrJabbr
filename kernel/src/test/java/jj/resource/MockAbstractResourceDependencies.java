@@ -69,11 +69,11 @@ public class MockAbstractResourceDependencies extends Dependencies {
 	}
 
 	public <T extends Resource<Void>> MockAbstractResourceDependencies(Class<T> resourceClass, Location base, String name) {
-		super(new MockInnerAbstractResourceDependencies(), ResourceIdentifierHelper.make(resourceClass, base, name, null));
+		super(new MockInnerAbstractResourceDependencies(), new MockResourceIdentifierMaker().make(resourceClass, base, name, null));
 	}
 
 	public <T extends Resource<A>, A> MockAbstractResourceDependencies(Class<T> resourceClass, Location base, String name, A argument) {
-		super(new MockInnerAbstractResourceDependencies(), ResourceIdentifierHelper.make(resourceClass, base, name, argument));
+		super(new MockInnerAbstractResourceDependencies(), new MockResourceIdentifierMaker().make(resourceClass, base, name, argument));
 	}
 
 	public <T extends Resource<A>, A> MockAbstractResourceDependencies(ResourceIdentifier<T, A> identifier) {

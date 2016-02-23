@@ -16,11 +16,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.HashSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceFinderImplTest {
@@ -31,19 +29,19 @@ public class ResourceFinderImplTest {
 	private @Mock ResourceCache resourceCache;
 	private @Mock Publisher publisher;
 	private @Mock CurrentTask currentTask;
-	private ResourceIdentifierMaker resourceIdentifierMaker;
+	private ResourceIdentifierMaker resourceIdentifierMaker = new MockResourceIdentifierMaker();
 	
 	private ResourceFinderImpl rfi;
 	
-	private @Mock SimpleResourceCreator<Void, StaticResource> staticResourceCreator;
-	private @Mock SimpleResourceCreator<Sha1ResourceTarget, Sha1Resource> sha1ResourceCreator;
+	private @Mock SimpleResourceCreator<StaticResource, Void> staticResourceCreator;
+	private @Mock SimpleResourceCreator<Sha1Resource, Sha1ResourceTarget> sha1ResourceCreator;
 	
 	private @Captor ArgumentCaptor<ResourceEvent> eventCaptor;
 	
 	private @Mock StaticResource staticResource1;
-	private ResourceIdentifier<StaticResource, Void> sr1Key = ResourceIdentifierHelper.make(StaticResource.class, Public, name1);
+	private ResourceIdentifier<StaticResource, Void> sr1Key = resourceIdentifierMaker.make(StaticResource.class, Public, name1);
 	private @Mock StaticResource staticResource2;
-	private ResourceIdentifier<StaticResource, Void> sr2Key = ResourceIdentifierHelper.make(StaticResource.class, Private, name2);
+	private ResourceIdentifier<StaticResource, Void> sr2Key = resourceIdentifierMaker.make(StaticResource.class, Private, name2);
 
 	private @Mock Sha1Resource sha1Resource1;
 	private Sha1ResourceTarget sha1Target1;
@@ -59,15 +57,13 @@ public class ResourceFinderImplTest {
 	@Before
 	public void before() {
 
-		resourceIdentifierMaker = new MockResourceIdentifierMaker();
-
 		rfi = new ResourceFinderImpl(resourceCache, publisher, currentTask, resourceIdentifierMaker);
 
 		sha1Target1 = new Sha1ResourceTarget(staticResource1);
-		sh1Key = ResourceIdentifierHelper.make(Sha1Resource.class, AppBase, name1, sha1Target1);
+		sh1Key = resourceIdentifierMaker.make(Sha1Resource.class, AppBase, name1, sha1Target1);
 
 		sha1Target2 = new Sha1ResourceTarget(staticResource2);
-		sh2Key = ResourceIdentifierHelper.make(Sha1Resource.class, AppBase, name2, sha1Target2);
+		sh2Key = resourceIdentifierMaker.make(Sha1Resource.class, AppBase, name2, sha1Target2);
 
 		given((ResourceIdentifier<StaticResource, Void>)staticResource1.identifier()).willReturn(sr1Key);
 		given((ResourceIdentifier<StaticResource, Void>)staticResource2.identifier()).willReturn(sr2Key);

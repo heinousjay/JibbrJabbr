@@ -115,15 +115,17 @@ public class StylesheetResourceTest {
 		given(resourceFinder.loadResource(ScriptResource.class, Assets, StylesheetResource.LESS_SCRIPT)).willReturn(lessScriptResource);
 		
 		LessResource less1 = new LessResource(
-
-			new MockAbstractResourceDependencies(ResourceIdentifierHelper.make(StylesheetResource.class, Private, "test.less"), resourceFinder),
+			new MockAbstractResourceDependencies(
+				new MockResourceIdentifierMaker().make(StylesheetResource.class, Private, "test.less"),
+				resourceFinder
+			),
 			cssPath.resolveSibling("test.less")
 		);
 		given(resourceFinder.loadResource(LessResource.class, Private, "test.less")).willReturn(less1);
 		given(resourceFinder.loadResource(LessResource.class, Public.and(Private), "test.less")).willReturn(less1);
 		
 		LessResource less2 = new LessResource(
-			new MockAbstractResourceDependencies(ResourceIdentifierHelper.make(StylesheetResource.class, Private, "test2.less"), resourceFinder),
+			new MockAbstractResourceDependencies(new MockResourceIdentifierMaker().make(StylesheetResource.class, Private, "test2.less"), resourceFinder),
 			cssPath.resolveSibling("test2.less")
 		);
 
@@ -132,7 +134,7 @@ public class StylesheetResourceTest {
 		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willAnswer(invocation -> invocation.getArguments()[0]);
 		
 		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(
-			ResourceIdentifierHelper.make(StylesheetResource.class, Virtual, NAME),
+			new MockResourceIdentifierMaker().make(StylesheetResource.class, Virtual, NAME),
 			resourceFinder
 		);
 		

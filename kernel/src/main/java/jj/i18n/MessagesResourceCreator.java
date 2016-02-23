@@ -33,7 +33,7 @@ import jj.resource.Location;
  *
  */
 @Singleton
-class MessagesResourceCreator extends SimpleResourceCreator<Locale, MessagesResource> {
+class MessagesResourceCreator extends SimpleResourceCreator<MessagesResource, Locale> {
 
 	@Inject
 	MessagesResourceCreator(final Dependencies dependencies) {

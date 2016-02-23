@@ -29,7 +29,7 @@ import jj.server.ServerLocation;
  *
  */
 @Singleton
-class StylesheetResourceCreator extends SimpleResourceCreator<Void, StylesheetResource> {
+class StylesheetResourceCreator extends SimpleResourceCreator<StylesheetResource, Void> {
 	
 	@Inject
 	StylesheetResourceCreator(final Dependencies dependencies) {

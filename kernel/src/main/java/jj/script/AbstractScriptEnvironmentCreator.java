@@ -28,7 +28,7 @@ import jj.server.ServerLocation;
  * @author jason
  *
  */
-public abstract class AbstractScriptEnvironmentCreator<A, T extends AbstractScriptEnvironment<A>> extends SimpleResourceCreator<A, T> {
+public abstract class AbstractScriptEnvironmentCreator<T extends AbstractScriptEnvironment<A>, A> extends SimpleResourceCreator<T, A> {
 	
 	protected static final Location Virtual = ServerLocation.Virtual;
 	

@@ -2,8 +2,8 @@ package jj.http.server.websocket;
 
 import static jj.server.ServerLocation.Virtual;
 import jj.resource.MockAbstractResourceDependencies;
+import jj.resource.MockResourceIdentifierMaker;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceIdentifierHelper;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
 
@@ -23,7 +23,7 @@ public class MockAbstractWebSocketConnectionHostDependencies extends AbstractWeb
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(resourceFinder),
 			new MockAbstractScriptEnvironmentDependencies.MockInnerAbstractScriptEnvironmentDependencies(),
 			new MockInnerAbstractWebSocketConnectionHostDependencies(),
-			ResourceIdentifierHelper.make(resourceClass, Virtual, name)
+			new MockResourceIdentifierMaker().make(resourceClass, Virtual, name)
 		);
 	}
 

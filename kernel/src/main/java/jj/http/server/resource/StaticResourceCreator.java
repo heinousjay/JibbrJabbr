@@ -25,7 +25,7 @@ import jj.resource.SimpleResourceCreator;
  *
  */
 @Singleton
-public class StaticResourceCreator extends SimpleResourceCreator<Void, StaticResource> {
+public class StaticResourceCreator extends SimpleResourceCreator<StaticResource, Void> {
 
 	@Inject
 	StaticResourceCreator(final Dependencies dependencies) {

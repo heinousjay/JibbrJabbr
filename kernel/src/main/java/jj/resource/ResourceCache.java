@@ -16,8 +16,11 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 
 /**
- * central lookup for all resources, mapped from the URI
- * representation of their path to the resource.
+ * <p>
+ * Cache of {@link Resource}s, keyed by their associated
+ * {@link ResourceIdentifier}s. Main purpose is to provide
+ * a type-safe heterogeneous collection, and to provide a
+ * way to get all known resources associated to a path
  * @author jason
  *
  */
@@ -35,12 +38,19 @@ class ResourceCache {
 	}
 
 	List<Resource<?>> findAllByPath(Path path) {
-		return Collections.unmodifiableList(resourceCache.values().stream().filter(
-			resource ->
-				resource.alive() && // skip the deaders!
-				resource instanceof FileSystemResource && // and check for path equality
-				path.equals(((FileSystemResource)resource).path())
-		).collect(Collectors.toList()));
+		return Collections.unmodifiableList(
+			resourceCache.values().stream()
+				.filter(
+					resource ->
+						// only living resources
+						resource.alive() &&
+						// that are from the file system
+						resource instanceof FileSystemResource &&
+						// and have the same path
+						path.equals(((FileSystemResource)resource).path())
+				)
+				.collect(Collectors.toList())
+		);
 	}
 	
 	/**
@@ -52,13 +62,13 @@ class ResourceCache {
 	}
 	
 	@Listener
-	void on(ServerStopping event) {
+	void on(ServerStopping ignored) {
 		resourceCache.clear();
 	}
 	
 	@SuppressWarnings("unchecked")
-	<A, T extends Resource<A>> ResourceCreator<A, T> getCreator(final Class<T> type) {
-		return (ResourceCreator<A, T>) resourceCreators.get(type);
+	<T extends Resource<A>, A> ResourceCreator<T, A> getCreator(final Class<T> type) {
+		return (ResourceCreator<T, A>) resourceCreators.get(type);
 	}
 
 	<T extends Resource<A>, A> T get(ResourceIdentifier<T, A> identifier) {
@@ -71,17 +81,17 @@ class ResourceCache {
 		return identifier.resourceClass.cast(resourceCache.putIfAbsent(identifier, resource));
 	}
 
-	<T extends Resource<?>> boolean replace(Resource<T> newResource) {
+	<T extends Resource<A>, A> boolean replace(Resource<T> newResource) {
 		return resourceCache.replace(newResource.identifier(), newResource) != null;
 	}
 
-	<A, T extends Resource<A>> boolean replace(Resource<T> currentResource, Resource<T> newResource) {
+	<T extends Resource<A>, A> boolean replace(Resource<T> currentResource, Resource<T> newResource) {
 		ResourceIdentifier<? ,?> identifier = currentResource.identifier();
 		assert identifier.equals(newResource.identifier()) : "RESOURCE REPLACEMENT MUST BE EQUIVALENT";
 		return resourceCache.replace(identifier, currentResource, newResource);
 	}
 
-	<A, T extends Resource<A>> boolean remove(T resource) {
+	<T extends Resource<A>, A> boolean remove(T resource) {
 		return resourceCache.remove(resource.identifier(), resource);
 	}
 	
@@ -92,9 +102,9 @@ class ResourceCache {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getName()).append(" {\n");
-		resourceCache.forEach((identifier, resource) -> {
-			sb.append("  ").append(identifier).append(" = ").append(resource).append("\n");
-		});
+		resourceCache.forEach((identifier, resource) ->
+			sb.append("  ").append(identifier).append(" = ").append(resource).append("\n")
+		);
  		return sb.append("}").toString();
 	}
 }

@@ -25,7 +25,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-class Sha1ResourceCreator extends SimpleResourceCreator<Sha1ResourceTarget, Sha1Resource> {
+class Sha1ResourceCreator extends SimpleResourceCreator<Sha1Resource, Sha1ResourceTarget> {
 	
 	@Inject
 	Sha1ResourceCreator(final Dependencies dependencies) {

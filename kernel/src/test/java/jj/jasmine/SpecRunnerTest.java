@@ -55,7 +55,7 @@ public class SpecRunnerTest {
 	@SuppressWarnings("unchecked")
 	private void givenResource(String name) {
 
-		ResourceIdentifier<ScriptResource, Void> identifier = ResourceIdentifierHelper.make(ScriptResource.class, location, name);
+		ResourceIdentifier<ScriptResource, Void> identifier = new MockResourceIdentifierMaker().make(ScriptResource.class, location, name);
 		given((ResourceIdentifier<ScriptResource, Void>)sr.identifier()).willReturn(identifier);
 	}
 

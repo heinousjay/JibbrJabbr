@@ -109,7 +109,9 @@ public class ResourceWatchServiceLoopTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testWatches() {
-		given((ResourceIdentifier<MyTestResource, Void>)resource.identifier()).willReturn(ResourceIdentifierHelper.make(MyTestResource.class, Virtual, "whatever"));
+		given((ResourceIdentifier<MyTestResource, Void>)resource.identifier()).willReturn(
+			new MockResourceIdentifierMaker().make(MyTestResource.class, Virtual, "whatever")
+		);
 
 		given(resourceWatchSwitch.runFileWatcher()).willReturn(true);
 

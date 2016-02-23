@@ -68,7 +68,7 @@ public class ResourceSystemIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
-		System.out.println("resourceCache = " + resourceCache);
+//		System.out.println("resourceCache = " + resourceCache);
 //		System.out.println("reloadedCount = " + reloadedCount);
 //		System.out.println("killedCount = " + killedCount);
 //		System.out.println("loadedCount = " + loadedCount);

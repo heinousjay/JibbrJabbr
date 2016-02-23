@@ -35,9 +35,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceCreatorsTest {
 	
-	@Mock SimpleResourceCreator<?, ? extends AbstractResource<?>> creator;
+	@Mock SimpleResourceCreator<? extends AbstractResource<?>, ?> creator;
 	
-	Map<Class<? extends AbstractResource<?>>, SimpleResourceCreator<?, ? extends AbstractResource<?>>>
+	Map<Class<? extends AbstractResource<?>>, SimpleResourceCreator<? extends AbstractResource<?>, ?>>
 		resourceCreators = new HashMap<>();
 
 	@Test

@@ -27,7 +27,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Void, DocumentScriptEnvironment> {
+public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<DocumentScriptEnvironment, Void> {
 	
 	@Inject
 	DocumentScriptEnvironmentCreator(final Dependencies dependencies) {

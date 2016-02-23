@@ -66,7 +66,9 @@ public class JasmineScriptEnvironmentTest {
 	@SuppressWarnings("unchecked")
 	private ScriptResource fakeResource(ScriptResource sr) {
 		given(sr.sha1()).willReturn("da39a3ee5e6b4b0d3255bfef95601890afd8070" + (++count));
-		given((ResourceIdentifier<ScriptResource, Void>)sr.identifier()).willReturn(ResourceIdentifierHelper.make(ScriptResource.class, AppBase, "script" + count));
+		given((ResourceIdentifier<ScriptResource, Void>)sr.identifier()).willReturn(
+			new MockResourceIdentifierMaker().make(ScriptResource.class, AppBase, "script" + count)
+		);
 		return sr;
 	}
 	

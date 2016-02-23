@@ -26,7 +26,9 @@ import jj.util.SHA1Helper;
 class MyResource extends AbstractResource<Void> implements FileSystemResource {
 	
 	protected MyResource(String name, Publisher publisher) {
-		super(new MockAbstractResourceDependencies(ResourceIdentifierHelper.make(MyResource.class, AppBase, name), publisher));
+		super(new MockAbstractResourceDependencies(
+			new MockResourceIdentifierMaker().make(MyResource.class, AppBase, name), publisher)
+		);
 	}
 
 	@Override

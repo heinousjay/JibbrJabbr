@@ -42,7 +42,7 @@ import jj.util.GenericUtils;
  *
  */
 @Singleton
-public class SimpleResourceCreator<A, T extends AbstractResource<A>> implements ResourceCreator<A, T> {
+public class SimpleResourceCreator<T extends AbstractResource<A>, A> implements ResourceCreator<T, A> {
 	
 	@Singleton
 	public static class Dependencies {

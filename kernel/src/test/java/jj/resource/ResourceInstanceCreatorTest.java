@@ -70,7 +70,8 @@ public class ResourceInstanceCreatorTest  {
 		
 		given(pathResolver.resolvePath(location, name)).willReturn(path);
 
-		ResourceIdentifier<StaticResource, Void> identifier = ResourceIdentifierHelper.make(StaticResource.class, location, name);
+		ResourceIdentifier<StaticResource, Void> identifier =
+			new MockResourceIdentifierMaker().make(StaticResource.class, location, name);
 		rimc.createResource(identifier);
 		
 		verify(pathResolver).resolvePath(location, name);
@@ -100,7 +101,8 @@ public class ResourceInstanceCreatorTest  {
 	@Test
 	public void testVirtualCreationAndArgs() {
 
-		ResourceIdentifier<TestDateResource, Date> identifier = ResourceIdentifierHelper.make(TestDateResource.class, Virtual, name, date);
+		ResourceIdentifier<TestDateResource, Date> identifier =
+			new MockResourceIdentifierMaker().make(TestDateResource.class, Virtual, name, date);
 		rimc.createResource(identifier);
 		
 		verify(injector).createChildInjector(moduleCaptor.capture());
@@ -117,7 +119,8 @@ public class ResourceInstanceCreatorTest  {
 	public void testCreationError() {
 		
 		given(injector.getInstance(TestDateResource.class)).willThrow(new RuntimeException());
-		ResourceIdentifier<TestDateResource, Date> identifier = ResourceIdentifierHelper.make(TestDateResource.class, Virtual, name, date);
+		ResourceIdentifier<TestDateResource, Date> identifier =
+			new MockResourceIdentifierMaker().make(TestDateResource.class, Virtual, name, date);
 		rimc.createResource(identifier);
 		
 		assertThat(publisher.events.size(), is(1));

@@ -30,7 +30,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<RequiredModule, ModuleScriptEnvironment> {
+class ModuleScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ModuleScriptEnvironment, RequiredModule> {
 	
 	@Inject
 	ModuleScriptEnvironmentCreator(final Dependencies dependencies) {

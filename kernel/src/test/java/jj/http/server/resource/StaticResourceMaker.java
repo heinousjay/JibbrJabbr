@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import jj.event.Publisher;
 import jj.resource.Location;
 import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.ResourceIdentifierHelper;
+import jj.resource.MockResourceIdentifierMaker;
 
 /**
  * @author jason
@@ -35,7 +35,7 @@ public class StaticResourceMaker {
 		
 		return new StaticResource(
 			new MockAbstractResourceDependencies(
-				ResourceIdentifierHelper.make(StaticResource.class, base, name),
+				new MockResourceIdentifierMaker().make(StaticResource.class, base, name),
 				publisher
 			),
 			path

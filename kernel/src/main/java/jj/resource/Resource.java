@@ -52,7 +52,11 @@ public interface Resource<T> {
 	 */
 	void addDependent(Resource<?> dependent);
 
-	// FUCK YOU JAVA AND YOUR STUPID INABILITY TO REFERENCE SELF-TYPES!
+
+	/**
+	 * The identifier of the resource. Java won't let me self-reference the right types, so
+	 * for now it's a wild-card
+	 */
 	ResourceIdentifier<? extends Resource<T>, T> identifier();
 	
 	/**

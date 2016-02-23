@@ -28,7 +28,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-class ReplScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<Void, ReplScriptEnvironment> {
+class ReplScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ReplScriptEnvironment, Void> {
 
 	@Inject
 	ReplScriptEnvironmentCreator(Dependencies dependencies) {

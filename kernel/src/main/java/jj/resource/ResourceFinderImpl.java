@@ -107,7 +107,7 @@ class ResourceFinderImpl implements ResourceFinder {
 	}
 
 	private <T extends Resource<A>, A> T createResource(ResourceIdentifier<T, A> identifier) {
-		ResourceCreator<A, T> creator = findCreator(identifier);
+		ResourceCreator<T, A> creator = findCreator(identifier);
 
 		try {
 			T resource = creator.create(identifier.base, identifier.name, identifier.argument);
@@ -130,8 +130,8 @@ class ResourceFinderImpl implements ResourceFinder {
 		return resourceCache.get(identifier);
 	}
 
-	private <T extends Resource<A>, A>  ResourceCreator<A, T> findCreator(ResourceIdentifier<T, A> identifier) {
-		ResourceCreator<A, T> resourceCreator = resourceCache.getCreator(identifier.resourceClass);
+	private <T extends Resource<A>, A>  ResourceCreator<T, A> findCreator(ResourceIdentifier<T, A> identifier) {
+		ResourceCreator<T, A> resourceCreator = resourceCache.getCreator(identifier.resourceClass);
 		assert resourceCreator != null : "no ResourceCreator for " + identifier.resourceClass;
 		return resourceCreator;
 	}

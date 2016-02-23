@@ -10,7 +10,7 @@ import java.io.IOException;
  * @param <A> The type of argument required for resource creation
  * @param <T> The type of resource we create
  */
-interface ResourceCreator<A, T extends Resource<A>> {
+interface ResourceCreator<T extends Resource<A>, A> {
 
 	/**
 	 * The type of resource we create
