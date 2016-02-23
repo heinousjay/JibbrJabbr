@@ -32,7 +32,7 @@ import jj.ServerStarting.Priority;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
-import jj.resource.PathCreation;
+import jj.resource.FileCreation;
 import jj.resource.PathResolver;
 import jj.resource.ResourceLoader;
 
@@ -71,8 +71,8 @@ class ConfigurationEventManager {
 	}
 
 	@Listener
-	void on(PathCreation pathCreation) {
-		if (configFilePath.equals(pathCreation.path)) {
+	void on(FileCreation fileCreation) {
+		if (configFilePath.equals(fileCreation.path)) {
 			load();
 		}
 	}

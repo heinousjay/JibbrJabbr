@@ -5,8 +5,8 @@ import java.nio.file.Path;
 /**
  * @author jason
  */
-public class MockPathCreation extends PathCreation {
-	public MockPathCreation(Path path) {
+public class MockFileCreation extends FileCreation {
+	public MockFileCreation(Path path) {
 		super(path);
 	}
 }

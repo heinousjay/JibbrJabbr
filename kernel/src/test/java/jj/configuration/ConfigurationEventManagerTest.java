@@ -25,10 +25,9 @@ import static jj.server.ServerLocation.Virtual;
 
 import jj.Base;
 import jj.MockServerStarting;
-import jj.ServerStarting;
 import jj.ServerStarting.Priority;
 import jj.execution.TaskHelper;
-import jj.resource.MockPathCreation;
+import jj.resource.MockFileCreation;
 import jj.resource.PathResolver;
 import jj.resource.ResourceLoader;
 
@@ -60,11 +59,11 @@ public class ConfigurationEventManagerTest {
 	@Test
 	public void testPathCreation() {
 
-		cem.on(new MockPathCreation(Base.path));
+		cem.on(new MockFileCreation(Base.path));
 
 		verify(resourceLoader, never()).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
 
-		cem.on(new MockPathCreation(Base.path.resolve(CONFIG_SCRIPT_NAME)));
+		cem.on(new MockFileCreation(Base.path.resolve(CONFIG_SCRIPT_NAME)));
 
 		verify(resourceLoader).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
 	}
