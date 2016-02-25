@@ -21,11 +21,6 @@ import static org.hamcrest.CoreMatchers.is;
 
 import java.nio.file.Paths;
 
-import jj.document.ErrorEvaluatingClientStub;
-import jj.document.ErrorEvaluatingSharedScript;
-import jj.document.EvaluatingClientStub;
-import jj.document.EvaluatingSharedScript;
-import jj.document.ScriptCompiler;
 import jj.event.Publisher;
 import jj.script.MockRhinoContextProvider;
 import jj.script.module.ScriptResource;
@@ -75,16 +70,20 @@ public class ScriptCompilerTest {
 		);
 		
 		given(sharedScript.path()).willReturn(Paths.get("/"));
+		given(sharedScript.source()).willReturn("invalid");
 		
 		sc = new ScriptCompiler(contextProvider, publisher);
 	}
 	
 	@Test
 	public void testClientScript() {
+
+		String clientStubs = "function stubWithReturn(){return global['//doInvoke']('stubWithReturn',global['//convertArgs'](arguments));}\n" +
+			"function stubNoReturn(){global['//doCall']('stubNoReturn',global['//convertArgs'](arguments));}\n";
 		
 		RuntimeException re = new RuntimeException();
 		
-		given(contextProvider.context.evaluateString(eq(scope), anyString(), anyString())).willThrow(re);
+		given(contextProvider.context.evaluateString(scope, clientStubs, "client stub for " + serverScriptName)).willThrow(re);
 		
 		try {
 			sc.compile(scope, clientScript, null, serverScriptName);
@@ -97,10 +96,7 @@ public class ScriptCompilerTest {
 		
 		verify(contextProvider.context).evaluateString(eq(scope), anyString(), anyString());
 		
-		assertThat(clientStubCaptor.getValue(), is(
-			"function stubWithReturn(){return global['//doInvoke']('stubWithReturn',global['//convertArgs'](arguments));}\n" +
-			"function stubNoReturn(){global['//doCall']('stubNoReturn',global['//convertArgs'](arguments));}\n"
-		));
+		assertThat(clientStubCaptor.getValue(), is(clientStubs));
 		
 		verify(publisher).publish(isA(EvaluatingClientStub.class));
 		verify(publisher).publish(isA(ErrorEvaluatingClientStub.class));
@@ -111,8 +107,8 @@ public class ScriptCompilerTest {
 		
 		RuntimeException re = new RuntimeException();
 		
-		given(contextProvider.context.evaluateString(eq(scope), anyString(), anyString())).willThrow(re);
-		
+		given(contextProvider.context.evaluateString(scope, sharedScript.source(), sharedScript.path().toString())).willThrow(re);
+
 		
 		try {
 			sc.compile(scope, null, sharedScript, serverScriptName);

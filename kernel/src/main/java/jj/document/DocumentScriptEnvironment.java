@@ -81,8 +81,6 @@ public class DocumentScriptEnvironment
 	
 	private final String sha1;
 	
-	private final String serverPath;
-	
 	private final ScriptableObject scope;
 	
 	private final ScriptableObject global;
@@ -129,15 +127,13 @@ public class DocumentScriptEnvironment
 			sharedScript == null ? "none" : sharedScript.sha1(),
 			serverScript == null ? "none" : serverScript.sha1()
 		);
-
-		serverPath = "/" + sha1 + "/" + name();
 		
 		if (serverScript == null)  {
 			socketUri = null;
 			global = null;
 			scope = null;
 		} else {
-			socketUri = serverPath + ".socket";
+			socketUri = serverPath() + ".socket";
 			global = api.global();
 			scope = configureTimers(configureModuleObjects(name(), createChainedScope(global)));
 			
@@ -176,11 +172,6 @@ public class DocumentScriptEnvironment
 	@Override
 	public String sha1() {
 		return sha1;
-	}
-
-	@Override
-	public String serverPath() {
-		return serverPath;
 	}
 	
 	@Override

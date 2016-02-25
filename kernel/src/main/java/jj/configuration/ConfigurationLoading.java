@@ -15,6 +15,14 @@
  */
 package jj.configuration;
 
-public class ConfigurationLoading {
-	
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
+import org.slf4j.Logger;
+
+@ServerLogger
+public class ConfigurationLoading extends LoggedEvent {
+	@Override
+	public void describeTo(Logger logger) {
+		logger.trace("signaling configuration is being loaded");
+	}
 }

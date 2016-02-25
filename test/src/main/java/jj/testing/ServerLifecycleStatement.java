@@ -29,21 +29,22 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 
 import org.junit.runner.Description;
+import org.slf4j.Logger;
 
 @Singleton
 @Subscriber
 public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 	
 	private final JJServerLifecycle lifecycle;
-	private final TestLog testLog;
+	private final Logger testLog;
 	private final Description description;
 	private final CountDownLatch configured = new CountDownLatch(1);
 	
 	@Inject
 	ServerLifecycleStatement(
-		final JJServerLifecycle lifecycle,
-		final TestLog testLog,
-		final Description description
+		JJServerLifecycle lifecycle,
+		@TestRunnerLogger Logger testLog,
+		Description description
 	) {
 		this.lifecycle = lifecycle;
 		this.testLog = testLog;

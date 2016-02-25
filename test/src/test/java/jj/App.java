@@ -36,6 +36,8 @@ public class App {
 	public static final Path app2;
 	
 	public static final Path configuration;
+
+	public static final Path configuration2;
 	
 	public static final Path css;
 	
@@ -54,6 +56,7 @@ public class App {
 			app1 = getPath("/test-apps/app1/");
 			app2 = getPath("/test-apps/app2/");
 			configuration = getPath("/test-apps/configuration/");
+			configuration2 = getPath("/test-apps/configuration2/");
 			css = getPath("/test-apps/css/");
 			httpClient = getPath("/test-apps/http-client/");
 			jasmine = getPath("/test-apps/jasmine/");

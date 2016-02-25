@@ -64,14 +64,4 @@ public class StaticResource extends AbstractFileResource<Void> implements Transf
 	public RandomAccessFile randomAccessFile() throws IOException {
 		return new RandomAccessFile(path.toFile(), "r");
 	}
-
-	@Override
-	public String serverPath() {
-		return "/" + sha1() + "/" + name();
-	}
-	
-	@Override
-	public boolean safeToServe() {
-		return base().servable();
-	}
 }

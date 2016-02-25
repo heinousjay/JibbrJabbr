@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.application.MockApplication;
 import jj.event.MockPublisher;
 import jj.http.server.resource.StaticResource;
 import jj.resource.*;
@@ -64,21 +63,18 @@ public class StylesheetResourceTest {
 	
 	Path cssPath;
 	
-	MockApplication app;
-	
 	@Before
 	public void before() throws Exception {
 		
 		contextProvider = new RealRhinoContextProvider();
 		
 		cssPath = Paths.get(StylesheetResourceTest.class.getResource("/jj/css/test/test.css").toURI());
-		app = new MockApplication(cssPath.getParent());
 		given(cssResource.path()).willReturn(cssPath);
 		given(cssResource.charset()).willReturn(UTF_8);
 	}
 	
 	private StylesheetResource newStylesheet(MockAbstractResourceDependencies dependencies) {
-		return new StylesheetResource(dependencies, contextProvider, global, processor, lessConfiguration, app);
+		return new StylesheetResource(dependencies, contextProvider, global, processor, lessConfiguration);
 	}
 
 	@Test

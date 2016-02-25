@@ -74,7 +74,6 @@ require('jj/logging-configuration')
 	.scriptSystem.off()
 	.resourceSystem.off()
 	.server.debug()
-	.testRunner.debug()
 	.script('index').trace()
 	.script('d3/index').trace()
 	.script('chat/index').off();

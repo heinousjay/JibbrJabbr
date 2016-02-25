@@ -36,7 +36,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.application.Application;
 import jj.http.server.LoadedResource;
 import jj.http.server.ServableResourceConfiguration;
 import jj.http.server.resource.StaticResource;
@@ -73,9 +72,7 @@ public class StylesheetResource extends AbstractResource<Void> implements Loaded
 	private final ByteBuf bytes;
 	private final String sha1;
 	private final Path path;
-	private final String serverPath;
 	private final long size;
-	private final boolean safeToServe;
 	private final LessConfiguration lessConfiguration;
 
 	@Inject
@@ -84,8 +81,7 @@ public class StylesheetResource extends AbstractResource<Void> implements Loaded
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global,
 		final CssReferenceVersionProcessor processor,
-		final LessConfiguration lessConfiguration,
-		final Application application
+		final LessConfiguration lessConfiguration
 	) {
 		super(dependencies);
 		
@@ -124,15 +120,12 @@ public class StylesheetResource extends AbstractResource<Void> implements Loaded
 				throw new ResourceNotViableException(path, ioe);
 			}
 		}
-		
-		safeToServe = base().servable();
 
 		result = processor.fixUris(result, this);
 		
 		sha1 = SHA1Helper.keyFor(result);
 		bytes = Unpooled.copiedBuffer(result, charset());
 		size = bytes.readableBytes();
-		serverPath = "/" + sha1 + "/" + name();
 	}
 	
 	private String processLessScript(final Provider<RhinoContext> contextProvider, final ScriptableObject global, String lessName) {
@@ -178,16 +171,6 @@ public class StylesheetResource extends AbstractResource<Void> implements Loaded
 	@Override
 	public String sha1() {
 		return sha1;
-	}
-
-	@Override
-	public String serverPath() {
-		return serverPath;
-	}
-	
-	@Override
-	public boolean safeToServe() {
-		return safeToServe;
 	}
 
 	@Override

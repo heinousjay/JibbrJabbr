@@ -34,17 +34,20 @@ import jj.resource.Resource;
 public interface ServableResource extends Resource<Void> {
 
 
-	String serverPath();
+	default String serverPath() {
+		return "/" + sha1() + "/" + name();
+	}
+
+	default boolean safeToServe() {
+		return base().servable();
+	}
 	
 	/**
 	 * The mime of resource suitably formatted for response
 	 * in the Content-Type header (specifically, including a
 	 * charset parameter if needed.)
-	 * @return
 	 */
 	String contentType();
 	
 	boolean compressible();
-	
-	boolean safeToServe();
 }

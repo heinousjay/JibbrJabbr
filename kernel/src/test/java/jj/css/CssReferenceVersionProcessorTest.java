@@ -79,7 +79,7 @@ public class CssReferenceVersionProcessorTest {
 		given(dependencies.resourceFinder().loadResource(StaticResource.class, Public, REPLACEMENT_CSS)).willReturn(replacement);
 		willReturn(replacement).given(servableLoader).loadResource(new URIMatch(REPLACEMENT_CSS));
 		
-		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null, app);
+		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null);
 		
 		
 		given(testCss.serverPath()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");

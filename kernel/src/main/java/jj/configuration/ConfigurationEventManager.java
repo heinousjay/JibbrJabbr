@@ -56,7 +56,10 @@ class ConfigurationEventManager {
 		this.resourceLoader = resourceFinder;
 		configFilePath = pathResolver.resolvePath(AppBase, CONFIG_SCRIPT_NAME);
 	}
-	
+
+	/**
+	 * When the server is started, try to load the configuration
+	 */
 	@Listener
 	void on(ServerStarting event) {
 		event.registerStartupTask(Priority.Middle, new ServerTask("initial load of configuration script") {
@@ -70,18 +73,29 @@ class ConfigurationEventManager {
 		});
 	}
 
+	/**
+	 * If a config file is created, try to load it
+	 */
 	@Listener
 	void on(FileCreation fileCreation) {
 		if (configFilePath.equals(fileCreation.path)) {
 			load();
 		}
 	}
-	
+
+	/**
+	 * noting that the configuration has been loaded. this only
+	 * matters during startup
+	 */
 	@Listener
 	void on(ConfigurationLoaded configurationLoaded) {
 		latch.countDown();
 	}
-	
+
+	/**
+	 * Noting that the configuration has errored, this only
+	 * matters during startup
+	 */
 	@Listener
 	void on(ConfigurationErrored event) {
 		latch.countDown();
