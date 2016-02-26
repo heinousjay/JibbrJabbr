@@ -40,7 +40,7 @@ public class Latch {
 
 	public void await(long timeout, TimeUnit unit) throws InterruptedException {
 		long timeoutMillis = TimeUnit.MILLISECONDS.convert(timeout, unit);
-		timeoutMillis += "true".equals(System.getenv("TRAVIS")) ? 2000 : 0;
+		timeoutMillis += "true".equals(System.getenv("CI")) ? 2000 : 0;
 		if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
 			throw new AssertionError("timed out in " + timeoutMillis + " ms");
 		}
