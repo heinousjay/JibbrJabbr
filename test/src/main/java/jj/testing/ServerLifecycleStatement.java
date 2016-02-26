@@ -64,7 +64,7 @@ public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 			testLog.info("{} - test start", description);
 			testLog.info(" Starting the server.");
 			lifecycle.start();
-			assertTrue("configuration load timed out", configured.await(500, TimeUnit.MILLISECONDS));
+			configured.await(500, TimeUnit.MILLISECONDS);
 			evaluateInner();
 		} finally {
 			lifecycle.stop();

@@ -87,7 +87,7 @@ public class JasmineIntegrationTest {
 		
 		// takes about 1 second locally
 		// maybe externalize timeouts?  or produce a factor on travis?
-		assertTrue("timed out", latch.await(3, SECONDS));
+		latch.await(3, SECONDS);
 		
 		// make sure we got notified as expected
 		assertNotNull(success);
@@ -101,7 +101,7 @@ public class JasmineIntegrationTest {
 		touch(resourceFinder.findResource(ScriptResource.class, Private, "jasmine-int-test.js"));
 		touch(resourceFinder.findResource(ScriptResource.class, Private, "jasmine-int-test-failures.js"));
 		
-		assertTrue("timed out", latch.await(3, SECONDS));
+		latch.await(3, SECONDS);
 		
 		// make sure they ran again
 		assertNotNull(success);

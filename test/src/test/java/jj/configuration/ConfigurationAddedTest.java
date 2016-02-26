@@ -86,7 +86,7 @@ public class ConfigurationAddedTest {
 		}
 
 		// it can take a while to get noticed and load
-		assertTrue("timed out", latch.await(2500, TimeUnit.MILLISECONDS));
+		latch.await(2500, TimeUnit.MILLISECONDS);
 
 		assertThat("did not load the new configuration", jasmineConfiguration.autorunSpecs(), is(true));
 	}

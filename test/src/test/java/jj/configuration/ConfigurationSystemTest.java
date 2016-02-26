@@ -109,7 +109,7 @@ public class ConfigurationSystemTest {
 	@Test
 	public void test() throws Exception {
 		if (!loaded) {
-			assertTrue("timed out waiting for load", loadedLatch.await(500, MILLISECONDS));
+			loadedLatch.await(500, MILLISECONDS);
 		}
 		assert !failed : "failed";
 		

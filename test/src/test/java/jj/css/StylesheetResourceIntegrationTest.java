@@ -75,7 +75,7 @@ public class StylesheetResourceIntegrationTest {
 	public void testLess() throws Exception {
 		resourceLoader.loadResource(StylesheetResource.class, Virtual, "less.css");
 		
-		assertTrue("timed out", latch.await(2, SECONDS));
+		latch.await(2, SECONDS);
 		
 		String lessOutput = stylesheet.bytes().toString(UTF_8);
 		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css.output")), UTF_8);
@@ -88,7 +88,7 @@ public class StylesheetResourceIntegrationTest {
 	public void testCss() throws Exception {
 		resourceLoader.loadResource(StylesheetResource.class, Virtual, "test.css");
 		
-		assertTrue("timed out", latch.await(2, SECONDS));
+		latch.await(2, SECONDS);
 		
 		String cssOutput = stylesheet.bytes().toString(UTF_8);
 		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css.output")), UTF_8);
@@ -101,7 +101,7 @@ public class StylesheetResourceIntegrationTest {
 		latch = new Latch(2); // we want two!
 		resourceLoader.loadResource(StylesheetResource.class, Virtual, "replacement.css");
 		
-		assertTrue("timed out", latch.await(2, SECONDS));
+		latch.await(2, SECONDS);
 		
 		String cssOutput = stylesheet.bytes().toString(UTF_8);
 		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/replacement.css.output")), UTF_8);

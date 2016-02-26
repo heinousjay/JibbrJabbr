@@ -138,7 +138,7 @@ public class SystemScriptsTest {
 		load("system-properties.js");
 		load("uri-routing-configuration.js"); // loaded by configuration
 		
-		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
+		testCountLatch.await(total * 250, MILLISECONDS);
 		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
 		assertThat(successCount.get(), is(total)); // just for certainty?
 	}

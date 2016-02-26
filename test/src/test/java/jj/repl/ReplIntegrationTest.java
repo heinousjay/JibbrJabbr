@@ -73,7 +73,7 @@ public class ReplIntegrationTest {
 	
 	@Test
 	public void test() throws Throwable {
-		assertTrue("timed out waiting for init", latch.await(500, MILLISECONDS));
+		latch.await(500, MILLISECONDS);
 		
 		// well... it started so that's something
 		// connect to config.port() and send in some commands? why not
@@ -129,7 +129,7 @@ public class ReplIntegrationTest {
 			}
 		});
 		
-		assertTrue("timed out waiting for response", latch.await(1, SECONDS));
+		latch.await(1, SECONDS);
 		if (failure.get() != null) {
 			throw failure.get();
 		}

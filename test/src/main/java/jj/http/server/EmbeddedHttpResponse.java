@@ -58,9 +58,7 @@ public class EmbeddedHttpResponse {
 	}
 	
 	public EmbeddedHttpResponse await(long time, TimeUnit unit) throws Throwable {
-		if (!responded.await(time, unit)) {
-			throw new AssertionError("timed out in " + time + " " + unit);
-		}
+		responded.await(time, unit);
 		checkError();
 		
 		return this;

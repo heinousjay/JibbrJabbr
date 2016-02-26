@@ -94,7 +94,7 @@ public class HttpClientIntegrationTest {
 			});
 		
 		
-		assertTrue("timed out", latch.await(500, MILLISECONDS));
+		latch.await(500, MILLISECONDS);
 		if (cause.get() != null) {
 			throw cause.get();
 		}

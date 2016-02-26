@@ -99,14 +99,20 @@ public class BasicServingTest {
 				}
 			});
 		}
-		
-		boolean succeeded = latch.await(timeout, SECONDS);
+
+		AssertionError timeoutError = null;
+
+		try {
+			latch.await(timeout, SECONDS);
+		} catch (AssertionError ae) {
+			timeoutError = ae;
+		}
 		
 		if (error.getSuppressed().length > 0) {
 			throw error;
 		}
-		if (!succeeded) {
-			throw new AssertionError("timed out");
+		if (timeoutError != null) {
+			throw timeoutError;
 		}
 	}
 	

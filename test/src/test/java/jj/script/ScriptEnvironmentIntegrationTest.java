@@ -136,9 +136,9 @@ public class ScriptEnvironmentIntegrationTest {
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
-		
-		assertTrue(latch1.await(1, SECONDS));
-		assertTrue(latch.await(1, SECONDS));
+
+		latch1.await(1, SECONDS);
+		latch.await(1, SECONDS);
 		
 		assertThat(documentOneCount.get(), is(1));
 		assertThat(documentTwoCount.get(), is(1));
@@ -206,7 +206,7 @@ public class ScriptEnvironmentIntegrationTest {
 	private void loadScriptEnvironment(final String name) throws InterruptedException {
 		latch = new Latch(1);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name);
-		assertTrue(latch.await(1, TimeUnit.SECONDS));
+		latch.await(1, TimeUnit.SECONDS);
 	}
 
 }

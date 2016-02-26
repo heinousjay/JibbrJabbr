@@ -38,9 +38,11 @@ public class Latch {
 		return latch.getCount();
 	}
 
-	public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
+	public void await(long timeout, TimeUnit unit) throws InterruptedException {
 		long timeoutMillis = TimeUnit.MILLISECONDS.convert(timeout, unit);
 		timeoutMillis += "true".equals(System.getenv("TRAVIS")) ? 2000 : 0;
-		return latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
+		if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+			throw new AssertionError("timed out in " + timeoutMillis + " ms");
+		}
 	}
 }

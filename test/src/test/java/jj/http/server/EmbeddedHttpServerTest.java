@@ -80,7 +80,7 @@ public class EmbeddedHttpServerTest {
 		server.request(new EmbeddedHttpRequest("/0.txt"), responseReady);
 		server.request(new EmbeddedHttpRequest("/jj.js"), responseReady);
 		
-		assertTrue(myLatch.await(3, SECONDS));
+		myLatch.await(3, SECONDS);
 		
 		if (testFailures.getSuppressed().length > 0) {
 			throw testFailures;

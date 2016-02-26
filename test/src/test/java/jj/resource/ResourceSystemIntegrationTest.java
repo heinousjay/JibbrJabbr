@@ -169,7 +169,7 @@ public class ResourceSystemIntegrationTest {
 		// htmlResource are left alone in the cache, and that the
 		// modules don't load again without another request
 		
-		assertTrue("timed out", waitForCount(9 + 5 + 1));
+		waitForCount(9 + 5 + 1);
 		assertFalse("couldn't update things correctly", failed.get());
 		
 		assertFalse(scriptResource2.alive());
@@ -262,9 +262,9 @@ public class ResourceSystemIntegrationTest {
 		}
 	}
 	
-	private boolean waitForCount(int count) throws Exception {
+	private void waitForCount(int count) throws Exception {
 		latch = new Latch(count);
 		countEvents = true;
-		return latch.await(4, SECONDS);
+		latch.await(4, SECONDS);
 	}
 }
