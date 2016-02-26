@@ -23,7 +23,6 @@ import static jj.server.ServerLocation.Virtual;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 
@@ -36,6 +35,7 @@ import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class StylesheetResourceIntegrationTest {
 	
 	StylesheetResource stylesheet;
 	
-	CountDownLatch latch;
+	Latch latch;
 	
 	@Listener
 	void on(ResourceLoaded event) {
@@ -68,7 +68,7 @@ public class StylesheetResourceIntegrationTest {
 	@Before
 	public void before() {
 		stylesheet = null;
-		latch = new CountDownLatch(1);
+		latch = new Latch(1);
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class StylesheetResourceIntegrationTest {
 	
 	@Test
 	public void testReplacements() throws Exception {
-		latch = new CountDownLatch(2); // we want two!
+		latch = new Latch(2); // we want two!
 		resourceLoader.loadResource(StylesheetResource.class, Virtual, "replacement.css");
 		
 		assertTrue("timed out", latch.await(2, SECONDS));

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -87,7 +86,7 @@ public class BasicServingTest {
 	
 	private void runBasicStressTest(final int timeout, final int totalClients, final List<String> uris) throws Throwable {
 		final AssertionError error = new AssertionError("failure!");
-		final CountDownLatch latch = new CountDownLatch(totalClients);
+		final Latch latch = new Latch(totalClients);
 		for (int i = 0; i < totalClients; ++i) {
 			String uri = uris.get(i % uris.size());
 			server.request(new EmbeddedHttpRequest(uri), response -> {
@@ -164,7 +163,7 @@ public class BasicServingTest {
 	
 	private void poundIt(final int threadCount, final int perClientTimeout, final int perClientRequestCount) throws Exception {
 		final List<String> requests = makeAll();
-		final CountDownLatch latch = new CountDownLatch(threadCount);
+		final Latch latch = new Latch(threadCount);
 		final ExecutorService service = Executors.newFixedThreadPool(threadCount);
 	
 		final Throwable[] throwables = new Throwable[threadCount];

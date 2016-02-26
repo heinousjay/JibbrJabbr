@@ -21,6 +21,7 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.jasmine.JasmineConfiguration;
 import jj.testing.JibbrJabbrTestServer;
+import jj.testing.Latch;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +32,6 @@ import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.core.Is.is;
@@ -55,7 +55,7 @@ public class ConfigurationAddedTest {
 	@Inject
 	JasmineConfiguration jasmineConfiguration;
 
-	private final CountDownLatch latch = new CountDownLatch(2);
+	private final Latch latch = new Latch(2);
 
 	@Listener
 	void on(ConfigurationLoaded event) {

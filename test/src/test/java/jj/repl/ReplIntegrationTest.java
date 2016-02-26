@@ -29,7 +29,6 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
 import java.net.InetAddress;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -40,6 +39,7 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,7 +57,7 @@ public class ReplIntegrationTest {
 	@Inject ReplConfiguration config;
 
 	Bootstrap bootstrap;
-	CountDownLatch latch = new CountDownLatch(1);
+	Latch latch = new Latch(1);
 	
 	@Listener
 	void on(ReplListening replListening) {
@@ -77,7 +77,7 @@ public class ReplIntegrationTest {
 		
 		// well... it started so that's something
 		// connect to config.port() and send in some commands? why not
-		latch = new CountDownLatch(1);
+		latch = new Latch(1);
 		
 		final AtomicReference<Throwable> failure = new AtomicReference<>();
 		

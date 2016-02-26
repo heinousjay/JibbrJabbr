@@ -9,7 +9,6 @@ import static org.hamcrest.Matchers.*;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.FileTime;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,6 +29,7 @@ import jj.script.module.RequiredModule;
 import jj.script.module.ScriptResource;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -226,7 +226,7 @@ public class ResourceSystemIntegrationTest {
 	// also tests out the events indirectly
 	
 	boolean countEvents = false;
-	CountDownLatch latch;
+	Latch latch;
 	AtomicInteger reloadedCount;
 	AtomicInteger killedCount;
 	AtomicInteger loadedCount;
@@ -263,7 +263,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	private boolean waitForCount(int count) throws Exception {
-		latch = new CountDownLatch(count);
+		latch = new Latch(count);
 		countEvents = true;
 		return latch.await(4, SECONDS);
 	}

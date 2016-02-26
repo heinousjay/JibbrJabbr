@@ -25,7 +25,6 @@ import io.netty.handler.codec.http.HttpMethod;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -48,6 +47,7 @@ import jj.resource.ResourceSettings;
 import jj.script.ScriptError;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -92,7 +92,7 @@ public class ConfigurationSystemTest {
 	private LoggingConfiguration loggingConfiguration;
 	
 	volatile boolean loaded;
-	final CountDownLatch loadedLatch = new CountDownLatch(1);
+	final Latch loadedLatch = new Latch(1);
 	volatile boolean failed;
 	
 	@Listener 

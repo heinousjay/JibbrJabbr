@@ -19,8 +19,6 @@ import static org.junit.Assert.*;
 import static java.util.concurrent.TimeUnit.*;
 import static org.hamcrest.Matchers.*;
 
-import java.util.concurrent.CountDownLatch;
-
 import io.netty.handler.codec.http.HttpHeaderNames;
 
 import javax.inject.Inject;
@@ -30,6 +28,7 @@ import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpServer.ResponseReady;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -63,7 +62,7 @@ public class EmbeddedHttpServerTest {
 	@Test
 	public void testCallback() throws Throwable {
 		
-		final CountDownLatch myLatch = new CountDownLatch(3);
+		final Latch myLatch = new Latch(3);
 		final AssertionError testFailures = new AssertionError("there were test failures");
 		ResponseReady responseReady = response -> {
 			try {

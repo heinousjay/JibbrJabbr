@@ -38,7 +38,7 @@ public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 	private final JJServerLifecycle lifecycle;
 	private final Logger testLog;
 	private final Description description;
-	private final CountDownLatch configured = new CountDownLatch(1);
+	private final Latch configured = new Latch(1);
 	
 	@Inject
 	ServerLifecycleStatement(

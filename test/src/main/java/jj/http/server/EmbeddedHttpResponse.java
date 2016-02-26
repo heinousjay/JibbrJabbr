@@ -22,10 +22,10 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.ReferenceCountUtil;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import jj.http.server.EmbeddedHttpServer.ResponseReady;
+import jj.testing.Latch;
 
 /**
  * @author jason
@@ -35,7 +35,7 @@ public class EmbeddedHttpResponse {
 	
 	private final ResponseReady responseReady;
 	
-	private final CountDownLatch responded = new CountDownLatch(1);
+	private final Latch responded = new Latch(1);
 	
 	volatile Throwable error;
 	
@@ -59,7 +59,7 @@ public class EmbeddedHttpResponse {
 	
 	public EmbeddedHttpResponse await(long time, TimeUnit unit) throws Throwable {
 		if (!responded.await(time, unit)) {
-			throw new AssertionError("timed out");
+			throw new AssertionError("timed out in " + time + " " + unit);
 		}
 		checkError();
 		
