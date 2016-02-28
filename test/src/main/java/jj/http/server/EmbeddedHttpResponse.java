@@ -24,7 +24,6 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.util.concurrent.TimeUnit;
 
-import jj.http.server.EmbeddedHttpServer.ResponseReady;
 import jj.testing.Latch;
 
 /**
@@ -32,6 +31,11 @@ import jj.testing.Latch;
  *
  */
 public class EmbeddedHttpResponse {
+
+	@FunctionalInterface
+	public interface ResponseReady {
+		void ready(EmbeddedHttpResponse response) throws Exception;
+	}
 	
 	private final ResponseReady responseReady;
 	

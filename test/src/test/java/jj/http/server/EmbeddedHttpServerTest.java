@@ -25,7 +25,7 @@ import javax.inject.Inject;
 
 import jj.App;
 import jj.ServerRoot;
-import jj.http.server.EmbeddedHttpServer.ResponseReady;
+import jj.http.server.EmbeddedHttpResponse.ResponseReady;
 import jj.testing.JibbrJabbrTestServer;
 
 import jj.testing.Latch;
