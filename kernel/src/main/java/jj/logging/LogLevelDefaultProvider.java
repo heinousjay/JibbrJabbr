@@ -38,14 +38,15 @@ public class LogLevelDefaultProvider implements Provider<Map<String, Level>> {
 	LogLevelDefaultProvider(@LoggerNames Map<String, String> loggerNames) {
 		Map<String, Level> result = new HashMap<>();
 		for (String logger : loggerNames.values()) {
-			result.put(logger, Level.Trace);
+			result.put(logger, Level.Info);
 		}
 		// special! don't activate the access log by default
-		//result.put("access", Level.Off);
+		result.put("access", Level.Off);
 		// or the netty stuff
 		result.put("io.netty", Level.Off);
 		// log the config at info by default
 		result.put("script@config", Level.Info);
+		result.put("server", Level.Trace);
 		levels = Collections.unmodifiableMap(result);
 	}
 
