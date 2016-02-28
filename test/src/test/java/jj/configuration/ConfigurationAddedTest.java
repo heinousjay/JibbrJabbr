@@ -69,7 +69,6 @@ public class ConfigurationAddedTest {
 
 	@Test
 	public void test() throws Exception {
-		assertThat(latch.getCount(), is(1L));
 		assertThat(jasmineConfiguration.autorunSpecs(), is(false));
 
 		try(BufferedWriter writer =
