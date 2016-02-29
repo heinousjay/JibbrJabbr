@@ -114,7 +114,7 @@ class TelnetConnectionHandler extends SimpleChannelInboundHandler<ByteBuf> {
 	}
 
 	@Override
-	protected void messageReceived(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+	protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
 		dumpBuffer("received", msg);
 		// sanity check
 		assert state != null : "got into read without expecting anything next";

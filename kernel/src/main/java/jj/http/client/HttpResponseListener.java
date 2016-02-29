@@ -18,6 +18,7 @@ package jj.http.client;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
@@ -34,7 +35,7 @@ public abstract class HttpResponseListener {
 		return handler;
 	}
 
-	private ChannelHandlerAdapter handler = new ChannelHandlerAdapter() {
+	private ChannelHandlerAdapter handler = new ChannelInboundHandlerAdapter() {
 
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

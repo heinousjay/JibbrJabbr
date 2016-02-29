@@ -122,7 +122,7 @@ public class EngineHttpHandlerTest {
 		
 		prepareInjectorStubbing();
 		
-		handler.messageReceived(ctx, fullHttpRequest);
+		handler.channelRead0(ctx, fullHttpRequest);
 		
 		verify(httpResponse).sendError(HttpResponseStatus.BAD_REQUEST);
 	}
@@ -135,7 +135,7 @@ public class EngineHttpHandlerTest {
 		
 		prepareInjectorStubbing();
 		
-		handler.messageReceived(ctx, fullHttpRequest);
+		handler.channelRead0(ctx, fullHttpRequest);
 		
 		verify(webSocketConnectionMaker).handshakeWebsocket();
 	}
@@ -156,7 +156,7 @@ public class EngineHttpHandlerTest {
 		given(servableResources.routeProcessor(resourceName)).willReturn(routeProcessor);
 		
 		// when
-		handler.messageReceived(ctx, fullHttpRequest);
+		handler.channelRead0(ctx, fullHttpRequest);
 		
 		// then
 		verify(injector).createChildInjector(moduleCaptor.capture());
@@ -188,7 +188,7 @@ public class EngineHttpHandlerTest {
 		givenRouting();
 		
 		// when
-		handler.messageReceived(ctx, fullHttpRequest);
+		handler.channelRead0(ctx, fullHttpRequest);
 		
 		// then
 		verify(httpResponse).sendNotFound();

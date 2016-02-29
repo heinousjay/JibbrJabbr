@@ -16,8 +16,9 @@
 package jj.http.server;
 
 import io.netty.buffer.ByteBuf;
+
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -82,7 +83,7 @@ public class EmbeddedHttpServer {
 		return response;
 	}
 	
-	private final class ReceiverAdapter extends ChannelHandlerAdapter {
+	private final class ReceiverAdapter extends ChannelOutboundHandlerAdapter {
 		
 		private final EmbeddedHttpResponse response;
 		
@@ -124,7 +125,7 @@ public class EmbeddedHttpServer {
 				
 				ChunkedNioFile fileChunk = (ChunkedNioFile)msg;
 				do {
-					ByteBuf buffer = fileChunk.readChunk(ctx);
+					ByteBuf buffer = fileChunk.readChunk(ctx.alloc());
 					
 					if (buffer == null) {
 						Thread.sleep(10);

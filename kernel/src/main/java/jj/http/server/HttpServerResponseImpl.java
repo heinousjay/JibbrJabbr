@@ -131,14 +131,14 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	@Override
 	public HttpServerResponse header(final AsciiString name, final Date date) {
 		assertNotCommitted();
-		response.headers().addObject(name, date);
+		response.headers().add(name, date);
 		return this;
 	}
 
 	@Override
 	public HttpServerResponse header(final AsciiString name, final long value) {
 		assertNotCommitted();
-		response.headers().addLong(name, value);
+		response.headers().add(name, value);
 		return this;
 	}
 
@@ -146,7 +146,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	@Override
-	public Iterable<Entry<CharSequence, CharSequence>> allHeaders() {
+	public Iterable<Entry<String, String>> allHeaders() {
 		// TODO make unmodifiable if committed
 		return response.headers();
 	}
@@ -201,7 +201,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	@Override
 	public void sendError(final HttpResponseStatus status) {
 		assertNotCommitted();
-		byte[] body = status.reasonPhrase().toByteArray();
+		byte[] body = status.reasonPhrase().getBytes(StandardCharsets.US_ASCII);
 		status(status)
 			.header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE)
 			.header(HttpHeaderNames.CONTENT_LENGTH, body.length)
@@ -294,10 +294,6 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * previously been set on the response.  this is the appropriate responding
 	 * method for dynamically generated responses (not including simple statically
 	 * compiled dynamic resources, like less->css)
-	 * 
-	 * @param resource
-	 * @param bytes
-	 * @return
 	 */
 	protected HttpServerResponse sendResource(final LoadedResource resource) {
 		return header(HttpHeaderNames.ETAG, resource.sha1())

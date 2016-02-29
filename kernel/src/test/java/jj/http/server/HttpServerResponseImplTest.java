@@ -96,7 +96,7 @@ public class HttpServerResponseImplTest {
 		assertThat(response.header(HttpHeaderNames.CONTENT_TYPE), is(mime));
 		assertThat(response.header(HttpHeaderNames.ETAG), is(sha1));
 		assertThat(response.header(HttpHeaderNames.CONTENT_LENGTH), is(String.valueOf(size)));
-		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpHeaderValues.NO_CACHE));
+		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpHeaderValues.NO_CACHE.toString()));
 	}
 
 	private void testCachedNotModifiedResource(ServableResource resource) throws IOException {

@@ -87,10 +87,7 @@ public interface HttpServerResponse {
 
 	CharSequence header(AsciiString name);
 
-	/**
-	 * @return
-	 */
-	Iterable<Entry<CharSequence, CharSequence>> allHeaders();
+	Iterable<Entry<String, String>> allHeaders();
 
 	HttpVersion version();
 
