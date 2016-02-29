@@ -15,11 +15,13 @@
  */
 package jj.http.client;
 
+import io.netty.resolver.dns.DnsServerAddresses;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,6 +32,8 @@ import javax.inject.Singleton;
  */
 @Singleton
 class HttpClientConfigurationReader {
+
+	private static final InetSocketAddress DEFAULT_LOCAL_ADDRESS = new InetSocketAddress((InetAddress)null, 0);
 	
 	private final HttpClientConfiguration configuration;
 	
@@ -37,45 +41,44 @@ class HttpClientConfigurationReader {
 	HttpClientConfigurationReader(final HttpClientConfiguration configuration) {
 		this.configuration = configuration;
 	}
+
+	private InetSocketAddress newInetSocketAddress(String nameserverAddress) {
+		if (nameserverAddress == null || nameserverAddress.isEmpty()) {
+			return null;
+		}
+
+		try {
+			return new InetSocketAddress(InetAddress.getByName(nameserverAddress), 53);
+		} catch (UnknownHostException uhe) {
+			// TODO publish it!
+			return null;
+		}
+	}
 	
 	InetSocketAddress localClientAddress() {
-		InetSocketAddress localAddress = new InetSocketAddress((InetAddress)null, 0);
-		String ip = configuration.localClientAddress();
-		if (ip != null) {
-			try {
-				localAddress = new InetSocketAddress(InetAddress.getByName(ip), 0);
-			} catch (UnknownHostException uhe) {
-				// publish it!
-			}
-		}
-		
-		return localAddress;
+		InetSocketAddress localAddress = newInetSocketAddress(configuration.localClientAddress());
+		return localAddress != null ? localAddress : DEFAULT_LOCAL_ADDRESS;
 	}
 	
 	InetSocketAddress localNameserverAddress() {
-		InetSocketAddress localAddress = new InetSocketAddress((InetAddress)null, 0);
-		String ip = configuration.localNameserverAddress();
-		if (ip != null) {
-			try {
-				localAddress = new InetSocketAddress(InetAddress.getByName(ip), 0);
-			} catch (UnknownHostException uhe) {
-				// publish it!
-			}
-		}
-		
-		return localAddress;
+		InetSocketAddress localAddress = newInetSocketAddress(configuration.localNameserverAddress());
+		return localAddress != null ? localAddress : DEFAULT_LOCAL_ADDRESS;
 	}
 
-	List<InetSocketAddress> nameservers() {
-		List<InetSocketAddress> nameservers = new ArrayList<>(configuration.nameservers().size());
-		for (String nameserver : configuration.nameservers()) {
-			try {
-				nameservers.add(new InetSocketAddress(InetAddress.getByName(nameserver), 53));
-			} catch (UnknownHostException uhe) {
-				// publish it!
-			}
-		}
-		return nameservers;
+	private  DnsServerAddresses useDefaultAddresses() {
+		// TODO publish it!
+		return DnsServerAddresses.defaultAddresses();
+	}
+
+	DnsServerAddresses nameservers() {
+		List<InetSocketAddress> nameservers = configuration.nameservers().stream()
+			.map(this::newInetSocketAddress)
+			.filter(o -> o != null)
+			.collect(Collectors.toList());
+
+		return nameservers.isEmpty() ?
+				useDefaultAddresses() :
+				DnsServerAddresses.sequential(nameservers);
 	}
 	
 	@Override

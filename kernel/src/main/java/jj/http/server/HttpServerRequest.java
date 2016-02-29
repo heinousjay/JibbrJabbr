@@ -89,7 +89,7 @@ public interface HttpServerRequest {
 	/**
 	 * Every header from the request
 	 */
-	List<Entry<CharSequence, CharSequence>> allHeaders();
+	Iterable<Entry<String, String>> allHeaders();
 
 	/**
 	 * A unique ID for the request

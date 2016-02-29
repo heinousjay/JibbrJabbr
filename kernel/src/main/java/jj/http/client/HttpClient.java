@@ -25,12 +25,13 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.resolver.dns.DnsNameResolverGroup;
+import io.netty.resolver.dns.DnsAddressResolverGroup;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import io.netty.resolver.dns.DnsServerAddresses;
 import jj.configuration.ConfigurationLoaded;
 import jj.configuration.ConfigurationLoading;
 import jj.event.Listener;
@@ -86,25 +87,19 @@ class HttpClient {
 		
 		if (configuration.hashCode() != configurationHashCode) {
 			configurationHashCode = configuration.hashCode();
-			
-			List<InetSocketAddress> nameservers = configuration.nameservers();
-			
-			if (nameservers.isEmpty()) {
-				// publish it!
-				bootstrap = null;
-			} else {
-			
-				Bootstrap b = bootstrapProvider.get()
-					.group(eventLoop)
-					.handler(initializer)
-					.channel(NioSocketChannel.class)
-					.localAddress(configuration.localClientAddress())
-					.resolver(new DnsNameResolverGroup(NioDatagramChannel.class, configuration.localNameserverAddress(), nameservers))
-					.option(ChannelOption.TCP_NODELAY, true)
-					.validate();
-				
-				bootstrap = b;
-			}
+
+			bootstrap = bootstrapProvider.get()
+				.group(eventLoop)
+				.handler(initializer)
+				.channel(NioSocketChannel.class)
+				.localAddress(configuration.localClientAddress())
+				.resolver(new DnsAddressResolverGroup(
+					NioDatagramChannel.class,
+					configuration.localNameserverAddress(),
+					configuration.nameservers()
+				))
+				.option(ChannelOption.TCP_NODELAY, true)
+				.validate();
 		}
 	}
 	

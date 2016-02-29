@@ -109,7 +109,7 @@ public class ReplIntegrationTest {
 							}
 
 							@Override
-							protected void messageReceived(ChannelHandlerContext ctx, String msg) throws Exception {
+							protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
 								if (msg.equals(response.substring(0, msg.length()))) {
 									response.delete(0, msg.length());
 								}

@@ -39,14 +39,14 @@ public class WebSocketRequestChecker {
 	
 	private boolean isUpgradeRequest(final FullHttpRequest request) {
 		return request.headers().contains(HttpHeaderNames.CONNECTION) &&
-			request.headers().get(HttpHeaderNames.CONNECTION).toString().toLowerCase().contains(HttpHeaderValues.UPGRADE.toLowerCase());
+			request.headers().get(HttpHeaderNames.CONNECTION).toLowerCase().contains(HttpHeaderValues.UPGRADE.toLowerCase());
 	}
 	
 	public boolean isWebSocketRequest(final FullHttpRequest request) {
 		
 		return HttpMethod.GET.equals(request.method()) &&
 			isUpgradeRequest(request) &&
-			HttpHeaderValues.WEBSOCKET.equalsIgnoreCase(request.headers().get(HttpHeaderNames.UPGRADE)) &&
+			HttpHeaderValues.WEBSOCKET.contentEqualsIgnoreCase(request.headers().get(HttpHeaderNames.UPGRADE)) &&
 			isWebSocketURI(request);
 	}
 	

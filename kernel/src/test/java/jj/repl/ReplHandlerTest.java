@@ -77,7 +77,7 @@ public class ReplHandlerTest {
 	@Test
 	public void testEmptyMessage() throws Exception {
 		
-		rh.messageReceived(ctx, "   \n\r\n\r\n   ");
+		rh.channelRead0(ctx, "   \n\r\n\r\n   ");
 
 		verify(ctx).writeAndFlush(">");
 		
@@ -88,7 +88,7 @@ public class ReplHandlerTest {
 	public void testMessageSuccess() throws Exception {
 		
 		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl-console")).willReturn(script);
-		rh.messageReceived(ctx, "something");
+		rh.channelRead0(ctx, "something");
 		
 		taskRunner.runFirstTask();
 		
@@ -101,7 +101,7 @@ public class ReplHandlerTest {
 		RuntimeException e = new RuntimeException("this is an exception");
 
 		given(contextProvider.context.compileString("$$print(function() { return something; });", "repl-console")).willThrow(e);
-		rh.messageReceived(ctx, "something");
+		rh.channelRead0(ctx, "something");
 		
 		verify(ctx).writeAndFlush(e.getMessage() + "\n>");
 		

@@ -82,7 +82,7 @@ class ReplHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	@Override
-	protected void messageReceived(final ChannelHandlerContext ctx, final String msg) throws Exception {
+	protected void channelRead0(final ChannelHandlerContext ctx, final String msg) throws Exception {
 		
 		ReplScriptEnvironment rse = 
 			resourceFinder.findResource(ReplScriptEnvironment.class, Virtual, ReplScriptEnvironment.NAME);

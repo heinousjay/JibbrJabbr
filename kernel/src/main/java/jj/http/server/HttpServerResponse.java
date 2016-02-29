@@ -24,7 +24,6 @@ import io.netty.handler.codec.http.HttpVersion;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.List;
 import java.util.Map.Entry;
 
 import jj.resource.Resource;
@@ -90,10 +89,7 @@ public interface HttpServerResponse {
 
 	CharSequence header(AsciiString name);
 
-	/**
-	 * @return
-	 */
-	List<Entry<CharSequence, CharSequence>> allHeaders();
+	Iterable<Entry<String, String>> allHeaders();
 
 	HttpVersion version();
 

@@ -98,7 +98,7 @@ public class EngineHttpHandler extends SimpleChannelInboundHandler<FullHttpReque
 	}
 
 	@Override
-	protected void messageReceived(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
+	protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
 		
 		//long time = System.nanoTime();
 		// injector creation is split apart here because it's measurably slower to include the websocket bindings

@@ -19,13 +19,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.netty.handler.codec.http.*;
 import jj.Version;
 import jj.event.Publisher;
 import jj.resource.Resource;
@@ -35,13 +35,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AsciiString;
-import io.netty.handler.codec.http.DefaultHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderUtil;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.stream.ChunkedNioFile;
 
 /**
@@ -56,10 +49,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	private final ChannelHandlerContext ctx;
 	
 	private final Publisher publisher;
-	
-	/**
-	 * @param response
-	 */
+
 	@Inject
 	HttpServerResponseImpl(
 		final Version version,
@@ -142,14 +132,14 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	@Override
 	public HttpServerResponse header(final AsciiString name, final Date date) {
 		assertNotCommitted();
-		response.headers().addObject(name, date);
+		response.headers().add(name, date);
 		return this;
 	}
 
 	@Override
 	public HttpServerResponse header(final AsciiString name, final long value) {
 		assertNotCommitted();
-		response.headers().addLong(name, value);
+		response.headers().add(name, value);
 		return this;
 	}
 
@@ -157,9 +147,9 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * @return
 	 */
 	@Override
-	public List<Entry<CharSequence, CharSequence>> allHeaders() {
+	public Iterable<Entry<String, String>> allHeaders() {
 		// TODO make unmodifiable if committed
-		return response.headers().entries();
+		return response.headers();
 	}
 
 	@Override
@@ -212,7 +202,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	@Override
 	public void sendError(final HttpResponseStatus status) {
 		assertNotCommitted();
-		byte[] body = status.reasonPhrase().toByteArray();
+		byte[] body = status.reasonPhrase().getBytes(StandardCharsets.US_ASCII);
 		status(status)
 			.header(HttpHeaderNames.CACHE_CONTROL, HttpHeaderValues.NO_STORE)
 			.header(HttpHeaderNames.CONTENT_LENGTH, body.length)
@@ -305,10 +295,6 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	 * previously been set on the response.  this is the appropriate responding
 	 * method for dynamically generated responses (not including simple statically
 	 * compiled dynamic resources, like less->css)
-	 * 
-	 * @param resource
-	 * @param bytes
-	 * @return
 	 */
 	protected HttpServerResponse sendResource(final LoadedResource resource) {
 		return header(HttpHeaderNames.ETAG, resource.sha1())
@@ -338,7 +324,7 @@ class HttpServerResponseImpl implements HttpServerResponse {
 	}
 	
 	private ChannelFuture maybeClose(final ChannelFuture f) {
-		if (!HttpHeaderUtil.isKeepAlive(request.request())) {
+		if (!HttpHeaders.isKeepAlive(request.request())) {
 			f.addListener(ChannelFutureListener.CLOSE);
 		}
 		
