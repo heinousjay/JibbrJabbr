@@ -149,6 +149,16 @@ subprojects {
 		classifier = 'javadoc'
 		from javadoc.destinationDir
 	}
+
+	test {
+		// failures are such a pain to diagnose!
+		if (System.getenv('CI') == 'true') {
+			beforeTest { descriptor ->
+				logger.lifecycle("Running test: " + descriptor)
+			}
+			testLogging.showStandardStreams = true
+		}
+	}
 }
 
 // configures the jar to be the actual final build product
