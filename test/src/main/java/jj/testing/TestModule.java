@@ -22,6 +22,8 @@ import org.junit.runner.Description;
 
 import jj.CoreModule;
 import jj.JJModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates the server kernel without the http server,
@@ -38,10 +40,10 @@ class TestModule extends JJModule {
 	private final boolean withHttpServer;
 	
 	TestModule(
-		final JibbrJabbrTestServer testServer,
-		final String[] args,
-		final Description description,
-		final boolean withHttpServer
+		JibbrJabbrTestServer testServer,
+		String[] args,
+		Description description,
+		boolean withHttpServer
 	) {
 		this.testServer = testServer;
 		this.args = args;
@@ -55,8 +57,8 @@ class TestModule extends JJModule {
 		bind(JibbrJabbrTestServer.class).toInstance(testServer);
 		
 		bind(Description.class).toInstance(description);
-		
-		bindLoggedEventsAnnotatedWith(TestRunnerLogger.class).toLogger(TestRunnerLogger.NAME);
+
+		bind(Logger.class).annotatedWith(TestRunnerLogger.class).toInstance(LoggerFactory.getLogger(TestRunnerLogger.NAME));
 		
 		if (!withHttpServer) {
 			bind(Channel.class).toInstance(mock(Channel.class));
@@ -65,9 +67,7 @@ class TestModule extends JJModule {
 		install(new CoreModule(args));
 		
 		if (testServer.modules != null) {
-			for (JJModule module : testServer.modules) {
-				install(module);
-			}
+			testServer.modules.forEach(this::install);
 		}
 	}
 }

@@ -298,8 +298,9 @@ public class EventSystemTest {
 					}
 				});
 			}
-			
-			assertTrue("timed out", latch.await(threads * 2, SECONDS));
+			// if there is only one cpu available, give it extra time cause it will take longer
+			int seconds = Math.max(threads, 2) * 2;
+			assertTrue("timed out in " + seconds + " seconds", latch.await(seconds, SECONDS));
 			if (!throwables.isEmpty()) {
 				AssertionError error = new AssertionError(throwables.size() + " test failures");
 				Throwable t;

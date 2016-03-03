@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
 
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
-import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 
@@ -35,6 +34,7 @@ import jj.resource.ResourceLoader;
 import jj.script.module.ScriptResource;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ public class JasmineIntegrationTest {
 	@Inject ResourceLoader resourceLoader;
 	@Inject ResourceFinder resourceFinder;
 	
-	CountDownLatch latch;
+	Latch latch;
 	
 	JasmineTestSuccess success;
 	JasmineTestFailure failure;
@@ -79,7 +79,7 @@ public class JasmineIntegrationTest {
 	@Test
 	public void test() throws Exception {
 		
-		latch = new CountDownLatch(2);
+		latch = new Latch(2);
 		
 		// loading a script resource triggers the jasmine run
 		resourceLoader.loadResource(ScriptResource.class, Private, "jasmine-int-test.js");
@@ -87,7 +87,7 @@ public class JasmineIntegrationTest {
 		
 		// takes about 1 second locally
 		// maybe externalize timeouts?  or produce a factor on travis?
-		assertTrue("timed out", latch.await(3, SECONDS));
+		latch.await(3, SECONDS);
 		
 		// make sure we got notified as expected
 		assertNotNull(success);
@@ -96,12 +96,12 @@ public class JasmineIntegrationTest {
 		// contents of test results are verified in the unit tests
 		success = null;
 		failure = null;
-		latch = new CountDownLatch(2);
+		latch = new Latch(2);
 		
 		touch(resourceFinder.findResource(ScriptResource.class, Private, "jasmine-int-test.js"));
 		touch(resourceFinder.findResource(ScriptResource.class, Private, "jasmine-int-test-failures.js"));
 		
-		assertTrue("timed out", latch.await(3, SECONDS));
+		latch.await(3, SECONDS);
 		
 		// make sure they ran again
 		assertNotNull(success);

@@ -15,20 +15,25 @@
  */
 package jj.configuration;
 
+import static jj.application.AppLocation.AppBase;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
 import static jj.server.ServerLocation.Virtual;
+
+import jj.Base;
 import jj.MockServerStarting;
-import jj.ServerStarting;
 import jj.ServerStarting.Priority;
 import jj.execution.TaskHelper;
+import jj.resource.MockFileCreation;
+import jj.resource.PathResolver;
 import jj.resource.ResourceLoader;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -37,21 +42,39 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigurationScriptLoaderTest {
+public class ConfigurationEventManagerTest {
 
 	@Mock ResourceLoader resourceLoader;
-	
-	@InjectMocks ConfigurationScriptLoader csp;
-	
-	@Mock ServerStarting serverStarting;
+
+	@Mock PathResolver pathResolver;
+
+	ConfigurationEventManager cem;
+
+	@Before
+	public void before() {
+		given(pathResolver.resolvePath(AppBase, CONFIG_SCRIPT_NAME)).willReturn(Base.path.resolve(CONFIG_SCRIPT_NAME));
+		cem = new ConfigurationEventManager(resourceLoader, pathResolver);
+	}
+
+	@Test
+	public void testPathCreation() {
+
+		cem.on(new MockFileCreation(Base.path));
+
+		verify(resourceLoader, never()).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
+
+		cem.on(new MockFileCreation(Base.path.resolve(CONFIG_SCRIPT_NAME)));
+
+		verify(resourceLoader).loadResource(ConfigurationScriptEnvironment.class, Virtual, CONFIG_NAME);
+	}
 	
 	@Test
-	public void test() throws Exception {
+	public void testServerStarting() throws Exception {
 		// trips the latch
-		csp.on((ConfigurationLoaded)null);
+		cem.on((ConfigurationLoaded) null);
+
 		MockServerStarting event = new MockServerStarting();
-		
-		csp.on(event);
+		cem.on(event);
 		
 		assertThat(event.priority, is(Priority.Middle));
 		

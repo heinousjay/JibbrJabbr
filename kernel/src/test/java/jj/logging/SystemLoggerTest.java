@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.text.DecimalFormat;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -164,21 +163,6 @@ run 5
 	int run = 0;
 	final AtomicInteger count = new AtomicInteger();
 	final AtomicInteger expected = new AtomicInteger();
-
-	@Test
-	public void testtesttest() {
-
-		int threadTotal = 12;
-		ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
-		ExecutorService executor = Executors.newFixedThreadPool(threadTotal);
-		for (int i = 0; i < threadTotal; ++i) {
-			executor.submit(() -> {
-				map.computeIfAbsent("key", s -> { System.out.println("Hi"); return new Object(); });
-			});
-		}
-
-		System.out.println(map);
-	}
 	
 	private void loadTest(final int threadTotal, final int lowerBound, final int upperBound, final int timeout, final int waitTime) throws Exception {
 		System.out.println("run " + ++run);

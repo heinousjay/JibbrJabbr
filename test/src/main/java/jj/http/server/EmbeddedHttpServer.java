@@ -32,9 +32,16 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import jj.ServerLogger;
+import jj.event.Publisher;
 import jj.execution.TaskRunner;
+import jj.logging.Emergency;
+import jj.logging.LoggedEvent;
+import org.slf4j.Logger;
 
 /**
+ * Provides a hook into the HTTP system
+ *
  * @author jason
  *
  */
@@ -44,28 +51,28 @@ public class EmbeddedHttpServer {
 	private final Provider<EngineHttpHandler> handlerProvider;
 	
 	private final TaskRunner taskRunner;
-	
-	public interface ResponseReady {
-		void ready(EmbeddedHttpResponse response) throws Exception;
-	}
+
+	private final Publisher publisher;
 	
 	@Inject
 	EmbeddedHttpServer(
-		final Provider<EngineHttpHandler> handlerProvider,
-		final TaskRunner taskRunner
+		Provider<EngineHttpHandler> handlerProvider,
+		TaskRunner taskRunner,
+	    Publisher publisher
 	) {
 		this.handlerProvider = handlerProvider;
 		this.taskRunner = taskRunner;
+		this.publisher = publisher;
 	}
 	
-	public void request(EmbeddedHttpRequest request, ResponseReady responseReady) {
+	public void request(EmbeddedHttpRequest request, EmbeddedHttpResponse.ResponseReady responseReady) {
 		init(request, new EmbeddedHttpResponse(responseReady));
 	}
 
 	public EmbeddedHttpResponse request(EmbeddedHttpRequest request) {
 		return init(request, new EmbeddedHttpResponse());
 	}
-	
+
 	private EmbeddedHttpResponse init(EmbeddedHttpRequest request, EmbeddedHttpResponse response) {
 
 		final EmbeddedChannel channel = new EmbeddedChannel(new ReceiverAdapter(response), handlerProvider.get());
@@ -78,10 +85,14 @@ public class EmbeddedHttpServer {
 				channel.writeInbound(msg);
 			}
 		});
-		
+
+		publisher.publish(request);
 		
 		return response;
 	}
+
+	@ServerLogger
+	private abstract static class EmbeddedResponseWrite extends LoggedEvent {}
 	
 	private final class ReceiverAdapter extends ChannelOutboundHandlerAdapter {
 		
@@ -103,6 +114,13 @@ public class EmbeddedHttpServer {
 		
 		@Override
 		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+
+			publisher.publish(new EmbeddedResponseWrite() {
+				@Override
+				public void describeTo(Logger logger) {
+					logger.trace("writing embedded http message of type {}", msg.getClass());
+				}
+			});
 
 			if (msg instanceof HttpResponse) {
 				
@@ -136,7 +154,7 @@ public class EmbeddedHttpServer {
 				} while (!fileChunk.isEndOfInput());
 				
 			} else {
-				System.out.println("yo yo yo! " + msg.getClass());
+				publisher.publish(new Emergency("received a message of unknown type {}", msg.getClass()));
 			}
 		}
 		

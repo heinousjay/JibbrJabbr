@@ -23,8 +23,6 @@ public class ScriptResource extends AbstractFileResource<Void> implements Loaded
 	
 	private final Script script;
 	
-	private final boolean safeToServe;
-	
 	@Inject
 	ScriptResource(
 		final Dependencies dependencies,
@@ -36,8 +34,6 @@ public class ScriptResource extends AbstractFileResource<Void> implements Loaded
 		try (RhinoContext context = contextProvider.get()) {
 			script = context.compileString(source, name());
 		}
-
-		safeToServe = base().servable();
 	}
 	
 	public Script script() {
@@ -51,16 +47,6 @@ public class ScriptResource extends AbstractFileResource<Void> implements Loaded
 	@Override
 	public ByteBuf bytes() {
 		return Unpooled.wrappedBuffer(byteBuffer);
-	}
-	
-	@Override
-	public String serverPath() {
-		return "/" + sha1() + "/" + name();
-	}
-	
-	@Override
-	public boolean safeToServe() {
-		return safeToServe;
 	}
 
 	@Override

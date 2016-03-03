@@ -16,9 +16,12 @@
 package jj.configuration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static jj.application.AppLocation.AppBase;
+import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_SCRIPT_NAME;
 import static jj.server.ServerLocation.Virtual;
 import static jj.configuration.ConfigurationScriptEnvironmentCreator.CONFIG_NAME;
 
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
@@ -29,27 +32,34 @@ import jj.ServerStarting.Priority;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.execution.ServerTask;
+import jj.resource.FileCreation;
+import jj.resource.PathResolver;
 import jj.resource.ResourceLoader;
 
 /**
  * ensures that the configuration file for the application
- * is available to the system on startup
+ * is available to the system on startup and thereafter
  * 
  * @author jason
  *
  */
 @Singleton
 @Subscriber
-class ConfigurationScriptLoader {
+class ConfigurationEventManager {
 	
 	private final ResourceLoader resourceLoader;
+	private final Path configFilePath;
 	private final CountDownLatch latch = new CountDownLatch(1);
 	
 	@Inject
-	ConfigurationScriptLoader(final ResourceLoader resourceFinder) {
+	ConfigurationEventManager(ResourceLoader resourceFinder, PathResolver pathResolver) {
 		this.resourceLoader = resourceFinder;
+		configFilePath = pathResolver.resolvePath(AppBase, CONFIG_SCRIPT_NAME);
 	}
-	
+
+	/**
+	 * When the server is started, try to load the configuration
+	 */
 	@Listener
 	void on(ServerStarting event) {
 		event.registerStartupTask(Priority.Middle, new ServerTask("initial load of configuration script") {
@@ -62,12 +72,30 @@ class ConfigurationScriptLoader {
 			}
 		});
 	}
-	
+
+	/**
+	 * If a config file is created, try to load it
+	 */
+	@Listener
+	void on(FileCreation fileCreation) {
+		if (configFilePath.equals(fileCreation.path)) {
+			load();
+		}
+	}
+
+	/**
+	 * noting that the configuration has been loaded. this only
+	 * matters during startup
+	 */
 	@Listener
 	void on(ConfigurationLoaded configurationLoaded) {
 		latch.countDown();
 	}
-	
+
+	/**
+	 * Noting that the configuration has errored, this only
+	 * matters during startup
+	 */
 	@Listener
 	void on(ConfigurationErrored event) {
 		latch.countDown();

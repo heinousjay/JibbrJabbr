@@ -19,17 +19,16 @@ import static org.junit.Assert.*;
 import static java.util.concurrent.TimeUnit.*;
 import static org.hamcrest.Matchers.*;
 
-import java.util.concurrent.CountDownLatch;
-
 import io.netty.handler.codec.http.HttpHeaderNames;
 
 import javax.inject.Inject;
 
 import jj.App;
 import jj.ServerRoot;
-import jj.http.server.EmbeddedHttpServer.ResponseReady;
+import jj.http.server.EmbeddedHttpResponse.ResponseReady;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -63,7 +62,7 @@ public class EmbeddedHttpServerTest {
 	@Test
 	public void testCallback() throws Throwable {
 		
-		final CountDownLatch myLatch = new CountDownLatch(3);
+		final Latch myLatch = new Latch(3);
 		final AssertionError testFailures = new AssertionError("there were test failures");
 		ResponseReady responseReady = response -> {
 			try {
@@ -81,7 +80,7 @@ public class EmbeddedHttpServerTest {
 		server.request(new EmbeddedHttpRequest("/0.txt"), responseReady);
 		server.request(new EmbeddedHttpRequest("/jj.js"), responseReady);
 		
-		assertTrue(myLatch.await(3, SECONDS));
+		myLatch.await(3, SECONDS);
 		
 		if (testFailures.getSuppressed().length > 0) {
 			throw testFailures;

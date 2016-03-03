@@ -23,7 +23,7 @@ import java.nio.file.Path;
  * @author jason
  *
  */
-interface FileSystemResource {
+public interface FileSystemResource {
 	
 	/** the {@link Path} to the resource */
 	Path path();

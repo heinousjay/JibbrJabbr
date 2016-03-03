@@ -46,6 +46,7 @@ public class LogLevelDefaultProvider implements Provider<Map<String, Level>> {
 		result.put("io.netty", Level.Off);
 		// log the config at info by default
 		result.put("script@config", Level.Info);
+		result.put("server", Level.Trace);
 		levels = Collections.unmodifiableMap(result);
 	}
 

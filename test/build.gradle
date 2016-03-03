@@ -78,16 +78,6 @@ dependencies {
 test {
 	inputs.file project(':').jar.archivePath
 	
-	minHeapSize = "128m"
-	maxHeapSize = "512m"
-
-//	testLogging.showStandardStreams = true
-//	beforeTest { descriptor ->
-//		logger.lifecycle("Running test: " + descriptor)
-//	}
-//
-//	// listen to standard out and standard error of the test JVM(s)
-//	onOutput { descriptor, event ->
-//		logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
-//	}
+	minHeapSize = '128m'
+	maxHeapSize = '512m'
 }

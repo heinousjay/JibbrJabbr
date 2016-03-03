@@ -61,10 +61,10 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment<Void> imp
 	
 	@Inject
 	ConfigurationScriptEnvironment(
-		final Dependencies dependencies,
-		final @Global ScriptableObject global,
-		final ConfigurationCollector collector,
-		final Application application
+		Dependencies dependencies,
+		@Global ScriptableObject global,
+		ConfigurationCollector collector,
+		Application application
 	) {
 		super(dependencies);
 		
@@ -85,6 +85,7 @@ class ConfigurationScriptEnvironment extends AbstractScriptEnvironment<Void> imp
 		} else {
 			publisher.publish(new UsingDefaultConfiguration(application.resolvePath(AppBase)));
 			configurationComplete();
+			// by not existing at this point,
 			throw new NoSuchResourceException(getClass(), CONFIG_SCRIPT_NAME);
 		}
 	}

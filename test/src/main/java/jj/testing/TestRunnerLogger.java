@@ -24,15 +24,17 @@ import java.lang.annotation.Target;
 import javax.inject.Qualifier;
 
 /**
+ * The log for test infrastructure
+ *
  * @author jason
  *
  */
 @Qualifier
 @Documented
-@Target(ElementType.TYPE)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestRunnerLogger {
 
-	public static final String NAME = "test runner";
+	String NAME = "test runner";
 
 }

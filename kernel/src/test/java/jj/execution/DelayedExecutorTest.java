@@ -39,10 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DelayedExecutorTest {
-	
-	/**
-	 * 
-	 */
+
 	private static final int LATCH_WAIT_TIME = 200;
 
 	MockClock clock;
@@ -57,7 +54,7 @@ public class DelayedExecutorTest {
 			2,
 			2,
 			10000, MILLISECONDS,
-			new SynchronousQueue<Runnable>(),
+			new SynchronousQueue<>(),
 			new JJThreadFactory(jjUncaughtExceptionHandler).namePattern("%d"),
 			new JJRejectedExecutionHandler()
 		) {
@@ -73,7 +70,7 @@ public class DelayedExecutorTest {
 			1,
 			1,
 			10000, MILLISECONDS,
-			new LinkedBlockingQueue<Runnable>(),
+			new LinkedBlockingQueue<>(),
 			new JJThreadFactory(jjUncaughtExceptionHandler).namePattern("%d"),
 			new JJRejectedExecutionHandler()
 		) {

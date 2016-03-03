@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
 import static jj.document.DocumentScriptEnvironment.*;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,6 +42,7 @@ import jj.script.module.ModuleScriptEnvironment;
 import jj.script.module.RequiredModule;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,7 +71,7 @@ public class ScriptEnvironmentIntegrationTest {
 		new JibbrJabbrTestServer(ServerRoot.one, App.module)
 			.injectInstance(this);
 	
-	CountDownLatch latch;
+	Latch latch;
 	
 	DocumentScriptEnvironment scriptEnvironment;
 	
@@ -93,7 +93,7 @@ public class ScriptEnvironmentIntegrationTest {
 		}
 	}
 	
-	private ServerTask countDown(final CountDownLatch latch) {
+	private ServerTask countDown(final Latch latch) {
 		return new ServerTask("countdown") {
 			
 			@Override
@@ -116,9 +116,9 @@ public class ScriptEnvironmentIntegrationTest {
 		// external set up
 		documentOneCount.set(0);
 		documentTwoCount.set(0);
-		latch = new CountDownLatch(2);
+		latch = new Latch(2);
 		
-		CountDownLatch latch1 = new CountDownLatch(12);
+		Latch latch1 = new Latch(12);
 		ServerTask countDown = countDown(latch1);
 		
 		String name1 = DOCUMENT_ONE;
@@ -136,9 +136,9 @@ public class ScriptEnvironmentIntegrationTest {
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name2).then(countDown);
-		
-		assertTrue(latch1.await(1, SECONDS));
-		assertTrue(latch.await(1, SECONDS));
+
+		latch1.await(1, SECONDS);
+		latch.await(1, SECONDS);
 		
 		assertThat(documentOneCount.get(), is(1));
 		assertThat(documentTwoCount.get(), is(1));
@@ -204,9 +204,9 @@ public class ScriptEnvironmentIntegrationTest {
 	 * @throws InterruptedException
 	 */
 	private void loadScriptEnvironment(final String name) throws InterruptedException {
-		latch = new CountDownLatch(1);
+		latch = new Latch(1);
 		resourceLoader.loadResource(DocumentScriptEnvironment.class, Virtual, name);
-		assertTrue(latch.await(1, TimeUnit.SECONDS));
+		latch.await(1, TimeUnit.SECONDS);
 	}
 
 }

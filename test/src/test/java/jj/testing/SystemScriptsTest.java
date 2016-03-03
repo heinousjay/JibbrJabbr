@@ -26,7 +26,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -63,7 +62,7 @@ public class SystemScriptsTest {
 		// the cast is ugly but if i ever end up with more than 2.1 billion
 		// specs i guess addressing this will be a pleasure haha
 		
-		return (int)Files.list(in).filter(path -> { return path.toString().endsWith(".js"); }).count();
+		return (int)Files.list(in).filter(path -> path.toString().endsWith(".js")).count();
 	}
 	
 	static {
@@ -98,7 +97,7 @@ public class SystemScriptsTest {
 	@Inject
 	ResourceLoader resourceLoader;
 	
-	final CountDownLatch testCountLatch = new CountDownLatch(total);
+	final Latch testCountLatch = new Latch(total);
 	final AtomicInteger successCount = new AtomicInteger();
 	final AtomicInteger failureCount = new AtomicInteger();
 	
@@ -139,7 +138,7 @@ public class SystemScriptsTest {
 		load("system-properties.js");
 		load("uri-routing-configuration.js"); // loaded by configuration
 		
-		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
+		testCountLatch.await(total * 250, MILLISECONDS);
 		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
 		assertThat(successCount.get(), is(total)); // just for certainty?
 	}

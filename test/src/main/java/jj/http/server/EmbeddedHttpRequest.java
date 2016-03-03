@@ -22,6 +22,9 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
+import jj.ServerLogger;
+import jj.logging.LoggedEvent;
+import org.slf4j.Logger;
 
 /**
  * I know this seems like a waste of a class since it thinly and
@@ -33,7 +36,8 @@ import io.netty.handler.codec.http.HttpVersion;
  * @author jason
  *
  */
-public class EmbeddedHttpRequest {
+@ServerLogger
+public class EmbeddedHttpRequest extends LoggedEvent {
 	
 	final DefaultHttpRequest request;
 
@@ -59,5 +63,10 @@ public class EmbeddedHttpRequest {
 			new DefaultFullHttpRequest(request.protocolVersion(), request.method(), request.uri());
 		result.headers().add(request.headers());
 		return result;
+	}
+
+	@Override
+	public void describeTo(Logger logger) {
+		logger.debug("processing embedded request {}" , request);
 	}
 }

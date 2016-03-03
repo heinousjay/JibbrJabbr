@@ -28,7 +28,7 @@ public class ConfigurationModule extends JJModule {
 		
 		bindAPIModulePath("/jj/configuration/api");
 		
-		bindStartupListener(ConfigurationScriptLoader.class);
+		bindStartupListener(ConfigurationEventManager.class);
 		
 		bindCreationOf(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);
 	}
