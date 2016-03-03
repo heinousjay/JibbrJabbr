@@ -120,14 +120,14 @@ class HttpServer {
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded event) {
+	void on(ConfigurationLoaded event) {
 		if (httpServerSwitch.on()) {
 			checkStart();
 		}
 	}
 
 	@Listener
-	void serverStopping(ServerStopping event) {
+	void on(ServerStopping event) {
 		if (httpServerSwitch.on() && serverBootstrap != null) {
 			stop(serverBootstrap);
 			publisher.publish(new HttpServerStopped());

@@ -26,19 +26,14 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 
 import jj.application.AppLocation;
-import jj.document.CurrentDocumentRequestProcessor;
-import jj.document.DocumentScriptEnvironment;
-import jj.document.DocumentWebSocketMessageProcessors;
-import jj.document.HtmlResource;
-import jj.document.ScriptCompiler;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.MockAbstractWebSocketConnectionHostDependencies;
 import jj.http.server.websocket.MockCurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
+import jj.http.server.websocket.WebSocketConnectionHost;
 import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceKey;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceNotViableException;
 import jj.script.PendingKey;
@@ -70,8 +65,7 @@ public class DocumentScriptEnvironmentTest {
 	@Mock ScriptCompiler scriptCompiler;
 	@Mock DocumentWebSocketMessageProcessors processors;
 	@Mock DocumentRequestProcessor documentRequestProcessor;
-	
-	ResourceKey cacheKey;
+
 	MockRhinoContextProvider contextMaker;
 	MockAbstractWebSocketConnectionHostDependencies dependencies;
 	
@@ -94,28 +88,27 @@ public class DocumentScriptEnvironmentTest {
 	}
 	
 	private void makeResourceDependencies(String name) {
-		dependencies = new MockAbstractWebSocketConnectionHostDependencies(name, resourceFinder);
-		
-		cacheKey = dependencies.cacheKey();
+		dependencies = new MockAbstractWebSocketConnectionHostDependencies(DocumentScriptEnvironment.class, name, resourceFinder);
+
 		contextMaker = dependencies.mockRhinoContextProvider();
 		given(contextMaker.context.newObject(any(Scriptable.class))).willReturn(local);
 		given(contextMaker.context.newChainedScope(any(Scriptable.class))).willReturn(local);
 	}
 	
 	private void givenAnHtmlResource(String baseName) throws Exception {
-		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, baseName + ".html")).willReturn(html);
+		given(resourceFinder.loadResource(HtmlResource.class, AppLocation.Public, baseName + ".html")).willReturn(html);
 	}
 
 	private void givenAClientScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Public, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenASharedScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Public, ScriptResourceType.Shared.suffix(baseName))).willReturn(script);
 	}
 
 	private void givenAServerScript(String baseName) throws Exception {
-		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(baseName))).willReturn(script);
+		given(resourceFinder.loadResource(ScriptResource.class, AppLocation.Private, ScriptResourceType.Client.suffix(baseName))).willReturn(script);
 	}
 	
 	private DocumentScriptEnvironment givenADocumentScriptEnvironment(String baseName) {
@@ -140,30 +133,30 @@ public class DocumentScriptEnvironmentTest {
 		givenAnHtmlResource(name);
 		given(html.document()).willReturn(Jsoup.parse("<html><head><title>test</title></head></html>"));
 		DocumentScriptEnvironment dse = givenADocumentScriptEnvironment(name);
-		given(connection.webSocketConnectionHost()).willReturn(dse);
+		willReturn(dse).given(connection).webSocketConnectionHost();
 		// we expect documents to be cloned on first access, and that instance should be maintained
 		Document document = dse.document();
 		given(documentRequestProcessor.document()).willReturn(document);
 		
-		try (Closer closer = currentDocument.enterScope(documentRequestProcessor)) {
+		try (Closer ignored = currentDocument.enterScope(documentRequestProcessor)) {
 			dse.captureContextForKey(key);
 		}
 		
 		assertThat(currentDocument.current(), is(nullValue()));
 		
-		try (Closer closer = dse.restoreContextForKey(key)) {
+		try (Closer ignored = dse.restoreContextForKey(key)) {
 			assertThat(currentDocument.current(), is(sameInstance(documentRequestProcessor)));
 		}
 
 		assertThat(currentDocument.current(), is(nullValue()));
 		
-		try (Closer closer = currentConnection.enterScope(connection)) {
+		try (Closer ignored = currentConnection.enterScope(connection)) {
 			dse.captureContextForKey(key);
 		}
 		
 		assertThat(currentConnection.current(), is(nullValue()));
 		
-		try (Closer closer = dse.restoreContextForKey(key)) {
+		try (Closer ignored = dse.restoreContextForKey(key)) {
 			assertThat(currentConnection.current(), is(sameInstance(connection)));
 		}
 		
@@ -259,7 +252,7 @@ public class DocumentScriptEnvironmentTest {
 		givenAClientScript(name);
 		givenAServerScript(name);
 		
-		DocumentScriptEnvironment result = givenADocumentScriptEnvironment(name);
+		WebSocketConnectionHost result = givenADocumentScriptEnvironment(name);
 		
 		result.connected(connection1);
 		result.connected(connection2);
@@ -272,7 +265,7 @@ public class DocumentScriptEnvironmentTest {
 		given(connection4.webSocketConnectionHost()).willReturn(result);
 		given(connection5.webSocketConnectionHost()).willReturn(result);
 		
-		return result;
+		return (DocumentScriptEnvironment)result;
 	}
 	
 	@Test

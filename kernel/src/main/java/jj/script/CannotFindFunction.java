@@ -27,9 +27,9 @@ import jj.logging.LoggedEvent;
 @EmergencyLogger
 public class CannotFindFunction extends LoggedEvent {
 
-	private final ScriptEnvironment scriptEnvironment;
+	private final ScriptEnvironment<?> scriptEnvironment;
 	
-	CannotFindFunction(final ScriptEnvironment scriptEnvironment) {
+	CannotFindFunction(final ScriptEnvironment<?> scriptEnvironment) {
 		this.scriptEnvironment = scriptEnvironment;
 	}
 

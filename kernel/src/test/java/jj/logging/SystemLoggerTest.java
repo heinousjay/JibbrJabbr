@@ -56,7 +56,7 @@ public class SystemLoggerTest {
 		
 		sl = new SystemLogger(taskRunner, loggers);
 		
-		sl.start(null); // it ignores the event
+		sl.on(null); // it ignores the event
 		
 		publishLoop = taskRunner.runFirstTaskInDaemon();
 	}
@@ -84,7 +84,7 @@ public class SystemLoggerTest {
 		latch = new CountDownLatch(1);
 		String name = "name 1";
 		Thread.currentThread().setName(name);
-		sl.log(new HelperEvent1());
+		sl.on(new HelperEvent1());
 		assertTrue(latch.await(400, MILLISECONDS));
 		assertThat(threadName, is(name));
 	}
@@ -166,7 +166,7 @@ run 5
 	
 	private void loadTest(final int threadTotal, final int lowerBound, final int upperBound, final int timeout, final int waitTime) throws Exception {
 		System.out.println("run " + ++run);
-		ExecutorService executor = null;
+		ExecutorService executor = Executors.newFixedThreadPool(threadTotal);
 		final HelperEvent2 helperEvent = new HelperEvent2();
 		long start = System.nanoTime();
 		long latchTime = 0;
@@ -174,19 +174,14 @@ run 5
 			count.set(0);
 			expected.set(0);
 			latch = new CountDownLatch(threadTotal);
-			executor = Executors.newFixedThreadPool(threadTotal);
 			for (int i = 0; i < threadTotal; ++i) {
-				executor.submit(new Runnable() {
-					
-					@Override
-					public void run() {
-						int runs = RandomHelper.nextInt(lowerBound, upperBound);
-						expected.getAndAdd(runs);
-						for (int i = 0; i < runs; ++i) {
-							sl.log(helperEvent);
-						}
-						latch.countDown();
+				executor.submit(() -> {
+					int runs = RandomHelper.nextInt(lowerBound, upperBound);
+					expected.getAndAdd(runs);
+					for (int i1 = 0; i1 < runs; ++i1) {
+						sl.on(helperEvent);
 					}
+					latch.countDown();
 				});
 			}
 			

@@ -99,7 +99,7 @@ public class LoggingConfigurator {
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded event) {
+	void on(ConfigurationLoaded event) {
 		setLevels();
 	}
 	
@@ -110,7 +110,7 @@ public class LoggingConfigurator {
 	private void setLevels() {
 		logger(Logger.ROOT_LOGGER_NAME, Level.OFF);
 		setLevels(logLevelDefaultProvider.get());
-		setLevels(config.loggingLevels());
+		//setLevels(config.loggingLevels());
 		logger(EmergencyLogger.NAME, Level.TRACE);
 	}
 	

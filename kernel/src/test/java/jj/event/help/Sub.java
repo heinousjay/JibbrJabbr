@@ -25,7 +25,7 @@ public class Sub {
 	public int heard = 0;
 	
 	@Listener
-	void listen(IEvent event) {
+	void on(IEvent event) {
 		++heard;
 	}
 }

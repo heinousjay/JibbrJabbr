@@ -21,7 +21,7 @@ package jj.script;
  * @author jason
  *
  */
-public interface ChildScriptEnvironment extends ScriptEnvironment {
+public interface ChildScriptEnvironment<T> extends ScriptEnvironment<T> {
 
-	public ScriptEnvironment parent();
+	ScriptEnvironment<?> parent();
 }

@@ -19,10 +19,11 @@ import static org.mockito.BDDMockito.*;
 import static jj.jasmine.JasmineScriptEnvironment.*;
 import static jj.server.ServerLocation.Virtual;
 import static jj.resource.ResourceEventMaker.makeResourceLoaded;
-import jj.resource.ResourceLoaded;
-import jj.resource.ResourceLoader;
+
+import jj.resource.*;
 import jj.script.module.ScriptResource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -39,15 +40,29 @@ public class SpecRunnerTest {
 	@Mock JasmineConfiguration configuration;
 	@Mock JasmineSwitch jasmineSwitch;
 	@Mock ResourceLoader resourceLoader;
+	@Mock PathResolver pathResolver;
 	
 	@InjectMocks SpecRunner specRunner;
 	
 	@Mock ScriptResource sr;
+	@Mock Location location;
+
+	@Before
+	public void before() {
+		givenResource("name.js");
+	}
+
+	@SuppressWarnings("unchecked")
+	private void givenResource(String name) {
+
+		ResourceIdentifier<ScriptResource, Void> identifier = new MockResourceIdentifierMaker().make(ScriptResource.class, location, name);
+		given((ResourceIdentifier<ScriptResource, Void>)sr.identifier()).willReturn(identifier);
+	}
 
 	@Test
 	public void testNoAutorun() {
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
 		verify(resourceLoader, never()).loadResource(eq(JasmineScriptEnvironment.class), eq(Virtual), anyString(), anyVararg());
 	}
@@ -57,33 +72,43 @@ public class SpecRunnerTest {
 		
 		given(configuration.autorunSpecs()).willReturn(true);
 		given(sr.name()).willReturn("name.js");
+		given(sr.base()).willReturn(location);
+		given(pathResolver.specLocationFor(location)).willReturn(location);
 
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 		
-		verify(resourceLoader).loadResource(JasmineScriptEnvironment.class, Virtual, "name-spec.js", rl);
+		verify(resourceLoader).loadResource(JasmineScriptEnvironment.class, Virtual, "name-jasmine-spec.js", rl);
 	}
 	
 	@Test
 	public void testIgnored() {
 
 		given(configuration.autorunSpecs()).willReturn(true);
+		given(sr.base()).willReturn(location);
+		given(pathResolver.specLocationFor(location)).willReturn(location);
 		
-		given(sr.name()).willReturn(JASMINE_JS);
+		givenResource(JASMINE_JS);
 		ResourceLoaded rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
-		given(sr.name()).willReturn(JASMINE_BOOT_JS);
-		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		verifyZeroInteractions(resourceLoader);
 
-		given(sr.name()).willReturn(JASMINE_RUN_JS);
+		givenResource(JASMINE_BOOT_JS);
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
 
-		given(sr.name()).willReturn("name-spec.js");
+		verifyZeroInteractions(resourceLoader);
+
+		givenResource(JASMINE_RUN_JS);
 		rl = makeResourceLoaded(sr);
-		specRunner.resourceLoaded(rl);
+		specRunner.on(rl);
+
+		verifyZeroInteractions(resourceLoader);
+
+		givenResource("name-spec.js");
+		rl = makeResourceLoaded(sr);
+		specRunner.on(rl);
 		
 		verifyZeroInteractions(resourceLoader);
 	}

@@ -38,7 +38,7 @@ import org.mozilla.javascript.ScriptableObject;
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractScriptEnvironmentTest {
 	
-	private class MyScriptEnvironment extends AbstractScriptEnvironment {
+	private class MyScriptEnvironment extends AbstractScriptEnvironment<Void> {
 		
 		protected MyScriptEnvironment(Dependencies dependencies) {
 			super(dependencies);
@@ -87,7 +87,7 @@ public class AbstractScriptEnvironmentTest {
 
 	@Before
 	public void before() throws Exception {
-		ase = new MyScriptEnvironment(dependencies = new MockAbstractScriptEnvironmentDependencies());
+		ase = new MyScriptEnvironment(dependencies = new MockAbstractScriptEnvironmentDependencies(MyScriptEnvironment.class, "test environment"));
 	}
 	
 	@Test

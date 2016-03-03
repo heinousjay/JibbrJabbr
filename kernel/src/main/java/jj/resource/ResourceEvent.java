@@ -15,8 +15,6 @@
  */
 package jj.resource;
 
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 
 import jj.logging.LoggedEvent;
@@ -28,51 +26,57 @@ import jj.logging.LoggedEvent;
  */
 @ResourceLogger
 public abstract class ResourceEvent extends LoggedEvent {
+
+	protected final ResourceIdentifier<? ,?> identifier;
 	
-	/** this is not always available, in particular when the resource did not get created */
-	public final ResourceKey resourceKey;
-	public final Class<? extends Resource> resourceClass;
-	public final Location base;
-	public final String name;
-	public final Object[] arguments;
-	
-	protected ResourceEvent(final AbstractResource resource) {
-		this.resourceKey = resource.cacheKey();
-		this.resourceClass = resource.getClass();
-		this.base = resource.base();
-		this.name = resource.name();
-		this.arguments = resource.creationArgs();
+	protected ResourceEvent(final ResourceIdentifier<? ,?> identifier) {
+		assert identifier != null;
+		this.identifier = identifier;
 	}
 	
-	protected ResourceEvent(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
-		this.resourceKey = null;
-		this.resourceClass = resourceClass;
-		this.base = base;
-		this.name = name;
-		this.arguments = arguments;
+	public <T extends Resource<A>, A> boolean matches(Class<T> resourceClass, Location base, String name, A argument) {
+		return identifier.equals(resourceClass, base, name, argument);
 	}
-	
-	public boolean matches(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
-		return this.resourceClass == resourceClass &&
-			this.base == base &&
-			this.name.equals(name) &&
-			Arrays.equals(this.arguments, arguments);
+
+	public boolean matches(ResourceIdentifier<?, ?> other) {
+		return other != null && other.equals(identifier);
 	}
-	
-	public boolean matches(final AbstractResource resource) {
-		return matches(resource.getClass(), resource.base(), resource.name(), resource.creationArgs());
+
+	public boolean matches(Resource<?> resource) {
+		return matches(resource.identifier());
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Resource<A>, A> ResourceIdentifier<T, A> identifier() {
+		return (ResourceIdentifier<T, A>)identifier;
+	}
+
+	public Class<?> type() {
+		return identifier.resourceClass;
+	}
+
+	public Location base() {
+		return identifier.base;
+	}
+
+	public String name() {
+		return identifier.name;
+	}
+
+	public Object argument() {
+		return identifier.argument;
 	}
 	
 	protected abstract String description();
 	
 	@Override
 	public void describeTo(Logger log) {
-		log.info("{} - {} at {}/{}", description(), resourceClass.getName(), base, name);
+		log.info("{} - {}", description(), identifier);
 	}
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(type: " + resourceClass.getName() + ", base: " + base + ", name: " + name + ", args: " + arguments + ")";
+		return getClass().getSimpleName() + "(" + identifier + ")";
 	}
 
 }

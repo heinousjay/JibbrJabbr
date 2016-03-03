@@ -28,7 +28,6 @@ import jj.event.Publisher;
 import jj.http.server.HttpServerRequestImpl;
 import jj.http.server.HttpServerResponseImpl;
 import jj.logging.LoggedEvent;
-import jj.resource.Resource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -80,7 +79,7 @@ public class HttpServerResponseImplTest {
 		assertThat(response.charset(), is(UTF_8));
 	}
 
-	private void testCachedResource(Resource resource) throws IOException {
+	private void testCachedResource(ServableResource resource) throws IOException {
 		response.sendCachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
@@ -90,7 +89,7 @@ public class HttpServerResponseImplTest {
 		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpServerResponse.MAX_AGE_ONE_YEAR));
 	}
 
-	private void testUncachedResource(Resource resource) throws IOException {
+	private void testUncachedResource(ServableResource resource) throws IOException {
 		response.sendUncachableResource(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.OK));
@@ -100,7 +99,7 @@ public class HttpServerResponseImplTest {
 		assertThat(response.header(HttpHeaderNames.CACHE_CONTROL), is(HttpHeaderValues.NO_CACHE.toString()));
 	}
 
-	private void testCachedNotModifiedResource(Resource resource) throws IOException {
+	private void testCachedNotModifiedResource(ServableResource resource) throws IOException {
 		response.sendNotModified(resource, true);
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));
@@ -109,7 +108,7 @@ public class HttpServerResponseImplTest {
 		assertThat(response.hasNoBody(), is(true));
 	}
 
-	private void testUncachedNotModifiedResource(Resource resource) throws IOException {
+	private void testUncachedNotModifiedResource(ServableResource resource) throws IOException {
 		response.sendNotModified(resource);
 		
 		assertThat(response.status(), is(HttpResponseStatus.NOT_MODIFIED));

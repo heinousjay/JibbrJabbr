@@ -33,6 +33,8 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 	
 	private final MapBinder<String, RouteProcessor> routeProcessorBinder;
 	
+	private final MapBinder<Class<? extends ServableResource>, RouteProcessorConfiguration> routeProcessorConfigurationBinder;
+	
 	private final Multibinder<RouteContributor> routeContributorBinder;
 	
 	public ServableResourceBindingProcessor(Binder binder) {
@@ -44,6 +46,12 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 		
 		routeProcessorBinder = MapBinder.newMapBinder(binder, String.class, RouteProcessor.class);
 		
+		routeProcessorConfigurationBinder = MapBinder.newMapBinder(
+			binder,
+			new TypeLiteral<Class<? extends ServableResource>>() {},
+			new TypeLiteral<RouteProcessorConfiguration>() {}
+		);
+		
 		routeContributorBinder = Multibinder.newSetBinder(binder, RouteContributor.class);
 	}
 
@@ -52,12 +60,14 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 		
 		String name = null;
 		Class<? extends RouteProcessor> routeProcessorClass = SimpleRouteProcessor.class;
+		Class<? extends RouteProcessorConfiguration> routeProcessorConfigurationClass = DefaultRouteProcessorConfiguration.class;
 		Class<? extends RouteContributor> routeContributorClass = EmptyRouteContributor.class;
 		
 		ServableResourceConfiguration config = resourceClassBinding.getAnnotation(ServableResourceConfiguration.class);
 		if (config != null) {
 			name = config.name();
 			routeProcessorClass = config.processor();
+			routeProcessorConfigurationClass = config.processorConfig();
 			routeContributorClass = config.routeContributor();
 		}
 		
@@ -73,6 +83,7 @@ public class ServableResourceBindingProcessor implements ResourceBindingProcesso
 		
 		servableResourceBinder.addBinding(name).toInstance(resourceClassBinding);
 		routeProcessorBinder.addBinding(name).to(routeProcessorClass);
+		routeProcessorConfigurationBinder.addBinding(resourceClassBinding).to(routeProcessorConfigurationClass);
 		
 		if (routeContributorClass != EmptyRouteContributor.class) {
 			routeContributorBinder.addBinding().to(routeContributorClass);

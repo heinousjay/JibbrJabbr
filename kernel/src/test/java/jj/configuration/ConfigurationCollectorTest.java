@@ -47,7 +47,7 @@ public class ConfigurationCollectorTest {
 
 	@Before
 	public void before() {
-		given(env.currentRootScriptEnvironment()).willReturn(cse);
+		given((ConfigurationScriptEnvironment)env.currentRootScriptEnvironment()).willReturn(cse);
 		
 		converters = new Converters(ConverterSetMaker.converters());
 		collector = new ConfigurationCollector(converters, env);

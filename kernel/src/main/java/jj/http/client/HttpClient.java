@@ -17,8 +17,6 @@ package jj.http.client;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.List;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -31,7 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import io.netty.resolver.dns.DnsServerAddresses;
 import jj.configuration.ConfigurationLoaded;
 import jj.configuration.ConfigurationLoading;
 import jj.event.Listener;
@@ -74,12 +71,12 @@ class HttpClient {
 	}
 	
 	@Listener
-	void configurationLoading(ConfigurationLoading event) {
+	void on(ConfigurationLoading event) {
 		makeBootstrap();
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded event) {
+	void on(ConfigurationLoaded event) {
 		makeBootstrap();
 	}
 	

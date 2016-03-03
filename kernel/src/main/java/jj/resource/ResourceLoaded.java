@@ -15,20 +15,23 @@
  */
 package jj.resource;
 
+import java.lang.ref.WeakReference;
+
 /**
  * @author jason
  *
  */
 public class ResourceLoaded extends ResourceEvent implements ResourceCacheUpdated {
 
-	public ResourceLoaded(AbstractResource resource) {
-		super(resource);
+	final WeakReference<Resource<?>> resourceReference;
+
+	public ResourceLoaded(Resource<?> resource) {
+		super(resource.identifier());
+		resourceReference = new WeakReference<>(resource);
 	}
 
 	@Override
 	public String description() {
 		return "resource loaded";
 	}
-	
-	
 }

@@ -26,10 +26,6 @@ import jj.script.PendingKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.RealRhinoContextProvider;
 import jj.script.AbstractScriptEnvironment;
-import jj.script.module.ModuleScriptEnvironment;
-import jj.script.module.RequiredModule;
-import jj.script.module.RootScriptEnvironment;
-import jj.script.module.ScriptResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +45,7 @@ public class ModuleScriptEnvironmentTest {
 	
 	RequiredModule requiredModule;
 	
-	@Mock(extraInterfaces = { RootScriptEnvironment.class }) AbstractScriptEnvironment parent;
+	@Mock(extraInterfaces = { RootScriptEnvironment.class }) AbstractScriptEnvironment<?> parent;
 	
 	@Mock ScriptResource scriptResource;
 	
@@ -64,41 +60,50 @@ public class ModuleScriptEnvironmentTest {
 	private MockAbstractScriptEnvironmentDependencies construct(String name) {
 		contextProvider = new RealRhinoContextProvider();
 		
-		MockAbstractScriptEnvironmentDependencies dependencies =
-			new MockAbstractScriptEnvironmentDependencies(contextProvider, name);
+		given(((RootScriptEnvironment<?>)parent).global()).willReturn(global);
 		
-		given(((RootScriptEnvironment)parent).global()).willReturn(global);
-		
-		requiredModule = new RequiredModule((RootScriptEnvironment)parent, name);
+		requiredModule = new RequiredModule((RootScriptEnvironment<?>)parent, name);
 		requiredModule.pendingKey(new PendingKey());
 		
 		given(parent.alive()).willReturn(true);
-		return dependencies;
+
+		return new MockAbstractScriptEnvironmentDependencies(
+			ModuleScriptEnvironment.class,
+			name,
+			requiredModule,
+			contextProvider
+		);
+	}
+	
+	private void givenModuleLocation(Location location) {
+		given(((RootScriptEnvironment<?>)parent).moduleLocation()).willReturn(location);
 	}
 
-	public void constructScriptModule(String name, String moduleIdentifier, Location scriptBase) {
+	private void constructScriptModule(String name, String moduleIdentifier, Location scriptLocation) {
 		
 		MockAbstractScriptEnvironmentDependencies dependencies = construct(name);
 		
-		given(dependencies.resourceFinder().loadResource(ScriptResource.class, scriptBase, moduleIdentifier + ".js")).willReturn(scriptResource);
+		given(dependencies.resourceFinder().loadResource(ScriptResource.class, scriptLocation, moduleIdentifier + ".js")).willReturn(scriptResource);
 		
-		given(scriptResource.base()).willReturn(scriptBase);
+		given(scriptResource.base()).willReturn(scriptLocation);
 		given(scriptResource.name()).willReturn(moduleIdentifier);
 		given(scriptResource.source()).willReturn("");
 		
+		givenModuleLocation(scriptLocation);
 		mse = new ModuleScriptEnvironment(dependencies, requiredModule);
 	}
 
-	public void constructJSONModule(String name, String moduleIdentifier, Location jsonBase) {
+	private void constructJSONModule(String name, String moduleIdentifier, Location jsonLocation) {
 		
 		MockAbstractScriptEnvironmentDependencies dependencies = construct(name);
 		
-		given(dependencies.resourceFinder().loadResource(JSONResource.class, jsonBase, moduleIdentifier + ".json")).willReturn(jsonResource);
+		given(dependencies.resourceFinder().loadResource(JSONResource.class, jsonLocation, moduleIdentifier + ".json")).willReturn(jsonResource);
 		
-		given(jsonResource.base()).willReturn(jsonBase);
+		given(jsonResource.base()).willReturn(jsonLocation);
 		given(jsonResource.name()).willReturn(moduleIdentifier);
 		given(jsonResource.contents()).willReturn(contents);
 		
+		givenModuleLocation(jsonLocation);
 		mse = new ModuleScriptEnvironment(dependencies, requiredModule);
 	}
 	

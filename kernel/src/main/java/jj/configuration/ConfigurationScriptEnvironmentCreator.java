@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.resource.Location;
+import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**
@@ -31,28 +32,26 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ConfigurationScriptEnvironment> {
+class ConfigurationScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<ConfigurationScriptEnvironment, Void> {
 	
 	static final String CONFIG_NAME = "config";
 	static final String CONFIG_SCRIPT_NAME = CONFIG_NAME + ".js";
 	
 	@Inject
-	ConfigurationScriptEnvironmentCreator(
-		final Dependencies dependencies
-	) {
+	ConfigurationScriptEnvironmentCreator(Dependencies dependencies) {
 		super(dependencies);
 	}
 
 	@Override
-	protected ConfigurationScriptEnvironment createScriptEnvironment(String name, Object... args) throws IOException {
-		assert name == CONFIG_NAME : "can only create " + CONFIG_NAME;
-		return creator.createResource(ConfigurationScriptEnvironment.class, resourceKey(Virtual, name, args), Virtual, name, args);
+	protected ConfigurationScriptEnvironment createScriptEnvironment(String name, Void argument) throws IOException {
+		assert CONFIG_NAME.equals(name) : "can only create " + CONFIG_NAME;
+		return creator.createResource(resourceIdentifierMaker.make(type(), Virtual, name, null));
 	}
 	
 	@Override
-	protected URI uri(Location base, String name, Object... args) {
-		assert name == CONFIG_NAME : "can only load " + CONFIG_NAME;
-		return super.uri(base, name, args);
+	protected URI uri(Location base, String name, Void argument) {
+		assert CONFIG_NAME.equals(name) : "can only load " + CONFIG_NAME;
+		return super.uri(base, name, argument);
 	}
 
 }

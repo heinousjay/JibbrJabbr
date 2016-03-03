@@ -22,15 +22,17 @@ import static org.mockito.BDDMockito.*;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Arrays;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.resolver.dns.DnsAddressResolverGroup;
+import io.netty.resolver.dns.DnsServerAddresses;
 
 import javax.inject.Provider;
 
-import io.netty.resolver.dns.DnsServerAddresses;
+import jj.configuration.ConfigurationLoading;
+
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,8 +65,6 @@ public class HttpClientTest {
 	
 	@Mock InetSocketAddress localClientAddress;
 	@Mock InetSocketAddress localNameserverAddress;
-	@Mock InetSocketAddress nameserverAddress1;
-	@Mock InetSocketAddress nameserverAddress2;
 	
 	@Before
 	public void before() {
@@ -79,7 +79,7 @@ public class HttpClientTest {
 		given(configuration.localNameserverAddress()).willReturn(localNameserverAddress);
 		given(configuration.nameservers()).willReturn(DnsServerAddresses.defaultAddresses());
 		
-		client.configurationLoading(null);
+		client.on((ConfigurationLoading)null);
 		
 		verify(bootstrap).group(group);
 		verify(bootstrap).handler(initializer);

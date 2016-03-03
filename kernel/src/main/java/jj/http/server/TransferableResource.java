@@ -30,7 +30,7 @@ import jj.resource.FileResource;
  * @author jason
  *
  */
-public interface TransferableResource extends FileResource, ServableResource {
+public interface TransferableResource extends FileResource<Void>, ServableResource {
 	
 	FileChannel fileChannel() throws IOException;
 

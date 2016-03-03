@@ -19,15 +19,12 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.BDDMockito.isA;
-
 import jj.event.Publisher;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * validates that dependencies are handled correctly
@@ -39,13 +36,14 @@ public class AbstractResourceTest {
 
 	@Mock Publisher publisher;
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testDependencyAndLifetimeInteraction() {
 		
-		final AbstractResource base = new MyResource("", publisher);
-		final AbstractResource one = new MyResource("1", publisher);
-		final AbstractResource two = new MyResource("2", publisher);
-		final AbstractResource one_two = new MyResource("1/2", publisher);
+		final AbstractResource<Void> base = new MyResource("", publisher);
+		final AbstractResource<Void> one = new MyResource("1", publisher);
+		final AbstractResource<Void> two = new MyResource("2", publisher);
+		final AbstractResource<Void> one_two = new MyResource("1/2", publisher);
 		
 		base.addDependent(one);
 		base.addDependent(two);
@@ -64,17 +62,13 @@ public class AbstractResourceTest {
 		
 		// okay this is a little weird, i admit it
 		
-		willAnswer(new Answer<Void>() {
-
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				ResourceKilled event = (ResourceKilled)invocation.getArguments()[0];
-				base.resourceKilled(event);
-				one.resourceKilled(event);
-				two.resourceKilled(event);
-				one_two.resourceKilled(event);
-				return null;
-			}
+		willAnswer((invocation) -> {
+			ResourceKilled event = (ResourceKilled)invocation.getArguments()[0];
+			base.on(event);
+			one.on(event);
+			two.on(event);
+			one_two.on(event);
+			return null;
 		}).given(publisher).publish(isA(ResourceKilled.class));
 		
 		one_two.kill();

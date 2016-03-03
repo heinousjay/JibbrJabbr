@@ -25,7 +25,6 @@ import io.netty.handler.codec.http.HttpMethod;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -48,6 +47,7 @@ import jj.resource.ResourceSettings;
 import jj.script.ScriptError;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -66,7 +66,9 @@ public class ConfigurationSystemTest {
 	}
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.configuration).injectInstance(this);
+	public JibbrJabbrTestServer app =
+		new JibbrJabbrTestServer(ServerRoot.one, App.configuration)
+			.injectInstance(this);
 	
 	@Inject
 	private ConfigurationCollector collector;
@@ -90,24 +92,24 @@ public class ConfigurationSystemTest {
 	private LoggingConfiguration loggingConfiguration;
 	
 	volatile boolean loaded;
-	final CountDownLatch loadedLatch = new CountDownLatch(1);
+	final Latch loadedLatch = new Latch(1);
 	volatile boolean failed;
 	
 	@Listener 
-	void ConfigurationLoaded(ConfigurationLoaded configurationLoaded) {
+	void on(ConfigurationLoaded configurationLoaded) {
 		loaded = true;
 		loadedLatch.countDown();
 	}
 	
 	@Listener
-	void scriptError(ScriptError scriptError) {
+	void on(ScriptError scriptError) {
 		failed = true;
 	}
 
 	@Test
 	public void test() throws Exception {
 		if (!loaded) {
-			assertTrue("timed out waiting for load", loadedLatch.await(500, MILLISECONDS));
+			loadedLatch.await(500, MILLISECONDS);
 		}
 		assert !failed : "failed";
 		
@@ -178,7 +180,6 @@ public class ConfigurationSystemTest {
 		assertThat(loggingLevels.get("script system"), is(Level.Off));
 		assertThat(loggingLevels.get("resource system"), is(Level.Off));
 		assertThat(loggingLevels.get("server"), is(Level.Debug));
-		assertThat(loggingLevels.get("test runner"), is(Level.Debug));
 		assertThat(loggingLevels.get("script@index"), is(Level.Trace));
 		assertThat(loggingLevels.get("script@d3/index"), is(Level.Trace));
 		assertThat(loggingLevels.get("script@chat/index"), is(Level.Off));

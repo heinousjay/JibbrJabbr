@@ -32,7 +32,7 @@ import jj.util.Closer;
  *
  */
 @Singleton
-public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironment> {
+public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironment<?>> {
 	
 	private final Provider<RhinoContext> contextProvider;
 	
@@ -45,26 +45,22 @@ public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironmen
 	 * internal method, to allow continuation resumption to also involve environment-dependent
 	 * context restoration
 	 */
-	Closer enterScope(final AbstractScriptEnvironment scriptEnvironment, final PendingKey pendingKey) {
+	Closer enterScope(final AbstractScriptEnvironment<?> scriptEnvironment, final PendingKey pendingKey) {
 		
 		final Closer environmentCloser = enterScope(scriptEnvironment);
 		final Closer contextCloser = scriptEnvironment.restoreContextForKey(pendingKey);
 		
-		return new Closer() {
-			
-			@Override
-			public void close() {
-				environmentCloser.close();
-				contextCloser.close();
-			}
+		return () -> {
+			environmentCloser.close();
+			contextCloser.close();
 		};
 	}
 	
-	protected AbstractScriptEnvironment innerCurrent() {
-		return (AbstractScriptEnvironment)current();
+	protected AbstractScriptEnvironment<?> innerCurrent() {
+		return (AbstractScriptEnvironment<?>)current();
 	}
 	
-	public <T extends ScriptEnvironment> T currentAs(Class<T> environmentClass) {
+	public <T extends ScriptEnvironment<?>> T currentAs(Class<T> environmentClass) {
 		return environmentClass.cast(current());
 	}
 	
@@ -76,9 +72,6 @@ public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironmen
 	 * 
 	 * the continuation will be configured to restore the state of the script environment
 	 * on resumption
-	 * 
-	 * @param continuation
-	 * @return
 	 */
 	public ContinuationPending preparedContinuation(Continuation continuation) {
 		assert current() != null : "can't perform a continuation unless a script is in context";
@@ -92,9 +85,6 @@ public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironmen
 	/**
 	 * captures a continuation from the rhino interpreter, and stores the information
 	 * necessary for resumption
-	 * @param pendingId 
-	 * @param continuationState
-	 * @return
 	 */
 	private ContinuationPending prepareContinuation(ContinuationState continuationState) {
 		
@@ -107,16 +97,13 @@ public class CurrentScriptEnvironment extends ExecutionInstance<ScriptEnvironmen
 		}
 	}
 
-	/**
-	 * @return
-	 */
-	public RootScriptEnvironment currentRootScriptEnvironment() {
-		ScriptEnvironment current = current();
+	public RootScriptEnvironment<?> currentRootScriptEnvironment() {
+		ScriptEnvironment<?> current = current();
 		while (current instanceof ChildScriptEnvironment) {
-			current = ((ChildScriptEnvironment)current).parent();
+			current = ((ChildScriptEnvironment<?>)current).parent();
 		}
 		assert current instanceof RootScriptEnvironment : "declare your root!";
 		
-		return (RootScriptEnvironment)current;
+		return (RootScriptEnvironment<?>)current;
 	}
 }

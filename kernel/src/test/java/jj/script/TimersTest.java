@@ -20,7 +20,8 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import jj.execution.DelayedExecutor.CancelKey;
 import jj.execution.MockTaskRunner;
-import jj.resource.ResourceKey;
+import jj.resource.Location;
+import jj.resource.ResourceIdentifier;
 import jj.script.module.RootScriptEnvironment;
 import jj.util.Closer;
 
@@ -30,7 +31,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mozilla.javascript.Callable;
+import org.mozilla.javascript.Script;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+
+import java.io.IOException;
 
 /**
  * @author jason
@@ -38,30 +43,118 @@ import org.mozilla.javascript.ScriptableObject;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TimersTest {
-	
+
+	public static class RootEnvironment extends AbstractScriptEnvironment<Void> implements RootScriptEnvironment<Void> {
+
+		public RootEnvironment(Dependencies dependencies) {
+			super(dependencies);
+		}
+
+		@Override
+		public boolean needsReplacing() throws IOException {
+			return false;
+		}
+
+		@Override
+		public Scriptable scope() {
+			return null;
+		}
+
+		@Override
+		public Script script() {
+			return null;
+		}
+
+		@Override
+		public String scriptName() {
+			return null;
+		}
+
+		@Override
+		public String sha1() {
+			return null;
+		}
+
+		@Override
+		public ScriptableObject global() {
+			return null;
+		}
+
+		@Override
+		public Location moduleLocation() {
+			return null;
+		}
+	}
+
+	public static class ChildEnvironment extends AbstractScriptEnvironment<Void> implements ChildScriptEnvironment<Void> {
+
+		public ChildEnvironment(Dependencies dependencies) {
+			super(dependencies);
+		}
+
+		@Override
+		public boolean needsReplacing() throws IOException {
+			return false;
+		}
+
+		@Override
+		public ScriptEnvironment<?> parent() {
+			return null;
+		}
+
+		@Override
+		public Scriptable scope() {
+			return null;
+		}
+
+		@Override
+		public Script script() {
+			return null;
+		}
+
+		@Override
+		public String scriptName() {
+			return null;
+		}
+
+		@Override
+		public String sha1() {
+			return null;
+		}
+	}
+
 	MockTaskRunner taskRunner;
 	MockRhinoContextProvider contextProvider;
 	Timers timers;
 	
 	@Mock Callable callable;
 	@Mock ScriptableObject scope;
-	@Mock(extraInterfaces = {ChildScriptEnvironment.class}) AbstractScriptEnvironment module;
-	@Mock(extraInterfaces = {RootScriptEnvironment.class}) AbstractScriptEnvironment root;
-	@Mock ResourceKey rk;
+	@Mock ChildEnvironment child;
+	@Mock ResourceIdentifier<ChildEnvironment, Void> childIdentifier;
+	@Mock RootEnvironment root;
+	@Mock ResourceIdentifier<RootEnvironment, Void> rootIdentifier;
 	CurrentScriptEnvironment env;
 	
 	@Mock CancelKey cancelKey;
 	@Mock PendingKey pendingKey;
 
+
+	@SuppressWarnings("unchecked")
+	private void prepIdentifiers() {
+		given((ResourceIdentifier<RootEnvironment, Void>)root.identifier()).willReturn(rootIdentifier);
+		given((ResourceIdentifier<ChildEnvironment, Void>) child.identifier()).willReturn(childIdentifier);
+	}
+
 	@Before
 	public void before() {
 		taskRunner = new MockTaskRunner();
 		taskRunner.cancelKey = cancelKey;
-		given(((ChildScriptEnvironment)module).parent()).willReturn(root);
+		willReturn(root).given(((ChildScriptEnvironment<?>) child)).parent();
 		env = new CurrentScriptEnvironment(contextProvider);
-		given(root.cacheKey()).willReturn(rk);
 		
-		given(module.execute(any(Callable.class), anyVararg())).willReturn(pendingKey);
+		given(child.execute(any(Callable.class), anyVararg())).willReturn(pendingKey);
+
+		prepIdentifiers();
 		
 		timers = new Timers(taskRunner, env);
 	}
@@ -73,7 +166,7 @@ public class TimersTest {
 		}
 		
 		ScriptEnvironmentDied event = new ScriptEnvironmentDied(root);
-		timers.scriptEnvironmentDied(event);
+		timers.on(event);
 		
 		verify(cancelKey).cancel();
 	}
@@ -94,7 +187,7 @@ public class TimersTest {
 	
 	@Test
 	public void testCancelSetInterval() throws Throwable {
-		try (Closer closer = env.enterScope(module)) {
+		try (Closer closer = env.enterScope(child)) {
 			interval1.run();
 		}
 
@@ -107,7 +200,7 @@ public class TimersTest {
 	
 	@Test
 	public void testCancelSetTimeout() throws Throwable {
-		try (Closer closer = env.enterScope(module)) {
+		try (Closer closer = env.enterScope(child)) {
 			timeout1.run();
 		}
 		
@@ -151,7 +244,7 @@ public class TimersTest {
 	};
 	
 	private void testRun(Runnable r, long delay, boolean repeat, Object...args) throws Throwable {
-		try (Closer closer = env.enterScope(module)) {
+		try (Closer closer = env.enterScope(child)) {
 			r.run();
 		}
 		assertThat(taskRunner.firstTaskDelay(), is(delay));
@@ -165,7 +258,7 @@ public class TimersTest {
 		
 		assertThat(taskRunner.taskWillRepeat(task), is(repeat));
 		
-		verify(module).execute(callable, args);
+		verify(child).execute(callable, args);
 	}
 
 }

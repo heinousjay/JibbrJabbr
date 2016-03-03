@@ -35,23 +35,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceCreatorsTest {
 	
-	@Mock SimpleResourceCreator<? extends AbstractResource> creator;
+	@Mock SimpleResourceCreator<? extends AbstractResource<?>, ?> creator;
 	
-	Map<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>>
+	Map<Class<? extends AbstractResource<?>>, SimpleResourceCreator<? extends AbstractResource<?>, ?>>
 		resourceCreators = new HashMap<>();
 
 	@Test
 	public void testKnownResourceTypeNames() {
 		resourceCreators.put(StaticResource.class, creator);
 		resourceCreators.put(Sha1Resource.class, creator);
-		resourceCreators.put(AbstractResource.class, creator);
 		
 		ResourceCreators rc = new ResourceCreators(resourceCreators);
 		
 		// contains here, because order matters
 		assertThat(rc.knownResourceTypeNames(), contains(
 			"jj.http.server.resource.StaticResource",
-			"jj.resource.AbstractResource",
 			"jj.resource.Sha1Resource"
 		));
 	}

@@ -26,8 +26,6 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Map.Entry;
 
-import jj.resource.Resource;
-
 /**
  * @author jason
  *
@@ -108,9 +106,9 @@ public interface HttpServerResponse {
 	 * @param resource
 	 * @return
 	 */
-	HttpServerResponse sendNotModified(Resource resource);
+	HttpServerResponse sendNotModified(ServableResource resource);
 
-	HttpServerResponse sendNotModified(Resource resource, boolean cache);
+	HttpServerResponse sendNotModified(ServableResource resource, boolean cache);
 
 	/**
 	 * Sends a 307 Temporary Redirect to the given resource, using the fully qualified
@@ -118,7 +116,7 @@ public interface HttpServerResponse {
 	 * @param resource
 	 * @return
 	 */
-	HttpServerResponse sendTemporaryRedirect(Resource resource);
+	HttpServerResponse sendTemporaryRedirect(ServableResource resource);
 
 	/**
 	 * @param e
@@ -135,8 +133,8 @@ public interface HttpServerResponse {
 	 */
 	String contentsString();
 
-	HttpServerResponse sendUncachableResource(Resource resource) throws IOException;
+	HttpServerResponse sendUncachableResource(ServableResource resource) throws IOException;
 
-	HttpServerResponse sendCachableResource(Resource resource) throws IOException;
+	HttpServerResponse sendCachableResource(ServableResource resource) throws IOException;
 
 }

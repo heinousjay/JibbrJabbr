@@ -15,7 +15,7 @@
  */
 package jj.application;
 
-import static jj.application.AppLocation.AppBase;
+import static jj.application.AppLocation.*;
 import static jj.server.ServerLocation.*;
 
 import java.nio.file.Path;
@@ -43,29 +43,59 @@ public class Application implements LocationResolver {
 	
 	@Inject
 	public Application(final Arguments arguments, final Server server) {
-		
 		basePath = arguments.get("app", Path.class, server.resolvePath(Root, "app"));
 	}
 	
-	@Override
-	public boolean pathInBase(final Path path) {
-		return path.startsWith(basePath);
+	public Path resolvePath(Location base) {
+		assert base instanceof AppLocation;
+		AppLocation location = (AppLocation)base;
+		return basePath.resolve(location.path()).normalize().toAbsolutePath();
 	}
 
 	@Override
 	public Path resolvePath(Location base, String name) {
 		assert base instanceof AppLocation;
 		AppLocation location = (AppLocation)base;
-		return basePath.resolve(location.path()).resolve(name).toAbsolutePath();
+		return basePath.resolve(location.path()).resolve(name).normalize().toAbsolutePath();
 	}
 	
 	@Override
 	public Location resolveBase(Path path) {
-		return pathInBase(path) ? AppBase : null;
+		assert path != null;
+		path = path.normalize().toAbsolutePath();
+		Location result = null;
+		if (path.startsWith(basePath)) {
+			result = AppBase;
+			if (path.startsWith(resolvePath(Private))) {
+				result = Private;
+			} else if (path.startsWith(resolvePath(Public))) {
+				result = Public;
+			} else if (path.startsWith(resolvePath(Specs))) {
+				result = Specs;
+			}
+		}
+		
+		return result;
 	}
 	
 	@Override
 	public List<Location> watchedLocations() {
 		return Collections.singletonList(AppBase);
+	}
+	
+	@Override
+	public Location specLocationFor(Location base) {
+		return base == Private ? Specs : null;
+	}
+
+	public String normalizedName(Location originalBase, Location normalizedBase, String name) {
+		assert originalBase == AppBase :
+				"originalBase is not AppBase, originalBase: " + originalBase + ", normalizedBase: " + normalizedBase + ", name: " + name;
+		assert normalizedBase instanceof AppLocation :
+				"normalizedBase is not AppLocation, originalBase: " + originalBase + ", normalizedBase: " + normalizedBase + ", name: " + name;
+		AppLocation location = (AppLocation)normalizedBase;
+		assert name.startsWith(location.path()) :
+				"did not normalize correctly? originalBase: " + originalBase + ", normalizedBase: " + normalizedBase + ", name: " + name;
+		return name.substring(location.path().length());
 	}
 }

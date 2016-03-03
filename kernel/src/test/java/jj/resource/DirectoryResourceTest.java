@@ -39,14 +39,14 @@ public class DirectoryResourceTest {
 		String name = "helpers";
 		Path path = Base.appPath().resolve(name);
 		
-		DirectoryResource r = new DirectoryResource(new MockAbstractResourceDependencies(base, name), path);
+		DirectoryResource r = new DirectoryResource(new MockAbstractResourceDependencies(DirectoryResource.class, base, name), path);
 		
 		assertThat(r, is(notNullValue()));
 
 		name = "internal";
 		path = Base.appPath().resolve(name);
 		
-		r = new DirectoryResource(new MockAbstractResourceDependencies(base, name), path);
+		r = new DirectoryResource(new MockAbstractResourceDependencies(DirectoryResource.class, base, name), path);
 		
 		assertThat(r, is(notNullValue()));
 
@@ -54,17 +54,17 @@ public class DirectoryResourceTest {
 		path = Base.appPath().resolve(name);
 		
 		try {
-			new DirectoryResource(new MockAbstractResourceDependencies(base, name), path);
+			new DirectoryResource(new MockAbstractResourceDependencies(DirectoryResource.class, base, name), path);
 			fail();
-		} catch (NoSuchResourceException nsre) {}
+		} catch (NoSuchResourceException nsre) { /* empty */ }
 
 		name = "blank.gif";
 		path = Base.appPath().resolve(name);
 		
 		try {
-			new DirectoryResource(new MockAbstractResourceDependencies(base, name), path);
+			new DirectoryResource(new MockAbstractResourceDependencies(DirectoryResource.class, base, name), path);
 			fail();
-		} catch (NoSuchResourceException nsre) {}
+		} catch (NoSuchResourceException nsre) { /* empty */ }
 		
 	}
 

@@ -24,9 +24,8 @@ import javax.inject.Singleton;
 import jj.application.AppLocation;
 import jj.application.Application;
 import jj.http.server.ServableResource;
-import jj.http.server.resource.StaticResource;
 import jj.http.server.uri.URIMatch;
-import jj.resource.ResourceFinder;
+import jj.resource.ServableLoader;
 
 /**
  * <p>
@@ -44,15 +43,12 @@ class CssReferenceVersionProcessor {
 	private static final Pattern ABSOLUTE = Pattern.compile("^(?:https?:)?//");
 
 	private final Application application;
-	private final ResourceFinder resourceFinder;
+	private final ServableLoader servableLoader;
 	
 	@Inject
-	CssReferenceVersionProcessor(
-		final Application application,
-		final ResourceFinder resourceFinder
-	) {
+	CssReferenceVersionProcessor(Application application, ServableLoader servableLoader) {
 		this.application = application;
-		this.resourceFinder = resourceFinder;
+		this.servableLoader = servableLoader;
 	}
 
 	
@@ -62,20 +58,19 @@ class CssReferenceVersionProcessor {
 	}
 	
 	private String fixUrls(final String css, final StylesheetResource resource) {
-		return doReplacement(css, resource, URL, "url($1", "$1)", StaticResource.class);
+		return doReplacement(css, resource, URL, "url($1", "$1)");
 	}
 	
 	private String fixImports(final String css, final StylesheetResource resource) {
-		return doReplacement(css, resource, IMPORT, "@import $1", "$1", StylesheetResource.class);
+		return doReplacement(css, resource, IMPORT, "@import $1", "$1");
 	}
 	
 	private String doReplacement(
-		final String css,
-		final StylesheetResource resource,
-		final Pattern pattern,
-		final String prefix,
-		final String suffix,
-		final Class<? extends ServableResource> type
+		String css,
+		StylesheetResource resource,
+		Pattern pattern,
+		String prefix,
+		String suffix
 	) {
 		// yuck.  the API was never updated
 		StringBuffer sb = new StringBuffer();
@@ -89,17 +84,18 @@ class CssReferenceVersionProcessor {
 				if (replacement.startsWith("/")) {
 					name = replacement.substring(1);
 				} else {
-					name = application.resolvePath(AppLocation.AppBase, "")
+					name = application.resolvePath(AppLocation.Public, "") // Public!
 						.relativize(resource.path().resolveSibling(replacement))
 						.normalize()
 						.toString();
 				
 				}
-				ServableResource dependency = resourceFinder.loadResource(type, AppLocation.AppBase, name);
+				URIMatch uriMatch = new URIMatch("/" + name);
+				
+				ServableResource dependency = servableLoader.loadResource(uriMatch);
 				
 				if (dependency != null) {
 					dependency.addDependent(resource);
-					URIMatch uriMatch = new URIMatch("/" + name);
 					if (!uriMatch.versioned) {
 						// we only want to replace uris that weren't already versioned
 						replacement = dependency.serverPath();

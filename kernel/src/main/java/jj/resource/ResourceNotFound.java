@@ -23,8 +23,8 @@ import org.slf4j.Logger;
  */
 public class ResourceNotFound extends ResourceEvent {
 	
-	public ResourceNotFound(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
-		super(resourceClass, base, name, arguments);
+	public <T extends Resource<A>, A> ResourceNotFound(ResourceIdentifier<T, A> resourceIdentifier) {
+		super(resourceIdentifier);
 	}
 	
 	@Override
@@ -33,7 +33,8 @@ public class ResourceNotFound extends ResourceEvent {
 	}
 	
 	@Override
-	public void describeTo(Logger logger) {
-		logger.trace("{} - {} at {}", description(), resourceClass, name);
+	public void describeTo(Logger logger)
+	{
+		logger.trace("{} - {}", description(), identifier);
 	}
 }

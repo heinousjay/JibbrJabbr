@@ -55,7 +55,7 @@ public class ServerEventScriptBridgeTest {
 	
 	@InjectMocks ServerEventScriptBridge sesb;
 	
-	@Mock ScriptEnvironment se;
+	@Mock ScriptEnvironment<?> se;
 	@Mock Callable callable1;
 	@Mock Callable callable2;
 	
@@ -70,7 +70,7 @@ public class ServerEventScriptBridgeTest {
 	public void before() {
 		taskRunner = new MockTaskRunner();
 		
-		given(env.current()).willReturn(se);
+		willReturn(se).given(env).current();
 		// this is really just to return something
 		// javac seems to only like this method.  annoying!
 		given(injector.getInstance((Class<? extends ServerEventCallableInvoker>)any(Class.class))).willAnswer(i -> seci);

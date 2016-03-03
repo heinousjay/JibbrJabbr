@@ -30,9 +30,4 @@ public abstract class ServerTask extends DelayedTask<ServerExecutor> {
 	public ServerTask(String name) {
 		super(name);
 	}
-
-	@Override
-	protected ServerExecutor findExecutor(ExecutorFinder executors) {
-		return executors.ofType(ServerExecutor.class);
-	}
 }

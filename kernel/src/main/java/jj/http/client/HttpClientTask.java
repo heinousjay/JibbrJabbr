@@ -24,15 +24,15 @@ import jj.execution.JJTask;
  * @author jason
  *
  */
-public abstract class HttpClientTask extends JJTask {
+public abstract class HttpClientTask extends JJTask<HttpClientNioEventLoopGroup> {
 
 	public HttpClientTask(String name) {
 		super(name);
 	}
 
 	@Override
-	protected final void addRunnableToExecutor(ExecutorFinder executors, Runnable runnable) {
-		executors.ofType(HttpClientNioEventLoopGroup.class).execute(runnable);
+	protected final void addRunnableToExecutor(HttpClientNioEventLoopGroup executor, Runnable runnable) {
+		executor.execute(runnable);
 	}
 
 }

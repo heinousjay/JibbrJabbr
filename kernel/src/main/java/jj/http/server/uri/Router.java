@@ -59,7 +59,7 @@ public class Router {
 	}
 	
 	@Listener
-	void configurationLoaded(ConfigurationLoaded configurationLoaded) {
+	void on(ConfigurationLoaded configurationLoaded) {
 		taskRunner.execute(new ServerTask("parsing routing configuration") {
 			
 			@Override

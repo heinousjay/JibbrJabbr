@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import jj.execution.ServerTask;
 import jj.execution.TaskRunner;
 import io.netty.buffer.ByteBuf;
-import io.netty.util.ByteProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -71,7 +70,7 @@ class TelnetConnectionHandler extends SimpleChannelInboundHandler<ByteBuf> {
 		AwaitingClientNegotiation,
 		AwaitingWillTransmitBinary,
 		AwaitingWillNegotiateCharset,
-		Done; // technically not a state
+		Done // technically not a state
 	}
 	
 	private final TaskRunner taskRunner;
@@ -155,15 +154,10 @@ class TelnetConnectionHandler extends SimpleChannelInboundHandler<ByteBuf> {
 	
 	private void dumpBuffer(String message, ByteBuf buffer) {
 		System.out.println(message);
-		buffer.forEachByte(new ByteProcessor() {
-			
-			@Override
-			public boolean process(byte value) throws Exception {
-				// TODO Auto-generated method stub
-				System.out.print(Integer.toHexString(((int)value) & 255));
-				System.out.print(" ");
-				return true;
-			}
+		buffer.forEachByte(value -> {
+			System.out.print(Integer.toHexString(((int)value) & 255));
+			System.out.print(" ");
+			return true;
 		});
 		System.out.println(); // and linebreak
 	}

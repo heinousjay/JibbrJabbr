@@ -21,8 +21,7 @@ import java.util.Iterator;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.ResourceKey;
-import jj.resource.ResourceName;
+import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.ScriptThread;
 
@@ -30,7 +29,7 @@ import jj.script.ScriptThread;
  * @author jason
  *
  */
-public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvironment implements WebSocketConnectionHost {
+public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvironment<Void> implements WebSocketConnectionHost {
 	
 	@Singleton
 	public static class AbstractWebSocketConnectionHostDependencies {
@@ -50,14 +49,12 @@ public abstract class AbstractWebSocketConnectionHost extends AbstractScriptEnvi
 			final AbstractResourceDependencies abstractResourceDependencies,
 			final AbstractScriptEnvironmentDependencies abstractScriptEnvironmentDependencies,
 			final AbstractWebSocketConnectionHostDependencies abstractWebSocketConnectionHostDependencies,
-			final ResourceKey cacheKey,
-			final @ResourceName String name
+			final ResourceIdentifier<?, ?> identifier
 		) {
 			super(
 				abstractResourceDependencies,
 				abstractScriptEnvironmentDependencies,
-				cacheKey,
-				name
+				identifier
 			);
 			
 			this.abstractWebSocketConnectionHostDependencies = abstractWebSocketConnectionHostDependencies;

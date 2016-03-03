@@ -1,0 +1,24 @@
+@import "test.css";
+@import "http://example.com/something.css";
+.box-icon {
+  background-image: url(images/box-icon.txt);
+}
+.rox-icon {
+  background-image: url("images/other/rox-icon.txt") no-repeat 1% 25%;
+}
+.sox-icon {
+  background-image: url('images/./sox-icon.txt');
+}
+.sox-icon2 {
+  background-image: url('/images/sox-icon.txt');
+}
+.warning-icon {
+  background-image: url(not-found-thing.jpg);
+}
+.fqdn-icon {
+  background-image: url(http://example.com/absolute/path);
+}
+
+body { background: url('https://www.example.com/pinkish.png') }
+
+li { list-style: url("//www.example.com/redball.png") disc }

@@ -36,14 +36,12 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import jj.AnswerWithSelf;
 import jj.document.DocumentScriptEnvironment;
 import jj.http.server.HttpServerResponse;
 import jj.http.server.uri.URIMatch;
-import jj.http.server.websocket.WebSocketConnectionHost;
-import jj.http.server.websocket.WebSocketConnectionMaker;
-import jj.http.server.websocket.WebSocketFrameHandler;
-import jj.http.server.websocket.WebSocketFrameHandlerCreator;
 import jj.resource.ResourceFinder;
 
 import org.junit.Before;
@@ -70,7 +68,7 @@ public class WebSocketConnectionMakerTest {
 	@Mock Channel channel;
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	@Mock ChannelFuture channelFuture;
-	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
+	@Captor ArgumentCaptor<GenericFutureListener<Future<Void>>> futureListenerCaptor;
 	@Mock FullHttpRequest request;
 	HttpServerResponse response;
 	@Mock WebSocketServerHandshakerFactory handshakerFactory;
@@ -84,6 +82,8 @@ public class WebSocketConnectionMakerTest {
 	Set<Class<? extends WebSocketConnectionHost>> webSocketConnectionHosts;
 	
 	WebSocketConnectionMaker wscm;
+	
+	public interface TestWebSocketConnectionHost extends WebSocketConnectionHost {}
 
 	@Before
 	public void before() {
@@ -91,7 +91,7 @@ public class WebSocketConnectionMakerTest {
 		response = mock(HttpServerResponse.class, AnswerWithSelf.ANSWER_WITH_SELF);
 		
 		webSocketConnectionHosts = new HashSet<>();
-		webSocketConnectionHosts.add(WebSocketConnectionHost.class);
+		webSocketConnectionHosts.add(TestWebSocketConnectionHost.class);
 		webSocketConnectionHosts.add(DocumentScriptEnvironment.class);
 		
 		wscm = new WebSocketConnectionMaker(handlerCreator, resourceFinder, ctx, request, response, handshakerFactory, webSocketConnectionHosts);

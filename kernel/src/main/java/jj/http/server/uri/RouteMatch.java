@@ -49,12 +49,6 @@ public class RouteMatch {
 	}
 
 	public String toString() {
-		return new StringBuilder("RouteMatch(\n")
-			.append("  uriMatch=").append(uriMatch).append("\n")
-			.append("  route=").append(route).append("\n")
-			.append("  routes=").append(routes).append("\n")
-			.append("  params=").append(params).append("\n")
-			.append(")")
-			.toString();
+		return String.format("RouteMatch(%n  uriMatch=%s%n  route=%s%n  routes=%s%n  params=%s%n)", uriMatch, route, routes, params);
 	}
 }

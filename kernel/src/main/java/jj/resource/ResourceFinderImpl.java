@@ -1,14 +1,20 @@
 package jj.resource;
 
-import java.io.IOException;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import jj.event.Publisher;
 import jj.execution.CurrentTask;
+import jj.logging.Warning;
+import jj.util.Closer;
 
 /**
  * coordinates access to the resource cache for the outside
@@ -19,142 +25,140 @@ import jj.execution.CurrentTask;
 @Singleton
 class ResourceFinderImpl implements ResourceFinder {
 	
-	private final ConcurrentMap<ResourceKey, ResourceTask> resourcesInProgress = new ConcurrentHashMap<>();
+	private final ConcurrentMap<ResourceIdentifier<?, ?>, ResourceTask> resourcesInProgress =
+		new ConcurrentHashMap<>(16, 0.75f, 4);
 
 	private final ResourceCache resourceCache;
-	
-	private final ResourceWatchService resourceWatchService;
 	
 	private final Publisher publisher;
 	
 	private final CurrentTask currentTask;
+
+	private final ResourceIdentifierMaker resourceIdentifierMaker;
 	
 	@Inject
 	ResourceFinderImpl(
-		final ResourceCache resourceCache,
-		final ResourceWatchService resourceWatchService,
-		final Publisher publisher,
-		final CurrentTask currentTask
+		ResourceCache resourceCache,
+		Publisher publisher,
+		CurrentTask currentTask,
+	    ResourceIdentifierMaker resourceIdentifierMaker
 	) {
 		this.resourceCache = resourceCache;
-		this.resourceWatchService = resourceWatchService;
 		this.publisher = publisher;
 		this.currentTask = currentTask;
+		this.resourceIdentifierMaker = resourceIdentifierMaker;
 	}
 	
 	@Override
-	public <T extends Resource> T findResource(
-		final Class<T> resourceClass,
-		Location locations,
-		String name,
-		Object... args
-	) {
-		T result = null;
-		
-		for (Location base : locations.locations()) {
-			result = result == null ?
-				resourceClass.cast(resourceCache.get(resourceCache.getCreator(resourceClass).resourceKey(base, name, args))) :
-				result;
-		}
-		
-		return result;
+	public <T extends Resource<Void>> T findResource(Class<T> resourceClass, Location location, String name) {
+		return findResource(resourceIdentifierMaker.make(resourceClass, location, name, null));
+	}
+	
+	@Override
+	public <T extends Resource<A>, A> T findResource(Class<T> resourceClass, Location location, String name, A argument) {
+		return findResource(resourceIdentifierMaker.make(resourceClass, location, name, argument));
+	}
+
+	@Override
+	public <T extends Resource<A>, A> T findResource(ResourceIdentifier<T, A> identifier) {
+		return resourceIdentifiers(identifier).stream()
+			.map(resourceCache::get)
+			.filter(r -> r != null)
+			.findFirst()
+			.orElse(null);
+	}
+
+	@Override
+	@ResourceThread
+	public <T extends Resource<Void>> T loadResource(Class<T> resourceClass, Location location, String name) {
+		return loadResource(resourceIdentifierMaker.make(resourceClass, location, name, null));
 	}
 	
 	@Override
 	@ResourceThread
-	public <T extends Resource> T loadResource(
-		final Class<T> resourceClass,
-		Location bundle,
-		String name,
-		Object...arguments
-	) {
+	public <T extends Resource<A>, A> T loadResource(Class<T> resourceClass, Location location, String name, A argument) {
+		return loadResource(resourceIdentifierMaker.make(resourceClass, location, name, argument));
+	}
+
+	@Override
+	@ResourceThread
+	public <T extends Resource<A>, A> T loadResource(ResourceIdentifier<T, A> identifier) {
+
 		assert currentTask.currentIs(ResourceTask.class) : "Can only call loadResource from a ResourceTask";
-		
-		ResourceCreator<T> resourceCreator = resourceCache.getCreator(resourceClass);
-		
-		assert resourceCreator != null : "no ResourceCreator for " + resourceClass;
-		T result = null;
-		
-		for (Location base : bundle.locations()) {
-		
-			ResourceKey cacheKey = resourceCreator.resourceKey(base, name, arguments);
-			acquire(cacheKey);
-			try {
-				result = resourceClass.cast(resourceCache.get(cacheKey));
-				if (result == null) {
-					createResource(base, name, resourceCreator, cacheKey, arguments);
-				} else if (((AbstractResource)result).isObselete()) {
-					replaceResource(base, name, resourceCreator, result, cacheKey, arguments);
-				}
-				result = resourceClass.cast(resourceCache.get(cacheKey));
-			
-			} catch (Exception e) {
-				publisher.publish(new ResourceError(resourceClass, base, name, arguments, e));
-			} finally {
-				release(cacheKey);
+
+		try (Closer ignored = acquire(identifier)) {
+
+			T resource = findResource(identifier);
+			if (resource == null) {
+				resource = resourceIdentifiers(identifier).stream()
+					.map(this::createResource)
+					.filter(r -> r != null)
+					.findFirst()
+					.orElse(null);
 			}
-			
-			if (result != null) {
-				break;
-			}
+
+			return resource;
+
+		} catch (InterruptedException ie) {
+			// this is a shutdown
 		}
-		
-		return result;
+
+		return null;
 	}
-	
-	private void acquire(ResourceKey slot) {
-		ResourceTask owner = resourcesInProgress.putIfAbsent(slot, currentTask.currentAs(ResourceTask.class));
+
+	private <T extends Resource<A>, A> T createResource(ResourceIdentifier<T, A> identifier) {
+		ResourceCreator<T, A> creator = findCreator(identifier);
+
+		try {
+			T resource = creator.create(identifier.base, identifier.name, identifier.argument);
+
+			// resource not found!
+			if (resource == null) {
+				publisher.publish(new ResourceNotFound(identifier));
+				// try to add it to the cache.  shouldn't be in there!
+				// if it isn't, tell the world we loaded a new resource
+			} else if (resourceCache.putIfAbsent(resource) == null) {
+				publisher.publish(new ResourceLoaded(resource));
+			} else {
+				publisher.publish(new Warning("Resource identified by {} was created but already in the cache!"));
+			}
+		} catch (Exception e) {
+			publisher.publish(new ResourceError(identifier, e));
+		}
+
+		// return whatever is in the cache
+		return resourceCache.get(identifier);
+	}
+
+	private <T extends Resource<A>, A>  ResourceCreator<T, A> findCreator(ResourceIdentifier<T, A> identifier) {
+		ResourceCreator<T, A> resourceCreator = resourceCache.getCreator(identifier.resourceClass);
+		assert resourceCreator != null : "no ResourceCreator for " + identifier.resourceClass;
+		return resourceCreator;
+	}
+
+	/**
+	 * Converts a resource identifier with a list of locations into a list
+	 * of resource identifiers with one location apiece
+	 */
+	private <T extends Resource<A>, A> List<ResourceIdentifier<T, A>> resourceIdentifiers(ResourceIdentifier<T, A> identifier) {
+		List<ResourceIdentifier<T, A>> attempts;
+		if (identifier.base.locations().size() > 1) {
+			attempts = identifier.base.locations().stream().map(
+				location -> resourceIdentifierMaker.make(identifier.resourceClass, location, identifier.name, identifier.argument)
+			).collect(Collectors.toList());
+		} else {
+			attempts = Collections.singletonList(identifier);
+		}
+		return attempts;
+	}
+
+	private Closer acquire(ResourceIdentifier<?, ?> identifier) throws InterruptedException {
+		ResourceTask owner = resourcesInProgress.putIfAbsent(identifier, currentTask.currentAs(ResourceTask.class));
 		if (owner != null) {
-			owner.await();
-		}
-	}
-	
-	private void release(ResourceKey slot) {
-		resourcesInProgress.remove(slot, currentTask.currentAs(ResourceTask.class));
-	}
-
-	private <T extends Resource> void replaceResource(
-		final Location base,
-		String name,
-		ResourceCreator<T> resourceCreator,
-		T result,
-		ResourceKey cacheKey,
-		Object...arguments
-	) throws IOException {
-		
-		T resource = resourceCreator.create(base, name, arguments);
-		
-		if (resource == null) {
-			publisher.publish(new ResourceNotFound(resourceCreator.type(), base, name, arguments));
-		} else {
-			if (resourceCache.replace(cacheKey, (AbstractResource)result, (AbstractResource)resource)) {
-				publisher.publish(new ResourceReloaded((AbstractResource)result));
-			} // else we wasted our time, something else replaced it already
-		} 
-	}
-
-	private <T extends Resource> void createResource(
-		Location base,
-		String name,
-		ResourceCreator<T> resourceCreator,
-		ResourceKey cacheKey,
-		Object...arguments
-	) throws IOException {
-		
-		T resource = resourceCreator.create(base, name, arguments);
-		if (resource == null) {
-			publisher.publish(new ResourceNotFound(resourceCreator.type(), base, name, arguments));
-		} else {
-			if (resourceCache.putIfAbsent(cacheKey, (AbstractResource)resource) == null) {
-				// let the world know
-				publisher.publish(new ResourceLoaded((AbstractResource)resource));
-				
-				if (resource instanceof FileSystemResource) {
-					// if this was the first time we put this in the cache,
-					// we set up a file watch on it for background reloads
-					resourceWatchService.watch((FileSystemResource)resource);
-				}
+			if (!owner.await(2, SECONDS)) {
+				return () -> {};
 			}
 		}
+		return () -> resourcesInProgress.remove(identifier, currentTask.currentAs(ResourceTask.class));
 	}
 }

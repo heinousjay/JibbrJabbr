@@ -20,22 +20,22 @@ import java.net.URI;
 
 import jj.event.Publisher;
 
-class MyResourceCreator extends SimpleResourceCreator<MyResource> {
+class MyResourceCreator extends SimpleResourceCreator<MyResource, Void> {
 	
 	private final Publisher publisher;
 	
 	MyResourceCreator(Publisher publisher) {
-		super(new Dependencies(null, null));
+		super(new Dependencies(null, null, null));
 		this.publisher = publisher;
 	}
 
 	@Override
-	public MyResource create(Location base, String name, Object... args) throws IOException {
+	public MyResource create(Location base, String name, Void argument) throws IOException {
 		return new MyResource(name, publisher);
 	}
 
 	@Override
-	protected URI uri(Location base, String name, Object... args) {
+	protected URI uri(Location base, String name, Void argument) {
 		return URI.create(name);
 	}
 }

@@ -42,14 +42,14 @@ abstract class TrieNode {
 	void addRoute(Route route) {
 		if (route.uri().length() == route.index()) {
 		
-			goal = goal == null ? new LinkedHashMap<HttpMethod, Route>(3) : goal;
+			goal = goal == null ? new LinkedHashMap<>(3) : goal;
 			if (goal.containsKey(route.method())) {
 				throw new IllegalArgumentException(
 					"duplicate " + route + ", current config = " + goal
 				);
 			}
 			goal.put(route.method(), route);
-			route.setParent(this);
+			route.added();
 		
 		} else {
 

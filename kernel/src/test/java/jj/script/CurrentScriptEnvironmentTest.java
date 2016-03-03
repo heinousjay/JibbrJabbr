@@ -60,11 +60,11 @@ public class CurrentScriptEnvironmentTest {
 	
 	RhinoContext rhinoContext;
 	
-	@Mock(extraInterfaces = {RootScriptEnvironment.class}) AbstractScriptEnvironment ase;
+	@Mock(extraInterfaces = {RootScriptEnvironment.class}) AbstractScriptEnvironment<?> ase;
 	
 	@Mock(extraInterfaces = {RootScriptEnvironment.class}) WebSocketConnectionHost host;
 	
-	@Mock ChildScriptEnvironment child;
+	@Mock ChildScriptEnvironment<?> child;
 	
 	@Mock ContinuationPending continuationPending;
 	
@@ -118,14 +118,14 @@ public class CurrentScriptEnvironmentTest {
 	@Test
 	public void testCurrentRootScriptEnvironment() {
 		
-		given(child.parent()).willReturn((ScriptEnvironment)host);
+		willReturn(host).given(child).parent();
 		
 		try (Closer closer = cse.enterScope(child)) {
-			assertThat(cse.currentRootScriptEnvironment(), is((ScriptEnvironment)host));
+			assertThat(cse.currentRootScriptEnvironment(), is(host));
 		}
 		
 		try (Closer closer = cse.enterScope(ase)) {
-			assertThat(cse.currentRootScriptEnvironment(), is((ScriptEnvironment)ase));
+			assertThat(cse.currentRootScriptEnvironment(), is(ase));
 		}
 		
 	}

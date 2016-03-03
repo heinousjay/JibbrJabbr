@@ -23,8 +23,6 @@ public interface ContinuationResumer {
 	
 	/**
 	 * Resume a continuation, for use by code that constructs its own ContinuationPendingKey, such as from a network message
-	 * @param pendingKey
-	 * @param result
 	 */
 	void resume(PendingKey pendingKey, Object result);
 }

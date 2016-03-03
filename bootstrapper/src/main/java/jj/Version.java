@@ -16,9 +16,10 @@
 package jj;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,81 +30,126 @@ import java.util.regex.Pattern;
  * @author Jason Miller
  *
  */
-public abstract class Version {
+public class Version {
 	
 	/** The name of the system */
-	protected static final String name;
+	private final String name;
 	
 	/** The full version of the system */
-	protected static final String version;
+	private final String version;
 	
 	/** The major version of the system */
-	protected static final int major;
+	private final int major;
 	
 	/** The minor version of the system */
-	protected static final int minor;
+	private final int minor;
 	
 	/** Flag indicating if this is a snapshot */
-	protected static final boolean snapshot;
+	private final boolean snapshot;
 	
 	/** name of the repository branch for this build version */
-	protected static final String branchName;
+	private final String branchName;
 	
 	/** user name of the person who created the commit for this build version */
-	protected static final String commitUserName;
+	private final String commitUserName;
 	
 	/** email address of the person who created the commit for this build version */
-	protected static final String commitUserEmail;
+	private final String commitUserEmail;
 	
 	/** id of the commit for this build version */
-	protected static final String commitId;
+	private final String commitId;
 	
 	/** description of the commit for this build version */
-	protected static final String commitDescription;
+	private final String commitDescription;
 	
 	/** date and time of the commit for this build version */
-	protected static final Date commitDate;
+	private final Instant commitDate; 
 	
-	static {
+	Version() {
 		// we do things this way to avoid depending on any jj internal classes in
 		// order to create these values
-		
-		
 		try (BufferedReader r = new BufferedReader(
-				new InputStreamReader(
-					Version.class.getResourceAsStream("VERSION"), StandardCharsets.UTF_8
-				)
-			)
+			new InputStreamReader(Version.class.getResourceAsStream("VERSION"), StandardCharsets.UTF_8)
+		)
 		) {
 		
-		name = r.readLine();
-		version = r.readLine();
-		
-		Pattern versionParser = Pattern.compile("(\\d*)\\.(\\d*)(-SNAPSHOT)?");
-		
-		Matcher matcher = versionParser.matcher(version);
-		matcher.matches();
-		major = Integer.parseInt(matcher.group(1));
-		minor = Integer.parseInt(matcher.group(2));
-		snapshot = matcher.group(3) != null;
-		
-		branchName = r.readLine();
-		
-		commitUserName = r.readLine();
-		commitUserEmail = r.readLine();
-		commitId = r.readLine();
-		commitDescription = r.readLine();
-		commitDate = new Date(Long.parseLong(r.readLine()));
-
-
+			name = r.readLine();
+			version = r.readLine();
 			
-		} catch (Exception e) {
+			Pattern versionParser = Pattern.compile("(\\d*)\\.(\\d*)(-SNAPSHOT)?");
+			
+			Matcher matcher = versionParser.matcher(version);
+			if (matcher.matches()) {
+				major = Integer.parseInt(matcher.group(1));
+				minor = Integer.parseInt(matcher.group(2));
+				snapshot = matcher.group(3) != null;
+			} else {
+				major = 0;
+				minor = 0;
+				snapshot = true;
+			}
+			
+			branchName = r.readLine();
+			
+			commitUserName = r.readLine();
+			commitUserEmail = r.readLine();
+			commitId = r.readLine();
+			commitDescription = r.readLine();
+			
+			Instant candidate;
+			try {
+				candidate = Instant.ofEpochMilli(Long.parseLong(r.readLine()));
+			} catch (Exception e) {
+				candidate = Instant.EPOCH;
+			}
+			commitDate = candidate;
+			
+		} catch (IOException e) {
 			throw new AssertionError("MY JAR IS BROKEN", e);
 		}
 	}
 	
-	public abstract String name();
-	public abstract String branchName();
-	public abstract String version();
-	public abstract String commitId();
+	public String name() {
+		return name;
+	}
+	
+	public String version() {
+		return version;
+	}
+	
+	public int major() {
+		return major;
+	}
+	
+	public int minor() {
+		return minor;
+	}
+	
+	public boolean snapshot() {
+		return snapshot;
+	}
+	
+	public String branchName() {
+		return branchName;
+	}
+	
+	public String commitId() {
+		return commitId;
+	}
+	
+	public String commitUserName() {
+		return commitUserName;
+	}
+	
+	public String commitUserEmail() {
+		return commitUserEmail;
+	}
+	
+	public String commitDescription() {
+		return commitDescription;
+	}
+	
+	public Instant commitDate() {
+		return commitDate;
+	}
 }

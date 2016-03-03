@@ -31,6 +31,7 @@ public class CssModule extends JJModule {
 		bindCreationOf(LessResource.class).to(LessResourceCreator.class);
 		bindCreationOf(StylesheetResource.class).to(StylesheetResourceCreator.class);
 		bindConfiguration(LessConfiguration.class);
+		bindLoggedEventsAnnotatedWith(LessLogger.class).toLogger(LessLogger.NAME);
 	}
 
 }

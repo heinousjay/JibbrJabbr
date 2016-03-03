@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,9 +32,7 @@ import javax.inject.Inject;
 import jj.App;
 import jj.ServerRoot;
 import jj.http.server.EmbeddedHttpRequest;
-import jj.http.server.EmbeddedHttpResponse;
 import jj.http.server.EmbeddedHttpServer;
-import jj.http.server.EmbeddedHttpServer.ResponseReady;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -78,7 +75,7 @@ public class BasicServingTest {
 	
 	@Rule
 	public JibbrJabbrTestServer app = 
-		new JibbrJabbrTestServer(ServerRoot.one, App.one)
+		new JibbrJabbrTestServer(ServerRoot.one, App.app1)
 		.verifying()
 		//.recording()
 		.injectInstance(this);
@@ -89,31 +86,33 @@ public class BasicServingTest {
 	
 	private void runBasicStressTest(final int timeout, final int totalClients, final List<String> uris) throws Throwable {
 		final AssertionError error = new AssertionError("failure!");
-		final CountDownLatch latch = new CountDownLatch(totalClients);
+		final Latch latch = new Latch(totalClients);
 		for (int i = 0; i < totalClients; ++i) {
 			String uri = uris.get(i % uris.size());
-			server.request(new EmbeddedHttpRequest(uri), new ResponseReady() {
-				
-				@Override
-				public void ready(EmbeddedHttpResponse response) throws Exception {
-					try {
-						trace.mode().traceEvent(uri, response.bodyContentAsBytes());
-					} catch (Throwable t) {
-						error.addSuppressed(t);
-					} finally {
-						latch.countDown();
-					}
+			server.request(new EmbeddedHttpRequest(uri), response -> {
+				try {
+					trace.mode().traceEvent(uri, response.bodyContentAsBytes());
+				} catch (Throwable t) {
+					error.addSuppressed(t);
+				} finally {
+					latch.countDown();
 				}
 			});
 		}
-		
-		boolean succeeded = latch.await(timeout, SECONDS);
+
+		AssertionError timeoutError = null;
+
+		try {
+			latch.await(timeout, SECONDS);
+		} catch (AssertionError ae) {
+			timeoutError = ae;
+		}
 		
 		if (error.getSuppressed().length > 0) {
 			throw error;
 		}
-		if (!succeeded) {
-			throw new AssertionError("timed out");
+		if (timeoutError != null) {
+			throw timeoutError;
 		}
 	}
 	
@@ -170,24 +169,20 @@ public class BasicServingTest {
 	
 	private void poundIt(final int threadCount, final int perClientTimeout, final int perClientRequestCount) throws Exception {
 		final List<String> requests = makeAll();
-		final CountDownLatch latch = new CountDownLatch(threadCount);
+		final Latch latch = new Latch(threadCount);
 		final ExecutorService service = Executors.newFixedThreadPool(threadCount);
 	
 		final Throwable[] throwables = new Throwable[threadCount];
 		try {
 			for (int i = 0; i < threadCount; ++i) {
 				final int index = i;
-				service.submit(new Runnable() {
-					
-					@Override
-					public void run() {
-						try {
-							runBasicStressTest(perClientTimeout, perClientRequestCount, requests);
-						} catch (Throwable t) {
-							throwables[index] = t;
-						} finally {
-							latch.countDown();
-						}
+				service.submit(() -> {
+					try {
+						runBasicStressTest(perClientTimeout, perClientRequestCount, requests);
+					} catch (Throwable t) {
+						throwables[index] = t;
+					} finally {
+						latch.countDown();
 					}
 				});
 			}

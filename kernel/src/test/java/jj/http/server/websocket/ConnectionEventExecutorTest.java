@@ -15,10 +15,7 @@
  */
 package jj.http.server.websocket;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.*;
 import jj.execution.MockTaskRunner;
 import jj.http.server.websocket.ConnectionEventExecutor;
 import jj.http.server.websocket.WebSocketConnection;
@@ -53,7 +50,7 @@ public class ConnectionEventExecutorTest {
 		
 		cee = new ConnectionEventExecutor(taskRunner, new MockCurrentWebSocketConnection());
 		
-		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
+		willReturn(webSocketConnectionHost).given(connection).webSocketConnectionHost();
 	}
 	
 	@Test

@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import jj.resource.AbstractFileResource;
 
-public class ModuleResource extends AbstractFileResource {
+public class ModuleResource extends AbstractFileResource<Void> {
 
 	@Inject
 	ModuleResource(Dependencies dependencies, Path path) throws Exception {

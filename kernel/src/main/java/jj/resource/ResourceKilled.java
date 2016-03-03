@@ -23,14 +23,8 @@ package jj.resource;
  */
 public class ResourceKilled extends ResourceEvent implements ResourceCacheUpdated {
 
-	/**
-	 * @param resourceClass
-	 * @param base
-	 * @param name
-	 * @param arguments
-	 */
-	ResourceKilled(AbstractResource resource) {
-		super(resource);
+	ResourceKilled(AbstractResource<?> resource) {
+		super(resource.identifier());
 	}
 
 	@Override

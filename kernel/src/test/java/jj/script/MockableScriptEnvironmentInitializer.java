@@ -40,11 +40,11 @@ public class MockableScriptEnvironmentInitializer extends ScriptEnvironmentIniti
 
 	
 	@Override
-	public void initializeScript(AbstractScriptEnvironment se) {
+	public void initializeScript(AbstractScriptEnvironment<?> se) {
 		super.initializeScript(se);
 	}
 	
-	public void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
+	public void scriptEnvironmentInitialized(ScriptEnvironment<?> scriptEnvironment) {
 		
 	}
 }

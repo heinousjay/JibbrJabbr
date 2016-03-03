@@ -22,11 +22,6 @@ import static io.netty.handler.codec.http.HttpMethod.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.http.server.uri.Route;
-import jj.http.server.uri.RouteMatch;
-import jj.http.server.uri.RouteTrie;
-import jj.http.server.uri.URIMatch;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -105,29 +100,42 @@ public class RouteTrieTest {
 		RouteTrie rt = makeMixedUpTrie().compress();
 		checkTrie(rt);
 //		System.out.println(rt);
-//		
-//		for (int i = 0; i < 1000; ++i) {
+//
+//		// prebench
+//		for (int i = 0; i < 10000; ++i) {
 //			checkTrie(rt);
 //		}
-//		
+//
 //		long now = System.currentTimeMillis();
 //		for (int i = 0; i < 10000; ++i) {
 //			checkTrie(rt);
 //		}
 //		System.out.println(System.currentTimeMillis() - now);
-//		
+//
 //		now = System.currentTimeMillis();
 //		for (int i = 0; i < 10000; ++i) {
 //			checkTrie(rt);
 //		}
 //		System.out.println(System.currentTimeMillis() - now);
-//		
+//
 //		now = System.currentTimeMillis();
 //		for (int i = 0; i < 10000; ++i) {
 //			checkTrie(rt);
 //		}
 //		System.out.println(System.currentTimeMillis() - now);
-//		
+//
+//		now = System.currentTimeMillis();
+//		for (int i = 0; i < 30000; ++i) {
+//			checkTrie(rt);
+//		}
+//		System.out.println(System.currentTimeMillis() - now);
+//
+//		now = System.currentTimeMillis();
+//		for (int i = 0; i < 30000; ++i) {
+//			checkTrie(rt);
+//		}
+//		System.out.println(System.currentTimeMillis() - now);
+//
 //		now = System.currentTimeMillis();
 //		for (int i = 0; i < 30000; ++i) {
 //			checkTrie(rt);

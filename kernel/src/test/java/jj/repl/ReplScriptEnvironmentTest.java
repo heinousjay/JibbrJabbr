@@ -51,7 +51,7 @@ public class ReplScriptEnvironmentTest {
 	@Before
 	public void before() {
 		contextProvider = new RealRhinoContextProvider();
-		dependencies = new MockAbstractScriptEnvironmentDependencies(contextProvider, ReplScriptEnvironment.NAME);
+		dependencies = new MockAbstractScriptEnvironmentDependencies(ReplScriptEnvironment.class, ReplScriptEnvironment.NAME, contextProvider);
 		
 		given(dependencies.resourceFinder().loadResource(ScriptResource.class, Assets, ReplScriptEnvironment.BASE_REPL_SYSTEM)).willReturn(script);
 		

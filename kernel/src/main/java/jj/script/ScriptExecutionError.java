@@ -23,7 +23,7 @@ import jj.logging.Emergency;
  */
 public class ScriptExecutionError extends Emergency {
 	
-	ScriptExecutionError(final ScriptEnvironment scriptEnvironment, final Throwable t) {
+	ScriptExecutionError(final ScriptEnvironment<?> scriptEnvironment, final Throwable t) {
 		super("unexpected problem during script execution " + scriptEnvironment, t);
 	}
 }

@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.resource.ResourceEvent;
-import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.resource.ResourceNotFound;
@@ -46,33 +45,29 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	
 	private final ResourceLoader resourceLoader;
 	
-	private final ResourceFinder resourceFinder;
-	
 	private final DependsOnScriptEnvironmentInitialization initializer;
 	
 	private final ConcurrentMap<RequiredModule, Boolean> waiters = new ConcurrentHashMap<>(4);
 	
 	@Inject
 	RequiredModuleContinuationProcessor(
-		final ResourceLoader resourceLoader,
-		final ResourceFinder resourceFinder,
-		final DependsOnScriptEnvironmentInitialization initializer
+		ResourceLoader resourceLoader,
+		DependsOnScriptEnvironmentInitialization initializer
 	) {
 		this.resourceLoader = resourceLoader;
-		this.resourceFinder = resourceFinder;
 		this.initializer = initializer;
 	}
 	
-	private RequiredModule extractRequiredModule(final ResourceEvent event) {
+	private RequiredModule extractRequiredModule(ResourceEvent event) {
 		RequiredModule result = null;
-		if (event.arguments.length == 1 && event.arguments[0] instanceof RequiredModule) {
-			result = (RequiredModule)event.arguments[0];
+		if (event.argument() instanceof RequiredModule) {
+			result = (RequiredModule)event.argument();
 		}
 		return result;
 	}
 	
 	@Listener
-	void resourceNotFound(final ResourceNotFound event) {
+	void on(ResourceNotFound event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null && waiters.remove(requiredModule) != null) {
 			requiredModule.pendingKey().resume(false);
@@ -80,26 +75,26 @@ class RequiredModuleContinuationProcessor implements ContinuationProcessor {
 	}
 	
 	@Listener
-	void resourceLoaded(final ResourceLoaded event) {
+	void on(ResourceLoaded event) {
 		RequiredModule requiredModule = extractRequiredModule(event);
 		if (requiredModule != null) {
 			waiters.remove(requiredModule);
 		}
 	}
 	
-	private void loadEnvironment(final RequiredModule requiredModule) {
+	private void loadEnvironment(RequiredModule requiredModule) {
 		resourceLoader.loadResource(ModuleScriptEnvironment.class, Virtual, requiredModule.identifier(), requiredModule);
 		Boolean result = waiters.putIfAbsent(requiredModule, Boolean.TRUE);
-		assert (result == null) : "something is crossed up in the " + getClass();
+		assert (result == null);
 	}
 
 	@Override
-	public void process(final ContinuationState continuationState) {
+	public void process(ContinuationState continuationState) {
 		
 		final RequiredModule requiredModule = continuationState.continuationAs(RequiredModule.class);
 		
 		ModuleScriptEnvironment scriptEnvironment = 
-			resourceFinder.findResource(
+			resourceLoader.findResource(
 				ModuleScriptEnvironment.class,
 				Virtual,
 				requiredModule.identifier(),

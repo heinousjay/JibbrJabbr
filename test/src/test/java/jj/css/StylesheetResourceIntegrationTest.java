@@ -17,13 +17,12 @@ package jj.css;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static jj.application.AppLocation.AppBase;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import static jj.server.ServerLocation.Virtual;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 
@@ -36,6 +35,8 @@ import jj.resource.ResourceLoaded;
 import jj.resource.ResourceLoader;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -54,40 +55,58 @@ public class StylesheetResourceIntegrationTest {
 	
 	StylesheetResource stylesheet;
 	
-	CountDownLatch latch = new CountDownLatch(1);
+	Latch latch;
 	
 	@Listener
-	void resourceLoaded(ResourceLoaded event) {
-		if (event.resourceClass == StylesheetResource.class) {
-			stylesheet = resourceFinder.findResource(StylesheetResource.class, event.base, event.name);
+	void on(ResourceLoaded event) {
+		if (event.type() == StylesheetResource.class) {
+			stylesheet = resourceFinder.findResource(StylesheetResource.class, event.base(), event.name());
 			latch.countDown();
 		}
 	}
+	
+	@Before
+	public void before() {
+		stylesheet = null;
+		latch = new Latch(1);
+	}
 
-	// this test fails in eclipse. there's something funky about the classpath i need to figure out
 	@Test
 	public void testLess() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, AppBase, "less.css");
+		resourceLoader.loadResource(StylesheetResource.class, Virtual, "less.css");
 		
-		assertTrue("timed out", latch.await(2, SECONDS));
+		latch.await(2, SECONDS);
 		
 		String lessOutput = stylesheet.bytes().toString(UTF_8);
-		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css")), UTF_8);
-		System.out.println(lessOutput);
+		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css.output")), UTF_8);
+		
 		assertThat(lessOutput, is(expectedOutput));
 	}
 	
 	
 	@Test
 	public void testCss() throws Exception {
-		resourceLoader.loadResource(StylesheetResource.class, AppBase, "test.css");
+		resourceLoader.loadResource(StylesheetResource.class, Virtual, "test.css");
 		
-		assertTrue("timed out", latch.await(2, SECONDS));
+		latch.await(2, SECONDS);
 		
-		String lessOutput = stylesheet.bytes().toString(UTF_8);
-		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css")), UTF_8);
+		String cssOutput = stylesheet.bytes().toString(UTF_8);
+		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/test.css.output")), UTF_8);
 		
-		assertThat(lessOutput, is(expectedOutput));
+		assertThat(cssOutput, is(expectedOutput));
+	}
+	
+	@Test
+	public void testReplacements() throws Exception {
+		latch = new Latch(2); // we want two!
+		resourceLoader.loadResource(StylesheetResource.class, Virtual, "replacement.css");
+		
+		latch.await(2, SECONDS);
+		
+		String cssOutput = stylesheet.bytes().toString(UTF_8);
+		String expectedOutput = new String(Files.readAllBytes(Paths.get(App.css + "/replacement.css.output")), UTF_8);
+		
+		assertThat(cssOutput, is(expectedOutput));
 	}
 
 }

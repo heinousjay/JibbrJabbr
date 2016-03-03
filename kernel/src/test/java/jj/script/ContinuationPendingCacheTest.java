@@ -49,7 +49,7 @@ public class ContinuationPendingCacheTest {
 	private static final int STRIDE = 400;
 	private static final int KEY_COUNT = STRESS_LEVEL * STRIDE;
 	
-	private static final class HelperTask extends ScriptTask<ScriptEnvironment> {
+	private static final class HelperTask extends ScriptTask<ScriptEnvironment<?>> {
 
 		/** it will never run so nulls are cool!
 		 */

@@ -15,6 +15,8 @@
  */
 package jj.jasmine;
 
+import jj.configuration.Default;
+
 /**
  * @author jason
  *
@@ -24,7 +26,6 @@ public interface JasmineConfiguration {
 	/**
 	 * when a script environment is loaded, if a spec resource matching the specPattern
 	 * above is found, it is automatically run if this property is true
-	 * @return
 	 */
 	boolean autorunSpecs();
 }

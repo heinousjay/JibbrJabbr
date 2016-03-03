@@ -9,7 +9,6 @@ import static org.hamcrest.Matchers.*;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.FileTime;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,6 +29,7 @@ import jj.script.module.RequiredModule;
 import jj.script.module.ScriptResource;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,7 +47,8 @@ public class ResourceSystemIntegrationTest {
 	
 	@Inject EmbeddedHttpServer server;
 	
-	@Inject ResourceCache resourceCache;
+	@Inject
+	ResourceCache resourceCache;
 	
 	DocumentScriptEnvironment dse;
 	HtmlResource htmlResource;
@@ -73,7 +74,7 @@ public class ResourceSystemIntegrationTest {
 //		System.out.println("loadedCount = " + loadedCount);
 		try {
 			Files.walkFileTree(App.module.resolve("created"), new TreeDeleter());
-		} catch (NoSuchFileException nsfe) {}
+		} catch (NoSuchFileException nsfe) { /* empty */ }
 	}
 	
 	@Rule
@@ -88,34 +89,43 @@ public class ResourceSystemIntegrationTest {
 		
 		// validates that directory structures are created as expected
 		DirectoryResource root = finder.findResource(DirectoryResource.class, AppBase, "");
-		DirectoryResource deep = finder.findResource(DirectoryResource.class, AppBase, "deep");
-		DirectoryResource nesting = finder.findResource(DirectoryResource.class, AppBase, "deep/nesting");
+		DirectoryResource pub = finder.findResource(DirectoryResource.class, Public, "");
+		DirectoryResource pubDeep = finder.findResource(DirectoryResource.class, Public, "deep");
+		DirectoryResource priv = finder.findResource(DirectoryResource.class, Private, "");
+		DirectoryResource privDeep = finder.findResource(DirectoryResource.class, Private, "deep");
+		DirectoryResource nesting = finder.findResource(DirectoryResource.class, Private, "deep/nesting");
 		assertThat(root, is(notNullValue()));
-		assertThat(deep, is(notNullValue()));
+		assertThat(pub, is(notNullValue()));
+		//assertTrue(root.dependents().contains(pub));
+		assertThat(pubDeep, is(notNullValue()));
+		assertTrue(pub.dependents().contains(pubDeep));
+		assertThat(priv, is(notNullValue()));
+		//assertTrue(root.dependents().contains(priv));
+		assertThat(privDeep, is(notNullValue()));
 		assertThat(nesting, is(notNullValue()));
-		assertTrue(root.dependents().contains(deep));
-		assertTrue(deep.dependents().contains(nesting));
+		assertTrue(priv.dependents().contains(privDeep));
+		assertTrue(privDeep.dependents().contains(nesting));
 		
 		assertThat(server.request(new EmbeddedHttpRequest("deep/nested")).await(1, SECONDS).status().code(), is(200));
 		
 		dse = finder.findResource(DocumentScriptEnvironment.class, Virtual, "deep/nested");
-		htmlResource = finder.findResource(HtmlResource.class, AppBase, "deep/nested.html");
-		assertTrue(deep.dependents().contains(htmlResource));
+		htmlResource = finder.findResource(HtmlResource.class, Public, "deep/nested.html");
+		assertTrue(pubDeep.dependents().contains(htmlResource));
 		
 		mse1 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/module", new RequiredModule(dse, "deep/module"));
-		scriptResource1 = finder.findResource(ScriptResource.class, AppBase, "deep/module.js");
-		assertTrue(deep.dependents().contains(scriptResource1));
-		assertTrue(((AbstractResource)dse).dependents().contains(mse1));
+		scriptResource1 = finder.findResource(ScriptResource.class, Private, "deep/module.js");
+		assertTrue(privDeep.dependents().contains(scriptResource1));
+		assertTrue(((AbstractResource<?>)dse).dependents().contains(mse1));
 		
 		mse2 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/module", new RequiredModule(dse, "deep/nesting/module"));
-		scriptResource2 = finder.findResource(ScriptResource.class, AppBase, "deep/nesting/module.js");
+		scriptResource2 = finder.findResource(ScriptResource.class, Private, "deep/nesting/module.js");
 		assertTrue(nesting.dependents().contains(scriptResource2));
-		assertTrue(((AbstractResource)dse).dependents().contains(mse2));
+		assertTrue(((AbstractResource<?>)dse).dependents().contains(mse2));
 		
 		mse3 = finder.findResource(ModuleScriptEnvironment.class, Virtual, "deep/nesting/values", new RequiredModule(dse, "deep/nesting/values"));
-		jsonResource1 = finder.findResource(JSONResource.class, AppBase, "deep/nesting/values.json");
+		jsonResource1 = finder.findResource(JSONResource.class, Private, "deep/nesting/values.json");
 		assertTrue(nesting.dependents().contains(jsonResource1));
-		assertTrue(((AbstractResource)dse).dependents().contains(mse3));
+		assertTrue(((AbstractResource<?>)dse).dependents().contains(mse3));
 		
 		assertTrue(dse.alive());
 		assertTrue(htmlResource.alive());
@@ -159,7 +169,7 @@ public class ResourceSystemIntegrationTest {
 		// htmlResource are left alone in the cache, and that the
 		// modules don't load again without another request
 		
-		assertTrue("timed out", waitForCount(9 + 5 + 1));
+		waitForCount(9 + 5 + 1);
 		assertFalse("couldn't update things correctly", failed.get());
 		
 		assertFalse(scriptResource2.alive());
@@ -202,7 +212,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	// also need a delete test!
-	private void touch(FileResource resource) throws Exception {
+	private void touch(FileResource<?> resource) throws Exception {
 		FileTime originalFileTime = Files.getLastModifiedTime(resource.path());
 		FileTime newFileTime;
 		do {
@@ -216,7 +226,7 @@ public class ResourceSystemIntegrationTest {
 	// also tests out the events indirectly
 	
 	boolean countEvents = false;
-	CountDownLatch latch;
+	Latch latch;
 	AtomicInteger reloadedCount;
 	AtomicInteger killedCount;
 	AtomicInteger loadedCount;
@@ -229,7 +239,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	@Listener
-	void resourceReloaded(ResourceReloaded event) {
+	void on(ResourceReloaded event) {
 		reloadedCount.incrementAndGet();
 		if (countEvents) {
 			latch.countDown();
@@ -237,7 +247,7 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	@Listener
-	void resourceKilled(ResourceKilled event) {
+	void on(ResourceKilled event) {
 		killedCount.incrementAndGet();
 		if (countEvents) {
 			latch.countDown();
@@ -245,16 +255,16 @@ public class ResourceSystemIntegrationTest {
 	}
 	
 	@Listener
-	void resourceLoaded(ResourceLoaded event) {
+	void on(ResourceLoaded event) {
 		if (loadedCount != null) loadedCount.incrementAndGet();
 		if (countEvents) {
 			latch.countDown();
 		}
 	}
 	
-	private boolean waitForCount(int count) throws Exception {
-		latch = new CountDownLatch(count);
+	private void waitForCount(int count) throws Exception {
+		latch = new Latch(count);
 		countEvents = true;
-		return latch.await(4, SECONDS);
+		latch.await(4, SECONDS);
 	}
 }

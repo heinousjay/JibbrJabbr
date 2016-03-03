@@ -16,12 +16,12 @@
 package jj.execution;
 
 import java.lang.ref.WeakReference;
+import java.time.Clock;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 import jj.ServerLogger;
 import jj.logging.LoggedEvent;
-import jj.util.Clock;
 
 import org.slf4j.Logger;
 
@@ -44,9 +44,9 @@ class TaskTracker extends LoggedEvent implements Delayed {
 	
 	private final String name;
 	
-	private final WeakReference<JJTask> task;
+	private final WeakReference<JJTask<?>> task;
 	
-	TaskTracker(final Clock clock, final JJTask tracked) {
+	TaskTracker(final Clock clock, final JJTask<?> tracked) {
 		this.clock = clock;
 		task = new WeakReference<>(tracked);
 		name = tracked.name();
@@ -54,7 +54,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 	
 	@Override
 	public final long getDelay(TimeUnit unit) {
-		return unit.convert(maxTime - (clock.time() - enqueuedTime), TimeUnit.MILLISECONDS);
+		return unit.convert(maxTime - (clock.millis() - enqueuedTime), TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
@@ -77,17 +77,17 @@ class TaskTracker extends LoggedEvent implements Delayed {
 		executionTime = 0;
 		startTime = 0;
 		maxTime = timeoutMillis;
-		enqueuedTime = clock.time();
+		enqueuedTime = clock.millis();
 	}
 	
 	void start() {
 		assert (maxTime != 0 && startTime == 0);
-		startTime = clock.time();
+		startTime = clock.millis();
 	}
 	
 	void end() {
 		assert (startTime != 0 && executionTime == 0);
-		executionTime = clock.time() - startTime;
+		executionTime = clock.millis() - startTime;
 	}
 	
 	void endedInError() {
@@ -106,7 +106,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 		return executionTime;
 	}
 	
-	JJTask task() {
+	JJTask<?> task() {
 		return task.get();
 	}
 	
@@ -124,7 +124,7 @@ class TaskTracker extends LoggedEvent implements Delayed {
 	public void describeTo(Logger logger) {
 		if (logger.isTraceEnabled()) {
 			// i agree, this is ugly
-			JJTask task = this.task.get();
+			JJTask<?> task = task();
 			boolean logged = false;
 			if (task instanceof DelayedTask) {
 				DelayedTask<?> dTask = (DelayedTask<?>)task;

@@ -1,9 +1,9 @@
 package jj.http.server.websocket;
 
-import static org.mockito.Mockito.mock;
+import static jj.server.ServerLocation.Virtual;
 import jj.resource.MockAbstractResourceDependencies;
+import jj.resource.MockResourceIdentifierMaker;
 import jj.resource.ResourceFinder;
-import jj.resource.ResourceKey;
 import jj.script.MockAbstractScriptEnvironmentDependencies;
 import jj.script.MockRhinoContextProvider;
 
@@ -13,16 +13,17 @@ public class MockAbstractWebSocketConnectionHostDependencies extends AbstractWeb
 		extends AbstractWebSocketConnectionHost.AbstractWebSocketConnectionHostDependencies {
 		
 	}
-	
-	
 
-	public MockAbstractWebSocketConnectionHostDependencies(String name, ResourceFinder resourceFinder) {
+	public <T extends WebSocketConnectionHost> MockAbstractWebSocketConnectionHostDependencies(
+		Class<T> resourceClass,
+		String name,
+		ResourceFinder resourceFinder
+	) {
 		super(
 			new MockAbstractResourceDependencies.MockInnerAbstractResourceDependencies(resourceFinder),
 			new MockAbstractScriptEnvironmentDependencies.MockInnerAbstractScriptEnvironmentDependencies(),
 			new MockInnerAbstractWebSocketConnectionHostDependencies(),
-			mock(ResourceKey.class),
-			name
+			new MockResourceIdentifierMaker().make(resourceClass, Virtual, name)
 		);
 	}
 
@@ -30,7 +31,4 @@ public class MockAbstractWebSocketConnectionHostDependencies extends AbstractWeb
 		return ((MockAbstractScriptEnvironmentDependencies.MockInnerAbstractScriptEnvironmentDependencies)scriptEnvironmentDependencies).mockRhinoContextProvider();
 	}
 
-	public ResourceKey cacheKey() {
-		return resourceKey;
-	}
 }

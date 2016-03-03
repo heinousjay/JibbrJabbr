@@ -15,7 +15,6 @@
  */
 package jj.http.server;
 
-import static jj.application.AppLocation.*;
 import static jj.server.ServerLocation.*;
 import static org.mockito.BDDMockito.*;
 
@@ -31,6 +30,7 @@ import jj.http.server.uri.RouteMatch;
 import jj.http.server.uri.URIMatch;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoader;
+import jj.server.ServerLocation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,12 +52,11 @@ public class SimpleRouteProcessorTest {
 	static final String ZERO_TXT = "0.txt";
 	static final String UNVERSIONED_URI = "/" + ZERO_TXT;
 	static final String VERSIONED_URI = "/" + SHA1 + "/" + ZERO_TXT;
-	static final String MIME = "mime";
-	static final long LENGTH = 100L;
 	
 	@Mock ResourceFinder resourceFinder;
 	@Mock ResourceLoader resourceLoader;
 	Map<String, Class<? extends ServableResource>> servableResources;
+	Map<Class<? extends ServableResource>, RouteProcessorConfiguration> processorConfigurations;
 	
 	SimpleRouteProcessor srs;
 	
@@ -68,7 +67,9 @@ public class SimpleRouteProcessorTest {
 	
 	@Mock Promise promise;
 	
-	@Captor ArgumentCaptor<JJTask> taskCaptor;
+	@Captor ArgumentCaptor<JJTask<?>> taskCaptor;
+	
+	ServerLocation location = Root; // YEAH RIGHT!
 	
 	@Before
 	public void before() {
@@ -76,15 +77,18 @@ public class SimpleRouteProcessorTest {
 		servableResources = new HashMap<>();
 		servableResources.put(STATIC, StaticResource.class);
 		
+		processorConfigurations = new HashMap<>();
+		processorConfigurations.put(StaticResource.class, () -> location);
+		
 		given(routeMatch.resourceName()).willReturn(STATIC);
 		
 		given(request.uriMatch()).willReturn(new URIMatch("/hi/there"));
-		
+
 		given(resourceLoader.loadResource(any(), any(), anyString())).willReturn(promise);
 		
 		given(resource.sha1()).willReturn(SHA1);
 		
-		srs = new SimpleRouteProcessor(resourceFinder, resourceLoader, servableResources);
+		srs = new SimpleRouteProcessor(resourceFinder, resourceLoader, servableResources, processorConfigurations);
 	}
 	
 	@Test
@@ -102,7 +106,7 @@ public class SimpleRouteProcessorTest {
 	private void givenResourceRequest(String uri) {
 		URIMatch match = new URIMatch(uri);
 		given(request.uriMatch()).willReturn(match);
-		given(resourceLoader.findResource(StaticResource.class, AppBase.and(Assets), match.path)).willReturn(resource);
+		given(resourceLoader.findResource(StaticResource.class, location, match.path)).willReturn(resource);
 	}
 	
 	@Test

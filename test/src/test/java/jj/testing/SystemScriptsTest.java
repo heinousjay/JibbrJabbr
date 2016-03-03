@@ -26,14 +26,12 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
 import jj.App;
 import jj.JJ;
-import jj.JJModule;
 import jj.ServerRoot;
 import jj.event.Listener;
 import jj.event.Subscriber;
@@ -64,7 +62,7 @@ public class SystemScriptsTest {
 		// the cast is ugly but if i ever end up with more than 2.1 billion
 		// specs i guess addressing this will be a pleasure haha
 		
-		return (int)Files.list(in).filter(path -> { return path.toString().endsWith(".js"); }).count();
+		return (int)Files.list(in).filter(path -> path.toString().endsWith(".js")).count();
 	}
 	
 	static {
@@ -92,35 +90,31 @@ public class SystemScriptsTest {
 	@Rule
 	public JibbrJabbrTestServer server =
 		new JibbrJabbrTestServer(ServerRoot.one, App.configuration) // we use the configuration because that loads all the core configuration scripts
-			.runAllSpecs()                          // this defaults to off.  that might not survive now!
-			.injectInstance(this)                   // well, sure
-			.withModule(new JJModule() {
-				protected void configure() {
-					bindAPIModulePath(SPEC_PATH);    // and put the specs on the path
-				}
-			});
+			.runAllSpecs()                          // this way, it runs specs regardless
+			.injectInstance(this);                  // well, sure
+
 	
 	@Inject
 	ResourceLoader resourceLoader;
 	
-	final CountDownLatch testCountLatch = new CountDownLatch(total);
+	final Latch testCountLatch = new Latch(total);
 	final AtomicInteger successCount = new AtomicInteger();
 	final AtomicInteger failureCount = new AtomicInteger();
 	
 	@Listener
-	void testPassed(JasmineTestSuccess success) {
+	void on(JasmineTestSuccess success) {
 		successCount.incrementAndGet();
 		testCountLatch.countDown();
 	}
 	
 	@Listener
-	void testFailed(JasmineTestFailure failure) {
+	void on(JasmineTestFailure failure) {
 		failureCount.incrementAndGet();
 		testCountLatch.countDown();
 	}
 	
 	@Listener
-	void testErrored(JasmineTestError error) {
+	void on(JasmineTestError error) {
 		failureCount.incrementAndGet();
 		testCountLatch.countDown();
 	}
@@ -144,7 +138,7 @@ public class SystemScriptsTest {
 		load("system-properties.js");
 		load("uri-routing-configuration.js"); // loaded by configuration
 		
-		assertTrue("timed out", testCountLatch.await(total * 250, MILLISECONDS));
+		testCountLatch.await(total * 250, MILLISECONDS);
 		assertThat(failureCount.get() + " failed", failureCount.get(), is(0));
 		assertThat(successCount.get(), is(total)); // just for certainty?
 	}

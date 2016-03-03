@@ -43,27 +43,23 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	private static final class TaskOrKey {
 		private final PendingKey pendingKey;
-		private final ScriptTask<? extends ScriptEnvironment> task;
+		private final ScriptTask<? extends ScriptEnvironment<?>> task;
 		
-		TaskOrKey(final ScriptTask<? extends ScriptEnvironment> task, final PendingKey pendingKey) {
+		TaskOrKey(final ScriptTask<? extends ScriptEnvironment<?>> task, final PendingKey pendingKey) {
 			this.task = task;
 			this.pendingKey = pendingKey;
 		}
 	}
 
-	private final ThreadLocal<HashMap<ScriptEnvironment, List<TaskOrKey>>> pendingInitialization = 
-		new ThreadLocal<HashMap<ScriptEnvironment, List<TaskOrKey>>>() {
+	private final ThreadLocal<HashMap<ScriptEnvironment<?>, List<TaskOrKey>>> pendingInitialization = 
+		new ThreadLocal<HashMap<ScriptEnvironment<?>, List<TaskOrKey>>>() {
 		
 		@Override
-		protected HashMap<ScriptEnvironment, List<TaskOrKey>> initialValue() {
+		protected HashMap<ScriptEnvironment<?>, List<TaskOrKey>> initialValue() {
 			return new HashMap<>();
 		}
 	};
-	
-	/**
-	 * @param targetName
-	 * @param moduleScriptEnvironment
-	 */
+
 	@Inject
 	ScriptEnvironmentInitializer(
 		final TaskRunner taskRunner,
@@ -75,11 +71,11 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		this.publisher = publisher;
 	}
 	
-	void initializeScript(AbstractScriptEnvironment se) {
+	void initializeScript(AbstractScriptEnvironment<?> se) {
 		taskRunner.execute(new InitializerTask("initializing " + se, se));
 	}
 	
-	void scriptEnvironmentInitialized(ScriptEnvironment scriptEnvironment) {
+	void scriptEnvironmentInitialized(ScriptEnvironment<?> scriptEnvironment) {
 		List<TaskOrKey> tasksOrKeys = pendingInitialization.get().remove(scriptEnvironment);
 		if (tasksOrKeys != null) {
 			for (TaskOrKey taskOrKey : tasksOrKeys) {
@@ -94,16 +90,17 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 		}
 	}
 	
-	private List<TaskOrKey> getTaskOrKeyList(ScriptEnvironment scriptEnvironment) {
+	private List<TaskOrKey> getTaskOrKeyList(ScriptEnvironment<?> scriptEnvironment) {
 		List<TaskOrKey> taskOrKeys = pendingInitialization.get().get(scriptEnvironment);
 		if (taskOrKeys == null) {
-			pendingInitialization.get().put(scriptEnvironment, new ArrayList<TaskOrKey>());
+			pendingInitialization.get().put(scriptEnvironment, new ArrayList<>());
 			taskOrKeys = pendingInitialization.get().get(scriptEnvironment);
 		}
 		return taskOrKeys;
 	}
 	
-	public void executeOnInitialization(ScriptEnvironment scriptEnvironment, ScriptTask<? extends ScriptEnvironment> task) {
+	@Override
+	public void executeOnInitialization(ScriptEnvironment<?> scriptEnvironment, ScriptTask<? extends ScriptEnvironment<?>> task) {
 		assert isScriptThread.forScriptEnvironment(scriptEnvironment) : "only wait on script environments from their own thread!";
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(task, null));
@@ -111,24 +108,17 @@ public class ScriptEnvironmentInitializer implements DependsOnScriptEnvironmentI
 	
 	/**
 	 * register here to have a pendingKey resumed when a scriptEnvironment has transitioned to initialized
-	 * @param scriptEnvironment
-	 * @param pendingKey
 	 */
 	@Override
-	public void resumeOnInitialization(final ScriptEnvironment scriptEnvironment, final PendingKey pendingKey) {
+	public void resumeOnInitialization(final ScriptEnvironment<?> scriptEnvironment, final PendingKey pendingKey) {
 		assert isScriptThread.forScriptEnvironment(scriptEnvironment) : "only wait on script environments from their own thread!";
 		assert !scriptEnvironment.initialized() : "do not wait on scriptEnvironments that are initialized!";
 		getTaskOrKeyList(scriptEnvironment).add(new TaskOrKey(null, pendingKey));
 	}
 	
-	private class InitializerTask extends ScriptTask<AbstractScriptEnvironment> {
-		
+	private class InitializerTask extends ScriptTask<AbstractScriptEnvironment<?>> {
 
-		/**
-		 * @param name
-		 * @param scriptEnvironment
-		 */
-		protected InitializerTask(String name, AbstractScriptEnvironment scriptEnvironment) {
+		protected InitializerTask(String name, AbstractScriptEnvironment<?> scriptEnvironment) {
 			super(name, scriptEnvironment);
 		}
 		

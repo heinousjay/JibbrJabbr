@@ -37,7 +37,7 @@ public class ServerEventCallableInvokerTest {
 	
 	ServerEventCallableInvoker invoker;
 	
-	@Mock ScriptEnvironment target;
+	@Mock ScriptEnvironment<?> target;
 	@Mock Callable callable;
 	
 	@Before

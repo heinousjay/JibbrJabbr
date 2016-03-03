@@ -28,7 +28,7 @@ public class BrokenListener {
 	public int heard = 0;
 	
 	@Listener
-	public void throwAnException(Event event) throws Exception {
+	public void on(Event event) throws Exception {
 		++heard;
 		throw new Exception();
 	}

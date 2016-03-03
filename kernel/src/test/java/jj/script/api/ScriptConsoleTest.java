@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptConsoleTest {
 	
-	@Mock RootScriptEnvironment se;
+	@Mock RootScriptEnvironment<Void> se;
 	@Mock CurrentScriptEnvironment env;
 	MockPublisher publisher;
 	
@@ -47,11 +47,12 @@ public class ScriptConsoleTest {
 	
 	@Mock Logger logger;
 	
+	@SuppressWarnings("unchecked")
 	@Before
 	public void before() {
 		given(se.name()).willReturn("some/path");
-		given(env.current()).willReturn(se);
-		given(env.currentRootScriptEnvironment()).willReturn(se);
+		given((RootScriptEnvironment<Void>)env.current()).willReturn(se);
+		given((RootScriptEnvironment<Void>)env.currentRootScriptEnvironment()).willReturn(se);
 		publisher = new MockPublisher();
 		
 		sc = new ScriptConsole(env, publisher);

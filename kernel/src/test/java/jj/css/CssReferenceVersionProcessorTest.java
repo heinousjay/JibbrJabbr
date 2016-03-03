@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
 import static jj.application.AppLocation.*;
+import static jj.server.ServerLocation.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,8 +29,9 @@ import java.nio.file.Paths;
 import jj.application.MockApplication;
 import jj.http.server.resource.StaticResource;
 import jj.http.server.resource.StaticResourceMaker;
+import jj.http.server.uri.URIMatch;
 import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.ResourceFinder;
+import jj.resource.ServableLoader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,8 +54,8 @@ public class CssReferenceVersionProcessorTest {
 	
 	Path basePath;
 
-	ResourceFinder resourceFinder;
-	MockApplication app;
+	@Mock ServableLoader servableLoader;
+	private MockApplication app;
 	
 	@Mock StylesheetResource testCss;
 	
@@ -64,33 +66,32 @@ public class CssReferenceVersionProcessorTest {
 		basePath = Paths.get(getClass().getResource("/jj/css/test").toURI());
 		app = new MockApplication(basePath);
 		
-		dependencies = new MockAbstractResourceDependencies(AppBase, REPLACEMENT_CSS);
-		
-		resourceFinder = dependencies.resourceFinder();
+		dependencies = new MockAbstractResourceDependencies(StylesheetResource.class, Virtual, REPLACEMENT_CSS);
 	}
 
 	@Test
 	public void testProcessUrls() throws Exception {
 		
-		CssReferenceVersionProcessor processor = new CssReferenceVersionProcessor(app, resourceFinder);
+		CssReferenceVersionProcessor processor = new CssReferenceVersionProcessor(app, servableLoader);
 		
 		// given
-		StaticResource replacement = spy(StaticResourceMaker.make(app, AppBase, REPLACEMENT_CSS));
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, REPLACEMENT_CSS)).willReturn(replacement);
+		StaticResource replacement = spy(StaticResourceMaker.make(AppBase, REPLACEMENT_CSS, basePath.resolve(REPLACEMENT_CSS)));
+		given(dependencies.resourceFinder().loadResource(StaticResource.class, Public, REPLACEMENT_CSS)).willReturn(replacement);
+		willReturn(replacement).given(servableLoader).loadResource(new URIMatch(REPLACEMENT_CSS));
 		
-		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null, app);
+		StylesheetResource stylesheet = new StylesheetResource(dependencies, null, null, processor, null);
 		
 		
 		given(testCss.serverPath()).willReturn("/11f2a2c59c6b8c8be4287d441ace20d0afa43e0e/test.css");
 		given(testCss.path()).willReturn(basePath.resolve(TEST_CSS));
-		given(resourceFinder.loadResource(StylesheetResource.class, AppBase, TEST_CSS)).willReturn(testCss);
+		willReturn(testCss).given(servableLoader).loadResource(new URIMatch(TEST_CSS));
 		
-		StaticResource box = spy(StaticResourceMaker.make(app, AppBase, BOX_ICON));
-		StaticResource rox = spy(StaticResourceMaker.make(app, AppBase, ROX_ICON));
-		StaticResource sox = spy(StaticResourceMaker.make(app, AppBase, SOX_ICON));
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, BOX_ICON)).willReturn(box);
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, ROX_ICON)).willReturn(rox);
-		given(resourceFinder.loadResource(StaticResource.class, AppBase, SOX_ICON)).willReturn(sox);
+		StaticResource box = spy(StaticResourceMaker.make(AppBase, BOX_ICON, basePath.resolve(BOX_ICON)));
+		StaticResource rox = spy(StaticResourceMaker.make(AppBase, ROX_ICON, basePath.resolve(ROX_ICON)));
+		StaticResource sox = spy(StaticResourceMaker.make(AppBase, SOX_ICON, basePath.resolve(SOX_ICON)));
+		willReturn(box).given(servableLoader).loadResource(new URIMatch(BOX_ICON));
+		willReturn(rox).given(servableLoader).loadResource(new URIMatch(ROX_ICON));
+		willReturn(sox).given(servableLoader).loadResource(new URIMatch(SOX_ICON));
 		
 		String inputString = new String(Files.readAllBytes(basePath.resolve(REPLACEMENT_CSS)), UTF_8);
 		

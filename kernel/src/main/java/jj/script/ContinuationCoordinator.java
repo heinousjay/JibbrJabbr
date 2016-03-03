@@ -56,11 +56,11 @@ class ContinuationCoordinator implements ContinuationResumer {
 		this.is = is;
 	}
 	
-	private void log(final Throwable t, final ScriptEnvironment scriptEnvironment) {
+	private void log(final Throwable t, final ScriptEnvironment<?> scriptEnvironment) {
 		publisher.publish(new ScriptExecutionError(scriptEnvironment, t));
 	} 
 	
-	private PendingKey execute(final ScriptEnvironment scriptEnvironment, final ContinuationExecution execution) {
+	private PendingKey execute(final ScriptEnvironment<?> scriptEnvironment, final ContinuationExecution execution) {
 		try (RhinoContext context = contextProvider.get()) {
 			execution.run(context);
 		} catch (ContinuationPending continuation) {
@@ -81,14 +81,14 @@ class ContinuationCoordinator implements ContinuationResumer {
 	 * @param script The script to evaluate.
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
-	PendingKey execute(final ScriptEnvironment scriptEnvironment, final Script script) {
+	PendingKey execute(final ScriptEnvironment<?> scriptEnvironment, final Script script) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
 		assert is.forScriptEnvironment(scriptEnvironment) : "only execute this in the right script environment!";
 		
 		return execute(scriptEnvironment, context -> {
-			try (Closer closer = env.enterScope(scriptEnvironment)) {
+			try (Closer ignored = env.enterScope(scriptEnvironment)) {
 				context.executeScriptWithContinuations(script, scriptEnvironment.scope());
 			}
 		});
@@ -101,7 +101,7 @@ class ContinuationCoordinator implements ContinuationResumer {
 	 * @param args The arguments to the function, if any
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
-	PendingKey execute(final ScriptEnvironment scriptEnvironment, final Callable callable, final Object...args) {
+	PendingKey execute(final ScriptEnvironment<?> scriptEnvironment, final Callable callable, final Object...args) {
 		
 		assert (scriptEnvironment != null) : "cannot execute without a script execution environment";
 		
@@ -110,7 +110,7 @@ class ContinuationCoordinator implements ContinuationResumer {
 		if (callable != null) {
 
 			return execute(scriptEnvironment, context -> {
-				try (Closer closer = env.enterScope(scriptEnvironment)) {
+				try (Closer ignored = env.enterScope(scriptEnvironment)) {
 					context.callFunctionWithContinuations(callable, scriptEnvironment.scope(), args);
 				}
 			});
@@ -127,7 +127,7 @@ class ContinuationCoordinator implements ContinuationResumer {
 	 * @param result The result of the resumption
 	 * @return A key representing a pending continuation, or null if the execution completed
 	 */
-	PendingKey resumeContinuation(ScriptEnvironment scriptEnvironment, final PendingKey pendingKey, final Object result) {
+	PendingKey resumeContinuation(ScriptEnvironment<?> scriptEnvironment, final PendingKey pendingKey, final Object result) {
 		
 		assert (scriptEnvironment != null) : "cannot resume without a script execution environment";
 		
@@ -137,13 +137,14 @@ class ContinuationCoordinator implements ContinuationResumer {
 		
 		assert pendingKey != null : "cannot resume without a pending key";
 		
-		final AbstractScriptEnvironment environment = (AbstractScriptEnvironment)scriptEnvironment;
-		
-		final ContinuationPending continuation = ((AbstractScriptEnvironment)scriptEnvironment).continuationPending(pendingKey);
+		final AbstractScriptEnvironment<?> environment = (AbstractScriptEnvironment<?>)scriptEnvironment;
+
+		//noinspection ThrowableResultOfMethodCallIgnored
+		final ContinuationPending continuation = ((AbstractScriptEnvironment<?>)scriptEnvironment).continuationPending(pendingKey);
 		if (continuation != null) {
 
 			return execute(scriptEnvironment, context -> {
-				try (Closer closer = env.enterScope(environment, pendingKey)) {
+				try (Closer ignored = env.enterScope(environment, pendingKey)) {
 					context.resumeContinuation(continuation.getContinuation(), environment.scope(), result);
 				}
 			});
@@ -157,8 +158,6 @@ class ContinuationCoordinator implements ContinuationResumer {
 	/**
 	 * Kinda weird that this is in here, but it's a convenience for now
 	 * TODO decide if this is okay here
-	 * @param pendingKey
-	 * @param result
 	 */
 	@Override
 	public void resume(final PendingKey pendingKey, final Object result) {
@@ -172,11 +171,7 @@ class ContinuationCoordinator implements ContinuationResumer {
 		
 		return continuationState;
 	}
-	
-	/**
-	 * 
-	 * @param continuationState
-	 */
+
 	private PendingKey processContinuationState(ContinuationState continuationState) {
 		if (continuationState != null) {
 			

@@ -29,7 +29,6 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
 import java.net.InetAddress;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -40,6 +39,7 @@ import jj.event.Listener;
 import jj.event.Subscriber;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,10 +57,10 @@ public class ReplIntegrationTest {
 	@Inject ReplConfiguration config;
 
 	Bootstrap bootstrap;
-	CountDownLatch latch = new CountDownLatch(1);
+	Latch latch = new Latch(1);
 	
 	@Listener
-	void replListening(ReplListening replListening) {
+	void on(ReplListening replListening) {
 		latch.countDown();
 	}
 	
@@ -73,11 +73,11 @@ public class ReplIntegrationTest {
 	
 	@Test
 	public void test() throws Throwable {
-		assertTrue("timed out waiting for init", latch.await(500, MILLISECONDS));
+		latch.await(500, MILLISECONDS);
 		
 		// well... it started so that's something
 		// connect to config.port() and send in some commands? why not
-		latch = new CountDownLatch(1);
+		latch = new Latch(1);
 		
 		final AtomicReference<Throwable> failure = new AtomicReference<>();
 		
@@ -129,7 +129,7 @@ public class ReplIntegrationTest {
 			}
 		});
 		
-		assertTrue("timed out waiting for response", latch.await(1, SECONDS));
+		latch.await(1, SECONDS);
 		if (failure.get() != null) {
 			throw failure.get();
 		}

@@ -133,7 +133,7 @@ public class EventSystemTest {
 			pub.publish(new Event());
 			worked = true;
 		} catch (AssertionError ae) {
-			assertThat(ae.getMessage(), is("broken event listener! jj.event.help.BrokenListener.throwAnException(jj.event.help.Event)"));
+			assertThat(ae.getMessage(), is("broken event listener! jj.event.help.BrokenListener.on(jj.event.help.Event)"));
 		}
 		
 		assertFalse(worked);
@@ -199,7 +199,7 @@ public class EventSystemTest {
 		// when
 		pub.publish(new EventSub());
 		pub.publish(new UnrelatedIEvent());
-		
+
 		// then
 		assertThat(childSub.heard, is(2));
 		assertThat(childSub.heard2, is(1));
@@ -217,7 +217,7 @@ public class EventSystemTest {
 		assertThat(pub.listenerMap.get(UnrelatedIEvent.class).size(), is(1));
 		
 		// and one little validation of the target method
-		assertThat(pub.listenerMap.get(IEvent.class).peek().target(), is("jj.event.help.Sub.listen(jj.event.help.IEvent)"));
+		assertThat(pub.listenerMap.get(IEvent.class).peek().target(), is("jj.event.help.Sub.on(jj.event.help.IEvent)"));
 		
 		return pub;
 	}
@@ -298,8 +298,9 @@ public class EventSystemTest {
 					}
 				});
 			}
-			
-			assertTrue("timed out", latch.await(threads * 2, SECONDS));
+			// if there is only one cpu available, give it extra time cause it will take longer
+			int seconds = Math.max(threads, 2) * 2;
+			assertTrue("timed out in " + seconds + " seconds", latch.await(seconds, SECONDS));
 			if (!throwables.isEmpty()) {
 				AssertionError error = new AssertionError(throwables.size() + " test failures");
 				Throwable t;

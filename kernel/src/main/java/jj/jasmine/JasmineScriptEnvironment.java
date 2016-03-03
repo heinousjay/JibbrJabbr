@@ -25,7 +25,9 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.resource.Location;
 import jj.resource.NoSuchResourceException;
+import jj.resource.PathResolver;
 import jj.resource.ResourceFinder;
 import jj.resource.ResourceLoaded;
 import jj.script.AbstractScriptEnvironment;
@@ -44,7 +46,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-public class JasmineScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
+public class JasmineScriptEnvironment extends AbstractScriptEnvironment<ResourceLoaded> implements RootScriptEnvironment<ResourceLoaded> {
 
 	private static final String JASMINE         = "jasmine";
 	static final String JASMINE_JS      = JASMINE + ".js";
@@ -69,27 +71,34 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	
 	private final ResourceLoaded resourceLoaded;
 	
+	private final Location specLocation;
+	
 	@Inject
 	JasmineScriptEnvironment(
 		final Dependencies dependencies,
 		final @Global ScriptableObject global,
 		final ResourceFinder resourceFinder,
+		final PathResolver pathResolver,
 		final ResourceLoaded resourceLoaded // the original event that caused us to get loaded
 	) {
 		super(dependencies);
+
+		assert resourceLoaded.type() == ScriptResource.class : "cannot run ";
 		
 		this.resourceLoaded = resourceLoaded;
 		
 		this.global = global;
 		
+		this.specLocation = pathResolver.specLocationFor(resourceLoaded.base());
+		
 		// we need some scripts to be happy
-		target  = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, resourceLoaded.name);
-		spec    = resourceFinder.loadResource(ScriptResource.class, resourceLoaded.base, name);
+		target  = resourceFinder.loadResource(resourceLoaded.identifier());
+		spec    = resourceFinder.loadResource(ScriptResource.class, specLocation, name());
 		
 		// target is unlikely to be null, but maybe it got deleted while we were getting created
 		// if spec is null, we have nothing to do
 		if (target == null || spec == null) {
-			throw new NoSuchResourceException(JasmineScriptEnvironment.class, name);
+			throw new NoSuchResourceException(JasmineScriptEnvironment.class, name());
 		}
 		
 		// if we have a reason to load stuff, load stuff!
@@ -132,8 +141,8 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	}
 	
 	@Override
-	protected Object[] creationArgs() {
-		return new Object[] { resourceLoaded };
+	public ResourceLoaded creationArg() {
+		return resourceLoaded;
 	}
 
 	@Override
@@ -149,6 +158,11 @@ public class JasmineScriptEnvironment extends AbstractScriptEnvironment implemen
 	@Override
 	public Script script() {
 		return boot.script();
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		return resourceLoaded.base().and(specLocation);
 	}
 	
 	ScriptResource spec() {

@@ -20,7 +20,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.netty.buffer.ByteBuf;
@@ -35,10 +34,12 @@ import jj.ServerRoot;
 import jj.http.client.api.RestOperation;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-
+@Ignore // this test is currently pointless
 public class HttpClientIntegrationTest {
 
 	@Rule
@@ -63,7 +64,7 @@ public class HttpClientIntegrationTest {
 		
 		final AtomicReference<String> response = new AtomicReference<>();
 		final AtomicReference<Throwable> cause = new AtomicReference<>();
-		final CountDownLatch latch = new CountDownLatch(1);
+		final Latch latch = new Latch(1);
 		
 		requester.requestTo(server.baseUrl() + "/test2.txt")
 			.get()
@@ -93,7 +94,7 @@ public class HttpClientIntegrationTest {
 			});
 		
 		
-		assertTrue("timed out", latch.await(500, MILLISECONDS));
+		latch.await(500, MILLISECONDS);
 		if (cause.get() != null) {
 			throw cause.get();
 		}

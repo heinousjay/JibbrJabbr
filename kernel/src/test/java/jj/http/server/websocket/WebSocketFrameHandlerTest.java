@@ -18,15 +18,13 @@ package jj.http.server.websocket;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import jj.engine.HostEvent;
-import jj.http.server.websocket.WebSocketConnection;
-import jj.http.server.websocket.WebSocketConnectionHost;
-import jj.http.server.websocket.WebSocketConnectionTracker;
-import jj.http.server.websocket.WebSocketFrameHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
@@ -64,7 +62,7 @@ public class WebSocketFrameHandlerTest {
 	// own won't work without talking to an actual resource
 	@Mock(answer=Answers.RETURNS_DEEP_STUBS) ChannelHandlerContext ctx;
 	
-	@Captor ArgumentCaptor<ChannelFutureListener> futureListenerCaptor;
+	@Captor ArgumentCaptor<GenericFutureListener<Future<Void>>> futureListenerCaptor;
 	ChannelFuture future;
 
 	ByteBuf byteBuf;
@@ -75,7 +73,7 @@ public class WebSocketFrameHandlerTest {
 	public void before() {
 		byteBuf = Unpooled.buffer(0);
 		
-		given(connection.webSocketConnectionHost()).willReturn(webSocketConnectionHost);
+		willReturn(webSocketConnectionHost).given(connection).webSocketConnectionHost();
 	}
 	
 	@Test
@@ -88,13 +86,11 @@ public class WebSocketFrameHandlerTest {
 		verify(executor).submit(connection, HostEvent.clientConnected.toString(), connection);
 		verify(ctx.channel().closeFuture()).addListener(futureListenerCaptor.capture());
 		
-		ChannelFutureListener listener = futureListenerCaptor.getValue();
-		
-		listener.operationComplete(future);
+		futureListenerCaptor.getValue().operationComplete(future);
 		
 		verify(connectionTracker).removeConnection(connection);
 		verify(webSocketConnectionHost).disconnected(connection);
-		verify(executor).submit(connection, HostEvent.clientDisconnected.toString(), connection);;
+		verify(executor).submit(connection, HostEvent.clientDisconnected.toString(), connection);
 	}
 	
 	@Test

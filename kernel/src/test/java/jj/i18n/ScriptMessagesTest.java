@@ -57,7 +57,7 @@ public class ScriptMessagesTest {
 
 	ScriptMessages sm;
 	
-	@Mock ScriptEnvironment se;
+	@Mock ScriptEnvironment<?> se;
 	@Mock Scriptable scope;
 	
 	@Mock MessagesResource mr;
@@ -74,7 +74,7 @@ public class ScriptMessagesTest {
 		
 		sm = new ScriptMessages(resourceFinder, taskRunner, env, configuration);
 		
-		given(env.current()).willReturn(se);
+		willReturn(se).given(env).current();
 		given(se.scope()).willReturn(scope);
 		
 		given(mr.containsKey("key")).willReturn(true);

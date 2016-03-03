@@ -12,10 +12,12 @@ import java.nio.charset.Charset;
  * <p>
  * do not implement this directly, extend {@link AbstractResource} instead
  * 
+ * @param <T> the type of creation argument. Void if none
+ * 
  * @author jason
  *
  */
-public interface Resource {
+public interface Resource<T> {
 	
 	/**
 	 * The base location of this resource
@@ -48,16 +50,29 @@ public interface Resource {
 	 * outside of resource death, so semantically it is important to arrange that a permanent
 	 * relationship makes sense
 	 */
-	void addDependent(Resource dependent);
-	
+	void addDependent(Resource<?> dependent);
+
+
 	/**
-	 * The key in the cache where this resource is stored
+	 * The identifier of the resource. Java won't let me self-reference the right types, so
+	 * for now it's a wild-card
 	 */
-	ResourceKey cacheKey();
+	ResourceIdentifier<? extends Resource<T>, T> identifier();
 	
 	/**
 	 * flag indicating this live status of this resource.  a resource is considered alive
 	 * between the time of its creation and the time it is removed from the resource cache.
 	 */
 	boolean alive();
+
+	/**
+	 * the type of resource, declared here so the compiler is happy with it being used to
+	 * load resources generically
+	 */
+	Class<? extends Resource<T>> type();
+
+	/**
+	 * the argument, if any, used to parameterize creation
+	 */
+	T creationArg();
 }

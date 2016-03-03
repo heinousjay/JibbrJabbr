@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 import jj.resource.SimpleResourceCreator;
 
 @Singleton
-class PropertiesResourceCreator extends SimpleResourceCreator<PropertiesResource> {
+class PropertiesResourceCreator extends SimpleResourceCreator<PropertiesResource, Void> {
 
 	@Inject
 	PropertiesResourceCreator(final Dependencies dependencies) {

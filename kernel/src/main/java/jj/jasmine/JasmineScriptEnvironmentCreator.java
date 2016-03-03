@@ -20,6 +20,8 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.resource.ResourceIdentifier;
+import jj.resource.ResourceLoaded;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**
@@ -27,7 +29,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-class JasmineScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<JasmineScriptEnvironment> {
+class JasmineScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<JasmineScriptEnvironment, ResourceLoaded> {
 
 	@Inject
 	JasmineScriptEnvironmentCreator(final Dependencies dependencies) {
@@ -35,8 +37,8 @@ class JasmineScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<J
 	}
 
 	@Override
-	protected JasmineScriptEnvironment createScriptEnvironment(String name, Object...args) throws IOException {
-		return creator.createResource(type(), resourceKey(Virtual, name, args), Virtual, name, args);
+	protected JasmineScriptEnvironment createScriptEnvironment(String name, ResourceLoaded argument) throws IOException {
+		return creator.createResource(resourceIdentifierMaker.make(type(), Virtual, name, argument));
 	}
 
 }

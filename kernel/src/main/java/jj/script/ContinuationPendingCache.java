@@ -43,8 +43,8 @@ class ContinuationPendingCache {
 		this.currentTask = currentTask;
 	}
 	
-	private final ScriptTask<ScriptEnvironment> reserved = 
-		new ScriptTask<ScriptEnvironment>("", null) {
+	private final ScriptTask<ScriptEnvironment<?>> reserved = 
+		new ScriptTask<ScriptEnvironment<?>>("", null) {
 		
 			@Override
 			protected void begin() throws Exception {
@@ -52,8 +52,8 @@ class ContinuationPendingCache {
 			}
 		};
 		
-	private final ScriptTask<ScriptEnvironment> alreadyResumed =
-		new ScriptTask<ScriptEnvironment>("", null) {
+	private final ScriptTask<ScriptEnvironment<?>> alreadyResumed =
+		new ScriptTask<ScriptEnvironment<?>>("", null) {
 			
 			@Override
 			protected void begin() throws Exception {
@@ -71,9 +71,7 @@ class ContinuationPendingCache {
 	 * @param keys A collection of {@link PendingKey}s to remove
 	 */
 	void removePendingTasks(Collection<PendingKey> keys) {
-		keys.forEach(key -> {
-			resumableTasks.remove(key.id());
-		});
+		keys.forEach(key -> resumableTasks.remove(key.id()));
 	}
 	
 	String uniqueID() {

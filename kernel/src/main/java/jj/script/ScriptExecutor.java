@@ -17,9 +17,11 @@ package jj.script;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import java.time.Clock;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import jj.ServerStopping;
 import jj.event.Listener;
@@ -27,7 +29,6 @@ import jj.event.Subscriber;
 import jj.execution.DelayedExecutor;
 import jj.execution.JJRejectedExecutionHandler;
 import jj.execution.JJThreadFactory;
-import jj.util.Clock;
 
 /**
  * provides a single-threaded {@link DelayedExecutor} suitable for running script tasks.
@@ -35,6 +36,7 @@ import jj.util.Clock;
  * @author jason
  *
  */
+@Singleton
 @Subscriber
 class ScriptExecutor extends DelayedExecutor {
 	
@@ -42,15 +44,15 @@ class ScriptExecutor extends DelayedExecutor {
 
 	@Inject
 	ScriptExecutor(
-		final Clock clock,
-		final JJThreadFactory threadFactory,
-		final JJRejectedExecutionHandler handler
+		Clock clock,
+		JJThreadFactory threadFactory,
+		JJRejectedExecutionHandler handler
 	) {
 		super(
 			clock,
 			1, 1,
 			10, MILLISECONDS,
-			new LinkedBlockingQueue<Runnable>(),
+			new LinkedBlockingQueue<>(),
 			threadFactory.namePattern("JibbrJabbr Script Thread %s"),
 			handler
 		);
@@ -63,7 +65,7 @@ class ScriptExecutor extends DelayedExecutor {
 	}
 
 	@Listener
-	void stop(ServerStopping event) {
+	void on(ServerStopping serverStopping) {
 		shutdown();
 	}
 	

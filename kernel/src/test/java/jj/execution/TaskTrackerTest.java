@@ -34,7 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class TaskTrackerTest {
 
 	MockClock clock = new MockClock();
-	@Mock JJTask task;
+	@Mock JJTask<?> task;
 
 	@Test
 	public void test() {
@@ -50,26 +50,26 @@ public class TaskTrackerTest {
 		tt.enqueue();
 
 		assertThat(tt.startTime(), is(0L));
-		assertThat(tt.enqueuedTime(), is(-clock.time()));
+		assertThat(tt.enqueuedTime(), is(-clock.millis()));
 		assertThat(tt.executionTime(), is(0L));
 
 		clock.advance(1, SECONDS);
 
 		tt.start();
 
-		assertThat(tt.startTime(), is(clock.time()));
+		assertThat(tt.startTime(), is(clock.millis()));
 		assertThat(tt.enqueuedTime(), is(1000L));
 		assertThat(tt.executionTime(), is(0L));
 
 		clock.advance(3, MILLISECONDS);
 
-		assertThat(tt.startTime(), is(clock.time() - 3));
+		assertThat(tt.startTime(), is(clock.millis() - 3));
 		assertThat(tt.enqueuedTime(), is(1000L));
 		assertThat(tt.executionTime(), is(0L));
 
 		tt.end();
 
-		assertThat(tt.startTime(), is(clock.time() - 3));
+		assertThat(tt.startTime(), is(clock.millis() - 3));
 		assertThat(tt.enqueuedTime(), is(1000L));
 		assertThat(tt.executionTime(), is(3L));
 	}

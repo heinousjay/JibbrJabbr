@@ -18,16 +18,20 @@ package jj.resource;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static jj.server.ServerLocation.*;
 
-import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import jj.application.AppLocation;
-import jj.event.Publisher;
+import jj.Base;
+import jj.ServerStarting;
+import jj.ServerStopping;
+import jj.event.MockPublisher;
+import jj.execution.JJTask;
 import jj.execution.MockTaskRunner;
 
 import org.junit.Before;
@@ -40,22 +44,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 // integrates a bit
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceWatchServiceLoopTest {
-	
+
+	@Mock ResourceWatchSwitch resourceWatchSwitch;
 	ResourceCache resourceCache;
-	@Mock ResourceFinder resourceFinder;
-	@Mock ResourceWatcher watcher;
-	@Mock Publisher publisher;
+	@Mock ResourceLoader resourceLoader;
+	@Mock FileWatcher watcher;
+	MockPublisher publisher;
 	MockTaskRunner taskRunner;
 
-	Map<URI, Boolean> changes = new HashMap<>();
+	Map<Path, FileWatcher.Action> changes = new HashMap<>();
 	
 	ResourceWatchServiceLoop loop;
-	
-	URI uri1;
-	URI uri2;
-	URI uri3;
-	URI uri4;
-	URI uri5;
+
 	MyResource resource1;
 	MyResource resource2;
 	MyResource resource3;
@@ -65,48 +65,98 @@ public class ResourceWatchServiceLoopTest {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private ResourceCreators makeResourceCreators() {
 		Map map = new HashMap<>();
-		map.put(MyResource.class, new MyResourceCreator(publisher));
+		map.put(MyResource.class, new MyResourceCreator(publisher = new MockPublisher()));
 		return new ResourceCreators(map);
 	}
 	
 	private MyResource makeResource(String name) {
 		MyResource result = spy(new MyResource(name, publisher));
-		resourceCache.putIfAbsent(result.cacheKey(), result);
+		resourceCache.putIfAbsent(result);
 		return result;
 	}
 	
 	@Before
 	public void before() throws Exception {
-		resourceCache = new ResourceCacheImpl(makeResourceCreators());
+
+		resourceCache = new ResourceCache(makeResourceCreators());
 		
 		taskRunner = new MockTaskRunner();
-		loop = new ResourceWatchServiceLoop(resourceCache, resourceFinder, watcher, taskRunner);
-		
-		uri1 = URI.create("resource1");
+		loop = new ResourceWatchServiceLoop(
+			resourceWatchSwitch,
+			resourceCache,
+			resourceLoader,
+			watcher,
+			publisher,
+			taskRunner
+		);
+
 		resource1 = makeResource("resource1");
-		
-		uri2 = URI.create("resource2");
 		resource2 = makeResource("resource2");
-		
-		uri3 = URI.create("resource3");
 		resource3 = makeResource("resource3");
-		
-		uri4 = URI.create("resource4");
 		resource4 = makeResource("resource4");
-		
-		uri5 = URI.create("resource5");
 		resource5 = makeResource("resource5");
 	}
 	
 	@Test
 	public void testStart() {
-		loop.start();
-		
-		assertThat(taskRunner.firstTask(), is(loop));
+		assertThat(startWatchLoop(), is(loop));
+	}
+
+	public interface MyTestResource extends FileSystemResource, Resource<Void> {}
+
+	@Mock MyTestResource resource;
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testWatches() {
+		given((ResourceIdentifier<MyTestResource, Void>)resource.identifier()).willReturn(
+			new MockResourceIdentifierMaker().make(MyTestResource.class, Virtual, "whatever")
+		);
+
+		given(resourceWatchSwitch.runFileWatcher()).willReturn(true);
+
+		Path path = Paths.get("whatever/makes/you/happy");
+		given(resource.path()).willReturn(path);
+
+		loop.on(new ResourceLoaded(resource));
+		verify(watcher, never()).watch(path.getParent());
+
+		given(watcher.start()).willReturn(true);
+		loop.on((ServerStarting) null);
+		loop.on(new ResourceLoaded(resource));
+		verify(watcher).watch(path.getParent());
+
+		given(resource.isDirectory()).willReturn(true);
+		loop.on(new ResourceLoaded(resource));
+		verify(watcher).watch(path);
+
+	}
+
+	@Test
+	public void testDirectoryCreation() throws Exception {
+		startWatchLoop();
+
+		changes.put(Base.path, FileWatcher.Action.Create);
+		loopOverChangesAndDie();
+
+		DirectoryCreation dc = (DirectoryCreation)publisher.events.get(0);
+		assertThat(dc.path, is(Base.path));
+	}
+
+	@Test
+	public void testFileCreation() throws Exception {
+		startWatchLoop();
+		Path path = Base.path.resolve("blank.gif");
+		changes.put(path, FileWatcher.Action.Create);
+		loopOverChangesAndDie();
+
+		FileCreation fc = (FileCreation)publisher.events.get(0);
+		assertThat(fc.path, is(path));
 	}
 	
 	@Test
 	public void testDependencyTreeAllDeletes() throws Exception {
+		startWatchLoop();
 		
 		// we should only delete because only resource 5 is set to be reloaded
 		// and it is not in the tree as resource one depends on it
@@ -119,36 +169,40 @@ public class ResourceWatchServiceLoopTest {
 		resource3.addDependent(resource4);
 		resource5.addDependent(resource1);
 		
-		changes.put(uri1, true);
+		changes.put(resource1.path(), FileWatcher.Action.Delete);
+
+		loopOverChangesAndDie();
 		
-		InterruptedException ie = new InterruptedException();
-		given(watcher.awaitChangedUris()).willReturn(changes).willThrow(ie);
-		
-		try {
-			loop.run();
-		} catch (InterruptedException caught) {
-			assertTrue(ie == caught);
-		}
-		
-		assertThat(resourceCache.get(resource1.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource2.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource3.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource4.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource5.cacheKey()), is((Resource)resource5));
+		assertThat(resourceCache.get(resource1.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource2.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource3.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource4.identifier()), is(nullValue()));
+		assertThat(MyResource.class.cast(resourceCache.get(resource5.identifier())), is(resource5));
 		
 		assertThat(taskRunner.tasks, is(empty()));
-		verifyZeroInteractions(resourceFinder);
+		verifyZeroInteractions(resourceLoader);
 
 		verify(resource1).kill();
 		verify(resource2).kill();
 		verify(resource3).kill();
 		verify(resource4).kill();
 		verify(resource5, never()).kill();
-		verify(publisher, times(4)).publish(isA(ResourceKilled.class));
+		assertThat(publisher.events.size(), is(9));
+		check((ResourceKilled)publisher.events.get(5), resource1);
+		check((ResourceKilled)publisher.events.get(6), resource2);
+		check((ResourceKilled)publisher.events.get(7), resource3);
+		check((ResourceKilled)publisher.events.get(8), resource4);
 	}
-	
+
+	private void check(ResourceEvent event, MyResource resource) {
+		// because we're spying, the resource is a runtime subclass
+		assertTrue(event.type().isAssignableFrom(resource.getClass()));
+	}
+
 	@Test
 	public void testDependencyTreeWithReloads() throws Exception {
+
+		startWatchLoop();
 		
 		// we should only delete because only resource 5 is set to be reloaded
 		// and it is not in the tree as resource one depends on it
@@ -161,35 +215,51 @@ public class ResourceWatchServiceLoopTest {
 		resource3.addDependent(resource4);
 		resource4.addDependent(resource5);
 		
-		changes.put(uri1, false);
+		changes.put(resource1.path(), FileWatcher.Action.Modify);
 		
-		InterruptedException ie = new InterruptedException();
-		given(watcher.awaitChangedUris()).willReturn(changes).willThrow(ie);
+		loopOverChangesAndDie();
 		
-		try {
-			loop.run();
-		} catch (InterruptedException caught) {
-			assertTrue(ie == caught);
-		}
-		
-		assertThat(resourceCache.get(resource1.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource2.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource3.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource4.cacheKey()), is(nullValue()));
-		assertThat(resourceCache.get(resource5.cacheKey()), is((Resource)resource5));
-		
-		assertThat(taskRunner.tasks, is(not(empty())));
-		
-		taskRunner.runFirstTask();
+		assertThat(resourceCache.get(resource1.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource2.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource3.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource4.identifier()), is(nullValue()));
+		assertThat(resourceCache.get(resource5.identifier()), is(nullValue()));
 
 		verify(resource1).kill();
 		verify(resource2).kill();
 		verify(resource3).kill();
 		verify(resource4).kill();
 		verify(resource5).kill();
-		verify(publisher, times(5)).publish(isA(ResourceKilled.class));
-		
-		verify(resourceFinder).loadResource(resource5.getClass(), AppLocation.AppBase, resource5.name());
+		assertThat(publisher.events.size(), is(10));
+		check((ResourceKilled) publisher.events.get(5), resource1);
+		check((ResourceKilled) publisher.events.get(6), resource2);
+		check((ResourceKilled) publisher.events.get(7), resource3);
+		check((ResourceKilled) publisher.events.get(8), resource4);
+		check((ResourceKilled) publisher.events.get(9), resource5);
+
+		verify(resourceLoader).loadResource(resource5.identifier());
+		verifyNoMoreInteractions(resourceLoader);
+	}
+
+	private JJTask<?> startWatchLoop() {
+		given(resourceWatchSwitch.runFileWatcher()).willReturn(true);
+		given(watcher.start()).willReturn(true);
+		loop.on((ServerStarting) null);
+		return taskRunner.tasks.remove(0);
+	}
+
+	private void loopOverChangesAndDie() throws Exception {
+		InterruptedException ie = new InterruptedException();
+		given(watcher.awaitChangedPaths()).willReturn(changes).willThrow(ie);
+
+		try {
+			loop.on((ServerStarting)null);
+			loop.run();
+		} catch (InterruptedException caught) {
+			assertTrue(ie == caught);
+		} finally {
+			loop.on((ServerStopping)null);
+		}
 	}
 
 }

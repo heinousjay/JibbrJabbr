@@ -160,7 +160,7 @@ class EventConfiguringTypeListener implements TypeListener {
 			className = method.getDeclaringClass().getPackage().getName() +
 				".InvokerFor" +
 				method.getDeclaringClass().getSimpleName() +
-				"$" + method.getName() +
+				"$" + method.getName() + method.getParameterTypes()[0].getSimpleName() +
 				"$" + Integer.toHexString(method.hashCode());
 			// hanging onto event types is okay, they'll get reused
 			parameterType = method.getParameterTypes()[0].getName();

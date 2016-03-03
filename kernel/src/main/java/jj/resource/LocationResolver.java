@@ -23,11 +23,6 @@ import java.util.List;
  *
  */
 public interface LocationResolver {
-	
-	/**
-	 * True if the given path is in the base
-	 */
-	boolean pathInBase(Path path);
 
 	/**
 	 * resolve the given location and name against
@@ -41,5 +36,14 @@ public interface LocationResolver {
 	 * enumerate the paths that this resolver wants watched for changes
 	 */
 	List<Location> watchedLocations();
+	
+	/**
+	 * if there is an appropriate location for specs for a given
+	 * location, return it, otherwise return null
+	 * 
+	 */
+	Location specLocationFor(Location base);
+
+	String normalizedName(Location originalBase, Location normalizedBase, String name);
 
 }

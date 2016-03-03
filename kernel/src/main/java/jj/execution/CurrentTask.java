@@ -26,18 +26,18 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-public class CurrentTask extends ExecutionInstance<JJTask> {
+public class CurrentTask extends ExecutionInstance<JJTask<?>> {
 	
 	public String name() {
-		JJTask task = current();
+		JJTask<?> task = current();
 		return task == null ? null : task.name();
 	}
 	
-	public <T extends JJTask> T currentAs(Class<T> type) {
+	public <T extends JJTask<?>> T currentAs(Class<T> type) {
 		return type.cast(current());
 	}
 
-	public <T extends JJTask> boolean currentIs(Class<T> type) {
+	public <T extends JJTask<?>> boolean currentIs(Class<T> type) {
 		return type.isInstance(current());
 	}
 }

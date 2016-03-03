@@ -15,6 +15,7 @@
  */
 package jj.repl;
 
+import static jj.application.AppLocation.AppBase;
 import static jj.server.ServerLocation.*;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -27,6 +28,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import jj.resource.Location;
 import jj.script.AbstractScriptEnvironment;
 import jj.script.PendingKey;
 import jj.script.Global;
@@ -42,7 +44,7 @@ import jj.util.Closer;
  * @author jason
  *
  */
-class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScriptEnvironment {
+class ReplScriptEnvironment extends AbstractScriptEnvironment<Void> implements RootScriptEnvironment<Void> {
 
 	static final String NAME = "repl";
 	static final String BASE_REPL_SYSTEM = "base-repl-system.js";
@@ -125,5 +127,12 @@ class ReplScriptEnvironment extends AbstractScriptEnvironment implements RootScr
 	@Override
 	public ScriptableObject global() {
 		return global;
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		// maybe define a REPL base location where repl-only modules can live!
+		// but only after modularity and the REPL lives alone
+		return AppBase;
 	}
 }

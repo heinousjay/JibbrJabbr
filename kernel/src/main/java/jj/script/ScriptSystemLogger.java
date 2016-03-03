@@ -39,6 +39,6 @@ import org.slf4j.Logger;
 @Inherited
 @interface ScriptSystemLogger {
 
-	public static final String NAME = "script system";
+	String NAME = "script system";
 
 }

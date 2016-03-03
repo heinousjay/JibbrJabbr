@@ -55,7 +55,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-public class MessagesResource extends AbstractResource {
+public class MessagesResource extends AbstractResource<Locale> {
 	
 	// doubled because java8 is a pain
 	private static final String __ = "_";
@@ -80,7 +80,7 @@ public class MessagesResource extends AbstractResource {
 		ArrayList<PropertiesResource> propertiesResources = findResources(resourceFinder);
 		
 		if (propertiesResources.isEmpty()) {
-			throw new NoSuchResourceException(MessagesResource.class, name);
+			throw new NoSuchResourceException(MessagesResource.class, name());
 		}
 		
 		String[] shas = new String[propertiesResources.size()];
@@ -101,7 +101,7 @@ public class MessagesResource extends AbstractResource {
 		ArrayList<PropertiesResource> result = new ArrayList<>(4);
 		for (String candidateName : candidateNames()) {
 			PropertiesResource resource =
-				resourceFinder.loadResource(PropertiesResource.class, AppLocation.AppBase, candidateName);
+				resourceFinder.loadResource(PropertiesResource.class, AppLocation.Private, candidateName);
 			if (resource != null) {
 				result.add(resource);
 				resource.addDependent(this);
@@ -112,6 +112,7 @@ public class MessagesResource extends AbstractResource {
 	}
 	
 	private String[] candidateNames() {
+		String name = name();
 		return new String[] {
 			name + EXT,
 			name + __ + locale.getLanguage() + EXT,
@@ -130,8 +131,8 @@ public class MessagesResource extends AbstractResource {
 	}
 	
 	@Override
-	protected Object[] creationArgs() {
-		return new Object[] { locale };
+	public Locale creationArg() {
+		return locale;
 	}
 	
 	public boolean containsKey(String key) {

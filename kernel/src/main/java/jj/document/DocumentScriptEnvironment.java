@@ -15,6 +15,8 @@
  */
 package jj.document;
 
+import static jj.application.AppLocation.*;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -27,7 +29,6 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import jj.application.AppLocation;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.engine.EngineAPI;
 import jj.execution.ExecutionInstance;
@@ -39,6 +40,7 @@ import jj.http.server.websocket.ConnectionBroadcastStack;
 import jj.http.server.websocket.CurrentWebSocketConnection;
 import jj.http.server.websocket.WebSocketConnection;
 import jj.http.server.websocket.WebSocketMessageProcessor;
+import jj.resource.Location;
 import jj.resource.ResourceThread;
 import jj.resource.NoSuchResourceException;
 import jj.resource.ResourceNotViableException;
@@ -62,7 +64,7 @@ import jj.util.SHA1Helper;
 )
 public class DocumentScriptEnvironment
 	extends AbstractWebSocketConnectionHost
-	implements ExecutionLifecycleAware, RootScriptEnvironment, ServableResource {
+	implements ExecutionLifecycleAware, RootScriptEnvironment<Void>, ServableResource {
 	
 	public static final String JJ_JS = "jj.js";
 	public static final String JQUERY_JS_DEV = "jquery-2.0.3.js";
@@ -78,8 +80,6 @@ public class DocumentScriptEnvironment
 	private final String socketUri;
 	
 	private final String sha1;
-	
-	private final String serverPath;
 	
 	private final ScriptableObject scope;
 	
@@ -110,15 +110,16 @@ public class DocumentScriptEnvironment
 	) {
 		super(dependencies);
 		
-		html = resourceFinder.loadResource(HtmlResource.class, AppLocation.AppBase, resourceName(name));
-		
+		html = resourceFinder.loadResource(HtmlResource.class, Public, resourceName(name()));
+
+		// NO
 		if (html == null) {
-			throw new NoSuchResourceException(getClass(), name + "-" + resourceName(name));
+			throw new NoSuchResourceException(getClass(), name() + "-" + resourceName(name()));
 		}
 		
-		clientScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Client.suffix(name));
-		sharedScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Shared.suffix(name));
-		serverScript = resourceFinder.loadResource(ScriptResource.class, AppLocation.AppBase, ScriptResourceType.Server.suffix(name));
+		clientScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Client.suffix(name()));
+		sharedScript = resourceFinder.loadResource(ScriptResource.class, Public, ScriptResourceType.Shared.suffix(name()));
+		serverScript = resourceFinder.loadResource(ScriptResource.class, Private, ScriptResourceType.Client.suffix(name()));
 		
 		sha1 = SHA1Helper.keyFor(
 			html.sha1(),
@@ -126,22 +127,20 @@ public class DocumentScriptEnvironment
 			sharedScript == null ? "none" : sharedScript.sha1(),
 			serverScript == null ? "none" : serverScript.sha1()
 		);
-
-		serverPath = "/" + sha1 + "/" + name;
 		
 		if (serverScript == null)  {
 			socketUri = null;
 			global = null;
 			scope = null;
 		} else {
-			socketUri = serverPath + ".socket";
+			socketUri = serverPath() + ".socket";
 			global = api.global();
-			scope = configureTimers(configureModuleObjects(name, createChainedScope(global)));
+			scope = configureTimers(configureModuleObjects(name(), createChainedScope(global)));
 			
 			try {
 				compiler.compile(scope, clientScript, sharedScript, serverScript.name());
 			} catch (Exception e) {
-				throw new ResourceNotViableException(name, e);
+				throw new ResourceNotViableException(name(), e);
 			}
 		}
 		
@@ -167,17 +166,12 @@ public class DocumentScriptEnvironment
 
 	@Override
 	public String scriptName() {
-		return ScriptResourceType.Client.suffix(name);
+		return ScriptResourceType.Client.suffix(name());
 	}
 
 	@Override
 	public String sha1() {
 		return sha1;
-	}
-
-	@Override
-	public String serverPath() {
-		return serverPath;
 	}
 	
 	@Override
@@ -208,6 +202,11 @@ public class DocumentScriptEnvironment
 	@Override
 	public ScriptableObject global() {
 		return global;
+	}
+	
+	@Override
+	public Location moduleLocation() {
+		return Private.and(Public);
 	}
 
 	@Override
@@ -320,23 +319,14 @@ public class DocumentScriptEnvironment
 		return (closer != null) ? closer : super.restoreContextForKey(key);
 	}
 
-	/**
-	 * @return
-	 */
 	public String socketUri() {
 		return socketUri;
 	}
 
-	/**
-	 * @return
-	 */
 	public ScriptResource clientScriptResource() {
 		return clientScript;
 	}
 
-	/**
-	 * @return
-	 */
 	public ScriptResource sharedScriptResource() {
 		return sharedScript;
 	}

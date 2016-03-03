@@ -15,8 +15,6 @@
  */
 package jj.script.module;
 
-
-import static jj.application.AppLocation.*;
 import static jj.server.ServerLocation.*;
 
 import java.io.IOException;
@@ -41,11 +39,14 @@ import org.mozilla.javascript.ScriptableObject;
  * Provides the notion of a script module, which is the standard unit of execution
  * in the JibbrJabbr system. A module must belong to a parent script environment of
  * some sort, which provides the top-level execution semantics, but in principle, all
- * modules are interchangable.
+ * modules are interchangeable.
  * 
  * <p>
  * Modules are identified by a tuple of identifier and parent, so the same script loaded
- * from two different parents will have independent scopes
+ * from two different parents will have independent scopes. If the same modules is loaded
+ * multiple times within the context of a single parent, the same instance will be returned.
+ * Modules cannot be parents of modules, this is a function of the
+ * {@link RootScriptEnvironment}
  * 
  * <p>
  * Modules can be either executable scripts, which can assign to the provided module.exports
@@ -67,7 +68,7 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-public class ModuleScriptEnvironment extends AbstractScriptEnvironment implements ChildScriptEnvironment {
+public class ModuleScriptEnvironment extends AbstractScriptEnvironment<RequiredModule> implements ChildScriptEnvironment<RequiredModule> {
 	
 	public static final String API_PREFIX = "jj/";
 	
@@ -91,12 +92,12 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 	) {
 		super(dependencies);
 
-		String moduleIdentifier = name;
+		String moduleIdentifier = name();
 		
-		Location base = AppBase;
-		if (name.startsWith(API_PREFIX)) {
+		Location base = requiredModule.parent().moduleLocation();
+		if (name().startsWith(API_PREFIX)) {
 			base = APIModules;
-			moduleIdentifier = name.substring(API_PREFIX.length());
+			moduleIdentifier = name().substring(API_PREFIX.length());
 		}
 		
 		this.requiredModule = requiredModule;
@@ -160,16 +161,11 @@ public class ModuleScriptEnvironment extends AbstractScriptEnvironment implement
 
 	@Override
 	public String scriptName() {
-		return name + ".js";
+		return name() + ".js";
 	}
 	
 	@Override
-	protected Object[] creationArgs() {
-		return new Object[] { requiredModule };
-	}
-	
-	@Override
-	public ScriptEnvironment parent() {
+	public ScriptEnvironment<?> parent() {
 		return requiredModule.parent();
 	}
 

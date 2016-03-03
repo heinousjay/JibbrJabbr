@@ -28,12 +28,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jj.application.MockApplication;
 import jj.event.MockPublisher;
 import jj.http.server.resource.StaticResource;
-import jj.resource.MockAbstractResourceDependencies;
-import jj.resource.NoSuchResourceException;
-import jj.resource.ResourceFinder;
+import jj.resource.*;
 import jj.script.RealRhinoContextProvider;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;
@@ -42,9 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -68,26 +63,23 @@ public class StylesheetResourceTest {
 	
 	Path cssPath;
 	
-	MockApplication app;
-	
 	@Before
 	public void before() throws Exception {
 		
 		contextProvider = new RealRhinoContextProvider();
 		
 		cssPath = Paths.get(StylesheetResourceTest.class.getResource("/jj/css/test/test.css").toURI());
-		app = new MockApplication(cssPath.getParent());
 		given(cssResource.path()).willReturn(cssPath);
 		given(cssResource.charset()).willReturn(UTF_8);
 	}
 	
 	private StylesheetResource newStylesheet(MockAbstractResourceDependencies dependencies) {
-		return new StylesheetResource(dependencies, contextProvider, global, processor, lessConfiguration, app);
+		return new StylesheetResource(dependencies, contextProvider, global, processor, lessConfiguration);
 	}
 
 	@Test
 	public void testNotFound() {
-		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(AppBase, NAME);
+		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(StylesheetResource.class, Virtual, NAME);
 		try {
 			newStylesheet(dependencies);
 			fail();
@@ -95,15 +87,15 @@ public class StylesheetResourceTest {
 			// yay
 		}
 		
-		verify(dependencies.resourceFinder()).loadResource(StaticResource.class, AppBase, NAME);
-		verify(dependencies.resourceFinder()).loadResource(LessResource.class, AppBase, "test.less");
+		verify(dependencies.resourceFinder()).loadResource(StaticResource.class, Public, NAME);
+		verify(dependencies.resourceFinder()).loadResource(LessResource.class, Private, "test.less");
 	}
 	
 	@Test
 	public void testCssFound() {
-		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(AppBase, NAME);
+		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(StylesheetResource.class, Virtual, NAME);
 		
-		given(dependencies.resourceFinder().loadResource(StaticResource.class, AppBase, NAME)).willReturn(cssResource);
+		given(dependencies.resourceFinder().loadResource(StaticResource.class, Public, NAME)).willReturn(cssResource);
 		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willReturn("");
 		
 		StylesheetResource sr = newStylesheet(dependencies);
@@ -118,21 +110,29 @@ public class StylesheetResourceTest {
 		
 		given(resourceFinder.loadResource(ScriptResource.class, Assets, StylesheetResource.LESS_SCRIPT)).willReturn(lessScriptResource);
 		
-		LessResource less1 = new LessResource(new MockAbstractResourceDependencies(AppBase, "test.less", resourceFinder), cssPath.resolveSibling("test.less"));
-		given(resourceFinder.loadResource(LessResource.class, AppBase, "test.less")).willReturn(less1);
+		LessResource less1 = new LessResource(
+			new MockAbstractResourceDependencies(
+				new MockResourceIdentifierMaker().make(StylesheetResource.class, Private, "test.less"),
+				resourceFinder
+			),
+			cssPath.resolveSibling("test.less")
+		);
+		given(resourceFinder.loadResource(LessResource.class, Private, "test.less")).willReturn(less1);
+		given(resourceFinder.loadResource(LessResource.class, Public.and(Private), "test.less")).willReturn(less1);
 		
-		LessResource less2 = new LessResource(new MockAbstractResourceDependencies(AppBase, "test2.less", resourceFinder), cssPath.resolveSibling("test2.less"));
-		given(resourceFinder.loadResource(LessResource.class, AppBase, "test2.less")).willReturn(less2);
-		
-		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willAnswer(new Answer<String>() {
+		LessResource less2 = new LessResource(
+			new MockAbstractResourceDependencies(new MockResourceIdentifierMaker().make(StylesheetResource.class, Private, "test2.less"), resourceFinder),
+			cssPath.resolveSibling("test2.less")
+		);
 
-			@Override
-			public String answer(InvocationOnMock invocation) throws Throwable {
-				return (String)invocation.getArguments()[0];
-			}
-		});
+		given(resourceFinder.loadResource(LessResource.class, Public.and(Private), "test2.less")).willReturn(less2);
 		
-		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(AppBase, NAME, resourceFinder);
+		given(processor.fixUris(anyString(), isA(StylesheetResource.class))).willAnswer(invocation -> invocation.getArguments()[0]);
+		
+		MockAbstractResourceDependencies dependencies = new MockAbstractResourceDependencies(
+			new MockResourceIdentifierMaker().make(StylesheetResource.class, Virtual, NAME),
+			resourceFinder
+		);
 		
 		try (RhinoContext context = contextProvider.get().withoutContinuations()) {
 			global = context.initStandardObjects();

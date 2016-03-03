@@ -32,15 +32,12 @@ import jj.execution.TaskRunner;
 class ContinuationPendingKeyResultExtractorHelper extends ContinuationPendingCache {
 
 	static Map<PendingKey, Object> RESULT_MAP = new HashMap<>();
-	
-	/**
-	 * @param taskRunner
-	 */
+
 	ContinuationPendingKeyResultExtractorHelper() {
 		super(new TaskRunner() { // cause really, it shouldn't happen
 			
 			@Override
-			public Promise execute(JJTask task) {
+			public <ExecutorType> Promise execute(JJTask<ExecutorType> task) {
 				throw new AssertionError("how did this get called?");
 			}
 		}, new CurrentTask());

@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import jj.logging.LoggedEvent;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -35,7 +36,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import jj.application.Application;
 import jj.http.server.LoadedResource;
 import jj.http.server.ServableResourceConfiguration;
 import jj.http.server.resource.StaticResource;
@@ -46,6 +46,7 @@ import jj.script.Global;
 import jj.script.RhinoContext;
 import jj.script.module.ScriptResource;
 import jj.util.SHA1Helper;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -61,16 +62,17 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-@ServableResourceConfiguration(routeContributor = StylesheetResourceRouteContributor.class)
-public class StylesheetResource extends AbstractResource implements LoadedResource {
+@ServableResourceConfiguration(
+	routeContributor = StylesheetResourceRouteContributor.class,
+	processorConfig = StylesheetResourceRouteProcessorConfiguration.class
+)
+public class StylesheetResource extends AbstractResource<Void> implements LoadedResource {
 
 	static final String LESS_SCRIPT = "less-rhino-1.7.3.js";
 	private final ByteBuf bytes;
 	private final String sha1;
 	private final Path path;
-	private final String serverPath;
 	private final long size;
-	private final boolean safeToServe;
 	private final LessConfiguration lessConfiguration;
 
 	@Inject
@@ -79,27 +81,26 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		final Provider<RhinoContext> contextProvider,
 		final @Global ScriptableObject global,
 		final CssReferenceVersionProcessor processor,
-		final LessConfiguration lessConfiguration,
-		final Application application
+		final LessConfiguration lessConfiguration
 	) {
 		super(dependencies);
 		
 		this.lessConfiguration = lessConfiguration;
 		
 		// is there a static css file?
-		StaticResource css = resourceFinder.loadResource(StaticResource.class, AppBase, name);
+		StaticResource css = resourceFinder.loadResource(StaticResource.class, Public, name());
 		String result;
 		
 		if (css == null) {
 			// for whatever reason, i'm getting obsessed with optimal string processing
-			String lessName = new StringBuilder(name.length() + 1)
-				.append(name)
-				.replace(name.length() - 3, name.length() - 2, "le")
+			String lessName = new StringBuilder(name().length() + 1)
+				.append(name())
+				.replace(name().length() - 3, name().length() - 2, "le")
 				.toString();
 
 			// this is just to check for existence of the resource, it will get loaded from
 			// the script execution and hooked into the dependency system then
-			LessResource lessSheet = resourceFinder.loadResource(LessResource.class, AppBase, lessName);
+			LessResource lessSheet = resourceFinder.loadResource(LessResource.class, Private, lessName);
 			if (lessSheet == null) {
 				throw new NoSuchResourceException(StylesheetResource.class, name());
 			}
@@ -119,15 +120,12 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 				throw new ResourceNotViableException(path, ioe);
 			}
 		}
-		
-		safeToServe = application.pathInBase(path);
 
 		result = processor.fixUris(result, this);
 		
 		sha1 = SHA1Helper.keyFor(result);
 		bytes = Unpooled.copiedBuffer(result, charset());
 		size = bytes.readableBytes();
-		serverPath = "/" + sha1 + "/" + name;
 	}
 	
 	private String processLessScript(final Provider<RhinoContext> contextProvider, final ScriptableObject global, String lessName) {
@@ -173,16 +171,6 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 	@Override
 	public String sha1() {
 		return sha1;
-	}
-
-	@Override
-	public String serverPath() {
-		return serverPath;
-	}
-	
-	@Override
-	public boolean safeToServe() {
-		return safeToServe;
 	}
 
 	@Override
@@ -235,7 +223,7 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			String resourceName = String.valueOf(args[0]);
 			publisher.publish(new LoadingLessResource(resourceName));
-			LessResource lr = resourceFinder.loadResource(LessResource.class, AppBase, resourceName);
+			LessResource lr = resourceFinder.loadResource(LessResource.class, Public.and(Private), resourceName);
 			if (lr != null) {
 				lr.addDependent(StylesheetResource.this);
 				return lr.contents();
@@ -266,8 +254,23 @@ public class StylesheetResource extends AbstractResource implements LoadedResour
 		
 		public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
 			
-			System.out.println(args[0]);
+			if (args.length == 1) { publisher.publish(new LessLog(args[0])); }
 			return Undefined.instance;
+		}
+	}
+
+	@LessLogger
+	private static class LessLog extends LoggedEvent {
+
+		private final Object arg;
+
+		LessLog(Object arg) {
+			this.arg = arg;
+		}
+
+		@Override
+		public void describeTo(Logger logger) {
+			logger.debug("{}", arg);
 		}
 	}
 }

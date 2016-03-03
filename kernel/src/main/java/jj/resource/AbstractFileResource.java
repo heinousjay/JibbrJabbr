@@ -21,7 +21,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-public abstract class AbstractFileResource extends AbstractResource implements FileResource {
+public abstract class AbstractFileResource<T> extends AbstractResource<T> implements FileResource<T> {
 	
 	protected final Path path;
 	protected final FileTime lastModified;
@@ -35,6 +35,12 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 		final Path path
 	) {
 		this(dependencies, path, true);
+	}
+	
+	// java likes to be a pain
+	@SuppressWarnings("unchecked")
+	private static NoSuchResourceException noSuchResourceException(Class<?> instanceClass, Path path) {
+		throw new NoSuchResourceException((Class<? extends Resource<?>>)instanceClass, path);
 	}
 	
 	@ResourceThread
@@ -52,11 +58,11 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 			try {
 				attributes = Files.readAttributes(path, BasicFileAttributes.class);
 			} catch (NoSuchFileException nsfe) {
-				throw new NoSuchResourceException(getClass(), path);
+				throw noSuchResourceException(getClass(), path);
 			}
 			
 			if (!attributes.isRegularFile()) {
-				throw new NoSuchResourceException(getClass(), path);
+				throw noSuchResourceException(getClass(), path);
 			}
 			
 			size = attributes.size();
@@ -82,7 +88,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 				sha1 = SHA1Helper.keyFor(path);
 			} else { // avoid reading the sha1 directly, try to save it
 				byteBuffer = null;
-				Sha1Resource sha1Resource = resourceFinder.loadResource(Sha1Resource.class, base, name, this);
+				Sha1Resource sha1Resource = resourceFinder.loadResource(Sha1Resource.class, base(), name(), new Sha1ResourceTarget(this));
 				assert sha1Resource.representedFileSize() == size;
 				sha1 = sha1Resource.representedSha();
 			}
@@ -96,6 +102,7 @@ public abstract class AbstractFileResource extends AbstractResource implements F
 	protected String extension() {
 		// file resources get a path based on their name, right?
 		// at least in all cases where these settings matter, anyway
+		String name = name();
 		return name.substring(name.lastIndexOf(".") + 1);
 	}
 	

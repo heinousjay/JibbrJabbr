@@ -19,17 +19,16 @@ import static org.junit.Assert.*;
 import static java.util.concurrent.TimeUnit.*;
 import static org.hamcrest.Matchers.*;
 
-import java.util.concurrent.CountDownLatch;
-
 import io.netty.handler.codec.http.HttpHeaderNames;
 
 import javax.inject.Inject;
 
 import jj.App;
 import jj.ServerRoot;
-import jj.http.server.EmbeddedHttpServer.ResponseReady;
+import jj.http.server.EmbeddedHttpResponse.ResponseReady;
 import jj.testing.JibbrJabbrTestServer;
 
+import jj.testing.Latch;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -46,7 +45,7 @@ public class EmbeddedHttpServerTest {
 	EmbeddedHttpServer server;
 	
 	@Rule
-	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.one).injectInstance(this);
+	public JibbrJabbrTestServer app = new JibbrJabbrTestServer(ServerRoot.one, App.app1).injectInstance(this);
 
 	@Test
 	public void test() throws Throwable {
@@ -63,21 +62,17 @@ public class EmbeddedHttpServerTest {
 	@Test
 	public void testCallback() throws Throwable {
 		
-		final CountDownLatch myLatch = new CountDownLatch(3);
+		final Latch myLatch = new Latch(3);
 		final AssertionError testFailures = new AssertionError("there were test failures");
-		ResponseReady responseReady = new ResponseReady() {
-			
-			@Override
-			public void ready(EmbeddedHttpResponse response) {
-				try {
-					String body = response.bodyContentAsString();
-					int contentLength = response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH, -1);
-					assertThat(body.length(), is(contentLength)); // this only works because it's ASCII haha
-				} catch (Throwable t) {
-					testFailures.addSuppressed(t);
-				} finally {
-					myLatch.countDown();
-				}
+		ResponseReady responseReady = response -> {
+			try {
+				String body = response.bodyContentAsString();
+				int contentLength = response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH, -1);
+				assertThat(body.length(), is(contentLength)); // this only works because it's ASCII haha
+			} catch (Throwable t) {
+				testFailures.addSuppressed(t);
+			} finally {
+				myLatch.countDown();
 			}
 		};
 		
@@ -85,7 +80,7 @@ public class EmbeddedHttpServerTest {
 		server.request(new EmbeddedHttpRequest("/0.txt"), responseReady);
 		server.request(new EmbeddedHttpRequest("/jj.js"), responseReady);
 		
-		assertTrue(myLatch.await(3, SECONDS));
+		myLatch.await(3, SECONDS);
 		
 		if (testFailures.getSuppressed().length > 0) {
 			throw testFailures;

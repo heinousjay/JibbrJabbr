@@ -24,7 +24,7 @@ import org.jsoup.select.NodeVisitor;
  * @author jason
  *
  */
-public class HtmlResource extends AbstractFileResource {
+public class HtmlResource extends AbstractFileResource<Void> {
 
 	private final Document document;
 	
@@ -69,7 +69,7 @@ public class HtmlResource extends AbstractFileResource {
 		
 		Parser parser = Parser.htmlParser().setTrackErrors(configuration.showParsingErrors() ? Integer.MAX_VALUE : 0);
 		
-		this.document = parser.parseInput(html, name);
+		this.document = parser.parseInput(html, name());
 		
 		List<ParseError> errors = parser.getErrors();
 		if (!errors.isEmpty()) {

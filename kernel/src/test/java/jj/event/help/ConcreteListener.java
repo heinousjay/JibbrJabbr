@@ -26,7 +26,7 @@ public class ConcreteListener extends AbstractListener {
 	public int unrelatedIEventCount;
 	
 	@Listener
-	void unrelatedIEvent(UnrelatedIEvent event) {
+	void on(UnrelatedIEvent event) {
 		++unrelatedIEventCount;
 	}
 }

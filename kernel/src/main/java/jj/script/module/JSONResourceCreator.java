@@ -26,7 +26,7 @@ import jj.resource.SimpleResourceCreator;
  *
  */
 @Singleton
-class JSONResourceCreator extends SimpleResourceCreator<JSONResource> {
+class JSONResourceCreator extends SimpleResourceCreator<JSONResource, Void> {
 
 	@Inject
 	JSONResourceCreator(jj.resource.SimpleResourceCreator.Dependencies dependencies) {
@@ -34,7 +34,7 @@ class JSONResourceCreator extends SimpleResourceCreator<JSONResource> {
 	}
 	
 	@Override
-	protected boolean arguments(Location base, String name) {
+	protected boolean arguments(Location base, String name, Void argument) {
 		return name.endsWith(".json");
 	}
 }

@@ -16,25 +16,38 @@
 package jj.resource;
 
 import java.io.IOException;
-import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import jj.application.AppLocation;
+import static jj.application.AppLocation.AppBase;
 import jj.event.Publisher;
 import jj.util.SHA1Helper;
 
-class MyResource extends AbstractResource {
+class MyResource extends AbstractResource<Void> implements FileSystemResource {
 	
 	protected MyResource(String name, Publisher publisher) {
-		super(new MockAbstractResourceDependencies(new ResourceKey(MyResource.class, URI.create(name)), AppLocation.AppBase, name, publisher));
+		super(new MockAbstractResourceDependencies(
+			new MockResourceIdentifierMaker().make(MyResource.class, AppBase, name), publisher)
+		);
 	}
 
 	@Override
 	public String sha1() {
-		return SHA1Helper.keyFor(name);
+		return SHA1Helper.keyFor(name());
 	}
 
 	@Override
 	public boolean needsReplacing() throws IOException {
 		return false;
+	}
+
+	@Override
+	public boolean isDirectory() {
+		return false;
+	}
+
+	@Override
+	public Path path() {
+		return Paths.get(name());
 	}
 }

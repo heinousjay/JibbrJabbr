@@ -28,15 +28,15 @@ public class TaskHelper {
 	/**
 	 * @param name
 	 */
-	public static void invoke(final JJTask toInvoke) throws Exception {
+	public static void invoke(final JJTask<?> toInvoke) throws Exception {
 		toInvoke.run();
 	}
 	
-	public static void markDone(final JJTask toMark) {
+	public static void markDone(final JJTask<?> toMark) {
 		toMark.promise().done();
 	}
 	
-	public static void errored(final JJTask task, final Throwable cause) {
+	public static void errored(final JJTask<?> task, final Throwable cause) {
 		task.errored(cause);
 	}
 }

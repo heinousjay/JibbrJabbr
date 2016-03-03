@@ -29,11 +29,13 @@ import io.netty.util.concurrent.GenericFutureListener;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Provider;
 
+import jj.configuration.ConfigurationLoaded;
 import jj.event.MockPublisher;
 import jj.execution.MockTaskRunner;
 
@@ -45,9 +47,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.BDDMockito;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * @author jason
@@ -55,14 +55,6 @@ import org.mockito.stubbing.Answer;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class HttpServerTest {
-	
-	Provider<EngineHttpHandler> engineProvider = new Provider<EngineHttpHandler>() {
-		
-		@Override
-		public EngineHttpHandler get() {
-			return mock(EngineHttpHandler.class);
-		}
-	};
 	
 	@Mock HttpServerSwitch httpServerSwitch;
 	
@@ -194,7 +186,7 @@ public class HttpServerTest {
 	public void testServerOff() throws Exception {
 		
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		
 		// then
 		assertTrue(publisher.events.isEmpty());
@@ -217,7 +209,7 @@ public class HttpServerTest {
 		givenStartupConditions();
 
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		taskRunner.runFirstTask();
 		
 		// check more - the value of the bindings maybe?
@@ -248,7 +240,7 @@ public class HttpServerTest {
 		givenStartupConditions();
 
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		taskRunner.runFirstTask();
 		
 		assertThat(publisher.events.size(), is(3));
@@ -258,26 +250,21 @@ public class HttpServerTest {
 		publisher.events.clear();
 		
 		// given
-		bindings = Arrays.asList(new Binding(8070));
+		bindings = Collections.singletonList(new Binding(8070));
 		given(serverBootstrap.bind(8070)).willReturn(future);
 		hashCode = 93987934; // just needs to be different
 		given(serverBootstrap.group()).willReturn(bossGroup);
-		willAnswer(new Answer<Future<?>>() {
-
-			@Override
-			public Future<?> answer(InvocationOnMock invocation) throws Throwable {
-				@SuppressWarnings("unchecked")
-				GenericFutureListener<Future<?>> listener = (GenericFutureListener<Future<?>>)invocation.getArguments()[0];
-				listener.operationComplete(groupFuture);
-				return groupFuture;
-			}
-			
+		willAnswer(invocation -> {
+			@SuppressWarnings("unchecked")
+			GenericFutureListener<Future<?>> listener = (GenericFutureListener<Future<?>>)invocation.getArguments()[0];
+			listener.operationComplete(groupFuture);
+			return groupFuture;
 		}).given(groupFuture).addListener(any());
 		willReturn(groupFuture).given(bossGroup).shutdownGracefully(anyLong(), anyLong(), BDDMockito.any(TimeUnit.class));
 		given(groupFuture.isSuccess()).willReturn(true);
 
 		// when
-		httpServer.configurationLoaded(null);
+		httpServer.on((ConfigurationLoaded)null);
 		taskRunner.runFirstTask();
 		
 		// then

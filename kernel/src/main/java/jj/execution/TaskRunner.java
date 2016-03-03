@@ -30,6 +30,6 @@ public interface TaskRunner {
 	 * @param task The task to execute.
 	 * @return The {@link Promise} from the given task.
 	 */
-	Promise execute(final JJTask task);
+	<ExecutorType> Promise execute(final JJTask<ExecutorType> task);
 
 }

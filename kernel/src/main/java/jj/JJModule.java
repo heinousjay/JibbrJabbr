@@ -23,11 +23,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
+import javax.inject.Singleton;
 
 import jj.configuration.ConfigurationObjectBinder;
 import jj.conversion.Converter;
 import jj.engine.HostObject;
-import jj.execution.ExecutorBinder;
 import jj.http.server.ServableResource;
 import jj.http.server.ServableResourceBindingProcessor;
 import jj.http.server.websocket.WebSocketConnectionHost;
@@ -40,7 +40,8 @@ import jj.resource.SimpleResourceCreator;
 import jj.script.Continuation;
 import jj.script.ContinuationProcessor;
 import jj.script.ContinuationProcessorBinder;
-import jj.server.APIPaths;
+import jj.server.APIModulePaths;
+import jj.server.APISpecPaths;
 import jj.server.AssetPaths;
 
 import com.google.inject.AbstractModule;
@@ -57,6 +58,9 @@ import com.google.inject.multibindings.Multibinder;
  */
 public abstract class JJModule extends AbstractModule {
 	
+	// this annotation is used to ensure that no one can inject Set<Object> and
+	// get a weird variety of server components, because that's just not a
+	// sensible thing to do
 	@Qualifier
 	@Target(PARAMETER)
 	@Retention(RetentionPolicy.RUNTIME)
@@ -65,8 +69,6 @@ public abstract class JJModule extends AbstractModule {
 	private ResourceBinder resources;
 
 	private ContinuationProcessorBinder continuationProcessors;
-
-	private ExecutorBinder executors;
 
 	private LoggingBinder loggers;
 
@@ -78,9 +80,11 @@ public abstract class JJModule extends AbstractModule {
 	private Multibinder<Converter<?, ?>> converters;
 	private Multibinder<HostObject> hostObjects;
 	private Multibinder<String> assetPaths;
-	private Multibinder<String> apiPaths;
+	private Multibinder<String> apiModulePaths;
+	private Multibinder<String> apiSpecPaths;
 
 	protected void bindStartupListener(Class<?> startupListenerClass) {
+		assert startupListenerClass.isAnnotationPresent(Singleton.class) : "startup listeners must be singletons!";
 		if (startupListeners == null) {
 			startupListeners =  Multibinder.newSetBinder(binder(), Object.class, StartupListeners.class);
 		}
@@ -111,13 +115,21 @@ public abstract class JJModule extends AbstractModule {
 	
 	protected void bindAPIModulePath(String path) {
 		assert path != null && path.startsWith("/") : "path must be present and start with /";
-		if (apiPaths == null) {
-			apiPaths = Multibinder.newSetBinder(binder(), String.class, APIPaths.class);
+		if (apiModulePaths == null) {
+			apiModulePaths = Multibinder.newSetBinder(binder(), String.class, APIModulePaths.class);
 		}
-		apiPaths.addBinding().toInstance(path);
+		apiModulePaths.addBinding().toInstance(path);
+	}
+	
+	protected void bindAPISpecPath(String path) {
+		assert path != null && path.startsWith("/") : "path must be present and start with /";
+		if (apiSpecPaths == null) {
+			apiSpecPaths = Multibinder.newSetBinder(binder(), String.class, APISpecPaths.class);
+		}
+		apiSpecPaths.addBinding().toInstance(path);
 	}
 
-	protected <T extends AbstractResource> LinkedBindingBuilder<SimpleResourceCreator<T>> bindCreationOf(Class<T> resourceClass) {
+	protected <T extends AbstractResource<A>, A> LinkedBindingBuilder<SimpleResourceCreator<T, A>> bindCreationOf(Class<T> resourceClass) {
 		if (resources == null) {
 			resources = new ResourceBinder(binder())
 				.addResourceBindingProcessor(ServableResource.class, new ServableResourceBindingProcessor(binder()))
@@ -134,10 +146,8 @@ public abstract class JJModule extends AbstractModule {
 	}
 
 	protected void bindExecutor(Class<?> executor) {
-		if (executors == null) {
-			executors = new ExecutorBinder(binder());
-		}
-		executors.addExecutor(executor);
+		assert executor.isAnnotationPresent(Singleton.class);
+		binder().bind(executor).asEagerSingleton();
 	}
 
 	protected BindingBuilder bindLoggedEventsAnnotatedWith(Class<? extends Annotation> annotation) {

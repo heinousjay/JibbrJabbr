@@ -25,7 +25,7 @@ import jj.execution.TaskRunner;
  * @author jason
  *
  */
-public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTask<ScriptExecutor> {
+public abstract class ScriptTask<T extends ScriptEnvironment<?>> extends DelayedTask<ScriptExecutor> {
 	
 	protected final T scriptEnvironment;
 	
@@ -56,13 +56,13 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 		} else if (result != null) {
 			resume();
 		} else {
-			throw new AssertionError("did you mess with the pendingKey and/or result?\npendingKey = " + pendingKey + "\nresult = " + result);
+			throw new AssertionError("did you mess with the pendingKey and/or result?\npendingKey = " + pendingKey + "\nresult = null");
 		}
 		
 		if (pendingKey == null) {
 			complete();
 		} else {
-			((AbstractScriptEnvironment)scriptEnvironment).awaitContinuation(this);
+			((AbstractScriptEnvironment<?>)scriptEnvironment).awaitContinuation(this);
 		}
 	}
 	
@@ -76,7 +76,7 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	 * Resumes executing the task
 	 */
 	void resume() {
-		pendingKey = ((AbstractScriptEnvironment)scriptEnvironment).resumeContinuation(pendingKey, result);
+		pendingKey = ((AbstractScriptEnvironment<?>)scriptEnvironment).resumeContinuation(pendingKey, result);
 	}
 	/**
 	 * Implement this method to run after completion of either the begin or resume methods, when no
@@ -87,17 +87,11 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	protected void complete() throws Exception {
 		
 	}
-	
-	@Override
-	protected ScriptExecutor findExecutor(ExecutorFinder executors) {
-		return executors.ofType(ScriptExecutorFactory.class).executorFor(scriptEnvironment);
-	}
 
 	/**
 	 * return null if the task is completed
 	 * return the continuation pendingKey if the task needs to be resumed
 	 * be sure to store the key for resumption
-	 * @return
 	 */
 	final PendingKey pendingKey() {
 		return pendingKey;
@@ -106,7 +100,6 @@ public abstract class ScriptTask<T extends ScriptEnvironment> extends DelayedTas
 	/**
 	 * The {@link TaskRunner} will call this with the result to be used to continue.
 	 * do not do any processing in this method! store the value and wait to be run
-	 * @param result
 	 */
 	final void resumeWith(Object result) {
 		this.result = result;

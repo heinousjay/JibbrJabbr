@@ -30,45 +30,55 @@ import jj.util.GenericUtils;
  * 
  * <p>
  * If the resource being created has special creation needs, override
- * {@link #create(Location, String, Object...)}, otherwise just extend
+ * {@link #create(Location, String, A)}, otherwise just extend
  * this class and bind it.
  * 
  * <p>
  * If all you need to do is validate the arguments are correct, override
- * {@link #arguments(Location, String)} and return true if everything is
+ * {@link #arguments(Location, String, A)} and return true if everything is
  * fine, false if not.
  * 
  * @author jason
  *
  */
 @Singleton
-public class SimpleResourceCreator<T extends AbstractResource> implements ResourceCreator<T> {
+public class SimpleResourceCreator<T extends AbstractResource<A>, A> implements ResourceCreator<T, A> {
 	
 	@Singleton
 	public static class Dependencies {
 		protected final PathResolver pathResolver;
 		protected final ResourceInstanceCreator creator;
+		protected final ResourceIdentifierMaker resourceIdentifierMaker;
 		
 		@Inject
-		protected Dependencies(final PathResolver pathResolver, final ResourceInstanceCreator creator) {
+		protected Dependencies(PathResolver pathResolver, ResourceInstanceCreator creator, ResourceIdentifierMaker resourceIdentifierMaker) {
 			this.pathResolver = pathResolver;
 			this.creator = creator;
+			this.resourceIdentifierMaker = resourceIdentifierMaker;
 		}
 	}
 	protected final PathResolver pathResolver;
 	protected final ResourceInstanceCreator creator;
+	protected final ResourceIdentifierMaker resourceIdentifierMaker;
 	private final Class<T> type;
+	private final Class<A> argType;
 	
 	@SuppressWarnings("unchecked")
 	@Inject
 	protected SimpleResourceCreator(final Dependencies dependencies) {
 		pathResolver = dependencies.pathResolver;
 		creator = dependencies.creator;
-		type = (Class<T>)GenericUtils.extractGenericParameter(getClass());
+		resourceIdentifierMaker = dependencies.resourceIdentifierMaker;
+		type = (Class<T>)GenericUtils.extractTypeParameterAsClass(getClass(), SimpleResourceCreator.class, "T");
+		argType = (Class<A>)GenericUtils.extractTypeParameterAsClass(getClass(), SimpleResourceCreator.class, "A");
 	}
 
-	protected URI uri(final Location base, final String name, final Object...args) {
+	protected URI uri(final Location base, final String name, final A argument) {
 		return pathResolver.resolvePath(base, name).toUri();
+	}
+	
+	public Class<A> argType() {
+		return argType;
 	}
 	
 	@Override
@@ -76,18 +86,13 @@ public class SimpleResourceCreator<T extends AbstractResource> implements Resour
 		return type;
 	}
 	
-	@Override
-	public ResourceKey resourceKey(final Location base, final String name, final Object...args) {
-		return new ResourceKey(type, uri(base, name, args));
-	}
-	
-	protected boolean arguments(Location base, String name) {
+	protected boolean arguments(Location base, String name, A argument) {
 		return true;
 	}
 
 	@Override
-	public T create(Location base, String name, Object... args) throws IOException {
-		assert arguments(base, name);
-		return creator.createResource(type, resourceKey(base, name), base, name);
+	public T create(Location base, String name, A argument) throws IOException {
+		assert arguments(base, name, argument) : getClass().getName();
+		return creator.createResource(resourceIdentifierMaker.make(type(), base, name, argument));
 	}
 }

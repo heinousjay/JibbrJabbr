@@ -60,7 +60,7 @@ class PhantomJSSetupPlugin implements Plugin<Project> {
 repositories {
 	//mavenLocal()
 	maven {
-	url 'https://oss.sonatype.org/content/repositories/snapshots/'
+		url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
 }
 
@@ -78,6 +78,6 @@ dependencies {
 test {
 	inputs.file project(':').jar.archivePath
 	
-	minHeapSize = "128m"
-	maxHeapSize = "512m"
+	minHeapSize = '128m'
+	maxHeapSize = '512m'
 }

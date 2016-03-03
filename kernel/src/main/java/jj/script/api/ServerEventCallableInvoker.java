@@ -32,7 +32,7 @@ abstract class ServerEventCallableInvoker {
 	
 	private final TaskRunner taskRunner;
 
-	private ScriptEnvironment target;
+	private ScriptEnvironment<?> target;
 	
 	private Callable callable;
 	
@@ -42,7 +42,7 @@ abstract class ServerEventCallableInvoker {
 		this.taskRunner = taskRunner;
 	}
 	
-	void invocationInstances(final ScriptEnvironment target, final Callable callable) {
+	void invocationInstances(final ScriptEnvironment<?> target, final Callable callable) {
 		this.target = target;
 		this.callable = callable;
 	}
@@ -57,7 +57,7 @@ abstract class ServerEventCallableInvoker {
 		
 		if (alive) {
 			String name = "invoking " + target.name() + " function with server event " + event.getClass().getName();
-			taskRunner.execute(new ScriptTask<ScriptEnvironment>(name, target) {
+			taskRunner.execute(new ScriptTask<ScriptEnvironment<?>>(name, target) {
 				@Override
 				protected void begin() throws Exception {
 					if (alive) {

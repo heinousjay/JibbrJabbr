@@ -32,12 +32,12 @@ public class ChildSub {
 	}
 	
 	@Listener
-	void listen(Event event) {
+	void on(Event event) {
 		++heard;
 	}
 	
 	@Listener
-	Object listen2(EventSub eventSub) {
+	Object on(EventSub eventSub) {
 		++heard2;
 		return null;
 	}

@@ -37,18 +37,19 @@ class AbstractResourceEventDemuxer {
 	
 	AbstractResourceEventDemuxer() {}
 	
-	private final ConcurrentHashMap<ResourceKey, AbstractResource> waitingResources = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<ResourceIdentifier<?, ?>, AbstractResource<?>> waitingResources =
+		new ConcurrentHashMap<>(16, 0.75f, 4);
 
 	@Listener
-	void resourceLoaded(ResourceLoaded event) {
+	void on(ResourceLoaded event) {
 		
-		AbstractResource resource = waitingResources.remove(event.resourceKey);
+		AbstractResource<?> resource = waitingResources.remove(event.identifier());
 		if (resource != null) {
 			resource.resourceLoaded();
 		}
 	}
 	
-	void awaitInitialization(AbstractResource resource) {
-		waitingResources.put(resource.cacheKey(), resource);
+	void awaitInitialization(AbstractResource<?> resource) {
+		waitingResources.put(resource.identifier(), resource);
 	}
 }

@@ -10,7 +10,7 @@ public class ServerRoot {
 	
 	static {
 		try {
-			one = getPath("/root1/");
+			one = getPath("/test-roots/root1/");
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

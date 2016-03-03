@@ -15,20 +15,16 @@
  */
 package jj.document.servable;
 
-import static io.netty.handler.codec.http.HttpMethod.GET;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.*;
 import jj.css.StylesheetResource;
 import jj.document.servable.DocumentRequestProcessor;
 import jj.document.servable.ResourceUrlDocumentFilter;
-import jj.http.server.RouteProcessor;
-import jj.http.server.ServableResources;
 import jj.http.server.resource.StaticResource;
-import jj.http.server.uri.Route;
-import jj.http.server.uri.RouteMatch;
-import jj.http.server.uri.Router;
 import jj.http.server.uri.URIMatch;
+import jj.resource.ServableLoader;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
@@ -44,27 +40,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceUrlDocumentFilterTest {
 	
-	@Mock ServableResources servables;
-	@Mock Router router;
-	@Mock Route route;
+	private @Mock DocumentRequestProcessor documentRequestProcessor;
+	private Document document;
 	
-	@Mock RouteMatch routeMatch1;
-	@Mock RouteMatch routeMatch2;
-	@Mock RouteMatch routeMatch3;
-
-	@Mock RouteProcessor routeProcessor;
+	private @Mock StylesheetResource cssResource;
+	private String cssResourcePath = "css/path.css";
+	private @Mock StaticResource staticResource1;
+	private String baseStaticPath = "base/static.path";
+	private @Mock StaticResource staticResource2;
+	private String assetStaticPath = "asset/static-1.2.path";
 	
-	@Mock DocumentRequestProcessor documentRequestProcessor;
-	Document document;
+	@Mock ServableLoader servableLoader;
 	
-	@Mock StylesheetResource cssResource;
-	String cssResourcePath = "css/path.css";
-	@Mock StaticResource staticResource1;
-	String baseStaticPath = "base/static.path";
-	@Mock StaticResource staticResource2;
-	String assetStaticPath = "asset/static-1.2.path";
-	
-	ResourceUrlDocumentFilter filter;
+	private ResourceUrlDocumentFilter filter;
 	
 	@Before
 	public void before() {
@@ -75,35 +63,15 @@ public class ResourceUrlDocumentFilterTest {
 			"</a><link href='" + assetStaticPath + "'/>");
 		given(documentRequestProcessor.document()).willReturn(document);
 		
-		filter = new ResourceUrlDocumentFilter(servables, router);
+		filter = new ResourceUrlDocumentFilter(servableLoader);
 	}
 	
 	@Test
 	public void test() {
 		
-		// given
-		given(router.routeRequest(GET, new URIMatch("/" + cssResourcePath))).willReturn(routeMatch1);
-		given(routeMatch1.matched()).willReturn(true);
-		given(routeMatch1.resourceName()).willReturn("stylesheet");
-		given(routeMatch1.route()).willReturn(route);
-		given(router.routeRequest(GET, new URIMatch("/" + baseStaticPath))).willReturn(routeMatch2);
-		given(routeMatch2.matched()).willReturn(true);
-		given(routeMatch2.resourceName()).willReturn("static");
-		given(routeMatch2.route()).willReturn(route);
-		given(router.routeRequest(GET, new URIMatch("/" + assetStaticPath))).willReturn(routeMatch3);
-		given(routeMatch3.matched()).willReturn(true);
-		given(routeMatch3.resourceName()).willReturn("static");
-		given(routeMatch3.route()).willReturn(route);
-		
-		willReturn(StylesheetResource.class).given(servables).classFor("stylesheet");
-		willReturn(StaticResource.class).given(servables).classFor("static");
-		
-		given(servables.routeProcessor("stylesheet")).willReturn(routeProcessor);
-		given(servables.routeProcessor("static")).willReturn(routeProcessor);
-		
-		given(routeProcessor.loadResource(StylesheetResource.class, new URIMatch("/" + cssResourcePath), route)).willReturn(cssResource);
-		given(routeProcessor.loadResource(StaticResource.class, new URIMatch("/" + baseStaticPath), route)).willReturn(staticResource1);
-		given(routeProcessor.loadResource(StaticResource.class, new URIMatch("/" + assetStaticPath), route)).willReturn(staticResource2);
+		willReturn(cssResource).given(servableLoader).loadResource(new URIMatch("/" + cssResourcePath));
+		willReturn(staticResource1).given(servableLoader).loadResource(new URIMatch("/" + baseStaticPath));
+		willReturn(staticResource2).given(servableLoader).loadResource(new URIMatch("/" + assetStaticPath));
 		
 		given(cssResource.serverPath()).willReturn("/substitutesha/" + cssResourcePath);
 		given(staticResource1.serverPath()).willReturn("/substitutesha/" + baseStaticPath);
@@ -124,7 +92,6 @@ public class ResourceUrlDocumentFilterTest {
 	public void test2() {
 		
 		// given
-		given(router.routeRequest(eq(GET), any(URIMatch.class))).willReturn(routeMatch1);
 		document.select("img").attr("src", "../style.gif");
 		given(documentRequestProcessor.uri()).willReturn("/files/");
 		

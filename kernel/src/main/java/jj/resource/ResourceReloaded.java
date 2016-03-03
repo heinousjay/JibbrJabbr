@@ -21,8 +21,8 @@ package jj.resource;
  */
 public class ResourceReloaded extends ResourceEvent implements ResourceCacheUpdated {
 
-	public ResourceReloaded(AbstractResource resource) {
-		super(resource);
+	public ResourceReloaded(AbstractResource<?> resource) {
+		super(resource.identifier());
 	}
 
 	@Override

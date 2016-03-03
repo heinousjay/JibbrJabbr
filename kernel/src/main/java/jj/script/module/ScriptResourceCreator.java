@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 import jj.resource.SimpleResourceCreator;
 
 @Singleton
-public class ScriptResourceCreator extends SimpleResourceCreator<ScriptResource> {
+public class ScriptResourceCreator extends SimpleResourceCreator<ScriptResource, Void> {
 
 	@Inject
 	ScriptResourceCreator(final Dependencies dependencies) {

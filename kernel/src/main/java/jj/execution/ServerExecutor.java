@@ -15,6 +15,7 @@
  */
 package jj.execution;
 
+import java.time.Clock;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -23,7 +24,6 @@ import javax.inject.Singleton;
 import jj.ServerStopping;
 import jj.event.Listener;
 import jj.event.Subscriber;
-import jj.util.Clock;
 
 /**
  * Special internal executor for the various tasks the server needs done.
@@ -37,9 +37,9 @@ class ServerExecutor extends DelayedExecutor {
 
 	@Inject
 	ServerExecutor(
-		final Clock clock,
-		final JJThreadFactory threadFactory,
-		final JJRejectedExecutionHandler handler
+		Clock clock,
+		JJThreadFactory threadFactory,
+		JJRejectedExecutionHandler handler
 	) {
 		super(
 			clock,
@@ -58,7 +58,7 @@ class ServerExecutor extends DelayedExecutor {
 	}
 
 	@Listener
-	public void stop(ServerStopping event) {
+	public void on(ServerStopping event) {
 		shutdownNow();
 	}
 	

@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import jj.resource.ResourceIdentifier;
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Script;
@@ -31,8 +32,6 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import jj.resource.AbstractResource;
-import jj.resource.ResourceKey;
-import jj.resource.ResourceName;
 import jj.util.Closer;
 
 /**
@@ -47,7 +46,7 @@ import jj.util.Closer;
  * @author jason
  *
  */
-public abstract class AbstractScriptEnvironment extends AbstractResource implements ScriptEnvironment {
+public abstract class AbstractScriptEnvironment<T> extends AbstractResource<T> implements ScriptEnvironment<T> {
 	
 	@Singleton
 	protected static class AbstractScriptEnvironmentDependencies {
@@ -90,10 +89,9 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 		protected Dependencies(
 			final AbstractResourceDependencies abstractResourceDependencies,
 			final AbstractScriptEnvironmentDependencies abstractScriptEnvironmentDependencies,
-			final ResourceKey cacheKey,
-			final @ResourceName String name
+			final ResourceIdentifier<?, ?> identifier
 		) {
-			super(abstractResourceDependencies, cacheKey, Virtual, name);
+			super(abstractResourceDependencies, identifier);
 			this.scriptEnvironmentDependencies = abstractScriptEnvironmentDependencies;
 		}
 	}
@@ -162,9 +160,6 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	/**
 	 * Resume a continuation in this environment
-	 * @param pendingKey
-	 * @param result
-	 * @return
 	 */
 	PendingKey resumeContinuation(PendingKey pendingKey, Object result) {
 		return continuationCoordinator.resumeContinuation(this, pendingKey, result);
@@ -172,9 +167,8 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	/**
 	 * Await a continuation in this environment
-	 * @param task
 	 */
-	<T extends ScriptEnvironment> void awaitContinuation(ScriptTask<T> task) {
+	<S extends ScriptEnvironment<?>> void awaitContinuation(ScriptTask<S> task) {
 		continuationPendingCache.storeForContinuation(task);
 	}
 
@@ -203,7 +197,6 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	
 	/**
 	 * Override this function for custom initialization functionality
-	 * @return
 	 */
 	protected PendingKey doInitialize() {
 		return script() == null ? null : execute(script());
@@ -225,6 +218,7 @@ public abstract class AbstractScriptEnvironment extends AbstractResource impleme
 	 */
 	PendingKey createContinuationContext(final ContinuationPending continuationPending) {
 		PendingKey key = dependencies.scriptEnvironmentDependencies.pendingKeyProvider.get();
+		//noinspection ThrowableResultOfMethodCallIgnored
 		continuationPendings.put(key, continuationPending);
 		captureContextForKey(key);
 		return key;

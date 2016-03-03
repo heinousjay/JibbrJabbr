@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import jj.resource.Sha1ResourceCreator.Sha1ResourceTarget;
 import jj.util.SHA1Helper;
 
 /**
@@ -35,7 +34,7 @@ import jj.util.SHA1Helper;
  * @author jason
  *
  */
-class Sha1Resource extends AbstractResource {
+class Sha1Resource extends AbstractResource<Sha1ResourceTarget> {
 	
 	static final String EXTENSION = "sha1";
 	
@@ -49,6 +48,8 @@ class Sha1Resource extends AbstractResource {
 	private final long representedFileSize;
 	
 	private final String sha1;
+	
+	private final Sha1ResourceTarget target;
 
 	@Inject
 	Sha1Resource(
@@ -56,7 +57,7 @@ class Sha1Resource extends AbstractResource {
 		final Sha1ResourceTarget target
 	) throws IOException {
 		super(dependencies);
-		
+
 		Path path = Paths.get(target.resource.path().toString() + "." + EXTENSION);
 		
 		// 3 possibilities
@@ -89,6 +90,7 @@ class Sha1Resource extends AbstractResource {
 		
 		sha1 = SHA1Helper.keyFor(representedSha, String.valueOf(size));
 		
+		this.target = target;
 		target.resource.addDependent(this);
 	}
 	
@@ -103,6 +105,11 @@ class Sha1Resource extends AbstractResource {
 
 	public long representedFileSize() {
 		return representedFileSize;
+	}
+	
+	@Override
+	public Sha1ResourceTarget creationArg() {
+		return target;
 	}
 
 	@Override

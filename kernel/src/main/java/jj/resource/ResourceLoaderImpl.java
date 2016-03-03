@@ -22,8 +22,6 @@ import jj.execution.Promise;
 import jj.execution.TaskRunner;
 
 /**
- * if you need to load a resource, here's a simple way to do it
- * 
  * @author jason
  *
  */
@@ -32,45 +30,58 @@ class ResourceLoaderImpl implements ResourceLoader {
 	
 	private final TaskRunner taskRunner;
 	private final ResourceFinder resourceFinder;
+	private final ResourceIdentifierMaker maker;
 	
 	@Inject
-	ResourceLoaderImpl(final TaskRunner taskRunner, final ResourceFinder resourceFinder) {
+	ResourceLoaderImpl(TaskRunner taskRunner, ResourceFinder resourceFinder, ResourceIdentifierMaker maker) {
 		this.taskRunner = taskRunner;
 		this.resourceFinder = resourceFinder;
+		this.maker = maker;
 	}
-	
-	@Override
-	public <T extends Resource> T findResource(Class<T> resourceClass, Location base, String name, Object... args) {
-		return resourceFinder.findResource(resourceClass, base, name, args);
-	}
-	
-	@Override
-	public Promise loadResource(final Class<? extends Resource> resourceClass, final Location base, final String name,  final Object...arguments) {
-		return taskRunner.execute(new ResourceLoaderTask(resourceClass, base, name, arguments));
-	}
-	
-	private final class ResourceLoaderTask extends ResourceTask {
-		
-		private final Class<? extends Resource> resourceClass;
-		private final Location base;
-		private final String name;
-		private final Object[] arguments;
 
-		/**
-		 * @param name
-		 */
-		public ResourceLoaderTask(final Class<? extends Resource> resourceClass, final Location base, final String name, final Object...arguments) {
-			super("Resource loader [" + resourceClass.getSimpleName() + "@" + base + "/" + name + "]");
-			this.resourceClass = resourceClass;
-			this.base = base;
-			this.name = name;
-			this.arguments = arguments;
+	@Override
+	public <T extends Resource<A>, A> T findResource(ResourceIdentifier<T, A> identifier) {
+		return resourceFinder.findResource(identifier);
+	}
+
+	@Override
+	public <T extends Resource<Void>> T findResource(Class<T> resourceClass, Location base, String name) {
+		return findResource(maker.make(resourceClass, base, name));
+	}
+	
+	@Override
+	public <T extends Resource<A>, A> T findResource(Class<T> resourceClass, Location base, String name, A argument) {
+		return findResource(maker.make(resourceClass, base, name, argument));
+	}
+
+	@Override
+	public <T extends Resource<A>, A> Promise loadResource(ResourceIdentifier<T, A> identifier) {
+		return taskRunner.execute(new ResourceLoaderTask<>(identifier));
+	}
+	
+	@Override
+	public <T extends Resource<Void>> Promise loadResource(Class<T> resourceClass, Location base, String name) {
+		return loadResource(maker.make(resourceClass, base, name));
+	}
+	
+	@Override
+	public <T extends Resource<A>, A> Promise loadResource(final Class<T> resourceClass, final Location base, final String name,  final A argument) {
+		return loadResource(maker.make(resourceClass, base, name, argument));
+	}
+	
+	private final class ResourceLoaderTask<T extends Resource<A>, A> extends ResourceTask {
+		
+		private final ResourceIdentifier<T, A> identifier;
+
+		private ResourceLoaderTask(ResourceIdentifier<T, A> identifier) {
+			super("Resource loader [" + identifier + "]");
+			this.identifier = identifier;
 			
 		}
 
 		@Override
 		protected void run() throws Exception {
-			resourceFinder.loadResource(resourceClass, base, name, arguments);
+			resourceFinder.loadResource(identifier);
 		}
 	}
 }

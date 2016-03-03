@@ -15,17 +15,16 @@
  */
 package jj.resource;
 
+import static jj.server.ServerLocation.Virtual;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import jj.document.HtmlResource;
-import jj.http.server.resource.StaticResource;
+import jj.event.MockPublisher;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,60 +40,64 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceCacheTest {
+
+
 	
-	URI uri = URI.create("/resource1");
+	MyResource resource1;
+	MyResource resource2;
+	TestDateResource testDateResource1;
 	
-	@Mock StaticResource sr;
-	
-	@Mock SimpleResourceCreator<StaticResource> src;
-	
-	@Mock HtmlResource hr;
-	
-	@Mock SimpleResourceCreator<HtmlResource> hrc;
-	
-	ResourceKey sKey;
-	
-	ResourceKey hKey;
-	
-	ResourceCacheImpl rc;
+	@Mock SimpleResourceCreator<MyResource, Void> creator1;
+	@Mock SimpleResourceCreator<TestDateResource, Date> creator2;
+
+	ResourceCache rc;
+
+	MockPublisher publisher;
 	
 	@Before
 	public void before() {
+
+		publisher = new MockPublisher();
 		
-		HashMap<Class<? extends AbstractResource>, SimpleResourceCreator<? extends AbstractResource>> map = new HashMap<>();
-		map.put(StaticResource.class, src);
-		map.put(HtmlResource.class, hrc);
-		rc = new ResourceCacheImpl(new ResourceCreators(map));
-		
-		given(src.type()).willReturn(StaticResource.class);
-		given(hrc.type()).willReturn(HtmlResource.class);
-		
-		sKey = new ResourceKey(StaticResource.class, uri);
-		hKey = new ResourceKey(HtmlResource.class, uri);
+		HashMap<Class<? extends AbstractResource<?>>, SimpleResourceCreator<? extends AbstractResource<?>, ?>> map = new HashMap<>();
+		map.put(MyResource.class, creator1);
+		map.put(TestDateResource.class, creator2);
+		rc = new ResourceCache(new ResourceCreators(map));
+
+		resource1 = new MyResource("resource1", publisher);
+		resource2 = new MyResource("resource2", publisher);
+		ResourceIdentifier<TestDateResource, Date> identifier = new MockResourceIdentifierMaker().make(
+			TestDateResource.class,
+			Virtual,
+			"resource1",
+			new Date()
+		);
+		testDateResource1 = new TestDateResource(identifier);
+
 	}
 	
 	@Test
 	public void testShutdownBehavior() throws Exception {
 		
-		rc.putIfAbsent(sKey, hr);
-		assertThat(rc.get(sKey), is((Resource)hr));
-		rc.serverStopping(null);
-		assertThat(rc.get(sKey), is(nullValue()));
+		rc.putIfAbsent(resource1);
+		assertThat(rc.get(resource1.identifier()), is(resource1));
+		rc.on(null);
+		assertThat(rc.get(resource1.identifier()), is(nullValue()));
 		
 	}
 
 	@Test
-	public void testOperationsByUri() throws IOException {
+	public void testOperationsByPath() throws IOException {
 		
 		// given
-		rc.putIfAbsent(sKey, sr);
-		rc.putIfAbsent(hKey, hr);
+		rc.putIfAbsent(resource1);
+		rc.putIfAbsent(testDateResource1);
 		// when
-		List<AbstractResource> resources = rc.findAllByUri(uri);
+		List<Resource<?>> resources = rc.findAllByPath(resource1.path());
 		
 		// then
-		assertThat(resources.size(), is(2));
-		assertThat(resources, containsInAnyOrder((Resource)sr, (Resource)hr));
+		assertThat(resources, hasSize(2));
+		assertThat(resources, containsInAnyOrder(resource1, testDateResource1));
 	}
 
 }

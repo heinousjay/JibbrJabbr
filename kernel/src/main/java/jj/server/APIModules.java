@@ -31,7 +31,7 @@ public class APIModules extends InternalAssets {
 
 	
 	@Inject
-	APIModules(final ResourceResolver resolver, final @APIPaths Set<String> paths) {
+	APIModules(final ResourceResolver resolver, final @APIModulePaths Set<String> paths) {
 		super(resolver, paths);
 	}
 }

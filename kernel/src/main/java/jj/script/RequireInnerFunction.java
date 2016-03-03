@@ -68,7 +68,7 @@ class RequireInnerFunction extends BaseFunction {
 		
 		String moduleIdentifier = toModuleIdentifier(String.valueOf(args[0]), String.valueOf(args[1]));
 		
-		RootScriptEnvironment parent = env.currentRootScriptEnvironment();
+		RootScriptEnvironment<?> parent = env.currentRootScriptEnvironment();
 		
 		RequiredModule requiredModule = new RequiredModule(parent, moduleIdentifier);
 		

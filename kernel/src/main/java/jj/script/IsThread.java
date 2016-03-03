@@ -24,14 +24,14 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class IsThread {
-	private final ScriptExecutorFactory scriptExecutorFactory;
+	private final ScriptExecutor scriptExecutor;
 	
 	@Inject
-	IsThread(final ScriptExecutorFactory scriptExecutorFactory) {
-		this.scriptExecutorFactory = scriptExecutorFactory;
+	IsThread(final ScriptExecutor scriptExecutor) {
+		this.scriptExecutor = scriptExecutor;
 	}
 
-	public boolean forScriptEnvironment(final ScriptEnvironment scriptEnvironment) {
-		return scriptExecutorFactory.isScriptThreadFor(scriptEnvironment);
+	public boolean forScriptEnvironment(final ScriptEnvironment<?> scriptEnvironment) {
+		return scriptExecutor.isScriptThread();
 	}
 }

@@ -44,10 +44,20 @@ public enum ServerLocation implements Location {
 	 * the running server, registered in a module, and intended
 	 * for use in scripts via the require mechanism.
 	 */
-	APIModules;
+	APIModules,
+	
+	/**
+	 * Specs to validate API modules
+	 */
+	APISpecs;
 
 	@Override
 	public boolean parentInDirectory() {
 		return this == Modules;
+	}
+	
+	@Override
+	public boolean servable() {
+		return this == Assets;
 	}
 }

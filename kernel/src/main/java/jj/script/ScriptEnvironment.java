@@ -33,7 +33,7 @@ import org.mozilla.javascript.ScriptableObject;
  * @author jason
  *
  */
-public interface ScriptEnvironment extends Resource {
+public interface ScriptEnvironment<T> extends Resource<T> {
 
 	/**
 	 * The execution scope for the script

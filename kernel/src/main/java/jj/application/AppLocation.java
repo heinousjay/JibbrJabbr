@@ -44,7 +44,7 @@ public enum AppLocation implements Location {
 	
 	private final String path;
 	
-	private AppLocation(String path) {
+	AppLocation(String path) {
 		this.path = path;
 	}
 	
@@ -55,5 +55,10 @@ public enum AppLocation implements Location {
 	@Override
 	public boolean parentInDirectory() {
 		return true;
+	}
+	
+	@Override
+	public boolean servable() {
+		return this == Public;
 	}
 }

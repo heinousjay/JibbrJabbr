@@ -28,7 +28,7 @@ import jj.http.server.uri.Route;
  *
  */
 @Singleton
-public class EmptyRouteContributor implements RouteContributor {
+class EmptyRouteContributor implements RouteContributor {
 
 	@Override
 	public List<Route> contributions() {

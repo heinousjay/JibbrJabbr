@@ -19,7 +19,7 @@ public class ScriptModule extends JJModule {
 		
 		bind(ContinuationResumer.class).to(ContinuationCoordinator.class);
 		
-		bindExecutor(ScriptExecutorFactory.class);
+		bindExecutor(ScriptExecutor.class);
 		
 		install(new ScriptResourceModule());
 		

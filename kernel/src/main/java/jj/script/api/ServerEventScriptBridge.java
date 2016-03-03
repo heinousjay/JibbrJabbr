@@ -66,7 +66,7 @@ public class ServerEventScriptBridge {
 	// ugh! okay map of ScriptEnvironment -> (map of event name -> (map of Callable -> generated invoker instance))
 	// only the top level map needs to accomodate concurrency because a given script environment is guaranteed
 	// to only execute from a single thread.
-	private final ConcurrentMap<ScriptEnvironment, Map<String, Map<Callable, ServerEventCallableInvoker>>> invokers =
+	private final ConcurrentMap<ScriptEnvironment<?>, Map<String, Map<Callable, ServerEventCallableInvoker>>> invokers =
 		new ConcurrentHashMap<>(16, 0.75F, 4);
 	
 	private final ConcurrentMap<String, Class<? extends ServerEventCallableInvoker>> invokerClasses = new ConcurrentHashMap<>(16, 0.75F, 2);
@@ -82,7 +82,7 @@ public class ServerEventScriptBridge {
 	private final CtConstructor superConstructor;
 	
 	@Inject
-	ServerEventScriptBridge(final CurrentScriptEnvironment env, final Injector injector) throws Exception {
+	ServerEventScriptBridge(CurrentScriptEnvironment env, Injector injector) throws Exception {
 		this.env = env;
 		this.injector = injector;
 		
@@ -162,7 +162,7 @@ public class ServerEventScriptBridge {
 	}
 	
 	@Listener
-	void scriptEnvironmentDied(ScriptEnvironmentDied sed) {
+	void on(ScriptEnvironmentDied sed) {
 		Map<String, Map<Callable, ServerEventCallableInvoker>> map = invokers.remove(sed.scriptEnvironment());
 		// make sure the various invokers don't get invoked before cleanup
 		if (map != null) {

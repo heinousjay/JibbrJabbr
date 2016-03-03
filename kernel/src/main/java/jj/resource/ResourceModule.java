@@ -4,9 +4,6 @@ import jj.JJModule;
 
 
 public class ResourceModule extends JJModule {
-	
-	public ResourceModule() {
-	}
 
 	@Override
 	protected void configure() {
@@ -19,15 +16,12 @@ public class ResourceModule extends JJModule {
 		
 		bind(PathResolver.class).to(PathResolverImpl.class);
 		
-		bind(ResourceCache.class).to(ResourceCacheImpl.class);
-		
 		bind(ResourceFinder.class).to(ResourceFinderImpl.class);
 		
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
 		
-		bind(ResourceWatchService.class).to(ResourceWatchServiceImpl.class);
-		
 		bindStartupListener(DirectoryStructureLoader.class);
+		bindStartupListener(ResourceWatchServiceLoop.class);
 		
 		bindCreationOf(DirectoryResource.class).to(DirectoryResourceCreator.class);
 		

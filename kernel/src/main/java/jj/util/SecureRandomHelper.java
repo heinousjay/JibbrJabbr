@@ -28,7 +28,7 @@ public enum SecureRandomHelper {
 	private static ThreadLocal<SecureRandom> randoms = new ThreadLocal<SecureRandom>() {
 		protected SecureRandom initialValue() {
 			return new SecureRandom();
-		};
+		}
 	};
 	
 	public static int nextInt() {

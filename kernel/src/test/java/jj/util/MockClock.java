@@ -15,9 +15,10 @@
  */
 package jj.util;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
-
-import jj.util.Clock;
 
 /**
  * @author jason
@@ -26,11 +27,6 @@ import jj.util.Clock;
 public class MockClock extends Clock {
 
 	public long time = System.currentTimeMillis();
-	
-	@Override
-	public long time() {
-		return time;
-	}
 	
 	public MockClock advance() {
 		time++;
@@ -41,14 +37,24 @@ public class MockClock extends Clock {
 		this.time += TimeUnit.MILLISECONDS.convert(time, timeUnit);
 		return this;
 	}
-	
-	public MockClock retreat() {
-		time--;
-		return this;
+
+	@Override
+	public ZoneId getZone() {
+		return ZoneId.systemDefault();
 	}
-	
-	public MockClock retreat(long time, TimeUnit timeUnit) {
-		this.time -= TimeUnit.MILLISECONDS.convert(time, timeUnit);
-		return this;
+
+	@Override
+	public Clock withZone(ZoneId zone) {
+		return null; // not used in the system so we don't really bother, yet
+	}
+
+	@Override
+	public long millis() {
+		return time;
+	}
+
+	@Override
+	public Instant instant() {
+		return Instant.ofEpochMilli(time);
 	}
 }

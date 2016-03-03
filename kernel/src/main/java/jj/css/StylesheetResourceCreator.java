@@ -15,20 +15,30 @@
  */
 package jj.css;
 
+import java.net.URI;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jj.resource.Location;
 import jj.resource.SimpleResourceCreator;
+import jj.server.ServerLocation;
 
 /**
  * @author jason
  *
  */
 @Singleton
-class StylesheetResourceCreator extends SimpleResourceCreator<StylesheetResource> {
+class StylesheetResourceCreator extends SimpleResourceCreator<StylesheetResource, Void> {
 	
 	@Inject
 	StylesheetResourceCreator(final Dependencies dependencies) {
 		super(dependencies);
+	}
+	
+	@Override
+	protected URI uri(Location base, String name, Void argument) {
+		assert base == ServerLocation.Virtual;
+		return URI.create(name);
 	}
 }
