@@ -21,7 +21,7 @@ import jj.JJModule;
  * @author jason
  *
  */
-public class ConversionModule extends JJModule {
+public class ConversionModule extends JJModule implements BindsConverter {
 
 	@Override
 	protected void configure() {

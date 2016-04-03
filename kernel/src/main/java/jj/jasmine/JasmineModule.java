@@ -16,12 +16,18 @@
 package jj.jasmine;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.resource.BindsResourceCreation;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class JasmineModule extends JJModule {
+public class JasmineModule extends JJModule
+	implements BindsConfiguration,
+		BindsResourceCreation,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {
@@ -29,7 +35,7 @@ public class JasmineModule extends JJModule {
 		bindAssetPath("/jj/jasmine/assets");
 		bindAPIModulePath("/jj/jasmine/api");
 
-		bindCreationOf(JasmineScriptEnvironment.class).to(JasmineScriptEnvironmentCreator.class);
+		createResource(JasmineScriptEnvironment.class).using(JasmineScriptEnvironmentCreator.class);
 		
 		bindConfiguration(JasmineConfiguration.class);
 		

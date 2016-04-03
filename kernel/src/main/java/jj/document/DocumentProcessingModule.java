@@ -15,15 +15,13 @@
  */
 package jj.document;
 
-import com.google.inject.Binder;
-import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.multibindings.MapBinder;
-
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
 import jj.document.servable.DocumentServableModule;
 import jj.http.server.websocket.WebSocketMessageProcessor;
 import jj.jjmessage.JJMessage;
-import jj.jjmessage.JJMessage.Type;
+import jj.resource.BindsResourceCreation;
+import jj.server.BindsServerPath;
 
 /**
  * FIXME: WebSocketMessageProcessor binding doesn't really make any sense!
@@ -31,34 +29,21 @@ import jj.jjmessage.JJMessage.Type;
  * @author jason
  *
  */
-public class DocumentProcessingModule extends JJModule {
-	
-	public static class MessageProcessorBinder {
-		
-		private final MapBinder<Type, DocumentWebSocketMessageProcessor> messageProcessorsBinding;
-		
-		public MessageProcessorBinder(final Binder binder) {
-			messageProcessorsBinding = 
-				MapBinder.newMapBinder(binder, Type.class, DocumentWebSocketMessageProcessor.class);
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T extends Enum<Type>, U extends DocumentWebSocketMessageProcessor> LinkedBindingBuilder<U> of(Type type) {
-			return (LinkedBindingBuilder<U>)messageProcessorsBinding.addBinding(type);
-		}
-	}
+public class DocumentProcessingModule extends JJModule
+	implements BindsConfiguration,
+		BindsMessageProcessor,
+		BindsResourceCreation,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {
-		
-		MessageProcessorBinder bindProcessing = new MessageProcessorBinder(binder());
-		
-		bindProcessing.of(JJMessage.Type.Event).to(EventMessageProcessor.class);
-		bindProcessing.of(JJMessage.Type.Element).to(ElementMessageProcessor.class);
-		bindProcessing.of(JJMessage.Type.Result).to(ResultMessageProcessor.class);
-		
-		bindCreationOf(DocumentScriptEnvironment.class).to(DocumentScriptEnvironmentCreator.class);
-		bindCreationOf(HtmlResource.class).to(HtmlResourceCreator.class);
+
+		processJJMessage(JJMessage.Type.Event).using(EventMessageProcessor.class);
+		processJJMessage(JJMessage.Type.Element).using(ElementMessageProcessor.class);
+		processJJMessage(JJMessage.Type.Result).using(ResultMessageProcessor.class);
+
+		createResource(DocumentScriptEnvironment.class).using(DocumentScriptEnvironmentCreator.class);
+		createResource(HtmlResource.class).using(HtmlResourceCreator.class);
 		
 		bind(WebSocketMessageProcessor.class).to(DocumentWebSocketMessageProcessors.class);
 		

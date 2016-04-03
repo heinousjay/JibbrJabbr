@@ -16,16 +16,17 @@
 package jj.jjmessage;
 
 import jj.JJModule;
+import jj.script.BindsContinuationProcessing;
 
 /**
  * @author jason
  *
  */
-public class JJMessageModule extends JJModule {
+public class JJMessageModule extends JJModule implements BindsContinuationProcessing {
 
 	@Override
 	protected void configure() {
-		bindContinuationProcessingOf(JJMessage.class).to(JJMessageContinuationProcessor.class);
+		processorContinuation(JJMessage.class).using(JJMessageContinuationProcessor.class);
 	}
 
 }

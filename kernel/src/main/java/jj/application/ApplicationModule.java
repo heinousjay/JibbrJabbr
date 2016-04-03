@@ -1,15 +1,12 @@
 package jj.application;
 
 import jj.JJModule;
-import jj.resource.LocationResolverBinder;
+import jj.resource.BindsLocationResolution;
 
-public class ApplicationModule extends JJModule {
+public class ApplicationModule extends JJModule implements BindsLocationResolution {
 
 	@Override
 	protected void configure() {
-		
-		new LocationResolverBinder(binder()).
-		// that ugly ugly line!
 		resolvePathsFor(AppLocation.class).with(Application.class);
 	}
 

@@ -31,7 +31,7 @@ import com.google.inject.multibindings.MapBinder;
  * @author jason
  *
  */
-public class LoggingBinder {
+class LoggingBinder {
 	
 	private final MapBinder<String, String> loggerNameBinder;
 	
@@ -41,7 +41,7 @@ public class LoggingBinder {
 		void toLogger(String loggerName);
 	}
 	
-	public LoggingBinder(Binder binder) {
+	LoggingBinder(Binder binder) {
 		loggerNameBinder = MapBinder.newMapBinder(binder, String.class, String.class, LoggerNames.class);
 		
 		loggerBinder = MapBinder.newMapBinder(
@@ -55,7 +55,7 @@ public class LoggingBinder {
 		new LoggingBinder(binder).loggerNameBinder.addBinding("netty").toInstance("io.netty");
 	}
 
-	public BindingBuilder annotatedWith(final Class<? extends Annotation> annotation) {
+	BindingBuilder annotatedWith(final Class<? extends Annotation> annotation) {
 		
 		return loggerName -> {
 

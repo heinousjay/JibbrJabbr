@@ -15,7 +15,6 @@
  */
 package jj.server;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +31,7 @@ import jj.ResourceResolver;
  * @author jason
  *
  */
-public abstract class InternalAssets {
+abstract class InternalAssets {
 
 	protected static final Path NOT_FOUND = Paths.get("/jj/not-found-sentinel/");
 	

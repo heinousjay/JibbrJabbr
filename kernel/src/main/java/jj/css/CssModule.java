@@ -16,20 +16,28 @@
 package jj.css;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.logging.BindsLogger;
+import jj.resource.BindsResourceCreation;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class CssModule extends JJModule {
+public class CssModule extends JJModule
+	implements BindsConfiguration,
+		BindsLogger,
+		BindsResourceCreation,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {
 		
 		bindAssetPath("/jj/css/assets");
 		bindAPIModulePath("/jj/css/api");
-		bindCreationOf(LessResource.class).to(LessResourceCreator.class);
-		bindCreationOf(StylesheetResource.class).to(StylesheetResourceCreator.class);
+		createResource(LessResource.class).using(LessResourceCreator.class);
+		createResource(StylesheetResource.class).using(StylesheetResourceCreator.class);
 		bindConfiguration(LessConfiguration.class);
 		bindLoggedEventsAnnotatedWith(LessLogger.class).toLogger(LessLogger.NAME);
 	}

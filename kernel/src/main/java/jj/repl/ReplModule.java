@@ -16,12 +16,18 @@
 package jj.repl;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.resource.BindsResourceCreation;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class ReplModule extends JJModule {
+public class ReplModule extends JJModule
+	implements BindsConfiguration,
+		BindsResourceCreation,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {
@@ -29,7 +35,7 @@ public class ReplModule extends JJModule {
 		bindAPIModulePath("/jj/repl/api");
 		bindConfiguration(ReplConfiguration.class);
 		bindStartupListener(ReplServer.class);
-		bindCreationOf(ReplScriptEnvironment.class).to(ReplScriptEnvironmentCreator.class);
+		createResource(ReplScriptEnvironment.class).using(ReplScriptEnvironmentCreator.class);
 	}
 
 }

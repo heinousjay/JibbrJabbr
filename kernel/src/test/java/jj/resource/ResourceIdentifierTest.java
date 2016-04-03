@@ -1,8 +1,6 @@
 package jj.resource;
 
 import jj.application.AppLocation;
-import jj.script.module.ModuleScriptEnvironment;
-import jj.script.module.ScriptResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

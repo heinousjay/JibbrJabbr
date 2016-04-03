@@ -16,7 +16,6 @@
 package jj.script;
 
 import static jj.script.ScriptExecutionState.*;
-import static jj.server.ServerLocation.Virtual;
 
 import java.util.HashMap;
 

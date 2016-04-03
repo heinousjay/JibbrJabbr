@@ -19,7 +19,6 @@ import java.io.IOException;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
-import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**
@@ -27,7 +26,7 @@ import jj.script.AbstractScriptEnvironmentCreator;
  *
  */
 @Singleton
-public class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<DocumentScriptEnvironment, Void> {
+class DocumentScriptEnvironmentCreator extends AbstractScriptEnvironmentCreator<DocumentScriptEnvironment, Void> {
 	
 	@Inject
 	DocumentScriptEnvironmentCreator(final Dependencies dependencies) {

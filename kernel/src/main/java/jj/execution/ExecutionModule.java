@@ -23,7 +23,7 @@ import jj.JJModule;
  * @author jason
  *
  */
-public class ExecutionModule extends JJModule {
+public class ExecutionModule extends JJModule implements BindsExecutor {
 	
 	@Override
 	protected void configure() {

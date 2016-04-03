@@ -27,13 +27,13 @@ import com.google.inject.multibindings.MapBinder;
  * @author jason
  *
  */
-public class ResourceBinder {
+class ResourceBinder {
 	
 	private final Map<Class<? extends Resource<?>>, ResourceBindingProcessor<? extends Resource<?>>> bindingProcessors = new HashMap<>();
 
 	private final MapBinder<Class<? extends AbstractResource<?>>, SimpleResourceCreator<? extends AbstractResource<?>, ?>> resourceCreatorBinder;
 	
-	public ResourceBinder(final Binder binder) {
+	ResourceBinder(final Binder binder) {
 		resourceCreatorBinder = MapBinder.newMapBinder(
 			binder,
 			new TypeLiteral<Class<? extends AbstractResource<?>>>() {},
@@ -41,7 +41,7 @@ public class ResourceBinder {
 		);
 	}
 	
-	public <A, T extends Resource<A>> ResourceBinder addResourceBindingProcessor(Class<T> resourceClass, ResourceBindingProcessor<?> bindingProcessor) {
+	<A, T extends Resource<A>> ResourceBinder addResourceBindingProcessor(Class<T> resourceClass, ResourceBindingProcessor<?> bindingProcessor) {
 		bindingProcessors.put(resourceClass, bindingProcessor);
 		return this;
 	}

@@ -16,13 +16,23 @@
 package jj.i18n;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.conversion.BindsConverter;
 import jj.i18n.ScriptMessages.ScriptMessagesLoaderBundle;
+import jj.resource.BindsResourceCreation;
+import jj.script.BindsContinuationProcessing;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class I18NModule extends JJModule {
+public class I18NModule extends JJModule
+	implements BindsConfiguration,
+		BindsContinuationProcessing,
+	BindsConverter,
+		BindsResourceCreation,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {
@@ -33,10 +43,10 @@ public class I18NModule extends JJModule {
 
 		bindConverter(StringToLocaleConverter.class);
 
-		bindContinuationProcessingOf(ScriptMessagesLoaderBundle.class).to(ScriptMessages.class);
+		processorContinuation(ScriptMessagesLoaderBundle.class).using(ScriptMessages.class);
 
-		bindCreationOf(PropertiesResource.class).to(PropertiesResourceCreator.class);
-		bindCreationOf(MessagesResource.class).to(MessagesResourceCreator.class);
+		createResource(PropertiesResource.class).using(PropertiesResourceCreator.class);
+		createResource(MessagesResource.class).using(MessagesResourceCreator.class);
 	}
 
 }

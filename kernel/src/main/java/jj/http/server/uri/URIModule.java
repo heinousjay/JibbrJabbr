@@ -16,12 +16,14 @@
 package jj.http.server.uri;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class URIModule extends JJModule {
+public class URIModule extends JJModule implements BindsConfiguration, BindsServerPath {
 
 
 	@Override

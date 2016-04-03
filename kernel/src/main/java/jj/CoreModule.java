@@ -30,6 +30,7 @@ import jj.execution.ExecutionModule;
 import jj.i18n.I18NModule;
 import jj.jasmine.JasmineModule;
 import jj.jjmessage.JJMessageModule;
+import jj.logging.BindsLogger;
 import jj.logging.LoggingModule;
 import jj.repl.ReplModule;
 import jj.resource.ResourceModule;
@@ -43,7 +44,7 @@ import java.time.Clock;
  * @author jason
  *
  */
-public class CoreModule extends JJModule {
+public class CoreModule extends JJModule implements BindsLogger {
 	
 	private final String [] args;
 	private final ResourceResolver resourceResolver;

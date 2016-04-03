@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 import javax.inject.Inject;
 
 import jj.resource.Location;
-import jj.resource.ResourceIdentifier;
 import jj.script.AbstractScriptEnvironmentCreator;
 
 /**

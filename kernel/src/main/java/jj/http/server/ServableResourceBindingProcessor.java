@@ -24,6 +24,8 @@ import jj.resource.ResourceBindingProcessor;
 import jj.util.StringUtils;
 
 /**
+ * About a billion pieces of binding magic to make sure things are configured reasonably
+ *
  * @author jason
  *
  */

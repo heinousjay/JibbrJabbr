@@ -18,12 +18,17 @@ package jj.logging;
 import static jj.logging.LoggingBinder.registerBuiltins;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class LoggingModule extends JJModule {
+public class LoggingModule extends JJModule
+	implements BindsConfiguration,
+		BindsLogger,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {

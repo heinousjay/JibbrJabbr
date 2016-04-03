@@ -16,13 +16,21 @@
 package jj.http.client;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.execution.BindsExecutor;
 import jj.http.client.api.RestOperation;
+import jj.script.BindsContinuationProcessing;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class HttpClientModule extends JJModule {
+public class HttpClientModule extends JJModule
+	implements BindsConfiguration,
+		BindsContinuationProcessing,
+		BindsExecutor,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {
@@ -30,8 +38,8 @@ public class HttpClientModule extends JJModule {
 		bindAPIModulePath("/jj/http/client/api");
 		
 		bindStartupListener(HttpClient.class);
-		
-		bindContinuationProcessingOf(RestOperation.class).to(HttpClientRequestContinuationProcessor.class);
+
+		processorContinuation(RestOperation.class).using(HttpClientRequestContinuationProcessor.class);
 		
 		bindExecutor(HttpClientNioEventLoopGroup.class);
 		

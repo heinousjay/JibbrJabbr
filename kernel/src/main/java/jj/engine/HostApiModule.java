@@ -6,7 +6,7 @@ import jj.JJModule;
  * @author jason
  *
  */
-public class HostApiModule extends JJModule {
+public class HostApiModule extends JJModule implements BindsEngineHostObject {
 
 	@Override
 	protected void configure() {

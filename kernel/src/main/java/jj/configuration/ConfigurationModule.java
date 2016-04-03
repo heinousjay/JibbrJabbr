@@ -16,12 +16,14 @@
 package jj.configuration;
 
 import jj.JJModule;
+import jj.resource.BindsResourceCreation;
+import jj.server.BindsServerPath;
 
 /**
  * @author jason
  *
  */
-public class ConfigurationModule extends JJModule {
+public class ConfigurationModule extends JJModule implements BindsResourceCreation, BindsServerPath {
 
 	@Override
 	protected void configure() {
@@ -29,7 +31,7 @@ public class ConfigurationModule extends JJModule {
 		bindAPIModulePath("/jj/configuration/api");
 		
 		bindStartupListener(ConfigurationEventManager.class);
-		
-		bindCreationOf(ConfigurationScriptEnvironment.class).to(ConfigurationScriptEnvironmentCreator.class);
+
+		createResource(ConfigurationScriptEnvironment.class).using(ConfigurationScriptEnvironmentCreator.class);
 	}
 }

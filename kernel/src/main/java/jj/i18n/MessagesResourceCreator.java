@@ -24,7 +24,6 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import jj.resource.ResourceIdentifier;
 import jj.resource.SimpleResourceCreator;
 import jj.resource.Location;
 

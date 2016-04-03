@@ -1,12 +1,20 @@
 package jj.script;
 
+import jj.configuration.BindsConfiguration;
+import jj.execution.BindsExecutor;
+import jj.logging.BindsLogger;
+import jj.server.BindsServerPath;
 import org.mozilla.javascript.ScriptableObject;
 
 import jj.JJModule;
 import jj.script.module.ScriptResourceModule;
 
 
-public class ScriptModule extends JJModule {
+public class ScriptModule extends JJModule
+	implements BindsConfiguration,
+		BindsExecutor,
+		BindsLogger,
+	BindsServerPath {
 	
 	@Override
 	protected void configure() {

@@ -15,7 +15,6 @@
  */
 package jj.jasmine;
 
-import jj.configuration.Default;
 
 /**
  * @author jason

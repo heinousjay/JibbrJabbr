@@ -1,9 +1,18 @@
 package jj.resource;
 
 import jj.JJModule;
+import jj.configuration.BindsConfiguration;
+import jj.execution.BindsExecutor;
+import jj.logging.BindsLogger;
+import jj.server.BindsServerPath;
 
 
-public class ResourceModule extends JJModule {
+public class ResourceModule extends JJModule
+	implements BindsConfiguration,
+		BindsExecutor,
+		BindsLogger,
+		BindsResourceCreation,
+	BindsServerPath {
 
 	@Override
 	protected void configure() {
@@ -23,9 +32,9 @@ public class ResourceModule extends JJModule {
 		bindStartupListener(DirectoryStructureLoader.class);
 		bindStartupListener(ResourceWatchServiceLoop.class);
 		
-		bindCreationOf(DirectoryResource.class).to(DirectoryResourceCreator.class);
-		
-		bindCreationOf(Sha1Resource.class).to(Sha1ResourceCreator.class);
+		createResource(DirectoryResource.class).using(DirectoryResourceCreator.class);
+
+		createResource(Sha1Resource.class).using(Sha1ResourceCreator.class);
 		
 		bindLoggedEventsAnnotatedWith(ResourceLogger.class).toLogger(ResourceLogger.NAME);
 	}

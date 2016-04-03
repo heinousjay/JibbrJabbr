@@ -32,6 +32,7 @@ import jj.App;
 import jj.JJModule;
 import jj.ServerRoot;
 import jj.http.client.api.RestOperation;
+import jj.server.BindsServerPath;
 import jj.testing.JibbrJabbrTestServer;
 
 import jj.testing.Latch;
@@ -46,13 +47,7 @@ public class HttpClientIntegrationTest {
 	public JibbrJabbrTestServer server =
 		new JibbrJabbrTestServer(ServerRoot.one, App.httpClient)
 			.withHttp()
-			.withModule(new JJModule() {
-				
-				@Override
-				protected void configure() {
-					bindAPIModulePath("/http/client/test");
-				}
-			})
+			.withModule(new TestHelperModule())
 			.injectInstance(this);
 	
 	@Inject HttpRequester requester;
@@ -99,5 +94,13 @@ public class HttpClientIntegrationTest {
 			throw cause.get();
 		}
 		assertThat(response.get(), is("I am the text"));
+	}
+
+	private static class TestHelperModule extends JJModule implements BindsServerPath {
+
+		@Override
+		protected void configure() {
+			bindAPIModulePath("/http/client/test");
+		}
 	}
 }

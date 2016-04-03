@@ -1,11 +1,5 @@
 package jj.resource;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * A tuple that identifies a given resource, but is not instance specific
  * @author jason

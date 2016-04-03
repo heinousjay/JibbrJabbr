@@ -15,13 +15,13 @@
  */
 /**
  * <p>
- * Defines the {@link PropertiesResource}, a primitive resource that wraps a properties file
- * to expose the key-value pairs defined within in a manner analogous to {@link Properties},
+ * Defines the {@link jj.i18n.PropertiesResource}, a primitive resource that wraps a properties file
+ * to expose the key-value pairs defined within in a manner analogous to {@link java.util.Properties},
  * but assuming UTF-8 (and soon this will be configurable)
  * 
  * <p>
- * Also defines a higher-level {@link MessagesResource}, which organizes a set of 
- * {@link PropertiesResource}s according to a name and a locale, for internationalization
+ * Also defines a higher-level {@link jj.i18n.MessagesResource}, which organizes a set of
+ * {@link jj.i18n.PropertiesResource}s according to a name and a locale, for internationalization
  * purposes.
  * 
  * @author jason
@@ -29,4 +29,3 @@
  */
 package jj.i18n;
 
-import java.util.Properties;

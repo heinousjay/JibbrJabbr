@@ -2,8 +2,6 @@ package jj.resource;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -11,7 +9,7 @@ import java.util.Date;
 /**
  * @author jason
  */
-public class TestDateResource extends AbstractResource<Date> implements FileSystemResource {
+class TestDateResource extends AbstractResource<Date> implements FileSystemResource {
 
 	@Inject
 	TestDateResource(ResourceIdentifier<?, ?> identifier) {

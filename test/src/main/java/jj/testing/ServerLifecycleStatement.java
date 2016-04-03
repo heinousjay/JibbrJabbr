@@ -15,9 +15,6 @@
  */
 package jj.testing;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -33,7 +30,7 @@ import org.slf4j.Logger;
 
 @Singleton
 @Subscriber
-public class ServerLifecycleStatement extends JibbrJabbrTestStatement {
+class ServerLifecycleStatement extends JibbrJabbrTestStatement {
 	
 	private final JJServerLifecycle lifecycle;
 	private final Logger testLog;

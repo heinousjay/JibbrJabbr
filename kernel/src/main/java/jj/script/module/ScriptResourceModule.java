@@ -16,6 +16,8 @@
 package jj.script.module;
 
 import jj.JJModule;
+import jj.resource.BindsResourceCreation;
+import jj.script.BindsContinuationProcessing;
 
 /**
  * Initializes the module.
@@ -23,16 +25,18 @@ import jj.JJModule;
  * @author jason
  *
  */
-public class ScriptResourceModule extends JJModule {
+public class ScriptResourceModule extends JJModule
+	implements BindsContinuationProcessing,
+		BindsResourceCreation {
 
 	@Override
 	protected void configure() {
-		
-		bindCreationOf(JSONResource.class).to(JSONResourceCreator.class);
-		bindCreationOf(ScriptResource.class).to(ScriptResourceCreator.class);
-		bindCreationOf(ModuleScriptEnvironment.class).to(ModuleScriptEnvironmentCreator.class);
-		
-		bindContinuationProcessingOf(RequiredModule.class).to(RequiredModuleContinuationProcessor.class);
+
+		createResource(JSONResource.class).using(JSONResourceCreator.class);
+		createResource(ScriptResource.class).using(ScriptResourceCreator.class);
+		createResource(ModuleScriptEnvironment.class).using(ModuleScriptEnvironmentCreator.class);
+
+		processorContinuation(RequiredModule.class).using(RequiredModuleContinuationProcessor.class);
 	}
 
 
