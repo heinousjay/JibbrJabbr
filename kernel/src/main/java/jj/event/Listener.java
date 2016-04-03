@@ -35,7 +35,8 @@ import java.lang.annotation.Target;
  * Events can be any type, or any interface, with the exception of
  * {@link Object}. Event delivery respects the class hierarchy, so
  * subscribing to a base event will get delivery for all sub types.
- * Due to type erasure, parameterized classes do not work.
+ * Due to type erasure, parameterized classes do not work, as it is not
+ * possible to get the type parameters from the event at runtime.
  * 
  * <p>
  * No serious processing should be done in event listeners since you have no control over

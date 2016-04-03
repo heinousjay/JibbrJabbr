@@ -30,7 +30,12 @@ package jj.event;
  *
  */
 public interface Publisher {
-	
+
+	/**
+	 * Invokes listeners interested in the event type being published
+	 * @param event The event to publish. Must not be null, must not be
+	 *              of type Object
+	 */
 	void publish(Object event);
 
 }

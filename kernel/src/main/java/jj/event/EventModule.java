@@ -19,32 +19,32 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.AbstractMatcher;
 
 import jj.JJModule;
-import jj.execution.TaskRunner;
 
 /**
  * @author jason
  *
  */
 public class EventModule extends JJModule {
-	
+
 	private static class SubscriberMatcher extends AbstractMatcher<TypeLiteral<?>> {
 
 		@Override
 		public boolean matches(TypeLiteral<?> t) {
-			Class<?> c = t.getRawType();
-			boolean result = c.isAnnotationPresent(Subscriber.class) ||
-				TaskRunner.class.isAssignableFrom(c) ||
-				Publisher.class.isAssignableFrom(c);
-			
-			return result;
+			return t.getRawType().isAnnotationPresent(Subscriber.class);
 		}
 	}
 	
 	@Override
 	protected void configure() {
-		
-		bindListener(new SubscriberMatcher(), new EventConfiguringTypeListener());
+
+		// since the EventListenerBinder cannot be injected, we create the
+		// state here and bind it as an instance.
+		EventSystemState state = new EventSystemState();
+		bind(EventSystemState.class).toInstance(state);
+		bindListener(new SubscriberMatcher(), new EventListenerBinder(state));
+
 		bind(Publisher.class).to(PublisherImpl.class);
+		bind(ListenerReferenceCleaner.class).asEagerSingleton();
 	}
 
 }

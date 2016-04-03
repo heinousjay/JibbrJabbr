@@ -15,49 +15,71 @@
  */
 package jj.event;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.lang.invoke.MethodHandle;
 
 /**
- * Inject the Publisher to publish events.
+ * Inject the {@link Publisher} to publish events.
  * 
  * @author jason
  *
  */
 @Singleton
 class PublisherImpl implements Publisher {
-	
-	private Map<Class<?>, ConcurrentLinkedQueue<Invoker>> listenerMap;
-	
-	@Inject
-	PublisherImpl() {}
-	
-	void listenerMap(Map<Class<?>, ConcurrentLinkedQueue<Invoker>> listenerMap) {
-		this.listenerMap = listenerMap;
-	}
-	
-	private void invoke(final Object event, final Class<?> clazz) {
-		if (clazz != null && clazz != Object.class) {
-			if (listenerMap.containsKey(clazz)) {
-				for (Invoker invoker : listenerMap.get(clazz)) {
-					try {
-						invoker.invoke(event);
-					} catch (Exception e) {
-						throw new AssertionError("broken event listener! " + invoker.target(), e);
-					}
-				}
-			}
-			for (Class<?> iface : clazz.getInterfaces()) {
-				invoke(event, iface);
-			}
-			invoke(event, clazz.getSuperclass());
+
+	private static class BadEventListenerError extends AssertionError {
+		BadEventListenerError(MethodHandle badHandle, Throwable cause) {
+			super(
+				"broken event listener in " +
+					badHandle.type().parameterType(0).getName() +
+					" receiving " +
+					badHandle.type().parameterType(1).getName(),
+				cause
+			);
 		}
 	}
-	
+
+	private final EventSystemState state;
+
+	@Inject
+	PublisherImpl(EventSystemState state) {
+		this.state = state;
+	}
+
+	private void invoke(final Object event, final Class<?> eventType) {
+
+		if (eventType != null && eventType != Object.class) {
+
+			state.handleByReceiverTypesFor(eventType).forEach(
+				(receiverType, handle) ->
+					state.instancesFor(receiverType).forEach(
+						ref -> {
+							Object instance = ref.get();
+							if (instance != null) {
+								try {
+									handle.invoke(instance, event);
+								} catch (Throwable cause) {
+									throw new BadEventListenerError(handle, cause);
+								}
+							}
+						}
+					)
+			);
+
+			// recurse up the class hierarchy of the event to get wider listeners
+			for (Class<?> iface : eventType.getInterfaces()) {
+				invoke(event, iface);
+			}
+			invoke(event, eventType.getSuperclass());
+		}
+
+	}
+
 	@Override
 	public void publish(final Object event) {
+		assert event != null : "Can't publish nothing!";
+		assert event.getClass() != Object.class : "Can't publish an Object!";
 		invoke(event, event.getClass());
 	}
 }

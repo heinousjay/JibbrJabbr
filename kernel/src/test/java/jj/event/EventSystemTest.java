@@ -20,15 +20,11 @@ import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.inject.Singleton;
 
 import jj.event.help.BrokenListener;
 import jj.event.help.ChildSub;
@@ -46,6 +42,7 @@ import jj.util.RandomHelper;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -67,23 +64,11 @@ import com.google.inject.spi.Message;
 @RunWith(MockitoJUnitRunner.class)
 public class EventSystemTest {
 	
-	@Singleton
-	public static class PublisherChild extends PublisherImpl {
-		
-		
-		Map<Class<?>, ConcurrentLinkedQueue<Invoker>> listenerMap;
-		
-		
-		@Override
-		void listenerMap(Map<Class<?>, ConcurrentLinkedQueue<Invoker>> listenerMap) {
-			this.listenerMap = listenerMap;
-			super.listenerMap(listenerMap);
-		}
-	}
-	
 	private Injector injector;
 	
-	private PublisherChild pub;
+	private Publisher pub;
+
+	private EventSystemState state;
 	
 	private Thread publisherLoop;
 	
@@ -100,8 +85,10 @@ public class EventSystemTest {
 
 		MockTaskRunner taskRunner = injector.getInstance(MockTaskRunner.class);
 		
-		pub = injector.getInstance(PublisherChild.class);
-		
+		pub = injector.getInstance(Publisher.class);
+
+		state = injector.getInstance(EventSystemState.class);
+
 		publisherLoop = taskRunner.runFirstTaskInDaemon();
 	}
 	
@@ -133,7 +120,7 @@ public class EventSystemTest {
 			pub.publish(new Event());
 			worked = true;
 		} catch (AssertionError ae) {
-			assertThat(ae.getMessage(), is("broken event listener! jj.event.help.BrokenListener.on(jj.event.help.Event)"));
+			assertThat(ae.getMessage(), is("broken event listener in jj.event.help.BrokenListener receiving jj.event.help.Event"));
 		}
 		
 		assertFalse(worked);
@@ -142,7 +129,7 @@ public class EventSystemTest {
 	@Test
 	public void testCorrectOperation() throws Exception {
 		
-		PublisherChild pub = impl();
+		Publisher pub = impl();
 		
 		System.gc();
 		
@@ -151,17 +138,16 @@ public class EventSystemTest {
 		// verify the listeners are all unregistered so
 		// we aren't leaking memory, but we should still have
 		// sets for the event types
-		assertThat(pub.listenerMap.size(), is(4));
-		assertTrue("should have no IEvent listeners", pub.listenerMap.get(IEvent.class).isEmpty());
-		assertTrue("should have no Event listeners", pub.listenerMap.get(Event.class).isEmpty());
-		assertTrue("should have no EventSub listeners", pub.listenerMap.get(EventSub.class).isEmpty());
-		assertTrue("should have no UnrelatedIEvent listeners", pub.listenerMap.get(UnrelatedIEvent.class).isEmpty());
+		assertThat("should have no IEvent listeners", state.listenerCountFor(IEvent.class), is(0));
+		assertThat("should have no Event listeners", state.listenerCountFor(Event.class), is(0));
+		assertThat("should have no EventSub listeners", state.listenerCountFor(EventSub.class), is(0));
+		assertThat("should have no UnrelatedIEvent listeners", state.listenerCountFor(UnrelatedIEvent.class), is(0));
 		
 		// and publishing should not cause any exceptions at this point
 		pub.publish(new EventSub());
 	}
 	
-	private PublisherChild impl() {
+	private Publisher impl() {
 		// publishing with nothing listening is fine
 		pub.publish(new EventSub());
 		
@@ -210,14 +196,11 @@ public class EventSystemTest {
 		
 		// we should have four listeners registered at this point,
 		// and after they go out of scope we should have none
-		assertThat(pub.listenerMap.size(), is(4));
-		assertThat(pub.listenerMap.get(IEvent.class).size(), is(3));
-		assertThat(pub.listenerMap.get(Event.class).size(), is(1));
-		assertThat(pub.listenerMap.get(EventSub.class).size(), is(1));
-		assertThat(pub.listenerMap.get(UnrelatedIEvent.class).size(), is(1));
-		
-		// and one little validation of the target method
-		assertThat(pub.listenerMap.get(IEvent.class).peek().target(), is("jj.event.help.Sub.on(jj.event.help.IEvent)"));
+		assertThat(state.totalListeners(), is(4));
+		assertThat(state.listenerCountFor(IEvent.class), is(3));
+		assertThat(state.listenerCountFor(Event.class), is(1));
+		assertThat(state.listenerCountFor(EventSub.class), is(1));
+		assertThat(state.listenerCountFor(UnrelatedIEvent.class), is(1));
 		
 		return pub;
 	}
@@ -319,6 +302,76 @@ public class EventSystemTest {
 			executor.shutdownNow();
 		}
 	}
-	
-	
+
+	@Ignore
+	@Test
+	public void stressItOut() {
+
+		Sub sub = injector.getInstance(Sub.class);
+		ConcreteListener cl = injector.getInstance(ConcreteListener.class);
+		ConcurrentSub csub = injector.getInstance(ConcurrentSub.class);
+		ChildSub childSub = injector.createChildInjector(new AbstractModule() {
+
+			@Override
+			protected void configure() {
+				bind(ChildSub.class);
+			}
+		}).getInstance(ChildSub.class);
+
+		long now = System.currentTimeMillis();
+		for (int i = 0; i < 100000; ++i) {
+			pub.publish(new EventSub());
+			pub.publish(new Event());
+			pub.publish(new UnrelatedIEvent());
+		}
+		System.out.println(System.currentTimeMillis() - now + " ms");
+
+		now = System.currentTimeMillis();
+		for (int i = 0; i < 100000; ++i) {
+			pub.publish(new EventSub());
+			pub.publish(new Event());
+			pub.publish(new UnrelatedIEvent());
+		}
+		System.out.println(System.currentTimeMillis() - now + " ms");
+
+		now = System.currentTimeMillis();
+		for (int i = 0; i < 100000; ++i) {
+			pub.publish(new EventSub());
+			pub.publish(new Event());
+			pub.publish(new UnrelatedIEvent());
+		}
+		System.out.println(System.currentTimeMillis() - now + " ms");
+
+		now = System.currentTimeMillis();
+		for (int i = 0; i < 100000; ++i) {
+			pub.publish(new EventSub());
+			pub.publish(new Event());
+			pub.publish(new UnrelatedIEvent());
+		}
+		System.out.println(System.currentTimeMillis() - now + " ms");
+
+		now = System.currentTimeMillis();
+		for (int i = 0; i < 100000; ++i) {
+			pub.publish(new EventSub());
+			pub.publish(new Event());
+			pub.publish(new UnrelatedIEvent());
+		}
+		System.out.println(System.currentTimeMillis() - now + " ms");
+
+		now = System.currentTimeMillis();
+		for (int i = 0; i < 100000; ++i) {
+			pub.publish(new EventSub());
+			pub.publish(new Event());
+			pub.publish(new UnrelatedIEvent());
+		}
+		System.out.println(System.currentTimeMillis() - now + " ms");
+
+		now = System.currentTimeMillis();
+		for (int i = 0; i < 100000; ++i) {
+			pub.publish(new EventSub());
+			pub.publish(new Event());
+			pub.publish(new UnrelatedIEvent());
+		}
+		System.out.println(System.currentTimeMillis() - now + " ms");
+	}
 }

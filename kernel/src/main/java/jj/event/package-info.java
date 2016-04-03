@@ -19,10 +19,10 @@
  * 
  * <p>
  * Subscribing to events works as part of the injection process, so only objects created
- * by Guice can participate. First, annotate the class with {@link Subscriber}, then
+ * by Guice can participate. First, annotate the class with {@link jj.event.Subscriber}, then
  * declare an instance method with any name, of any access except private, returning
  * nothing or anything at all (the value is ignored) and that takes a single parameter of
- * the event type you wish to receive.  Annotate this method with {@link Listener}.
+ * the event type you wish to receive.  Annotate this method with {@link jj.event.Listener}.
  * Congratulations! Instances of this class will now receive these events.  You can, of
  * course, declare as many listeners as you wish.
  * 
@@ -31,11 +31,12 @@
  * to see if you care.
  * 
  * <p>
- * You can inject {@link Publisher} to publish events to all registered listeners.
+ * You can inject {@link jj.event.Publisher} to publish events to all registered listeners.
  * 
  * <p>
  * Listeners cannot be unregistered, so instances will receive events
- * across their entire lifetimes.
+ * across their entire lifetimes. The instances are held in WeakReferences to allow
+ * normal GC to work
  * 
  * <p>
  * No serious processing should be done in event listeners since you have no control over
